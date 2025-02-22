@@ -2,5 +2,5 @@
 
 int main()
 {
-  std::cout << "tkach.danil/n";
+  std::cout << "tkach.danil\n";
 }
