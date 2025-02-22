@@ -2,5 +2,5 @@
 
 int main()
 {
-  std::cout << "pilugina.margarita" << '\n';
+  std::cout << "pilugina.margarita \n";
 }
