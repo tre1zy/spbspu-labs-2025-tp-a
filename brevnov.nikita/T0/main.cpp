@@ -1,5 +1,7 @@
+#include <iostream>
+
 int main()
 {
-  std::cerr << "brevnov.nikita\n";
+  std::cout << "brevnov.nikita\n";
   return 0;
 }
