@@ -1,3 +1,5 @@
+#ifndef DATA_STRUCT_HPP
+#define DATA_STRUCT_HPP
 #include <string>
 
 namespace demehin
@@ -17,27 +19,27 @@ namespace demehin
     struct DoubleIO
     {
       double& ref;
-    }
+    };
 
     struct LlIO
     {
       long long& ref;
-    }
+    };
 
     struct DelimiterIO
     {
       char exp;
-    }
+    };
 
     struct LabelIO
     {
       std::string exp;
-    }
+    };
 
     struct StringIO
     {
       std::string& ref;
-    }
+    };
 
     std::istream& operator>>(std::istream& in, DoubleIO&& dest);
     std::istream& operator>>(std::istream& in, LlIO&& dest);
@@ -47,3 +49,5 @@ namespace demehin
 
   }
 }
+
+#endif
