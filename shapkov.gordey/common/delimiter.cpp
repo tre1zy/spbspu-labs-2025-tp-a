@@ -1,4 +1,4 @@
-#include "delimeter.hpp"
+#include "delimiter.hpp"
 
 std::istream& shapkov::operator>>(std::istream& in, delimiterIO&& dest)
 {
