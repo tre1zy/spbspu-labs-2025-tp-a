@@ -31,9 +31,9 @@ namespace demehin
       char exp;
     };
 
-    struct LabelIO
+    struct KeyNumIO
     {
-      std::string exp;
+      int ref;
     };
 
     struct StringIO
@@ -45,7 +45,7 @@ namespace demehin
     std::istream& operator>>(std::istream& in, LlIO&& dest);
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
     std::istream& operator>>(std::istream& in, StringIO&& dest);
-    std::istream& operator>>(std::istream& in, LabelIO&& dest);
+    std::istream& operator>>(std::istream& in, KeyNumIO& dest);
 
   }
 }

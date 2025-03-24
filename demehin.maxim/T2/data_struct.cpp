@@ -56,7 +56,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, StringIO&& dest)
   return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
 
-std::istream& demehin::ioStructs::operator>>(std::istream& in, LabelIO&& dest)
+std::istream& demehin::ioStructs::operator>>(std::istream& in, KeyNumIO& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -65,10 +65,12 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, LabelIO&& dest)
   }
   std::string label = "";
   in >> label;
-  if (label != dest.exp)
+  std::cout << label << "\n";
+  if (label.substr(0, 3) != "key")
   {
     in.setstate(std::ios::failbit);
   }
+  dest.ref = label.back();
   return in;
 }
 
@@ -82,17 +84,37 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
   DataStruct input;
   {
     using sep = DelimiterIO;
-    using label = LabelIO;
+    using keyNum = KeyNumIO;
     using dbl = DoubleIO;
     using ll = LlIO;
     using str = StringIO;
-    in >> sep{ '(' } >> sep{ ':' };
+    /*in >> sep{ '(' } >> sep{ ':' };
     in >> label{ "key1" } >> dbl{ input.key1 };
     in >> sep{ ':' };
     in >> label{ "key2" } >> ll{ input.key2 };
     in >> sep{ ':' };
     in >> label{ "key3" } >> str{ input.key3 };
-    in >> sep{ ':' } >> sep{ ')' };
+    in >> sep{ ':' } >> sep{ ')' };*/
+    in >> sep{ '(' } >> sep{ ':' };
+    for (size_t i = 0; i < 3; i++)
+    {
+      keyNum key_num{ 0 };
+      in >> key_num;
+      if (key_num.ref == '1')
+      {
+        in >> dbl{ input.key1 };
+      }
+      else if (key_num.ref == '2')
+      {
+        in >> ll{ input.key2 };
+      }
+      else if (key_num.ref == '3')
+      {
+        in >> str{ input.key3 };
+      }
+      in >> sep{ ':' };
+    }
+    in >> sep { ')' };
   }
   if (in)
   {

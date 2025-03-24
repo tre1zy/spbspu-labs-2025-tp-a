@@ -8,10 +8,9 @@
 int main()
 {
   std::vector< demehin::DataStruct > data;
-  std::istringstream iss("(:key1 5.45e-2:key2 10ll:key3 \"Data\":)");
   std::copy
   (
-    std::istream_iterator< demehin::DataStruct >(iss),
+    std::istream_iterator< demehin::DataStruct >(std::cin),
     std::istream_iterator< demehin::DataStruct >(),
     std::back_inserter(data)
   );
@@ -22,4 +21,5 @@ int main()
     std::ostream_iterator< demehin::DataStruct >(std::cout, "\n")
   );
 }
+
 
