@@ -1,6 +1,6 @@
 #include "delimeter.hpp"
 
-std::istream& shapkov::operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream& shapkov::operator>>(std::istream& in, delimiterIO&& dest)
 {
   std::istream::sentry s(in);
   if (!s)
