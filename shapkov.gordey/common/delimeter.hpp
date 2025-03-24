@@ -1,5 +1,5 @@
-#ifndef DELIMETER_H
-#define DELIMETER_H
+#ifndef DELIMETER_HPP
+#define DELIMETER_HPP
 #include <iostream>
 
 namespace shapkov

@@ -1,9 +1,9 @@
-#include "delimeter.h"
+#include "delimeter.hpp"
 
 std::istream& shapkov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
+  std::istream::sentry s(in);
+  if (!s)
   {
     return in;
   }

@@ -1,5 +1,5 @@
-#ifndef SCOPE_GUARD
-#define SCOPE_GUARD
+#ifndef SCOPE_GUARD_HPP
+#define SCOPE_GUARD_HPP
 #include <iostream>
 
 namespace shapkov
