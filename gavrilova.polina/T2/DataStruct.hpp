@@ -2,11 +2,13 @@
 #define DATA_STRUCT_HPP
 
 #include <string>
+#include <iostream>
+#include <sstream>
 
 namespace gavrilova
 {
 
-  struct Data
+  struct DataStruct
   {
     double key1;
     long long key2;
@@ -25,7 +27,7 @@ namespace gavrilova
 
   struct LongLongIO
   {
-    double& ref;
+    long long& ref;
   };
 
   struct StringIO
@@ -43,8 +45,8 @@ namespace gavrilova
   std::istream& operator>>(std::istream& in, LongLongIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, LabelIO&& dest);
-  std::istream& operator>>(std::istream& in, Data& dest);
-  std::ostream& operator<<(std::ostream& out, const Data& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 }
 
 #endif
