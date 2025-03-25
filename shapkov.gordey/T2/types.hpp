@@ -1,6 +1,7 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 #include <iostream>
+#include <string>
 
 namespace shapkov
 {
@@ -14,10 +15,10 @@ namespace shapkov
   };
   struct stringIO
   {
-    std::string& key;
+    std::string key;
   };
   std::istream& operator>>(std::istream& in, doubleScientificIO& rhs);
   std::istream& operator>>(std::istream& in, ratioIO& rhs);
-  //std::istream& operator>>(std::istream& in, stringIO&& rhs);
+  std::istream& operator>>(std::istream& in, stringIO& rhs);
 }
 #endif

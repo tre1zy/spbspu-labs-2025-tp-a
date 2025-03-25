@@ -1,10 +1,11 @@
 #include "types.hpp"
 #include <delimiter.hpp>
 
+using check = shapkov::delimiterIO;
 std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO& rhs)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
+  std::istream::sentry s(in);
+  if (!s)
   {
     return in;
   }
@@ -13,9 +14,8 @@ std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO& rhs)
 
 std::istream& shapkov::operator>>(std::istream& in, ratioIO& rhs)
 {
-  using check = shapkov::delimiterIO;
-  std::istream::sentry sentry(in);
-  if (!sentry)
+  std::istream::sentry s(in);
+  if (!s)
   {
     return in;
   }
@@ -31,4 +31,14 @@ std::istream& shapkov::operator>>(std::istream& in, ratioIO& rhs)
     rhs.key = { llTemp, ullTemp };
   }
   return in;
+}
+
+std::istream& shapkov::operator>>(std::istream& in, stringIO& rhs)
+{
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
+  return std::getline(in >> check{ '"' }, rhs.key, '"');
 }
