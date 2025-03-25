@@ -2,6 +2,7 @@
 #include <cctype>
 #include <cmath>
 #include <sstream>
+#include <iomanip>
 #include "scope_guard.hpp"
 
 namespace
@@ -115,6 +116,41 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
+std::ostream& demehin::ioStructs::operator<<(std::ostream& out, DoubleSciO&& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+
+  double val = dest.ref;
+  bool is_negative = val < 0;
+  val = std::abs(val);
+  int exp = (val == 0.0) ? 0 : std::floor(std::log10(val));
+  double mant = val / std::pow(10, exp);
+
+  if (mant >= 10.0)
+  {
+    mant /= 10.0;
+    exp++;
+  }
+  else if (mant < 1.0)
+  {
+    mant *= 10.0;
+    exp--;
+  }
+
+  if (is_negative)
+  {
+    out << '-';
+  }
+
+  out << std::fixed << std::setprecision(1) << mant;
+  out << 'e' << (exp >= 0 ? '+' : '-') << std::abs(exp);
+  return out;
+}
+
 std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
@@ -123,10 +159,10 @@ std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
     return out;
   }
   iofmtguard fmtguard(out);
-
+  double dblval = src.key2;
   out << std::scientific;
-  out << "(:key1 " << src.key1;
-  out << ":key2 " << src.key2 << "ll";
+  out << "(:key1 " << src.key1 << "ll";
+  out << ":key2 " << DoubleSciO{dblval};
   out << ":key3 \"" << src.key3 << "\":)";
   return out;
 }

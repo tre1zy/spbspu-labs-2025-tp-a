@@ -41,12 +41,17 @@ namespace demehin
       std::string& ref;
     };
 
+    struct DoubleSciO
+    {
+      double& ref;
+    };
+
     std::istream& operator>>(std::istream& in, DoubleIO&& dest);
     std::istream& operator>>(std::istream& in, LlIO&& dest);
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
     std::istream& operator>>(std::istream& in, StringIO&& dest);
     std::istream& operator>>(std::istream& in, KeyNumIO& dest);
-
+    std::ostream& operator<<(std::ostream& in, DoubleSciO&& dest);
   }
 }
 
