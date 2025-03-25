@@ -1,4 +1,5 @@
 #include "data.h"
+#include <cmath>
 #include <iomanip>
 #include <algorithm>
 #include "iofmtguard.h"
@@ -168,15 +169,15 @@ std::ostream& ohantsev::operator<<(std::ostream& out, DoubleO&& dest)
   while (mant < 1)
   {
     mant *= 10;
-    order++;
+    order--;
   }
   while (mant >= 10)
   {
     mant /= 10;
-    order--;
+    order++;
   }
   mant = std::round(mant * 10) / 10.0;
-  out << mant;
+  out << std::fixed << std::setprecision(1) << mant;
   out << 'e' << ((order < 0) ? '-' : '+') << std::abs(order);
   return out;
 }
