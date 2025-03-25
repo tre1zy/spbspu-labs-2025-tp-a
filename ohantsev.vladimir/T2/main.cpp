@@ -38,7 +38,6 @@ int main()
       return a.key3.size() < b.key3.size();
     }
   );
-  std::cout << "Data:\n";
   std::copy(
     std::begin(data),
     std::end(data),
