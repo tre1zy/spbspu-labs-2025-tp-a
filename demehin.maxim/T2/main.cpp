@@ -4,16 +4,25 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <limits>
 
 int main()
 {
   std::vector< demehin::DataStruct > data;
-  std::copy
-  (
-    std::istream_iterator< demehin::DataStruct >(std::cin),
-    std::istream_iterator< demehin::DataStruct >(),
-    std::back_inserter(data)
-  );
+  while (!std::cin.eof())
+  {
+    std::copy
+    (
+      std::istream_iterator< demehin::DataStruct >(std::cin),
+      std::istream_iterator< demehin::DataStruct >(),
+      std::back_inserter(data)
+    );
+    if (!std::cin)
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
   std::copy
   (
     std::begin(data),
