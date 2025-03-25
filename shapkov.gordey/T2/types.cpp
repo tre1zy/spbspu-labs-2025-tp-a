@@ -2,7 +2,7 @@
 #include <delimiter.hpp>
 
 using check = shapkov::delimiterIO;
-std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO& rhs)
+std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -12,7 +12,7 @@ std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO& rhs)
   return in >> rhs.key;
 }
 
-std::istream& shapkov::operator>>(std::istream& in, ratioIO& rhs)
+std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -25,6 +25,11 @@ std::istream& shapkov::operator>>(std::istream& in, ratioIO& rhs)
   in >> llTemp;
   in >> check{ ':' } >> check{ 'D' };
   in >> ullTemp;
+  long long signCheck = ullTemp;
+  if (signCheck < 0)
+  {
+    in.setstate(std::ios::failbit);
+  }
   in >> check{ ':' } >> check{ ')' };
   if (in)
   {
@@ -33,7 +38,7 @@ std::istream& shapkov::operator>>(std::istream& in, ratioIO& rhs)
   return in;
 }
 
-std::istream& shapkov::operator>>(std::istream& in, stringIO& rhs)
+std::istream& shapkov::operator>>(std::istream& in, stringIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -41,4 +46,19 @@ std::istream& shapkov::operator>>(std::istream& in, stringIO& rhs)
     return in;
   }
   return std::getline(in >> check{ '"' }, rhs.key, '"');
+}
+
+std::istream& shapkov::operator>>(std::istream& in, labelIO&& rhs)
+{
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
+  std::string data = "";
+  if (std::getline(in, data) && (data != rhs.exp))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
