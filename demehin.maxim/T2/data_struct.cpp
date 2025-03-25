@@ -65,7 +65,6 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, KeyNumIO& dest)
   }
   std::string label = "";
   in >> label;
-  std::cout << label << "\n";
   if (label.substr(0, 3) != "key")
   {
     in.setstate(std::ios::failbit);
@@ -88,17 +87,18 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
     using dbl = DoubleIO;
     using ll = LlIO;
     using str = StringIO;
+    in >> sep{ '(' } >> sep{ ':' };
     for (size_t i = 0; i < 3; i++)
     {
       keyNum key_num{ 0 };
       in >> key_num;
       if (key_num.ref == '1')
       {
-        in >> dbl{ input.key1 };
+        in >> ll{ input.key1 };
       }
       else if (key_num.ref == '2')
       {
-        in >> ll{ input.key2 };
+        in >> dbl{ input.key2 };
       }
       else if (key_num.ref == '3')
       {

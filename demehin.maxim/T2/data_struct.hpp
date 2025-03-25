@@ -6,8 +6,8 @@ namespace demehin
 {
   struct DataStruct
   {
-    double key1;
-    long long key2;
+    long long key1;
+    double key2;
     std::string key3;
   };
 
