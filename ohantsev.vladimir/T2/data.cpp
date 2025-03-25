@@ -44,7 +44,7 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   return in;
 }
 
-std::istream& ohantsev::operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& ohantsev::operator>>(std::istream& in, DoubleI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -73,7 +73,7 @@ std::istream& ohantsev::operator>>(std::istream& in, DoubleIO&& dest)
   return in;
 }
 
-std::istream& ohantsev::operator>>(std::istream& in, UllIO&& dest)
+std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -84,7 +84,7 @@ std::istream& ohantsev::operator>>(std::istream& in, UllIO&& dest)
   return in;
 }
 
-std::istream& ohantsev::operator>>(std::istream& in, StringIO&& dest)
+std::istream& ohantsev::operator>>(std::istream& in, StringI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -132,13 +132,13 @@ std::istream& ohantsev::operator>>(std::istream& in, KeyIO&& dest)
   switch (ID)
   {
   case 1:
-    in >> DoubleIO{ dest.data.key1 };
+    in >> DoubleI{ dest.data.key1 };
     break;
   case 2:
-    in >> UllIO{ dest.data.key2 };
+    in >> UllI{ dest.data.key2 };
     break;
   case 3:
-    in >> StringIO{ dest.data.key3 };
+    in >> StringI{ dest.data.key3 };
     break;
   }
   return in;
@@ -160,6 +160,36 @@ std::istream& ohantsev::operator>>(std::istream& in, Data& dest)
   in >> MultDelimiterIO{ ")" };
   return in;
 }
+
+std::ostream& ohantsev::operator<<(std::ostream& out, DoubleO&& dest)
+{
+  double mant = dest.ref;
+  int order = 0;
+  while (mant < 1)
+  {
+    mant *= 10;
+    order++;
+  }
+  while (mant > 10)
+  {
+    mant /= 10;
+    order--;
+  }
+  out << static_cast<int>(mant) << '.' << static_cast<int>(mant * 10) % 10;
+  out << 'e' << ((order < 0) ? '-' : '+') << std::abs(order);
+  return out;
+}
+
+std::ostream& ohantsev::operator<<(std::ostream& out, UllO&& dest)
+{
+  return (out << dest.ref << "ull");
+}
+
+std::ostream& ohantsev::operator<<(std::ostream& out, StringO&& dest)
+{
+  return (out << '"' << dest.ref << '"');
+}
+
 std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
 {
   std::ostream::sentry sentry(out);
@@ -168,9 +198,8 @@ std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
     return out;
   }
   iofmtguard fmtguard(out);
-  out << std::fixed << std::setprecision(1) << std::scientific;
-  out << "(:key1 " << dest.key1 << ':';
-  out << "key2 " << dest.key2 << "ull:";
-  out << "key3 " << '"' << dest.key3 << '"' << ":)";
+  out << "(:key1 " << DoubleO{ dest.key1 } << ':';
+  out << "key2 " << UllO{ dest.key2 } << ':';
+  out << "key3 " << StringO{ dest.key3 } << ":)";
   return out;
 }

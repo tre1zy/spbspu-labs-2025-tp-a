@@ -23,19 +23,34 @@ namespace ohantsev
     std::string exp;
   };
 
-  struct DoubleIO
+  struct DoubleI
   {
     double& ref;
   };
 
-  struct UllIO
+  struct DoubleO
+  {
+    const double& ref;
+  };
+
+  struct UllI
   {
     unsigned long long& ref;
   };
 
-  struct StringIO
+  struct UllO
+  {
+    const unsigned long long& ref;
+  };
+
+  struct StringI
   {
     std::string& ref;
+  };
+
+  struct StringO
+  {
+    const std::string& ref;
   };
 
   struct LabelIO
@@ -57,13 +72,16 @@ namespace ohantsev
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, MultDelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
-  std::istream& operator>>(std::istream& in, UllIO&& dest);
-  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, DoubleI&& dest);
+  std::istream& operator>>(std::istream& in, UllI&& dest);
+  std::istream& operator>>(std::istream& in, StringI&& dest);
   std::istream& operator>>(std::istream& in, LabelIO&& dest);
   std::istream& operator>>(std::istream& in, TypenameIO&& dest);
   std::istream& operator>>(std::istream& in, Data& dest);
   std::istream& operator>>(std::istream& in, KeyIO&& dest);
+  std::ostream& operator<<(std::ostream& out, DoubleO&& dest);
+  std::ostream& operator<<(std::ostream& out, UllO&& dest);
+  std::ostream& operator<<(std::ostream& out, StringO&& dest);
   std::ostream& operator<<(std::ostream& out, const Data& dest);
 }
 #endif
