@@ -1,5 +1,6 @@
 #include "DataStruct.hpp"
 #include <iomanip>
+#include <cmath>
 #include "IOStreamGuard.hpp"
 
 namespace gavrilova {
@@ -154,7 +155,9 @@ namespace gavrilova {
           return out;
       }
       IOStreamGuard fmtguard(out);
-      out << "(:key1 " << src.key1 << "d:key2 " << src.key2 << "ll:" << "key3 \"" << src.key3 << "\":)";
+      out << "(:key1 " << src.key1;
+      out << ((std::fmod(src.key1, 1.0) == 0) ? ".0d" : "d"); 
+      out << ":key2 " << src.key2 << "ll:" << "key3 \"" << src.key3 << "\":)";
       return out;
   }
 
