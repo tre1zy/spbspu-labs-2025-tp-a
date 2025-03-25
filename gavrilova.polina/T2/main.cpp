@@ -12,7 +12,8 @@ int main()
   std::vector< DataStruct > data;
 
   DataStruct new_struct;
-  while (std::cin >> new_struct && !std::cin.eof()) {
+  while (!std::cin.eof()) {
+    std::cin >> new_struct;
     if (!std::cin) {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
