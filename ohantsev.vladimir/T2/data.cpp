@@ -168,14 +168,15 @@ std::ostream& ohantsev::operator<<(std::ostream& out, DoubleO&& dest)
   while (mant < 1)
   {
     mant *= 10;
-    order--;
-  }
-  while (mant > 10)
-  {
-    mant /= 10;
     order++;
   }
-  out << static_cast<int>(mant) << '.' << static_cast<int>(mant * 10) % 10;
+  while (mant >= 10)
+  {
+    mant /= 10;
+    order--;
+  }
+  mant = std::round(mant * 10) / 10.0;
+  out << mant;
   out << 'e' << ((order < 0) ? '-' : '+') << std::abs(order);
   return out;
 }
