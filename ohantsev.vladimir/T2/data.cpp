@@ -51,7 +51,26 @@ std::istream& ohantsev::operator>>(std::istream& in, DoubleIO&& dest)
   {
     return in;
   }
-  return in >> dest.ref >> DelimiterIO{ ':' };
+  std::string numberStr;
+  char current;
+  bool hasExponent = false;
+  while (in.get(current) && current != ':') {
+    if (current == 'e' || current == 'E') {
+      hasExponent = true;
+    }
+    numberStr += current;
+  }
+  if (!hasExponent) {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  try {
+    dest.ref = std::stod(numberStr);
+  }
+  catch (...) {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
 
 std::istream& ohantsev::operator>>(std::istream& in, UllIO&& dest)
