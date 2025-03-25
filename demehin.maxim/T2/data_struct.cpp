@@ -160,7 +160,6 @@ std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
   }
   iofmtguard fmtguard(out);
   double dblval = src.key2;
-  out << std::scientific;
   out << "(:key1 " << src.key1 << "ll";
   out << ":key2 " << DoubleSciO{dblval};
   out << ":key3 \"" << src.key3 << "\":)";
