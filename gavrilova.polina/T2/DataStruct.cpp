@@ -12,15 +12,8 @@ namespace gavrilova {
     char c;
     in >> c;
     if (in && c != dest.exp) {
-        in.setstate(std::ios::failbit);
+      in.setstate(std::ios::failbit);
     }
-    // if (!in) {
-    //   std::cout << "Fail in delimetr";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in delimetr";
-    // }
     return in;
   }
 
@@ -32,15 +25,8 @@ namespace gavrilova {
     char c;
     in >> c;
     if (in && (std::tolower(c) != std::tolower(dest.exp))) {
-        in.setstate(std::ios::failbit);
+      in.setstate(std::ios::failbit);
     }
-    // if (!in) {
-    //   std::cout << "Fail in symbol";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in symbol";
-    // }
     return in;
   }
 
@@ -49,16 +35,7 @@ namespace gavrilova {
     if (!sentry) {
       return in;
     }
-    
     in >> dest.ref >> SymbolIO{'d'};
-
-    // if (!in) {
-    //   std::cout << "Fail in double";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in double";
-    // }
     return in;
   }
 
@@ -68,13 +45,6 @@ namespace gavrilova {
       return in;
     }
     in >> dest.ref >> SymbolIO{'l'} >> SymbolIO{'l'};
-    // if (!in) {
-    //   std::cout << "Fail in long";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in long";
-    // }
     return in;
   }
 
@@ -84,13 +54,6 @@ namespace gavrilova {
       return in;
     }
     std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
-    // if (!in) {
-    //   std::cout << "Fail in striing";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in string";
-    // }
     return in;
   }
 
@@ -100,33 +63,22 @@ namespace gavrilova {
       return in;
     }
     std::getline(in, dest.ref, ' ');
-    // if (!in) {
-    //   std::cout << "Fail in striing";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in string";
-    // }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, LabelIO&& dest) {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
+  std::istream& input_value(std::istream& in, int ids[3], int id, DataStruct& dest) {
+    if (!in) {
       return in;
     }
-    std::string data;
-    if ((in >> StringI_with_spaceIO{ data }) && (data != dest.exp)) {
+    if (ids[id] == 0) {
+      in >> DoubleIO{ dest.key1 };
+    } else if (ids[id] == 1) {
+      in >> LongLongIO{ dest.key2 };
+    } else if (ids[id] == 2) {
+      in >> String_with_quotsIO{ dest.key3 };
+    } else {
       in.setstate(std::ios::failbit);
     }
-    // std::cout << "\n" << data << " " << "dest.exp";
-    // if (!in) {
-    //   std::cout << "Fail in lable";
-    // }
-    // else
-    // {
-    //   std::cout << "Good in lable";
-    // }
     return in;
   }
 
@@ -139,18 +91,53 @@ namespace gavrilova {
     DataStruct input;
     {
       using sep = DelimiterIO;
-      using label = LabelIO;
-      using ll = LongLongIO;
-      using dbl = DoubleIO;
-      using str = String_with_quotsIO;
+
+      int ids[] = {0, 1, 2};
 
       in >> sep{ '('};
       in >> sep{ ':' };
-      in >> label{ "key1" } >> dbl{ input.key1 };
+      {
+        std::string key = "beleberda";
+        in >> key;
+        if (key == "key2") {
+          std::swap(ids[0], ids[1]);
+        } else if (key == "key3") {
+          std::swap(ids[0], ids[2]);
+        } else if (key != "key1") {
+          in.setstate(std::ios::failbit);
+        }
+
+        input_value(in, ids, ids[0], input);
+      }
+
       in >> sep{ ':' };
-      in >> label{ "key2" } >> ll{ input.key2 };
+      {
+        std::string key = "beleberda";
+        in >> key;
+        if ((key == "key2" && ids[0] == 1) ||
+            (key == "key3" && ids[0] == 2) ||
+            (key == "key1" && ids[0] == 0)) {
+          in.setstate(std::ios::failbit);
+        } else if (key == "key1" || key == "key3") {
+          std::swap(ids[1], ids[2]);
+        } else if (key != "key2") {
+          in.setstate(std::ios::failbit);
+        }
+        input_value(in, ids, ids[1], input);
+      }
       in >> sep{ ':' };
-      in >> label{ "key3" } >> str{ input.key3 };
+      {
+        std::string key = "beleberda";
+        in >> key;
+        if ((key == "key2" && ids[2] != 1) ||
+            (key == "key3" && ids[2] != 2) ||
+            (key == "key1" && ids[2] != 0)) {
+          in.setstate(std::ios::failbit);
+        } else if (key != "key1" && key != "key3" && key != "key2") {
+          in.setstate(std::ios::failbit);
+        }
+        input_value(in, ids, ids[2], input);
+      }
       in >> sep{ ':' };
       in >> sep{ ')' };
     }
@@ -167,7 +154,7 @@ namespace gavrilova {
           return out;
       }
       IOStreamGuard fmtguard(out);
-      out << "(:key1 " << src.key1 << "ull:key2 " << src.key2 << ":" << "key3 \"" << src.key3 << "\":)";
+      out << "(:key1 " << src.key1 << "d:key2 " << src.key2 << "ll:" << "key3 \"" << src.key3 << "\":)";
       return out;
   }
 
