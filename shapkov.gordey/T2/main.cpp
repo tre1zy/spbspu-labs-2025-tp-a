@@ -2,6 +2,7 @@
 #include "types.hpp"
 #include <sstream>
 #include <delimiter.hpp>
+#include "dataStruct.hpp"
 
 int main()
 {
@@ -12,15 +13,11 @@ int main()
   //input1 >> param;
   //shapkov::doubleScientificIO param1;
   shapkov::stringIO param3;
-  input2 >> param3;
+  //input2 >> param3;
   //input1 >> param1 >> shapkov::delimiterIO{ 'd' };
-  if (input2)
-  {
-    //std::cout << param.key.first << " " << param.key.second << '\n';
-    std::cout << param3.key << '\n';
-  }
-  else
-  {
-    std::cout << ":(\n";
-  }
+  shapkov::DataStruct data;
+  input1 >> data.key1;
+  input >> data.key2;
+  input2 >> data.key3;
+  std::cout << data << '\n';
 }
