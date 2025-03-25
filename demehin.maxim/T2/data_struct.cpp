@@ -19,7 +19,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, DelimiterIO&& des
 
   char c = '0';
   in >> c;
-  if (in && (c != dest.exp))
+  if (in && (std::tolower(c) != dest.exp))
   {
     in.setstate(std::ios::failbit);
   }
@@ -88,14 +88,6 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
     using dbl = DoubleIO;
     using ll = LlIO;
     using str = StringIO;
-    /*in >> sep{ '(' } >> sep{ ':' };
-    in >> label{ "key1" } >> dbl{ input.key1 };
-    in >> sep{ ':' };
-    in >> label{ "key2" } >> ll{ input.key2 };
-    in >> sep{ ':' };
-    in >> label{ "key3" } >> str{ input.key3 };
-    in >> sep{ ':' } >> sep{ ')' };*/
-    in >> sep{ '(' } >> sep{ ':' };
     for (size_t i = 0; i < 3; i++)
     {
       keyNum key_num{ 0 };
