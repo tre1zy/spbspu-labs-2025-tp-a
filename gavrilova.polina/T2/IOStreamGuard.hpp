@@ -1,5 +1,5 @@
 #ifndef IO_STREAM_GUARD_HPP
-#define IO_STREAM_GUARD_HPP 
+#define IO_STREAM_GUARD_HPP
 
 #include <iostream>
 
