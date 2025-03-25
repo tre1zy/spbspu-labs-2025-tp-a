@@ -123,6 +123,7 @@ std::ostream& demehin::ioStructs::operator<<(std::ostream& out, DoubleSciO&& des
   {
     return out;
   }
+  demehin::iofmtguard fmtguard(out);
 
   double val = dest.ref;
   bool is_negative = val < 0;
