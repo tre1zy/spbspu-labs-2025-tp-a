@@ -45,20 +45,16 @@ namespace gavrilova
     std::string& ref;
   };
 
-  struct LabelIO
-  {
-    std::string exp;
-  };
-
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, SymbolIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleIO&& dest);
   std::istream& operator>>(std::istream& in, LongLongIO&& dest);
   std::istream& operator>>(std::istream& in, String_with_quotsIO&& dest);
   std::istream& operator>>(std::istream& in, StringI_with_spaceIO&& dest);
-  std::istream& operator>>(std::istream& in, LabelIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+
+  bool compare(const DataStruct& lhs, const DataStruct& rhs);
 }
 
 #endif
