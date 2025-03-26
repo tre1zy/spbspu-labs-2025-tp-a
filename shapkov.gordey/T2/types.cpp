@@ -56,7 +56,7 @@ std::istream& shapkov::operator>>(std::istream& in, labelIO&& rhs)
     return in;
   }
   std::string data = "";
-  if (std::getline(in, data) && (data != rhs.exp))
+  if (std::getline(in, data, static_cast<char>(32)) && (data != rhs.exp))
   {
     in.setstate(std::ios::failbit);
   }

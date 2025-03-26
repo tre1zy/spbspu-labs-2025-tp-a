@@ -7,11 +7,11 @@ namespace shapkov
 {
   struct DataStruct
   {
-    doubleScientificIO key1;
-    ratioIO key2;
-    stringIO key3;
+    double key1;
+    std::pair< long long, unsigned long long > key2;
+    std::string key3;
   };
-  //std::istream& operator>>(std::istream& in, DataStruct& rhs);
-  std::ostream& operator<<(std::ostream& out, DataStruct& rhs);
+  std::istream& operator>>(std::istream& in, DataStruct& rhs);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& rhs);
 }
 #endif

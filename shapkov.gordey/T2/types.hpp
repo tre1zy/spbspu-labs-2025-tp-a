@@ -7,15 +7,15 @@ namespace shapkov
 {
   struct doubleScientificIO
   {
-    double key;
+    double& key;
   };
   struct ratioIO
   {
-    std::pair< long long, unsigned long long > key;
+    std::pair< long long, unsigned long long >& key;
   };
   struct stringIO
   {
-    std::string key;
+    std::string& key;
   };
   struct labelIO
   {

@@ -6,18 +6,22 @@
 
 int main()
 {
-  shapkov::ratioIO param;
-  std::istringstream input("(:N -23333333333 :D 2234  :)");
-  std::istringstream input1("5.45d");
-  std::istringstream input2("\"Data\"");
-  //input1 >> param;
-  //shapkov::doubleScientificIO param1;
-  shapkov::stringIO param3;
-  //input2 >> param3;
-  //input1 >> param1 >> shapkov::delimiterIO{ 'd' };
   shapkov::DataStruct data;
-  input1 >> data.key1;
-  input >> data.key2;
-  input2 >> data.key3;
+  //std::istringstream input("(:N -23 :D 36  :)");
+  //std::istringstream input1("5.45d");
+  //std::istringstream input2("\"Data\":");
+  //std::istringstream input3("(:N -23 :D 36  :) 5.45 \"Data\"");
+  //input3 >> shapkov::ratioIO{ data.key2 } >> shapkov::doubleScientificIO{ data.key1 } >> shapkov::stringIO{ data.key3 };
+  std::cin >> data;
   std::cout << data << '\n';
+  //std::istringstream input4("key r");
+  //input4 >> shapkov::labelIO{ "key" } >> shapkov::delimiterIO{ 'f' };
+  if (std::cin)
+  {
+    std::cout << "all right\n";
+  }
+  else
+  {
+    std::cout << "bad job\n";
+  }
 }
