@@ -21,6 +21,7 @@ int main()
       data.push_back(new_struct);
     }
   }
+
   std::sort(data.begin(), data.end(), compare);
 
   std::copy(
