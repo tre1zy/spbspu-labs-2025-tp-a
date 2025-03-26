@@ -14,6 +14,7 @@ int main()
   //input3 >> shapkov::ratioIO{ data.key2 } >> shapkov::doubleScientificIO{ data.key1 } >> shapkov::stringIO{ data.key3 };
   std::cin >> data;
   std::cout << data << '\n';
+  std::cout << data.key1 << '\n';
   //std::istringstream input4("key r");
   //input4 >> shapkov::labelIO{ "key" } >> shapkov::delimiterIO{ 'f' };
   if (std::cin)

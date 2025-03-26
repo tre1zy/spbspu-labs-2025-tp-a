@@ -8,19 +8,76 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
   {
     return in;
   }
-  shapkov::DataStruct input;
+  DataStruct input;
   using check = delimiterIO;
-  using label = labelIO;
   using dbl = doubleScientificIO;
   using ratio = ratioIO;
   using str = stringIO;
-  //bool eachKey[3]{};
-  in >> check{ '(' } >> check{ ':' } >> label{ "key1" };
-  in >> dbl{ input.key1 };
-  in >> check{ ':' } >> label{ "key2" };
-  in >> ratio{ input.key2 };
-  in >> check{ ':' } >> label{ "key3" };
-  in >> str{ input.key3 };
+  bool eachKey[3] = { false, false, false };
+  std::string key = "";
+  in >> check{ '(' } >> check{ ':' };
+  in >> key;
+  if (key == "key1")
+  {
+    eachKey[0] = true;
+    in >> dbl{ input.key1 };
+  }
+  else if (key == "key2")
+  {
+    eachKey[1] = true;
+    in >> ratio{ input.key2 };
+  }
+  else if (key == "key3")
+  {
+    eachKey[2] = true;
+    in >> str{ input.key3 };
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+  in >> check{ ':' };
+  in >> key;
+  if (key == "key1" && eachKey[0] == false)
+  {
+    eachKey[0] = true;
+    in >> dbl{ input.key1 };
+  }
+  else if (key == "key2" && eachKey[1] == false)
+  {
+    eachKey[1] = true;
+    in >> ratio{ input.key2 };
+  }
+  else if (key == "key3" && eachKey[2] == false)
+  {
+    eachKey[2] = true;
+    in >> str{ input.key3 };
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+  in >> check{ ':' };
+  in >> key;
+  if (key == "key1" && eachKey[0] == false)
+  {
+    eachKey[0] = true;
+    in >> dbl{ input.key1 };
+  }
+  else if (key == "key2" && eachKey[1] == false)
+  {
+    eachKey[1] = true;
+    in >> ratio{ input.key2 };
+  }
+  else if (key == "key3" && eachKey[2] == false)
+  {
+    eachKey[2] = true;
+    in >> str{ input.key3 };
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
   in >> check{ ':' } >> check{ ')' };
   if (in)
   {
@@ -37,7 +94,7 @@ std::ostream& shapkov::operator<<(std::ostream& out, const DataStruct& rhs)
     return out;
   }
   out << "(:key1 ";
-  out << rhs.key1;
+  out << doubleScientificIO{ const_cast<double&>(rhs.key1) };
   out << ":key2 (:N ";
   out << rhs.key2.first;
   out << ":D ";
