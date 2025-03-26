@@ -120,13 +120,12 @@ namespace gavrilova {
             (key == "key1" && ids[0] == 0)) {
           in.setstate(std::ios::failbit);
           std::cout << "in first \n";
-        } else if (key == "key3" && ids[0] == 1) {
+        } else if (key == "key3" && (ids[0] == 1 || ids[0] == 0)) {
           std::swap(ids[1], ids[2]);
         } else if (key == "key1" && ids[0] == 2) {
           std::swap(ids[1], ids[2]);
         } else if (key != "key1" && key != "key3" && key != "key2") {
           in.setstate(std::ios::failbit);
-          std::cout << "In last\n";
         }
 
         input_value(in, ids, 1, input);
