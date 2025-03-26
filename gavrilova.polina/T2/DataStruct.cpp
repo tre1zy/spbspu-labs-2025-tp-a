@@ -4,7 +4,7 @@
 #include "IOStreamGuard.hpp"
 
 namespace {
-  
+
 std::istream& input_value(std::istream& in, int ids[3], int id, gavrilova::DataStruct& dest)
 {
   if (!in) {
