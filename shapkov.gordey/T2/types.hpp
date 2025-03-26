@@ -25,5 +25,6 @@ namespace shapkov
   std::istream& operator>>(std::istream& in, ratioIO&& rhs);
   std::istream& operator>>(std::istream& in, stringIO&& rhs);
   std::istream& operator>>(std::istream& in, labelIO&& rhs);
+  std::ostream& operator<<(std::ostream& out, const doubleScientificIO& rhs);
 }
 #endif
