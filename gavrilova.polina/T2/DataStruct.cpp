@@ -108,7 +108,7 @@ namespace gavrilova {
           in.setstate(std::ios::failbit);
         }
 
-        input_value(in, ids, ids[0], input);
+        input_value(in, ids, 0, input);
       }
 
       in >> sep{ ':' };
@@ -119,12 +119,17 @@ namespace gavrilova {
             (key == "key3" && ids[0] == 2) ||
             (key == "key1" && ids[0] == 0)) {
           in.setstate(std::ios::failbit);
-        } else if (key == "key1" || key == "key3") {
+          std::cout << "in first \n";
+        } else if (key == "key3" && ids[0] == 1) {
           std::swap(ids[1], ids[2]);
-        } else if (key != "key2") {
+        } else if (key == "key1" && ids[0] == 2) {
+          std::swap(ids[1], ids[2]);
+        } else if (key != "key1" && key != "key3" && key != "key2") {
           in.setstate(std::ios::failbit);
+          std::cout << "In last\n";
         }
-        input_value(in, ids, ids[1], input);
+
+        input_value(in, ids, 1, input);
       }
       in >> sep{ ':' };
       {
@@ -137,12 +142,11 @@ namespace gavrilova {
         } else if (key != "key1" && key != "key3" && key != "key2") {
           in.setstate(std::ios::failbit);
         }
-        input_value(in, ids, ids[2], input);
+        input_value(in, ids, 2, input);
       }
       in >> sep{ ':' };
       in >> sep{ ')' };
     }
-
     if (in) {
       dest = input;
     }
@@ -152,7 +156,7 @@ namespace gavrilova {
   std::ostream& operator<<(std::ostream& out, const DataStruct& src) {
       std::ostream::sentry sentry(out);
       if (!sentry) {
-          return out;
+        return out;
       }
       IOStreamGuard fmtguard(out);
       out << "(:key1 " << src.key1;
