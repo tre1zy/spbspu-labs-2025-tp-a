@@ -34,7 +34,28 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
   {
     return in;
   }
-  return in >> dest.ref;
+
+  std::string num;
+  std::getline(in, num, ':');
+  size_t ePos = num.find_first_of("eE");
+  if (ePos == std::string::npos || num[ePos] == num.back())
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  if (num[ePos + 1] != '+' && num[ePos + 1] != '-')
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  std::istringstream iss(num);
+  if (!(iss >> dest.ref))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+
 }
 
 std::istream& demehin::ioStructs::operator>>(std::istream& in, LlIO&& dest)
@@ -95,7 +116,7 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
       in >> key_num;
       if (key_num.ref == '1')
       {
-        in >> ll{ input.key1 };
+        in >> ll{ input.key1 } >> sep{ ':' };
       }
       else if (key_num.ref == '2')
       {
@@ -103,9 +124,8 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
       }
       else if (key_num.ref == '3')
       {
-        in >> str{ input.key3 };
+        in >> str{ input.key3 } >> sep{ ':' };
       }
-      in >> sep{ ':' };
     }
     in >> sep { ')' };
   }
@@ -116,7 +136,7 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& demehin::ioStructs::operator<<(std::ostream& out, DoubleSciO&& dest)
+std::ostream& demehin::ioStructs::operator<<(std::ostream& out, DoubleIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -162,7 +182,7 @@ std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
   iofmtguard fmtguard(out);
   double dblval = src.key2;
   out << "(:key1 " << src.key1 << "ll";
-  out << ":key2 " << DoubleSciO{dblval};
+  out << ":key2 " << DoubleIO{dblval};
   out << ":key3 \"" << src.key3 << "\":)";
   return out;
 }
