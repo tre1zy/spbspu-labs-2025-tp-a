@@ -2,8 +2,7 @@
 #include <cstddef>
 #include <exception>
 #include <ios>
-#include <istream>
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <type_traits>
 #include "scopeGuard.hpp"
