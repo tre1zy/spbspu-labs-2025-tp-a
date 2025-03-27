@@ -13,5 +13,6 @@ namespace shapkov
   };
   std::istream& operator>>(std::istream& in, DataStruct& rhs);
   std::ostream& operator<<(std::ostream& out, const DataStruct& rhs);
+  bool dataComparator(const DataStruct& lhs, const DataStruct& rhs);
 }
 #endif
