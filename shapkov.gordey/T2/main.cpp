@@ -15,7 +15,7 @@ int main()
       std::istream_iterator< shapkov::DataStruct >(),
       std::back_inserter(data)
     );
-    if (std::cin.fail())
+    if (!std::cin)
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
