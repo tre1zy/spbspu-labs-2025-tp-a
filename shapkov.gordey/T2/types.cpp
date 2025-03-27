@@ -84,7 +84,7 @@ std::ostream& shapkov::operator<<(std::ostream& out, const doubleScientificIO& r
   }
   if (toDivide)
   {
-    while (value > 10)
+    while (value >= 10)
     {
       degree += 1;
       value /= 10;
