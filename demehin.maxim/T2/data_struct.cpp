@@ -55,7 +55,6 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
     in.setstate(std::ios::failbit);
   }
   return in;
-
 }
 
 std::istream& demehin::ioStructs::operator>>(std::istream& in, LlIO&& dest)
@@ -136,7 +135,7 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& demehin::ioStructs::operator<<(std::ostream& out, DoubleIO&& dest)
+std::ostream& demehin::ioStructs::operator<<(std::ostream& out, const DoubleIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -172,6 +171,16 @@ std::ostream& demehin::ioStructs::operator<<(std::ostream& out, DoubleIO&& dest)
   return out;
 }
 
+std::ostream& demehin::ioStructs::operator<<(std::ostream& out, const LlIO&& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  return out << dest.ref << "ll";
+}
+
 std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
@@ -180,9 +189,10 @@ std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
     return out;
   }
   iofmtguard fmtguard(out);
+  long long llval = src.key1;
   double dblval = src.key2;
-  out << "(:key1 " << src.key1 << "ll";
-  out << ":key2 " << DoubleIO{dblval};
+  out << "(:key1 " << LlIO{ llval };
+  out << ":key2 " << DoubleIO{ dblval };
   out << ":key3 \"" << src.key3 << "\":)";
   return out;
 }

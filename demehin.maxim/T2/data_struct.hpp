@@ -46,7 +46,8 @@ namespace demehin
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
     std::istream& operator>>(std::istream& in, StringIO&& dest);
     std::istream& operator>>(std::istream& in, KeyNumIO& dest);
-    std::ostream& operator<<(std::ostream& in, DoubleIO&& dest);
+    std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest);
+    std::ostream& operator<<(std::ostream& out, const LlIO&& dest);
   }
 }
 
