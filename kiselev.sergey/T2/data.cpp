@@ -1,4 +1,5 @@
 #include "data.hpp"
+#include <cctype>
 #include <cstddef>
 #include <exception>
 #include <ios>
@@ -16,7 +17,7 @@ std::istream& kiselev::operator>>(std::istream& input, DelimeterIO&& dest)
   }
   char c = '0';
   input >> c;
-  if (input && (c != dest.exp))
+  if (input && (std::tolower(c) != dest.exp))
   {
     input.setstate(std::ios::failbit);
   }
@@ -40,14 +41,14 @@ std::istream& kiselev::operator>>(std::istream& input, UllIO&& dest)
     return input;
   }
   std::string number;
-  input >> number;
+  std::getline(input >> DelimeterIO{ '0' }, number, ':');
+  if (number.empty())
+  {
+    input.setstate(std::ios::failbit);
+    return input;
+  }
   try
   {
-    if (number.empty() || number.front() != 0)
-    {
-      input.setstate(std::ios::failbit);
-      return input;
-    }
     dest.ref = std::stoull(number, nullptr, 8);
   }
   catch (const std::exception&)
@@ -64,17 +65,7 @@ std::istream& kiselev::operator>>(std::istream& input, CharIO&& dest)
   {
     return input;
   }
-  std::string symbol;
-  std::getline(input >> DelimeterIO{ '\'' }, symbol, '\'');
-  if (symbol.size() != 1)
-  {
-    input.setstate(std::ios::failbit);
-  }
-  else
-  {
-    dest.ref = symbol.front();
-  }
-  return input;
+  return input >> DelimeterIO{ '\'' } >> dest.ref >> DelimetersIO{ "\':" };
 }
 
 std::istream& kiselev::operator>>(std::istream& input, StringIO&& dest)
@@ -84,7 +75,8 @@ std::istream& kiselev::operator>>(std::istream& input, StringIO&& dest)
   {
     return input;
   }
-  return std::getline(input >> DelimeterIO{ '"' }, dest.ref, '"');
+  std::getline(input >> DelimeterIO{ '"' }, dest.ref, '"');
+  return input >> DelimeterIO{ ':' };
 }
 
 std::istream& kiselev::operator>>(std::istream& input, KeyIO&& dest)
@@ -94,16 +86,20 @@ std::istream& kiselev::operator>>(std::istream& input, KeyIO&& dest)
   {
     return input;
   }
-  input >> DelimetersIO{ ":key" };
-  input >> dest.key;
-  switch (dest.key)
+  input >> DelimetersIO{ "key" };
+  int key;
+  input >> key;
+  switch (key)
   {
   case 1:
     input >> UllIO{ dest.data.key1 };
+    break;
   case 2:
     input >> CharIO{ dest.data.key2 };
+    break;
   case 3:
     input >> StringIO{ dest.data.key3 };
+    break;
   default:
     input.setstate(std::ios::failbit);
   }
@@ -118,23 +114,14 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
     return input;
   }
   detail::ScopeGuard scope(input);
-  input >> DelimetersIO{ "(" };
-  input >> KeyIO{ dest, 0 };
-  input >> KeyIO{ dest, 0 };
-  input >> KeyIO{ dest, 0 };
+  input >> DelimetersIO{ "(:" };
+  input >> KeyIO{ dest };
+  input >> KeyIO{ dest };
+  input >> KeyIO{ dest };
   input >> DelimetersIO{ ":)" };
   return input;
 }
-std::ostream& kiselev::operator<<(std::ostream& output, CharIO&& dest)
-{
-  return output << "\'" << dest.ref << "\'";
-}
-
-std::ostream& kiselev::operator<<(std::ostream& output, StringIO&& dest)
-{
-  return output << "\"" << dest.ref << "\"";
-}
-std::ostream& kiselev::operator<<(std::ostream& output, DataStruct& dest)
+std::ostream& kiselev::operator<<(std::ostream& output, const DataStruct& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -143,7 +130,20 @@ std::ostream& kiselev::operator<<(std::ostream& output, DataStruct& dest)
   }
   detail::ScopeGuard scope(output);
   output << "(:key1 " << dest.key1;
-  output << ":key2 " << CharIO{ dest.key2 };
-  output << ":key3 " << StringIO{ dest.key3 };
+  output << ":key2 \'" << dest.key2 << "\'";
+  output << ":key3 \"" << dest.key3 << "\")";
   return output;
+}
+
+bool kiselev::compare(const DataStruct& lhs, const DataStruct& rhs)
+{
+  if (lhs.key1 != rhs.key1)
+  {
+    return lhs.key1 < rhs.key1;
+  }
+  else if (lhs.key2 != rhs.key2)
+  {
+    return lhs.key2 < rhs.key2;
+  }
+  return lhs.key3.size() < rhs.key3.size();
 }

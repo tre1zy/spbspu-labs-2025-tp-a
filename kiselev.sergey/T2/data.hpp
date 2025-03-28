@@ -1,7 +1,6 @@
 #ifndef DATA_HPP
 #define DATA_HPP
 #include <iostream>
-#include <istream>
 #include <string>
 
 namespace kiselev
@@ -35,8 +34,7 @@ namespace kiselev
   };
   struct KeyIO
   {
-    DataStruct data;
-    int key;
+    DataStruct& data;
   };
   std::istream& operator>>(std::istream& input, DelimeterIO&& dest);
   std::istream& operator>>(std::istream& input, DelimetersIO&& dest);
@@ -45,8 +43,7 @@ namespace kiselev
   std::istream& operator>>(std::istream& input, StringIO&& dest);
   std::istream& operator>>(std::istream& input, KeyIO&& dest);
   std::istream& operator>>(std::istream& input, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& output, CharIO&& dest);
-  std::ostream& operator<<(std::ostream& output, StringIO&& dest);
-  std::ostream& operator<<(std::ostream& output, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& output, const DataStruct& dest);
+  bool compare(const DataStruct& lhs, const DataStruct& rhs);
 }
 #endif
