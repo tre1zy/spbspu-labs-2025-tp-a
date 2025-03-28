@@ -22,7 +22,7 @@ std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
 
 std::istream& ohantsev::operator>>(std::istream& in, MultDelimiterIO&& dest)
 {
-  for (auto chr : dest.exp)
+  for (auto chr: dest.exp)
   {
     in >> DelimiterIO{ chr };
   }
@@ -53,13 +53,15 @@ std::istream& ohantsev::operator>>(std::istream& in, DoubleI&& dest)
     return in;
   }
   std::string numberStr;
-  char current;
+  std::getline(in, numberStr, ':');
   bool hasExponent = false;
-  while (in.get(current) && current != ':') {
-    if (current == 'e' || current == 'E') {
+  for (auto chr: numberStr)
+  {
+    if (chr == 'e' || chr == 'E')
+    {
       hasExponent = true;
+      break;
     }
-    numberStr += current;
   }
   if (!hasExponent) {
     in.setstate(std::ios::failbit);
@@ -178,7 +180,7 @@ std::ostream& ohantsev::operator<<(std::ostream& out, DoubleO&& dest)
   }
   mant = std::round(mant * 10) / 10.0;
   out << std::fixed << std::setprecision(1) << mant;
-  out << 'e' << ((order < 0) ? '-' : '+') << std::abs(order);
+  out << 'e' << ((order < 0) ? '-': '+') << std::abs(order);
   return out;
 }
 
