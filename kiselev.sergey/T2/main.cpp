@@ -28,10 +28,5 @@ int main()
     std::end(data),
     std::ostream_iterator< kiselev::DataStruct >(std::cout, "\n")
   );
-  /*
-  kiselev::DataStruct data;
-  std::cin >> data;
-  std::cout << data << '\n';
-  */
   return 0;
 }

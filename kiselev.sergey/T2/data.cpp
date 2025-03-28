@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <exception>
 #include <ios>
+#include <vector>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -49,7 +50,7 @@ std::istream& kiselev::operator>>(std::istream& input, UllIO&& dest)
   }
   try
   {
-    dest.ref = std::stoull(number, nullptr, 10);
+    dest.ref = std::stoull(number, nullptr, 8);
   }
   catch (const std::exception&)
   {
@@ -113,13 +114,48 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
   {
     return input;
   }
-  detail::ScopeGuard scope(input);
+  DataStruct temp;
   input >> DelimetersIO{ "(:" };
-  input >> KeyIO{ dest };
-  input >> KeyIO{ dest };
-  input >> KeyIO{ dest };
-  input >> DelimetersIO{ ":)" };
+  input >> KeyIO{ temp };
+  input >> KeyIO{ temp };
+  input >> KeyIO{ temp };
+  input >> DelimetersIO{ ")" };
+  if (input)
+  {
+    dest = temp;
+  }
   return input;
+}
+
+std::ostream& kiselev::operator<<(std::ostream& output, const UllIO&& dest)
+{
+  unsigned long long number = dest.ref;
+  if (dest.ref == 0)
+  {
+    return output << "00";
+  }
+  std::vector< unsigned > octalNum;
+  while (number > 0)
+  {
+    octalNum.push_back(number % 8);
+    number /= 8;
+  }
+  output << "0";
+  for (auto it = octalNum.rbegin(); it != octalNum.rend(); ++it)
+  {
+    output << *it;
+  }
+  return output;
+}
+
+std::ostream& kiselev::operator<<(std::ostream& output, const CharIO&& dest)
+{
+  return output << "\'" << dest.ref << "\'";
+}
+
+std::ostream& kiselev::operator<<(std::ostream &output, const StringIO&& dest)
+{
+  return output << "\"" << dest.ref << "\"";
 }
 std::ostream& kiselev::operator<<(std::ostream& output, const DataStruct& dest)
 {
@@ -128,10 +164,13 @@ std::ostream& kiselev::operator<<(std::ostream& output, const DataStruct& dest)
   {
     return output;
   }
+  unsigned long long ull = dest.key1;
+  char ch = dest.key2;
+  std::string string = dest.key3;
   detail::ScopeGuard scope(output);
-  output << "(:key1 0" << dest.key1;
-  output << ":key2 \'" << dest.key2 << "\'";
-  output << ":key3 \"" << dest.key3 << "\")";
+  output << "(:key1 " << UllIO{ ull };
+  output << ":key2 " << CharIO{ ch };
+  output << ":key3 " << StringIO{ string } << ":)";
   return output;
 }
 
