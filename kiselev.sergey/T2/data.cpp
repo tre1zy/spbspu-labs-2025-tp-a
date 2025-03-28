@@ -1,12 +1,7 @@
 #include "data.hpp"
 #include <cctype>
-#include <cstddef>
 #include <exception>
-#include <ios>
 #include <vector>
-#include <iostream>
-#include <string>
-#include <type_traits>
 #include "scopeGuard.hpp"
 
 std::istream& kiselev::operator>>(std::istream& input, DelimeterIO&& dest)
@@ -115,11 +110,13 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
     return input;
   }
   DataStruct temp;
-  input >> DelimetersIO{ "(:" };
-  input >> KeyIO{ temp };
-  input >> KeyIO{ temp };
-  input >> KeyIO{ temp };
-  input >> DelimetersIO{ ")" };
+  {
+    input >> DelimetersIO{ "(:" };
+    input >> KeyIO{ temp };
+    input >> KeyIO{ temp };
+    input >> KeyIO{ temp };
+    input >> DelimetersIO{ ")" };
+  }
   if (input)
   {
     dest = temp;
@@ -165,11 +162,11 @@ std::ostream& kiselev::operator<<(std::ostream& output, const DataStruct& dest)
     return output;
   }
   unsigned long long ull = dest.key1;
-  char ch = dest.key2;
+  char symbol = dest.key2;
   std::string string = dest.key3;
   detail::ScopeGuard scope(output);
   output << "(:key1 " << UllIO{ ull };
-  output << ":key2 " << CharIO{ ch };
+  output << ":key2 " << CharIO{ symbol };
   output << ":key3 " << StringIO{ string } << ":)";
   return output;
 }
