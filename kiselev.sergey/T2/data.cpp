@@ -49,7 +49,7 @@ std::istream& kiselev::operator>>(std::istream& input, UllIO&& dest)
   }
   try
   {
-    dest.ref = std::stoull(number, nullptr, 8);
+    dest.ref = std::stoull(number, nullptr, 10);
   }
   catch (const std::exception&)
   {
@@ -129,7 +129,7 @@ std::ostream& kiselev::operator<<(std::ostream& output, const DataStruct& dest)
     return output;
   }
   detail::ScopeGuard scope(output);
-  output << "(:key1 " << dest.key1;
+  output << "(:key1 0" << dest.key1;
   output << ":key2 \'" << dest.key2 << "\'";
   output << ":key3 \"" << dest.key3 << "\")";
   return output;
