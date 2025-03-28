@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <ios>
 #include <iostream>
 #include <vector>
+#include <limits>
 #include <iterator>
 #include "data.hpp"
 int main()
@@ -14,6 +16,10 @@ int main()
       std::istream_iterator< kiselev::DataStruct >(),
       std::back_inserter(data)
     );
+    if (!std::cin)
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
   std::sort(data.begin(), data.end(), kiselev::compare);
   std::copy
