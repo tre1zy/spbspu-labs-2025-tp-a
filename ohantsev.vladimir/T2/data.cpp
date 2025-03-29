@@ -168,17 +168,20 @@ std::ostream& ohantsev::operator<<(std::ostream& out, DoubleO&& dest)
 {
   double mant = dest.ref;
   int order = 0;
-  while (std::abs(mant) < 1 && mant != 0)
+  if (mant != 0)
   {
-    mant *= 10;
-    order--;
+    while (std::abs(mant) < 1)
+    {
+      mant *= 10;
+      order--;
+    }
+    while (std::abs(mant) >= 9.95)
+    {
+      mant /= 10;
+      order++;
+    }
+    mant = std::round(mant * 10) / 10.0;
   }
-  while (std::abs(mant) >= 9.95)
-  {
-    mant /= 10;
-    order++;
-  }
-  mant = std::round(mant * 10) / 10.0;
   out << std::fixed << std::setprecision(1) << mant;
   out << 'e' << ((order < 0) ? '-': '+') << std::abs(order);
   return out;
