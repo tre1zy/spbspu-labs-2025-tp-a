@@ -109,8 +109,8 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
   int LabelID = 0;
   in >> LabelID;
   if (in) {
-    auto iter = std::find(dest.notFilled.begin(), dest.notFilled.end(), LabelID);
-    if (iter == dest.notFilled.end())
+    auto iter = std::find(dest.notFilled.cbegin(), dest.notFilled.cend(), LabelID);
+    if (iter == dest.notFilled.cend())
     {
       in.setstate(std::ios::failbit);
     }
@@ -168,12 +168,12 @@ std::ostream& ohantsev::operator<<(std::ostream& out, DoubleO&& dest)
 {
   double mant = dest.ref;
   int order = 0;
-  while (mant < 1)
+  while (std::abs(mant) < 1 && mant != 0)
   {
     mant *= 10;
     order--;
   }
-  while (mant >= 10)
+  while (std::abs(mant) >= 9.95)
   {
     mant /= 10;
     order++;
