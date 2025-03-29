@@ -20,6 +20,10 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &des
   {
     return out << "0b0";
   }
+  else if (dest.ref == 1)
+  {
+    return out << "0b01";
+  }
   return out << "0b" + std::bitset< 64 >(dest.ref).to_string().substr(64 - calcBitWidth(dest.ref));
 }
 
