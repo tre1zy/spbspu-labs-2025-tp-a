@@ -10,7 +10,7 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &des
     return out;
   }
   FormatGuard guard(out);
-  return out << "0b" + std::bitset< 64 >(dest.ref).to_string().substr(64 - std::__bit_width(dest.ref));
+  return out << "0b" + std::bitset< 64 >(dest.ref).to_string().substr(64 - std::bit_width(dest.ref));
 }
 
 std::ostream &puzikov::output::operator<<(std::ostream &out, const PairValue &dest)
