@@ -1,6 +1,7 @@
 #include "output_wrapper_structs.hpp"
 #include "format_guard.hpp"
 #include <bitset>
+#include <cmath>
 
 std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &dest)
 {
@@ -10,7 +11,12 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &des
     return out;
   }
   FormatGuard guard(out);
-  return out << "0b" + std::bitset< 64 >(dest.ref).to_string().substr(64 - std::bit_width(dest.ref));
+  auto calcBitWidth = [](const unsigned long long &num)
+  {
+    return 1 + std::log2(num);
+  };
+
+  return out << "0b" + std::bitset< 64 >(dest.ref).to_string().substr(64 - calcBitWidth(dest.ref));
 }
 
 std::ostream &puzikov::output::operator<<(std::ostream &out, const PairValue &dest)
@@ -34,5 +40,4 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const StringValue &
   FormatGuard guard(out);
   return out << '\"' << dest.ref << '\"';
 }
-
 
