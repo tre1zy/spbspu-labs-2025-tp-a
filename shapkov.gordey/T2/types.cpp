@@ -2,6 +2,7 @@
 #include <delimiter.hpp>
 #include <scopeGuard.hpp>
 #include <iomanip>
+#include <string>
 
 using check = shapkov::delimiterIO;
 std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
@@ -11,7 +12,27 @@ std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
   {
     return in;
   }
-  return in >> rhs.key;
+  std::string value;
+  std::getline(in, value, ':');
+  size_t posOfExp = 0;
+  posOfExp = value.find_first_of("eE");
+  if (posOfExp == std::string::npos)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  if (posOfExp == value.size() - 1)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  if (value[posOfExp + 1] != '-' && value[posOfExp + 1] != '+')
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  rhs.key = std::stod(value);
+  return in;
 }
 
 std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
@@ -27,11 +48,6 @@ std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
   in >> llTemp;
   in >> check{ ':' } >> check{ 'D' };
   in >> ullTemp;
-  long long signCheck = ullTemp;
-  if (signCheck < 0)
-  {
-    in.setstate(std::ios::failbit);
-  }
   in >> check{ ':' } >> check{ ')' };
   if (in)
   {
