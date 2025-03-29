@@ -26,17 +26,18 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
   {
     eachKey[1] = true;
     in >> ratio{ input.key2 };
+    in >> check{ ':' };
   }
   else if (key == "key3")
   {
     eachKey[2] = true;
     in >> str{ input.key3 };
+    in >> check{ ':' };
   }
   else
   {
     in.setstate(std::ios::failbit);
   }
-  in >> check{ ':' };
   in >> key;
   if (key == "key1" && eachKey[0] == false)
   {
@@ -47,17 +48,18 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
   {
     eachKey[1] = true;
     in >> ratio{ input.key2 };
+    in >> check{ ':' };
   }
   else if (key == "key3" && eachKey[2] == false)
   {
     eachKey[2] = true;
     in >> str{ input.key3 };
+    in >> check{ ':' };
   }
   else
   {
     in.setstate(std::ios::failbit);
   }
-  in >> check{ ':' };
   in >> key;
   if (key == "key1" && eachKey[0] == false)
   {
@@ -68,17 +70,19 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
   {
     eachKey[1] = true;
     in >> ratio{ input.key2 };
+    in >> check{ ':' };
   }
   else if (key == "key3" && eachKey[2] == false)
   {
     eachKey[2] = true;
     in >> str{ input.key3 };
+    in >> check{ ':' };
   }
   else
   {
     in.setstate(std::ios::failbit);
   }
-  in >> check{ ':' } >> check{ ')' };
+  in >> check{ ')' };
   if (in)
   {
     rhs = input;
