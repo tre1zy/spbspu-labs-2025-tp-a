@@ -14,7 +14,6 @@ int main()
 
   std::vector< DataStruct > data;
 
-  int i = 0;
   while (!std::cin.eof())
   {
     std::copy(input_it_t {std::cin}, input_it_t {}, std::back_inserter(data));
@@ -26,6 +25,6 @@ int main()
   }
 
   std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
+  std::copy(data.begin(), data.end(), output_it_t {std::cout, "\n"});
   return 0;
 }
