@@ -1,4 +1,5 @@
 #include "data.h"
+#include <sstream>
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
@@ -36,9 +37,9 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   {
     return in;
   }
-  std::string s = "";
-  std::getline(in, s, ':');
-  if (in && std::find(dest.exp.begin(), dest.exp.end(), s) == dest.exp.end())
+  std::string name = "";
+  in >> name;
+  if (in && std::find(dest.exp.begin(), dest.exp.end(), name) == dest.exp.end())
   {
     in.setstate(std::ios::failbit);
   }
@@ -83,7 +84,18 @@ std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
   {
     return in;
   }
-  in >> dest.ref >> TypenameIO{ { "ull", "ULL" } };
+  std::string ull = "";
+  std::getline(in, ull, ':');
+  if (ull != "" && ull[0] != '-')
+  {
+    std::istringstream ullSource(ull);
+    ullSource >> dest.ref >> TypenameIO{ { "ull", "ULL" } };
+    if (!ullSource.fail())
+    {
+      return in;
+    }
+  }
+  in.setstate(std::ios::failbit);
   return in;
 }
 
