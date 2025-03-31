@@ -39,7 +39,7 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   }
   std::string name = "";
   in >> name;
-  if (in && std::find(dest.exp.begin(), dest.exp.end(), name) == dest.exp.end())
+  if (in && std::find(dest.exp.cbegin(), dest.exp.cend(), name) == dest.exp.cend())
   {
     in.setstate(std::ios::failbit);
   }
@@ -64,14 +64,17 @@ std::istream& ohantsev::operator>>(std::istream& in, DoubleI&& dest)
       break;
     }
   }
-  if (!hasExponent) {
+  if (!hasExponent)
+  {
     in.setstate(std::ios::failbit);
     return in;
   }
-  try {
+  try
+  {
     dest.ref = std::stod(numberStr);
   }
-  catch (...) {
+  catch (...)
+  {
     in.setstate(std::ios::failbit);
   }
   return in;
@@ -90,7 +93,7 @@ std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
   {
     std::istringstream ullSource(ull);
     ullSource >> dest.ref >> TypenameIO{ { "ull", "ULL" } };
-    if (!ullSource.fail())
+    if ((!ullSource.fail()) && (ullSource.eof()))
     {
       return in;
     }
