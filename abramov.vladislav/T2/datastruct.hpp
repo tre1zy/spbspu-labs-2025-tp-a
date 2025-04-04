@@ -10,5 +10,7 @@ namespace abramov
     unsigned long long int key2;
     std::string key3;
   };
+
+  std::ostream &operator<<(std::ostream &out, const DataStruct &data);
 }
 #endif
