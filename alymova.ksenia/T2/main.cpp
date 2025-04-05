@@ -14,6 +14,11 @@ int main()
   StreamGuard is_sg(in);
   DataStruct d;
   in >> d;
+  if (!in)
+  {
+    std::cerr << "Incorrect input\n";
+    return 1;
+  }
   out << d << '\n';
   /*std::istringstream iss("(:key1 076:key2 'c':key3 \"Let madness release you\":)");
   std::copy(

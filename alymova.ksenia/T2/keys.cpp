@@ -31,36 +31,6 @@ std::istream& alymova::operator>>(std::istream& in, Label&& object)
   }
   return in;
 }
-/*std::istream& alymova::operator>>(std::istream& in, UllOct&& object)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  std::string s_oct;
-  try
-  {
-    std::getline(in, s_oct, ':');
-    if (s_oct[0] != '0')
-    {
-      throw std::logic_error("");
-    }
-    for (size_t i = 1; i != s_oct.size(); i++)
-    {
-      if ((s_oct[i] < '0') || (s_oct[i] > '7'))
-      {
-        throw std::logic_error("");
-      }
-    }
-    object.i_oct = std::stoll(s_oct, 0, 8);
-  }
-  catch(const std::exception& e)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}*/
 std::istream& alymova::operator>>(std::istream& in, UllOct&& object)
 {
   std::istream::sentry sentry(in);
