@@ -1,30 +1,26 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
-#include <string>
-#include <utility>
 #include <vector>
 
-struct DataStruct {
-  long long key1;
-  std::pair< long long, unsigned long long > key2;
-  std::string key3;
-};
-
-std::istream& operator>>(std::istream& input, std::pair< long long, unsigned long long >& value);
-
-std::ostream& operator<<(std::ostream& output, const std::pair< long long, unsigned long long >& value);
-
-std::istream& operator>>(std::istream& input, DataStruct& value);
-
-std::ostream& operator<<(std::ostream& output, const DataStruct& value);
+#include "data_struct.hpp"
 
 int main()
 {
-  std::vector< DataStruct > data;
-  std::copy(std::istream_iterator< DataStruct >(std::cin),
-            std::istream_iterator< DataStruct >(),
-            std::back_inserter(data));
+  std::vector< zholobov::DataStruct > data;
+  while (!std::cin.eof()) {
+    std::copy(std::istream_iterator< zholobov::DataStruct >(std::cin), std::istream_iterator< zholobov::DataStruct >(),
+              std::back_inserter(data));
+    if (std::cin.fail()) {
+      std::cin.clear();
+      std::string temp;
+      std::getline(std::cin, temp);
+    }
+  }
+
+  //  std::sort(data.begin(), data.end());
+
+  std::copy(data.begin(), data.end(), std::ostream_iterator< zholobov::DataStruct >(std::cout, "\n"));
 
   return 0;
 }
