@@ -3,14 +3,13 @@
 #include <iostream>
 
 namespace zholobov {
-
   namespace io_helpers {
 
     struct DelimiterIO {
       char c;
     };
 
-    struct CharIO {
+    struct LexCharIO {
       char c;
     };
 
@@ -27,7 +26,7 @@ namespace zholobov {
     };
 
     std::istream& operator>>(std::istream& input, DelimiterIO&& value);
-    std::istream& operator>>(std::istream& input, CharIO&& value);
+    std::istream& operator>>(std::istream& input, LexCharIO&& value);
     std::istream& operator>>(std::istream& input, LongLongIO&& value);
     std::istream& operator>>(std::istream& input, PairIO&& value);
     std::istream& operator>>(std::istream& input, StringIO&& value);
@@ -46,22 +45,20 @@ std::istream& zholobov::io_helpers::operator>>(std::istream& input, DelimiterIO&
     return input;
   }
   char c = 0;
-  input >> c;
-  if (input && (c != value.c)) {
+  if ((input >> c) && (c != value.c)) {
     input.setstate(std::ios::failbit);
   }
   return input;
 }
 
-std::istream& zholobov::io_helpers::operator>>(std::istream& input, CharIO&& value)
+std::istream& zholobov::io_helpers::operator>>(std::istream& input, LexCharIO&& value)
 {
   std::istream::sentry s(input);
   if (!s) {
     return input;
   }
   char c = 0;
-  input >> c;
-  if (input && (std::tolower(c) != value.c)) {
+  if ((input >> c) && (std::tolower(c) != std::tolower(value.c))) {
     input.setstate(std::ios::failbit);
   }
   return input;
@@ -74,7 +71,7 @@ std::istream& zholobov::io_helpers::operator>>(std::istream& input, LongLongIO&&
     return input;
   }
   long long temp = 0;
-  if (!(input >> temp >> CharIO{'l'} >> CharIO{'l'})) {
+  if (!(input >> temp >> LexCharIO{'l'} >> LexCharIO{'l'})) {
     return input;
   }
   value.ref = temp;
@@ -87,8 +84,7 @@ std::ostream& zholobov::io_helpers::operator<<(std::ostream& output, const LongL
   if (!s) {
     return output;
   }
-  output << value.ref << "ll";
-  return output;
+  return output << value.ref << "ll";
 }
 
 std::istream& zholobov::io_helpers::operator>>(std::istream& input, PairIO&& value)
@@ -112,8 +108,7 @@ std::ostream& zholobov::io_helpers::operator<<(std::ostream& output, const PairI
   if (!s) {
     return output;
   }
-  output << "N " << value.ref.first << ":D " << value.ref.second;
-  return output;
+  return output << "N " << value.ref.first << ":D " << value.ref.second;
 }
 
 std::istream& zholobov::io_helpers::operator>>(std::istream& input, StringIO&& value)
@@ -137,8 +132,7 @@ std::ostream& zholobov::io_helpers::operator<<(std::ostream& output, const Strin
   if (!s) {
     return output;
   }
-  output << '"' << value.ref << '"';
-  return output;
+  return output << '"' << value.ref << '"';
 }
 
 std::istream& zholobov::operator>>(std::istream& input, DataStruct& value)
@@ -151,8 +145,7 @@ std::istream& zholobov::operator>>(std::istream& input, DataStruct& value)
   input >> io_helpers::DelimiterIO{'('} >> io_helpers::DelimiterIO{':'};
   for (int i = 0; i < 3; ++i) {
     std::string key;
-    input >> key;
-    if (input && (key.size() == 4) && key.substr(0, 3) == "key") {
+    if ((input >> key) && (key.size() == 4) && key.substr(0, 3) == "key") {
       char k = key.back();
       switch (k) {
         case '1':
