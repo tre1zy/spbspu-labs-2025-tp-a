@@ -16,6 +16,7 @@ namespace zholobov {
   std::istream& operator>>(std::istream& input, DataStruct& value);
   std::ostream& operator<<(std::ostream& output, const DataStruct& value);
 
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs);
 }
 
 #endif

@@ -10,6 +10,10 @@ namespace zholobov {
       char c;
     };
 
+    struct CharIO {
+      char c;
+    };
+
     struct LongLongIO {
       long long& ref;
     };
@@ -23,6 +27,7 @@ namespace zholobov {
     };
 
     std::istream& operator>>(std::istream& input, DelimiterIO&& value);
+    std::istream& operator>>(std::istream& input, CharIO&& value);
     std::istream& operator>>(std::istream& input, LongLongIO&& value);
     std::istream& operator>>(std::istream& input, PairIO&& value);
     std::istream& operator>>(std::istream& input, StringIO&& value);
@@ -35,6 +40,20 @@ namespace zholobov {
 }
 
 std::istream& zholobov::io_helpers::operator>>(std::istream& input, DelimiterIO&& value)
+{
+  std::istream::sentry s(input);
+  if (!s) {
+    return input;
+  }
+  char c = 0;
+  input >> c;
+  if (input && (c != value.c)) {
+    input.setstate(std::ios::failbit);
+  }
+  return input;
+}
+
+std::istream& zholobov::io_helpers::operator>>(std::istream& input, CharIO&& value)
 {
   std::istream::sentry s(input);
   if (!s) {
@@ -55,7 +74,7 @@ std::istream& zholobov::io_helpers::operator>>(std::istream& input, LongLongIO&&
     return input;
   }
   long long temp = 0;
-  if (!(input >> temp >> DelimiterIO{'l'} >> DelimiterIO{'l'})) {
+  if (!(input >> temp >> CharIO{'l'} >> CharIO{'l'})) {
     return input;
   }
   value.ref = temp;
@@ -175,4 +194,19 @@ std::ostream& zholobov::operator<<(std::ostream& output, const DataStruct& value
   output << ":key2 (:" << io_helpers::PairIO{pair} << ":)";
   output << ":key3 " << io_helpers::StringIO{str} << ":)";
   return output;
+}
+
+bool zholobov::operator<(const DataStruct& lhs, const DataStruct& rhs)
+{
+  if (lhs.key1 != rhs.key1) {
+    return lhs.key1 < rhs.key1;
+  } else {
+    long long l = lhs.key2.first / rhs.key2.second;
+    long long r = rhs.key2.first / lhs.key2.second;
+    if (l != r) {
+      return l < r;
+    } else {
+      return lhs.key3.size() < rhs.key3.size();
+    }
+  }
 }

@@ -17,10 +17,7 @@ int main()
       std::getline(std::cin, temp);
     }
   }
-
-  //  std::sort(data.begin(), data.end());
-
+  std::sort(data.begin(), data.end());
   std::copy(data.begin(), data.end(), std::ostream_iterator< zholobov::DataStruct >(std::cout, "\n"));
-
   return 0;
 }
