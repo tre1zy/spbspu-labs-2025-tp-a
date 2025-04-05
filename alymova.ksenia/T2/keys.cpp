@@ -104,7 +104,7 @@ std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
   out << ":key3 ";
   out << "\"" << object.key3 << "\"";
   out << ":)";
-  return out; 
+  return out;
 }
 alymova::StreamGuard::StreamGuard(std::basic_ios< char >& s):
   s_(s),
