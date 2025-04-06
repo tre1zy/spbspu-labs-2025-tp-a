@@ -2,8 +2,9 @@
 #include <iostream>
 #include <exception>
 #include <iostream>
+#include <sstream>
 
-std::istream& alymova::operator>>(std::istream& in, Delimiter&& object)
+std::istream& alymova::operator>>(std::istream& in, DelimiterIO&& object)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -17,7 +18,7 @@ std::istream& alymova::operator>>(std::istream& in, Delimiter&& object)
   }
   return in;
 }
-std::istream& alymova::operator>>(std::istream& in, Label&& object)
+std::istream& alymova::operator>>(std::istream& in, LabelIO&& object)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -31,14 +32,14 @@ std::istream& alymova::operator>>(std::istream& in, Label&& object)
   }
   return in;
 }
-std::istream& alymova::operator>>(std::istream& in, UllOct&& object)
+std::istream& alymova::operator>>(std::istream& in, UllOctIO&& object)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
-  in >> Delimiter{'0'} >> object.i_oct;
+  in >> DelimiterIO{'0'} >> object.i_oct;
   std::string s_oct = std::to_string(object.i_oct);
   if ((s_oct.find('8') != std::string::npos) || (s_oct.find('9') != std::string::npos))
   {
@@ -46,14 +47,14 @@ std::istream& alymova::operator>>(std::istream& in, UllOct&& object)
   }
   return in;
 }
-std::istream& alymova::operator>>(std::istream& in, ChrLit&& object)
+std::istream& alymova::operator>>(std::istream& in, ChrLitIO&& object)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
-  return in >> Delimiter{'\''} >> object.c >> Delimiter{'\''};
+  return in >> DelimiterIO{'\''} >> object.c >> DelimiterIO{'\''};
 }
 std::istream& alymova::operator>>(std::istream& in, StringIO&& object)
 {
@@ -62,7 +63,7 @@ std::istream& alymova::operator>>(std::istream& in, StringIO&& object)
   {
     return in;
   }
-  return std::getline(in >> Delimiter{'"'}, object.s, '"');
+  return std::getline(in >> DelimiterIO{'"'}, object.s, '"');
 }
 std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
 {
@@ -71,18 +72,75 @@ std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
   {
     return in;
   }
+  StreamGuard guard(in);
   DataStruct input;
-  in >> Delimiter{'('};
-  in >> Delimiter{':'};
-  in >> Label{"key1"};
-  in >> UllOct{input.key1};
-  in >> Delimiter{':'};
-  in >> Label{"key2"};
-  in >> ChrLit{input.key2};
-  in >> Delimiter{':'};
-  in >> Label{"key3"};
-  in >> StringIO{input.key3};
-  in >> Label{":)"};
+  std::string keys[3] = {};
+  size_t ids[3] = {0, 1, 2};
+
+  in >> std::noskipws;
+  in >> DelimiterIO{'('};
+  in >> DelimiterIO{':'};
+  {
+    std::string name;
+    getline(in, name, ' ');
+    if (name == "key2")
+    {
+      ids[0] = 1;
+    }
+    else if (name == "key3")
+    {
+      ids[0] = 2;
+    }
+    else if (name != "key1")
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  std::getline(in, keys[ids[0]], ':');
+  {
+    std::string name;
+    getline(in, name, ' ');
+    if (name == "key1" && ids[0] != 0)
+    {
+      ids[1] = 0;
+    }
+    else if (name == "key3" && ids[0] != 2)
+    {
+      ids[1] = 2;
+    }
+    else if (!(name == "key2" && ids[0] != 1))
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  std::getline(in, keys[ids[1]], ':');
+  {
+    std::string name;
+    getline(in, name, ' ');
+    if (name == "key1" && ids[0] != 0 && ids[1] != 0)
+    {
+      ids[2] = 0;
+    }
+    else if (name == "key2" && ids[0] != 1 && ids[1] != 1)
+    {
+      ids[2] = 1;
+    }
+    else if (!(name == "key3" && ids[0] != 2 && ids[1] != 2))
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  std::getline(in, keys[ids[2]], ':');
+  in >> DelimiterIO{')'};
+
+  std::istringstream stream(keys[0] + keys[1] + keys[2]);
+  stream >> UllOctIO{input.key1};
+  stream >> ChrLitIO{input.key2};
+  stream >> StringIO{input.key3};
+  if (stream.fail())
+  {
+    in.setstate(std::ios::failbit);
+  }
   if (in)
   {
     object = input;

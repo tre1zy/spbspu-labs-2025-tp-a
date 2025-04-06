@@ -5,11 +5,11 @@
 
 namespace alymova
 {
-  struct UllOct
+  struct UllOctIO
   {
     unsigned long long int& i_oct;
   };
-  struct ChrLit
+  struct ChrLitIO
   {
     char& c;
   };
@@ -17,11 +17,11 @@ namespace alymova
   {
     std::string& s;
   };
-  struct Delimiter
+  struct DelimiterIO
   {
     char exp;
   };
-  struct Label
+  struct LabelIO
   {
     std::string exp;
   };
@@ -31,10 +31,10 @@ namespace alymova
     char key2;
     std::string key3;
   };
-  std::istream& operator>>(std::istream& in, Delimiter&& object);
-  std::istream& operator>>(std::istream& in, Label&& object);
-  std::istream& operator>>(std::istream& in, UllOct&& object);
-  std::istream& operator>>(std::istream& in, ChrLit&& object);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& object);
+  std::istream& operator>>(std::istream& in, LabelIO&& object);
+  std::istream& operator>>(std::istream& in, UllOctIO&& object);
+  std::istream& operator>>(std::istream& in, ChrLitIO&& object);
   std::istream& operator>>(std::istream& in, StringIO&& object);
   std::istream& operator>>(std::istream& in, DataStruct& object);
   std::ostream& operator<<(std::ostream& out, const DataStruct& object);
