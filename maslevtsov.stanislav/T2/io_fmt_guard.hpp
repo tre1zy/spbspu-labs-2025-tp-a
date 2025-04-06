@@ -1,5 +1,5 @@
-#ifndef IO_FMT_GUARD
-#define IO_FMT_GUARD
+#ifndef IO_FMT_GUARD_HPP
+#define IO_FMT_GUARD_HPP
 
 #include <iomanip>
 
