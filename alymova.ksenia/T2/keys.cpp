@@ -40,10 +40,13 @@ std::istream& alymova::operator>>(std::istream& in, UllOctIO&& object)
     return in;
   }
   in >> DelimiterIO{'0'} >> object.i_oct;
-  std::string s_oct = std::to_string(object.i_oct);
-  if ((s_oct.find('8') != std::string::npos) || (s_oct.find('9') != std::string::npos))
+  if (in)
   {
-    in.setstate(std::ios::failbit);
+    std::string s_oct = std::to_string(object.i_oct);
+    if ((s_oct.find('8') != std::string::npos) || (s_oct.find('9') != std::string::npos))
+    {
+      in.setstate(std::ios::failbit);
+    }
   }
   return in;
 }
