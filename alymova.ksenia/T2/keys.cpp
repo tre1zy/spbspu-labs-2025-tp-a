@@ -145,6 +145,7 @@ std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
   {
     object = input;
   }
+  in.clear();
   return in;
 }
 std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
