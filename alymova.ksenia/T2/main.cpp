@@ -12,12 +12,18 @@ int main()
   StreamGuard is_sg(std::cin);
 
   std::vector< DataStruct > data;
-  std::copy(
-    std::istream_iterator< DataStruct >(std::cin),
-    std::istream_iterator< DataStruct >(),
-    std::back_inserter(data)
-  );
-
+  while (!std::cin.eof())
+  {
+    if (!std::cin)
+    {
+      std::cin.clear(std::cin.rdstate() ^ std::ios_base::failbit);
+    }
+    std::copy(
+      std::istream_iterator< DataStruct >(std::cin),
+      std::istream_iterator< DataStruct >(),
+      std::back_inserter(data)
+    );
+  }
   std::copy(
     std::begin(data),
     std::end(data),
