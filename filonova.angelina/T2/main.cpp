@@ -23,7 +23,6 @@ int main()
     }
   }
 
-  std::cout << "\nSoted:\n";
   std::sort(data.begin(), data.end());
   std::copy(data.begin(), data.end(), output_it_t(std::cout, "\n"));
 
