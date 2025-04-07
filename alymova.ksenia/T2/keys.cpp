@@ -77,73 +77,37 @@ std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
   }
   StreamGuard guard(in);
   DataStruct input;
-  std::string keys[3] = {};
-  size_t ids[3] = {0, 1, 2};
+  bool flag1 = false;
+  bool flag2 = false;
+  bool flag3 = false;
 
-  in >> std::noskipws;
   in >> DelimiterIO{'('};
+  while ((!flag1 || !flag2 || !flag3) && in)
+  {
+    std::string name;
+    in >> name;
+    if (name == ":key1" && !flag1)
+    {
+      flag1 = true;
+      in >> UllOctIO{input.key1};
+    }
+    else if (name == ":key2" && !flag2)
+    {
+      flag2 = true;
+      in >> ChrLitIO{input.key2};
+    }
+    else if (name == ":key3" && !flag3)
+    {
+      flag3 = true;
+      in >> StringIO{input.key3};
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
   in >> DelimiterIO{':'};
-  {
-    std::string name;
-    getline(in, name, ' ');
-    if (name == "key2")
-    {
-      ids[0] = 1;
-    }
-    else if (name == "key3")
-    {
-      ids[0] = 2;
-    }
-    else if (name != "key1")
-    {
-      in.setstate(std::ios::failbit);
-    }
-  }
-  std::getline(in, keys[ids[0]], ':');
-  {
-    std::string name;
-    getline(in, name, ' ');
-    if (name == "key1" && ids[0] != 0)
-    {
-      ids[1] = 0;
-    }
-    else if (name == "key3" && ids[0] != 2)
-    {
-      ids[1] = 2;
-    }
-    else if (!(name == "key2" && ids[0] != 1))
-    {
-      in.setstate(std::ios::failbit);
-    }
-  }
-  std::getline(in, keys[ids[1]], ':');
-  {
-    std::string name;
-    getline(in, name, ' ');
-    if (name == "key1" && ids[0] != 0 && ids[1] != 0)
-    {
-      ids[2] = 0;
-    }
-    else if (name == "key2" && ids[0] != 1 && ids[1] != 1)
-    {
-      ids[2] = 1;
-    }
-    else if (!(name == "key3" && ids[0] != 2 && ids[1] != 2))
-    {
-      in.setstate(std::ios::failbit);
-    }
-  }
-  std::getline(in, keys[ids[2]], ':');
   in >> DelimiterIO{')'};
-
-  std::istringstream stream(keys[0] + keys[1] + keys[2]);
-  stream >> UllOctIO{input.key1};
-  stream >> ChrLitIO{input.key2};
-  stream >> StringIO{input.key3};
-  if (stream.fail())
-  {
-    in.setstate(std::ios::failbit);
-  }
   if (in)
   {
     object = input;
