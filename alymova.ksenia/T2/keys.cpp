@@ -75,7 +75,6 @@ std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
   {
     return in;
   }
-  StreamGuard guard(in);
   DataStruct input;
   bool flag1 = false;
   bool flag2 = false;
@@ -112,6 +111,7 @@ std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
   {
     object = input;
   }
+  in.clear();
   return in;
 }
 std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
@@ -130,6 +130,18 @@ std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
   out << "\"" << object.key3 << "\"";
   out << ":)";
   return out;
+}
+bool alymova::comparator(const DataStruct& data1, const DataStruct& data2)
+{
+  if (data1.key1 == data2.key1)
+  {
+    if (data1.key2 == data2.key2)
+    {
+      return data1.key3.size() < data2.key3.size();
+    }
+    return data1.key2 < data2.key2;
+  }
+  return data1.key1 < data2.key1;
 }
 alymova::StreamGuard::StreamGuard(std::basic_ios< char >& s):
   s_(s),

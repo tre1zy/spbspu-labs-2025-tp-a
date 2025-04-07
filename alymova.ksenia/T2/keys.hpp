@@ -2,6 +2,7 @@
 #define KEYS_HPP
 #include <string>
 #include <iostream>
+#include <vector>
 
 namespace alymova
 {
@@ -38,6 +39,8 @@ namespace alymova
   std::istream& operator>>(std::istream& in, StringIO&& object);
   std::istream& operator>>(std::istream& in, DataStruct& object);
   std::ostream& operator<<(std::ostream& out, const DataStruct& object);
+
+  bool comparator(const DataStruct& data1, const DataStruct& data2);
 
   class StreamGuard
   {
