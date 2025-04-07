@@ -1,5 +1,6 @@
-#include "data-struct.hpp"
 #include <cmath>
+#include "scope-guard.hpp"
+#include "data-struct.hpp"
 
 std::istream & savintsev::operator>>(std::istream & in, DelimiterIO && dest)
 {
@@ -128,4 +129,16 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
   }
 
   return in;
+}
+
+std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  ScopeGuard guard(out);
+  out << "(:key1 " << dest.key1 << ":key2 " << dest.key2 << ":key3 \"" << dest.key3 << "\":)";
+  return out;
 }
