@@ -66,18 +66,7 @@ std::istream & savintsev::operator>>(std::istream & in, UllIO && dest)
 
 std::istream & savintsev::operator>>(std::istream & in, LabelIO && dest)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  std::string data = "";
-  if ((in >> StringIO{data}) && (data != dest.exp))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
+  return in >> dest.ref;
 }
 
 std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
@@ -88,61 +77,50 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
     return in;
   }
 
-  DataStruct input;
+  savintsev::DataStruct temp{};
   bool has_key1 = false, has_key2 = false, has_key3 = false;
 
   try
   {
-    in >> DelimiterIO{'{'};
-    in >> DelimiterIO{':'};
+    in >> savintsev::DelimiterIO{'('};
+    in >> savintsev::DelimiterIO{':'};
 
-    while (in.peek() != '}')
+    for (int i = 0; i < 3; ++i)
     {
-
       std::string label;
-      if (!(in >> LabelIO{label}))
-      {
-        throw std::runtime_error("Expected key");
-      }
+      in >> savintsev::LabelIO{label};
 
       if (label == "key1")
       {
-        if (!(in >> DoubleIO{input.key1}))
-        {
-          throw std::runtime_error("Failed to read key1");
-        }
+        in >> savintsev::DoubleIO{temp.key1};
         has_key1 = true;
       }
       else if (label == "key2")
       {
-        if (!(in >> UllIO{input.key2}))
-        {
-          throw std::runtime_error("Failed to read key2");
-        }
+        in >> savintsev::UllIO{temp.key2};
         has_key2 = true;
       }
       else if (label == "key3")
       {
-        if (!(in >> StringIO{input.key3}))
-        {
-          throw std::runtime_error("Failed to read key3");
-        }
+        in >> savintsev::StringIO{temp.key3};
         has_key3 = true;
       }
       else
       {
         throw std::runtime_error("Unknown key: " + label);
       }
+
+      in >> savintsev::DelimiterIO{':'};
     }
 
-    in >> DelimiterIO{'}'};
+    in >> savintsev::DelimiterIO{')'};
 
     if (!(has_key1 && has_key2 && has_key3))
     {
-      throw std::runtime_error("Missing required key(s)");
+      throw std::runtime_error("Missing keys");
     }
 
-    dest = input;
+    dest = temp;
   }
   catch (...)
   {

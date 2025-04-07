@@ -36,7 +36,7 @@ namespace savintsev
 
   struct LabelIO
   {
-    std::string exp;
+    std::string & ref;
   };
 
   std::istream & operator>>(std::istream & in, DelimiterIO && dest);
