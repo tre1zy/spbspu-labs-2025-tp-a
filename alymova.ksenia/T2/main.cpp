@@ -37,7 +37,6 @@ int main()
       std::cin.clear(std::cin.rdstate() ^ std::ios_base::failbit);
     }
   }*/
-  std::cout << data.size();
   std::sort(data.begin(), data.end(), comparator);
   std::copy(
     std::begin(data),
