@@ -12,18 +12,25 @@ int main()
   StreamGuard os_sg(std::cout);
   StreamGuard is_sg(std::cin);
 
-  std::vector< DataStruct > data;
-  while (!std::cin.eof())
+  std::vector< DataStruct > data{std::istream_iterator< DataStruct >(std::cin), std::istream_iterator< DataStruct >()};
+  /*std::vector< DataStruct > data;
+  std::istream_iterator< DataStruct > in(std::cin), eof;
+  while (in != eof)
   {
     DataStruct d;
-    std::cin >> d;
-    data.push_back(d);
-    if (std::cin.fail())
+    d = *in++;
+    if (!std::cin.fail())
     {
-      data.pop_back();
-      std::cin.clear(std::cin.rdstate() ^ std::ios_base::failbit);
+      data.push_back(d);
     }
-  }
+    std::cin.clear(std::cin.rdstate() ^ std::ios_base::failbit);
+  }*/
+  std::sort(data.begin(), data.end(), comparator);
+  std::copy(
+    data.begin(),
+    data.end(),
+    std::ostream_iterator< DataStruct >(std::cout, "\n")
+  );
   /*while (!std::cin.eof())
   {
     std::copy(
@@ -37,10 +44,4 @@ int main()
       std::cin.clear(std::cin.rdstate() ^ std::ios_base::failbit);
     }
   }*/
-  std::sort(data.begin(), data.end(), comparator);
-  std::copy(
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
 }
