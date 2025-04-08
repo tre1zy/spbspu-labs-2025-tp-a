@@ -1,8 +1,7 @@
-#ifndef KEYS_HPP
-#define KEYS_HPP
+#ifndef STRUCTS_HPP
+#define STRUCT_HPP
 #include <string>
 #include <iostream>
-#include <vector>
 
 namespace alymova
 {
@@ -31,6 +30,8 @@ namespace alymova
     unsigned long long int key1;
     char key2;
     std::string key3;
+
+    bool operator<(const DataStruct& other);
   };
   std::istream& operator>>(std::istream& in, DelimiterIO&& object);
   std::istream& operator>>(std::istream& in, LabelIO&& object);
@@ -40,19 +41,6 @@ namespace alymova
   std::istream& operator>>(std::istream& in, DataStruct& object);
   std::ostream& operator<<(std::ostream& out, const DataStruct& object);
 
-  bool comparator(const DataStruct& data1, const DataStruct& data2);
-
-  class StreamGuard
-  {
-  public:
-    StreamGuard(std::basic_ios< char >& s);
-    ~StreamGuard();
-  private:
-    std::basic_ios< char >& s_;
-    std::streamsize width_;
-    char fill_;
-    std::streamsize precision_;
-    std::basic_ios< char >::fmtflags fmt_;
-  };
+  bool predForStringIO(char c);
 }
 #endif

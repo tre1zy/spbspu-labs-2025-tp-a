@@ -1,8 +1,6 @@
-#include "keys.hpp"
+#include "structs.hpp"
 #include <iostream>
-#include <exception>
-#include <iostream>
-#include <sstream>
+#include "stream-guard.hpp"
 
 std::istream& alymova::operator>>(std::istream& in, DelimiterIO&& object)
 {
@@ -66,7 +64,21 @@ std::istream& alymova::operator>>(std::istream& in, StringIO&& object)
   {
     return in;
   }
-  return std::getline(in >> DelimiterIO{'"'}, object.s, '"');
+  alymova::StreamGuard guard(in);
+  in >> std::noskipws;
+
+  in >> DelimiterIO{'"'};
+  char next;
+  while (in >> next && next != '"')
+  {
+    if (next == '\n')
+    {
+      in.setstate(std::ios_base::failbit);
+      break;
+    }
+    object.s.push_back(next);
+  }
+  return in;
 }
 std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
 {
@@ -130,29 +142,19 @@ std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
   out << ":)";
   return out;
 }
-bool alymova::comparator(const DataStruct& data1, const DataStruct& data2)
+bool alymova::DataStruct::operator<(const DataStruct& other)
 {
-  if (data1.key1 == data2.key1)
+  if (key1 == other.key1)
   {
-    if (data1.key2 == data2.key2)
+    if (key2 == other.key2)
     {
-      return data1.key3.size() < data2.key3.size();
+      return key3.size() < other.key3.size();
     }
-    return data1.key2 < data2.key2;
+    return key2 < other.key2;
   }
-  return data1.key1 < data2.key1;
+  return key1 < other.key1;
 }
-alymova::StreamGuard::StreamGuard(std::basic_ios< char >& s):
-  s_(s),
-  width_(s.width()),
-  fill_(s.fill()),
-  precision_(s.precision()),
-  fmt_(s.flags())
-{}
-alymova::StreamGuard::~StreamGuard()
-{
-  s_.width(width_);
-  s_.fill(fill_);
-  s_.precision(precision_);
-  s_.flags(fmt_);
-}
+bool alymova::predForStringIO(char c)
+  {
+    return (c != '\n' && c != '"');
+  }
