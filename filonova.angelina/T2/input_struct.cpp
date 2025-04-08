@@ -1,5 +1,4 @@
 #include "input_struct.hpp"
-#include "format_guard.hpp"
 
 std::istream &filonova::operator>>(std::istream &in, DelimiterValue &&dest)
 {
@@ -24,9 +23,6 @@ std::istream &filonova::operator>>(std::istream &in, HexValue &&dest)
   {
     return in;
   }
-
-  FormatGuard guard(in);
-
   in >> DelimiterValue{'0'} >> DelimiterValue{'x'};
   in >> std::hex >> dest.ref;
   return in;

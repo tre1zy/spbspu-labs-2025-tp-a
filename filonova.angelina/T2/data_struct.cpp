@@ -1,5 +1,4 @@
 #include "input_struct.hpp"
-#include "format_guard.hpp"
 #include "data_struct.hpp"
 
 bool filonova::operator<(const DataStruct &lhs, const DataStruct &rhs)
@@ -72,11 +71,8 @@ std::ostream &filonova::operator<<(std::ostream &out, const DataStruct &src)
     return out;
   }
 
-  filonova::FormatGuard guard(out);
-
   out << "(";
   out << ":key1 0x" << std::hex << std::uppercase << src.key1;
-  out << std::fixed << std::setprecision(1);
   out << ":key2 #c(" << src.key2.real() << " " << src.key2.imag() << ")";
   out << ":key3 \"" << src.key3 << "\"";
   out << ":)";
