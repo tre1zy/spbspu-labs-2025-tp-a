@@ -3,6 +3,7 @@
 
 #include <string>
 #include <complex>
+#include <iomanip>
 
 namespace filonova
 {
