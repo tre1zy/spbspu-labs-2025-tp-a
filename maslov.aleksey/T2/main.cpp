@@ -3,6 +3,8 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <iomanip>
+#include "streamGuard.hpp"
 
 struct DataStruct
 {
@@ -25,6 +27,21 @@ bool DataStruct::operator<(const DataStruct & rhs) const
   {
     return key3.length() < rhs.key3.length();
   }
+}
+std::ostream & operator<<(std::ostream & out, const DataStruct & data)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  maslov::StreamGuard guard(out);
+  out << "(";
+  out << ":key1 " << std::fixed << std::setprecision(6) << data.key1;
+  out << ":key2 '" << data.key2;
+  out << "':key3 \"" << data.key3;
+  out << "\":)";
+  return out;
 }
 int main()
 {
