@@ -2,7 +2,8 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
-#include "dataStruct.hpp"
+#include <limits>
+#include "ioTypes.hpp"
 
 int main()
 {
@@ -19,6 +20,7 @@ int main()
     if (!std::cin)
     {
       std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
   std::sort(data.begin(), data.end());

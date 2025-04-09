@@ -11,9 +11,160 @@ std::ostream & maslov::operator<<(std::ostream & out, const DataStruct & data)
   }
   maslov::StreamGuard guard(out);
   out << "(";
-  out << ":key1 " << std::fixed << std::setprecision(6) << data.key1;
+  out << ":key1 " << std::scientific << std::setprecision(2) << data.key1;
   out << ":key2 '" << data.key2;
   out << "':key3 \"" << data.key3;
   out << "\":)";
   return out;
+}
+
+std::istream & maslov::operator>>(std::istream & in, DelimiterIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  char c = '0';
+  in >> c;
+  if (in && (c != dest.exp))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream & maslov::operator>>(std::istream & in, DoubleSciIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  std::string str;
+  char c;
+  bool hasExp = false;
+  while ((in >> c) && (c != ':'))
+  {
+    if (c == 'e' || c == 'E')
+    {
+      hasExp = true;
+    }
+    str += c;
+  }
+  if (in)
+  {
+    in.putback(c);
+  } 
+  if (!hasExp)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  try
+  {
+    dest.ref = std::stod(str);
+  }
+  catch (const std::exception &)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream & maslov::operator>>(std::istream & in, CharLitIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  if (!(in >> DelimiterIO{'\''}))
+  {
+    return in;
+  }
+  char c;
+  in >> std::noskipws;
+  if(!(in >> c))
+  {
+    in.setstate(std::ios::failbit);
+    in >> std::skipws;
+    return in;
+  }
+  dest.ref = c;
+  in >> DelimiterIO{'\''};
+  in >> std::skipws;
+  return in;
+}
+
+std::istream & maslov::operator>>(std::istream & in, StringIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  if (!(in >> DelimiterIO{'"'}))
+  {
+    return in;
+  }
+  in >> std::noskipws;
+  char c;
+  while ((in >> c) && (c != '"'))
+  {
+    dest.ref += c;
+  }
+  if (c != '"')
+  {
+    in.setstate(std::ios::failbit);
+  }
+  in >> std::skipws;
+  return in;
+}
+
+std::istream & maslov::operator>>(std::istream & in, DataStruct & data)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  DataStruct temp;
+  in >> DelimiterIO{'('};
+  bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+  for (size_t i = 0; i < 3; ++i)
+  {
+    in >> DelimiterIO{':'};
+    std::string name;
+    in >> name;
+    if (name == "key1")
+    {
+      in >> DoubleSciIO{temp.key1};
+      hasKey1 = true;
+    }
+    else if (name == "key2")
+    {
+      in >> CharLitIO{temp.key2};
+      hasKey2 = true;
+    }
+    else if (name == "key3")
+    {
+      in >> StringIO{temp.key3};
+      hasKey3 = true;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+  }
+  if (!hasKey1 || !hasKey2 || !hasKey3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  in >> DelimiterIO{':'};
+  in >> DelimiterIO{')'};
+  data = temp;
+  return in;
 }
