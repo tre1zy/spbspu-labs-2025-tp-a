@@ -51,7 +51,7 @@ namespace {
     }
     std::string n = "";
     std::getline(in, n, ':');
-    if (n.find("ull") == n.npos && n.find("ULL") == n.npos) {
+    if (n.find("e") == n.npos && n.find("E") == n.npos) {
       in.setstate(std::ios::failbit);
     }
     try {
@@ -70,7 +70,7 @@ namespace {
     }
     std::string n = "";
     std::getline(in, n, ':');
-    if (n.find("e") == n.npos && n.find("E") == n.npos) {
+    if (n.find("ull") == n.npos && n.find("ULL") == n.npos) {
       in.setstate(std::ios::failbit);
     }
     try {
@@ -114,7 +114,7 @@ std::istream& maslevtsov::operator>>(std::istream& in, DataStruct& dest)
   DataStruct result;
   in >> DelimiterIO{'('} >> DelimiterIO{':'};
   for (std::size_t i = 0; i < 3ull; ++i) {
-    LabelIO label{"0"};
+    LabelIO label{""};
     in >> label;
     if (label.exp_ == "key1") {
       in >> DoubleIO{result.key1_};
