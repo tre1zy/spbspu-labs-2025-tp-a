@@ -50,7 +50,8 @@ namespace {
       return in;
     }
     std::string n = "";
-    if (!std::getline(in, n, ':')) {
+    std::getline(in, n, ':');
+    if (n.find("ull") == n.npos && n.find("ULL") == n.npos) {
       in.setstate(std::ios::failbit);
     }
     try {
@@ -68,7 +69,8 @@ namespace {
       return in;
     }
     std::string n = "";
-    if (!std::getline(in, n, ':')) {
+    std::getline(in, n, ':');
+    if (n.find("e") == n.npos && n.find("E") == n.npos) {
       in.setstate(std::ios::failbit);
     }
     try {
