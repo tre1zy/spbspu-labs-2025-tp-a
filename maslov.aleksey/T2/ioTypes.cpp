@@ -190,7 +190,7 @@ std::ostream & maslov::operator<<(std::ostream & out, const DoubleSciIO & dest)
     mantissa *= 10.0;
     exp -= 1;
   }
-  out << std::fixed << std::setprecision(2);
+  out << std::fixed << std::setprecision(1);
   out << mantissa << 'e' << exp;
   return out;
 }
