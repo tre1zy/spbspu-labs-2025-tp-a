@@ -12,8 +12,10 @@ std::ostream &nehvedovich::operator<<(std::ostream &out, const data_struct &src)
   }
 
   FormatGuard fmtguard(out);
-  out << "{ " << "\"key1\": " << src.key1 << "ull, " << "\"key2\": '" << src.key2 << "', " << "\"key3\": \"" << src.key3
-      << "\" }";
+  out << "(:" << "key1 " << src.key1; 
+  out << "ull:" << "key2 '" << src.key2; 
+  out << "':" << "key3 \"" << src.key3;
+  out << "\":)";
   return out;
 }
 
