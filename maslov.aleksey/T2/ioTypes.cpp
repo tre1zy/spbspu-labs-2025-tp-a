@@ -56,7 +56,7 @@ std::istream & maslov::operator>>(std::istream & in, DoubleSciIO && dest)
   if (in)
   {
     in.putback(c);
-  } 
+  }
   if (!hasExp)
   {
     in.setstate(std::ios::failbit);
