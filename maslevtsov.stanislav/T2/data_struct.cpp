@@ -151,7 +151,11 @@ std::ostream& maslevtsov::operator<<(std::ostream& out, const DataStruct& dest)
       exponent -= 1;
     }
     out << std::fixed << std::setprecision(1);
-    out << mantissa << 'e' << exponent;
+    if (exponent > 0) {
+      out << mantissa << 'e' << '+' << exponent;
+    } else {
+      out << mantissa << 'e' << exponent;
+    }
   }
   out << ":key2 " << dest.key2_ << "ull:";
   out << "key3 \"" << dest.key3_ << "\":)";
