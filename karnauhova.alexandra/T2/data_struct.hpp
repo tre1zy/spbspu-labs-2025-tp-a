@@ -35,5 +35,14 @@ namespace karnauhova
   {
     std::string exp;
   };
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
+  std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest);
+  std::istream& operator>>(std::istream& in, UllIO&& dest);
+  std::ostream& operator<<(std::ostream& out, const UllIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, LabelIO& dest);
 }
 #endif
