@@ -120,10 +120,10 @@ std::istream& maslevtsov::operator>>(std::istream& in, DataStruct& dest)
     } else if (label.exp_ == "key2") {
       in >> UllIO{result.key2_};
     } else if (label.exp_ == "key3") {
-      in >> StringIO{result.key3_};
+      in >> StringIO{result.key3_} >> DelimiterIO{':'};
     }
   }
-  in >> DelimiterIO{':'} >> DelimiterIO{')'};
+  in >> DelimiterIO{')'};
   if (in) {
     dest = result;
   }
