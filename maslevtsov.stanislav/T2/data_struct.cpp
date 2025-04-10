@@ -1,9 +1,18 @@
 #include "data_struct.hpp"
-#include <iostream>
-#include <sstream>
+#include <cmath>
 #include "io_fmt_guard.hpp"
 
 namespace {
+  struct DelimiterIO
+  {
+    char exp_;
+  };
+
+  struct LabelIO
+  {
+    std::string exp_;
+  };
+
   struct DoubleIO
   {
     double& ref_;
@@ -19,16 +28,6 @@ namespace {
     std::string& ref_;
   };
 
-  struct DelimiterIO
-  {
-    char exp_;
-  };
-
-  struct LabelIO
-  {
-    std::string exp_;
-  };
-
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -40,6 +39,20 @@ namespace {
     if (in && (c != dest.exp_)) {
       in.setstate(std::ios::failbit);
     }
+    return in;
+  }
+
+  std::istream& operator>>(std::istream& in, LabelIO& dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+      return in;
+    }
+    std::string data = "";
+    if (!std::getline(in, data, ' ')) {
+      in.setstate(std::ios::failbit);
+    }
+    dest.exp_ = data;
     return in;
   }
 
@@ -89,20 +102,6 @@ namespace {
     }
     return std::getline(in >> DelimiterIO{'"'}, dest.ref_, '"');
   }
-
-  std::istream& operator>>(std::istream& in, LabelIO& dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-    std::string data = "";
-    if (!std::getline(in, data, ' ')) {
-      in.setstate(std::ios::failbit);
-    }
-    dest.exp_ = data;
-    return in;
-  }
 }
 
 std::istream& maslevtsov::operator>>(std::istream& in, DataStruct& dest)
@@ -138,8 +137,23 @@ std::ostream& maslevtsov::operator<<(std::ostream& out, const DataStruct& dest)
     return out;
   }
   IOFmtGuard fmtguard(out);
-  out << "(:key1 " << dest.key1_ << ":";
-  out << "key2 " << dest.key2_ << "ull:";
+  out << "(:key1 ";
+  if (dest.key1_ == 0.0) {
+    out << "0.0e0";
+  } else {
+    int exponent = static_cast< int >(std::floor(std::log10(std::abs(dest.key1_))));
+    double mantissa = dest.key1_ / std::pow(10.0, exponent);
+    if (mantissa >= 10.0) {
+      mantissa /= 10.0;
+      exponent += 1;
+    } else if (mantissa < 1.0) {
+      mantissa *= 10.0;
+      exponent -= 1;
+    }
+    out << std::fixed << std::setprecision(1);
+    out << mantissa << 'e' << exponent;
+  }
+  out << ":key2 " << dest.key2_ << "ull:";
   out << "key3 \"" << dest.key3_ << "\":)";
   return out;
 }
