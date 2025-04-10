@@ -178,7 +178,7 @@ std::ostream & maslov::operator<<(std::ostream & out, const DoubleSciIO & dest)
     return out;
   }
   double value = dest.ref;
-  int exp = static_cast< int >(std::floor(std::log10(std::abs(value))));
+  int exp = std::floor(std::log10(std::abs(value)));
   double mantissa = value / std::pow(10.0, exp);
   if (std::abs(mantissa) >= 10.0)
   {
