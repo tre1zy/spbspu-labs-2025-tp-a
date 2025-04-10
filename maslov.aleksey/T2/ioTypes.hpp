@@ -27,6 +27,7 @@ namespace maslov
   std::istream & operator>>(std::istream & in, CharLitIO && dest);
   std::istream & operator>>(std::istream & in, StringIO && dest);
   std::istream & operator>>(std::istream & in, DataStruct & data);
+  std::ostream & operator<<(std::ostream & out, const DoubleSciIO & dest);
   std::ostream & operator<<(std::ostream & out, const DataStruct & data);
 }
 

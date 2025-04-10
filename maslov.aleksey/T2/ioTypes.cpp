@@ -1,5 +1,6 @@
 #include "ioTypes.hpp"
 #include <iomanip>
+#include <cmath>
 #include "streamGuard.hpp"
 
 std::ostream & maslov::operator<<(std::ostream & out, const DataStruct & data)
@@ -11,7 +12,7 @@ std::ostream & maslov::operator<<(std::ostream & out, const DataStruct & data)
   }
   maslov::StreamGuard guard(out);
   out << "(";
-  out << ":key1 " << std::scientific << std::setprecision(2) << data.key1;
+  out << ":key1 " << DoubleSciIO{const_cast< double & >(data.key1)};
   out << ":key2 '" << data.key2;
   out << "':key3 \"" << data.key3;
   out << "\":)";
@@ -167,4 +168,29 @@ std::istream & maslov::operator>>(std::istream & in, DataStruct & data)
   in >> DelimiterIO{')'};
   data = temp;
   return in;
+}
+
+std::ostream & maslov::operator<<(std::ostream & out, const DoubleSciIO & dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  double value = dest.ref;
+  int exp = static_cast< int >(std::floor(std::log10(std::abs(value))));
+  double mantissa = value / std::pow(10.0, exp);
+  if (std::abs(mantissa) >= 10.0)
+  {
+    mantissa /= 10.0;
+    exp += 1;
+  }
+  else if (std::abs(mantissa) < 1.0)
+  {
+    mantissa *= 10.0;
+    exp -= 1;
+  }
+  out << std::fixed << std::setprecision(2);
+  out << mantissa << 'e' << exp;
+  return out;
 }
