@@ -1,5 +1,6 @@
 #include "io-utils.hpp"
 #include <cmath>
+#include "scope-guard.hpp"
 
 std::istream & savintsev::operator>>(std::istream & in, DelimiterIO && dest)
 {
@@ -27,37 +28,36 @@ std::istream & savintsev::operator>>(std::istream & in, DoubleIO && dest)
     return in;
   }
 
-  //std::string number;
-  //std::getline(in, number, ':');
-
-  int before = 0, power = 0;
-  size_t after = 0;
-  char c = '0';
-
-  in >> before;
-  in >> c;
-  if (c != '.')
+  std::string token;
+  if (!std::getline(in, token, ':'))
   {
     in.setstate(std::ios::failbit);
-  }
-  in >> after;
-  in >> c;
-  if (c != 'e' && c != 'E')
-  {
-    in.setstate(std::ios::failbit);
-  }
-  in >> power;
-
-  if (!in)
-  {
     return in;
   }
 
-  double fractional = after / std::pow(10.0, std::to_string(after).length());
-  double result = (before < 0 ? before - fractional : before + fractional) * std::pow(10.0, power);
+  if (token.find('e') == std::string::npos && token.find('E') == std::string::npos)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
 
-  dest.ref_ = result;
+  try
+  {
+    size_t idx = 0;
+    double value = std::stod(token, &idx);
 
+    if (idx != token.size())
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    dest.ref_ = value;
+  }
+  catch (const std::exception &)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  in.unget();
   return in;
 }
 
@@ -79,12 +79,12 @@ std::istream & savintsev::operator>>(std::istream & in, UllIO && dest)
     return in;
   }
 
-  std::ios::fmtflags f = in.flags();
+  ScopeGuard guard(in);
   in >> std::oct >> dest.ref_;
-  in.flags(f);
 
   return in;
 }
+
 
 std::istream & savintsev::operator>>(std::istream & in, LabelIO & dest)
 {

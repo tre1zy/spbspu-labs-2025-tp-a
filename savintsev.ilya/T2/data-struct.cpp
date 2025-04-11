@@ -80,7 +80,7 @@ std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & data
   out << std::scientific << std::setprecision(1) << data.key1 << ":";
 
   out << "key2 ";
-  out << std::oct << data.key2 << ":";
+  out << '0' << std::oct << data.key2 << ":";
 
   out << "key3 ";
   out << '"' << data.key3 << "\":)";
