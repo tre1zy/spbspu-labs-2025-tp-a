@@ -45,21 +45,7 @@ namespace duhanina
     {
       return in;
     }
-    std::string numStr;
-    in >> numStr;
-    try
-    {
-      size_t pos = 0;
-      dest.ref = std::stoll(numStr, &pos);
-      if (numStr.size() - pos != 2 || !(numStr[pos] == 'l' || numStr[pos] == 'L') || !(numStr[pos+1] == 'l' || numStr[pos+1] == 'L'))
-      {
-        in.setstate(std::ios::failbit);
-      }
-    }
-    catch (...)
-    {
-      in.setstate(std::ios::failbit);
-    }
+    in >> dest.ref >> DelimiterIO{'l'} >> DelimiterIO{'l'};
     return in;
   }
 
