@@ -6,7 +6,6 @@
 
 namespace duhanina
 {
-
   Iofmtguard::Iofmtguard(std::basic_ios< char >& s):
     s_(s),
     width_(s.width()),
