@@ -1,0 +1,41 @@
+#ifndef IO_UTILS_H
+#define IO_UTILS_H
+#include <cstddef>
+#include <string>
+#include <iostream>
+
+namespace savintsev
+{
+  struct DelimiterIO
+  {
+    char exp_;
+  };
+
+  struct DoubleIO
+  {
+    double & ref_;
+  };
+
+  struct UllIO
+  {
+    size_t & ref_;
+  };
+
+  struct StringIO
+  {
+    std::string & ref_;
+  };
+
+  struct LabelIO
+  {
+    std::string exp_;
+  };
+
+  std::istream & operator>>(std::istream & in, DelimiterIO && dest);
+  std::istream & operator>>(std::istream & in, DoubleIO && dest);
+  std::istream & operator>>(std::istream & in, StringIO && dest);
+  std::istream & operator>>(std::istream & in, UllIO && dest);
+  std::istream & operator>>(std::istream & in, LabelIO & dest);
+}
+
+#endif

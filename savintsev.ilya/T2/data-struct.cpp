@@ -1,74 +1,7 @@
-#include <cmath>
-#include "scope-guard.hpp"
 #include "data-struct.hpp"
-
-std::istream & savintsev::operator>>(std::istream & in, DelimiterIO && dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  char c = '0';
-  in >> c;
-
-  if (in && (c != dest.exp))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
-
-std::istream & savintsev::operator>>(std::istream & in, DoubleIO && dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  double value = 0.0;
-  in >> value;
-
-  if (!in)
-  {
-    return in;
-  }
-
-  dest.ref = value;
-  return in;
-}
-
-std::istream & savintsev::operator>>(std::istream & in, StringIO && dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
-}
-
-std::istream & savintsev::operator>>(std::istream & in, UllIO && dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  std::ios::fmtflags f = in.flags();
-  in >> std::oct >> dest.ref;
-  in.flags(f);
-
-  return in;
-}
-
-std::istream & savintsev::operator>>(std::istream & in, LabelIO && dest)
-{
-  return in >> dest.ref;
-}
+#include <iomanip>
+#include "scope-guard.hpp"
+#include "io-utils.hpp"
 
 std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
 {
@@ -78,7 +11,7 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
     return in;
   }
 
-  savintsev::DataStruct temp{};
+  savintsev::DataStruct temp;
   bool has_key1 = false, has_key2 = false, has_key3 = false;
 
   try
@@ -86,29 +19,29 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
     in >> savintsev::DelimiterIO{'('};
     in >> savintsev::DelimiterIO{':'};
 
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
-      std::string label;
-      in >> savintsev::LabelIO{label};
+      LabelIO label{""};
+      in >> label;
 
-      if (label == "key1")
+      if (label.exp_ == "key1")
       {
         in >> savintsev::DoubleIO{temp.key1};
         has_key1 = true;
       }
-      else if (label == "key2")
+      else if (label.exp_ == "key2")
       {
         in >> savintsev::UllIO{temp.key2};
         has_key2 = true;
       }
-      else if (label == "key3")
+      else if (label.exp_ == "key3")
       {
         in >> savintsev::StringIO{temp.key3};
         has_key3 = true;
       }
       else
       {
-        throw std::runtime_error("Unknown key: " + label);
+        throw std::runtime_error("Unknown key");
       }
 
       in >> savintsev::DelimiterIO{':'};
@@ -131,14 +64,26 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
   return in;
 }
 
-std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & dest)
+std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & data)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
   {
     return out;
   }
-  ScopeGuard guard(out);
-  out << "(:key1 " << dest.key1 << ":key2 " << dest.key2 << ":key3 \"" << dest.key3 << "\":)";
+
+  savintsev::ScopeGuard guard(out);
+
+  out << "(:";
+
+  out << "key1 ";
+  out << std::scientific << std::setprecision(1) << data.key1 << ":";
+
+  out << "key2 ";
+  out << std::oct << data.key2 << ":";
+
+  out << "key3 ";
+  out << '"' << data.key3 << "\":)";
+
   return out;
 }
