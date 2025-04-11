@@ -9,8 +9,8 @@ namespace duhanina
 {
   struct DataStruct
   {
-    std::complex< double > key1;
-    long long key2;
+    long long key1;
+    std::complex< double > key2;
     std::string key3;
 
     bool operator<(const DataStruct& other) const;
@@ -21,14 +21,14 @@ namespace duhanina
     char exp;
   };
 
-  struct ComplexIO
-  {
-    std::complex< double >& ref;
-  };
-
   struct LongLongIO
   {
     long long& ref;
+  };
+
+  struct ComplexIO
+  {
+    std::complex< double >& ref;
   };
 
   struct StringIO

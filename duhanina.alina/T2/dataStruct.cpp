@@ -38,6 +38,31 @@ namespace duhanina
     return in;
   }
 
+  std::istream& operator>>(std::istream& in, LongLongIO&& dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+    std::string numStr;
+    in >> numStr;
+    try
+    {
+      size_t pos = 0;
+      dest.ref = std::stoll(numStr, &pos);
+      if (numStr.size() - pos != 2 || !(numStr[pos] == 'l' || numStr[pos] == 'L') || !(numStr[pos+1] == 'l' || numStr[pos+1] == 'L'))
+      {
+        in.setstate(std::ios::failbit);
+      }
+    }
+    catch (...)
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
+  }
+
   std::istream& operator>>(std::istream& in, ComplexIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -59,31 +84,6 @@ namespace duhanina
     }
     return in;
   }
-
-  std::istream& operator>>(std::istream& in, LongLongIO&& dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    std::string numStr;
-    in >> numStr;
-    try
-    {
-      size_t pos = 0;
-      dest.ref = std::stoll(numStr, &pos);
-    if (numStr.size() - pos != 2 || !(numStr[pos] == 'l' || numStr[pos] == 'L') || !(numStr[pos+1] == 'l' || numStr[pos+1] == 'L'))
-    {
-      in.setstate(std::ios::failbit);
-    }
-  }
-  catch (...)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
 
   std::istream& operator>>(std::istream& in, StringIO&& dest)
   {
