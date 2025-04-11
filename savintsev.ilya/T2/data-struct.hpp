@@ -6,7 +6,6 @@
 
 namespace savintsev
 {
-  //DBL SCI | ULL OCT
   struct DataStruct
   {
     double key1;

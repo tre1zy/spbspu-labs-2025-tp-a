@@ -9,19 +9,24 @@ int main()
 {
   using namespace savintsev;
 
-  std::vector< DataStruct > dataVec;
+  std::vector< DataStruct > data;
 
-  std::istream_iterator< DataStruct > start(std::cin);
-  std::istream_iterator< DataStruct > end;
+  using data_iterator = std::istream_iterator< DataStruct >;
+  while (!std::cin.eof())
+  {
+    if (std::cin.fail())
+    {
+      std::cin.clear();
+    }
+    std::copy(data_iterator(std::cin), data_iterator(), std::back_inserter(data));
+  }
 
-  std::copy(start, end, std::back_inserter(dataVec));
-
-  std::sort(dataVec.begin(), dataVec.end(), [](const DataStruct &a, const DataStruct &b)
+  std::sort(data.begin(), data.end(), [](const DataStruct & a, const DataStruct & b)
   {
     if (a.key1 != b.key1) return a.key1 < b.key1;
     if (a.key2 != b.key2) return a.key2 < b.key2;
     return a.key3.length() < b.key3.length();
   });
 
-  std::copy(std::begin(dataVec), std::end(dataVec), std::ostream_iterator< DataStruct >(std::cout, "\n"));
+  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
 }
