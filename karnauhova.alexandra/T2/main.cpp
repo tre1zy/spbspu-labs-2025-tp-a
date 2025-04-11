@@ -23,12 +23,11 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  auto value = data.data();
-  std::cout << value->key1 << value->key2 << value->key3 << "\n";
-  // std::copy
-  // (
-  //   std::begin(data),
-  //   std::end(data),
-  //   std::ostream_iterator< karnauhova::DataStruct >(std::cout, "\n")
-  // );
+  
+  std::copy
+  (
+    std::begin(data),
+    std::end(data),
+    std::ostream_iterator< karnauhova::DataStruct >(std::cout, "\n")
+  );
 }

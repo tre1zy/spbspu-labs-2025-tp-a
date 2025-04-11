@@ -2,6 +2,8 @@
 #include <sstream>
 #include <string>
 #include <exception>
+#include <iomanip>
+#include "scope_guard.hpp"
 
 std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
 {
@@ -47,7 +49,7 @@ std::istream& karnauhova::operator>>(std::istream& in, StringIO&& dest)
     return in;
   }
   std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
-  return in >> DelimiterIO{ ':' };
+  return in;
 }
 
 std::istream& karnauhova::operator>>(std::istream& in, KeyIO& dest)
@@ -92,7 +94,7 @@ std::istream& karnauhova::operator>>(std::istream& in, DataStruct& dest)
       }
       else if (key_num.num == '2')
       {
-        in >> ull{input.key2};
+        in >> ull{input.key2} >> symb{':'};
       }
       else if (key_num.num == '3')
       {
@@ -106,4 +108,44 @@ std::istream& karnauhova::operator>>(std::istream& in, DataStruct& dest)
     dest = input;
   }
   return in;
+}
+
+std::ostream& karnauhova::operator<<(std::ostream& out, const DoubleIO&& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  iofmtguard fmtguard(out);
+  out << std::fixed << std::setprecision(1) << dest.ref << "d";
+  return out;
+}
+
+std::ostream& karnauhova::operator<<(std::ostream& out, const UllIO&& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  out << dest.ref << "ull";
+  return out;
+}
+
+std::ostream& karnauhova::operator<<(std::ostream& out, const DataStruct& src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  double dbl = src.key1;
+  unsigned long long ull = src.key2;
+  iofmtguard fmtguard(out);
+  out << "(:key1 " << DoubleIO{dbl};
+  out << ":key2 " << UllIO{ull};
+  out << ":key3 \"" << src.key3;
+  out << "\":)";
+  return out;
 }
