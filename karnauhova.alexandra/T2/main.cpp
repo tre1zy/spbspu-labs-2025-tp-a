@@ -2,6 +2,7 @@
 #include <iterator>
 #include <limits>
 #include <iostream>
+#include <algorithm>
 #include "data_struct.hpp"
 
 int main()
@@ -23,7 +24,7 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-
+  std::sort(data.begin(), data.end(), compare);
   std::copy
   (
     std::begin(data),

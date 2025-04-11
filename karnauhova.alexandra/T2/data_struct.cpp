@@ -149,3 +149,16 @@ std::ostream& karnauhova::operator<<(std::ostream& out, const DataStruct& src)
   out << "\":)";
   return out;
 }
+
+bool karnauhova::compare(const DataStruct& l, const DataStruct& r)
+{
+  if (l.key1 != r.key1)
+  {
+    return l.key1 < r.key1;
+  }
+  if (l.key2 != r.key2)
+  {
+    return l.key2 < r.key2;
+  }
+  return l.key3.size() < r.key3.size();
+}

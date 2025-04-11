@@ -1,6 +1,7 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
 #include <string>
+#include <vector>
 
 namespace karnauhova
 {
@@ -50,5 +51,6 @@ namespace karnauhova
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, LabelIO& dest);
+  bool compare(const DataStruct& l, const DataStruct& r);
 }
 #endif
