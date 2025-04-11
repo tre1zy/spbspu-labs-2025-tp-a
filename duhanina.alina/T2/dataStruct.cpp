@@ -118,13 +118,12 @@ namespace duhanina
       return in;
     }
     DataStruct temp;
-    in >> DelimiterIO{ '(' };
+    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
     bool k1 = false;
     bool k2 = false;
     bool k3 = false;
-    while (in.peek() == ':')
+    for (size_t i = 0; i < 3; i++)
     {
-      in >> DelimiterIO{ ':' };
       std::string label = "";
       if (!(in >> StringIO{ label }))
       {
