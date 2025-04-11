@@ -62,22 +62,8 @@ std::istream &abramov::operator>>(std::istream &in, StringIO &&dest)
   {
     return in;
   }
-  return std::getline(in, dest.ref, ' ');
-}
-
-std::istream &abramov::operator>>(std::istream &in, KeyIO &&dest)
-{
-  std::istream::sentry s(in);
-  if (!s)
-  {
-    return in;
-  }
-  std::string data = "";
-  if ((in >> StringIO{ data }) && (data != dest.key))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
+  in >> DelimiterIO{ '"' };
+  return std::getline(in, dest.ref, '"');
 }
 
 std::istream &abramov::operator>>(std::istream &in, DataStruct &data)
@@ -89,15 +75,40 @@ std::istream &abramov::operator>>(std::istream &in, DataStruct &data)
   }
   DataStruct input;
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-  in >> KeyIO{ "key1" };
-  in >> DoubleIO{ data.key1 };
-  in >> DelimiterIO{ ':' } >> KeyIO{ "key2" };
-  in >> UllIO{ data.key2 } >> DelimiterIO{ ':' } >> KeyIO{ "key3" };
-  std::string tmp;
-  std::getline(in, tmp, ':');
-  tmp = tmp.substr(1, tmp.size() - 2);
-  data.key3 = tmp;
+  std::string key;
+  constexpr size_t key_numbers = 3;
+  size_t count = 0;
+  while (count < key_numbers && in)
+  {
+    in >> key;
+    if (key == "key1")
+    {
+      in >> DoubleIO{ input.key1 };
+      in >> DelimiterIO{ ':' };
+      ++count;
+    }
+    else if (key == "key2")
+    {
+      in >> UllIO{ input.key2 };
+      in >> DelimiterIO{ ':' };
+      ++count;
+    }
+    else if (key == "key3")
+    {
+      in >> StringIO{ input.key3 };
+      in >> DelimiterIO{ ':' };
+      ++count;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
   in >> DelimiterIO{ ')' };
+  if (in)
+  {
+    data = input;
+  }
   return in;
 }
 

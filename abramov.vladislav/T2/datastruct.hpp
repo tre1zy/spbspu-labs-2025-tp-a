@@ -36,11 +36,5 @@ namespace abramov
     std::string &ref;
   };
   std::istream &operator>>(std::istream &in, StringIO &&dest);
-
-  struct KeyIO
-  {
-    std::string key;
-  };
-  std::istream &operator>>(std::istream &in, KeyIO &&dest);
 }
 #endif
