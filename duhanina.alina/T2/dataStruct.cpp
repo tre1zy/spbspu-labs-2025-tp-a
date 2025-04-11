@@ -132,12 +132,12 @@ namespace duhanina
       }
       if (label == "key1")
       {
-        in >> ComplexIO{ temp.key1 };
+        in >> LongLongIO{ temp.key1 };
         k1 = true;
       }
       else if (label == "key2")
       {
-        in >> LongLongIO{ temp.key2 };
+        in >> ComplexIO{ temp.key2 };
         k2 = true;
       }
       else if (label == "key3")
@@ -167,29 +167,24 @@ namespace duhanina
       return out;
     }
     Iofmtguard guard(out);
-    out << "(:key1 #c(";
-    out << std::fixed << std::setprecision(1) << src.key1.real();
-    if (src.key1.imag() >= 0)
-    {
-      out << '+';
-    }
-    out << src.key1.imag() << "):";
-    out << "key2 " << src.key2 << "ll:";
+    out << "(:key1 " << src.key1 << "ll:";
+    out << "key2 #c(" << std::fixed << std::setprecision(1) << src.key2.real();
+    out << src.key2.imag() << "):";
     out << "key3 \"" << src.key3 << "\":)";
     return out;
   }
 
   bool DataStruct::operator<(const DataStruct& other) const
   {
-    double thisMod = std::abs(key1);
-    double otherMod = std::abs(other.key1);
+    if (key1 != other.key1)
+    {
+      return key1 < other.key1;
+    }
+    const double thisMod = std::abs(key2);
+    const double otherMod = std::abs(other.key2);
     if (thisMod != otherMod)
     {
       return thisMod < otherMod;
-    }
-    if (key2 != other.key2)
-    {
-      return key2 < other.key2;
     }
     return key3.size() < other.key3.size();
   }
