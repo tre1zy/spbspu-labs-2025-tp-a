@@ -23,7 +23,7 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  
+
   std::copy
   (
     std::begin(data),
