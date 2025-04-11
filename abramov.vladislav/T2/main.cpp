@@ -4,10 +4,13 @@
 #include <limits>
 #include <algorithm>
 #include "datastruct.hpp"
+#include "stream_guard.hpp"
 
 int main()
 {
   using namespace abramov;
+  StreamGuard in(std::cin);
+  StreamGuard out(std::cout);
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
