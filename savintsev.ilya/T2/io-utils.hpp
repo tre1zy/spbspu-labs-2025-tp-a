@@ -36,6 +36,8 @@ namespace savintsev
   std::istream & operator>>(std::istream & in, StringIO && dest);
   std::istream & operator>>(std::istream & in, UllIO && dest);
   std::istream & operator>>(std::istream & in, LabelIO & dest);
+
+  std::ostream & operator<<(std::ostream & out, const DoubleIO & dest);
 }
 
 #endif

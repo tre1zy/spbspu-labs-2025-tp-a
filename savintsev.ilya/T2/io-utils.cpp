@@ -101,3 +101,44 @@ std::istream & savintsev::operator>>(std::istream & in, LabelIO & dest)
   dest.exp_ = data;
   return in;
 }
+
+std::ostream & savintsev::operator<<(std::ostream & out, const DoubleIO & dest)
+{
+  savintsev::ScopeGuard guard(out);
+
+  if (dest.ref_ == 0.0)
+  {
+    out << "0.0e+0";
+    return out;
+  }
+
+  int exponent = 0;
+  double mantissa = dest.ref_;
+
+  while (std::abs(mantissa) >= 10.0)
+  {
+    mantissa /= 10.0;
+    ++exponent;
+  }
+  while (std::abs(mantissa) < 1.0)
+  {
+    mantissa *= 10.0;
+    --exponent;
+  }
+
+  out.setf(std::ios::fixed);
+  out.precision(1);
+  out << mantissa;
+
+  out << 'e';
+  if (exponent >= 0)
+  {
+    out << '+' << exponent;
+  }
+  else
+  {
+    out << '-' << -exponent;
+  }
+
+  return out;
+}

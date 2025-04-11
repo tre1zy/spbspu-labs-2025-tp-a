@@ -77,7 +77,7 @@ std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & data
   out << "(:";
 
   out << "key1 ";
-  out << std::scientific << std::setprecision(1) << data.key1 << ":";
+  out << DoubleIO{const_cast< double & >(data.key1)} << ":";
 
   out << "key2 ";
   out << '0' << std::oct << data.key2 << ":";
