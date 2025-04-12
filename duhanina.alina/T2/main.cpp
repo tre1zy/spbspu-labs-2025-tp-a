@@ -20,8 +20,7 @@ int main()
     }
   }
   std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >
-(std::cout, "\n"));
+  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
   return 0;
 }
 

@@ -111,14 +111,8 @@ namespace duhanina
     bool k2 = false;
     bool k3 = false;
     std::string label;
-
-//    for (size_t i = 0; i < 3; i++)
     while (in >> label)
     {
-    //  if (!(in >> StringIO{ label }))
-    //  {
-    //    break;
-    //  }
       if (label == "key1")
       {
         in >> LongLongIO{ temp.key1 };
@@ -134,12 +128,19 @@ namespace duhanina
         in >> StringIO{ temp.key3 };
         k3 = true;
       }
+      else if (label == ")")
+      {
+        break;
+      }
       in >> DelimiterIO{ ':' };
     }
-    in >> DelimiterIO{ ')' };
-    if (k1 && k2 && k3)
+    if (in && k1 && k2 && k3)
     {
       dest = temp;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
