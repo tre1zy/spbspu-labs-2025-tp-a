@@ -1,14 +1,12 @@
 #include <iostream>
-#include "skip_any_of.hpp"
+#include "data_struct.hpp"
 
 int main()
 {
-  size_t matches = 0;
-  char c = '\0';
-  std::cin >> rychkov::input::anyOf(&matches, "key1", "key2", "key3") >> c;
-  if (!std::cin)
+  rychkov::DataStruct ds;
+  if (!(std::cin >> ds))
   {
-    std::cout << "fail\n";
+    std::cerr << "fail\n";
   }
-  std::cout << matches << " '" << c << "'\n";
+  std::cout << ds.key1 << ' ' << ds.key2 << ' ' << ds.key3 << '\n';
 }

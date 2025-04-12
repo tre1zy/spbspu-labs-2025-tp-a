@@ -51,7 +51,7 @@ namespace rychkov
           {
             if ((i >= sizes[j]) || (buffer[i] != possible.cases[j][i]))
             {
-              skips[j] = false;
+              skips[j] = true;
               continue;
             }
             else if (i + 1 == sizes[j])
