@@ -78,7 +78,9 @@ namespace duhanina
     {
       return in;
     }
-    return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+    in >> DelimiterIO{'"'};
+    std::getline(in, dest.ref, '"');
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, LabelIO&& dest)
@@ -89,7 +91,7 @@ namespace duhanina
       return in;
     }
     std::string label;
-    if ((in >> StringIO{ label }) && label != dest.exp)
+    if ((in >> label) && label != dest.exp)
     {
       in.setstate(std::ios::failbit);
     }
@@ -108,13 +110,15 @@ namespace duhanina
     bool k1 = false;
     bool k2 = false;
     bool k3 = false;
-    for (size_t i = 0; i < 3; i++)
+    std::string label;
+
+//    for (size_t i = 0; i < 3; i++)
+    while (in >> label)
     {
-      std::string label = "";
-      if (!(in >> StringIO{ label }))
-      {
-        break;
-      }
+    //  if (!(in >> StringIO{ label }))
+    //  {
+    //    break;
+    //  }
       if (label == "key1")
       {
         in >> LongLongIO{ temp.key1 };
@@ -133,13 +137,9 @@ namespace duhanina
       in >> DelimiterIO{ ':' };
     }
     in >> DelimiterIO{ ')' };
-    if (in && k1 && k2 && k3)
+    if (k1 && k2 && k3)
     {
       dest = temp;
-    }
-    else
-    {
-      in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -154,7 +154,7 @@ namespace duhanina
     Iofmtguard guard(out);
     out << "(:key1 " << src.key1 << "ll:";
     out << "key2 #c(" << std::fixed << std::setprecision(1) << src.key2.real();
-    out << src.key2.imag() << "):";
+    out << " " << src.key2.imag() << "):";
     out << "key3 \"" << src.key3 << "\":)";
     return out;
   }
