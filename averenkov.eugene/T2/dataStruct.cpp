@@ -13,7 +13,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     return in;
   }
   DataStruct tmp;
-  in >> DelimiterIO{':'};
+  in >> DelimiterIO{'('} >> DelimiterIO{':'};
   std::string field;
   while (in >> field)
   {
