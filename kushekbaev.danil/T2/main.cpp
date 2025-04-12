@@ -2,25 +2,27 @@
 #include <iterator>
 #include <algorithm>
 #include <iostream>
-#include "streamguard.hpp"
+#include <limits>
 #include "datastruct.hpp"
 
 int main()
 {
-  kushekbaev::StreamGuard outsg(std::cout);
-  kushekbaev::StreamGuard insg(std::cin);
-
   std::vector< kushekbaev::DataStruct > data;
   while (!std::cin.eof())
   {
-    if (std::cin.fail())
+    std::copy
+    (
+      std::istream_iterator< kushekbaev::DataStruct >(std::cin),
+      std::istream_iterator< kushekbaev::DataStruct >(),
+      std::back_inserter(data)
+    );
+    if (!std::cin)
     {
       std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::copy(std::istream_iterator< kushekbaev::DataStruct >(std::cin),
-      std::istream_iterator< kushekbaev::DataStruct >(), std::back_inserter(data));
   }
 
   std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator< kushekbaev::DataStruct >(std::cout, "\n"));
+  std::copy(std::begin(data), std::end(data), std::ostream_iterator< kushekbaev::DataStruct >(std::cout, "\n"));
 }
