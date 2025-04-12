@@ -1,5 +1,6 @@
 #include <iostream>
 #include "data_struct.hpp"
+#include <boost/core/typeinfo.hpp>
 
 int main()
 {
