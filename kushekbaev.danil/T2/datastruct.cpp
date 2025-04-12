@@ -35,7 +35,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& dest)
   bool key2exist = false;
   bool key3exist = false;
   DataStruct input;
-  in >> sep{ '{' };
+  in >> sep{ '(' };
   for (size_t i = 0; i < 3; ++i)
   {
     std::string label;
@@ -66,7 +66,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& dest)
     in.setstate(std::ios::failbit);
     return in;
   }
-  in >> sep{ ':' } >> sep{ '}' };
+  in >> sep{ ':' } >> sep{ ')' };
   dest = input;
   return in;
 }
@@ -108,19 +108,40 @@ std::istream& kushekbaev::operator>>(std::istream& in, ULLIO&& dest)
   {
     return in;
   }
-  in >> sep{ '0' } >> sep{ ( 'b' || 'B' )} >> dest.ref;
-  if (in)
+  char c = 0;
+  in >> c;
+  if (c != '0')
   {
-    std::string tmp = std::to_string(dest.ref);
-    for (char c: tmp)
-    {
-      if ((c != 1) || (c != 0))
-      {
-        in.setstate(std::ios::failbit);
-        break;
-      }
-    }
+    in.setstate(std::ios::failbit);
     return in;
+  }
+  in >> c;
+  if ((c != 'b') && (c != 'B'))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  std::string binStr;
+  while (in.get(c) && (c == '0' || c == '1'))
+  {
+    binStr += c;
+  }
+  if (!in.eof() && c != ':' && c != ' ')
+  {
+    in.unget();
+  }
+  if (binStr.empty())
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  try
+  {
+    dest.ref = std::stoull(binStr, nullptr, 2);
+  }
+  catch (...)
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
