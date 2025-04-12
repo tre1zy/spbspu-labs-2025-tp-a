@@ -5,7 +5,7 @@
 #include <string>
 #include <iterator>
 #include <vector>
-#include <iomanip> 
+#include <iomanip>
 #include <cmath>
 #include <algorithm>
 
