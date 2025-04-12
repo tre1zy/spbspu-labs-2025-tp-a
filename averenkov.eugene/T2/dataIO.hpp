@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include "IOFmtGuard.h"
+#include "iofmtguard.hpp"
 
 namespace DataIO
 {

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include "DataIO.h"
+#include "dataIO.hpp"
 
 struct DataStruct
 {
@@ -13,11 +13,8 @@ struct DataStruct
   std::string key3;
 };
 
-namespace DataIO
-{
-  std::istream& operator>>(std::istream& in, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
-  bool operator<(const DataStruct& a, const DataStruct& b);
-}
+std::istream& operator>>(std::istream& in, DataStruct& dest);
+std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+bool operator<(const DataStruct& a, const DataStruct& b);
 
 #endif

@@ -1,13 +1,13 @@
-#include "DataStruct.h"
+#include "dataStruct.hpp"
 #include <vector>
 #include <iterator>
 #include <algorithm>
 
 int main()
 {
-  std::vector<DataStruct> data;
-  std::istream_iterator<DataStruct> inputBegin(std::cin);
-  std::istream_iterator<DataStruct> inputEnd;
+  std::vector< DataStruct > data;
+  std::istream_iterator< DataStruct > inputBegin(std::cin);
+  std::istream_iterator< DataStruct > inputEnd;
   while (inputBegin != inputEnd)
   {
     data.push_back(*inputBegin);
@@ -23,7 +23,7 @@ int main()
   std::copy(
     data.begin(),
     data.end(),
-    std::ostream_iterator<DataStruct>(std::cout, "\n")
+    std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
   return 0;
 }
