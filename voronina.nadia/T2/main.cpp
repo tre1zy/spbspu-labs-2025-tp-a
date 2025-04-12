@@ -3,7 +3,6 @@
 int main()
 {
   using nspace::DataStruct;
-
   std::vector<DataStruct> data;
   while (!std::cin.eof())
   {
