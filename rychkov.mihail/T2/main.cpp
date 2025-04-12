@@ -1,7 +1,14 @@
 #include <iostream>
-#include "stream_guard.hpp"
+#include "skip_any_of.hpp"
 
 int main()
 {
-  rychkov::input::StreamGuard guard(std::cin);
+  size_t matches = 0;
+  char c = '\0';
+  std::cin >> rychkov::input::anyOf(&matches, "key1", "key2", "key3") >> c;
+  if (!std::cin)
+  {
+    std::cout << "fail\n";
+  }
+  std::cout << matches << " '" << c << "'\n";
 }
