@@ -124,31 +124,47 @@ namespace dribas
     if (!sentry) {
       return in;
     }
+
     Data temp;
     in >> DelimiterIO{'('} >> DelimiterIO{':'};
+
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
 
     for (int i = 0; i < 3; ++i) {
       std::string key;
       in >> key;
-      if (key != "key1" && key != "key2" && key != "key3") {
+      if (key == "key1") {
+        if (hasKey1) {
+          in.setstate(std::ios::failbit); return in;
+        }
+        hasKey1 = true;
+        in >> DoubleI{temp.key1};
+      } else if (key == "key2") {
+        if (hasKey2) {
+          in.setstate(std::ios::failbit); return in;
+        }
+        hasKey2 = true;
+        in >> UllI{temp.key2};
+      } else if (key == "key3") {
+        if (hasKey3) {
+          in.setstate(std::ios::failbit); return in;
+        }
+        hasKey3 = true;
+        in >> StringI{temp.key3};
+      } else {
         in.setstate(std::ios::failbit);
         return in;
       }
       in >> DelimiterIO{':'};
-      if (key == "key1") {
-        in >> DoubleI{temp.key1};
-      } else if (key == "key2") {
-        in >> UllI{temp.key2};
-      } else if ((key == "key3")) {
-        in >> StringI{temp.key3};
-      }
-      in >> DelimiterIO{':'};
+    }
+    if (!hasKey1 || !hasKey2 || !hasKey3) {
+      in.setstate(std::ios::failbit);
     }
     in >> DelimiterIO{')'};
     if (in) {
       dest = temp;
     }
-      return in;
+    return in;
   }
 
   std::ostream& operator<<(std::ostream& out, const Data& data)
