@@ -1,8 +1,8 @@
 #ifndef DATASTRUCT_HPP
 #define DATASTRUCT_HPP
 
-#include <ios>
 #include <string>
+#include <ios>
 
 namespace kushekbaev
 {
@@ -19,12 +19,12 @@ namespace kushekbaev
     char exp;
   };
 
-  struct ULLIO
+  struct ULLBinaryIO
   {
     unsigned long long& ref;
   };
 
-  struct CharIO
+  struct ChrLitIO
   {
     char& ref;
   };
@@ -34,13 +34,17 @@ namespace kushekbaev
     std::string& ref;
   };
 
-  std::istream& operator>>(std::istream& in, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  struct LabelIO
+  {
+    std::string exp;
+  };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, ULLIO&& dest);
-  std::istream& operator>>(std::istream& in, CharIO&& dest);
-  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& obj);
+  std::istream& operator>>(std::istream& in, ULLBinaryIO&& obj);
+  std::istream& operator>>(std::istream& in, ChrLitIO&& obj);
+  std::istream& operator>>(std::istream& in, StringIO&& obj);
+  std::istream& operator>>(std::istream& in, DataStruct& obj);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& obj);
 }
 
 #endif

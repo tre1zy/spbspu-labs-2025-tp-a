@@ -1,107 +1,20 @@
 #include "datastruct.hpp"
-#include <limits>
-#include <bitset>
 #include <iostream>
-
-using sep = kushekbaev::DelimiterIO;
-using ull = kushekbaev::ULLIO;
-using chr = kushekbaev::CharIO;
-using str = kushekbaev::StringIO;
 
 bool kushekbaev::DataStruct::operator<(const DataStruct& other) const
 {
-  if (key1 != other.key1)
+  if (key1 == other.key1)
   {
-    return key1 < other.key1;
-  }
-  else if (key2 != other.key2)
-  {
+    if (key2 == other.key2)
+    {
+      return key3.size() < other.key3.size();
+    }
     return key2 < other.key2;
   }
-  else
-  {
-    return key3.size() < other.key3.size();
-  }
+  return key1 < other.key1;
 }
 
-std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  bool key1exist = false;
-  bool key2exist = false;
-  bool key3exist = false;
-  DataStruct input;
-  in >> sep{ '(' };
-  for (size_t i = 0; i < 3; ++i)
-  {
-    std::string label;
-    in >> sep{ ':' } >> label;
-    if (label == "key1")
-    {
-      in >> ull{ input.key1 };
-      key1exist = true;
-    }
-    else if (label == "key2")
-    {
-      in >> chr{ input.key2 };
-      key2exist = true;
-    }
-    else if (label == "key3")
-    {
-      in >> str{ input.key3 };
-      key3exist = true;
-    }
-    else
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-  }
-  if (!key1exist || !key2exist || !key3exist)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  in >> sep{ ':' } >> sep{ ')' };
-  dest = input;
-  return in;
-}
-
-std::ostream& kushekbaev::operator<<(std::ostream& out, const DataStruct& dest)
-{
-  std::ostream::sentry sentry(out);
-  if (!sentry)
-  {
-    return out;
-  }
-  out << "(";
-  out << ":key1 0b" << dest.key1 << ":";
-  out << ":key2 '" << dest.key2 << "':";
-  out << ":key3 \"" << dest.key3 << "\":";
-  out << ")";
-  return out;
-}
-
-std::istream& kushekbaev::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char delim;
-  if ((in >> delim) && delim != dest.exp)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
-
-std::istream& kushekbaev::operator>>(std::istream& in, ULLIO&& dest)
+std::istream& kushekbaev::operator>>(std::istream& in, DelimiterIO&& obj)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -110,60 +23,132 @@ std::istream& kushekbaev::operator>>(std::istream& in, ULLIO&& dest)
   }
   char c = 0;
   in >> c;
-  if (c != '0')
+  if (in && std::tolower(c) != obj.exp)
   {
     in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream& kushekbaev::operator>>(std::istream& in, ULLBinaryIO&& obj)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
     return in;
   }
-  in >> c;
-  if ((c != 'b') && (c != 'B'))
+  in >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' } >> obj.ref;
+  if (in)
   {
-    in.setstate(std::ios::failbit);
+    std::string tmp = std::to_string(obj.ref);
+    if (tmp.empty())
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    for (size_t i = 0; i < tmp.size(); ++i)
+    {
+      if ((tmp[i] != '0') && (tmp[i] != '1'))
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+    }
+  }
+  return in;
+}
+
+std::istream& kushekbaev::operator>>(std::istream& in, ChrLitIO&& obj)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
     return in;
   }
-  std::string binStr;
-  while (in.get(c) && (c == '0' || c == '1'))
+  in >> DelimiterIO{ '\'' };
+  in >> obj.ref;
+  in >> DelimiterIO{ '\'' };
+  return in;
+}
+
+std::istream& kushekbaev::operator>>(std::istream& in, StringIO&& obj)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    binStr += c;
-  }
-  if (!in.eof() && c != ':' && c != ' ')
-  {
-    in.unget();
-  }
-  if (binStr.empty())
-  {
-    in.setstate(std::ios::failbit);
     return in;
   }
+  in >> DelimiterIO{ '\"' };
+  std::getline(in, obj.ref, '\"');
+  return in;
+}
+
+std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& obj)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+  DataStruct tmp;
   try
   {
-    dest.ref = std::stoull(binStr, nullptr, 2);
+    in >> DelimiterIO{ '(' };
+    while ((!hasKey1 || !hasKey2 || !hasKey3) && in)
+    {
+      std::string label;
+      in >> label;
+      if (label == ":key1" && !hasKey1)
+      {
+        in >> ULLBinaryIO{ tmp.key1 };
+        hasKey1 = true;
+      }
+      else if (label == ":key2" && !hasKey2)
+      {
+        in >> ChrLitIO{ tmp.key2 };
+        hasKey2 = true;
+      }
+      else if (label == ":key3" && !hasKey3)
+      {
+        in >> StringIO{ tmp.key3 };
+        hasKey3 = true;
+      }
+      else
+      {
+        throw std::runtime_error("Unsupported key");
+      }
+    }
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' }; 
+    if (!hasKey1 || !hasKey2 || !hasKey3)
+    {
+      throw std::runtime_error("Not enough keys");
+    }
   }
   catch (...)
   {
     in.setstate(std::ios::failbit);
   }
+  if (in)
+  {
+    obj = tmp;
+  }
   return in;
 }
 
-std::istream& kushekbaev::operator>>(std::istream& in, CharIO&& dest)
+std::ostream& kushekbaev::operator<<(std::ostream& out, const DataStruct& obj)
 {
-  std::istream::sentry sentry(in);
+  std::ostream::sentry sentry(out);
   if (!sentry)
   {
-    return in;
+    return out;
   }
-  in >> sep{ '\'' } >> dest.ref >> sep{ '\'' };
-  return in;
-}
-
-std::istream& kushekbaev::operator>>(std::istream& in, StringIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  in >> sep{ '\"' } >> dest.ref >> sep{ '\"' };
-  return in;
+  out << "(:";
+  out << "key1 " << "0b" << obj.key1;
+  out << ":";
+  out << "key2 " << "\'" << obj.key2 << "\'";
+  out << ":";
+  out << "key3 " << "\"" << obj.key3 << "\"";
+  out << ":)";
+  return out;
 }
