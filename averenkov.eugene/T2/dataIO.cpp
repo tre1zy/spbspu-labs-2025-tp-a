@@ -25,7 +25,10 @@ namespace DataIO
     {
       return in;
     }
-    return in >> DelimiterIO{'\''} >> dest.ref >> DelimiterIO{'\''};
+    in >> DelimiterIO{'\''};
+    in >> dest.ref;
+    in >> DelimiterIO{'\''};
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, RationalIO&& dest)
@@ -37,8 +40,13 @@ namespace DataIO
     }
     long long n = 0;
     unsigned long long d = 1;
-    in >> DelimiterIO{'('} >> DelimiterIO{':'} >> LabelIO{"N"} >> n
-       >> DelimiterIO{':'} >> LabelIO{"D"} >> d >> DelimiterIO{':'} >> DelimiterIO{')'};
+    in >> DelimiterIO{'('};
+    in >> DelimiterIO{':'};
+    in >> LabelIO{"N"} >> n;
+    in >> DelimiterIO{':'};
+    in >> LabelIO{"D"} >> d;
+    in >> DelimiterIO{':'}
+    in >> DelimiterIO{')'};
     if (in)
     {
       dest.ref = {n, d};
@@ -53,7 +61,8 @@ namespace DataIO
     {
       return in;
     }
-    return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
+    std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, LabelIO&& dest)
