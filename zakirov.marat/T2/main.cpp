@@ -8,7 +8,7 @@
 int main()
 {
   zakirov::Guardian output_primary(std::cout);
-  zakirov::Guardian  input_primary(std::cin);
+  zakirov::Guardian input_primary(std::cin);
 
   std::vector< zakirov::Data > array;
   while (!std::cin.eof())

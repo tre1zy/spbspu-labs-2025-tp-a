@@ -104,7 +104,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
   }
 
   in >> MinorSymbol{'0'};
-  
+
   std::string hex_number;
   char next_number;
   in >> next_number;
