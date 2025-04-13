@@ -13,8 +13,9 @@ namespace rychkov
     std::string key3;
   };
   std::istream& operator>>(std::istream& in, DataStruct& link);
+  std::ostream& operator<<(std::ostream& in, const DataStruct& link);
 
-  namespace input
+  namespace iofmt
   {
     struct nth_ds_field
     {
@@ -28,7 +29,7 @@ namespace rychkov
     template< class T, size_t Id >
     extern std::istream& operator>>(std::istream& in, io_literal< T, Id >&&);
     template< class T, size_t Id >
-    extern std::ostream& operator<<(std::ostream& in, const io_literal< T, Id >&&);
+    extern std::ostream& operator<<(std::ostream& out, const io_literal< T, Id >&&);
 
     template< class T, size_t Id >
     class io_literal
@@ -45,8 +46,8 @@ namespace rychkov
         value(),
         link(initLink)
       {}
-      friend std::istream& rychkov::input::operator>>< T, Id >(std::istream& in, io_literal&&);
-      friend std::ostream& rychkov::input::operator<<< T, Id >(std::ostream& in, const io_literal&&);
+      friend std::istream& rychkov::iofmt::operator>>< T, Id >(std::istream& in, io_literal&&);
+      friend std::ostream& rychkov::iofmt::operator<<< T, Id >(std::ostream& out, const io_literal&&);
     private:
       T value;
       T& link;

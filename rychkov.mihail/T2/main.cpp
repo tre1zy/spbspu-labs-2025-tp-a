@@ -1,13 +1,28 @@
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <iterator>
+#include <limits>
+#include <iomanip>
+
 #include "data_struct.hpp"
-#include <boost/core/typeinfo.hpp>
 
 int main()
 {
-  rychkov::DataStruct ds;
-  if (!(std::cin >> ds))
+  std::vector< rychkov::DataStruct > values;
+  while (!std::cin.eof())
   {
-    std::cerr << "fail\n";
+    using Iter = std::istream_iterator< rychkov::DataStruct >;
+    std::copy(Iter(std::cin), Iter(), std::back_inserter(values));
+    if (!std::cin.eof())
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
-  std::cout << ds.key1 << ' ' << ds.key2 << ' ' << ds.key3 << '\n';
+  std::cout << std::setprecision(1);
+  for (const rychkov::DataStruct& i: values)
+  {
+    std::cout << i << '\n';
+  }
 }

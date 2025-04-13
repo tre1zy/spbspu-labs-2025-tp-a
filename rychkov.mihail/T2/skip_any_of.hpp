@@ -3,11 +3,11 @@
 
 #include <istream>
 #include <algorithm>
-#include "stream_guard.hpp"
+#include "ios_guard.hpp"
 
 namespace rychkov
 {
-  namespace input
+  namespace iofmt
   {
     template< size_t... Lens >
     struct match_any
@@ -35,7 +35,7 @@ namespace rychkov
       {
         return in;
       }
-      StreamGuard guard(in);
+      IosGuard guard(in);
 
       char static_buffer[maxLen]{};
       char* buffer = (possible.buffer == nullptr ? static_buffer : possible.buffer);
