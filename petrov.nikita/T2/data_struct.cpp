@@ -33,7 +33,7 @@ namespace petrov
       }
       return in;
   }
-  
+
   std::istream & operator>>(std::istream & in, DoubleIO && dest)
   {
     std::istream::sentry sentry(in);
