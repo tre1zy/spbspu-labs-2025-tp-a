@@ -34,11 +34,6 @@ namespace kushekbaev
     std::string& ref;
   };
 
-  struct LabelIO
-  {
-    std::string exp;
-  };
-
   std::istream& operator>>(std::istream& in, DelimiterIO&& obj);
   std::istream& operator>>(std::istream& in, ULLBinaryIO&& obj);
   std::istream& operator>>(std::istream& in, ChrLitIO&& obj);

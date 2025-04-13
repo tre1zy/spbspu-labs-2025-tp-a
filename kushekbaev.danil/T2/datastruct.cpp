@@ -144,7 +144,15 @@ std::ostream& kushekbaev::operator<<(std::ostream& out, const DataStruct& obj)
     return out;
   }
   out << "(:";
-  out << "key1 " << "0b" << obj.key1;
+  out << "key1 " << "0b";
+  if (obj.key1 == 1)
+  {
+    out << "01";
+  }
+  else
+  {
+    out << obj.key1;
+  }
   out << ":";
   out << "key2 " << "\'" << obj.key2 << "\'";
   out << ":";
