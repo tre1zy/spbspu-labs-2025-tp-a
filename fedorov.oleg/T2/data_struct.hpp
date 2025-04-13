@@ -14,7 +14,7 @@ struct DataStruct {
 
 bool operator<(const DataStruct &a, const DataStruct &b);
 std::istream &operator>>(std::istream &in, DataStruct &dest);
-std::ostream &operator<<(std::ostream &out, DataStruct &dest);
+std::ostream &operator<<(std::ostream &out, const DataStruct &dest);
 } // namespace fedorov
 
 #endif

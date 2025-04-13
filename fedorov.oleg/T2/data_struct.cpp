@@ -53,9 +53,9 @@ std::istream &operator>>(std::istream &in, DataStruct &dest)
 
   if ( !(hasKey1 && hasKey2 && hasKey3) ) {
     in.setstate(std::ios::failbit);
-
-    return in;
   }
+
+  return in;
 }
 
 std::ostream &operator<<(std::ostream &out, const DataStruct &src)

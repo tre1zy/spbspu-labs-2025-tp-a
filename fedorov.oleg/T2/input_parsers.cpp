@@ -15,7 +15,7 @@ std::istream &operator>>(std::istream &in, Char &&dest)
 std::istream &operator>>(std::istream &in, Complex &&dest)
 {
   char c;
-  if ( in >> c && c == '#' && in.get() == 'c' && in.get() == 'c' ) {
+  if ( in >> c && c == '#' && in.get() == 'c' && in.get() == '(' ) {
     double real, imag;
     if ( in >> real >> imag && in.get() == ')' ) {
       dest.ref = {real, imag};
