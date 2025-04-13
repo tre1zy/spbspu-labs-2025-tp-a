@@ -1,31 +1,26 @@
-#ifndef INPUT_PARSERS_HPP
-#define INPUT_PARSERS_HPP
+#ifndef INPUTKEYS_HPP
+#define INPUTKEYS_HPP
 
-#include <complex>
 #include <istream>
+#include <complex>
 #include <string>
-#include <utility>
 
 namespace fedorov {
-namespace input {
-struct Char {
-  char expected;
-};
-struct Complex {
-  std::complex<double>& ref;
-};
-struct Pair {
-  std::pair<long long, unsigned long long>& ref;
-};
-struct String {
-  std::string& ref;
+struct DoubleKey {
+  double& num;
 };
 
-std::istream& operator>>(std::istream& in, Char&& dest);
-std::istream& operator>>(std::istream& in, Complex&& dest);
-std::istream& operator>>(std::istream& in, Pair&& dest);
-std::istream& operator>>(std::istream& in, String&& dest);
-} // namespace input
+struct ComplexKey {
+  std::complex<double>& num;
+};
+
+struct StringKey {
+  std::string& string;
+};
+
+std::istream& operator>>(std::istream& input, DoubleKey&& key);
+std::istream& operator>>(std::istream& input, ComplexKey&& key);
+std::istream& operator>>(std::istream& input, StringKey&& key);
 } // namespace fedorov
 
 #endif

@@ -1,21 +1,25 @@
-#include "data_struct.hpp"
-#include <algorithm>
-#include <iostream>
+#include <limits>
 #include <iterator>
 #include <vector>
+#include <algorithm>
+
+#include "data_struct.hpp"
 
 int main()
 {
   using namespace fedorov;
+  using input_it_t = std::istream_iterator<DataStruct>;
+  using output_it_t = std::ostream_iterator<DataStruct>;
 
-  std::vector<DataStruct> data;
-  DataStruct temp;
-  while ( std::cin >> temp ) {
-    data.push_back(temp);
-    std::cin.clear();
+  std::vector<DataStruct> data(input_it_t{std::cin}, input_it_t{});
+
+  while ( !std::cin.eof() ) {
+    if ( std::cin.fail() ) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    std::copy(input_it_t{std::cin}, input_it_t{}, std::back_inserter(data));
   }
   std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator<DataStruct>{std::cout, "\n"});
-
-  return 0;
+  std::copy(data.cbegin(), data.cend(), output_it_t{std::cout, "\n"});
 }

@@ -1,44 +1,53 @@
 #include "input_parsers.hpp"
+#include "delimiter.hpp"
 
-#include <cctype>
-
-namespace fedorov {
-namespace input {
-std::istream &operator>>(std::istream &in, Char &&dest)
+std::istream& fedorov::operator>>(std::istream& input, DoubleKey&& key)
 {
-  char c;
-  if ( in >> c && c != dest.expected ) in.setstate(std::ios::failbit);
-
-  return in;
-}
-
-std::istream &operator>>(std::istream &in, Complex &&dest)
-{
-  char c;
-  if ( in >> c && c == '#' && in.get() == 'c' && in.get() == '(' ) {
-    double real, imag;
-    if ( in >> real >> imag && in.get() == ')' ) {
-      dest.ref = {real, imag};
-      return in;
-    }
+  std::istream::sentry sentry(input);
+  if ( !sentry ) {
+    return input;
   }
-  in.setstate(std::ios::failbit);
-  return in;
+
+  using del = DelimiterI;
+  double num = 0;
+
+  input >> num >> del{'d'};
+  if ( input ) {
+    key.num = num;
+  }
+  return input;
 }
 
-std::istream &operator>>(std::istream &in, Pair &&dest)
+std::istream& fedorov::operator>>(std::istream& input, ComplexKey&& key)
 {
-  in >> Char{'('} >> Char{':'} >> Char{'N'} >> dest.ref.first >> Char{':'} >> Char{'D'} >>
-      dest.ref.second >> Char{':'} >> Char{')'} >> Char{':'};
+  std::istream::sentry sentry(input);
+  if ( !sentry ) {
+    return input;
+  }
 
-  return in;
+  using del = DelimiterI;
+  using delStr = DelimiterStr;
+  double real = 0;
+  double imag = 0;
+
+  input >> delStr{"#c("} >> real >> imag >> del{')'};
+
+  if ( input ) {
+    key.num = {real, imag};
+  }
+  return input;
 }
 
-std::istream &operator>>(std::istream &in, String &&dest)
+std::istream& fedorov::operator>>(std::istream& input, StringKey&& key)
 {
-  in >> Char{'"'};
-  std::getline(in, dest.ref, '"');
-  return in >> Char{':'};
+  std::istream::sentry guard(input);
+  if ( !guard ) {
+    return input;
+  }
+
+  using del = DelimiterI;
+
+  input >> del{'"'};
+  std::getline(input, key.string, '\"');
+  return input;
 }
-} // namespace input
-} // namespace fedorov
