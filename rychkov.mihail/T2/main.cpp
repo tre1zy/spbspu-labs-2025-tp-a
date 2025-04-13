@@ -10,11 +10,11 @@
 int main()
 {
   std::vector< rychkov::DataStruct > values;
-  while (!std::cin.eof())
+  while (!std::cin.eof() && !std::cin.bad())
   {
     using Iter = std::istream_iterator< rychkov::DataStruct >;
     std::copy(Iter(std::cin), Iter(), std::back_inserter(values));
-    if (!std::cin.eof())
+    if (!std::cin.eof() && !std::cin.bad())
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

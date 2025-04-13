@@ -15,18 +15,18 @@ namespace rychkov
       const char* cases[sizeof...(Lens)];
       size_t* result_match;
       char* buffer;
-      match_any(const char(&...strings)[Lens], size_t* resultMatch = nullptr, char* buf = nullptr):
+      match_any(const char(&...strings)[Lens], size_t* result_match_p = nullptr, char* buf = nullptr):
         cases{strings...},
-        result_match(resultMatch),
+        result_match(result_match_p),
         buffer(buf)
       {}
     };
     template< size_t... Lens >
     std::istream& operator>>(std::istream& in, const match_any< Lens... >& possible)
     {
-      constexpr size_t minLen = std::min({Lens...});
-      constexpr size_t maxLen = std::max({Lens...});
-      if (minLen <= 1)
+      constexpr size_t min_len = std::min({Lens...});
+      constexpr size_t max_len = std::max({Lens...});
+      if (min_len <= 1)
       {
         return in;
       }
@@ -37,14 +37,14 @@ namespace rychkov
       }
       IosGuard guard(in);
 
-      char static_buffer[maxLen]{};
+      char static_buffer[max_len]{};
       char* buffer = (possible.buffer == nullptr ? static_buffer : possible.buffer);
       bool skips[sizeof...(Lens)]{};
       constexpr size_t sizes[] = {(Lens - 1)...};
-      bool atleastOne = true;
-      for (size_t i = 0; atleastOne && (i + 1 < maxLen) && (in >> buffer[i] >> std::noskipws); i++)
+      bool atleast_one = true;
+      for (size_t i = 0; atleast_one && (i + 1 < max_len) && (in >> buffer[i] >> std::noskipws); i++)
       {
-        atleastOne = false;
+        atleast_one = false;
         for (size_t j = 0; j < sizeof...(Lens); j++)
         {
           if (!skips[j])
@@ -62,7 +62,7 @@ namespace rychkov
               }
               return in;
             }
-            atleastOne = true;
+            atleast_one = true;
           }
         }
       }
@@ -75,19 +75,19 @@ namespace rychkov
     }
 
     template< size_t... Lens >
-    match_any< Lens... > anyOf(const char(&...strings)[Lens])
+    match_any< Lens... > anyof(const char(&...strings)[Lens])
     {
       return {strings...};
     }
     template< size_t... Lens >
-    match_any< Lens... > anyOf(size_t* resultMatch, const char(&...strings)[Lens])
+    match_any< Lens... > anyof(size_t* result_match, const char(&...strings)[Lens])
     {
-      return {strings..., resultMatch};
+      return {strings..., result_match};
     }
     template< size_t... Lens >
-    match_any< Lens... > anyOf(size_t* resultMatch, char* buf, const char(&...strings)[Lens])
+    match_any< Lens... > anyof(size_t* result_match, char* buf, const char(&...strings)[Lens])
     {
-      return {strings..., resultMatch, buf};
+      return {strings..., result_match, buf};
     }
   }
 }

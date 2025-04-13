@@ -27,9 +27,9 @@ namespace rychkov
     template< class T, size_t Id = 0 >
     class io_literal;
     template< class T, size_t Id >
-    extern std::istream& operator>>(std::istream& in, io_literal< T, Id >&&);
+    extern std::istream& operator>>(std::istream& in, io_literal< T, Id >&& wrapper);
     template< class T, size_t Id >
-    extern std::ostream& operator<<(std::ostream& out, const io_literal< T, Id >&&);
+    extern std::ostream& operator<<(std::ostream& out, const io_literal< T, Id >&& wrapper);
 
     template< class T, size_t Id >
     class io_literal
@@ -38,21 +38,21 @@ namespace rychkov
       using value_type = T;
       static constexpr size_t id = Id;
 
-      io_literal(const value_type& initVal):
-        value(initVal),
+      io_literal(const value_type& init):
+        value(init),
         link(value)
       {}
-      io_literal(value_type& initLink):
+      io_literal(value_type& init):
         value(),
-        link(initLink)
+        link(init)
       {}
-      friend std::istream& rychkov::iofmt::operator>>< T, Id >(std::istream& in, io_literal&&);
-      friend std::ostream& rychkov::iofmt::operator<<< T, Id >(std::ostream& out, const io_literal&&);
+      friend std::istream& rychkov::iofmt::operator>>< T, Id >(std::istream& in, io_literal&& wrapper);
+      friend std::ostream& rychkov::iofmt::operator<<< T, Id >(std::ostream& out, const io_literal&& wrapper);
     private:
       T value;
       T& link;
     };
-    using science_literal = io_literal< double >;
+    using scientific_literal = io_literal< double >;
     using ull_literal = io_literal< long long >;
     using string_literal = io_literal< std::string >;
   }
