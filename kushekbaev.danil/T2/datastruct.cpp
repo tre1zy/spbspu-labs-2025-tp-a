@@ -119,7 +119,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& obj)
         throw std::runtime_error("Unsupported key");
       }
     }
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' }; 
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
     if (!hasKey1 || !hasKey2 || !hasKey3)
     {
       throw std::runtime_error("Not enough keys");
