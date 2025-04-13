@@ -7,15 +7,15 @@ namespace smirnov
     class iofmtguard
     {
     public:
-	explicit iofmtguard(std::basic_ios<char>& stream);
-	~iofmtguard();
+        iofmtguard(std::basic_ios<char>& stream);
+        ~iofmtguard();
 
     private:
         std::basic_ios<char>& stream_;
-	std::streamsize precision_;
-	std::streamsize width_;
-	char fill_;
-	std::ios::fmtflags flags_;
+        std::streamsize precision_;
+        std::streamsize width_;
+        char fill_;
+        std::ios::fmtflags flags_;
     };
 }
 
