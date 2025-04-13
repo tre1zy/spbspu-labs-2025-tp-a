@@ -27,6 +27,8 @@ namespace aleksandrov
     std::streamsize precision_;
     std::basic_ios< char >::fmtflags fmt_;
   };
+
+  bool operator<(const DataStruct&, const DataStruct&);
 }
 
 #endif

@@ -17,5 +17,18 @@ namespace aleksandrov
     s_.precision(precision_);
     s_.flags(fmt_);
   }
+
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs)
+  {
+    if (lhs.key1 == rhs.key1)
+    {
+      if (lhs.key2 == rhs.key2)
+      {
+        return lhs.key3.size() < rhs.key3.size();
+      }
+      return (lhs.key2.first / lhs.key2.second) < (rhs.key2.first / rhs.key2.second);
+    }
+    return lhs.key1 < rhs.key1;
+  }
 }
 
