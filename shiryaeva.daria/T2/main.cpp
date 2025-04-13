@@ -8,7 +8,7 @@
 int main()
 {
   using namespace shiryaeva;
-  std::vector< DataStruct > data;
+  std::vector<DataStruct> data;
 
   while (!std::cin.eof())
   {
