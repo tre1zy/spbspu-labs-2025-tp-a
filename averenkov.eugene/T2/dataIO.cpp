@@ -45,7 +45,7 @@ namespace DataIO
     in >> LabelIO{"N"} >> n;
     in >> DelimiterIO{':'};
     in >> LabelIO{"D"} >> d;
-    in >> DelimiterIO{':'}
+    in >> DelimiterIO{':'};
     in >> DelimiterIO{')'};
     if (in)
     {
