@@ -139,7 +139,7 @@ namespace petrov
     std::ostream::sentry sentry(out);
     if (!sentry)
     {
-        return out;
+      return out;
     }
     StreamGuard outguard(out);
     out << "(:";

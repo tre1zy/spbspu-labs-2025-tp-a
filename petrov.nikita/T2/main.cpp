@@ -8,9 +8,19 @@ int main()
 {
   using namespace petrov;
   std::vector< DataStruct > data;
+  while (!std::cin.eof())
+  {
+    std::copy(
+    std::istream_iterator< DataStruct >(std::cin), 
+    std::istream_iterator< DataStruct >(), 
+    std::back_inserter(data)
+    );
+    std::cin.clear();
+    std::cin.ignore(1024, '\n');
+  }
   std::copy(
-    std::istream_iterator< DataStruct >(std::cin),
-    std::istream_iterator< DataStruct >(),
+    std::istream_iterator< DataStruct >(std::cin), 
+    std::istream_iterator< DataStruct >(), 
     std::back_inserter(data)
   );
   std::copy(
