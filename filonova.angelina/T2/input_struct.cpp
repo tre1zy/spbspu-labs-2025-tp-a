@@ -45,7 +45,7 @@ std::istream &filonova::operator>>(std::istream &in, ComplexValue &&dest)
 
   if (in)
   {
-    dest.ref = std::complex<double>(real, imag);
+    dest.ref = std::complex< double >(real, imag);
   }
   return in;
 }
