@@ -1,15 +1,15 @@
-#include <iostream>
 #include <limits>
 #include <iterator>
 #include <vector>
 #include "data-struct.hpp"
+#include "input-struct.hpp"
+#include "output-struct.hpp"
 
 int main()
 {
   using namespace aleksandrov;
 
   std::vector< DataStruct > data;
-
 
   while (!std::cin.eof())
   {
@@ -25,7 +25,6 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::cout << "Data:\n";
   std::copy
   (
     std::begin(data),

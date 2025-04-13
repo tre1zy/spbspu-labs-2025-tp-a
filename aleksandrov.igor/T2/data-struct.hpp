@@ -1,7 +1,8 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
 
-#include <ios>
+#include <iostream>
+#include <iomanip>
 #include <utility>
 #include <string>
 
@@ -12,41 +13,6 @@ namespace aleksandrov
     double key1;
     std::pair< long long, unsigned long long > key2;
     std::string key3;
-  };
-
-  struct DelimeterIO
-  {
-    char exp;
-  };
-
-  struct DoubleIO
-  {
-    double& ref;
-  };
-
-  struct RationalIO
-  {
-    std::pair< long long, unsigned long long >& ref;
-  };
-
-  struct LongLongIO
-  {
-    long long& ref;
-  };
-
-  struct UnsignedLongLongIO
-  {
-    unsigned long long& ref;
-  };
-
-  struct StringIO
-  {
-    std::string& ref;
-  };
-
-  struct LabelIO
-  {
-    std::string exp;
   };
 
   class iofmtguard
@@ -61,20 +27,6 @@ namespace aleksandrov
     std::streamsize precision_;
     std::basic_ios< char >::fmtflags fmt_;
   };
-
-  std::istream& operator>>(std::istream&, DelimeterIO&&);
-  std::istream& operator>>(std::istream&, DoubleIO&&);
-  std::istream& operator>>(std::istream&, RationalIO&&);
-  std::istream& operator>>(std::istream&, LongLongIO&&);
-  std::istream& operator>>(std::istream&, UnsignedLongLongIO&&);
-  std::istream& operator>>(std::istream&, LabelIO&);
-  std::istream& operator>>(std::istream&, DataStruct&);
-
-  std::ostream& operator<<(std::ostream&, const DoubleIO&);
-  std::ostream& operator<<(std::ostream&, const RationalIO&);
-  std::ostream& operator<<(std::ostream&, const LabelIO&);
-  std::ostream& operator<<(std::ostream&, const StringIO&);
-  std::ostream& operator<<(std::ostream&, const DataStruct&);
 }
 
 #endif
