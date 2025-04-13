@@ -75,7 +75,7 @@ namespace dribas
     if (!sentry) {
       return in;
     }
-    return in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> ull.ref;
+    return in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> std::hex >> ull.ref;
   }
 
   std::istream& operator>>(std::istream& in, StringI&& str)

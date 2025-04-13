@@ -11,20 +11,17 @@ int main()
   using namespace dribas;
 
   std::vector< dribas::Data > data;
-  while(!std::cin.eof())
-  {
-    std::copy
-    (
-      std::istream_iterator< Data >(std::cin),
-      std::istream_iterator< Data >(),
-      std::back_inserter(data)
-    );
-    if (!std::cin)
-    {
+  while (!std::cin.eof()) {
+    Data temp;
+    std::cin >> temp;
+    if (std::cin) {
+      data.push_back(temp);
+    } else {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+
   std::sort(data.begin(), data.end(), compare);
   std::copy
   (
