@@ -30,7 +30,3 @@ int main()
   );
 }
 
-void petrov::sort(std::vector< DataStruct > & vector)
-{
-  bool swapped = false;
-}
