@@ -8,7 +8,6 @@
 
 int main()
 {
-  std::cout << "start\n";
   using fedorov::DataStruct;
   using input_it_t = std::istream_iterator<DataStruct>;
   using output_it_t = std::ostream_iterator<DataStruct>;
