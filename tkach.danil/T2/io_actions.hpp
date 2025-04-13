@@ -27,11 +27,17 @@ namespace tkach
     size_t& ref;
   };
 
+  struct LabelIO
+  {
+    std::string exp;
+  };
+
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, UllIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::istream& operator>>(std::istream& in, LabelIO&& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 }
 

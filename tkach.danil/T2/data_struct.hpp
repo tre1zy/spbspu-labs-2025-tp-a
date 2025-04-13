@@ -12,7 +12,6 @@ namespace tkach
     size_t key2;
     std::string key3;
   };
-
 }
 
 #endif

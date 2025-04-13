@@ -1,5 +1,5 @@
-#ifndef DATA_STRUCT_HPP
-#define DATA_STRUCT_HPP
+#ifndef STREAMGUARD_HPP
+#define STREAMGUARD_HPP
 
 #include <iostream>
 
