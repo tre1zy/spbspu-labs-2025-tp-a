@@ -27,7 +27,7 @@ namespace dribas
     StreamGuard guard(out);
 
     out << "key1 ";
-    out << std::setprecision(2) << dbl.ref;
+    out << std::fixed << std::setprecision(1) << dbl.ref;
     out << "d";
     return out;
   }
