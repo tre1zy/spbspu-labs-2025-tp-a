@@ -27,19 +27,20 @@ std::istream & zakirov::operator>>(std::istream & in, Data & data)
 
   Data received;
   in >> MinorSymbol{'('};
+  in >> MinorSymbol{':'};
   std::string key;
-  in >> key;
   for (size_t i = 0; i < 3; ++i)
   {
-    if (key == ":key1")
+    in >> key;
+    if (key == "key1")
     {
       in >> UllOctIO{received.key1};
     }
-    else if (key == ":key2")
+    else if (key == "key2")
     {
       in >> UllHexIO{received.key2};
     }
-    else if (key == ":key3")
+    else if (key == "key3")
     {
       in >> StringIO{received.key3};
     }
@@ -67,7 +68,7 @@ std::istream & zakirov::operator>>(std::istream & in, MinorSymbol && sym)
   }
 
   char symbol;
-  if (in >> symbol && symbol == sym.symbol)
+  if (!(in >> symbol) || symbol != sym.symbol)
   {
     in.setstate(std::ios::failbit);
   }
@@ -83,13 +84,13 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
     return in;
   }
 
-  in >> MinorSymbol{'0'};
   std::string oct_number;
   char next_number;
   in >> next_number;
-  while (next_number >= '0' && next_number < '8')
+  while ((next_number >= '0' && next_number < '8') || next_number == 'u' || next_number == 'l')
   {
     oct_number += next_number;
+    in >> next_number;
   }
 
   if (next_number != ':')
@@ -105,6 +106,10 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
   {
     in.setstate(std::ios::failbit);
   }
+  catch (const std::invalid_argument &)
+  {
+    in.setstate(std::ios::failbit);
+  }
 
   return in;
 }
@@ -117,29 +122,24 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
     return in;
   }
 
-  in >> MinorSymbol{'0'};
-
-  std::string hex_number;
-  char next_number;
-  in >> next_number;
-  if (next_number != 'x' && next_number != 'X')
+  std::string hex_num;
+  char next_num;
+  in >> next_num;
+  while ((next_num >= '0' && next_num <= '9') || (next_num >= 'A' && next_num <= 'F') ||
+            next_num == 'x' || next_num == 'X')
   {
-    in.setstate(std::ios::failbit);
+    hex_num += next_num;
+    in >> next_num;
   }
 
-  while ((next_number >= '0' && next_number <= '9') || (next_number >= 'A' && next_number <= 'F'))
-  {
-    hex_number += next_number;
-  }
-
-  if (next_number != ':')
+  if (next_num != ':')
   {
     in.setstate(std::ios::failbit);
   }
 
   try
   {
-    num.ref = std::stoi(hex_number, nullptr, 16);
+    num.ref = std::stoi(hex_num, nullptr, 16);
   }
   catch (const std::out_of_range &)
   {
@@ -158,12 +158,13 @@ std::istream & zakirov::operator>>(std::istream & in, StringIO && str)
   }
 
   in >> MinorSymbol{'"'};
-  std::string string_r;
+  std::string string_r = "";
   char next_symbol;
   in >> next_symbol;
   while (next_symbol != '"')
   {
     string_r += next_symbol;
+    in >> next_symbol;
   }
 
   in >> MinorSymbol{':'};
@@ -180,7 +181,7 @@ std::ostream & zakirov::operator<<(std::ostream & out, const Data & src)
   }
 
   Guardian guardian(out);
-  out << "{ \":key1\": ";
+  out << "{ \"key1\": ";
   out << std::oct << src.key1;
   out << ", \"key2\": ";
   out << std::hex << src.key2;

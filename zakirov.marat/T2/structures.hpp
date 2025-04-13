@@ -30,7 +30,7 @@ namespace zakirov
 
   struct StringIO
   {
-    std::string exp;
+    std::string & exp;
   };
 
   std::istream & operator>>(std::istream & in, Data & data);
