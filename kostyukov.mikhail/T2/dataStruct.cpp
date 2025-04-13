@@ -119,12 +119,17 @@ std::ostream &kostyukov::operator<<(std::ostream &out, const UllIO &&dest) {
   kostyukov::ScopeGuard scopeGrd(out);
   if (dest.format == UllIO::Format::BIN) {
     std::string binStr = std::bitset<64>(dest.ref).to_string();
-    size_t first_one = binStr.find('1');
+    size_t firstOne = binStr.find('1');
     out << "0b";
-    if (first_one != std::string::npos) {
-      out << binStr.substr(first_one);
-    } else {
+    if (firstOne == std::string::npos) {
       out << '0';
+    } else {
+      std::string binSubStr = binStr.substr(firstOne);
+      if (binSubStr == "1") {
+        out << "01";
+      } else {
+        out << binSubStr;
+      }
     }
   } else {
     out << "0x" << std::hex << std::uppercase << dest.ref;
