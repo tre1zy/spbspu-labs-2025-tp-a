@@ -71,6 +71,7 @@ std::istream& tkach::operator>>(std::istream& in, DoubleIO&& dest)
     in.setstate(std::ios::failbit);
     return in;
   }
+  in.putback(':');
   try
   {
     size_t right_symbols = 0;
@@ -99,12 +100,13 @@ std::istream& tkach::operator>>(std::istream& in, UllIO&& dest)
     return in;
   }
   std::string str;
-   if (!std::getline(in, str, ':') || str.empty())
+  if (!std::getline(in, str, ':') || str.empty())
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-   try
+  in.putback(':');
+  try
   {
     size_t right_symbols = 0;
     size_t val = std::stoull(str, &right_symbols, 16);
@@ -126,7 +128,7 @@ std::istream& tkach::operator>>(std::istream& in, UllIO&& dest)
 
 std::istream& tkach::operator>>(std::istream& in, StringIO&& dest)
 {
-  if (!std::getline(in >> tkach::DelimiterIO{ '"' }, dest.ref, '"'));
+  if (!std::getline(in >> tkach::DelimiterIO{ '"' }, dest.ref, '"'))
   {
     in.setstate(std::ios::failbit);
   }
@@ -165,7 +167,14 @@ std::istream& tkach::operator>>(std::istream& in, DataStruct& dest)
     in >> key;
     inputKey(in, key, temp, keys);
   }
-  if (!(keys[0] == keys[1] == keys[2] == true && in >> DelimiterIO{':'} >> DelimiterIO{')'}))
+  for (auto key : keys)
+  {
+    if (key == false)
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  if (in >> DelimiterIO{':'} >> DelimiterIO{')'})
   {
     dest = temp;
   }
