@@ -1,5 +1,6 @@
 #include "structures.hpp"
 #include <iostream>
+#include <stack>
 
 std::istream & zakirov::operator>>(std::istream & in, Data & object)
 {
@@ -33,7 +34,6 @@ std::istream & zakirov::operator>>(std::istream & in, Data & object)
     }
   }
 
-  in >> MinorSymbol{':'};
   in >> MinorSymbol{')'};
   if (in)
   {
@@ -67,6 +67,30 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && object)
     return in;
   }
 
+  in >> MinorSymbol{'0'};
+  std::string oct_number;
+  char next_number;
+  in >> next_number;
+  while (next_number >= '0' && next_number < '8')
+  {
+    oct_number += next_number;
+  }
+
+  if (next_number != ':')
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  try
+  {
+    object.ref = std::stoi(oct_number, nullptr, 8);
+  }
+  catch (const std::out_of_range)
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
 }
 
 std::istream & zakirov::operator>>(std::istream & in, UllHexIO && object)
@@ -77,6 +101,36 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && object)
     return in;
   }
 
+  in >> MinorSymbol{'0'};
+  
+  std::string hex_number;
+  char next_number;
+  in >> next_number;
+  if (next_number != 'x' && next_number != 'X')
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  while ((next_number >= '0' && next_number <= '9') || (next_number >= 'A' && next_number <= 'F'))
+  {
+    hex_number += next_number;
+  }
+
+  if (next_number != ':')
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  try
+  {
+    object.ref = std::stoi(hex_number, nullptr, 16);
+  }
+  catch (const std::out_of_range)
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
 }
 
 std::istream & zakirov::operator>>(std::istream & in, StringIO && object)
@@ -87,4 +141,16 @@ std::istream & zakirov::operator>>(std::istream & in, StringIO && object)
     return in;
   }
 
+  in >> MinorSymbol{'"'};
+  std::string string_r;
+  char next_symbol;
+  in >> next_symbol;
+  while (next_symbol != '"')
+  {
+    string_r += next_symbol;
+  }
+
+  in >> MinorSymbol{':'};
+  object.exp = string_r;
+  return in;
 }
