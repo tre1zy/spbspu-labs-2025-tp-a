@@ -87,20 +87,20 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
   std::string oct_number;
   char next_number;
   in >> next_number;
-  while ((next_number >= '0' && next_number < '8') || next_number == 'u' || next_number == 'l')
+  while (next_number != ':' && !in.eof())
   {
     oct_number += next_number;
     in >> next_number;
   }
 
-  if (next_number != ':')
+  if (in.eof())
   {
     in.setstate(std::ios::failbit);
   }
 
   try
   {
-    num.ref = std::stoi(oct_number, nullptr, 8);
+    num.ref = std::stoull(oct_number, nullptr, 8);
   }
   catch (const std::out_of_range &)
   {
@@ -125,8 +125,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
   std::string hex_num;
   char next_num;
   in >> next_num;
-  while ((next_num >= '0' && next_num <= '9') || (next_num >= 'A' && next_num <= 'F') ||
-            next_num == 'x' || next_num == 'X')
+  while (next_num != ':' && !in.eof())
   {
     hex_num += next_num;
     in >> next_num;
@@ -139,9 +138,13 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
 
   try
   {
-    num.ref = std::stoi(hex_num, nullptr, 16);
+    num.ref = std::stoull(hex_num, nullptr, 16);
   }
   catch (const std::out_of_range &)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  catch (const std::invalid_argument &)
   {
     in.setstate(std::ios::failbit);
   }
