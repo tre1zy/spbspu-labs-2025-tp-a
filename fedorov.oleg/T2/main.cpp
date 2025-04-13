@@ -16,9 +16,9 @@ int main()
   std::copy(std::istream_iterator<DataStruct>{std::cin}, std::istream_iterator<DataStruct>{},
             std::back_inserter(data));
 
-  data.erase(std::remove_if(data.begin(), data.end(),
-                            [](const DataStruct &ds) { return std::cin.fail(); }),
-             data.end());
+  data.erase(
+      std::remove_if(data.begin(), data.end(), [](const DataStruct &) { return std::cin.fail(); }),
+      data.end());
 
   std::sort(data.begin(), data.end());
 
