@@ -6,40 +6,40 @@
 
 namespace kharlamov
 {
-    struct DataStruct
-    {
-        long long key1 = 0;
-        unsigned long long key2 = 0;
-        std::string key3;
-    };
+  struct DataStruct
+  {
+  long long key1 = 0;
+  unsigned long long key2 = 0;
+  std::string key3;
+  };
 
-    bool compare(const DataStruct& lhs, const DataStruct& rhs);
+  bool compare(const DataStruct& lhs, const DataStruct& rhs);
 
-    struct SymbolIO
-    {
-        char exp;
-    };
+  struct SymbolIO
+  {
+  char exp;
+  };
 
-    struct LongLongIO
-    {
-        long long& ref;
-    };
+  struct LongLongIO
+  {
+  long long& ref;
+  };
 
-    struct UnsignedLongLongIO
-    {
-        unsigned long long& ref;
-    };
-    struct StringIO
-    {
-        std::string& ref;
-    };
+  struct UnsignedLongLongIO
+  {
+  unsigned long long& ref;
+  };
+  struct StringIO
+  {
+  std::string& ref;
+  };
 
-    std::istream& operator>>(std::istream& in, SymbolIO&& dest);
-    std::istream& operator>>(std::istream& in, LongLongIO&& dest);
-    std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest);
-    std::istream& operator>>(std::istream& in, DataStruct& dest);
-    std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
-    std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, SymbolIO&& dest);
+  std::istream& operator>>(std::istream& in, LongLongIO&& dest);
+  std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
 }
 
 #endif
