@@ -1,9 +1,10 @@
-#include "dataStruct.hpp"
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <vector>
+
+#include "dataStruct.hpp"
 
 int main() {
   std::vector<kostyukov::DataStruct> data;

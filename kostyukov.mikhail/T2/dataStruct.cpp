@@ -1,10 +1,12 @@
 #include "dataStruct.hpp"
-#include "scopeGuard.hpp"
+
 #include <bitset>
 #include <cctype>
 #include <iostream>
 #include <set>
 #include <string>
+
+#include "scopeGuard.hpp"
 
 std::istream &kostyukov::operator>>(std::istream &in, DelimiterIO &&dest) {
   std::istream::sentry sentry(in);
@@ -44,9 +46,9 @@ std::istream &kostyukov::operator>>(std::istream &in, UllIO &&dest) {
   in >> prefix;
   int base = 0;
   prefix = std::tolower(prefix);
-  if (prefix == 'b') {
+  if (prefix == 'b' && dest.format == UllIO::Format::BIN) {
     base = 2;
-  } else if (prefix == 'x') {
+  } else if (prefix == 'x' && dest.format == UllIO::Format::HEX) {
     base = 16;
   } else {
     in.setstate(std::ios::failbit);
@@ -86,17 +88,17 @@ std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest) {
     if ((in >> key) && (key.size() == 4) && (key.substr(0, 3) == "key")) {
       char keyNum = key.back();
       switch (keyNum) {
-      case '1':
-        in >> UllIO{temp.key1, UllIO::Format::BIN};
-        break;
-      case '2':
-        in >> UllIO{temp.key2, UllIO::Format::HEX};
-        break;
-      case '3':
-        in >> StringIO{temp.key3};
-        break;
-      default:
-        in.setstate(std::ios::failbit);
+        case '1':
+          in >> UllIO{temp.key1, UllIO::Format::BIN};
+          break;
+        case '2':
+          in >> UllIO{temp.key2, UllIO::Format::HEX};
+          break;
+        case '3':
+          in >> StringIO{temp.key3};
+          break;
+        default:
+          in.setstate(std::ios::failbit);
       }
     } else {
       in.setstate(std::ios::failbit);

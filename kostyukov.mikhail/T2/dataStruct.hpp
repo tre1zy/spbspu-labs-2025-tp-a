@@ -31,5 +31,5 @@ std::istream &operator>>(std::istream &in, StringIO &&dest);
 std::istream &operator>>(std::istream &in, UllIO &&dest);
 std::ostream &operator<<(std::ostream &out, const UllIO &&dest);
 std::ostream &operator<<(std::ostream &out, const StringIO &&dest);
-} // namespace kostyukov
-#endif // DATA_STRUCT_HPP
+}  // namespace kostyukov
+#endif  // DATA_STRUCT_HPP
