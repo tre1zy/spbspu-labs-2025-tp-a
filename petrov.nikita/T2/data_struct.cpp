@@ -1,5 +1,4 @@
 #include "data_struct.hpp"
-#include <vector>
 
 petrov::StreamGuard::StreamGuard(std::basic_ios< char > & s):
   s_(s),
@@ -57,7 +56,14 @@ namespace petrov
     {
       return in;
     }
-    return in >> dest.ref >> DelimiterIO{ 'd' };
+    in >> dest.ref;
+    char postfix = '0';
+    in >> postfix;
+    if (in && postfix != 'd' && postfix != 'D')
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
   }
 
   std::istream & operator>>(std::istream & in, LongLongIO && dest)
@@ -103,20 +109,37 @@ namespace petrov
       return in;
     }
     DataStruct input;
+    std::string key = "";
     {
       using sep = DelimiterIO;
-      using label = LabelIO;
       using dbl = DoubleIO;
       using lli = LongLongIO;
       using str = StringIO;
       in >> sep{ '(' };
-      in >> sep{ ':' }; 
-      in >> label{ "key1" } >> dbl{ input.key1 };
       in >> sep{ ':' };
-      in >> label{ "key2" } >> lli{ input.key2 };
-      in >> sep{ ':'};
-      in >> label{ "key3" } >> str{ input.key3 };
-      in >> sep{ ':' };
+      for (size_t i = 1; i <= 3; i++)
+      {
+        in >> key;
+        if (key == "key1")
+        {
+          in >> dbl{ input.key1 };
+          in >> sep{ ':' };
+        }
+        else if (key == "key2")
+        {
+          in >> lli{ input.key2 };
+          in >> sep{ ':' };
+        }
+        else if (key == "key3")
+        {
+          in >> str{ input.key3 };
+          in >> sep{ ':' };
+        }
+        else
+        {
+          in.setstate(std::ios::failbit);
+        }
+      }
       in >> sep{ ')' };
     }
     if (in)
