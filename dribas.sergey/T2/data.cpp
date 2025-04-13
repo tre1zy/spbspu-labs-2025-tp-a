@@ -137,7 +137,7 @@ namespace dribas
       in >> DelimiterIO{':'};
       if (key == "key1") {
         in >> DoubleI{temp.key1};
-      } else if (key == "key2") { 
+      } else if (key == "key2") {
         in >> UllI{temp.key2};
       } else if ((key == "key3")) {
         in >> StringI{temp.key3};

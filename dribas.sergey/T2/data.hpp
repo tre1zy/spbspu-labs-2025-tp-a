@@ -37,7 +37,7 @@ namespace dribas
     std::string exp;
   };
 
-  struct UllO 
+  struct UllO
   {
     const unsigned long long& ref;
   };
