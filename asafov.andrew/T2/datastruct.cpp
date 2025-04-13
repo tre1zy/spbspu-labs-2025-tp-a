@@ -6,7 +6,7 @@ namespace
   {
     return (b - a) > epsilon * std::max(std::abs(a), std::abs(b));
   }
-  
+
   bool isChar(std::istream_iterator<char>& iit, const char ch)
   {
     const char temp = *(iit++);
@@ -48,7 +48,7 @@ namespace
   {
     for (const char a : str) *(oit++) = a;
   }
-  
+
   std::complex<double> readCmpLsp(std::istream_iterator<char>& iit)
   {
     std::complex<double> temp = 0;
@@ -129,8 +129,6 @@ namespace
       throw std::invalid_argument("invalid input!");
     }
   }
-
-  
 }
 
 bool asafov::cmpDataStruct(const DataStruct &a, const DataStruct &b)
@@ -157,6 +155,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
   isString(iit, ")");
   return is;
 }
+
 std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
 {
   std::ostream_iterator<char> oit(os);
