@@ -38,12 +38,12 @@ void petrov::sort(std::vector< DataStruct > & vector)
   {
     if (vector[k].key1 != vector [k - 1].key1)
     {
-      for (size_t i = 0; i < vector.size(); i++)
+      for (size_t i = 0; i < vector.size() - 1; i++)
       {
         swapped = false;
-        for (size_t j = 0; j < vector.size() - i; j++)
+        for (size_t j = 0; j < vector.size() - i - 1; j++)
         {
-          if (vector[j].key1 > vector[j + 1].key2)
+          if (vector[j].key1 > vector[j + 1].key1)
           {
             std::swap(vector[j], vector[j + 1]);
             swapped = true;
@@ -57,18 +57,56 @@ void petrov::sort(std::vector< DataStruct > & vector)
       return;
     }
   }
-  for (size_t i = 1; i <= vector.size(); i++)
+  for (size_t k = 1; k <= vector.size(); k++)
   {
-    if (vector[i].key2 != vector [i - 1].key2)
+    if (vector[k].key2 != vector [k - 1].key2)
     {
-      return;
+      if (vector[k].key1 != vector [k - 1].key1)
+      {
+        for (size_t i = 0; i < vector.size() - 1; i++)
+        {
+          swapped = false;
+          for (size_t j = 0; j < vector.size() - i - 1; j++)
+          {
+            if (vector[j].key2 > vector[j + 1].key2)
+            {
+              std::swap(vector[j], vector[j + 1]);
+              swapped = true;
+            }
+          }
+          if (!swapped)
+          {
+            break;
+          }
+        }
+        return;
+      }
     }
   }
-  for (size_t i = 1; i <= vector.size(); i++)
+  for (size_t k = 1; k <= vector.size(); k++)
   {
-    if (vector[i].key3.length() != vector [i - 1].key3.length())
+    if (vector[k].key3.length() != vector [k - 1].key3.length())
     {
-      return;
+      if (vector[k].key1 != vector [k - 1].key1)
+      {
+        for (size_t i = 0; i < vector.size() - 1; i++)
+        {
+          swapped = false;
+          for (size_t j = 0; j < vector.size() - i - 1; j++)
+          {
+            if (vector[j].key3.length() > vector[j + 1].key3.length())
+            {
+              std::swap(vector[j], vector[j + 1]);
+              swapped = true;
+            }
+          }
+          if (!swapped)
+          {
+            break;
+          }
+        }
+        return;
+      }
     }
   }
 }
