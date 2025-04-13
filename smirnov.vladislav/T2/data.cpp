@@ -1,5 +1,5 @@
-#include "data.h"
-#include "stream_guard.h"
+#include "data.hpp"
+#include "stream_guard.hpp"
 #include <iomanip>
 #include <sstream>
 #include <cmath>

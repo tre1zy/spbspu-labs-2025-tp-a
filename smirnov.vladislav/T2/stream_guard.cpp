@@ -1,4 +1,4 @@
-#include "stream_guard.h"
+#include "stream_guard.hpp"
 
 smirnov::iofmtguard::iofmtguard(std::basic_ios<char>& stream) :
     stream_(stream),
