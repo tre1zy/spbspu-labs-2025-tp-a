@@ -3,6 +3,20 @@
 #include <stack>
 #include "stream_guardian.hpp"
 
+bool zakirov::Data::operator<(const Data & other)
+{
+  if (key1 != other.key1)
+  {
+    return key1 < other.key1;
+  }
+  else if (key2 != other.key2)
+  {
+    return key2 < other.key2;
+  }
+
+  return key3.size() < key3.size();
+}
+
 std::istream & zakirov::operator>>(std::istream & in, Data & data)
 {
   std::istream::sentry sentry(in);
@@ -87,7 +101,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
   {
     num.ref = std::stoi(oct_number, nullptr, 8);
   }
-  catch (const std::out_of_range)
+  catch (const std::out_of_range &)
   {
     in.setstate(std::ios::failbit);
   }
@@ -127,7 +141,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
   {
     num.ref = std::stoi(hex_number, nullptr, 16);
   }
-  catch (const std::out_of_range)
+  catch (const std::out_of_range &)
   {
     in.setstate(std::ios::failbit);
   }
@@ -157,7 +171,7 @@ std::istream & zakirov::operator>>(std::istream & in, StringIO && str)
   return in;
 }
 
-std::ostream & zakirov::operator<<(std::ostream& out, const Data & src)
+std::ostream & zakirov::operator<<(std::ostream & out, const Data & src)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
