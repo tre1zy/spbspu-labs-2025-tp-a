@@ -19,13 +19,10 @@ std::istream &operator>>(std::istream &in, Complex &&dest)
     double real, imag;
     if ( in >> real >> imag && in.get() == ')' ) {
       dest.ref = {real, imag};
-    } else {
-      in.setstate(std::ios::failbit);
+      return in;
     }
-  } else {
-    in.setstate(std::ios::failbit);
   }
-
+  in.setstate(std::ios::failbit);
   return in;
 }
 
