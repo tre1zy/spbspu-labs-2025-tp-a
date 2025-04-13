@@ -1,8 +1,9 @@
 #include "structures.hpp"
 #include <iostream>
 #include <stack>
+#include "stream_guardian.hpp"
 
-std::istream & zakirov::operator>>(std::istream & in, Data & object)
+std::istream & zakirov::operator>>(std::istream & in, Data & data)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -37,12 +38,13 @@ std::istream & zakirov::operator>>(std::istream & in, Data & object)
   in >> MinorSymbol{')'};
   if (in)
   {
-    object = received;
+    data = received;
   }
+
   return in;
 }
 
-std::istream & zakirov::operator>>(std::istream & in, MinorSymbol && object)
+std::istream & zakirov::operator>>(std::istream & in, MinorSymbol && sym)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -51,7 +53,7 @@ std::istream & zakirov::operator>>(std::istream & in, MinorSymbol && object)
   }
 
   char symbol;
-  if (in >> symbol && symbol == object.symbol)
+  if (in >> symbol && symbol == sym.symbol)
   {
     in.setstate(std::ios::failbit);
   }
@@ -59,7 +61,7 @@ std::istream & zakirov::operator>>(std::istream & in, MinorSymbol && object)
   return in;
 }
 
-std::istream & zakirov::operator>>(std::istream & in, UllOctIO && object)
+std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -83,7 +85,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && object)
 
   try
   {
-    object.ref = std::stoi(oct_number, nullptr, 8);
+    num.ref = std::stoi(oct_number, nullptr, 8);
   }
   catch (const std::out_of_range)
   {
@@ -93,7 +95,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && object)
   return in;
 }
 
-std::istream & zakirov::operator>>(std::istream & in, UllHexIO && object)
+std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -123,7 +125,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && object)
 
   try
   {
-    object.ref = std::stoi(hex_number, nullptr, 16);
+    num.ref = std::stoi(hex_number, nullptr, 16);
   }
   catch (const std::out_of_range)
   {
@@ -133,7 +135,7 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && object)
   return in;
 }
 
-std::istream & zakirov::operator>>(std::istream & in, StringIO && object)
+std::istream & zakirov::operator>>(std::istream & in, StringIO && str)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -151,6 +153,24 @@ std::istream & zakirov::operator>>(std::istream & in, StringIO && object)
   }
 
   in >> MinorSymbol{':'};
-  object.exp = string_r;
+  str.exp = string_r;
   return in;
+}
+
+std::ostream & zakirov::operator<<(std::ostream& out, const Data & src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+
+  Guardian guardian(out);
+  out << "{ \":key1\": ";
+  out << std::oct << src.key1;
+  out << ", \"key2\": ";
+  out << std::hex << src.key2;
+  out << ", \"key3\": " << src.key3;
+  out << " }";
+  return out;
 }

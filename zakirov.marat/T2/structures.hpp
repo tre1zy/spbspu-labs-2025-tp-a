@@ -32,11 +32,12 @@ namespace zakirov
     std::string exp;
   };
 
-  std::istream & operator>>(std::istream & in, Data & object);
-  std::istream & operator>>(std::istream & in, MinorSymbol && object);
-  std::istream & operator>>(std::istream & in, UllOctIO && object);
-  std::istream & operator>>(std::istream & in, UllHexIO && object);
-  std::istream & operator>>(std::istream & in, StringIO && object);
+  std::istream & operator>>(std::istream & in, Data & data);
+  std::istream & operator>>(std::istream & in, MinorSymbol && sym);
+  std::istream & operator>>(std::istream & in, UllOctIO && num);
+  std::istream & operator>>(std::istream & in, UllHexIO && num);
+  std::istream & operator>>(std::istream & in, StringIO && str);
+  std::ostream & operator<<(std::ostream & out, const Data & src);
 }
 
 #endif
