@@ -1,4 +1,4 @@
-#include "Guard.h"
+#include "guard.h"
 
 kharlamov::Guard::Guard(std::basic_ios< char >& s):
   s_(s),
