@@ -7,6 +7,25 @@
 
 #include "data_struct.hpp"
 
+namespace rychkov
+{
+  struct ds_compare
+  {
+    bool operator()(const DataStruct& lhs, const DataStruct& rhs)
+    {
+      if (lhs.key1 != rhs.key1)
+      {
+        return lhs.key1 < rhs.key1;
+      }
+      else if (lhs.key2 != rhs.key2)
+      {
+        return lhs.key2 < rhs.key2;
+      }
+      return lhs.key3.length() < rhs.key3.length();
+    }
+  };
+}
+
 int main()
 {
   std::vector< rychkov::DataStruct > values;
@@ -20,6 +39,8 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+  std::sort(values.begin(), values.end(), rychkov::ds_compare());
+
   std::cout << std::setprecision(1);
   for (const rychkov::DataStruct& i: values)
   {

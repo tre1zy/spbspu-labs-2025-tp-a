@@ -22,6 +22,7 @@ std::istream& rychkov::iofmt::operator>> < rychkov::iofmt::scientific_literal::v
     long long temp = fractional, fracLen10 = 0;
     for (; temp != 0; temp /= 10, fracLen10++)
     {}
+    fractional = whole >= 0 ? fractional : -fractional;
     wrapper.link = (whole + fractional / std::pow(10., fracLen10)) * std::pow(10., power);
     return in;
   }

@@ -15,7 +15,7 @@ std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::scientific_literal::va
     return out;
   }
   IosGuard guard(out);
-  int power = wrapper.link == 0 ? 0 : 1 + static_cast< int >(std::floor(std::log10(std::fabs(wrapper.link))));
+  int power = wrapper.link == 0 ? 0 : 1 + static_cast< int >(std::floor(std::log10(std::fabs(wrapper.link)))) - 1;
   return out << std::fixed << wrapper.link * std::pow(10., -power) << 'e' << std::showpos << power;
 }
 template<>
