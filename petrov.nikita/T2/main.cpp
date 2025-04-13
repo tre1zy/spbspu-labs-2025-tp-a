@@ -38,12 +38,12 @@ void petrov::sort(std::vector< DataStruct > & vector)
   {
     if (vector[k].key1 != vector [k - 1].key1)
     {
-      for (size_t i = 0; i < vector.size(); i++) 
+      for (size_t i = 0; i < vector.size(); i++)
       {
         swapped = false;
-        for (size_t j = 0; j < vector.size() - i; j++) 
+        for (size_t j = 0; j < vector.size() - i; j++)
         {
-          if (vector[j].key1 > vector[j + 1].key2) 
+          if (vector[j].key1 > vector[j + 1].key2)
           {
             std::swap(vector[j], vector[j + 1]);
             swapped = true;
