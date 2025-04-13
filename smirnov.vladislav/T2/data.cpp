@@ -38,9 +38,9 @@ std::istream& smirnov::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
 
     size_t exp_pos = str.find_first_of("eE");
     if (exp_pos == std::string::npos ||
-        exp_pos == number_str.length() - 1 ||
-        (number_str[exp_pos + 1] != '+' &&
-         number_str[exp_pos + 1] != '-'))
+        exp_pos == str.length() - 1 ||
+        (str[exp_pos + 1] != '+' &&
+         str[exp_pos + 1] != '-'))
     {
         in.setstate(std::ios::failbit);
         return in;
@@ -168,11 +168,10 @@ std::ostream& smirnov::ioStructs::operator<<(std::ostream& out, const DoubleIO&&
     }
     smirnov::iofmtguard fmtguard(out);
 
-    double val = dest.ref;
+    double value = std::abs(dest.ref);
     bool is_negative = (dest.ref < 0);
-    value = std::abs(value);
-    int exponent = (value == 0.0) ? 0 : std::floor(std::log10(value));
-    double mantissa = val / std::pow(10, exponent);
+    int exponent = (value == 0.0) ? 0 : static_cast<int>( std::floor(std::log10(value)));
+    double mantissa = value / std::pow(10, exponent);
 
     if (mantissa >= 10.0)
     {
