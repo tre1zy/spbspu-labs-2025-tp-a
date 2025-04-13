@@ -24,13 +24,13 @@ int main()
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  
+
   std::sort(data.begin(), data.end());
   std::copy(
     data.begin(),
     data.end(),
     std::ostream_iterator<DataStruct>(std::cout, "\n")
   );
-
+  
   return 0;
 }
