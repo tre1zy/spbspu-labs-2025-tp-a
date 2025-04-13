@@ -1,10 +1,9 @@
+#include "DataStruct.h"
 #include <iomanip>
 #include <cmath>
 #include <limits>
-#include "DataStruct.h"
 namespace khokhryakova
 {
-
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -12,7 +11,7 @@ namespace khokhryakova
     {
       return in;
     }
-    char c;
+    char c = '\0' ;
     if ((in >> c) && (c != dest.exp))
     {
       in.setstate(std::ios::failbit);
@@ -27,7 +26,8 @@ namespace khokhryakova
     {
       return in;
     }
-    double real, imag;
+    double real = 0.0;
+    double imag = 0.0;
     in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' } >> DelimiterIO{ '(' };
     in >> real >> imag >> DelimiterIO{ ')' };
     if (in)
@@ -44,8 +44,8 @@ namespace khokhryakova
     {
       return in;
     }
-    long long N;
-    unsigned long long D;
+    long long N = 0;
+    unsigned long long D = 1;
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' } >> N;
     in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> D >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
     if (in)
@@ -132,11 +132,9 @@ namespace khokhryakova
     }
     std::ios_base::fmtflags flags = out.flags();
     out << std::fixed << std::setprecision(1);
-    out << "(:key1 #c("
-        << src.key1.real() << " "
-        << src.key1.imag() << ")"
-        << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)"
-        << ":key3 \"" << src.key3 << "\":)";
+    out << "(:key1 #c(" << src.key1.real() << " " << src.key1.imag() << ")";
+    out << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)";
+    out << ":key3 \"" << src.key3 << "\":)";
     out.flags(flags);
     return out;
   }

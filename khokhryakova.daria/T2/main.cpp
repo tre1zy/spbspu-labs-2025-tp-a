@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
-#include "DataStruct.h>
+#include "DataStruct.h"
 int main()
 {
   std::vector<khokhryakova::DataStruct> data;
