@@ -33,23 +33,20 @@ std::istream& smirnov::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
         return in;
     }
 
-    std::string num;
-    std::getline(in, num, ':');  
+    std::string str;
+    std::getline(in, str, ':');
 
-    size_t ePos = num.find_first_of("eE");
-    if (ePos == std::string::npos || num[ePos] == num.back())
+    size_t exp_pos = str.find_first_of("eE");
+    if (exp_pos == std::string::npos ||
+        exp_pos == number_str.length() - 1 ||
+        (number_str[exp_pos + 1] != '+' &&
+         number_str[exp_pos + 1] != '-'))
     {
         in.setstate(std::ios::failbit);
         return in;
     }
 
-    if (num[ePos + 1] != '+' && num[ePos + 1] != '-')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    std::istringstream iss(num);
+    std::istringstream iss(str);
     if (!(iss >> dest.ref))
     {
         in.setstate(std::ios::failbit);
@@ -73,9 +70,9 @@ std::istream& smirnov::ioStructs::operator>>(std::istream& in, ULLIO&& dest)
         return in;
     }
 
-    str = str.substr(2);  
+    str = str.substr(2);
     std::istringstream iss(str);
-    iss >> std::hex >> dest.ref;  
+    iss >> std::hex >> dest.ref;
     if (!iss)
     {
         in.setstate(std::ios::failbit);
@@ -118,7 +115,7 @@ std::istream& smirnov::ioStructs::operator>>(std::istream& in, KeyNumIO& dest)
 std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry) 
+    if (!sentry)
     {
         return in;
     }
@@ -134,7 +131,7 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
         in >> del{ '(' };
         in >> del{ ':' };
 
-        for (int i = 0; i < 3; ++i) 
+        for (int i = 0; i < 3; ++i)
         {
             keynum key_num{ 0 };
             in >> key_num;
@@ -153,7 +150,7 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
         }
         in >> del{ ')' };
     }
-    if (in) 
+    if (in)
     {
         dest = temp;
     }
@@ -172,20 +169,20 @@ std::ostream& smirnov::ioStructs::operator<<(std::ostream& out, const DoubleIO&&
     smirnov::iofmtguard fmtguard(out);
 
     double val = dest.ref;
-    bool is_negative = val < 0;
-    val = std::abs(val);
-    int exp = (val == 0.0) ? 0 : std::floor(std::log10(val));
-    double mant = val / std::pow(10, exp);
+    bool is_negative = (dest.ref < 0);
+    value = std::abs(value);
+    int exponent = (value == 0.0) ? 0 : std::floor(std::log10(value));
+    double mantissa = val / std::pow(10, exponent);
 
-    if (mant >= 10.0)
+    if (mantissa >= 10.0)
     {
-        mant /= 10.0;
-        exp++;
+        mantissa /= 10.0;
+        exponent++;
     }
-    else if (mant < 1.0)
+    else if (mantissa < 1.0)
     {
-        mant *= 10.0;
-        exp--;
+        mantissa *= 10.0;
+        exponent--;
     }
 
     if (is_negative)
@@ -193,8 +190,8 @@ std::ostream& smirnov::ioStructs::operator<<(std::ostream& out, const DoubleIO&&
         out << '-';
     }
 
-    out << std::fixed << std::setprecision(1) << mant;
-    out << 'e' << (exp >= 0 ? '+' : '-') << std::abs(exp);
+    out << std::fixed << std::setprecision(1) << mantissa;
+    out << 'e' << (exponent >= 0 ? '+' : '-') << std::abs(exponent);
     return out;
 }
 
