@@ -7,7 +7,7 @@ namespace dribas
   class StreamGuard
   {
   public:
-    StreamGuard(std::basic_ios< char >&);
+    explicit StreamGuard(std::basic_ios< char >&);
     ~StreamGuard();
   private:
     std::basic_ios< char >::fmtflags fmtflags_;
