@@ -15,19 +15,21 @@ namespace aleksandrov
     std::string key3;
   };
 
-  class iofmtguard
+  namespace detail
   {
-  public:
-    explicit iofmtguard(std::basic_ios< char >&);
-    ~iofmtguard();
-  private:
-    std::basic_ios< char >& s_;
-    std::streamsize width_;
-    char fill_;
-    std::streamsize precision_;
-    std::basic_ios< char >::fmtflags fmt_;
-  };
-
+    class iofmtguard
+    {
+    public:
+      explicit iofmtguard(std::basic_ios< char >&);
+      ~iofmtguard();
+    private:
+      std::basic_ios< char >& s_;
+      std::streamsize width_;
+      char fill_;
+      std::streamsize precision_;
+      std::basic_ios< char >::fmtflags fmt_;
+    };
+  }
   bool operator<(const DataStruct&, const DataStruct&);
 }
 

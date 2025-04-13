@@ -3,41 +3,40 @@
 
 namespace aleksandrov
 {
-  std::ostream& operator<<(std::ostream& out, const DoubleO& dest)
+  namespace detail
   {
-    std::ostream::sentry sentry(out);
-    if (!sentry)
+    std::ostream& operator<<(std::ostream& out, const DoubleO& dest)
     {
-      return out;
+      std::ostream::sentry sentry(out);
+      if (!sentry)
+      {
+        return out;
+      }
+      return out << std::fixed << std::setprecision(1) << dest.ref << 'd';
     }
-    out << std::fixed << std::setprecision(1) << dest.ref << 'd';
-    return out;
-  }
 
-  std::ostream& operator<<(std::ostream& out, const RationalO& dest)
-  {
-    std::ostream::sentry sentry(out);
-    if (!sentry)
+    std::ostream& operator<<(std::ostream& out, const RationalO& dest)
     {
-      return out;
+      std::ostream::sentry sentry(out);
+      if (!sentry)
+      {
+        return out;
+      }
+      out << "(:N " << dest.ref.first;
+      out << ":D " << dest.ref.second;
+      return out << ":)";
     }
-    out << "(:N " << dest.ref.first;
-    out << ":D " << dest.ref.second;
-    out << ":)";
-    return out;
-  }
 
-  std::ostream& operator<<(std::ostream& out, const StringO& dest)
-  {
-    std::ostream::sentry sentry(out);
-    if (!sentry)
+    std::ostream& operator<<(std::ostream& out, const StringO& dest)
     {
-      return out;
+      std::ostream::sentry sentry(out);
+      if (!sentry)
+      {
+        return out;
+      }
+      return out << '"' << dest.ref << '"';
     }
-    out << '"' << dest.ref << '"';
-    return out;
   }
-
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest)
   {
     std::ostream::sentry sentry(out);
@@ -45,11 +44,12 @@ namespace aleksandrov
     {
       return out;
     }
-    iofmtguard fmtguard(out);
-    out << "(:" << "key1 " << DoubleO{ dest.key1 };
-    out << ":key2 " << RationalO{ dest.key2 };
-    out << ":key3 " << StringO{ dest.key3 } << ":)";
-    return out;
+    detail::iofmtguard fmtguard(out);
+    out << "(:";
+    out << "key1 " << detail::DoubleO{ dest.key1 } << ':';
+    out << "key2 " << detail::RationalO{ dest.key2 } << ':';
+    out << "key3 " << detail::StringO{ dest.key3 };
+    return out << ":)";
   }
 }
 
