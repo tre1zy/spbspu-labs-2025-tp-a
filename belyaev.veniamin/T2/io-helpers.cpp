@@ -26,7 +26,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   {
     out << "-";
   }
-  else 
+  else
   {
     out << "+";
   }

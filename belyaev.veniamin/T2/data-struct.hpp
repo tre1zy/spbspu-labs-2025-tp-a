@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <string>
 
-namespace belyaev 
+namespace belyaev
 {
   struct DataStruct
   {
