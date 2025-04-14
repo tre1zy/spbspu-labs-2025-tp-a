@@ -1,5 +1,5 @@
 #include "datastruct.hpp"
-#include "ijfmtsream
+#include "iofmtguard.hpp"
 
 std::istream& nspace::operator>>(std::istream& in, DelimiterIO&& dest)
 {
