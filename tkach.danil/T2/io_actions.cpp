@@ -216,7 +216,7 @@ std::ostream& tkach::operator<<(std::ostream& out, const DoubleIO& dest)
     exp--;
   }
   out << std::fixed << std::setprecision(1);
-  out << mantissa << 'e' << exp;
+  out << mantissa << 'e' << (exp > 0 ? '+' : '-') << std::abs(exp);
   return out;
 }
 
