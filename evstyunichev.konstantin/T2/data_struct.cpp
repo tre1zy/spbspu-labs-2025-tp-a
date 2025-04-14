@@ -36,7 +36,7 @@ std::istream & evstyunichev::operator>>(std::istream& in, DelimitersIO &&dest)
   }
   for (char c: dest.exps)
   {
-    in >> DelimiterIO{ std::move(c) };
+    in >> DelimiterIO{ c };
     if (!in)
     {
       return in;
@@ -96,6 +96,10 @@ std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &&key)
   else if (k == 3)
   {
     in >> key.data.key3;
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
