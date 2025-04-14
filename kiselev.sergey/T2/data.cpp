@@ -110,6 +110,7 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
     return input;
   }
   DataStruct temp;
+  detail::ScopeGuard scope(input);
   {
     input >> DelimetersIO{ "(:" };
     input >> KeyIO{ temp };
