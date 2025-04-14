@@ -41,7 +41,8 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   return out;
 }
 
-std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& pairLL) {
+std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& pairLL)
+{
   belyaev::StreamGuard streamGuard(out);
 
   out << "(:N ";
