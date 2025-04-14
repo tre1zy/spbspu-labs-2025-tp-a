@@ -215,7 +215,7 @@ std::ostream& tkach::operator<<(std::ostream& out, const DoubleIO& dest)
     mantissa *= 10;
     exp--;
   }
-  out << std::fixed << std::setprecision(2);
+  out << std::fixed << std::setprecision(1);
   out << mantissa << 'e' << exp;
   return out;
 }
