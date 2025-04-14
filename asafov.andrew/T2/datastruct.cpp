@@ -1,5 +1,6 @@
 #include "datastruct.h"
 #include <stdexcept>
+#include <iterator>
 namespace
 {
   bool safeDoubleLess(double a, double b, double epsilon = 1e-10)
@@ -7,7 +8,7 @@ namespace
     return (b - a) > epsilon * std::max(std::abs(a), std::abs(b));
   }
 
-  bool isChar(std::istream_iterator<char>& iit, const char ch)
+  bool isChar(std::string::iterator& iit, const char ch)
   {
     const char temp = *(iit++);
     if (temp == ch)return true;
@@ -15,14 +16,18 @@ namespace
     return false;
   }
 
-  bool isString(std::istream_iterator<char>& iit, const char* str)
+  bool isString(std::string::iterator& iit, const char* str)
   {
-    for (size_t i = 0; i != '\0'; ++i) if (!isChar(iit, str[i])) return false;
+    for (size_t i = 0; i != '\0'; ++i)
+    {
+      if (isChar(iit, str[i])) return false;
+      ++iit;
+    }
     return true;
   }
 
-  unsigned long long readUllBin(std::istream_iterator<char>& iit)
-  {
+  unsigned long long readUllBin(std::string::iterator& iit)
+  {;
     unsigned long long temp = 0;
     isString(iit, "0b");
     while (*iit == '0' || *iit == '1')
@@ -33,7 +38,7 @@ namespace
     return temp;
   }
 
-  double readDouble(std::istream_iterator<char>& iit)
+  double readDouble(std::string::iterator& iit)
   {
     unsigned long long temp1 = 0;
     double temp2 = 0;
@@ -49,7 +54,7 @@ namespace
     for (size_t i = 0; str[i] != '\0'; ++i) *(oit++) = str[i];
   }
 
-  std::complex<double> readCmpLsp(std::istream_iterator<char>& iit)
+  std::complex<double> readCmpLsp(std::string::iterator& iit)
   {
     std::complex<double> temp = 0;
     isString(iit, "#c(");
@@ -59,7 +64,7 @@ namespace
     return temp;
   }
 
-  std::string readString(std::istream_iterator<char>& iit)
+  std::string readString(std::string::iterator& iit)
   {
     std::string temp;
     auto it = temp.begin();
@@ -67,35 +72,32 @@ namespace
     return temp;
   }
 
-  std::string writeUllBin(unsigned long long data)
+  std::string writeUllBin(unsigned long long num)
   {
-    std::string temp;
-    auto it = temp.begin();
-    while (data > 1)
+    if (num == 0) return "0b0";
+    
+    std::string binary;
+    while (num > 0)
     {
-      *(it++) = static_cast<char>((data & 1) + '0');
-      data /= 2;
+      binary = (num % 2 ? "1" : "0") + binary;
+      num /= 2;
     }
-    *(it++) = static_cast<char>(data + '0');
-    *(it++) = 'b';
-    *(it++) = '0';
-    temp.reserve();
-    return temp;
+    
+    return "0b" + binary;
   }
 
   std::string writeCmpLsp(std::complex<double> data)
   {
     std::string str;
-    auto it = str.begin();
-    *(it++) = '#';
-    *(it++) = 'c';
-    *(it++) = '(';
+    str += '#';
+    str += 'c';
+    str += '(';
     std::string temp = std::to_string(data.real());
-    for (const char i : temp) *(it++) = i;
-    *(it++) = ' ';
+    for (const char i : temp) str += i;
+    str += ' ';
     temp = std::to_string(data.imag());
-    for (const char i : temp) *(it++) = i;
-    *(it++) = ')';
+    for (const char i : temp) str += i;
+    str += ')';
     return str;
   }
 
@@ -104,29 +106,30 @@ namespace
     for (const auto a : str) *(oit++) = a;
   }
 
-  void readKey(std::istream_iterator<char>& iit, asafov::DataStruct& data, bool* read)
+  void readKey(std::string::iterator& iit, asafov::DataStruct& data, bool* read)
   {
     if (*iit == '1')
     {
-      if (read[0] == true) throw std::invalid_argument("invalid input!");
+      if (read[0] == true) throw std::logic_error("invalid input!");
       read[0] = true;
       data.key1 = readUllBin(iit);
     }
     else if (*iit == '2')
     {
-      if (read[1] == true) throw std::invalid_argument("invalid input!");
+      if (read[1] == true) throw std::logic_error("invalid input!");
       read[1] = true;
       data.key2 = readCmpLsp(iit);
     }
     else if (*iit == '3')
     {
-      if (read[2] == true) throw std::invalid_argument("invalid input!");
+      if (read[2] == true) throw std::logic_error("invalid input!");
       read[2] = true;
       data.key3 = readString(iit);
     }
     else
     {
-      throw std::invalid_argument("invalid input!");
+      std::cerr << *iit;
+      throw std::logic_error("invalid input!");
     }
   }
 }
@@ -146,13 +149,16 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   bool read[] = {false, false, false};
   std::istream_iterator<char> iit(is);
-  isString(iit, "(:key");
-  readKey(iit, data, read);
-  isString(iit, ":key");
-  readKey(iit, data, read);
-  isString(iit, ":key");
-  readKey(iit, data, read);
-  isString(iit, ")");
+  std::string stream;
+  while (!is.eof()) stream += *(iit++);
+  auto it = stream.begin();
+  isString(it, "(:key");
+  readKey(it, data, read);
+  isString(it, ":key");
+  readKey(it, data, read);
+  isString(it, ":key");
+  readKey(it, data, read);
+  isString(it, ")");
   return is;
 }
 
