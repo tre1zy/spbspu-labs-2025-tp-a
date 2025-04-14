@@ -58,7 +58,7 @@ namespace evstyunichev
   std::ostream & operator<<(std::ostream &out, StringIO &&dest);
   std::ostream & operator<<(std::ostream &out, CmplIO &&dest);
   std::ostream & operator<<(std::ostream &out, const DataStruct &dest);
-  double evstyunichev::abscmpl(const std::complex< double > &cmpl);
+  double abscmpl(const std::complex< double > &cmpl);
 }
 
 #endif

@@ -143,6 +143,7 @@ std::ostream & evstyunichev::operator<<(std::ostream &out, UllIO &&data)
     return out;
   }
   out << data.ref << "ull";
+  return out;
 }
 
 std::ostream & evstyunichev::operator<<(std::ostream &out, CmplIO &&data)
@@ -153,6 +154,7 @@ std::ostream & evstyunichev::operator<<(std::ostream &out, CmplIO &&data)
     return out;
   }
   out << "#c(" << data.cmpl.real() << ' ' << data.cmpl.imag() << ')';
+  return out;
 }
 
 std::ostream & evstyunichev::operator<<(std::ostream &out, StringIO &&data)
@@ -163,6 +165,7 @@ std::ostream & evstyunichev::operator<<(std::ostream &out, StringIO &&data)
     return out;
   }
   out << '"' << data.ref << '"';
+  return out;
 }
 
 std::ostream & evstyunichev::operator<<(std::ostream &out, const DataStruct &data)
