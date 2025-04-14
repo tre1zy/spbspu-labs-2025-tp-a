@@ -16,7 +16,7 @@ int main()
     }
     catch (const std::logic_error&)
     {
-      
+
     }
   }
   std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
