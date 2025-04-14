@@ -1,6 +1,8 @@
 #include "data_struct.hpp"
 #include <exception>
 #include <vector>
+#include <iomanip>
+#include <sstream>
 
 brevnov::StreamGuard::StreamGuard(std::basic_ios< char > & s):
   s_(s),
@@ -114,10 +116,10 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   switch (key)
   {
   case 1:
-    input >> UllIO{ dest.data.key1 };
+    input >> UnLongLongIO{ dest.data.key1 };
     break;
   case 2:
-    input >> CharIO{ dest.data.key2 };
+    input >> ComplexIO{ dest.data.key2 };
     break;
   case 3:
     input >> StringIO{ dest.data.key3 };
@@ -136,7 +138,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
     return input;
   }
   DataStruct temp;
-  detail::ScopeGuard scope(input);
+  StreamGuard scope(input);
   {
     input >> DelimitersIO{ "(:" };
     input >> KeyIO{ temp };
