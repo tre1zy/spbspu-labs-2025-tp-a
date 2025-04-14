@@ -10,7 +10,7 @@ int main()
 {
   using namespace dribas;
 
-  std::vector< dribas::Data > data;
+  std::vector< Data > data;
   while (!std::cin.eof()) {
     Data temp;
     std::cin >> temp;
@@ -29,5 +29,6 @@ int main()
     std::end(data),
     std::ostream_iterator< Data >(std::cout, "\n")
   );
+
   return 0;
 }

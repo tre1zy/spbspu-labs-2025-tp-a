@@ -32,11 +32,6 @@ namespace dribas
     char exp;
   };
 
-  struct LabelIO
-  {
-    std::string exp;
-  };
-
   struct UllO
   {
     const unsigned long long& ref;
@@ -53,11 +48,10 @@ namespace dribas
   };
 
   std::istream& operator>>(std::istream&, Data&);
-  std::istream& operator>>(std::istream&, DelimiterIO&&t);
+  std::istream& operator>>(std::istream&, DelimiterIO&&);
   std::istream& operator>>(std::istream&, DoubleI&&);
   std::istream& operator>>(std::istream&, UllI&&);
   std::istream& operator>>(std::istream&, StringI&&);
-  std::istream& operator>>(std::istream&, LabelIO&&);
 
   std::ostream& operator<<(std::ostream&, const DoubleO&&);
   std::ostream& operator<<(std::ostream&, const UllO&&);

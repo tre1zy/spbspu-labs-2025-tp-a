@@ -29,6 +29,7 @@ namespace dribas
     out << "key1 ";
     out << std::fixed << std::setprecision(1) << dbl.ref;
     out << "d";
+
     return out;
   }
 
@@ -57,6 +58,7 @@ namespace dribas
     out << '"';
     out << str.ref;
     out << '"';
+
     return out;
   }
 
@@ -66,6 +68,8 @@ namespace dribas
     if (!sentry) {
       return in;
     }
+    StreamGuard guard(in);
+
     return in >> dbl.ref >> DelimiterIO{ 'd' };
   }
 
@@ -75,6 +79,8 @@ namespace dribas
     if (!sentry) {
       return in;
     }
+    StreamGuard guard(in);
+
     return in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> std::hex >> ull.ref;
   }
 
@@ -84,6 +90,8 @@ namespace dribas
     if (!sentry) {
       return in;
     }
+    StreamGuard guard(in);
+
     return std::getline(in >> DelimiterIO{ '"' }, str.ref, '"');
   }
 
@@ -93,6 +101,7 @@ namespace dribas
     if (!sentry) {
       return in;
     }
+    StreamGuard guard(in);
 
     char c = '0';
     in >> c;
@@ -103,30 +112,16 @@ namespace dribas
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, LabelIO&& labl)
+  std::istream& operator>>(std::istream& in, Data& data)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
       return in;
     }
-
-    std::string label;
-    if ((in >> label) && label != labl.exp) {
-      in.setstate(std::ios::failbit);
-    }
-
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, Data& dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
+    StreamGuard guard(in);
 
     Data temp;
-    in >> DelimiterIO{'('} >> DelimiterIO{':'};
+    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
 
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
 
@@ -135,19 +130,22 @@ namespace dribas
       in >> key;
       if (key == "key1") {
         if (hasKey1) {
-          in.setstate(std::ios::failbit); return in;
+          in.setstate(std::ios::failbit);
+          return in;
         }
         hasKey1 = true;
         in >> DoubleI{temp.key1};
       } else if (key == "key2") {
         if (hasKey2) {
-          in.setstate(std::ios::failbit); return in;
+          in.setstate(std::ios::failbit);
+          return in;
         }
         hasKey2 = true;
         in >> UllI{temp.key2};
       } else if (key == "key3") {
         if (hasKey3) {
-          in.setstate(std::ios::failbit); return in;
+          in.setstate(std::ios::failbit);
+          return in;
         }
         hasKey3 = true;
         in >> StringI{temp.key3};
@@ -155,14 +153,14 @@ namespace dribas
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> DelimiterIO{':'};
+      in >> DelimiterIO{ ':' };
     }
     if (!hasKey1 || !hasKey2 || !hasKey3) {
       in.setstate(std::ios::failbit);
     }
-    in >> DelimiterIO{')'};
+    in >> DelimiterIO{ ')' };
     if (in) {
-      dest = temp;
+      data = temp;
     }
     return in;
   }
