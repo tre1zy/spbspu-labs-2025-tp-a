@@ -22,7 +22,6 @@ int main()
     {
       std::cin.clear();
       std::cin.ignore(1024, '\n');
-      data.pop_back();
     }
     std::copy(
       std::istream_iterator< DataStruct >(std::cin),
