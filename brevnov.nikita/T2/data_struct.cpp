@@ -66,4 +66,26 @@ std::istream& brevnov::operator>>(std::istream& input, UnLongLongIO&& dest)
   return input;
 }
 
+std::istream& brevnov::operator>>(std::istream& in, ComplexIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  double real = 0.0;
+  double imag = 0.0;
+  in >> DelimiterIO{ '#' };
+  in >> DelimiterIO{ 'c' };
+  in >> DelimiterIO{ '(' };
+  in >> real;
+  in >> imag;
+  in >> DelimiterIO{ ')' };
+  if (in)
+  {
+    dest.ref = std::complex< double >(real, imag);
+  }
+  return in;
+}
+
 
