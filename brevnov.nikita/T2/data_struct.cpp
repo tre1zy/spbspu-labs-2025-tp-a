@@ -153,7 +153,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct&& dest)
   return input;
 }
 
-std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO& dest)
 {
   unsigned long long num = dest.ref;
   if (dest.ref == 0)
@@ -174,19 +174,19 @@ std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& des
   return output;
 }
 
-std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO&& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO& dest)
 {
   output << "#c(" << std::fixed << std::setprecision(1) << dest.real();
   output << " " << dest.imag() << ")";
   return output;
 }
 
-std::ostream& brevnov::operator<<(std::ostream &output, const StringIO&& dest)
+std::ostream& brevnov::operator<<(std::ostream &output, const StringIO& dest)
 {
   return output << "\"" << dest.ref << "\"";
 }
 
-std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct&& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
