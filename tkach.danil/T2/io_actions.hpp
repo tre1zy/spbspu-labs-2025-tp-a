@@ -38,6 +38,8 @@ namespace tkach
   std::istream& operator>>(std::istream& in, UllIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::istream& operator>>(std::istream& in, LabelIO&& dest);
+  std::ostream& operator<<(std::ostream& out, const UllIO& dest);
+  std::ostream& operator<<(std::ostream& out, const DoubleIO& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 }
 

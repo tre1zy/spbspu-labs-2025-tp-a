@@ -1,6 +1,8 @@
 #include "io_actions.hpp"
 #include <iostream>
 #include <vector>
+#include <cmath>
+#include <iomanip>
 #include "data_struct.hpp"
 #include "streamguard.hpp"
 
@@ -181,6 +183,43 @@ std::istream& tkach::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
+std::ostream& tkach::operator<<(std::ostream& out, const UllIO& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  tkach::StreamGuard guard(out);
+  std::cout << "0x" << std::uppercase << std::hex << dest.ref;
+  return out;
+}
+
+std::ostream& tkach::operator<<(std::ostream& out, const DoubleIO& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  tkach::StreamGuard guard(out);
+  if (dest.ref == 0.0)
+  {
+    out << "0.0e+0";
+    return out;
+  }
+  int exp = std::floor(std::log10(std::abs(dest.ref)));
+  double mantissa = dest.ref / std::pow(10, exp);
+  if (mantissa < 1.0)
+  {
+    mantissa *= 10;
+    exp--;
+  }
+  out << std::fixed << std::setprecision(2);
+  out << mantissa << 'e' << exp;
+  return out;
+}
+
 std::ostream& tkach::operator<<(std::ostream& out, const tkach::DataStruct& dest)
 {
   std::ostream::sentry sentry(out);
@@ -190,8 +229,8 @@ std::ostream& tkach::operator<<(std::ostream& out, const tkach::DataStruct& dest
   }
   tkach::StreamGuard guard(out);
   out << "(";
-  out << ":key1 " << dest.key1;
-  out << ":key2 " << dest.key2;
+  out << ":key1 " << DoubleIO{const_cast< double & >(dest.key1)};
+  out << ":key2 " << UllIO{const_cast< size_t & >(dest.key2)};
   out << ":key3 \"" << dest.key3 << "\":)";
   return out;
 }
