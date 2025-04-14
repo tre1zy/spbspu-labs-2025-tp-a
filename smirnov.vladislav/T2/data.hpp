@@ -13,42 +13,41 @@ namespace smirnov
 
     std::istream& operator>>(std::istream& in, DataStruct& value);
     std::ostream& operator<<(std::ostream& out, const DataStruct& value);
+    bool operator<(const DataStruct& a, const DataStruct& b);
 
-    namespace ioStructs
+    struct DelimiterIO
     {
-        struct DelimiterIO
-        {
-            char expected;
-        };
+        char expected;
+    };
 
-        struct DoubleIO
-        {
-            double& ref;
-        };
+    struct DoubleIO
+    {
+        double& ref;
+    };
 
-        struct ULLIO
-        {
-            unsigned long long& ref;
-        };
+    struct UllIO
+    {
+        unsigned long long& ref;
+    };
 
-        struct StringIO
-        {
-            std::string& ref;
-        };
+    struct StringIO
+    {
+        std::string& ref;
+    };
 
-        struct KeyNumIO
-        {
-            int exp;
-        };
+    struct KeyNumIO
+    {
+        const std::string exp;
+    };
 
-        std::istream& operator>>(std::istream& in, DoubleIO&& dest);
-        std::istream& operator>>(std::istream& in, ULLIO&& dest);
-        std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-        std::istream& operator>>(std::istream& in, StringIO&& dest);
-        std::istream& operator>>(std::istream& in, KeyNumIO& dest);
-        std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest);
-        std::ostream& operator<<(std::ostream& out, const ULLIO&& dest);
-    }
+    std::istream& operator>>(std::istream& in, DoubleIO&& dest);
+    std::istream& operator>>(std::istream& in, UllIO&& dest);
+    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+    std::istream& operator>>(std::istream& in, StringIO&& dest);
+    std::istream& operator>>(std::istream& in, KeyNumIO&& dest);
+    std::ostream& operator<<(std::ostream& out, const DoubleIO& dest);
+    std::ostream& operator<<(std::ostream& out, const UllIO& dest);
+
 }
 
 #endif

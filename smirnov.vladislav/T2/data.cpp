@@ -4,221 +4,256 @@
 #include <sstream>
 #include <cmath>
 
-namespace
+namespace smirnov
 {
-    using namespace smirnov::ioStructs;
-}
 
-std::istream& smirnov::ioStructs::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
+    std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     {
-        return in;
-    }
-    char c;
-    in >> c;
-    if (in && c != dest.expected)
-    {
-        in.setstate(std::ios::failbit);
-    }
-    return in;
-}
-
-std::istream& smirnov::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    std::string str;
-    std::getline(in, str, ':');
-
-    size_t exp_pos = str.find_first_of("eE");
-    if (exp_pos == std::string::npos ||
-        exp_pos == str.length() - 1 ||
-        (str[exp_pos + 1] != '+' &&
-         str[exp_pos + 1] != '-'))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    std::istringstream iss(str);
-    if (!(iss >> dest.ref))
-    {
-        in.setstate(std::ios::failbit);
-    }
-    return in;
-}
-
-
-std::istream& smirnov::ioStructs::operator>>(std::istream& in, ULLIO&& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    std::string str;
-    if (!(in >> str) || (str.substr(0, 2) != "0x" && str.substr(0, 2) != "0X"))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    str = str.substr(2);
-    std::istringstream iss(str);
-    iss >> std::hex >> dest.ref;
-    if (!iss)
-    {
-        in.setstate(std::ios::failbit);
-    }
-    return in;
-}
-
-
-std::istream& smirnov::ioStructs::operator>>(std::istream& in, StringIO&& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-    std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
-    return in;
-}
-
-
-
-std::istream& smirnov::ioStructs::operator>>(std::istream& in, KeyNumIO& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    std::string word = "";
-    in >> word;
-    if (word.substr(0, 3) != "key")
-    {
-        in.setstate(std::ios::failbit);
-    }
-    dest.exp = word.back();
-    return in;
-}
-
-std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    DataStruct temp;
-    {
-        using del = DelimiterIO;
-        using keynum = KeyNumIO;
-        using ullval = ULLIO;
-        using dbval = DoubleIO;
-        using str = StringIO;
-
-        in >> del{ '(' };
-        in >> del{ ':' };
-
-        for (int i = 0; i < 3; ++i)
+	std::istream::sentry sentry(in);
+	if (!sentry)
+	{
+            return in;
+        }
+        char c = '0';
+        in >> c;
+        if (in && c != dest.expected)
         {
-            keynum key_num{ 0 };
-            in >> key_num;
-            if (key_num.exp == '1')
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+    {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+
+        return in >> dest.ref;
+    }
+
+    std::istream& operator>>(std::istream& in, UllIO&& dest)
+    {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+
+        std::string str;
+        in >> std::ws;
+        char a = '0';
+        char b = '0';
+        a = in.get();
+        a = in.peek();
+
+        if (a == '0' && (b == 'x' || b == 'X'))
+        {
+            in.get();
+            in >> std::hex >> dest.ref;
+            if (!in)
             {
-                in >> dbval{ temp.key1 } >> del{ ':' };
-            }
-            else if (key_num.exp == '2')
-            {
-                in >> ullval{ temp.key2 } >> del{ ':' };
-            }
-            else if (key_num.exp == '3')
-            {
-                in >> str{ temp.key3 } >> del{ ':' };
+                in.setstate(std::ios::failbit);
             }
         }
-        in >> del{ ')' };
+        else
+        {
+            in.unget();
+            in.setstate(std::ios::failbit);
+        }
+
+        return in;
     }
-    if (in)
+
+    std::istream& operator>>(std::istream& in, StringIO&& dest)
     {
-        dest = temp;
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+        std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+        return in;
     }
-    return in;
-}
 
-
-
-std::ostream& smirnov::ioStructs::operator<<(std::ostream& out, const DoubleIO&& dest)
-{
-    std::ostream::sentry sentry(out);
-    if (!sentry)
+    std::istream& operator>>(std::istream& in, KeyNumIO& dest)
     {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+        std::string data;
+        if ((in >> data) && (data != dest.exp))
+        {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, DataStruct& dest)
+    {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+
+        DataStruct str;
+        bool hasKey1 = false;
+        bool hasKey2 = false;
+        bool hasKey3 = false;
+        if (!(in >> DelimiterIO{ '(' }))
+        {
+            return in;
+        }
+
+        while (true)
+        {
+            in >> std::ws;
+            if (in.peek() == ':')
+            {
+                in.get();
+                if (in.peek() == ')')
+                {
+                    in.get();
+                    break;
+                }
+                else
+                {
+                    in.unget();
+                }
+            }
+            if (!(in >> DelimiterIO{ ':' }))
+            {
+                in.setstate(std::ios::failbit);
+                return in;
+            }
+            std::string key;
+            if (!(in >> key))
+            {
+                in.setstate(std::ios::failbit);
+                return in;
+            }
+            if (key == "key1")
+            {
+                if (!(in >> DoubleIO{ str.key1 }))
+                {
+                    return in;
+                }
+                hasKey1 = true;
+            }
+            else if (key == "key2")
+            {
+                if (!(in >> UllIO{ str.key2 }))
+                {
+                    return in;
+                }
+                hasKey2 = true;
+            }
+            else if (key == "key3")
+            {
+                if (!(in >> StringIO{ str.key3 }))
+                {
+                    return in;
+                }
+                hasKey3 = true;
+            }
+            else
+            {
+                in.setstate(std::ios::failbit);
+                return in;
+            }
+        }
+        if (hasKey1 && hasKey2 && hasKey3)
+        {
+            dest = str;
+        }
+        else
+        {
+            in.setstate(std::ios::failbit);
+        }
+
+        return in;
+    }
+
+    std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest)
+    {
+        std::ostream::sentry sentry(out);
+        if (!sentry)
+        {
+            return out;
+        }
+        iofmtguard guard(out);
+
+        double value = std::abs(dest.ref);
+        bool is_negative = (dest.ref < 0);
+        int exponent = (value == 0.0) ? 0 : static_cast<int>( std::floor(std::log10(value)));
+        double mantissa = value / std::pow(10, exponent);
+
+        if (mantissa >= 10.0)
+        {
+            mantissa /= 10.0;
+            exponent++;
+        }
+        else if (mantissa < 1.0)
+        {
+            mantissa *= 10.0;
+            exponent--;
+        }
+
+        if (is_negative)
+        {
+            out << '-';
+        }
+
+        out << std::fixed << std::setprecision(1) << mantissa;
+        out << 'e' << (exponent >= 0 ? '+' : '-') << std::abs(exponent);
         return out;
     }
-    smirnov::iofmtguard fmtguard(out);
 
-    double value = std::abs(dest.ref);
-    bool is_negative = (dest.ref < 0);
-    int exponent = (value == 0.0) ? 0 : static_cast<int>( std::floor(std::log10(value)));
-    double mantissa = value / std::pow(10, exponent);
-
-    if (mantissa >= 10.0)
+    std::ostream& operator<<(std::ostream& out, const UllIO&& dest)
     {
-        mantissa /= 10.0;
-        exponent++;
-    }
-    else if (mantissa < 1.0)
-    {
-        mantissa *= 10.0;
-        exponent--;
+        std::ostream::sentry sentry(out);
+        if (!sentry)
+        {
+            return out;
+        }
+        return out << "0x" << std::uppercase << std::hex << dest.ref;
     }
 
-    if (is_negative)
+    std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     {
-        out << '-';
-    }
+        std::ostream::sentry sentry(out);
+        if (!sentry)
+        {
+            return out;
+        }
+        double dbval = 0;
+        unsigned long long ullval = 0;
+        dbval = src.key1;
+        ullval = src.key2;
+        iofmtguard guard(out);
+        out << "(:key1 " << smirnov:: DoubleIO{ dbval }
+            << ":key2 " << smirnov: UllIO{ ullval };
+            << ":key3 \"" << src.key3 << "\":)";
 
-    out << std::fixed << std::setprecision(1) << mantissa;
-    out << 'e' << (exponent >= 0 ? '+' : '-') << std::abs(exponent);
-    return out;
-}
-
-std::ostream& smirnov::ioStructs::operator<<(std::ostream& out, const ULLIO&& dest)
-{
-    std::ostream::sentry sentry(out);
-    if (!sentry)
-    {
-        return out;
-    }
-    return out << "0X" << std::uppercase << std::hex << dest.ref;
-}
-
-std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& src)
-{
-    std::ostream::sentry sentry(out);
-    if (!sentry)
-    {
         return out;
     }
 
-    smirnov::iofmtguard guard(out);
-    double dbval = src.key1;
-    unsigned long long ullval = src.key2;
+    bool operator<(const DataStruct& a, const DataStruct& b)
+    {
+        if (a.key1 != b.key1)
+        {
+            return a.key1 < b.key1;
+        }
 
-    out << "(:key1 " << DoubleIO{ dbval };
-    out << ":key2 " << ULLIO{ ullval };
-    out << ":key3 \"" << src.key3;
-    out << "\":)";
-    return out;
+        if (a.key2 != b.key2)
+        {
+            return a.key2 < b.key2;
+        }
+        return a.key3 < b.key3;
+    }
 }

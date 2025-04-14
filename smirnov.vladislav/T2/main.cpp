@@ -3,12 +3,12 @@
 #include <vector>
 #include <algorithm>
 #include "data.hpp"
-#include <sstream>
 #include <limits>
 
 int main()
 {
     std::vector< smirnov::DataStruct > data;
+
     while (std::cin)
     {
         std::copy
@@ -24,20 +24,7 @@ int main()
         }
     }
 
-    std::sort(data.begin(), data.end(), [](const smirnov::DataStruct& a, const smirnov::DataStruct& b)
-        {
-            if (std::abs(a.key1 - b.key1) > 1e-9)
-            {
-                return a.key1 < b.key1;
-            }
-
-            if (a.key2 != b.key2)
-            {
-                return a.key2 < b.key2;
-            }
-
-            return a.key3.size() < b.key3.size();
-        });
+    std::sort(data.begin(), data.end());
 
     std::copy(
         std::begin(data),
