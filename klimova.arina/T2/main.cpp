@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "datastruct.hpp"
 
+
 int main()
 {
   using nspace::DataStruct;
