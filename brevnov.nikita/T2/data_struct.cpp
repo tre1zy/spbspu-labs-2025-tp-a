@@ -169,3 +169,45 @@ std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& des
   }
   return output;
 }
+
+std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO&& dest)
+{
+  output << "#c(" << std::fixed << std::setprecision(1) << dest.real();
+  output << " " << dest.imag() << ")";
+  return output;
+}
+
+std::ostream& brevnov::operator<<(std::ostream &output, const StringIO&& dest)
+{
+  return output << "\"" << dest.ref << "\"";
+}
+
+std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
+{
+  std::ostream::sentry sentry(output);
+  if (!sentry)
+  {
+    return output;
+  }
+  unsigned long long ull = dest.key1;
+  std::complex<double> complex = dest.key2;
+  std::string string = dest.key3;
+  detail::ScopeGuard scope(output);
+  output << "(:key1 " << UnLongLongIO{ ull };
+  output << ":key2 " << ComplexIO{ complex };
+  output << ":key3 " << StringIO{ string } << ":)";
+  return output;
+}
+
+bool brevnov::compare(const DataStruct& lhs, const DataStruct& rhs)
+{
+  if (lhs.key1 != rhs.key1)
+  {
+    return lhs.key1 < rhs.key1;
+  }
+  else if (lhs.key2 != rhs.key2)
+  {
+    return lhs.key2 < rhs.key2;
+  }
+  return lhs.key3.size() < rhs.key3.size();
+}

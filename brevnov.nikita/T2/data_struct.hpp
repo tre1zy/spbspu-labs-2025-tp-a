@@ -55,6 +55,7 @@ namespace brevnov
     std::basic_ios< char >::fmtflags fmt_;
   };
 
+  bool compare(const DataStruct& lhs, const DataStruct& rhs);
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, DelimitersIO&& dest);
   std::istream& operator>>(std::istream& in, ComplexIO&& dest);
