@@ -3,24 +3,28 @@
 #include <vector>
 #include <algorithm>
 #include "data.hpp"
-#include <limits>
+#include <sstream>
 
 int main()
 {
     std::vector< smirnov::DataStruct > data;
+    std::string line;
 
-    while (!std::cin.eof())
+    while (true)
     {
         std::copy
         (
-            std::istream_iterator< smirnov::DataStruct >(std::cin),
-            std::istream_iterator< smirnov::DataStruct >(),
-            std::back_inserter(data)
-        );
-        if (!std::cin)
+            std::getline(std::cin, line);
+        if (!std::cin || line.empty())
         {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+            break;
+        }
+
+        std::istringstream iss(line);
+        smirnov::DataStruct temp;
+        if (iss >> temp)
+        {
+            data.push_back(temp);
         }
     }
 

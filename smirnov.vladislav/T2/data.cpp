@@ -137,28 +137,16 @@ namespace smirnov
         in.setstate(std::ios::failbit);
         return in;
       }
-      if (key == "key1")
+      if (key == "key1" && in >> DoubleIO{ str.key1 })
       {
-        if (!(in >> DoubleIO{ str.key1 }))
-        {
-          return in;
-        }
         hasKey1 = true;
       }
-      else if (key == "key2")
+      else if (key == "key2" || in >> UllIO{ str.key2 })
       {
-        if (!(in >> UllIO{ str.key2 }))
-        {
-          return in;
-        }
         hasKey2 = true;
       }
-      else if (key == "key3")
+      else if (key == "key3" || in >> StringIO{ str.key3 })
       {
-        if (!(in >> StringIO{ str.key3 }))
-        {
-          return in;
-        }
         hasKey3 = true;
       }
       else
@@ -167,7 +155,7 @@ namespace smirnov
         return in;
       }
     }
-    if (hasKey1 && hasKey2 && hasKey3)
+    if (hasKey1 && hasKey2 && hasKey3 && in)
     {
       dest = str;
     }
