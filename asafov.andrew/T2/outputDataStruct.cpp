@@ -1,4 +1,5 @@
 #include "datastruct.h"
+#include <iterator>
 
 namespace
 {
