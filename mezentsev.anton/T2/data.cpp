@@ -56,7 +56,7 @@ std::istream& mezentsev::operator>>(std::istream& in, LongLongIO&& dest)
   {
     return in;
   }
-  in >> dest.def >> mezentsev::DelimitersIO{ "ll" };
+  in >> dest.def >> mezentsev::DelimitersIO{ "ll:" };
   return in;
 }
 
@@ -91,7 +91,7 @@ std::istream& mezentsev::operator>>(std::istream& in, Data& dest)
       in.setstate(std::ios::failbit);
     }
   }
-  in >> del{ ":)" };
+  in >> del{ ")" };
   if (in)
   {
     dest = temp;
