@@ -27,7 +27,6 @@ int main()
     std::end(data),
     std::ostream_iterator< horoshilov::DataStruct >(std::cout, "\n")
   );
-  std::cout << "\n";
   return 0;
 }
 
