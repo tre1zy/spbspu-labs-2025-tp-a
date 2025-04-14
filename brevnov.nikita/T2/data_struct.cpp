@@ -88,4 +88,84 @@ std::istream& brevnov::operator>>(std::istream& in, ComplexIO&& dest)
   return in;
 }
 
+std::istream& brevnov::operator>>(std::istream& input, StringIO&& dest)
+{
+  std::istream::sentry sentry(input);
+  if (!sentry)
+  {
+    return input;
+  }
+  std::getline(input >> DelimeterIO{ '"' }, dest.ref, '"');
+  return input >> DelimeterIO{ ':' };
+}
 
+std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
+{
+  std::istream::sentry sentry(input);
+  if (!sentry)
+  {
+    return input;
+  }
+  input >> DelimetersIO{ "key" };
+  int key;
+  input >> key;
+  switch (key)
+  {
+  case 1:
+    input >> UllIO{ dest.data.key1 };
+    break;
+  case 2:
+    input >> CharIO{ dest.data.key2 };
+    break;
+  case 3:
+    input >> StringIO{ dest.data.key3 };
+    break;
+  default:
+    input.setstate(std::ios::failbit);
+  }
+  return input;
+}
+
+std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
+{
+  std::istream::sentry sentry(input);
+  if (!sentry)
+  {
+    return input;
+  }
+  DataStruct temp;
+  detail::ScopeGuard scope(input);
+  {
+    input >> DelimetersIO{ "(:" };
+    input >> KeyIO{ temp };
+    input >> KeyIO{ temp };
+    input >> KeyIO{ temp };
+    input >> DelimetersIO{ ")" };
+  }
+  if (input)
+  {
+    dest = temp;
+  }
+  return input;
+}
+
+std::ostream& kiselev::operator<<(std::ostream& output, const UnLongLongIO&& dest)
+{
+  unsigned long long num = dest.ref;
+  if (dest.ref == 0)
+  {
+    return output << "00";
+  }
+  std::vector< unsigned > octal;
+  while (num > 0)
+  {
+    octal.push_back(num % 8);
+    num /= 8;
+  }
+  output << "0";
+  for (auto it = octal.rbegin(); it != octal.rend(); ++it)
+  {
+    output << *it;
+  }
+  return output;
+}
