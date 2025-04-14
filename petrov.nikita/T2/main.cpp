@@ -68,16 +68,11 @@ void petrov::sortByFirstKey(std::vector< DataStruct > & vector)
 
 void petrov::sortBySecondKey(std::vector< DataStruct > & vector)
 {
-  size_t k = 0;
-  while (vector[k].key1 == vector[k + 1].key2)
-  {
-    ++k;
-  }
   bool swapped = false;
-  for (size_t i = k; i < vector.size() - 1; i++)
+  for (size_t i = 0; i < vector.size() - 1; i++)
   {
     swapped = false;
-    for (size_t j = k; j < vector.size() - i - 1; j++)
+    for (size_t j = 0; j < vector.size() - i - 1; j++)
     {
       if (vector[j].key2 > vector[j + 1].key2)
       {
@@ -94,16 +89,11 @@ void petrov::sortBySecondKey(std::vector< DataStruct > & vector)
 
 void petrov::sortByThirdKey(std::vector< DataStruct > & vector)
 {
-  size_t k = 0;
-  while (vector[k].key2 == vector[k + 1].key2)
-  {
-    ++k;
-  }
   bool swapped = false;
-  for (size_t i = k; i < vector.size() - 1; i++)
+  for (size_t i = 0; i < vector.size() - 1; i++)
   {
     swapped = false;
-    for (size_t j = k; j < vector.size() - i - 1; j++)
+    for (size_t j = 0; j < vector.size() - i - 1; j++)
     {
       if (vector[j].key3.length() > vector[j + 1].key3.length())
       {
