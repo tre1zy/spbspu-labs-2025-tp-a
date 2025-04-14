@@ -23,6 +23,10 @@ std::string convertToBinString(unsigned long long num)
   {
     return "0";
   }
+  if (num == 1)
+  {
+    return "01";
+  }
   std::string bin;
   while (num > 0)
   {
