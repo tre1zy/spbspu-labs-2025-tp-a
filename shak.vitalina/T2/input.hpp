@@ -10,11 +10,13 @@ namespace shak
     char &ref;
   };
   std::istream &operator>>(std::istream &in, ChrLit &&dest);
+
   struct RatLsp
   {
-    std::pair<long long, unsigned long long> &ref;
+    std::pair< long long, unsigned long long > &ref;
   };
   std::istream &operator>>(std::istream &in, RatLsp &&dest);
+
   struct Str
   {
     std::string &ref;

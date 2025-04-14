@@ -1,8 +1,5 @@
 #include "input.hpp"
-#include "stream_guard.hpp"
 #include "delimiter.hpp"
-#include <iomanip>
-#include <string>
 
 using check = shak::DelimiterIO;
 std::istream &shak::operator>>(std::istream &in, ChrLit &&dest)
