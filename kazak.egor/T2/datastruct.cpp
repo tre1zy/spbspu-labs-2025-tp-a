@@ -6,38 +6,38 @@ namespace kazak
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
-    
+
     if (!sentry)
     {
       return in;
     }
-    
+
     char c = '0';
     in >> c;
-    
+
     if (in && (c != dest.exp))
     {
       in.setstate(std::ios::failbit);
     }
-    
+
     return in;
   }
 
   std::istream& operator>>(std::istream& in, ULLHexIO&& dest)
   {
     std::istream::sentry sentry(in);
-    
+
     if (!sentry)
     {
       return in;
     }
-    
+
     std::string hexStr;
     in >> std::ws;
     char c1, c2;
     c1 = in.get();
     c2 = in.peek();
-    
+
     if (c1 == '0' && (c2 == 'x' || c2 == 'X'))
     {
       in.get();
@@ -52,28 +52,28 @@ namespace kazak
       in.unget();
       in.setstate(std::ios::failbit);
     }
-    
+
     return in;
   }
 
   std::istream& operator>>(std::istream& in, RationalIO&& dest)
   {
     std::istream::sentry sentry(in);
-    
+
     if (!sentry)
     {
       return in;
     }
-    
+
     using sep = DelimiterIO;
     using lbl = LabelIO;
     long long numerator = 0;
     unsigned long long denominator = 0;
-    
+
     in >> sep{ '(' } >> lbl{ ":N" } >> numerator;
     in >> lbl{ ":D" } >> denominator;
     in >> sep{ ':' } >> sep{ ')' };
-    
+
     if (in)
     {
       dest.ref = std::make_pair(numerator, denominator);
@@ -84,61 +84,61 @@ namespace kazak
   std::istream& operator>>(std::istream& in, StringIO&& dest)
   {
     std::istream::sentry sentry(in);
-    
+
     if (!sentry)
     {
       return in;
     }
-    
+
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
   }
 
   std::istream& operator>>(std::istream& in, LabelIO&& dest)
   {
     std::istream::sentry sentry(in);
-    
+
     if (!sentry)
     {
       return in;
     }
-    
+
     std::string data;
-    
+
     if ((in >> data) && (data != dest.exp))
     {
       in.setstate(std::ios::failbit);
     }
-    
+
     return in;
   }
 
   std::istream& operator>>(std::istream& in, DataStruct& dest)
   {
     std::istream::sentry sentry(in);
-    
+
     if (!sentry)
     {
       return in;
     }
-    
+
     DataStruct input;
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
-    
+
     if (!(in >> DelimiterIO{'('}))
     {
       return in;
     }
-    
+
     while (true)
     {
       in >> std::ws;
-      
+
       if (in.peek() == ':')
       {
         in.get();
-        
+
         if (in.peek() == ')')
         {
           in.get();
@@ -149,28 +149,28 @@ namespace kazak
           in.unget();
         }
       }
-      
+
       if (!(in >> DelimiterIO{ ':' }))
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      
+
       std::string key;
-      
+
       if (!(in >> key))
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      
+
       if (key == "key1")
       {
         if (!(in >> ULLHexIO{ input.key1 }))
         {
           return in;
         }
-        
+
         hasKey1 = true;
       }
       else if (key == "key2")
@@ -179,7 +179,7 @@ namespace kazak
         {
           return in;
         }
-        
+
         hasKey2 = true;
       }
       else if (key == "key3")
@@ -188,7 +188,7 @@ namespace kazak
         {
           return in;
         }
-        
+
         hasKey3 = true;
       }
       else
@@ -197,7 +197,7 @@ namespace kazak
         return in;
       }
     }
-    
+
     if (hasKey1 && hasKey2 && hasKey3)
     {
       dest = input;
@@ -206,24 +206,24 @@ namespace kazak
     {
       in.setstate(std::ios::failbit);
     }
-    
+
     return in;
   }
 
   std::ostream& operator<<(std::ostream& out, const DataStruct& src)
   {
     std::ostream::sentry sentry(out);
-    
+
     if (!sentry)
     {
       return out;
     }
-    
+
     StreamGuard Stream(out);
     out << "(:key1 0x" << std::hex << std::uppercase << src.key1
         << ":key2 (:N " << std::dec << src.key2.first << ":D "
         << src.key2.second << ":):key3 \"" << src.key3 << "\":)";
-    
+
     return out;
   }
 }
