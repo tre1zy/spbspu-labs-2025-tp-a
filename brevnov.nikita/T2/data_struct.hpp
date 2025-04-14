@@ -17,6 +17,11 @@ namespace brevnov
     char exp;
   };
 
+  struct DelimetersIO
+  {
+    std::string exp;
+  };
+
   struct UnLongLongIO
   {
     unsigned long & ref;
@@ -30,6 +35,11 @@ namespace brevnov
   struct StringIO
   {
     std::string& ref;
+  };
+
+  struct KeyIO
+  {
+    DataStruct& data;
   };
 
   struct StreamGuard
@@ -46,10 +56,13 @@ namespace brevnov
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimitersIO&& dest);
   std::istream& operator>>(std::istream& in, ComplexIO&& dest);
   std::istream& operator>>(std::istream& in, UnLongLongIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
-  std::istream& operator>>(std::istream& in, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& src);
+  std::istream& operator>>(std::istream& in, KeyIO& dest);
+  std::ostream& operator<<(std::ostream& out, const UnLongLongIO& src);
+  std::ostream& operator<<(std::ostream& out, const ComplexIO& src);
+  std::ostream& operator<<(std::ostream& out, const StringIO& src);
 }
 #endif
