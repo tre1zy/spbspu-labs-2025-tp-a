@@ -1,4 +1,6 @@
 #include "data_struct.hpp"
+#include <exception>
+#include <vector>
 
 brevnov::StreamGuard::StreamGuard(std::basic_ios< char > & s):
   s_(s),
