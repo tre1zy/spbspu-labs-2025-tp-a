@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cctype>
+#include <cmath>
 #include <iomanip>
 #include "guard.h"
 
