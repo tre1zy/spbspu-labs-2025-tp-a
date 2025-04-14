@@ -1,7 +1,7 @@
 #include "data.h"
+#include <cctype>
 #include <istream>
 #include <ostream>
-#include <cctype>
 
 std::istream& kharlamov::operator>>(std::istream& in, kharlamov::SymbolIO&& dest)
 {
@@ -59,6 +59,7 @@ std::istream& kharlamov::operator>>(std::istream& in, kharlamov::DataStruct& des
   {
     return in;
   }
+  Guard scope(in);
   DataStruct temp;
   using sep = kharlamov::SymbolIO;
   in >> sep{ '(' };
@@ -112,6 +113,7 @@ std::ostream& kharlamov::operator<<(std::ostream& out, const kharlamov::DataStru
   {
     return out;
   }
+  Guard scope(out);
   out << "(:key1 " << src.key1 << "ll";
   out << ":key2 " << src.key2 << "ull";
   out << ":key3 \"" << src.key3 << "\":)";
