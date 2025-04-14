@@ -179,7 +179,7 @@ namespace smirnov
         return in;
     }
 
-    std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest)
+    std::ostream& operator<<(std::ostream& out, const DoubleIO& dest)
     {
         std::ostream::sentry sentry(out);
         if (!sentry)
@@ -214,7 +214,7 @@ namespace smirnov
         return out;
     }
 
-    std::ostream& operator<<(std::ostream& out, const UllIO&& dest)
+    std::ostream& operator<<(std::ostream& out, const UllIO& dest)
     {
         std::ostream::sentry sentry(out);
         if (!sentry)
