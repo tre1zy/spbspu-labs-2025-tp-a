@@ -3,6 +3,7 @@
 #include <string>
 #include <cassert>
 #include <iterator>
+#include <algorithm>
 #include <vector>
 #include <iomanip>
 #include "stream_guard.hpp"
@@ -42,6 +43,7 @@ int main()
     }
   }
 
+  std::sort(data.begin(), data.end());
   std::copy(std::begin(data), std::end(data), std::ostream_iterator<DataStruct>(std::cout, "\n"));
 
   return 0;

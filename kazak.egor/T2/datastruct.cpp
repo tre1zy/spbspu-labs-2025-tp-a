@@ -3,6 +3,26 @@
 
 namespace kazak
 {
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs)
+  {
+    if (lhs.key1 != rhs.key1)
+    {
+      return lhs.key1 < rhs.key1;
+    }
+
+    if (lhs.key2.first != rhs.key2.first)
+    {
+      return lhs.key2.first < rhs.key2.first;
+    }
+
+    if (lhs.key2.second != rhs.key2.second)
+    {
+      return lhs.key2.second < rhs.key2.second;
+    }
+
+    return lhs.key3 < rhs.key3;
+  }
+
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
