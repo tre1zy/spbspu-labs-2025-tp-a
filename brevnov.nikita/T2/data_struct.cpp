@@ -116,8 +116,7 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   switch (key)
   {
   case 1:
-    UnLongLongIO Ull{ dest.data.key1 };
-    input >> Ull;
+    input >> UnLongLongIO{ dest.data.key1 };;
     break;
   case 2:
     input >> ComplexIO{ dest.data.key2 };
@@ -131,7 +130,7 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   return input;
 }
 
-std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
+std::istream& brevnov::operator>>(std::istream& input, DataStruct&& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -187,7 +186,7 @@ std::ostream& brevnov::operator<<(std::ostream &output, const StringIO&& dest)
   return output << "\"" << dest.ref << "\"";
 }
 
-std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct&& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -204,7 +203,7 @@ std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
   return output;
 }
 
-bool brevnov::compare(const DataStruct& lhs, const DataStruct& rhs)
+bool brevnov::compare(const DataStruct& lhs, const DataStruct&& rhs)
 {
   if (lhs.key1 != rhs.key1)
   {
