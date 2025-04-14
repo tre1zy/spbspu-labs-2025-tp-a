@@ -236,9 +236,9 @@ namespace smirnov
         dbval = src.key1;
         ullval = src.key2;
         iofmtguard guard(out);
-        out << "(:key1 " << smirnov:: DoubleIO{ dbval }
-            << ":key2 " << smirnov: UllIO{ ullval };
-            << ":key3 \"" << src.key3 << "\":)";
+        out << "(:key1 " << smirnov:: DoubleIO{ dbval };
+        out << ":key2 " << smirnov: UllIO{ ullval };
+        out << ":key3 \"" << src.key3 << "\":)";
 
         return out;
     }
