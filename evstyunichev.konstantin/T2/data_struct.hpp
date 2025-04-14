@@ -17,9 +17,14 @@ namespace evstyunichev
 
   bool comparator(const DataStruct &, const DataStruct &);
 
-  struct DelimeterIO
+  struct DelimiterIO
   {
     char exp;
+  };
+
+  struct DelimitersIO
+  {
+    std::string exps;
   };
 
   struct UllIO
@@ -27,15 +32,27 @@ namespace evstyunichev
     unsigned long long &ref;
   };
 
-  struct CmpIO
+  struct CmplIO
   {
-    std::complex< double > &cmp;
+    std::complex< double > &cmpl;
   };
 
   struct StringIO
   {
     std::string &ref;
   };
+
+  struct KeyIO
+  {
+    DataStruct &data;
+  };
+
+  std::istream & operator>>(std::istream &in, KeyIO &key);
+  std::istream & operator>>(std::istream &in, DelimiterIO &&dest);
+  std::istream & operator>>(std::istream &in, DelimitersIO &&dest);
+  std::istream & operator>>(std::istream &in, UllIO &dest);
+  std::istream & operator>>(std::istream &in, CmplIO &dest);
+  double abscmpl(std::complex< double > &a, std::complex< double > &b);
 }
 
 #endif
