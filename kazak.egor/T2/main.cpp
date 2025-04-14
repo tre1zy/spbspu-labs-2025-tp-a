@@ -14,8 +14,7 @@ int main()
   using kazak::DataStruct;
 
   std::vector< DataStruct > data;
-  std::string input = "(:key2 (:N -1:D 7:):key1 0xFC92D:key3 \"data\":)";
-
+  std::string input((std::istreambuf_iterator<char>(std::cin)), std::istreambuf_iterator<char>());
   std::istringstream iss(input);
 
   while (iss >> std::ws)
