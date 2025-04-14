@@ -2,7 +2,7 @@
 #include <cctype>
 #include "guard.h"
 
-std::istream& mezentsev::operator>>(std::istream& input, DelimeterIO&& dest)
+std::istream& mezentsev::operator>>(std::istream& input, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -18,11 +18,11 @@ std::istream& mezentsev::operator>>(std::istream& input, DelimeterIO&& dest)
   return input;
 }
 
-std::istream& mezentsev::operator>>(std::istream& input, DelimetersIO&& dest)
+std::istream& mezentsev::operator>>(std::istream& input, DelimitersIO&& dest)
 {
   for (char c: dest.exp)
   {
-    input >> DelimeterIO{ c };
+    input >> DelimiterIO{ c };
   }
   return input;
 }
@@ -34,7 +34,7 @@ std::istream& mezentsev::operator>>(std::istream& input, CharIO&& dest)
   {
     return input;
   }
-  return input >> DelimeterIO{ '\'' } >> dest.ref >> DelimetersIO{ "\':" };
+  return input >> DelimiterIO{ '\'' } >> dest.def >> DelimitersIO{ "\':" };
 }
 
 std::istream& mezentsev::operator>>(std::istream& input, StringIO&& dest)
@@ -44,8 +44,8 @@ std::istream& mezentsev::operator>>(std::istream& input, StringIO&& dest)
   {
     return input;
   }
-  std::getline(input >> DelimeterIO{ '"' }, dest.ref, '"');
-  return input >> DelimeterIO{ ':' };
+  std::getline(input >> DelimiterIO{ '"' }, dest.def, '"');
+  return input >> DelimiterIO{ ':' };
 }
 
 
@@ -56,7 +56,7 @@ std::istream& mezentsev::operator>>(std::istream& in, LongLongIO&& dest)
   {
     return in;
   }
-  in >> dest.ref >> mezentsev::DelimitersIO{ "ll" };
+  in >> dest.def >> mezentsev::DelimitersIO{ "ll" };
   return in;
 }
 
@@ -68,12 +68,12 @@ std::istream& mezentsev::operator>>(std::istream& in, Data& dest)
     return in;
   }
   Guard scope(in);
-  DataStruct temp;
+  Data temp;
   using del = DelimitersIO;
-  in >> del{ '(' };
+  in >> del{ "(:" };
   for (int i = 0; i < 3; i++)
   {
-    in >> del{ ":key" };
+    in >> del{ "key" };
     int a;
     in >> a;
     switch(a)
@@ -101,17 +101,17 @@ std::istream& mezentsev::operator>>(std::istream& in, Data& dest)
 
 std::ostream& mezentsev::operator<<(std::ostream& output, const CharIO&& dest)
 {
-  return output << "\'" << dest.ref << "\'";
+  return output << "\'" << dest.def << "\'";
 }
 
 std::ostream& mezentsev::operator<<(std::ostream &output, const StringIO&& dest)
 {
-  return output << "\"" << dest.ref << "\"";
+  return output << "\"" << dest.def << "\"";
 }
 
-std::ostream& mezentsev::operator<<(std::ostream &output, const LongLongIO dest)
+std::ostream& mezentsev::operator<<(std::ostream &output, const LongLongIO&& dest)
 {
-  return output << dest.ref << "ll";
+  return output << dest.def << "ll";
 }
 
 std::ostream& mezentsev::operator<<(std::ostream& output, const Data& dest)
