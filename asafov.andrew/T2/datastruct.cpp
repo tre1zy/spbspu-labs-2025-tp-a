@@ -17,7 +17,7 @@ namespace
 
   bool isString(std::istream_iterator<char>& iit, const char* str)
   {
-    for (const char p : str) if (!isChar(iit, p)) return false;
+    for (size_t i = 0; i != '\0'; ++i) if (!isChar(iit, str[i])) return false;
     return true;
   }
 
@@ -46,7 +46,7 @@ namespace
 
   void writeString(std::ostream_iterator<char>& oit, const char* str)
   {
-    for (const char a : str) *(oit++) = a;
+    for (size_t i = 0; str[i] != '\0'; ++i) *(oit++) = str[i];
   }
 
   std::complex<double> readCmpLsp(std::istream_iterator<char>& iit)
@@ -91,10 +91,10 @@ namespace
     *(it++) = 'c';
     *(it++) = '(';
     std::string temp = std::to_string(data.real());
-    for (const char i : temp.c_str()) *(it++) = i;
+    for (const char i : temp) *(it++) = i;
     *(it++) = ' ';
     temp = std::to_string(data.imag());
-    for (const char i : temp.c_str()) *(it++) = i;
+    for (const char i : temp) *(it++) = i;
     *(it++) = ')';
     return str;
   }
