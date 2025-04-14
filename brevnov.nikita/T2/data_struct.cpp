@@ -103,7 +103,7 @@ std::istream& brevnov::operator>>(std::istream& input, StringIO&& dest)
   return input >> DelimiterIO{ ':' };
 }
 
-std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
+std::istream& brevnov::operator>>(std::istream& input, KeyIO& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)

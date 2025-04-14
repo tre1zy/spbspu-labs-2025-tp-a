@@ -61,7 +61,7 @@ namespace brevnov
   std::istream& operator>>(std::istream& in, ComplexIO&& dest);
   std::istream& operator>>(std::istream& in, UnLongLongIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
-  std::istream& operator>>(std::istream& in, KeyIO&& dest);
+  std::istream& operator>>(std::istream& in, KeyIO& dest);
   std::istream& operator>>(std::istream& input, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const UnLongLongIO& src);
   std::ostream& operator<<(std::ostream& out, const ComplexIO& src);
