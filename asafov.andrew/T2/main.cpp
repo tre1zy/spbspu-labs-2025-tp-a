@@ -2,9 +2,8 @@
 #include <algorithm>
 #include <vector>
 
-/*int main()
+int main()
 {
-  //(:key1 0b11:key2 #c(1.0 1.0):key3 "dataa":)
   std::vector<asafov::DataStruct> data;
   asafov::DataStruct temp;
 
@@ -14,26 +13,10 @@
   }
   catch(std::exception& e)
   {
-    std::cout << e.what() << std::endl;
+    std::cout << e.what() << '\n';
   }
   std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
   for (const auto& ds : data) std::cout << ds << "\n";
 
-  return 0;
-}*/
-
-int main()
-{
-  std::noskipws(std::cin);
-  asafov::DataStruct data;
-  try
-  {
-    std::cin >> data;
-  }
-  catch (const std::exception& e)
-  {
-    std::cerr << e.what() << '\n';
-  }
-  std::cout << data << '\n';
   return 0;
 }

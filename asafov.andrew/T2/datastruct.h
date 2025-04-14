@@ -7,8 +7,8 @@ namespace asafov
 {
   struct DataStruct
   {
-    unsigned long long key1; //[ULL BIN]
-    std::complex<double> key2;//[CMP LSP]
+    unsigned long long key1;      //[ULL BIN]
+    std::complex<double> key2;    //[CMP LSP]
     std::string key3;
   };
   bool cmpDataStruct(const DataStruct &a, const DataStruct &b);
