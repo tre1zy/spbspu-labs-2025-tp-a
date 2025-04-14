@@ -3,11 +3,11 @@
 #include <iterator>
 #include <algorithm>
 #include "dataStruct.hpp"
-#include "stream-guard.hpp"
+#include "streamGuard.hpp"
 
 int main()
 {
-  using namespace alymova;
+  using namespace cherkasov;
   StreamGuard coutGuard(std::cout);
   StreamGuard cinGuard(std::cin);
 

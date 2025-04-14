@@ -1,5 +1,5 @@
 #include "dataStruct.hpp"
-#include "stream-guard.hpp"
+#include "streamGuard.hpp"
 #include <sstream>
 #include <cmath>
 
@@ -17,7 +17,7 @@ namespace cherkasov
       return key2 < other.key2;
     return key3.size() < other.key3.size();
   }
-  
+
   std::istream & operator>>(std::istream & in, DelimiterIO && d)
   {
     char c;
