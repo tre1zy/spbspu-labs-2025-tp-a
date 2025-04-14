@@ -104,7 +104,7 @@ namespace
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   std::string line;
-  is.getline(line);
+  std::getline(is, line);
   line[line.size() - 1] = ' ';
   line[line.size() - 2] = '\n';
   data = parseDataStruct(line);
