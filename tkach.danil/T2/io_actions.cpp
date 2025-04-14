@@ -68,10 +68,9 @@ std::istream& tkach::operator>>(std::istream& in, DoubleIO&& dest)
     return in;
   }
   char c = '0';
-  if (!(in >> dest.ref)  || !(in >> c) || c != 'd' && c != 'D')
+  if (!(in >> dest.ref)  || !(in >> c) || (c != 'd' && c != 'D'))
   {
     in.setstate(std::ios::failbit);
-    return in;
   }
   return in;
 }
