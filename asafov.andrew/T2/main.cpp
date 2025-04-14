@@ -20,7 +20,7 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
-  if (data.size == 0) return 0;
+  if (data.size() == 0) return 0;
   for (const auto& ds : data) std::cout << ds << "\n";
 
   return 0;
