@@ -2,7 +2,7 @@
 #include <vector>
 #include <limits>
 #include <iterator>
-
+#include "data_struct.hpp"
 int main()
 {
   std::vector< brevnov::DataStruct > data;
