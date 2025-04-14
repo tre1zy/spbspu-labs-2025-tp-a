@@ -76,6 +76,23 @@ std::istream & zakirov::operator>>(std::istream & in, MinorSymbol && sym)
   return in;
 }
 
+std::istream & zakirov::operator>>(std::istream & in, MinorLetter && sym)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  char symbol;
+  if (!(in >> symbol) || (symbol != std::tolower(sym.letter) && symbol != std::toupper(sym.letter)))
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
+}
+
 std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
 {
   std::istream::sentry sentry(in);
@@ -84,33 +101,10 @@ std::istream & zakirov::operator>>(std::istream & in, UllOctIO && num)
     return in;
   }
 
-  std::string oct_number;
-  char next_number;
-  in >> next_number;
-  while (next_number != ':' && !in.eof())
-  {
-    oct_number += next_number;
-    in >> next_number;
-  }
-
-  if (in.eof())
-  {
-    in.setstate(std::ios::failbit);
-  }
-
-  try
-  {
-    num.ref = std::stoull(oct_number, nullptr, 8);
-  }
-  catch (const std::out_of_range &)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  catch (const std::invalid_argument &)
-  {
-    in.setstate(std::ios::failbit);
-  }
-
+  unsigned long long oct_num = 0;
+  in >> std::oct >> oct_num;
+  in >> MinorSymbol{':'};
+  num.ref = oct_num;
   return in;
 }
 
@@ -122,33 +116,11 @@ std::istream & zakirov::operator>>(std::istream & in, UllHexIO && num)
     return in;
   }
 
-  std::string hex_num;
-  char next_num;
-  in >> next_num;
-  while (next_num != ':' && !in.eof())
-  {
-    hex_num += next_num;
-    in >> next_num;
-  }
-
-  if (next_num != ':')
-  {
-    in.setstate(std::ios::failbit);
-  }
-
-  try
-  {
-    num.ref = std::stoull(hex_num, nullptr, 16);
-  }
-  catch (const std::out_of_range &)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  catch (const std::invalid_argument &)
-  {
-    in.setstate(std::ios::failbit);
-  }
-
+  in >> MinorSymbol{'0'} >> MinorLetter{'x'};
+  unsigned long long hex_num = 0;
+  in >> std::hex >> hex_num;
+  in >> MinorSymbol{':'};
+  num.ref = hex_num;
   return in;
 }
 
@@ -184,11 +156,11 @@ std::ostream & zakirov::operator<<(std::ostream & out, const Data & src)
   }
 
   Guardian guardian(out);
-  out << "{ \"key1\": ";
+  out << "(:key1: ";
   out << std::oct << src.key1;
-  out << ", \"key2\": ";
+  out << ":key2 ";
   out << std::hex << src.key2;
-  out << ", \"key3\": " << src.key3;
-  out << " }";
+  out << ":key3: \"" << src.key3;
+  out << "\":)";
   return out;
 }

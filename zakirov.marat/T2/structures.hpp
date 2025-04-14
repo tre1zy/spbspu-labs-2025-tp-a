@@ -4,7 +4,6 @@
 
 namespace zakirov
 {
-  //{:keyX 0xFFFA: :keyX 01001: :keyX 01001:}
   struct Data
   {
     bool operator<(const Data & other);
@@ -16,6 +15,11 @@ namespace zakirov
   struct MinorSymbol
   {
     char symbol;
+  };
+
+  struct MinorLetter
+  {
+    char letter;
   };
 
   struct UllOctIO
@@ -35,6 +39,7 @@ namespace zakirov
 
   std::istream & operator>>(std::istream & in, Data & data);
   std::istream & operator>>(std::istream & in, MinorSymbol && sym);
+  std::istream & operator>>(std::istream & in, MinorLetter && str);
   std::istream & operator>>(std::istream & in, UllOctIO && num);
   std::istream & operator>>(std::istream & in, UllHexIO && num);
   std::istream & operator>>(std::istream & in, StringIO && str);
