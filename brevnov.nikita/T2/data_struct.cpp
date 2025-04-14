@@ -116,7 +116,8 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   switch (key)
   {
   case 1:
-    input >> UnLongLongIO{ dest.data.key1 };
+    UnLongLongIO Ull{ dest.data.key1 };
+    input >> Ull;
     break;
   case 2:
     input >> ComplexIO{ dest.data.key2 };
