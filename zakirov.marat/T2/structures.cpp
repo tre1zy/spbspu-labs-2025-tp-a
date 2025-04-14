@@ -161,7 +161,7 @@ std::ostream & zakirov::operator<<(std::ostream & out, const Data & src)
   out << "(:key1 0";
   out << std::oct << src.key1;
   out << ":key2 0x";
-  out << std::hex << src.key2;
+  out << std::hex << std::uppercase << src.key2;
   out << ":key3 \"" << src.key3;
   out << "\":)";
   return out;
