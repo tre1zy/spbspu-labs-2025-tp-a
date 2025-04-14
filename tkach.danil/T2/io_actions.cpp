@@ -67,29 +67,11 @@ std::istream& tkach::operator>>(std::istream& in, DoubleIO&& dest)
   {
     return in;
   }
-  std::string str;
-  if (!std::getline(in, str, ':') || str.empty() || (str.find('e') == std::string::npos && str.find('E') == std::string::npos))
+  char c = '0';
+  if (!(in >> dest.ref)  || !(in >> c) || c != 'd' && c != 'D')
   {
     in.setstate(std::ios::failbit);
     return in;
-  }
-  in.putback(':');
-  try
-  {
-    size_t right_symbols = 0;
-    double vald = std::stod(str, &right_symbols);
-    if (str.length() != right_symbols)
-    {
-      in.setstate(std::ios::failbit);
-    }
-    else
-    {
-      dest.ref = vald;
-    }
-  }
-  catch (const std::exception&)
-  {
-    in.setstate(std::ios::failbit);
   }
   return in;
 }
@@ -203,20 +185,7 @@ std::ostream& tkach::operator<<(std::ostream& out, const DoubleIO& dest)
     return out;
   }
   tkach::StreamGuard guard(out);
-  if (dest.ref == 0.0)
-  {
-    out << "0.0e+0";
-    return out;
-  }
-  int exp = std::floor(std::log10(std::abs(dest.ref)));
-  double mantissa = dest.ref / std::pow(10, exp);
-  if (mantissa < 1.0)
-  {
-    mantissa *= 10;
-    exp--;
-  }
-  out << std::fixed << std::setprecision(1);
-  out << mantissa << 'e' << (exp > 0 ? '+' : '-') << std::abs(exp);
+  out << std::fixed << std::setprecision(1) << dest.ref << 'd';
   return out;
 }
 
