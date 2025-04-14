@@ -6,7 +6,6 @@
 
 int main()
 {
-/*
   std::vector< mezentsev::Data > data;
   while(!std::cin.eof())
   {
@@ -29,9 +28,5 @@ int main()
     std::end(data),
     std::ostream_iterator< mezentsev::Data >(std::cout, "\n")
   );
-*/
-  mezentsev::Data data;
-  std::cin >> data;
-  std::cout << data;
   return 0;
 }
