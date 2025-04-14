@@ -3,7 +3,7 @@
 #include <complex>
 #include <iostream>
 #include <string>
-namespace brevnov 
+namespace brevnov
 {
   struct DataStruct
   {
