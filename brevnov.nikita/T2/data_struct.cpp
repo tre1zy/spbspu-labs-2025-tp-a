@@ -31,3 +31,28 @@ std::istream& brevnov::operator>>(std::istream& input, DelimeterIO&& dest)
   }
   return input;
 }
+
+std::istream& brevnov::operator>>(std::istream& input, UnLongLongIO&& dest)
+{
+  std::istream::sentry sentry(input);
+  if (!sentry)
+  {
+    return input;
+  }
+  std::string num;
+  std::getline(input >> DelimeterIO{ '0' }, num, ':');
+  if (num.empty())
+  {
+    input.setstate(std::ios::failbit);
+    return input;
+  }
+  try
+  {
+    dest.ref = std::stoull(num, nullptr, 8);
+  }
+  catch (const std::exception&)
+  {
+    input.setstate(std::ios::failbit);
+  }
+  return input;
+}
