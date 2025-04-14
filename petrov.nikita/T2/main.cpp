@@ -18,13 +18,17 @@ int main()
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
+    if (!std::cin)
+    {
+      std::cin.clear();
+      std::cin.ignore(1024, '\n');
+      data.pop_back();
+    }
     std::copy(
-    std::istream_iterator< DataStruct >(std::cin),
-    std::istream_iterator< DataStruct >(),
-    std::back_inserter(data)
+      std::istream_iterator< DataStruct >(std::cin),
+      std::istream_iterator< DataStruct >(),
+      std::back_inserter(data)
     );
-    std::cin.clear();
-    std::cin.ignore(1024, '\n');
   }
   sort(data);
   std::copy(
