@@ -8,7 +8,7 @@
 int main()
 {
   using nspace::DataStruct;
-  std::vector<Data> data;
+  std::vector<DataStruct> data;
   std::copy
   (
     std::istream_iterator<DataStruct>(std::cin),

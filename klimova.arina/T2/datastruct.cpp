@@ -1,4 +1,5 @@
 #include "datastruct.hpp"
+#include "ijfmtsream
 
 std::istream& nspace::operator>>(std::istream& in, DelimiterIO&& dest)
 {
@@ -71,7 +72,7 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
   {
     return in;
   }
-  Data input;
+  DataStruct input;
   {
     using sep = DelimiterIO;
     using lbl = LabelIO;
