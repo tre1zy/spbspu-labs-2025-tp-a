@@ -11,15 +11,20 @@ int main()
   StreamGuard coutGuard(std::cout);
   StreamGuard cinGuard(std::cin);
   std::vector< DataStruct > data;
-  std::copy(
-    std::istream_iterator< DataStruct >(std::cin),
-    std::istream_iterator< DataStruct >(),
-    std::back_inserter(data)
-  );
+  while (!std::cin.eof())
+  {
+    if (std::cin.fail())
+    {
+      std::cin.clear();
+      continue;
+    }
+    std::copy(
+      std::istream_iterator< DataStruct >(std::cin),
+      std::istream_iterator< DataStruct >(),
+      std::back_inserter(data)
+    );
+  }
   std::sort(data.begin(), data.end());
-  std::copy(
-    data.begin(),
-    data.end(),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
+  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
 }
