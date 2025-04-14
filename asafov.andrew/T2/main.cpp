@@ -7,15 +7,16 @@ int main()
   std::vector<asafov::DataStruct> data;
   asafov::DataStruct temp;
 
-  try
+  while (!std::cin.eof())
   {
-    while (std::cin >> temp) data.push_back(temp);
-  }
-  catch(std::exception& e)
-  {
-    std::cout << e.what() << '\n';
+    try
+    {
+      std::cin >> temp;
+      data.push_back(temp);
+    }
   }
   std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
+  if (data.size == 0) return 0;
   for (const auto& ds : data) std::cout << ds << "\n";
 
   return 0;
