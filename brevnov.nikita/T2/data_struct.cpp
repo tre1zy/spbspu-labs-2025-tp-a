@@ -149,7 +149,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
   return input;
 }
 
-std::ostream& kiselev::operator<<(std::ostream& output, const UnLongLongIO&& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& dest)
 {
   unsigned long long num = dest.ref;
   if (dest.ref == 0)
