@@ -47,12 +47,18 @@ namespace evstyunichev
     DataStruct &data;
   };
 
-  std::istream & operator>>(std::istream &in, KeyIO &key);
+  std::istream & operator>>(std::istream &in, KeyIO &&key);
   std::istream & operator>>(std::istream &in, DelimiterIO &&dest);
   std::istream & operator>>(std::istream &in, DelimitersIO &&dest);
   std::istream & operator>>(std::istream &in, UllIO &dest);
   std::istream & operator>>(std::istream &in, CmplIO &dest);
-  double abscmpl(std::complex< double > &a, std::complex< double > &b);
+  std::istream & operator>>(std::istream &in, StringIO &dest);
+  std::istream & operator>>(std::istream &in, DataStruct &dest);
+  std::ostream & operator<<(std::ostream &out, UllIO &&dest);
+  std::ostream & operator<<(std::ostream &out, StringIO &&dest);
+  std::ostream & operator<<(std::ostream &out, CmplIO &&dest);
+  std::ostream & operator<<(std::ostream &out, const DataStruct &dest);
+  double evstyunichev::abscmpl(const std::complex< double > &cmpl);
 }
 
 #endif

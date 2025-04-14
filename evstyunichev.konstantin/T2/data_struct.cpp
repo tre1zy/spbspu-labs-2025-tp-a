@@ -1,8 +1,10 @@
 #include "data_struct.hpp"
 #include <cmath>
 #include <complex>
+#include <ios>
 #include <iostream>
 #include <utility>
+#include "stream_guard.hpp"
 
 double evstyunichev::abscmpl(const std::complex< double > &cmpl)
 {
@@ -73,7 +75,7 @@ std::istream & evstyunichev::operator>>(std::istream &in, CmplIO &dest)
   return in;
 }
 
-std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &key)
+std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &&key)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -98,6 +100,18 @@ std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &key)
   return in;
 }
 
+std::istream & evstyunichev::operator>>(std::istream &in, StringIO &dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> DelimiterIO{ '"' };
+  std::getline(in, dest.ref, '"');
+  return in;
+}
+
 std::istream & evstyunichev::operator>>(std::istream &in, DataStruct &data)
 {
   std::istream::sentry sentry(in);
@@ -105,7 +119,67 @@ std::istream & evstyunichev::operator>>(std::istream &in, DataStruct &data)
   {
     return in;
   }
-  in >> DelimiterIO{ '(' };
+  evstyunichev::StreamGuard guard(in);
+  DataStruct temp;
+  if (in >> DelimiterIO{ '(' })
+  {
+    in >> KeyIO{ temp };
+    in >> KeyIO{ temp };
+    in >> KeyIO{ temp };
+    in >> DelimitersIO{ ":)" };
+  }
+  if (in)
+  {
+    data = temp;
+  }
+  return in;
+}
+
+std::ostream & evstyunichev::operator<<(std::ostream &out, UllIO &&data)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  out << data.ref << "ull";
+}
+
+std::ostream & evstyunichev::operator<<(std::ostream &out, CmplIO &&data)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  out << "#c(" << data.cmpl.real() << ' ' << data.cmpl.imag() << ')';
+}
+
+std::ostream & evstyunichev::operator<<(std::ostream &out, StringIO &&data)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  out << '"' << data.ref << '"';
+}
+
+std::ostream & evstyunichev::operator<<(std::ostream &out, const DataStruct &data)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  StreamGuard guard(out);
+  unsigned long long ull = data.key1;
+  std::complex< double > cmpl = data.key2;
+  std::string string = data.key3;
+  out << "(:key1 " << UllIO{ ull };
+  out << ":key2 " << CmplIO{ cmpl };
+  out << ":key3 " << StringIO{ string } << ":)";
+  return out;
 }
 
 bool evstyunichev::comparator(const DataStruct &a, const DataStruct &b)
