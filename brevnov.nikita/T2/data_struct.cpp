@@ -18,7 +18,7 @@ brevnov::StreamGuard::~StreamGuard()
   s_.flags(fmt_);
 }
 
-std::istream& brevnov::operator>>(std::istream& input, DelimeterIO&& dest)
+std::istream& brevnov::operator>>(std::istream& input, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -34,11 +34,11 @@ std::istream& brevnov::operator>>(std::istream& input, DelimeterIO&& dest)
   return input;
 }
 
-std::istream& brevnov::operator>>(std::istream& input, DelimetersIO&& dest)
+std::istream& brevnov::operator>>(std::istream& input, DelimitersIO&& dest)
 {
   for (char c: dest.exp)
   {
-    input >> DelimeterIO{ c };
+    input >> DelimiterIO{ c };
   }
   return input;
 }
@@ -51,7 +51,7 @@ std::istream& brevnov::operator>>(std::istream& input, UnLongLongIO&& dest)
     return input;
   }
   std::string num;
-  std::getline(input >> DelimeterIO{ '0' }, num, ':');
+  std::getline(input >> DelimiterIO{ '0' }, num, ':');
   if (num.empty())
   {
     input.setstate(std::ios::failbit);
@@ -97,8 +97,8 @@ std::istream& brevnov::operator>>(std::istream& input, StringIO&& dest)
   {
     return input;
   }
-  std::getline(input >> DelimeterIO{ '"' }, dest.ref, '"');
-  return input >> DelimeterIO{ ':' };
+  std::getline(input >> DelimiterIO{ '"' }, dest.ref, '"');
+  return input >> DelimiterIO{ ':' };
 }
 
 std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
@@ -108,7 +108,7 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   {
     return input;
   }
-  input >> DelimetersIO{ "key" };
+  input >> DelimitersIO{ "key" };
   int key;
   input >> key;
   switch (key)
@@ -142,7 +142,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
-    input >> DelimetersIO{ ")" };
+    input >> DelimitersIO{ ")" };
   }
   if (input)
   {
