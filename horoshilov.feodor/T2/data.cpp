@@ -155,7 +155,7 @@ namespace horoshilov
       }
       mant = std::round(mant * 100) / 100.0;
     }
-    out << std::fixed << std::setprecision(2) << mant;
+    out << std::fixed << std::setprecision(1) << mant;
     out << 'e' << std::showpos << order;
     return out;
   }
