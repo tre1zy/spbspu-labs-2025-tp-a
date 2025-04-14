@@ -24,11 +24,11 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   out << "e";
   if (exp >= 0)
   {
-    out << "-";
+    out << "+";
   }
   else
   {
-    out << "+";
+    out << "-";
   }
   out << exp;
 
