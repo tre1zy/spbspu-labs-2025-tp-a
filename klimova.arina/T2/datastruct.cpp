@@ -64,7 +64,7 @@ std::istream& nspace::operator>>(std::istream& in, LabelIO&& dest)
   return in >> dest.ref;
 }
 
-std::istream& nspace::operator>>(std::istream& in, Data& dest)
+std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -123,7 +123,7 @@ std::istream& nspace::operator>>(std::istream& in, Data& dest)
   return in;
 }
 
-std::ostream& nspace::operator<<(std::ostream& out, const Data& src)
+std::ostream& nspace::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -139,7 +139,7 @@ std::ostream& nspace::operator<<(std::ostream& out, const Data& src)
   return out;
 }
 
-bool nspace::DataStruct::compareData(const Data& a, const Data& b)
+bool nspace::DataStruct::compareData(const DataStruct& a, const DataStruct& b)
 {
   if (a.key1 != b.key1)
   {

@@ -44,8 +44,8 @@ namespace nspace
   std::istream& operator>>(std::istream& in, ComplexIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, LabelIO&& dest);
-  std::istream& operator>>(std::istream& in, Data& dest);
-  std::istream& operator>>(std::istream& out, const Data& dest);
-  bool compareData(const Data& a, const Data& b);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::istream& operator>>(std::istream& out, const DataStruct& dest);
+  bool compareData(const DataStruct& a, const DataStruct& b);
 }
 #endif
