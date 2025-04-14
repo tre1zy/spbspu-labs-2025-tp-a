@@ -14,6 +14,10 @@ int main()
       std::cin >> temp;
       data.push_back(temp);
     }
+    catch (const std::logic_error&)
+    {
+      
+    }
   }
   std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
   if (data.size == 0) return 0;
