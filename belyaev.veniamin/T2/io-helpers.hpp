@@ -6,10 +6,15 @@
 
 namespace belyaev {
   struct DoubleIO {
-    double& num_;
+    double& value;
   };
 
-  std::ostream& operator<<(std::ostream& out, const DoubleIO& dbl);
+  struct PairLLIO {
+    std::pair< long long, unsigned long long >& value;
+  };
+
+  std::ostream& operator<<(std::ostream&, const DoubleIO&);
+  std::ostream& operator<<(std::ostream&, const PairLLIO&);
 }
 
 #endif

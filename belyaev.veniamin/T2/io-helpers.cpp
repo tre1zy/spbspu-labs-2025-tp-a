@@ -1,11 +1,17 @@
 #include "io-helpers.hpp"
+#include "stream-guard.hpp"
 
 std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
 {
-  // scopeguard?
+  belyaev::StreamGuard streamGuard(out);
 
   int exp = 0;
-  double mantissa = 0.0;
+  double mantissa = dbl.value;
+
+  if (mantissa == 0.0) {
+    out << "0.0e+0";
+    return out;
+  }
 
   while (std::abs(mantissa) >= 10.0)
   {
@@ -32,5 +38,16 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   }
   out << exp;
 
+  return out;
+}
+
+std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& pairLL) {
+  belyaev::StreamGuard streamGuard(out);
+
+  out << "(:N ";
+  out << pairLL.value.first;
+  out << ":D ";
+  out << pairLL.value.second;
+  out << ":)";
   return out;
 }
