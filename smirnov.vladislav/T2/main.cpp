@@ -12,9 +12,7 @@ int main()
 
     while (true)
     {
-        std::copy
-        (
-            std::getline(std::cin, line);
+        std::getline(std::cin, line);
         if (!std::cin || line.empty())
         {
             break;
