@@ -132,10 +132,12 @@ std::istream & zakirov::operator>>(std::istream & in, StringIO && str)
     return in;
   }
 
+  Guardian guardian(in);
+
   in >> MinorSymbol{'"'};
   std::string string_r = "";
   char next_symbol;
-  in >> next_symbol;
+  in >> std::noskipws >> next_symbol;
   while (next_symbol != '"')
   {
     string_r += next_symbol;
