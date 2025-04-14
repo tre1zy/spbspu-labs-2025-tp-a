@@ -7,18 +7,18 @@ namespace cherkasov
 {
   bool DataStruct::operator<(const DataStruct & other) const
   {
-    const auto mag = [](const std::complex<double>& c)
+    if (std::abs(key1) != std::abs(other.key1))
     {
-      return std::abs(c);
-    };
-    if (mag(key1) != mag(other.key1))
-      return mag(key1) < mag(other.key1);
+      return std::abs(key1) < std::abs(other.key1);
+    }
     if (key2 != other.key2)
+    {
       return key2 < other.key2;
+    }
     return key3.size() < other.key3.size();
   }
 
-  std::istream & operator>>(std::istream & in, DelimiterIO && d)
+  std::istream & operator>>(std::istream & in, ExpectChar && d)
   {
     char c;
     if (!(in >> c) || c != d.exp)
@@ -28,7 +28,7 @@ namespace cherkasov
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, LabelIO && l)
+  std::istream & operator>>(std::istream & in, Label && l)
   {
     std::string tmp;
     if (!(in >> tmp) || tmp != l.exp)
@@ -38,10 +38,10 @@ namespace cherkasov
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, ComplexIO && io)
+  std::istream & operator>>(std::istream & in, Complex && io)
   {
     StreamGuard g(in);
-    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' } >> DelimiterIO{ '(' };
+    in >> ExpectChar{ '#' } >> ExpectChar{ 'c' } >> ExpectChar{ '(' };
     double re = 0.0;
     double im = 0.0;
     in >> re;
@@ -50,7 +50,7 @@ namespace cherkasov
     {
       in >> im;
     }
-    in >> DelimiterIO{ ')' };
+    in >> ExpectChar{ ')' };
     if (in)
     {
       io.c = std::complex< double >(re, im);
@@ -58,18 +58,18 @@ namespace cherkasov
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, RationalIO && io)
+  std::istream & operator>>(std::istream & in, Rational && io)
   {
-    in >> DelimiterIO{ '(' } >> LabelIO{ "N" } >> io.rat.first
-       >> DelimiterIO{ ':' } >> LabelIO{ "D" } >> io.rat.second
-       >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
+    in >> ExpectChar{ '(' } >> Label{ "N" } >> io.rat.first
+       >> ExpectChar{ ':' } >> Label{ "D" } >> io.rat.second
+       >> ExpectChar{ ':' } >> ExpectChar{ ')' };
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, StringIO && io)
+  std::istream & operator>>(std::istream & in, Strings && io)
   {
     StreamGuard guard(in);
-    in >> std::noskipws >> DelimiterIO{ '"' };
+    in >> std::noskipws >> ExpectChar{ '"' };
     char ch;
     while (in >> ch && ch != '"')
     {
@@ -89,24 +89,24 @@ namespace cherkasov
     if (!s) return in;
     DataStruct temp;
     bool k1 = false, k2 = false, k3 = false;
-    in >> DelimiterIO{ '(' };
+    in >> ExpectChar{ '(' };
     while (!(k1 && k2 && k3) && in)
     {
       std::string label;
       in >> label;
       if (label == ":key1" && !k1)
       {
-        in >> ComplexIO{ temp.key1 };
+        in >> Complex{ temp.key1 };
         k1 = true;
       }
       else if (label == ":key2" && !k2)
       {
-        in >> RationalIO{ temp.key2 };
+        in >> Rational{ temp.key2 };
         k2 = true;
       }
       else if (label == ":key3" && !k3)
       {
-        in >> StringIO{ temp.key3 };
+        in >> Strings{ temp.key3 };
         k3 = true;
       }
       else
@@ -114,7 +114,7 @@ namespace cherkasov
         in.setstate(std::ios::failbit);
       }
     }
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
+    in >> ExpectChar{ ':' } >> ExpectChar{ ')' };
     if (in)
     {
       obj = temp;

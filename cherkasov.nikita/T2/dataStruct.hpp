@@ -16,38 +16,38 @@ namespace cherkasov
     bool operator<(const DataStruct & other) const;
   };
 
-  struct ComplexIO
+  struct Complex
   {
     std::complex< double > & c;
   };
 
-  struct RationalIO
+  struct Rational
   {
     std::pair< long long, unsigned long long > & rat;
   };
 
-  struct StringIO
+  struct Strings
   {
     std::string & s;
   };
 
-  struct DelimiterIO
+  struct ExpectChar
   {
     char exp;
   };
 
-  struct LabelIO
+  struct Label
   {
     std::string exp;
   };
 
-  std::istream & operator>>(std::istream & in, DelimiterIO&&);
-  std::istream & operator>>(std::istream & in, LabelIO&&);
-  std::istream & operator>>(std::istream & in, ComplexIO&&);
-  std::istream & operator>>(std::istream & in, RationalIO&&);
-  std::istream & operator>>(std::istream & in, StringIO&&);
-  std::istream & operator>>(std::istream & in, DataStruct&);
-  std::ostream & operator<<(std::ostream & out, const DataStruct&);
+  std::istream & operator>>(std::istream & in, ExpectChar &&);
+  std::istream & operator>>(std::istream & in, Label &&);
+  std::istream & operator>>(std::istream & in, Complex &&);
+  std::istream & operator>>(std::istream & in, Rational &&);
+  std::istream & operator>>(std::istream & in, Strings &&);
+  std::istream & operator>>(std::istream & in, DataStruct &);
+  std::ostream & operator<<(std::ostream & out, const DataStruct &);
 }
 
 #endif
