@@ -31,7 +31,34 @@ namespace smirnov
       return in;
     }
 
-    return in >> dest.ref;
+    double value = 0;
+    if (!(in >> value))
+    {
+      return in;
+    }
+
+    double abs_val = 0;
+    abs_val = std::abs(value);
+
+    if (abs_val == 0.0)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    int exp = 0;
+    double mantissa = 0.0;
+    exp = static_cast<int>(std::floor(std::log10(abs_val)));
+    mantissa = abs_val / std::pow(10, exp);
+
+    if (!(mantissa >= 1.0 && mantissa < 10.0))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    dest.ref = value;
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, UllIO&& dest)
@@ -101,69 +128,66 @@ namespace smirnov
       return in;
     }
 
-    DataStruct str;
+    iofmtguard guard(in);
+    DataStruct temp{};
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
-    if (!(in >> DelimiterIO{ '(' }))
+    using sep = smirnov::DelimiterIO;
+    using smirnov::DoubleIO;
+    using smirnov::UllIO;
+    using smirnov::StringIO;
+    in >> sep{ '(' };
+    for (int i = 0; i < 3; ++i)
     {
-      return in;
-    }
-
-    while (true)
-    {
-      in >> std::ws;
-      if (in.peek() == ':')
+      in >> sep{ ':' };
+      in >> sep{ 'k' } >> sep{ 'e' } >> sep{ 'y' };
+      int keyNumber = 0;
+      in >> keyNumber;
+      switch (keyNumber)
       {
-        in.get();
-        if (in.peek() == ')')
+      case 1:
+        if (hasKey1 || in.peek() == '"')
         {
-          in.get();
+          in.setstate(std::ios::failbit);
           break;
         }
-        else
-        {
-          in.unget();
-        }
-      }
-      if (!(in >> DelimiterIO{ ':' }))
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      std::string key;
-      if (!(in >> key))
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      if (key == "key1" && in >> DoubleIO{ str.key1 })
-      {
+        in >> DoubleIO{ temp.key1 };
         hasKey1 = true;
-      }
-      else if (key == "key2" || in >> UllIO{ str.key2 })
-      {
+        break;
+      case 2:
+        if (hasKey2)
+        {
+          in.setstate(std::ios::failbit);
+          break;
+        }
+        in >> UllIO{ temp.key2 };
         hasKey2 = true;
-      }
-      else if (key == "key3" || in >> StringIO{ str.key3 })
-      {
+        break;
+      case 3:
+        if (hasKey3)
+        {
+          in.setstate(std::ios::failbit);
+          break;
+        }
+        in >> StringIO{ temp.key3 };
         hasKey3 = true;
-      }
-      else
-      {
+        break;
+      default:
         in.setstate(std::ios::failbit);
-        return in;
+        break;
       }
     }
-    if (hasKey1 && hasKey2 && hasKey3 && in)
+
+    in >> sep{ ':' } >> sep{ ')' };
+    if (in && hasKey1 && hasKey2 && hasKey3)
     {
-      dest = str;
+      dest = temp;
     }
     else
     {
       in.setstate(std::ios::failbit);
     }
-
     return in;
   }
 
