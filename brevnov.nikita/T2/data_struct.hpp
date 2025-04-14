@@ -17,7 +17,7 @@ namespace brevnov
     char exp;
   };
 
-  struct DelimetersIO
+  struct DelimitersIO
   {
     std::string exp;
   };

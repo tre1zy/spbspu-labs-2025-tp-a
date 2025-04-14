@@ -138,7 +138,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
   DataStruct temp;
   detail::ScopeGuard scope(input);
   {
-    input >> DelimetersIO{ "(:" };
+    input >> DelimitersIO{ "(:" };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
