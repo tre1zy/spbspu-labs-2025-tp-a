@@ -32,6 +32,15 @@ std::istream& brevnov::operator>>(std::istream& input, DelimeterIO&& dest)
   return input;
 }
 
+std::istream& brevnov::operator>>(std::istream& input, DelimetersIO&& dest)
+{
+  for (char c: dest.exp)
+  {
+    input >> DelimeterIO{ c };
+  }
+  return input;
+}
+
 std::istream& brevnov::operator>>(std::istream& input, UnLongLongIO&& dest)
 {
   std::istream::sentry sentry(input);
@@ -56,3 +65,5 @@ std::istream& brevnov::operator>>(std::istream& input, UnLongLongIO&& dest)
   }
   return input;
 }
+
+
