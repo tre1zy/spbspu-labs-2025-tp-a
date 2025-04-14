@@ -9,7 +9,7 @@ int main()
 {
     std::vector< smirnov::DataStruct > data;
 
-    while (std::cin)
+    while (!std::cin.eof())
     {
         std::copy
         (
@@ -17,14 +17,14 @@ int main()
             std::istream_iterator< smirnov::DataStruct >(),
             std::back_inserter(data)
         );
-        if (!std::cin.eof())
+        if (!std::cin)
         {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         }
     }
 
-    std::sort(data.begin(), data.end());
+    std::sort(data.begin(), data.end(), smirnov::comparator);
 
     std::copy(
         std::begin(data),

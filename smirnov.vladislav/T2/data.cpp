@@ -243,7 +243,7 @@ namespace smirnov
     return out;
   }
 
-  bool operator<(const DataStruct& a, const DataStruct& b)
+  bool comparator(const DataStruct& a, const DataStruct& b)
   {
     if (a.key1 != b.key1)
     {

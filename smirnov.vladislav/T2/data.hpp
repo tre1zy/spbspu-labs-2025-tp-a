@@ -13,7 +13,7 @@ namespace smirnov
 
     std::istream& operator>>(std::istream& in, DataStruct& value);
     std::ostream& operator<<(std::ostream& out, const DataStruct& value);
-    bool operator<(const DataStruct& a, const DataStruct& b);
+    bool comparator(const DataStruct& a, const DataStruct& b);
 
     struct DelimiterIO
     {
