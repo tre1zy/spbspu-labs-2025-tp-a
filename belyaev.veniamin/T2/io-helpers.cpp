@@ -8,7 +8,8 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   int exp = 0;
   double mantissa = dbl.value;
 
-  if (mantissa == 0.0) {
+  if (mantissa == 0.0)
+  {
     out << "0.0e+0";
     return out;
   }
