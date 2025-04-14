@@ -14,25 +14,36 @@ int main()
   using kazak::DataStruct;
 
   std::vector< DataStruct > data;
-  std::string input((std::istreambuf_iterator<char>(std::cin)), std::istreambuf_iterator<char>());
-  std::istringstream iss(input);
+  std::string input;
 
-  while (iss >> std::ws)
+  while (true)
   {
-    DataStruct ds;
-    if (iss >> ds)
+    std::getline(std::cin, input);
+
+    if (input.empty())
     {
-      data.push_back(ds);
+        break;
     }
-    else
+
+    std::istringstream iss(input);
+
+    while (iss >> std::ws)
     {
-      iss.clear();
-      break;
+      DataStruct ds;
+      if (iss >> ds)
+      {
+        data.push_back(ds);
+      }
+      else
+      {
+        iss.clear();
+        break;
+      }
     }
   }
 
   std::cout << "Data:\n";
-  std::copy(std::begin(data), std::end(data), std::ostream_iterator< DataStruct >(std::cout, "\n"));
+  std::copy(std::begin(data), std::end(data), std::ostream_iterator<DataStruct>(std::cout, "\n"));
 
   return 0;
 }
