@@ -137,7 +137,7 @@ std::ostream& nspace::operator<<(std::ostream& out, const DataStruct& src)
   {
     return out;
   }
-  iofmtguard fmtguard(out);
+  Iofmtguard fmtguard(out);
   out << "(:";
   out << "key1 " << std::fixed << std::setprecision(1) << src.key1 << "d:";
   out << "key2 #c(" << std::real(src.key2) << " " << std::imag(src.key2) << "):";

@@ -9,7 +9,7 @@
 int main()
 {
   using nspace::DataStruct;
-  std::vector<DataStruct> data;
+  std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
     if (std::cin.fail())

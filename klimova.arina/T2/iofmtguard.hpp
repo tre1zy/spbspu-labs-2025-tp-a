@@ -5,11 +5,11 @@
 
 namespace nspace
 {
-  class iofmtguard
+  class Iofmtguard
   {
   public:
-    iofmtguard(std::basic_ios< char >& s);
-    ~iofmtguard();
+    Iofmtguard(std::basic_ios< char >& s);
+    ~Iofmtguard();
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;
