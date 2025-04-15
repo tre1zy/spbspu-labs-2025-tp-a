@@ -17,7 +17,16 @@ namespace
     {
       throw std::invalid_argument("Invalid binary format: " + s);
     }
-    return std::strtoull(s.c_str() + 2, nullptr, 2);
+    
+    const char* str = s.c_str() + 2;
+    char* endptr = nullptr;
+    unsigned long long value = std::strtoull(str, &endptr, 2);
+    
+    if (endptr == str || *endptr != '\0') {
+      throw std::invalid_argument("Invalid binary number: " + s);
+    }
+    
+    return value;
   }
 
   std::complex<double> parseComplex(const std::string& s)
@@ -37,8 +46,17 @@ namespace
     std::string real_str = trim(content.substr(0, space_pos));
     std::string imag_str = trim(content.substr(space_pos + 1));
 
-    double real = std::strtod(real_str.c_str(), nullptr);
-    double imag = std::strtod(imag_str.c_str(), nullptr);
+    char* endptr = nullptr;
+    double real = std::strtod(real_str.c_str(), &endptr);
+    if (endptr == real_str.c_str() || *endptr != '\0') {
+      throw std::invalid_argument("Invalid real part: " + real_str);
+    }
+
+    endptr = nullptr;
+    double imag = std::strtod(imag_str.c_str(), &endptr);
+    if (endptr == imag_str.c_str() || *endptr != '\0') {
+      throw std::invalid_argument("Invalid imaginary part: " + imag_str);
+    }
 
     return std::complex<double>(real, imag);
   }
@@ -56,6 +74,7 @@ namespace
   {
     asafov::DataStruct result;
     size_t pos = 0;
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
 
     while (pos < input.size())
     {
@@ -80,14 +99,17 @@ namespace
       if (key == "key1")
       {
         result.key1 = parseBinaryULL(value);
+        hasKey1 = true;
       }
       else if (key == "key2")
       {
         result.key2 = parseComplex(value);
+        hasKey2 = true;
       }
       else if (key == "key3")
       {
         result.key3 = parseQuotedString(value);
+        hasKey3 = true;
       }
       else
       {
@@ -95,6 +117,10 @@ namespace
       }
 
       pos = value_end;
+    }
+
+    if (!hasKey1 || !hasKey2 || !hasKey3) {
+      throw std::invalid_argument("Missing required keys in DataStruct");
     }
 
     return result;
@@ -106,6 +132,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
   std::string line;
   if (!std::getline(is, line))
   {
+    is.setstate(std::ios::failbit);
     return is;
   }
 
@@ -113,7 +140,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
   {
     data = parseDataStruct(line);
   }
-  catch (const std::exception&)
+  catch (const std::exception& e)
   {
     is.setstate(std::ios::failbit);
   }
