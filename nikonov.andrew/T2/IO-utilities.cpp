@@ -168,7 +168,7 @@ namespace nikonov
       StreamGuard outGuard(out);
       int exp = 0;
       double toOut = dest.ref_;
-      while (toOut > 10)
+      while (toOut >= 10)
       {
         toOut /= 10;
         ++exp;
@@ -188,7 +188,7 @@ namespace nikonov
       {
         return out;
       }
-      out << "0x" << std::hex << toOut.ref_;
+      out << "0x" << std::hex << std::uppercase <<  toOut.ref_;
       return out;;
     }
     std::ostream& operator<<(std::ostream& out, StringIO&& toOut)
