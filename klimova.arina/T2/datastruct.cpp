@@ -94,15 +94,27 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
       if (!(in >> lbl{ label })) break;
       if (label == "key1")
       {
-        if (!(in >> dbl{ dest.key1 })) return in;
+        if (!(in >> dbl{ dest.key1 }))
+        {
+          in.clear();
+          continue;
+        }
       }
       else if (label == "key2")
       {
-        if (!(in >> cmp{ dest.key2 })) return in;
+        if (!(in >> cmp{ dest.key2 }))
+        {
+          in.clear();
+          continue;
+        }
       }
       else if (label == "key3")
       {
-        if (!(in >> str{ dest.key3 })) return in;
+        if (!(in >> str{ dest.key3 }))
+        {
+          in.clear();
+          continue;
+        }
       }
       else if (label == ")")
       {
@@ -110,14 +122,14 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
       }
       else
       {
-        in.setstate(std::ios::failbit);
-        break;
+        in.clear();
+        continue;
       }
 
       if (!(in >> DelimiterIO{ ':' }))
       {
-        in.setstate(std::ios::failbit);
-        break;
+        in.clear();
+        continue;
       }
     }
   }
