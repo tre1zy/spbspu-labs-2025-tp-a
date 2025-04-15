@@ -178,7 +178,12 @@ namespace nikonov
         toOut *= 10;
         --exp;
       }
-      out << std::fixed << std::setprecision(1) << toOut << 'e' << exp;
+      out << std::fixed << std::setprecision(1) << toOut << 'e';
+      if (exp > 0)
+      {
+        out << '+';
+      }
+      out << exp;
       return out;
     }
     std::ostream& operator<<(std::ostream& out, UnsignedLongLong&& toOut)
