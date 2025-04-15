@@ -25,7 +25,7 @@ namespace nikonov
     };
     struct LabelIO
     {
-      std::string exp_;
+      std::string& ref_;
     };
 
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest);

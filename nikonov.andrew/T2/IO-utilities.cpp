@@ -2,7 +2,9 @@
 #include <stdexcept>
 #include <cmath>
 #include <string>
-#include <stack>
+#include <iomanip>
+#include <queue>
+#include "StreamGuard.hpp"
 namespace nikonov
 {
   namespace detail
@@ -74,6 +76,7 @@ namespace nikonov
           str += c;
         }
         int exp = std::stoi(str);
+        in.unget();
         dest.ref_ = mantissa * std::pow(10, exp);
       }
       catch (const std::exception& e)
@@ -84,6 +87,12 @@ namespace nikonov
     }
     std::istream& operator>>(std::istream& in, UnsignedLongLong&& dest)
     {
+      std::istream::sentry sentry(in);
+      if (!sentry)
+      {
+        return in;
+      }
+      in >> DelimiterIO{ '\'' };
       in >> DelimiterIO{ '0' };
       char c = '0';
       if (in >> c && (c != 'x' && c != 'X'))
@@ -94,15 +103,15 @@ namespace nikonov
       {
         size_t i = 0;
         unsigned long long tempUll = 0;
-        std::stack< int > digits;
-        while (in >> c && (c != ':'))
+        std::queue< int > digits;
+        while (in >> c && (c != '\''))
         {
           digits.push(hexCharToInt(c));
           i++;
         }
         for (; i > 0; i--)
         {
-          tempUll += digits.top() * std::pow(16, i - 1);
+          tempUll += digits.front() * std::pow(16, i - 1);
           digits.pop();
         }
         dest.ref_ = tempUll;
@@ -117,10 +126,18 @@ namespace nikonov
     {
       std::istream::sentry sentry(in);
       if (!sentry)
-      {
+      {;
         return in;
       }
-      return std::getline(in >> DelimiterIO{ '"' }, dest.ref_, '"');
+      in >> DelimiterIO{ '"' };
+      std::string str;
+      char c = '0';
+      while (in >> c && (c != '"'))
+      {
+        str += c;
+      }
+      dest.ref_ = str;
+      return in;
     }
     std::istream& operator>>(std::istream& in, LabelIO&& dest)
     {
@@ -129,11 +146,15 @@ namespace nikonov
       {
         return in;
       }
-      std::string data = "";
-      if ((in >> StringIO{ data }) && (data != dest.exp_))
+      StreamGuard inGuard(in);
+      in >> std::noskipws >> std::fixed;
+      std::string str = "";
+      char c = '0';
+      while (in >> c && (c != ' '))
       {
-        in.setstate(std::ios::failbit);
+        str += c;
       }
+      dest.ref_ = str;
       return in;
     }
 
@@ -144,13 +165,20 @@ namespace nikonov
       {
         return out;
       }
+      StreamGuard outGuard(out);
       int exp = 0;
       double toOut = dest.ref_;
-      for (; toOut > 10; exp++)
+      while (toOut > 10)
       {
         toOut /= 10;
+        ++exp;
       }
-      out << toOut << 'e' << exp;
+      while (toOut < 1)
+      {
+        toOut *= 10;
+        --exp;
+      }
+      out << std::fixed << std::setprecision(1) << toOut << 'e' << exp;
       return out;
     }
     std::ostream& operator<<(std::ostream& out, UnsignedLongLong&& toOut)
@@ -170,7 +198,7 @@ namespace nikonov
       {
         return out;
       }
-      out << toOut.ref_;
+      out << '"' << toOut.ref_ << '"';
       return out;
     }
   }
