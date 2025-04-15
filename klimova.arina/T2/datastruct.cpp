@@ -91,7 +91,10 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
     while (true)
     {
       std::string label;
-      if (!(in >> lbl{ label })) break;
+      if (!(in >> lbl{ label }))
+      {
+        break;
+      }
       if (label == "key1")
       {
         if (!(in >> dbl{ dest.key1 }))
