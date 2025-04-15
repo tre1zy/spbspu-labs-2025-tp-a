@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <complex>
+#include <limits>
 
 namespace nspace
 {

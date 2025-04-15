@@ -97,6 +97,7 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
         if (!(in >> dbl{ dest.key1 }))
         {
           in.clear();
+          in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
           continue;
         }
       }
@@ -105,6 +106,7 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
         if (!(in >> cmp{ dest.key2 }))
         {
           in.clear();
+          in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
           continue;
         }
       }
@@ -113,6 +115,7 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
         if (!(in >> str{ dest.key3 }))
         {
           in.clear();
+          in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
           continue;
         }
       }
@@ -123,12 +126,14 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
       else
       {
         in.clear();
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         continue;
       }
 
       if (!(in >> DelimiterIO{ ':' }))
       {
         in.clear();
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         continue;
       }
     }
