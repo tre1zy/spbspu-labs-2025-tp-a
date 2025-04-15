@@ -140,7 +140,7 @@ std::ostream& nspace::operator<<(std::ostream& out, const DataStruct& src)
   return out;
 }
 
-bool nspace::DataStruct::compareData(const DataStruct& a, const DataStruct& b)
+bool nspace::compareData(const DataStruct& a, const DataStruct& b)
 {
   if (a.key1 != b.key1)
   {
