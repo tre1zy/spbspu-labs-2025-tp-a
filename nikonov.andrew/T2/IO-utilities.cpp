@@ -129,14 +129,7 @@ namespace nikonov
       {;
         return in;
       }
-      in >> DelimiterIO{ '"' };
-      std::string str;
-      char c = '0';
-      while (in >> c && (c != '"'))
-      {
-        str += c;
-      }
-      dest.ref_ = str;
+      std::getline(in >> DelimiterIO{ '"' }, dest.ref_, '"');
       return in;
     }
     std::istream& operator>>(std::istream& in, LabelIO&& dest)
@@ -146,15 +139,7 @@ namespace nikonov
       {
         return in;
       }
-      StreamGuard inGuard(in);
-      in >> std::noskipws >> std::fixed;
-      std::string str = "";
-      char c = '0';
-      while (in >> c && (c != ' '))
-      {
-        str += c;
-      }
-      dest.ref_ = str;
+      std::getline(in, dest.ref_, ' ');
       return in;
     }
 
