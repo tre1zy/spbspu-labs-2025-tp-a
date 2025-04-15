@@ -114,7 +114,7 @@ std::istream &abramov::operator>>(std::istream &in, DataStruct &data)
 
 bool abramov::operator<(const DataStruct &lhs, const DataStruct &rhs)
 {
-  if (lhs.key1 == lhs.key1)
+  if (lhs.key1 == rhs.key1)
   {
     if (lhs.key2 == rhs.key2)
     {
