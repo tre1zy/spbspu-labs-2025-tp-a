@@ -1,9 +1,7 @@
 #include "dataStruct.hpp"
 #include "scopeGuard.hpp"
 #include <bitset>
-#include <cctype>
 #include <iostream>
-#include <set>
 #include <string>
 
 std::istream &kostyukov::operator>>(std::istream &in, DelimiterIO &&dest)
@@ -30,9 +28,9 @@ std::istream &kostyukov::operator>>(std::istream &in, StringIO &&dest)
     return in;
   }
   std::string temp;
-  in >> DelimiterIO{'"'};
+  in >> DelimiterIO{ '"' };
   std::getline(in, temp, '"');
-  in >> DelimiterIO{':'};
+  in >> DelimiterIO{ ':' };
   if (in)
   {
     dest.ref = temp;
@@ -47,7 +45,7 @@ std::istream &kostyukov::operator>>(std::istream &in, UllIO &&dest)
   {
     return in;
   }
-  in >> DelimiterIO{'0'};
+  in >> DelimiterIO{ '0' };
   char prefix = '0';
   in >> prefix;
   int base = 0;
@@ -99,9 +97,8 @@ std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
   {
     return in;
   }
-  in >> DelimiterIO{'('} >> DelimiterIO{':'};
+  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
   DataStruct temp{};
-  std::set<size_t> processedKeys;
   const size_t COUNT_KEYS_EXPECTED = 3;
   for (size_t i = 0; i < COUNT_KEYS_EXPECTED; i++)
   {
@@ -129,7 +126,7 @@ std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
       in.setstate(std::ios::failbit);
     }
   }
-  in >> DelimiterIO{')'};
+  in >> DelimiterIO{ ')' };
   if (in)
   {
     dest = temp;
@@ -144,10 +141,10 @@ std::ostream &kostyukov::operator<<(std::ostream &out, const UllIO &&dest)
   {
     return out;
   }
-  kostyukov::ScopeGuard scopeGrd(out);
+  ScopeGuard scopeGrd(out);
   if (dest.format == UllIO::Format::BIN)
   {
-    std::string binStr = std::bitset<64>(dest.ref).to_string();
+    std::string binStr = std::bitset< 64 >(dest.ref).to_string();
     size_t firstOne = binStr.find('1');
     out << "0b";
     if (firstOne == std::string::npos)
@@ -189,8 +186,8 @@ std::ostream &kostyukov::operator<<(std::ostream &out, const DataStruct &dest)
   unsigned long long ullBin = dest.key1;
   unsigned long long ullHex = dest.key2;
   std::string string = dest.key3;
-  out << "(:key1 " << UllIO{ullBin, UllIO::BIN} << ":key2 "
-      << UllIO{ullHex, UllIO::HEX} << ":key3 " << StringIO{string} << ":)";
+  out << "(:key1 " << UllIO{ ullBin, UllIO::BIN } << ":key2 "
+      << UllIO{ ullHex, UllIO::HEX } << ":key3 " << StringIO{ string } << ":)";
   return out;
 }
 
