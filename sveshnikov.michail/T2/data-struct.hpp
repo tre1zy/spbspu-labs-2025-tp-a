@@ -11,8 +11,8 @@ namespace sveshnikov
     std::string key3;
   };
 
-  std::istream& operator>>(std::istream& in, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& src);
+  std::istream &operator>>(std::istream &in, DataStruct &dest);
+  std::ostream &operator<<(std::ostream &out, const DataStruct &src);
 }
 
 #endif
