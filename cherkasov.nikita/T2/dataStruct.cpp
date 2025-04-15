@@ -86,7 +86,10 @@ namespace cherkasov
   std::istream & operator>>(std::istream & in, DataStruct & obj)
   {
     std::istream::sentry s(in);
-    if (!s) return in;
+    if (!s)
+    {
+      return in;
+    }
     DataStruct temp;
     bool k1 = false, k2 = false, k3 = false;
     in >> ExpectChar{ '(' };
@@ -94,7 +97,7 @@ namespace cherkasov
     {
       std::string label;
       in >> label;
-      if (!in) 
+      if (!in)
       {
         break;
       }
