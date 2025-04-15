@@ -5,10 +5,10 @@ namespace
 {
   std::string trim(const std::string& s)
   {
-  size_t start = s.find_first_not_of(" \t\n\r");
-  if (start == std::string::npos) return "";
-  size_t end = s.find_last_not_of(" \t\n\r");
-  return s.substr(start, end - start + 1);
+    size_t start = s.find_first_not_of(" \t\n\r");
+    if (start == std::string::npos) return "";
+    size_t end = s.find_last_not_of(" \t\n\r");
+    return s.substr(start, end - start + 1);
   }
 
   unsigned long long parseBinaryULL(const std::string& s)
@@ -104,9 +104,18 @@ namespace
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   std::string line;
-  std::getline(is, line);
-  line[line.size() - 1] = ' ';
-  line[line.size() - 2] = '\n';
-  data = parseDataStruct(line);
+  if (!std::getline(is, line))
+  {
+    return is;
+  }
+
+  try
+  {
+    data = parseDataStruct(line);
+  }
+  catch (const std::exception&)
+  {
+    is.setstate(std::ios::failbit);
+  }
   return is;
 }
