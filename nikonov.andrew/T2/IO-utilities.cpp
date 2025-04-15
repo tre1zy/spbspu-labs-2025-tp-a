@@ -92,7 +92,6 @@ namespace nikonov
       {
         return in;
       }
-      in >> DelimiterIO{ '\'' };
       in >> DelimiterIO{ '0' };
       char c = '0';
       if (in >> c && (c != 'x' && c != 'X'))
@@ -104,7 +103,7 @@ namespace nikonov
         size_t i = 0;
         unsigned long long tempUll = 0;
         std::queue< int > digits;
-        while (in >> c && (c != '\''))
+        while (in >> c && (c != ':'))
         {
           digits.push(hexCharToInt(c));
           i++;
@@ -114,6 +113,7 @@ namespace nikonov
           tempUll += digits.front() * std::pow(16, i - 1);
           digits.pop();
         }
+        in.unget();
         dest.ref_ = tempUll;
       }
       catch(const std::exception& e)

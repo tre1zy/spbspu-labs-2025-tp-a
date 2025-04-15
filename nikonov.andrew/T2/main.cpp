@@ -23,6 +23,14 @@ int main()
   using nikonov::DataStruct;
   using data_istream_it = std::istream_iterator< DataStruct >;
   std::vector< DataStruct > dS;
+  while (!std::cin.eof())
+  {
+    if (std::cin.fail())
+    {
+      std::cin.clear();
+    }
+    std::copy(data_istream_it(std::cin), data_istream_it(), std::back_inserter(dS));
+  }
   std::copy(data_istream_it(std::cin), data_istream_it(), std::back_inserter(dS));
   std::sort(dS.begin(), dS.end(), nikonov::detail::sortComparator);
   std::copy(dS.begin(), dS.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
