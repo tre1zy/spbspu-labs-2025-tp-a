@@ -90,10 +90,14 @@ namespace cherkasov
     DataStruct temp;
     bool k1 = false, k2 = false, k3 = false;
     in >> ExpectChar{ '(' };
-    while (!(k1 && k2 && k3) && in)
+    while (in)
     {
       std::string label;
       in >> label;
+      if (!in) 
+      {
+        break;
+      }
       if (label == ":key1" && !k1)
       {
         in >> Complex{ temp.key1 };
@@ -109,12 +113,17 @@ namespace cherkasov
         in >> Strings{ temp.key3 };
         k3 = true;
       }
+      else if (label == ":" && k1 && k2 && k3)
+      {
+        break;
+      }
       else
       {
         in.setstate(std::ios::failbit);
+        return in;
       }
     }
-    in >> ExpectChar{ ':' } >> ExpectChar{ ')' };
+    in >> ExpectChar{ ')' };
     if (in)
     {
       obj = temp;
