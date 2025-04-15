@@ -6,15 +6,16 @@ int main()
 {
   std::vector<asafov::DataStruct> data;
 
-  try {
+  try
+  {
     std::copy(
       std::istream_iterator<asafov::DataStruct>(std::cin),
       std::istream_iterator<asafov::DataStruct>(),
       std::back_inserter(data)
     );
 
-    if (data.empty()) {
-      std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+    if (data.empty())
+    {
       return 0;
     }
 
@@ -25,7 +26,9 @@ int main()
       std::end(data),
       std::ostream_iterator<asafov::DataStruct>(std::cout, "\n")
     );
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception& e)
+  {
     std::cerr << "Error: " << e.what() << "\n";
     return 1;
   }
