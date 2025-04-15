@@ -20,7 +20,6 @@ namespace
     const char* str = s.c_str() + 2;
     char* endptr = nullptr;
     unsigned long long value = std::strtoull(str, &endptr, 2);
-    
     if (endptr == str || *endptr != '\0') {
       throw std::invalid_argument("Invalid binary number: " + s);
     }
