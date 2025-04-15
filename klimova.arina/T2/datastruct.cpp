@@ -97,30 +97,15 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
       }
       if (label == "key1")
       {
-        if (!(in >> dbl{ dest.key1 }))
-        {
-          in.clear();
-          in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-          continue;
-        }
+        in >> dbl{ input.key1 };
       }
       else if (label == "key2")
       {
-        if (!(in >> cmp{ dest.key2 }))
-        {
-          in.clear();
-          in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-          continue;
-        }
+        in >> cmp{ input.key2 };
       }
       else if (label == "key3")
       {
-        if (!(in >> str{ dest.key3 }))
-        {
-          in.clear();
-          in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-          continue;
-        }
+        in >> str{ input.key3 };
       }
       else if (label == ")")
       {
@@ -128,18 +113,19 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
       }
       else
       {
-        in.clear();
-        in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        continue;
+        in.setstate(std::ios::failbit);
+        break;
       }
 
       if (!(in >> DelimiterIO{ ':' }))
       {
-        in.clear();
-        in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        continue;
+        break;
       }
     }
+  }
+  if (in)
+  {
+    dest = input;
   }
   return in;
 }

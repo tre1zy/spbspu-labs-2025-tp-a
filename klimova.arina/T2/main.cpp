@@ -3,6 +3,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
+#include <limits>
 #include "datastruct.hpp"
 
 int main()
@@ -14,6 +15,7 @@ int main()
     if (std::cin.fail())
     {
       std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(
       std::istream_iterator< DataStruct >(std::cin),
