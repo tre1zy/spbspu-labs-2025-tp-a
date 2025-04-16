@@ -13,7 +13,7 @@ std::istream& kiselev::operator>>(std::istream& input, DelimeterIO&& dest)
   }
   char c = '0';
   input >> c;
-  if (input && (std::tolower(c) != dest.exp))
+  if (input && (c != dest.exp))
   {
     input.setstate(std::ios::failbit);
   }
