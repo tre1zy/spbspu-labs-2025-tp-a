@@ -9,12 +9,14 @@ namespace demehin
     long long key1;
     double key2;
     std::string key3;
+
+    bool operator<(const DataStruct&) const noexcept;
   };
 
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
 
-  namespace ioStructs
+  namespace io
   {
     struct DoubleIO
     {
@@ -33,7 +35,7 @@ namespace demehin
 
     struct KeyNumIO
     {
-      int ref;
+      int key;
     };
 
     struct StringIO

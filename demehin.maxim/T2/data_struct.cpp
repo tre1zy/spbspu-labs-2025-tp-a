@@ -7,10 +7,10 @@
 
 namespace
 {
-  using namespace demehin::ioStructs;
+  using namespace demehin::io;
 }
 
-std::istream& demehin::ioStructs::operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream& demehin::io::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -27,7 +27,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, DelimiterIO&& des
   return in;
 }
 
-std::istream& demehin::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& demehin::io::operator>>(std::istream& in, DoubleIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -57,7 +57,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, DoubleIO&& dest)
   return in;
 }
 
-std::istream& demehin::ioStructs::operator>>(std::istream& in, LlIO&& dest)
+std::istream& demehin::io::operator>>(std::istream& in, LlIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -67,7 +67,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, LlIO&& dest)
   return in >> dest.ref >> DelimiterIO{ 'l' } >> DelimiterIO{ 'l' };
 }
 
-std::istream& demehin::ioStructs::operator>>(std::istream& in, StringIO&& dest)
+std::istream& demehin::io::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -77,7 +77,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, StringIO&& dest)
   return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
 
-std::istream& demehin::ioStructs::operator>>(std::istream& in, KeyNumIO& dest)
+std::istream& demehin::io::operator>>(std::istream& in, KeyNumIO& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -90,7 +90,7 @@ std::istream& demehin::ioStructs::operator>>(std::istream& in, KeyNumIO& dest)
   {
     in.setstate(std::ios::failbit);
   }
-  dest.ref = label.back();
+  dest.key = label.back();
   return in;
 }
 
@@ -113,15 +113,15 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
     {
       keyNum key_num{ 0 };
       in >> key_num;
-      if (key_num.ref == '1')
+      if (key_num.key == '1')
       {
         in >> ll{ input.key1 } >> sep{ ':' };
       }
-      else if (key_num.ref == '2')
+      else if (key_num.key == '2')
       {
         in >> dbl{ input.key2 };
       }
-      else if (key_num.ref == '3')
+      else if (key_num.key == '3')
       {
         in >> str{ input.key3 } >> sep{ ':' };
       }
@@ -135,7 +135,7 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& demehin::ioStructs::operator<<(std::ostream& out, const DoubleIO&& dest)
+std::ostream& demehin::io::operator<<(std::ostream& out, const DoubleIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -171,7 +171,7 @@ std::ostream& demehin::ioStructs::operator<<(std::ostream& out, const DoubleIO&&
   return out;
 }
 
-std::ostream& demehin::ioStructs::operator<<(std::ostream& out, const LlIO&& dest)
+std::ostream& demehin::io::operator<<(std::ostream& out, const LlIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -195,4 +195,17 @@ std::ostream& demehin::operator<<(std::ostream& out, const DataStruct& src)
   out << ":key2 " << DoubleIO{ dblval };
   out << ":key3 \"" << src.key3 << "\":)";
   return out;
+}
+
+bool demehin::DataStruct::operator<(const DataStruct& rhs) const noexcept
+{
+  if (key1 != rhs.key1)
+  {
+    return key1 < rhs.key1;
+  }
+  if (key2 != rhs.key2)
+  {
+    return key2 < rhs.key2;
+  }
+  return key3.size() < rhs.key3.size();
 }
