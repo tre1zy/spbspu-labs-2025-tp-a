@@ -4,9 +4,9 @@
 #include <iterator>
 
 int main()
-{
+{//(:key1 0b0:key2 #c(0.5 -0.5):key3 "Data":)
   std::vector<asafov::DataStruct> data;
-  try
+  while (!std::cin.eof())
   {
     std::copy(
       std::istream_iterator<asafov::DataStruct>(std::cin),
@@ -18,23 +18,13 @@ int main()
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-
-    if (data.empty())
-    {
-      return 0;
-    }
-    std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
-    std::copy(
-      std::begin(data),
-      std::end(data),
-      std::ostream_iterator<asafov::DataStruct>(std::cout, "\n")
-    );
   }
-  catch (const std::exception& e)
-  {
-    std::cerr << "Error: " << e.what() << "\n";
-    return 1;
-  }
-
+  std::cout << data.size();
+  std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
+  std::copy(
+    std::begin(data),
+    std::end(data),
+    std::ostream_iterator<asafov::DataStruct>(std::cout, "\n")
+  );
   return 0;
 }

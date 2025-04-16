@@ -15,13 +15,14 @@ namespace
   {
     if (s.size() < 2 || (s[0] != '0' || (s[1] != 'b' && s[1] != 'B')))
     {
-      throw std::invalid_argument("Invalid binary format: " + s);
+      throw std::logic_error("invalid binary format");
     }
     const char* str = s.c_str() + 2;
     char* endptr = nullptr;
     unsigned long long value = std::strtoull(str, &endptr, 2);
-    if (endptr == str || *endptr != '\0') {
-      throw std::invalid_argument("Invalid binary number: " + s);
+    if (endptr == str || *endptr != '\0')
+    {
+      throw std::logic_error("invalid binary format");
     }
     return value;
   }
@@ -30,14 +31,14 @@ namespace
   {
     if (s.size() < 5 || s.substr(0, 2) != "#c" || s[2] != '(' || s.back() != ')')
     {
-      throw std::logic_error("Invalid complex format: " + s);
+      throw std::logic_error("invalid complex format");
     }
 
     std::string content = s.substr(3, s.size() - 4);
     size_t space_pos = content.find(' ');
     if (space_pos == std::string::npos)
     {
-      throw std::logic_error("Invalid complex format (no space): " + s);
+      throw std::logic_error("invalid complex format");
     }
 
     std::string real_str = trim(content.substr(0, space_pos));
@@ -45,14 +46,16 @@ namespace
 
     char* endptr = nullptr;
     double real = std::strtod(real_str.c_str(), &endptr);
-    if (endptr == real_str.c_str() || *endptr != '\0') {
-      throw std::invalid_argument("Invalid real part: " + real_str);
+    if (endptr == real_str.c_str() || *endptr != '\0')
+    {
+      throw std::logic_error("invalid complex format");
     }
 
     endptr = nullptr;
     double imag = std::strtod(imag_str.c_str(), &endptr);
-    if (endptr == imag_str.c_str() || *endptr != '\0') {
-      throw std::invalid_argument("Invalid imaginary part: " + imag_str);
+    if (endptr == imag_str.c_str() || *endptr != '\0')
+    {
+      throw std::logic_error("invalid complex format");
     }
 
     return std::complex<double>(real, imag);
@@ -62,7 +65,7 @@ namespace
   {
     if (s.size() < 2 || s.front() != '"' || s.back() != '"')
     {
-      throw std::invalid_argument("Invalid string format: " + s);
+      throw std::invalid_argument("invalid string format");
     }
     return s.substr(1, s.size() - 2);
   }
@@ -110,14 +113,15 @@ namespace
       }
       else
       {
-        throw std::invalid_argument("Unknown key: " + key);
+        throw std::logic_error("Unknown key: " + key);
       }
 
       pos = value_end;
     }
 
-    if (!hasKey1 || !hasKey2 || !hasKey3) {
-      throw std::invalid_argument("Missing required keys in DataStruct");
+    if (!hasKey1 || !hasKey2 || !hasKey3)
+    {
+      throw std::logic_error("missing required keys in DataStruct");
     }
 
     return result;
@@ -140,6 +144,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
   catch (const std::exception& e)
   {
     is.setstate(std::ios::failbit);
+    return is;
   }
   return is;
 }
