@@ -1,15 +1,30 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <functional>
 #include <iostream>
 #include "data_struct.hpp"
 
-namespace petrov
+namespace
 {
-  void sort(std::vector< DataStruct > & vector);
-  void sortByFirstKey(std::vector< DataStruct > & vector);
-  void sortBySecondKey(std::vector< DataStruct > & vector);
-  void sortByThirdKey(std::vector< DataStruct > & vector);
+  bool compareDataStructs(const petrov::DataStruct & lhs, const petrov::DataStruct & rhs);
+  bool compareDataStructs(const petrov::DataStruct & lhs, const petrov::DataStruct & rhs)
+{
+  if (lhs.key1 < rhs.key2)
+  {
+    return true;
+  }
+  else if (lhs.key2 < rhs.key2)
+  {
+    return true;
+  }
+  else if (lhs.key3.length() < rhs.key3.length())
+  {
+    return true;
+  }
+  return false;
+}
+
 }
 
 int main()
@@ -29,80 +44,10 @@ int main()
       std::back_inserter(data)
     );
   }
-  sort(data);
+  std::sort(data.begin(), data.end(), compareDataStructs);
   std::copy(
       std::begin(data),
       std::end(data),
       std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
-}
-
-void petrov::sort(std::vector < DataStruct > & vector)
-{
-  sortByFirstKey(vector);
-  sortBySecondKey(vector);
-  sortByThirdKey(vector);
-}
-
-void petrov::sortByFirstKey(std::vector< DataStruct > & vector)
-{
-  bool swapped = false;
-  for (size_t i = 0; i < vector.size() - 1; i++)
-  {
-    swapped = false;
-    for (size_t j = 0; j < vector.size() - i - 1; j++)
-    {
-      if (vector[j].key1 > vector[j + 1].key1)
-      {
-        std::swap(vector[j].key1, vector[j + 1].key1);
-        swapped = true;
-      }
-    }
-    if (!swapped)
-    {
-      break;
-    }
-  }
-}
-
-void petrov::sortBySecondKey(std::vector< DataStruct > & vector)
-{
-  bool swapped = false;
-  for (size_t i = 0; i < vector.size() - 1; i++)
-  {
-    swapped = false;
-    for (size_t j = 0; j < vector.size() - i - 1; j++)
-    {
-      if (vector[j].key2 > vector[j + 1].key2)
-      {
-        std::swap(vector[j].key2, vector[j + 1].key2);
-        swapped = true;
-      }
-    }
-    if (!swapped)
-    {
-      break;
-    }
-  }
-}
-
-void petrov::sortByThirdKey(std::vector< DataStruct > & vector)
-{
-  bool swapped = false;
-  for (size_t i = 0; i < vector.size() - 1; i++)
-  {
-    swapped = false;
-    for (size_t j = 0; j < vector.size() - i - 1; j++)
-    {
-      if (vector[j].key3.length() > vector[j + 1].key3.length())
-      {
-        std::swap(vector[j].key3, vector[j + 1].key3);
-        swapped = true;
-      }
-    }
-    if (!swapped)
-    {
-      break;
-    }
-  }
 }
