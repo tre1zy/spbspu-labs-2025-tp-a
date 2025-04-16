@@ -8,13 +8,15 @@ namespace detail
   {
   public:
     ScopeGuard(std::basic_ios< char >& s);
+    ScopeGuard(const ScopeGuard&) = delete;
+    ScopeGuard(ScopeGuard&&) = delete;
     ~ScopeGuard();
   private:
     std::basic_ios< char >& s_;
-    std::streamsize width_;
-    char fill_;
-    std::streamsize precision_;
     std::basic_ios< char >::fmtflags fmt_;
+    std::streamsize width_;
+    std::streamsize precision_;
+    char fill_;
   };
 }
 #endif

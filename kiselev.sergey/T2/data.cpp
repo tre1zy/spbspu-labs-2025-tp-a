@@ -11,7 +11,7 @@ std::istream& kiselev::operator>>(std::istream& input, DelimeterIO&& dest)
   {
     return input;
   }
-  char c = '0';
+  char c;
   input >> c;
   if (input && (c != dest.exp))
   {
@@ -61,7 +61,8 @@ std::istream& kiselev::operator>>(std::istream& input, CharIO&& dest)
   {
     return input;
   }
-  return input >> DelimeterIO{ '\'' } >> dest.ref >> DelimetersIO{ "\':" };
+  std::string str = "\':";
+  return input >> DelimeterIO{ '\'' } >> dest.ref >> DelimetersIO{ str };
 }
 
 std::istream& kiselev::operator>>(std::istream& input, StringIO&& dest)
@@ -82,7 +83,8 @@ std::istream& kiselev::operator>>(std::istream& input, KeyIO&& dest)
   {
     return input;
   }
-  input >> DelimetersIO{ "key" };
+  std::string str = "key";
+  input >> DelimetersIO{ str };
   int key;
   input >> key;
   switch (key)
@@ -112,11 +114,12 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
   DataStruct temp;
   detail::ScopeGuard scope(input);
   {
-    input >> DelimetersIO{ "(:" };
+    std::string str = "(:";
+    input >> DelimetersIO{ str };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
-    input >> DelimetersIO{ ")" };
+    input >> DelimeterIO{ ')' };
   }
   if (input)
   {

@@ -22,7 +22,7 @@ namespace kiselev
 
   struct DelimetersIO
   {
-    std::string exp;
+    std::string& exp;
   };
 
   struct UllIO
