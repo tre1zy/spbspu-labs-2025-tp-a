@@ -9,22 +9,21 @@ namespace
 {
   bool compareDataStructs(const petrov::DataStruct & lhs, const petrov::DataStruct & rhs);
   bool compareDataStructs(const petrov::DataStruct & lhs, const petrov::DataStruct & rhs)
-{
-  if (lhs.key1 < rhs.key2)
   {
-    return true;
+    if (lhs.key1 < rhs.key2)
+    {
+      return true;
+    }
+    else if (lhs.key2 < rhs.key2)
+    {
+      return true;
+    }
+    else if (lhs.key3.length() < rhs.key3.length())
+    {
+      return true;
+    }
+    return false;
   }
-  else if (lhs.key2 < rhs.key2)
-  {
-    return true;
-  }
-  else if (lhs.key3.length() < rhs.key3.length())
-  {
-    return true;
-  }
-  return false;
-}
-
 }
 
 int main()

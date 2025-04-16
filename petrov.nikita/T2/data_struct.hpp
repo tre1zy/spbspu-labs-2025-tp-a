@@ -19,6 +19,11 @@ namespace petrov
     char exp;
   };
 
+  struct LabelIO
+  {
+    std::string exp;
+  };
+
   struct DoubleIO
   {
     double & ref;
