@@ -212,8 +212,8 @@ bool brevnov::compare(const DataStruct& lhs, const DataStruct& rhs)
   {
     return lhs.key1 < rhs.key1;
   }
-  const double lhscom = std::abs(lhs.ref);
-  const double rhscom = std::abs(rhs.ref);
+  const double lhscom = std::abs(lhs.key2.ref);
+  const double rhscom = std::abs(rhs.key2.ref);
   if (lhscom != rhscom)
   {
     return lhscom < rhscom;
