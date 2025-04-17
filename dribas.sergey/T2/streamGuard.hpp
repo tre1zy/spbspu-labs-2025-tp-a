@@ -9,12 +9,16 @@ namespace dribas
   public:
     explicit StreamGuard(std::basic_ios< char >&);
     ~StreamGuard();
+    StreamGuard(const StreamGuard&) = delete;
+    StreamGuard(StreamGuard&&) = delete;
+    StreamGuard& operator=(const StreamGuard&) = delete;
+    StreamGuard& operator=(StreamGuard&&) = delete;
   private:
     std::basic_ios< char >::fmtflags fmtflags_;
     std::streamsize width_;
     std::streamsize precision_;
-    char fill_;
     std::basic_ios< char >& stream_;
+    char fill_;
   };
 }
 

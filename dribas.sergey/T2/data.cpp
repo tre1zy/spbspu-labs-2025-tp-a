@@ -112,6 +112,20 @@ namespace dribas
     return in;
   }
 
+  std::istream& operator>>(std::istream& in, KeyI&& key)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+      return in;
+    }
+    StreamGuard guard(in);
+    in >> key.key;
+    if (key.key != key.expected && key.exict) {
+      in.setstate(std::ios::failbit);
+    }
+    key.exict = true;
+    return in;
+  }
   std::istream& operator>>(std::istream& in, Data& data)
   {
     std::istream::sentry sentry(in);
@@ -127,36 +141,19 @@ namespace dribas
 
     for (int i = 0; i < 3; ++i) {
       std::string key;
-      in >> key;
-      if (key == "key1") {
-        if (hasKey1) {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        hasKey1 = true;
-        in >> DoubleI{temp.key1};
-      } else if (key == "key2") {
-        if (hasKey2) {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        hasKey2 = true;
-        in >> UllI{temp.key2};
-      } else if (key == "key3") {
-        if (hasKey3) {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        hasKey3 = true;
-        in >> StringI{temp.key3};
-      } else {
+      in >> KeyI{ key, "key1", hasKey1 } || in >> KeyI{ key, "key2", hasKey2 } || in >> KeyI{ key, "key3", hasKey3 };
+      if (!in) {
         in.setstate(std::ios::failbit);
         return in;
       }
+      if (key == "key1") {
+        in >> DoubleI{ temp.key1 };
+      } else if (key == "key2") {
+        in >> UllI{ temp.key2 };
+      } else if (key == "key3") {
+        in >> StringI{ temp.key3 };
+      }
       in >> DelimiterIO{ ':' };
-    }
-    if (!hasKey1 || !hasKey2 || !hasKey3) {
-      in.setstate(std::ios::failbit);
     }
     in >> DelimiterIO{ ')' };
     if (in) {

@@ -4,8 +4,8 @@ dribas::StreamGuard::StreamGuard(std::basic_ios< char >& stream):
   fmtflags_(stream.flags()),
   width_(stream.width()),
   precision_(stream.precision()),
-  fill_(stream.fill()),
-  stream_(stream)
+  stream_(stream),
+  fill_(stream.fill())
 {}
 
 dribas::StreamGuard::~StreamGuard()

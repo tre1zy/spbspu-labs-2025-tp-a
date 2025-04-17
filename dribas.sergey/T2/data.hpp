@@ -47,11 +47,19 @@ namespace dribas
     const std::string& ref;
   };
 
+  struct KeyI
+  {
+    std::string& key;
+    const std::string expected;
+    bool exict = false;
+  };
+
   std::istream& operator>>(std::istream&, Data&);
   std::istream& operator>>(std::istream&, DelimiterIO&&);
   std::istream& operator>>(std::istream&, DoubleI&&);
   std::istream& operator>>(std::istream&, UllI&&);
   std::istream& operator>>(std::istream&, StringI&&);
+  std::istream& operator>>(std::istream&, KeyI&&);
 
   std::ostream& operator<<(std::ostream&, const DoubleO&&);
   std::ostream& operator<<(std::ostream&, const UllO&&);
