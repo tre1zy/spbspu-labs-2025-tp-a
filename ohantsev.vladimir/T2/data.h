@@ -22,7 +22,7 @@ namespace ohantsev
     ULL = 2,
     STR = 3
   };
-  
+
   struct DelimiterIO
   {
     char exp;
