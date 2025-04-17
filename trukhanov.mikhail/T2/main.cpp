@@ -22,11 +22,6 @@ int main()
         {
             data.push_back(ds);
         }
-        else
-        {
-            std::cerr << "[ERROR] Invalid format: " << line << "\n";
-        }
-
         iss.clear();
     }
 
@@ -44,3 +39,4 @@ int main()
 
     return 0;
 }
+
