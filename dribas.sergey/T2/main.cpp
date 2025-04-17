@@ -6,28 +6,28 @@
 
 #include "data.hpp"
 
-int main()
-{
+#include <iterator>
+
+int main() {
   using namespace dribas;
 
   std::vector< Data > data;
-  while (!std::cin.eof()) {
-    Data temp;
-    std::cin >> temp;
-    if (std::cin) {
-      data.push_back(temp);
-    } else {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
+
+  std::copy(
+    std::istream_iterator< Data >(std::cin),
+    std::istream_iterator< Data >(),
+    std::back_inserter(data)
+  );
+  if (!std::cin.eof() && std::cin.fail()) {
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 
   std::sort(data.begin(), data.end(), compare);
-  std::copy
-  (
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< Data >(std::cout, "\n")
+  std::copy(
+    data.begin(),
+    data.end(),
+    std::ostream_iterator< Data >(std::cout)
   );
 
   return 0;

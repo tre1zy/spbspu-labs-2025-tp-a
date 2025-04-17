@@ -126,6 +126,7 @@ namespace dribas
     key.exict = true;
     return in;
   }
+
   std::istream& operator>>(std::istream& in, Data& data)
   {
     std::istream::sentry sentry(in);
@@ -177,6 +178,7 @@ namespace dribas
     out << ':';
     out << StringO{ data.key3 };
     out << ":)";
+    out << '\n';
 
     return out;
   }
