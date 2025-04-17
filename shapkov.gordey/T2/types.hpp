@@ -11,7 +11,9 @@ namespace shapkov
   };
   struct ratioIO
   {
-    std::pair< long long, unsigned long long >& key;
+    using numerator = long long;
+    using denominator = unsigned long long;
+    std::pair< numerator, denominator >& key;
   };
   struct stringIO
   {
@@ -19,7 +21,7 @@ namespace shapkov
   };
   struct labelIO
   {
-    std::string exp;
+    const std::string& exp;
   };
   std::istream& operator>>(std::istream& in, doubleScientificIO&& rhs);
   std::istream& operator>>(std::istream& in, ratioIO&& rhs);

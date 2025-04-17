@@ -63,7 +63,8 @@ std::istream& shapkov::operator>>(std::istream& in, stringIO&& rhs)
   {
     return in;
   }
-  return std::getline(in >> check{ '"' }, rhs.key, '"');
+  in >> check{ '"' };
+  return std::getline(in, rhs.key, '"');
 }
 
 std::istream& shapkov::operator>>(std::istream& in, labelIO&& rhs)
@@ -74,7 +75,7 @@ std::istream& shapkov::operator>>(std::istream& in, labelIO&& rhs)
     return in;
   }
   std::string data = "";
-  if (std::getline(in, data, static_cast<char>(32)) && (data != rhs.exp))
+  if (std::getline(in, data, ' ') && (data != rhs.exp))
   {
     in.setstate(std::ios::failbit);
   }

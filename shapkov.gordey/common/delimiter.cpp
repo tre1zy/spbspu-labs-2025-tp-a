@@ -7,7 +7,7 @@ std::istream& shapkov::operator>>(std::istream& in, delimiterIO&& dest)
   {
     return in;
   }
-  char c = '0';
+  char c;
   in >> c;
   if (in && (c != dest.exp))
   {
