@@ -3,6 +3,7 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
+#include <cmath>
 
 brevnov::StreamGuard::StreamGuard(std::basic_ios< char > & s):
   s_(s),
@@ -211,9 +212,11 @@ bool brevnov::compare(const DataStruct& lhs, const DataStruct& rhs)
   {
     return lhs.key1 < rhs.key1;
   }
-  else if (lhs.key2 != rhs.key2)
+  const double lhscom = std::abs(lhs.ref);
+  const double rhscom = std::abs(rhs.ref);
+  if (lhscom != rhscom)
   {
-    return lhs.key2 < rhs.key2;
+    return lhscom < rhscom;
   }
   return lhs.key3.size() < rhs.key3.size();
 }
