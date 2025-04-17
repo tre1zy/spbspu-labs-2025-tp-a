@@ -38,7 +38,7 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &sou
   {
     return out << "0b01";
   }
-  
+
   std::string binString;
   fillBinRepresentationString(source.ref, binString);
   return out << binString;
