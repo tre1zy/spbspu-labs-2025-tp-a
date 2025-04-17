@@ -19,7 +19,7 @@ namespace brevnov
 
   struct DelimitersIO
   {
-    std::string exp;
+    std::string& exp;
   };
 
   struct UnLongLongIO
@@ -66,6 +66,6 @@ namespace brevnov
   std::ostream& operator<<(std::ostream& out, const UnLongLongIO&& src);
   std::ostream& operator<<(std::ostream& out, const ComplexIO&& src);
   std::ostream& operator<<(std::ostream& out, const StringIO&& src);
-  std::ostream& operator<<(std::ostream& output, const DataStruct&& dest);
+  std::ostream& operator<<(std::ostream& output, const DataStruct& dest);
 }
 #endif

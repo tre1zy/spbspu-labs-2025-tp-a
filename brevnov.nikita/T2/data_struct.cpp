@@ -79,12 +79,10 @@ std::istream& brevnov::operator>>(std::istream& in, ComplexIO&& dest)
   }
   double real = 0.0;
   double imag = 0.0;
-  in >> DelimiterIO{ '#' };
-  in >> DelimiterIO{ 'c' };
-  in >> DelimiterIO{ '(' };
+  in >> DelimitersIO{ "#c(" };
   in >> real;
   in >> imag;
-  in >> DelimiterIO{ ')' };
+  in >> DelimitersIO{ "):" };
   if (in)
   {
     dest.ref = std::complex< double >(real, imag);
@@ -130,7 +128,7 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   return input;
 }
 
-std::istream& brevnov::operator>>(std::istream& input, DataStruct&& dest)
+std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -153,7 +151,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct&& dest)
   return input;
 }
 
-std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& dest)
 {
   unsigned long long num = dest.ref;
   if (dest.ref == 0)
@@ -174,14 +172,14 @@ std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO& dest
   return output;
 }
 
-std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO& dest)
+std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO&& dest)
 {
   output << "#c(" << std::fixed << std::setprecision(1) << dest.real();
   output << " " << dest.imag() << ")";
   return output;
 }
 
-std::ostream& brevnov::operator<<(std::ostream &output, const StringIO& dest)
+std::ostream& brevnov::operator<<(std::ostream &output, const StringIO&& dest)
 {
   return output << "\"" << dest.ref << "\"";
 }
@@ -203,7 +201,7 @@ std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
   return output;
 }
 
-bool brevnov::compare(const DataStruct& lhs, const DataStruct&& rhs)
+bool brevnov::compare(const DataStruct& lhs, const DataStruct& rhs)
 {
   if (lhs.key1 != rhs.key1)
   {
