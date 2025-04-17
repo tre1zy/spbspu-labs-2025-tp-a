@@ -5,18 +5,20 @@
 
 namespace filonova
 {
-  struct FormatGuard
-  {
-    FormatGuard(std::basic_ios< char > &s);
-    ~FormatGuard();
+struct FormatGuard
+{
+  FormatGuard(std::basic_ios< char > &s);
 
-  private:
-    std::basic_ios< char > &s_;
-    char fill_;
-    std::streamsize precision_;
-    std::basic_ios< char >::fmtflags fmt_;
-  };
+  FormatGuard(const FormatGuard &) = delete;
+  FormatGuard &operator=(const FormatGuard &) = delete;
+  FormatGuard(FormatGuard &&) = delete;
+  FormatGuard &operator=(FormatGuard &&) = delete;
 
-} // namespace filonova
+  ~FormatGuard();
 
-#endif
+private:
+  std::basic_ios< char > &s_;
+  std::basic_ios< char >::fmtflags fmt_;
+  std::streamsize precision_;
+  char fill_;
+};
