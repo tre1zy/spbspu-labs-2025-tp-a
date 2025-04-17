@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <array>
-#include <vector>
+
 namespace ohantsev
 {
   struct Data
@@ -25,7 +25,7 @@ namespace ohantsev
 
   struct DelimiterIO
   {
-    char exp;
+    const char& exp;
   };
 
   struct MultDelimiterIO
@@ -71,7 +71,7 @@ namespace ohantsev
 
   struct TypenameIO
   {
-    std::vector<std::string> exp;
+    std::string exp;
   };
 
   struct KeyIO

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
+#include <cctype>
 #include "iofmtguard.h"
 
 std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
@@ -39,7 +40,10 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   }
   std::string name;
   in >> name;
-  if (in && std::find(dest.exp.cbegin(), dest.exp.cend(), name) == dest.exp.cend())
+  bool isValid = (name == dest.exp);
+  std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+  isValid = (isValid || (name == dest.exp));
+  if (in && !isValid)
   {
     in.setstate(std::ios::failbit);
   }
@@ -92,7 +96,7 @@ std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
   if (ull != "" && ull[0] != '-')
   {
     std::istringstream ullSource(ull);
-    ullSource >> dest.ref >> TypenameIO{ { "ull", "ULL" } };
+    ullSource >> dest.ref >> TypenameIO{ "ull" };
     if ((!ullSource.fail()) && (ullSource.eof()))
     {
       return in;
