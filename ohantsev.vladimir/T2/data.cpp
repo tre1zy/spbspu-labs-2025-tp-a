@@ -242,7 +242,7 @@ std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
   return out;
 }
 
-bool ohantsev::Data::operator<(const ohantsev::Data& rhs)
+bool ohantsev::Data::operator<(const ohantsev::Data& rhs) const
 {
   if (key1 != rhs.key1)
   {
