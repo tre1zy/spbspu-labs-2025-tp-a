@@ -24,7 +24,7 @@ namespace brevnov
 
   struct UnLongLongIO
   {
-    unsigned long & ref;
+    unsigned long long & ref;
   };
 
   struct ComplexIO
