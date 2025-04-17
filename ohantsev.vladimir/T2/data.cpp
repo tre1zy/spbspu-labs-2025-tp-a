@@ -3,7 +3,6 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
-#include <cctype>
 #include "iofmtguard.h"
 
 std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
@@ -41,7 +40,7 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   std::string name;
   in >> name;
   bool isValid = (name == dest.exp);
-  std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+  std::transform(name.cbegin(), name.cend(), name.begin(), ::toupper);
   isValid = (isValid || (name == dest.exp));
   if (in && !isValid)
   {
