@@ -1,9 +1,31 @@
 #include "output_wrapper_structs.hpp"
 #include "format_guard.hpp"
-#include <bitset>
 #include <cmath>
 
-std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &dest)
+int puzikov::output::calcBitWidth(unsigned long long num)
+{
+  if (num == 0)
+  {
+    return 1;
+  }
+  return static_cast< int >(std::log2(num)) + 1;
+}
+
+void puzikov::output::fillBinRepresentationString(unsigned long long num, std::string &binString)
+{
+  int bitWidth = calcBitWidth(num);
+  binString.resize(2 + bitWidth);
+  binString[0] = '0';
+  binString[1] = 'b';
+
+  for (int i = bitWidth - 1; i >= 0; --i)
+  {
+    binString[2 + i] = (num % 2) ? '1' : '0';
+    num /= 2;
+  }
+}
+
+std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &source)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -11,23 +33,18 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &des
     return out;
   }
   FormatGuard guard(out);
-  auto calcBitWidth = [](const unsigned long long &num)
-  {
-    return 1 + std::log2(num);
-  };
 
-  if (dest.ref == 0)
-  {
-    return out << "0b0";
-  }
-  else if (dest.ref == 1)
+  if (source.ref == 1)
   {
     return out << "0b01";
   }
-  return out << "0b" + std::bitset< 64 >(dest.ref).to_string().substr(64 - calcBitWidth(dest.ref));
+  
+  std::string binString;
+  fillBinRepresentationString(source.ref, binString);
+  return out << binString;
 }
 
-std::ostream &puzikov::output::operator<<(std::ostream &out, const PairValue &dest)
+std::ostream &puzikov::output::operator<<(std::ostream &out, const PairValue &source)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -35,10 +52,10 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const PairValue &de
     return out;
   }
   FormatGuard guard(out);
-  return out << "(:N " << dest.ref.first << ":D " << dest.ref.second << ":)";
+  return out << "(:N " << source.ref.first << ":D " << source.ref.second << ":)";
 }
 
-std::ostream &puzikov::output::operator<<(std::ostream &out, const StringValue &dest)
+std::ostream &puzikov::output::operator<<(std::ostream &out, const StringValue &source)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -46,6 +63,6 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const StringValue &
     return out;
   }
   FormatGuard guard(out);
-  return out << '\"' << dest.ref << '\"';
+  return out << '\"' << source.ref << '\"';
 }
 

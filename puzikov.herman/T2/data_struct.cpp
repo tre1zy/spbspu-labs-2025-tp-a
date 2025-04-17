@@ -29,7 +29,7 @@ std::istream &puzikov::operator>>(std::istream &in, DataStruct &dest)
     return in;
   }
 
-  in >> input::CharacterIO {'('} >> input::CharacterIO {':'};
+  in >> input::Character {'('} >> input::Character {':'};
   for (std::size_t i = 0; i < 3; ++i)
   {
     std::string key;
@@ -53,7 +53,7 @@ std::istream &puzikov::operator>>(std::istream &in, DataStruct &dest)
     }
   }
 
-  in >> input::CharacterIO {')'};
+  in >> input::Character {')'};
   return in;
 }
 

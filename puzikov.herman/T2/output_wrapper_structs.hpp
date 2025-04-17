@@ -1,6 +1,7 @@
 #ifndef OUTPUT_WRAPPER_STRUCTS
 #define OUTPUT_WRAPPER_STRUCTS
 
+#include <cmath>
 #include <ostream>
 
 namespace puzikov
@@ -11,19 +12,22 @@ namespace puzikov
     {
       const unsigned long long &ref;
     };
-    std::ostream &operator<<(std::ostream &out, const ULLValue &dest);
+    std::ostream &operator<<(std::ostream &out, const ULLValue &source);
 
     struct PairValue
     {
       const std::pair< long long, unsigned long long > &ref;
     };
-    std::ostream &operator<<(std::ostream &out, const PairValue &dest);
+    std::ostream &operator<<(std::ostream &out, const PairValue &source);
 
     struct StringValue
     {
       const std::string &ref;
     };
-    std::ostream &operator<<(std::ostream &out, const StringValue &dest);
+    std::ostream &operator<<(std::ostream &out, const StringValue &source);
+
+    int calcBitWidth(unsigned long long num);
+    void fillBinRepresentationString(unsigned long long num, std::string &binString);
   } // namespace output
 } // namespace puzikov
 

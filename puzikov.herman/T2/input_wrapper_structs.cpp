@@ -2,7 +2,7 @@
 
 #include <istream>
 
-std::istream &puzikov::input::operator>>(std::istream &in, CharacterIO &&dest)
+std::istream &puzikov::input::operator>>(std::istream &in, Character &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -12,7 +12,7 @@ std::istream &puzikov::input::operator>>(std::istream &in, CharacterIO &&dest)
 
   char c = 0;
   in.get(c);
-  if (in && (std::tolower(c) != std::tolower(dest.exp)))
+  if (in && std::tolower(c) != std::tolower(dest.exp))
   {
     in.setstate(std::ios::failbit);
   }
@@ -62,9 +62,9 @@ std::istream &puzikov::input::operator>>(std::istream &in, PairValue &&dest)
 
   long long n = 0;
   unsigned long long d = 0;
-  in >> CharacterIO {'('} >> CharacterIO {':'} >> CharacterIO {'N'} >> n;
-  in >> CharacterIO {':'} >> CharacterIO {'D'} >> d;
-  in >> CharacterIO {':'} >> CharacterIO {')'} >> CharacterIO {':'};
+  in >> Character {'('} >> Character {':'} >> Character {'N'} >> n;
+  in >> Character {':'} >> Character {'D'} >> d;
+  in >> Character {':'} >> Character {')'} >> Character {':'};
 
   if (in)
   {
@@ -80,7 +80,8 @@ std::istream &puzikov::input::operator>>(std::istream &in, StringValue &&dest)
   {
     return in;
   }
-  std::getline(in >> CharacterIO {'"'}, dest.ref, '"');
-  in >> CharacterIO {':'};
+  in >> Character {'"'};
+  std::getline(in, dest.ref, '"');
+  in >> Character {':'};
   return in;
 }

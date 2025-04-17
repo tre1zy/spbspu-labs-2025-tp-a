@@ -9,12 +9,14 @@ namespace puzikov
   {
     FormatGuard(std::basic_ios< char > &s);
     ~FormatGuard();
+    FormatGuard(const FormatGuard &) = delete;
+    FormatGuard(FormatGuard &&) = delete;
 
   private:
     std::basic_ios< char > &s_;
-    char fill_;
     std::streamsize precision_;
     std::basic_ios< char >::fmtflags fmt_;
+    char fill_;
   };
 } // namespace puzikov
 

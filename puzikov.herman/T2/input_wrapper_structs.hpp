@@ -8,11 +8,11 @@ namespace puzikov
 {
   namespace input
   {
-    struct CharacterIO
+    struct Character
     {
       char exp;
     };
-    std::istream &operator>>(std::istream &in, CharacterIO &&dest);
+    std::istream &operator>>(std::istream &in, Character &&dest);
 
     struct ULLValue
     {
