@@ -12,7 +12,7 @@ std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
   {
     return in;
   }
-  char c = '0';
+  char c;
   in >> c;
   if (in && (c != dest.exp))
   {
@@ -37,7 +37,7 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   {
     return in;
   }
-  std::string name = "";
+  std::string name;
   in >> name;
   if (in && std::find(dest.exp.cbegin(), dest.exp.cend(), name) == dest.exp.cend())
   {
@@ -121,18 +121,18 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
     return in;
   }
   in >> MultDelimiterIO{ "key" };
-  int LabelID = 0;
-  in >> LabelID;
+  int ID;
+  in >> ID;
   if (in) {
-    auto iter = std::find(dest.notFilled.cbegin(), dest.notFilled.cend(), LabelID);
+    auto iter = std::find(dest.notFilled.cbegin(), dest.notFilled.cend(), static_cast<KeyID>(ID));
     if (iter == dest.notFilled.cend())
     {
       in.setstate(std::ios::failbit);
     }
     else
     {
-      dest.labelID = *iter;
-      dest.notFilled.erase(iter);
+      dest.ID = *iter;
+      dest.notFilled[iter - dest.notFilled.cbegin()] = KeyID::EMPTY;
     }
   }
   return in;
@@ -145,19 +145,25 @@ std::istream& ohantsev::operator>>(std::istream& in, KeyIO&& dest)
   {
     return in;
   }
-  int ID;
+  KeyID ID;
   in >> LabelIO{ ID, dest.notFilled };
-  switch (ID)
+  if (!in.fail())
   {
-  case 1:
-    in >> DoubleI{ dest.data.key1 };
-    break;
-  case 2:
-    in >> UllI{ dest.data.key2 };
-    break;
-  case 3:
-    in >> StringI{ dest.data.key3 };
-    break;
+    switch (ID)
+    {
+    case KeyID::DBL:
+      in >> DoubleI{ dest.data.key1 };
+      break;
+    case KeyID::ULL:
+      in >> UllI{ dest.data.key2 };
+      break;
+    case KeyID::STR:
+      in >> StringI{ dest.data.key3 };
+      break;
+    case KeyID::EMPTY:
+      in.setstate(std::ios::failbit);
+      break;
+    }
   }
   return in;
 }
@@ -170,7 +176,7 @@ std::istream& ohantsev::operator>>(std::istream& in, Data& dest)
     return in;
   }
   iofmtguard guard(in);
-  std::vector<int> labels{ 1,2,3 };
+  std::array<KeyID, Data::FIELDS_COUNT> labels{ KeyID::DBL, KeyID::ULL, KeyID::STR };
   in >> MultDelimiterIO{ "(:" };
   in >> KeyIO{ dest, labels };
   in >> KeyIO{ dest, labels };
@@ -224,4 +230,17 @@ std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
   out << "key2 " << UllO{ dest.key2 } << ':';
   out << "key3 " << StringO{ dest.key3 } << ":)";
   return out;
+}
+
+bool ohantsev::Data::operator<(const ohantsev::Data& rhs)
+{
+  if (key1 != rhs.key1)
+  {
+    return key1 < rhs.key1;
+  }
+  if (key2 != rhs.key2)
+  {
+    return key2 < rhs.key2;
+  }
+  return key3.size() < rhs.key3.size();
 }

@@ -2,8 +2,8 @@
 #define DATA_H
 #include <iostream>
 #include <string>
+#include <array>
 #include <vector>
-
 namespace ohantsev
 {
   struct Data
@@ -11,8 +11,18 @@ namespace ohantsev
     double key1;
     unsigned long long key2;
     std::string key3;
+    bool operator<(const ohantsev::Data& rhs);
+    static constexpr int FIELDS_COUNT = 3;
   };
 
+  enum class KeyID
+  {
+    EMPTY = 0,
+    DBL = 1,
+    ULL = 2,
+    STR = 3
+  };
+  
   struct DelimiterIO
   {
     char exp;
@@ -20,7 +30,7 @@ namespace ohantsev
 
   struct MultDelimiterIO
   {
-    std::string exp;
+    const std::string& exp;
   };
 
   struct DoubleI
@@ -55,8 +65,8 @@ namespace ohantsev
 
   struct LabelIO
   {
-    int& labelID;
-    std::vector<int>& notFilled;
+    KeyID& ID;
+    std::array<KeyID, Data::FIELDS_COUNT>& notFilled;
   };
 
   struct TypenameIO
@@ -67,7 +77,7 @@ namespace ohantsev
   struct KeyIO
   {
     Data& data;
-    std::vector<int>& notFilled;
+    std::array<KeyID, Data::FIELDS_COUNT>& notFilled;
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);

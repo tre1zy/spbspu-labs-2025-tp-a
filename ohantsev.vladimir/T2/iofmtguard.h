@@ -9,12 +9,16 @@ namespace ohantsev
   public:
     iofmtguard(std::basic_ios< char >& s);
     ~iofmtguard();
-  private:
-    std::basic_ios< char >& s_;
-    std::streamsize width_;
-    char fill_;
+    iofmtguard(const iofmtguard&) = delete;
+    iofmtguard(iofmtguard&&) = delete;
+    iofmtguard& operator=(const iofmtguard&) = delete;
+    iofmtguard& operator=(iofmtguard&&) = delete;
+  private:    
     std::streamsize precision_;
+    std::streamsize width_;
+    std::basic_ios< char >& s_;
     std::basic_ios< char >::fmtflags fmt_;
+    char fill_;
   };
 }
 #endif
