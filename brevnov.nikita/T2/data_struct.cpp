@@ -178,8 +178,8 @@ std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& des
 
 std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO&& dest)
 {
-  output << "#c(" << std::fixed << std::setprecision(1) << dest.real();
-  output << " " << dest.imag() << ")";
+  output << "#c(" << std::fixed << std::setprecision(1) << dest.ref.real();
+  output << " " << dest.ref.imag() << ")";
   return output;
 }
 
