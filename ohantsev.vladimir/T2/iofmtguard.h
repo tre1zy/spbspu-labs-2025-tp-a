@@ -13,7 +13,7 @@ namespace ohantsev
     iofmtguard(iofmtguard&&) = delete;
     iofmtguard& operator=(const iofmtguard&) = delete;
     iofmtguard& operator=(iofmtguard&&) = delete;
-  private:    
+  private:
     std::streamsize precision_;
     std::streamsize width_;
     std::basic_ios< char >& s_;
