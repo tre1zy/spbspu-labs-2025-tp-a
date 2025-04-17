@@ -198,7 +198,7 @@ std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
   unsigned long long ull = dest.key1;
   std::complex<double> complex = dest.key2;
   std::string string = dest.key3;
-  detail::ScopeGuard scope(output);
+  StreamGuard scope(output);
   output << "(:key1 " << UnLongLongIO{ ull };
   output << ":key2 " << ComplexIO{ complex };
   output << ":key3 " << StringIO{ string } << ":)";
