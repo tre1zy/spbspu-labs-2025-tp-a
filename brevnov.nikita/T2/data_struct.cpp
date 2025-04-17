@@ -79,10 +79,12 @@ std::istream& brevnov::operator>>(std::istream& in, ComplexIO&& dest)
   }
   double real = 0.0;
   double imag = 0.0;
-  in >> DelimitersIO{ "#c(" };
+  std::string str = "#c(";
+  in >> DelimitersIO{ str };
+  str = "):";
   in >> real;
   in >> imag;
-  in >> DelimitersIO{ "):" };
+  in >> DelimitersIO{ str };
   if (in)
   {
     dest.ref = std::complex< double >(real, imag);
@@ -108,7 +110,8 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   {
     return input;
   }
-  input >> DelimitersIO{ "key" };
+  std::string str = "key";
+  input >> DelimitersIO{ str };
   int key;
   input >> key;
   switch (key)
@@ -138,11 +141,12 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
   DataStruct temp;
   StreamGuard scope(input);
   {
-    input >> DelimitersIO{ "(:" };
+    std::string str = "(:";
+    input >> DelimitersIO{ str };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
-    input >> DelimitersIO{ ")" };
+    input >> DelimiterIO{ ')' };
   }
   if (input)
   {
