@@ -3,7 +3,7 @@
 
 #include <istream>
 #include <algorithm>
-#include "ios_guard.hpp"
+#include "fmtguard.hpp"
 
 namespace rychkov
 {
@@ -13,12 +13,15 @@ namespace rychkov
     struct match_any
     {
       const char* cases[sizeof...(Lens)];
+      bool noskipws = false;
       size_t* result_match;
       char* buffer;
-      match_any(const char(&...strings)[Lens], size_t* result_match_p = nullptr, char* buf = nullptr):
+      match_any(const char(&... strings)[Lens], bool add_noskipws = false,
+          size_t* result_match_p = nullptr, char* buf_p = nullptr):
         cases{strings...},
+        noskipws(add_noskipws),
         result_match(result_match_p),
-        buffer(buf)
+        buffer(buf_p)
       {}
     };
     template< size_t... Lens >
@@ -30,31 +33,31 @@ namespace rychkov
       {
         return in;
       }
-      std::istream::sentry sentry(in);
+      std::istream::sentry sentry(in, possible.noskipws);
       if (!sentry)
       {
         return in;
       }
-      IosGuard guard(in);
+      fmtguard guard(in);
 
       char static_buffer[max_len]{};
       char* buffer = (possible.buffer == nullptr ? static_buffer : possible.buffer);
       bool skips[sizeof...(Lens)]{};
-      constexpr size_t sizes[] = {(Lens - 1)...};
+      constexpr size_t lens[] = {Lens...};
       bool atleast_one = true;
-      for (size_t i = 0; atleast_one && (i + 1 < max_len) && (in >> buffer[i] >> std::noskipws); i++)
+      for (size_t i = 0; atleast_one && (i + 1 < max_len) && in.get(buffer[i]); i++)
       {
         atleast_one = false;
         for (size_t j = 0; j < sizeof...(Lens); j++)
         {
           if (!skips[j])
           {
-            if ((i >= sizes[j]) || (buffer[i] != possible.cases[j][i]))
+            if ((i + 1 >= lens[j]) || (buffer[i] != possible.cases[j][i]))
             {
               skips[j] = true;
               continue;
             }
-            else if (i + 1 == sizes[j])
+            else if (i + 2 == lens[j])
             {
               if (possible.result_match != nullptr)
               {
@@ -75,19 +78,29 @@ namespace rychkov
     }
 
     template< size_t... Lens >
-    match_any< Lens... > anyof(const char(&...strings)[Lens])
+    match_any< Lens... > anyof(const char(&... strings)[Lens])
     {
       return {strings...};
     }
     template< size_t... Lens >
-    match_any< Lens... > anyof(size_t* result_match, const char(&...strings)[Lens])
+    match_any< Lens... > anyof(bool noskipws, const char(&... strings)[Lens])
     {
-      return {strings..., result_match};
+      return {strings..., noskipws};
     }
     template< size_t... Lens >
-    match_any< Lens... > anyof(size_t* result_match, char* buf, const char(&...strings)[Lens])
+    match_any< Lens... > anyof(size_t* result_match, const char(&... strings)[Lens])
     {
-      return {strings..., result_match, buf};
+      return {strings..., false, result_match};
+    }
+    template< size_t... Lens >
+    match_any< Lens... > anyof(bool noskipws, size_t* result_match, const char(&... strings)[Lens])
+    {
+      return {strings..., noskipws, result_match};
+    }
+    template< size_t... Lens >
+    match_any< Lens... > anyof(bool noskipws, size_t* result_match, char* buf, const char(&... strings)[Lens])
+    {
+      return {strings..., noskipws, result_match, buf};
     }
   }
 }

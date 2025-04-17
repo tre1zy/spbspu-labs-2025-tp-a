@@ -22,7 +22,7 @@ namespace rychkov
       size_t field_number;
       DataStruct& link;
     };
-    std::istream& operator>>(std::istream& in, nth_ds_field link);
+    std::istream& operator>>(std::istream& in, nth_ds_field wrapper);
 
     template< class T, size_t Id = 0 >
     class io_literal;

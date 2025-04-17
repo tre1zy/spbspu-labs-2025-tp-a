@@ -2,7 +2,7 @@
 
 #include <ostream>
 #include <cmath>
-#include "ios_guard.hpp"
+#include "fmtguard.hpp"
 #include "skip_any_of.hpp"
 
 template<>
@@ -14,7 +14,7 @@ std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::scientific_literal::va
   {
     return out;
   }
-  IosGuard guard(out);
+  fmtguard guard(out);
   int power = wrapper.link == 0 ? 0 : 1 + static_cast< int >(std::floor(std::log10(std::fabs(wrapper.link)))) - 1;
   return out << std::fixed << wrapper.link * std::pow(10., -power) << 'e' << std::showpos << power;
 }

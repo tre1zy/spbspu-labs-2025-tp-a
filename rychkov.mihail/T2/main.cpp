@@ -42,8 +42,5 @@ int main()
   std::sort(values.begin(), values.end(), rychkov::ds_compare());
 
   std::cout << std::setprecision(1);
-  for (const rychkov::DataStruct& i: values)
-  {
-    std::cout << i << '\n';
-  }
+  std::copy(values.begin(), values.end(), std::ostream_iterator< rychkov::DataStruct >(std::cout, "\n"));
 }
