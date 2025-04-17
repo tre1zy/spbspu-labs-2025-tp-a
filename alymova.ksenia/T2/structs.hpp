@@ -40,7 +40,5 @@ namespace alymova
   std::istream& operator>>(std::istream& in, StringIO&& object);
   std::istream& operator>>(std::istream& in, DataStruct& object);
   std::ostream& operator<<(std::ostream& out, const DataStruct& object);
-
-  bool predForStringIO(char c);
 }
 #endif

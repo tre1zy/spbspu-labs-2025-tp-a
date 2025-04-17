@@ -16,6 +16,7 @@ std::istream& alymova::operator>>(std::istream& in, DelimiterIO&& object)
   }
   return in;
 }
+
 std::istream& alymova::operator>>(std::istream& in, LabelIO&& object)
 {
   std::istream::sentry sentry(in);
@@ -30,6 +31,7 @@ std::istream& alymova::operator>>(std::istream& in, LabelIO&& object)
   }
   return in;
 }
+
 std::istream& alymova::operator>>(std::istream& in, UllOctIO&& object)
 {
   std::istream::sentry sentry(in);
@@ -48,6 +50,7 @@ std::istream& alymova::operator>>(std::istream& in, UllOctIO&& object)
   }
   return in;
 }
+
 std::istream& alymova::operator>>(std::istream& in, ChrLitIO&& object)
 {
   std::istream::sentry sentry(in);
@@ -57,6 +60,7 @@ std::istream& alymova::operator>>(std::istream& in, ChrLitIO&& object)
   }
   return in >> DelimiterIO{'\''} >> object.c >> DelimiterIO{'\''};
 }
+
 std::istream& alymova::operator>>(std::istream& in, StringIO&& object)
 {
   std::istream::sentry sentry(in);
@@ -80,6 +84,7 @@ std::istream& alymova::operator>>(std::istream& in, StringIO&& object)
   }
   return in;
 }
+
 std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
 {
   std::istream::sentry sentry(in);
@@ -125,6 +130,7 @@ std::istream& alymova::operator>>(std::istream& in, DataStruct& object)
   }
   return in;
 }
+
 std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
 {
   std::ostream::sentry sentry(out);
@@ -142,19 +148,16 @@ std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
   out << ":)";
   return out;
 }
+
 bool alymova::DataStruct::operator<(const DataStruct& other)
 {
-  if (key1 == other.key1)
+  if (key1 != other.key1)
   {
-    if (key2 == other.key2)
-    {
-      return key3.size() < other.key3.size();
-    }
+    return key1 < other.key1;
+  }
+  if (key2 != other.key2)
+  {
     return key2 < other.key2;
   }
-  return key1 < other.key1;
+  return key3.size() < other.key3.size();
 }
-bool alymova::predForStringIO(char c)
-  {
-    return (c != '\n' && c != '"');
-  }
