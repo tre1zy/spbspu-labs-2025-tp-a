@@ -15,8 +15,8 @@ std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::scientific_literal::va
     return out;
   }
   fmtguard guard(out);
-  int power = wrapper.link == 0 ? 0 : 1 + static_cast< int >(std::floor(std::log10(std::fabs(wrapper.link)))) - 1;
-  return out << std::fixed << wrapper.link * std::pow(10., -power) << 'e' << std::showpos << power;
+  int power = wrapper.link_ == 0 ? 0 : 1 + static_cast< int >(std::floor(std::log10(std::fabs(wrapper.link_)))) - 1;
+  return out << std::fixed << wrapper.link_ * std::pow(10., -power) << 'e' << std::showpos << power;
 }
 template<>
 std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::ull_literal::value_type,
@@ -27,7 +27,7 @@ std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::ull_literal::value_typ
   {
     return out;
   }
-  return out << wrapper.link << "ll";
+  return out << wrapper.link_ << "ll";
 }
 template<>
 std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::string_literal::value_type,
@@ -38,7 +38,7 @@ std::ostream& rychkov::iofmt::operator<<< rychkov::iofmt::string_literal::value_
   {
     return out;
   }
-  return out << '"' << wrapper.link << '"';
+  return out << '"' << wrapper.link_ << '"';
 }
 std::ostream& rychkov::operator<<(std::ostream& out, const DataStruct& link)
 {

@@ -23,7 +23,7 @@ std::istream& rychkov::iofmt::operator>>< rychkov::iofmt::scientific_literal::va
     for (; temp != 0; temp /= 10, fracLen10++)
     {}
     fractional = whole >= 0 ? fractional : -fractional;
-    wrapper.link = (whole + fractional / std::pow(10., fracLen10)) * std::pow(10., exponent);
+    wrapper.link_ = (whole + fractional / std::pow(10., fracLen10)) * std::pow(10., exponent);
     return in;
   }
   in.setstate(std::ios::failbit);
@@ -38,7 +38,7 @@ std::istream& rychkov::iofmt::operator>>< rychkov::iofmt::ull_literal::value_typ
   {
     return in;
   }
-  return in >> wrapper.link >> anyof("LL", "ll");
+  return in >> wrapper.link_ >> anyof("LL", "ll");
 }
 template<>
 std::istream& rychkov::iofmt::operator>>< rychkov::iofmt::string_literal::value_type,
@@ -49,7 +49,7 @@ std::istream& rychkov::iofmt::operator>>< rychkov::iofmt::string_literal::value_
   {
     return in;
   }
-  return std::getline(in >> anyof("\""), wrapper.link, '"');
+  return std::getline(in >> anyof("\""), wrapper.link_, '"');
 }
 
 std::istream& rychkov::iofmt::operator>>(std::istream& in, nth_ds_field wrapper)

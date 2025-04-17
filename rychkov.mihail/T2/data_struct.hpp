@@ -39,18 +39,18 @@ namespace rychkov
       static constexpr size_t id = Id;
 
       io_literal(const value_type& init):
-        value(init),
-        link(value)
+        value_(init),
+        link_(value_)
       {}
       io_literal(value_type& init):
-        value(),
-        link(init)
+        value_(),
+        link_(init)
       {}
       friend std::istream& rychkov::iofmt::operator>>< T, Id >(std::istream& in, io_literal&& wrapper);
       friend std::ostream& rychkov::iofmt::operator<<< T, Id >(std::ostream& out, const io_literal&& wrapper);
     private:
-      T value;
-      T& link;
+      value_type value_;
+      value_type& link_;
     };
     using scientific_literal = io_literal< double >;
     using ull_literal = io_literal< long long >;
