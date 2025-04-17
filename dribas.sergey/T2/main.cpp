@@ -27,7 +27,7 @@ int main()
   (
     std::begin(data),
     std::end(data),
-    std::ostream_iterator< Data >(std::cout)
+    std::ostream_iterator< Data >(std::cout, "\n")
   );
 
   return 0;
