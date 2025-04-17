@@ -75,7 +75,12 @@ std::istream& ohantsev::operator>>(std::istream& in, DoubleI&& dest)
   }
   try
   {
-    dest.ref = std::stod(numberStr);
+    std::size_t processedCount;
+    dest.ref = std::stod(numberStr, &processedCount);
+    if (processedCount < numberStr.size())
+    {
+      in.setstate(std::ios::failbit);
+    }
   }
   catch (...)
   {
