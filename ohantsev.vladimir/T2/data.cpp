@@ -123,7 +123,8 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
   in >> MultDelimiterIO{ "key" };
   int ID;
   in >> ID;
-  if (in) {
+  if (!in.fail())
+  {
     auto iter = std::find(dest.notFilled.cbegin(), dest.notFilled.cend(), static_cast<KeyID>(ID));
     if (iter == dest.notFilled.cend())
     {
