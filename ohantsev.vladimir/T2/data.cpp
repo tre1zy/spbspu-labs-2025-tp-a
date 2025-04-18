@@ -131,18 +131,16 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
   in >> MultDelimiterIO{ "key" };
   int ID;
   in >> ID;
-  if (!in.fail())
+  int position = ID - 1;
+  bool isValid = (position >= 0) && (position < Data::FIELDS_COUNT) && (!dest.filled[position]);
+  if (!in.fail() && !isValid)
   {
-    auto iter = std::find(dest.notFilled.cbegin(), dest.notFilled.cend(), static_cast<KeyID>(ID));
-    if (iter == dest.notFilled.cend())
-    {
-      in.setstate(std::ios::failbit);
-    }
-    else
-    {
-      dest.ID = *iter;
-      dest.notFilled[iter - dest.notFilled.cbegin()] = KeyID::EMPTY;
-    }
+    in.setstate(std::ios::failbit);
+  }
+  else
+  {
+    dest.ID = static_cast< KeyID >(ID);
+    dest.filled[position] = true;
   }
   return in;
 }
@@ -155,7 +153,7 @@ std::istream& ohantsev::operator>>(std::istream& in, KeyIO&& dest)
     return in;
   }
   KeyID ID;
-  in >> LabelIO{ ID, dest.notFilled };
+  in >> LabelIO{ ID, dest.filled };
   if (!in.fail())
   {
     switch (ID)
@@ -168,9 +166,6 @@ std::istream& ohantsev::operator>>(std::istream& in, KeyIO&& dest)
       break;
     case KeyID::STR:
       in >> StringI{ dest.data.key3 };
-      break;
-    case KeyID::EMPTY:
-      in.setstate(std::ios::failbit);
       break;
     }
   }
@@ -185,11 +180,11 @@ std::istream& ohantsev::operator>>(std::istream& in, Data& dest)
     return in;
   }
   iofmtguard guard(in);
-  std::array<KeyID, Data::FIELDS_COUNT> labels{ KeyID::DBL, KeyID::ULL, KeyID::STR };
+  std::array< bool, Data::FIELDS_COUNT > filledKeys{ 0 };
   in >> MultDelimiterIO{ "(:" };
-  in >> KeyIO{ dest, labels };
-  in >> KeyIO{ dest, labels };
-  in >> KeyIO{ dest, labels };
+  in >> KeyIO{ dest, filledKeys };
+  in >> KeyIO{ dest, filledKeys };
+  in >> KeyIO{ dest, filledKeys };
   in >> MultDelimiterIO{ ")" };
   return in;
 }

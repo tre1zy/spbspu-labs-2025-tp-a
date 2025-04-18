@@ -17,7 +17,6 @@ namespace ohantsev
 
   enum class KeyID
   {
-    EMPTY = 0,
     DBL = 1,
     ULL = 2,
     STR = 3
@@ -66,7 +65,7 @@ namespace ohantsev
   struct LabelIO
   {
     KeyID& ID;
-    std::array<KeyID, Data::FIELDS_COUNT>& notFilled;
+    std::array< bool, Data::FIELDS_COUNT >& filled;
   };
 
   struct TypenameIO
@@ -77,7 +76,7 @@ namespace ohantsev
   struct KeyIO
   {
     Data& data;
-    std::array<KeyID, Data::FIELDS_COUNT>& notFilled;
+    std::array< bool, Data::FIELDS_COUNT >& filled;
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
