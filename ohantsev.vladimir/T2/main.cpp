@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
-#include <string>
 #include <vector>
 #include "data.h"
 

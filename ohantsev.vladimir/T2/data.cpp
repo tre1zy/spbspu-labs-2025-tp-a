@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
+#include <cctype>
 #include "iofmtguard.h"
 
 std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
@@ -40,8 +41,11 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   std::string name;
   in >> name;
   bool isValid = (name == dest.exp);
-  std::transform(name.cbegin(), name.cend(), name.begin(), ::toupper);
-  isValid = (isValid || (name == dest.exp));
+  if (!isValid)
+  {
+    std::transform(name.cbegin(), name.cend(), name.begin(), static_cast< int(*)(int) >(std::toupper));
+    isValid = (name == dest.exp);
+  }
   if (in && !isValid)
   {
     in.setstate(std::ios::failbit);
@@ -133,7 +137,7 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
   in >> ID;
   int position = ID - 1;
   bool isValid = (position >= 0) && (position < Data::FIELDS_COUNT) && (!dest.filled[position]);
-  if (!in.fail() && !isValid)
+  if (in && !isValid)
   {
     in.setstate(std::ios::failbit);
   }
