@@ -184,7 +184,7 @@ std::istream& ohantsev::operator>>(std::istream& in, Data& dest)
     return in;
   }
   iofmtguard guard(in);
-  std::array< bool, Data::FIELDS_COUNT > filledKeys{ 0 };
+  std::array< bool, Data::FIELDS_COUNT > filledKeys{ false };
   in >> MultDelimiterIO{ "(:" };
   in >> KeyIO{ dest, filledKeys };
   in >> KeyIO{ dest, filledKeys };
