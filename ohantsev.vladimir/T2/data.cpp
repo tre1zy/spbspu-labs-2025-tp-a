@@ -40,13 +40,17 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   }
   std::string name;
   in >> name;
+  if (!in)
+  {
+    return in;
+  }
   bool isValid = (name == dest.exp);
   if (!isValid)
   {
     std::transform(name.cbegin(), name.cend(), name.begin(), static_cast< int(*)(int) >(std::toupper));
     isValid = (name == dest.exp);
   }
-  if (in && !isValid)
+  if (!isValid)
   {
     in.setstate(std::ios::failbit);
   }
