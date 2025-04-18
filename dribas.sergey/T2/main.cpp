@@ -24,7 +24,7 @@ int main() {
 
     if (!std::cin) {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
@@ -32,7 +32,7 @@ int main() {
   std::copy(
     data.begin(),
     data.end(),
-    std::ostream_iterator<Data>(std::cout)
+    std::ostream_iterator< Data >(std::cout)
   );
 
   return 0;
