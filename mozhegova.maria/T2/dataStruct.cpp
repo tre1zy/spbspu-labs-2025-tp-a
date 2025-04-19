@@ -49,14 +49,17 @@ namespace
       return in;
     }
     in >> DelimiterIO{ '0' } >> dest.ref;
-    auto a = dest.ref;
-    while (a > 0)
+    if (in)
     {
-      if (a % 10 >= 8)
+      unsigned long long a = dest.ref;
+      while (a > 0)
       {
-        in.setstate(std::ios::failbit);
+        if (a % 10 >= 8)
+        {
+          in.setstate(std::ios::failbit);
+        }
+        a /= 10;
       }
-      a /= 10;
     }
     return in;
   }
