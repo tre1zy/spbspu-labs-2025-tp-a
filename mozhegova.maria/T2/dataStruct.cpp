@@ -68,12 +68,15 @@ namespace
     {
       return in;
     }
-    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' };
     double real, imag = 0;
-    in >> DelimiterIO{ '(' } >> real;
-    in >> imag >> DelimiterIO{ ')' };
-    dest.ref.real(real);
-    dest.ref.imag(imag);
+    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' };
+    in >> DelimiterIO{ '(' };
+    in >> real >> imag;
+    in >> DelimiterIO{ ')' };
+    if (in)
+    {
+      dest.ref = std::complex< double >(real, imag);
+    }
     return in;
   }
 
@@ -99,25 +102,21 @@ std::istream & mozhegova::operator>>(std::istream & in, mozhegova::DataStruct & 
   {
     std::vector< std::string > keys(3);
     in >> DelimiterIO{ '(' };
-    bool rep1, rep2, rep3 = false;
     for (size_t i = 0; i < 3; i++)
     {
       in >> DelimiterIO{ ':' };
-      in >> StringIO{ keys[i] } >> DelimiterIO{ ' ' };
-      if (keys[i] == "key1" && !rep1)
+      in >> keys[i];
+      if (keys[i] == "key1")
       {
         in >> UlloctIO{ input.key1 };
-        rep1 = true;
       }
-      else if (keys[i] == "key2" && !rep2)
+      else if (keys[i] == "key2")
       {
         in >> ComplexIO{ input.key2 };
-        rep2 = true;
       }
-      else if (keys[i] == "key3" && !rep3)
+      else if (keys[i] == "key3")
       {
         in >> StringIO{ input.key3 };
-        rep3 = true;
       }
       else
       {
@@ -148,7 +147,7 @@ std::ostream & mozhegova::operator<<(std::ostream & out, const mozhegova::DataSt
   out << ":key2 " << "#c(";
   out << std::fixed << std::setprecision(1);
   out << dest.key2.real() << ' ' << dest.key2.imag() << ')';
-  out << ":key3 " << dest.key3;
+  out << ":key3 " << '"' << dest.key3 << '"';
   out << ":)";
   return out;
 }
