@@ -1,4 +1,6 @@
 #include "dataStruct.hpp"
+#include <vector>
+#include <iomanip>
 
 namespace
 {
@@ -20,11 +22,6 @@ namespace
   struct StringIO
   {
     std::string & ref;
-  };
-
-  struct LabelIO
-  {
-    std::string exp;
   };
 
   std::istream & operator>>(std::istream & in, DelimiterIO && dest)
@@ -87,21 +84,6 @@ namespace
     }
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
   }
-
-  std::istream & operator>>(std::istream & in, LabelIO && dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    std::string data = "";
-    if ((in >> StringIO{ data }) && (data != dest.exp))
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
 }
 
 std::istream & mozhegova::operator>>(std::istream & in, mozhegova::DataStruct & dest)
@@ -111,6 +93,44 @@ std::istream & mozhegova::operator>>(std::istream & in, mozhegova::DataStruct & 
   {
     return in;
   }
+  DataStruct input;
+  {
+    std::vector< std::string > keys(3);
+    in >> DelimiterIO{ '(' };
+    bool rep1, rep2, rep3 = false;
+    for (size_t i = 0; i < 3; i++)
+    {
+      in >> DelimiterIO{ ':' };
+      in >> StringIO{ keys[i] } >> DelimiterIO{ ' ' };
+      if (keys[i] == "key1" && !rep1)
+      {
+        in >> UlloctIO{ input.key1 };
+        rep1 = true;
+      }
+      else if (keys[i] == "key2" && !rep2)
+      {
+        in >> ComplexIO{ input.key2 };
+        rep2 = true;
+      }
+      else if (keys[i] == "key3" && !rep3)
+      {
+        in >> StringIO{ input.key3 };
+        rep3 = true;
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+    }
+    in >> DelimiterIO{ ':' };
+    in >> DelimiterIO{ ')' };
+  }
+  if (in)
+  {
+    dest = input;
+  }
+  return in;
 }
 
 std::ostream & mozhegova::operator<<(std::ostream & out, const mozhegova::DataStruct & dest)
@@ -120,6 +140,13 @@ std::ostream & mozhegova::operator<<(std::ostream & out, const mozhegova::DataSt
   {
     return out;
   }
+  out << '(';
+  out << ":key1 " << '0' << dest.key1;
+  out << ":key2 " << "#c(";
+  out << std::fixed << std::setprecision(1);
+  out << dest.key2.real() << ' ' << dest.key2.imag() << ')';
+  out << ":key3 " << dest.key3;
+  out << ":)";
 }
 
 bool mozhegova::DataStruct::operator<(const mozhegova::DataStruct & other) const
