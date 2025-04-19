@@ -1,6 +1,7 @@
 #include "dataStruct.hpp"
 #include <vector>
 #include <iomanip>
+#include "scopeGuard.hpp"
 
 namespace
 {
@@ -140,6 +141,7 @@ std::ostream & mozhegova::operator<<(std::ostream & out, const mozhegova::DataSt
   {
     return out;
   }
+  iofmtguard fmtguard(out);
   out << '(';
   out << ":key1 " << '0' << dest.key1;
   out << ":key2 " << "#c(";
