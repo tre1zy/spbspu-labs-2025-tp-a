@@ -74,6 +74,7 @@ namespace
     in >> imag >> DelimiterIO{ ')' };
     dest.ref.real(real);
     dest.ref.imag(imag);
+    return in;
   }
 
   std::istream & operator>>(std::istream & in, StringIO && dest)
@@ -149,6 +150,7 @@ std::ostream & mozhegova::operator<<(std::ostream & out, const mozhegova::DataSt
   out << dest.key2.real() << ' ' << dest.key2.imag() << ')';
   out << ":key3 " << dest.key3;
   out << ":)";
+  return out;
 }
 
 bool mozhegova::DataStruct::operator<(const mozhegova::DataStruct & other) const
