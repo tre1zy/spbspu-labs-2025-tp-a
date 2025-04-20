@@ -1,5 +1,6 @@
 #include "ioData.hpp"
 #include <complex>
+#include <iomanip>
 #include "streamGuard.hpp"
 
 namespace
@@ -137,12 +138,12 @@ std::ostream& finaev::operator<<(std::ostream& out, const DataStruct& rhs)
   {
     return out;
   }
-  StreamGuard streamGuard(out);
+  StreamGuard outGuard(out);
   out << "(:key1 ";
   out << rhs.key1;
   out << "ll:";
   out << "key2 #c(";
-  out << rhs.key2.real();
+  out << std::fixed << std::setprecision(1) << rhs.key2.real();
   out << " ";
   out << rhs.key2.imag();
   out << ")";
