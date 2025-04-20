@@ -4,7 +4,6 @@
 
 namespace
 {
-  
   struct delimiterIO
   {
     char obj;
@@ -113,18 +112,18 @@ std::istream& finaev::operator>>(std::istream& in, DataStruct& rhs)
         in >> str{ input.key3 };
         in >> sep{ ':' };
       }
-      else if (key == ")") 
+      else if (key == ")")
       {
         break;
       }
       else
       {
-        in.setstate(std::ios::failbit); 
+        in.setstate(std::ios::failbit);
         break;
       }
     }
   }
-  if (in) 
+  if (in)
   {
     rhs = input;
   }
