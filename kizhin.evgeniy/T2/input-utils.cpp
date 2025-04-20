@@ -15,7 +15,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Delimiter&& de
   if (!sentry) {
     return in;
   }
-  char c = 0;
+  char c;
   if ((in >> c) && (c != dest.val)) {
     in.setstate(std::ios::failbit);
   }
@@ -28,7 +28,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, OneOfDelimiter
   if (!sentry) {
     return in;
   }
-  char c = 0;
+  char c;
   const std::string& exp = dest.val;
   if ((in >> c) && std::find(exp.begin(), exp.end(), c) == exp.end()) {
     in.setstate(std::ios::failbit);
