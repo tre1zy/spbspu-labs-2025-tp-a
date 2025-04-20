@@ -40,7 +40,7 @@ struct kizhin::detail::output::Double
 
 struct kizhin::detail::output::Rational
 {
-  const std::pair< long long, unsigned long long >& val;
+  const DataStruct::Rational& val;
 };
 
 #endif

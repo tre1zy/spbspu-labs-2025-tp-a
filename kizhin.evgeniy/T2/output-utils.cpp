@@ -19,8 +19,8 @@ std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Ration
     return out;
   }
   out << "(";
-  out << ":N " << data.val.first;
-  out << ":D " << data.val.second;
+  out << ":N " << data.val.numerator;
+  out << ":D " << data.val.denominator;
   return out << ":)";
 }
 

@@ -12,7 +12,11 @@ namespace kizhin {
 struct kizhin::DataStruct
 {
   double key1;
-  std::pair< long long, unsigned long long > key2;
+  struct Rational
+  {
+    long long numerator;
+    unsigned long long denominator;
+  } key2;
   std::string key3;
 };
 

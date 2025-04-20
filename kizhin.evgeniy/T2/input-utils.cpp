@@ -61,9 +61,9 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Rational&& des
     return in;
   }
   in >> Delimiter{ '(' } >> Delimiter{ ':' };
-  in >> Nominator{ dest.val.first };
+  in >> Nominator{ dest.val.numerator };
   in >> Delimiter{ ':' };
-  in >> Denominator{ dest.val.second };
+  in >> Denominator{ dest.val.denominator };
   in >> Delimiter{ ':' } >> Delimiter{ ')' };
   return in;
 }

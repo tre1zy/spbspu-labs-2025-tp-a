@@ -11,14 +11,17 @@ class kizhin::StreamGuard
 {
 public:
   StreamGuard(std::basic_ios< char >&);
+  StreamGuard(const StreamGuard&) = delete;
   ~StreamGuard();
+
+  StreamGuard& operator=(const StreamGuard&) = delete;
 
 private:
   std::basic_ios< char >& s_;
-  char fill_;
   std::streamsize precision_;
   std::streamsize width_;
   std::basic_ios< char >::fmtflags flags_;
+  char fill_;
 };
 
 #endif

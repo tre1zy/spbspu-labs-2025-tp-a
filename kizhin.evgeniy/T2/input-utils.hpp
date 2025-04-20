@@ -68,7 +68,7 @@ struct kizhin::detail::input::Denominator
 
 struct kizhin::detail::input::Rational
 {
-  std::pair< long long, unsigned long long >& val;
+  DataStruct::Rational& val;
 };
 
 #endif
