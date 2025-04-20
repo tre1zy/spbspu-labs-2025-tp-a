@@ -124,11 +124,9 @@ std::istream& finaev::operator>>(std::istream& in, DataStruct& rhs)
       }
     }
   }
-  if (in) {
+  if (in) 
+  {
     rhs = input;
-    std::cerr << "Parsed: key1=" << rhs.key1 << ", key2=(" << rhs.key2.real() << "," << rhs.key2.imag() << "), key3=" << rhs.key3 << "\n";
-  } else {
-    std::cerr << "Parsing failed!\n";  // Отладочный вывод
   }
   return in;
 }
