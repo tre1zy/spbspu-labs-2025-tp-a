@@ -163,7 +163,24 @@ std::ostream &sveshnikov::operator<<(std::ostream &out, const DataStruct &src)
   out << "(";
   out << ":key1 " << src.key1 << "ll";
   out << ":key2 " << src.key2 << "ull";
-  out << ":key3 " << src.key3;
+  out << ":key3 " << "\"" << src.key3 << "\"";
   out << ":)";
   return out;
+}
+
+bool sveshnikov::DataStruct::operator<(const DataStruct &src) const
+{
+  if (key1 < src.key1)
+  {
+    return true;
+  }
+  else if (key1 == src.key1 && key2 < src.key2)
+  {
+    return true;
+  }
+  else if (key1 == src.key1 && key2 == src.key2 && key3.size() < src.key3.size())
+  {
+    return true;
+  }
+  return false;
 }
