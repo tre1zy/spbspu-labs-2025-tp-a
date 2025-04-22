@@ -52,7 +52,7 @@ std::istream& krylov::operator>>(std::istream& in, UllHexIO&& dest)
   {
     return in;
   }
-  in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> dest.ref;
+  in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> std::hex >> dest.ref;
   return in;
 }
 
