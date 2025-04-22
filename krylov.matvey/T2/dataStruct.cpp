@@ -34,16 +34,28 @@ std::istream& krylov::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& krylov::operator>>(std::istream& in, UllIO&& dest)
+std::istream& krylov::operator>>(std::istream& in, UllBinIO&& dest)
 {
   std::istream::sentry s(in);
   if (!s)
   {
     return in;
   }
-  in >> dest.ref;
+  in >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' } >> dest.ref;
   return in;
 }
+
+std::istream& krylov::operator>>(std::istream& in, UllHexIO&& dest)
+{
+  std::istream::sentry s(in);
+  if (!s)
+  {
+    return in;
+  }
+  in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> dest.ref;
+  return in;
+}
+
 std::istream& krylov::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry s(in);
@@ -55,7 +67,7 @@ std::istream& krylov::operator>>(std::istream& in, StringIO&& dest)
   return std::getline(in, dest.ref, '"');
 }
 
-std::istream& krylov::operator>>(std::istream &in, DataStruct &data)
+std::istream& krylov::operator>>(std::istream& in, DataStruct& data)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -72,13 +84,13 @@ std::istream& krylov::operator>>(std::istream &in, DataStruct &data)
     in >> key;
     if (key == "key1")
     {
-      in >> UllIO{ input.key1 };
+      in >> UllBinIO{ input.key1 };
       in >> DelimiterIO{ ':' };
       ++count;
     }
     else if (key == "key2")
     {
-      in >> UllIO{ input.key2 };
+      in >> UllHexIO{ input.key2 };
       in >> DelimiterIO{ ':' };
       ++count;
     }

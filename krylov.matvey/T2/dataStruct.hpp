@@ -19,11 +19,17 @@ namespace krylov
   };
   std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
 
-  struct UllIO
+  struct UllHexIO
   {
     unsigned long long int &ref;
   };
-  std::istream &operator>>(std::istream &in, UllIO &&dest);
+  std::istream &operator>>(std::istream &in, UllHexIO &&dest);
+
+  struct UllBinIO
+  {
+    unsigned long long int &ref;
+  };
+  std::istream &operator>>(std::istream &in, UllBinIO &&dest);
 
   struct StringIO
   {
