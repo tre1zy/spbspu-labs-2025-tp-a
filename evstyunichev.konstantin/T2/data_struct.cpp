@@ -34,7 +34,7 @@ std::istream & evstyunichev::operator>>(std::istream &in, DelimitersIO &&dest)
   {
     return in;
   }
-  evstyunichev::StreamGuard guard(in);
+  StreamGuard guard(in);
   std::noskipws(in);
   for (char c: dest.exps)
   {
@@ -52,7 +52,6 @@ std::istream & evstyunichev::operator>>(std::istream &in, UllIO &dest)
   }
   unsigned long long ull = 0;
   {
-    std::noskipws(in);
     in >> ull;
     in >> DelimitersIO{ "ull" };
   }
