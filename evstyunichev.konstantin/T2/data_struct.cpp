@@ -1,6 +1,7 @@
 #include "data_struct.hpp"
 #include <cmath>
 #include <complex>
+#include <iomanip>
 #include <ios>
 #include <iostream>
 #include <utility>
@@ -170,7 +171,8 @@ std::ostream & evstyunichev::operator<<(std::ostream &out, CmplIO &&data)
   {
     return out;
   }
-  out << "#c(" << data.cmpl.real() << ' ' << data.cmpl.imag() << ')';
+  StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1) << "#c(" << data.cmpl.real() << ' ' << data.cmpl.imag() << ')';
   return out;
 }
 
