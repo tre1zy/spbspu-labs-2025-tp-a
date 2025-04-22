@@ -11,7 +11,7 @@ double evstyunichev::abscmpl(const std::complex< double > &cmpl)
   return std::pow(std::pow(cmpl.real(), 2) + std::pow(cmpl.imag(), 2), 0.5);
 }
 
-std::istream & evstyunichev::operator>>(std::istream& in, DelimiterIO &&dest)
+std::istream & evstyunichev::operator>>(std::istream &in, DelimiterIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -20,27 +20,25 @@ std::istream & evstyunichev::operator>>(std::istream& in, DelimiterIO &&dest)
   }
   char c = '0';
   in >> c;
-  if (in && (c != dest.exp) && (tolower(c) != dest.exp))
+  if (c != dest.exp)
   {
     in.setstate(std::ios::failbit);
   }
   return in;
 }
 
-std::istream & evstyunichev::operator>>(std::istream& in, DelimitersIO &&dest)
+std::istream & evstyunichev::operator>>(std::istream &in, DelimitersIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
+  evstyunichev::StreamGuard guard(in);
+  std::noskipws(in);
   for (char c: dest.exps)
   {
     in >> DelimiterIO{ c };
-    if (!in)
-    {
-      return in;
-    }
   }
   return in;
 }
@@ -52,12 +50,16 @@ std::istream & evstyunichev::operator>>(std::istream &in, UllIO &dest)
   {
     return in;
   }
-  in >> dest.ref;
-  if (!in)
+  unsigned long long ull = 0;
   {
-    return in;
+    std::noskipws(in);
+    in >> ull;
+    in >> DelimitersIO{ "ull" };
   }
-  in >> DelimitersIO{ "ull" };
+  if (in)
+  {
+    dest.ref = ull;
+  }
   return in;
 }
 
@@ -68,9 +70,14 @@ std::istream & evstyunichev::operator>>(std::istream &in, CmplIO &dest)
   {
     return in;
   }
-  if (in >> DelimitersIO{ "#c(" })
+  StreamGuard guard(in);
+  double a = 0, b = 0;
+  std::skipws(in);
+  in >> DelimitersIO{ "#c(" };
+  in >> a >> b >> DelimiterIO{ ')' };
+  if (in)
   {
-    in >> dest.cmpl >> DelimiterIO{ ')' };
+    dest.cmpl = std::complex< double >{ a, b };
   }
   return in;
 }
@@ -82,20 +89,27 @@ std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &&key)
   {
     return in;
   }
-  in >> DelimitersIO{ ":key" };
-  int k = 0;
-  in >> k;
-  if (k == 1)
+  char k = 0;
   {
-    in >> key.data.key1;
+    evstyunichev::StreamGuard guard(in);
+    in >> DelimitersIO{ ":key" };
+    std::noskipws(in);
+    in >> k;
   }
-  else if (k == 2)
+  if (k == '1')
   {
-    in >> key.data.key2;
+    UllIO ull{ key.data.key1 };
+    in >> ull;
   }
-  else if (k == 3)
+  else if (k == '2')
   {
-    in >> key.data.key3;
+    CmplIO cmpl{ key.data.key2 };
+    in >> cmpl;
+  }
+  else if (k == '3')
+  {
+    StringIO str{ key.data.key3 };
+    in >> str;
   }
   else
   {
@@ -111,7 +125,10 @@ std::istream & evstyunichev::operator>>(std::istream &in, StringIO &dest)
   {
     return in;
   }
+  StreamGuard guard(in);
+  std::skipws(in);
   in >> DelimiterIO{ '"' };
+  std::noskipws(in);
   std::getline(in, dest.ref, '"');
   return in;
 }
@@ -123,15 +140,12 @@ std::istream & evstyunichev::operator>>(std::istream &in, DataStruct &data)
   {
     return in;
   }
-  evstyunichev::StreamGuard guard(in);
   DataStruct temp;
-  if (in >> DelimiterIO{ '(' })
-  {
-    in >> KeyIO{ temp };
-    in >> KeyIO{ temp };
-    in >> KeyIO{ temp };
-    in >> DelimitersIO{ ":)" };
-  }
+  in >> DelimiterIO{ '(' };
+  in >> KeyIO{ temp };
+  in >> KeyIO{ temp };
+  in >> KeyIO{ temp };
+  in >> DelimitersIO{ ":)" };
   if (in)
   {
     data = temp;
