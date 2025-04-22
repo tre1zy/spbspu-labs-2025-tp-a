@@ -171,8 +171,23 @@ std::ostream & evstyunichev::operator<<(std::ostream &out, CmplIO &&data)
   {
     return out;
   }
-  StreamGuard guard(out);
-  out << std::fixed << std::setprecision(1) << "#c(" << data.cmpl.real() << ' ' << data.cmpl.imag() << ')';
+  double a = data.cmpl.real(), b = data.cmpl.imag();
+  {
+    StreamGuard guard(out);
+    if (floor(a) == a)
+    {
+      out << std::fixed << std::setprecision(1);
+    }
+    out << "#c(" << a << ' ';
+  }
+  {
+    StreamGuard guard(out);
+    if (floor(b) == b)
+    {
+      out << std::fixed << std::setprecision(1);
+    }
+    out << b << ')';
+  }
   return out;
 }
 
