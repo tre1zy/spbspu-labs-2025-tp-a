@@ -1,5 +1,6 @@
 #include "data.hpp"
 #include <algorithm>
+#include <ios>
 #include <vector>
 #include <iostream>
 #include "scopeGuard.hpp"
@@ -36,8 +37,10 @@ std::istream& kiselev::operator>>(std::istream& input, UllIO&& dest)
   {
     return input;
   }
-  std::string number;
-  std::getline(input >> DelimeterIO{ '0' }, number, ':');
+  //std::string number;
+  //input >> DelimeterIO{ '0' }
+  input >> std::oct >> dest.ref >> DelimeterIO{ ':' };
+  /*
   if (number.empty())
   {
     input.setstate(std::ios::failbit);
@@ -51,6 +54,7 @@ std::istream& kiselev::operator>>(std::istream& input, UllIO&& dest)
   {
     input.setstate(std::ios::failbit);
   }
+  */
   return input;
 }
 
@@ -138,7 +142,7 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
 
 std::ostream& kiselev::operator<<(std::ostream& output, const UllIO&& dest)
 {
-  unsigned long long number = dest.ref;
+  /*unsigned long long number = dest.ref;
   if (dest.ref == 0)
   {
     return output << "00";
@@ -154,7 +158,8 @@ std::ostream& kiselev::operator<<(std::ostream& output, const UllIO&& dest)
   {
     output << *it;
   }
-  return output;
+  */
+  return output << '0' << std::oct << dest.ref;
 }
 
 std::ostream& kiselev::operator<<(std::ostream& output, const CharIO&& dest)
