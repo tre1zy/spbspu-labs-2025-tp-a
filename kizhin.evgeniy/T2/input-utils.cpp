@@ -1,15 +1,76 @@
-#include "input-utils.hpp"
+#include "io-utils.hpp"
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 #include "stream-guard.hpp"
+
+namespace kizhin {
+  struct Delimiter;
+  struct OneOfDelimiters;
+  struct Label;
+  struct String;
+  struct Double;
+  struct Nominator;
+  struct Denominator;
+  struct Rational;
+
+  std::istream& operator>>(std::istream&, Delimiter&&);
+  std::istream& operator>>(std::istream&, OneOfDelimiters&&);
+  std::istream& operator>>(std::istream&, Label&&);
+  std::istream& operator>>(std::istream&, String&&);
+  std::istream& operator>>(std::istream&, Double&&);
+  std::istream& operator>>(std::istream&, Nominator&&);
+  std::istream& operator>>(std::istream&, Denominator&&);
+  std::istream& operator>>(std::istream&, Rational&&);
+}
+
+struct kizhin::Delimiter
+{
+  char val;
+};
+
+struct kizhin::OneOfDelimiters
+{
+  const std::string& val;
+};
+
+struct kizhin::Double
+{
+  double& val;
+};
+
+struct kizhin::Label
+{
+  const std::string& val;
+};
+
+struct kizhin::String
+{
+  std::string& val;
+};
+
+struct kizhin::Nominator
+{
+  long long& val;
+};
+
+struct kizhin::Denominator
+{
+  unsigned long long& val;
+};
+
+struct kizhin::Rational
+{
+  DataStruct::Rational& val;
+};
 
 namespace kizhin {
   std::istream& inputKey(std::istream&, const std::string&, DataStruct&);
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, Delimiter&& dest)
+std::istream& kizhin::operator>>(std::istream& in, Delimiter&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -22,7 +83,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Delimiter&& de
   return in;
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, OneOfDelimiters&& dest)
+std::istream& kizhin::operator>>(std::istream& in, OneOfDelimiters&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -36,7 +97,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, OneOfDelimiter
   return in;
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, Nominator&& dest)
+std::istream& kizhin::operator>>(std::istream& in, Nominator&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -45,7 +106,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Nominator&& de
   return in >> Delimiter{ 'N' } >> dest.val;
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, Denominator&& dest)
+std::istream& kizhin::operator>>(std::istream& in, Denominator&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -54,7 +115,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Denominator&& 
   return in >> Delimiter{ 'D' } >> dest.val;
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, Rational&& dest)
+std::istream& kizhin::operator>>(std::istream& in, Rational&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -68,7 +129,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Rational&& des
   return in;
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, Double&& dest)
+std::istream& kizhin::operator>>(std::istream& in, Double&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -77,7 +138,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, Double&& dest)
   return in >> dest.val >> OneOfDelimiters{ "dD" };
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, String&& dest)
+std::istream& kizhin::operator>>(std::istream& in, String&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -86,7 +147,7 @@ std::istream& kizhin::detail::input::operator>>(std::istream& in, String&& dest)
   return std::getline(in >> Delimiter{ '"' }, dest.val, '"');
 }
 
-std::istream& kizhin::detail::input::operator>>(std::istream& in, Label&& dest)
+std::istream& kizhin::operator>>(std::istream& in, Label&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -107,7 +168,6 @@ std::istream& kizhin::operator>>(std::istream& in, DataStruct& dest)
   }
   StreamGuard guard(in);
   in >> std::skipws;
-  using namespace detail::input;
   in >> Delimiter{ '(' } >> Delimiter{ ':' };
   std::vector< std::string > keys{ "key1", "key2", "key3" };
   DataStruct input;
@@ -128,7 +188,6 @@ std::istream& kizhin::inputKey(std::istream& in, const std::string& key, DataStr
   if (!sentry) {
     return in;
   }
-  using namespace detail::input;
   if (key == "key1") {
     return in >> Double{ dest.key1 };
   } else if (key == "key2") {

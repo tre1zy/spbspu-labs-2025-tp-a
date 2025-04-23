@@ -1,9 +1,41 @@
-#include "output-utils.hpp"
+#include "io-utils.hpp"
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include "stream-guard.hpp"
 
-std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Label& data)
+namespace kizhin {
+  struct Label;
+  struct String;
+  struct Double;
+  struct Rational;
+
+  std::ostream& operator<<(std::ostream&, const Label&);
+  std::ostream& operator<<(std::ostream&, const String&);
+  std::ostream& operator<<(std::ostream&, const Double&);
+  std::ostream& operator<<(std::ostream&, const Rational&);
+}
+
+struct kizhin::Label
+{
+  const std::string& val;
+};
+
+struct kizhin::String
+{
+  const std::string& val;
+};
+
+struct kizhin::Double
+{
+  const double& val;
+};
+
+struct kizhin::Rational
+{
+  const DataStruct::Rational& val;
+};
+std::ostream& kizhin::operator<<(std::ostream& out, const Label& data)
 {
   std::ostream::sentry sentry(out);
   if (!sentry) {
@@ -12,7 +44,7 @@ std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Label&
   return out << ':' << data.val << ' ';
 }
 
-std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Rational& data)
+std::ostream& kizhin::operator<<(std::ostream& out, const Rational& data)
 {
   std::ostream::sentry sentry(out);
   if (!sentry) {
@@ -24,7 +56,7 @@ std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Ration
   return out << ":)";
 }
 
-std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Double& data)
+std::ostream& kizhin::operator<<(std::ostream& out, const Double& data)
 {
   std::ostream::sentry sentry(out);
   if (!sentry) {
@@ -33,7 +65,7 @@ std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const Double
   return out << std::fixed << std::setprecision(1) << data.val << 'd';
 }
 
-std::ostream& kizhin::detail::output::operator<<(std::ostream& out, const String& data)
+std::ostream& kizhin::operator<<(std::ostream& out, const String& data)
 {
   std::ostream::sentry sentry(out);
   if (!sentry) {
@@ -49,7 +81,6 @@ std::ostream& kizhin::operator<<(std::ostream& out, const DataStruct& data)
     return out;
   }
   StreamGuard guard(out);
-  using namespace detail::output;
   out << '(';
   out << Label{ "key1" } << Double{ data.key1 };
   out << Label{ "key2" } << Rational{ data.key2 };
