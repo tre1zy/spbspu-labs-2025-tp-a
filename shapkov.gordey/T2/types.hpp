@@ -9,11 +9,14 @@ namespace shapkov
   {
     double& key;
   };
+  struct ratio
+  {
+    std::pair< long long, unsigned long long > value;
+    ratio(const std::pair<long long, unsigned long long>& p);
+  };
   struct ratioIO
   {
-    using numerator = long long;
-    using denominator = unsigned long long;
-    std::pair< numerator, denominator >& key;
+    ratio& key;
   };
   struct stringIO
   {

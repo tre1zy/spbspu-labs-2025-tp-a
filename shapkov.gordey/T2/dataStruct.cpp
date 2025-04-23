@@ -19,18 +19,20 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
   for (int i = 0; i < 3; i++)
   {
     in >> key;
-    if (key == "key1" && hasKey[0] == false)
+    if (key == "key1" && !hasKey[0])
     {
       hasKey[0] = true;
       in >> dbl{ input.key1 };
     }
-    else if (key == "key2" && hasKey[1] == false)
+    else if (key == "key2" && !hasKey[1])
     {
       hasKey[1] = true;
-      in >> ratio{ input.key2 };
+      shapkov::ratio tempRatio(input.key2);
+      in >> ratio{ tempRatio };
+      input.key2 = tempRatio.value;
       in >> check{ ':' };
     }
-    else if (key == "key3" && hasKey[2] == false)
+    else if (key == "key3" && !hasKey[2])
     {
       hasKey[2] = true;
       in >> str{ input.key3 };

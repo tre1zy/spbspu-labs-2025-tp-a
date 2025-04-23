@@ -35,6 +35,10 @@ std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
   return in;
 }
 
+shapkov::ratio::ratio(const std::pair<long long, unsigned long long>& p):
+  value(p)
+{}
+
 std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
 {
   std::istream::sentry s(in);
@@ -51,7 +55,7 @@ std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
   in >> check{ ':' } >> check{ ')' };
   if (in)
   {
-    rhs.key = { llTemp, ullTemp };
+    rhs.key.value = { llTemp, ullTemp };
   }
   return in;
 }
