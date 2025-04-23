@@ -1,12 +1,71 @@
 #include "io-helpers.hpp"
 #include "stream-guard.hpp"
 
-std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
+belyaev::DelimeterIO::DelimeterIO(char expected_, bool caseSensitive_):
+  expected(expected_),
+  caseSensitive(caseSensitive_)
+{}
+
+std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
 {
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  char c = '0';
+  in >> c;
+  if (!dest.caseSensitive)
+  {
+    if (in && (tolower(c) != dest.expected))
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  else
+  {
+    if (in && (c != dest.expected))
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  return in;
+}
+
+std::istream& belyaev::operator>>(std::istream& in, const LabelIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  for (char expectedChar : dest.expected)
+  {
+    char currentDest = '0';
+    in.get(currentDest);
+    if (!in || (currentDest != expectedChar))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+  }
+
+  return in;
+}
+
+std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIO& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
   belyaev::StreamGuard streamGuard(out);
 
   int exp = 0;
-  double mantissa = dbl.value;
+  double mantissa = dest.value;
 
   if (mantissa == 0.0)
   {
@@ -27,7 +86,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   }
 
   out << mantissa;
-  
+
   out << "e";
   if (exp >= 0)
   {
@@ -42,14 +101,83 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleIO& dbl)
   return out;
 }
 
-std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& pairLL)
+std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& dest)
 {
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
   belyaev::StreamGuard streamGuard(out);
 
   out << "(:N ";
-  out << pairLL.value.first;
+  out << dest.value.first;
   out << ":D ";
-  out << pairLL.value.second;
+  out << dest.value.second;
   out << ":)";
   return out;
+}
+
+std::istream& belyaev::operator>>(std::istream& in, const DoubleEIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  std::string doubleHold;
+  if (!std::getline(in, doubleHold, ':'))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  if (doubleHold.find('e') == doubleHold.find('E'))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  try
+  {
+    size_t index = 0;
+    double number = std::stod(doubleHold, &index);
+
+    if (index != doubleHold.length())
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in.unget();
+    dest.value = number;
+  }
+  catch (const std::exception& e)
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
+}
+
+std::istream& belyaev::operator>>(std::istream& in, const PairLLIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  using sep = DelimeterIO;
+  bool cs = true;
+  in >> sep{'(', cs};
+  in >> sep{':', cs};
+  in >> sep{'N', cs};
+  in >> dest.value.first;
+  in >> sep{':', cs};
+  in >> sep{'D', cs};
+  in >> dest.value.second;
+  in >> sep{':', cs};
+  in >> sep{')', cs};
+  return in;
 }
