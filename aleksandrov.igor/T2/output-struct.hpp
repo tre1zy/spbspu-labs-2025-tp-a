@@ -5,27 +5,24 @@
 
 namespace aleksandrov
 {
-  namespace detail
+  struct DoubleO
   {
-    struct DoubleO
-    {
-      const double& ref;
-    };
+    const double& ref;
+  };
 
-    struct RationalO
-    {
-      const std::pair< long long, unsigned long long >& ref;
-    };
+  struct RationalO
+  {
+    const std::pair< long long, unsigned long long >& ref;
+  };
 
-    struct StringO
-    {
-      const std::string& ref;
-    };
+  struct StringO
+  {
+    const std::string& ref;
+  };
 
-    std::ostream& operator<<(std::ostream&, const DoubleO&);
-    std::ostream& operator<<(std::ostream&, const RationalO&);
-    std::ostream& operator<<(std::ostream&, const StringO&);
-  }
+  std::ostream& operator<<(std::ostream&, const DoubleO&);
+  std::ostream& operator<<(std::ostream&, const RationalO&);
+  std::ostream& operator<<(std::ostream&, const StringO&);
   std::ostream& operator<<(std::ostream&, const DataStruct&);
 }
 

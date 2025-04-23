@@ -2,35 +2,17 @@
 
 namespace aleksandrov
 {
-  namespace detail
+  bool DataStruct::operator<(const DataStruct& rhs) const
   {
-    iofmtguard::iofmtguard(std::basic_ios< char >& s):
-      s_(s),
-      width_(s.width()),
-      fill_(s.fill()),
-      precision_(s.precision()),
-      fmt_(s.flags())
-    {}
-
-    iofmtguard::~iofmtguard()
+    if (key1 == rhs.key1)
     {
-      s_.width(width_);
-      s_.fill(fill_);
-      s_.precision(precision_);
-      s_.flags(fmt_);
-    }
-  }
-  bool operator<(const DataStruct& lhs, const DataStruct& rhs)
-  {
-    if (lhs.key1 == rhs.key1)
-    {
-      if (lhs.key2 == rhs.key2)
+      if (key2 == rhs.key2)
       {
-        return lhs.key3.size() < rhs.key3.size();
+        return key3.size() < rhs.key3.size();
       }
-      return (lhs.key2.first / lhs.key2.second) < (rhs.key2.first / rhs.key2.second);
+      return (key2.first / key2.second) < (rhs.key2.first / rhs.key2.second);
     }
-    return lhs.key1 < rhs.key1;
+    return key1 < rhs.key1;
   }
 }
 

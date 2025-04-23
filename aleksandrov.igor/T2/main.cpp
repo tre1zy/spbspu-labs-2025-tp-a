@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include "data-struct.hpp"
+#include "stream-guard.hpp"
 #include "input-struct.hpp"
 #include "output-struct.hpp"
 
@@ -12,14 +13,12 @@ int main()
 
   std::vector< DataStruct > data;
 
+  using InputDataIt = std::istream_iterator< DataStruct >;
+  using OutputDataIt = std::ostream_iterator< DataStruct >;
+
   while (!std::cin.eof())
   {
-    std::copy
-    (
-      std::istream_iterator< DataStruct >(std::cin),
-      std::istream_iterator< DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(InputDataIt(std::cin), InputDataIt(), std::back_inserter(data));
     if (!std::cin)
     {
       std::cin.clear();
@@ -27,11 +26,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end());
-  std::copy
-  (
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), OutputDataIt(std::cout, "\n"));
 }
 

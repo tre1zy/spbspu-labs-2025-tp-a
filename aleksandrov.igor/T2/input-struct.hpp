@@ -5,44 +5,41 @@
 
 namespace aleksandrov
 {
-  namespace detail
+  struct DelimeterI
   {
-    struct DelimeterI
-    {
-      char exp;
-    };
+    char exp;
+  };
 
-    struct DoubleI
-    {
-      double& ref;
-    };
+  struct DoubleI
+  {
+    double& ref;
+  };
 
-    struct RationalI
-    {
-      std::pair< long long, unsigned long long >& ref;
-    };
+  struct RationalI
+  {
+    std::pair< long long, unsigned long long >& ref;
+  };
 
-    struct LongLongI
-    {
-      long long& ref;
-    };
+  struct LongLongI
+  {
+    long long& ref;
+  };
 
-    struct UnsignedLongLongI
-    {
-      unsigned long long& ref;
-    };
+  struct UnsignedLongLongI
+  {
+    unsigned long long& ref;
+  };
 
-    struct StringI
-    {
-      std::string& ref;
-    };
+  struct StringI
+  {
+    std::string& ref;
+  };
 
-    std::istream& operator>>(std::istream&, DelimeterI&&);
-    std::istream& operator>>(std::istream&, DoubleI&&);
-    std::istream& operator>>(std::istream&, RationalI&&);
-    std::istream& operator>>(std::istream&, LongLongI&&);
-    std::istream& operator>>(std::istream&, UnsignedLongLongI&&);
-  }
+  std::istream& operator>>(std::istream&, DelimeterI&&);
+  std::istream& operator>>(std::istream&, DoubleI&&);
+  std::istream& operator>>(std::istream&, RationalI&&);
+  std::istream& operator>>(std::istream&, LongLongI&&);
+  std::istream& operator>>(std::istream&, UnsignedLongLongI&&);
   std::istream& operator>>(std::istream&, DataStruct&);
 }
 
