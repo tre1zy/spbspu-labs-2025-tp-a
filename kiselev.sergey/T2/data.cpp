@@ -1,4 +1,5 @@
 #include "data.hpp"
+#include <algorithm>
 #include <vector>
 #include <iostream>
 #include "scopeGuard.hpp"
@@ -75,7 +76,7 @@ std::istream& kiselev::operator>>(std::istream& input, StringIO&& dest)
   return input >> DelimeterIO{ ':' };
 }
 
-std::istream& kiselev::operator>>(std::istream& input, KeyIO&& dest)
+std::istream& kiselev::operator>>(std::istream& input, KeyIO& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -86,6 +87,11 @@ std::istream& kiselev::operator>>(std::istream& input, KeyIO&& dest)
   input >> DelimetersIO{ str };
   int key;
   input >> key;
+  if (std::find(dest.keys.begin(), dest.keys.end(), key) != dest.keys.end())
+  {
+    input.setstate(std::ios::failbit);
+    return input;
+  }
   switch (key)
   {
   case 1:
@@ -100,6 +106,7 @@ std::istream& kiselev::operator>>(std::istream& input, KeyIO&& dest)
   default:
     input.setstate(std::ios::failbit);
   }
+  dest.keys.push_back(key);
   return input;
 }
 
@@ -115,9 +122,11 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
   {
     std::string str = "(:";
     input >> DelimetersIO{ str };
-    input >> KeyIO{ temp };
-    input >> KeyIO{ temp };
-    input >> KeyIO{ temp };
+    std::vector< int > vec;
+    KeyIO key{ temp, vec };
+    input >> key;
+    input >> key;
+    input >> key;
     input >> DelimeterIO{ ')' };
   }
   if (input)
