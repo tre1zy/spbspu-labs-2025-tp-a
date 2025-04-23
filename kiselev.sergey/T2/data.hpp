@@ -2,7 +2,7 @@
 #define DATA_HPP
 #include <iosfwd>
 #include <string>
-#include <vector>
+#include <array>
 
 namespace kiselev
 {
@@ -44,7 +44,7 @@ namespace kiselev
   struct KeyIO
   {
     DataStruct& data;
-    std::vector< int > keys;
+    std::array< int, 3 > keys;
   };
   std::istream& operator>>(std::istream& input, DelimeterIO&& dest);
   std::istream& operator>>(std::istream& input, DelimetersIO&& dest);

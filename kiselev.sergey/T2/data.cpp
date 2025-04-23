@@ -77,6 +77,13 @@ std::istream& kiselev::operator>>(std::istream& input, KeyIO& dest)
     input.setstate(std::ios::failbit);
     return input;
   }
+  auto it = std::find(dest.keys.begin(), dest.keys.end(), 0);
+  if (it == dest.keys.end())
+  {
+    input.setstate(std::ios::failbit);
+    return input;
+  }
+  *it = key;
   switch (key)
   {
   case 1:
@@ -91,7 +98,6 @@ std::istream& kiselev::operator>>(std::istream& input, KeyIO& dest)
   default:
     input.setstate(std::ios::failbit);
   }
-  dest.keys.push_back(key);
   return input;
 }
 
@@ -107,8 +113,7 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
   {
     std::string str = "(:";
     input >> DelimetersIO{ str };
-    std::vector< int > vec;
-    KeyIO key{ temp, vec };
+    KeyIO key{ temp, { 0, 0, 0 } };
     input >> key;
     input >> key;
     input >> key;
