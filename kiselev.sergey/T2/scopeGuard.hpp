@@ -7,7 +7,7 @@ namespace detail
   class ScopeGuard
   {
   public:
-    ScopeGuard(std::basic_ios< char >& s);
+    explicit ScopeGuard(std::basic_ios< char >& s);
     ScopeGuard(const ScopeGuard&) = delete;
     ScopeGuard(ScopeGuard&&) = delete;
     ~ScopeGuard();
