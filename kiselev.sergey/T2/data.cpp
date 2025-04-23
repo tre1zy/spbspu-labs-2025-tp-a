@@ -1,7 +1,6 @@
 #include "data.hpp"
 #include <algorithm>
 #include <ios>
-#include <vector>
 #include <iostream>
 #include "scopeGuard.hpp"
 
@@ -37,25 +36,7 @@ std::istream& kiselev::operator>>(std::istream& input, UllIO&& dest)
   {
     return input;
   }
-  //std::string number;
-  //input >> DelimeterIO{ '0' }
-  input >> std::oct >> dest.ref >> DelimeterIO{ ':' };
-  /*
-  if (number.empty())
-  {
-    input.setstate(std::ios::failbit);
-    return input;
-  }
-  try
-  {
-    dest.ref = std::stoull(number, nullptr, 8);
-  }
-  catch (const std::exception&)
-  {
-    input.setstate(std::ios::failbit);
-  }
-  */
-  return input;
+  return input >> std::oct >> dest.ref >> DelimeterIO{ ':' };
 }
 
 std::istream& kiselev::operator>>(std::istream& input, CharIO&& dest)
@@ -142,23 +123,6 @@ std::istream& kiselev::operator>>(std::istream& input, DataStruct& dest)
 
 std::ostream& kiselev::operator<<(std::ostream& output, const UllIO&& dest)
 {
-  /*unsigned long long number = dest.ref;
-  if (dest.ref == 0)
-  {
-    return output << "00";
-  }
-  std::vector< unsigned > octalNum;
-  while (number > 0)
-  {
-    octalNum.push_back(number % 8);
-    number /= 8;
-  }
-  output << "0";
-  for (auto it = octalNum.rbegin(); it != octalNum.rend(); ++it)
-  {
-    output << *it;
-  }
-  */
   return output << '0' << std::oct << dest.ref;
 }
 

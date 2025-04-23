@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <istream>
-#include <vector>
 #include <limits>
 #include <iterator>
 #include <iostream>
