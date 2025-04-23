@@ -11,8 +11,8 @@ namespace ohantsev
     double key1;
     unsigned long long key2;
     std::string key3;
-    bool operator<(const ohantsev::Data& rhs) const;
-    static constexpr int FIELDS_COUNT = 3;
+    bool operator<(const ohantsev::Data& rhs) const noexcept;
+    static constexpr std::size_t FIELDS_COUNT = 3;
   };
 
   enum class KeyID
@@ -24,7 +24,7 @@ namespace ohantsev
 
   struct DelimiterIO
   {
-    const char& exp;
+    char exp;
   };
 
   struct MultDelimiterIO
@@ -70,7 +70,8 @@ namespace ohantsev
 
   struct TypenameIO
   {
-    std::string exp;
+    static constexpr std::size_t VARIANTS = 2;
+    const std::array< std::string, VARIANTS >& exp;
   };
 
   struct KeyIO

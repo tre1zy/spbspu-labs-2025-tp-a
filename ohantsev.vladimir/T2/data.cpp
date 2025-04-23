@@ -40,17 +40,7 @@ std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
   }
   std::string name;
   in >> name;
-  if (!in)
-  {
-    return in;
-  }
-  bool isValid = (name == dest.exp);
-  if (!isValid)
-  {
-    std::transform(name.cbegin(), name.cend(), name.begin(), static_cast< int(*)(int) >(std::toupper));
-    isValid = (name == dest.exp);
-  }
-  if (!isValid)
+  if (std::find(dest.exp.cbegin(), dest.exp.cend(), name) == dest.exp.cend())
   {
     in.setstate(std::ios::failbit);
   }
@@ -108,7 +98,7 @@ std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
   if (ull != "" && ull[0] != '-')
   {
     std::istringstream ullSource(ull);
-    ullSource >> dest.ref >> TypenameIO{ "ull" };
+    ullSource >> dest.ref >> TypenameIO{ { "ull", "ULL" } };
     if ((!ullSource.fail()) && (ullSource.eof()))
     {
       return in;
@@ -140,7 +130,7 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
   int ID;
   in >> ID;
   int position = ID - 1;
-  bool isValid = (position >= 0) && (position < Data::FIELDS_COUNT) && (!dest.filled[position]);
+  bool isValid = (position >= 0) && (static_cast< std::size_t >(position) < Data::FIELDS_COUNT) && (!dest.filled[position]);
   if (in && !isValid)
   {
     in.setstate(std::ios::failbit);
@@ -244,7 +234,7 @@ std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
   return out;
 }
 
-bool ohantsev::Data::operator<(const ohantsev::Data& rhs) const
+bool ohantsev::Data::operator<(const ohantsev::Data& rhs) const noexcept
 {
   if (key1 != rhs.key1)
   {
