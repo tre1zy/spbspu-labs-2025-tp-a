@@ -6,15 +6,13 @@
 #include "data_struct.hpp"
 int main()
 {
-  std::vector< evstyunichev::DataStruct > data;
+  using data_st = evstyunichev::DataStruct;
+  using i_it_ds = std::istream_iterator< data_st >;
+  using o_it_ds = std::ostream_iterator< data_st >;
+  std::vector< data_st > data;
   while(!std::cin.eof())
   {
-    std::copy
-    (
-      std::istream_iterator< evstyunichev::DataStruct >(std::cin),
-      std::istream_iterator< evstyunichev::DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(i_it_ds(std::cin), i_it_ds(), std::back_inserter(data));
     if (!std::cin)
     {
       std::cin.clear();
@@ -22,11 +20,7 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), evstyunichev::comparator);
-  std::copy
-  (
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< evstyunichev::DataStruct >(std::cout, "\n")
+  std::copy(std::begin(data), std::end(data), o_it_ds(std::cout, "\n")
   );
   return 0;
 }

@@ -45,9 +45,10 @@ namespace evstyunichev
   struct KeyIO
   {
     DataStruct &data;
+    int done;
   };
 
-  std::istream & operator>>(std::istream &in, KeyIO &&key);
+  std::istream & operator>>(std::istream &in, KeyIO &key);
   std::istream & operator>>(std::istream &in, DelimiterIO &&dest);
   std::istream & operator>>(std::istream &in, DelimitersIO &&dest);
   std::istream & operator>>(std::istream &in, UllIO &dest);

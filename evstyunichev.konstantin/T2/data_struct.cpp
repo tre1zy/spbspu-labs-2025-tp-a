@@ -7,6 +7,14 @@
 #include <utility>
 #include "stream_guard.hpp"
 
+namespace
+{
+  bool exist(unsigned int k, evstyunichev::KeyIO &dest)
+  {
+    return (1 << k) & dest.done;
+  }
+}
+
 double evstyunichev::abscmpl(const std::complex< double > &cmpl)
 {
   return std::pow(std::pow(cmpl.real(), 2) + std::pow(cmpl.imag(), 2), 0.5);
@@ -82,31 +90,31 @@ std::istream & evstyunichev::operator>>(std::istream &in, CmplIO &dest)
   return in;
 }
 
-std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &&key)
+std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &key)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
-  char k = 0;
+  unsigned int k = 0;
   {
     evstyunichev::StreamGuard guard(in);
     in >> DelimitersIO{ ":key" };
     std::noskipws(in);
     in >> k;
   }
-  if (k == '1')
+  if (k == 1 && exist(k, key))
   {
     UllIO ull{ key.data.key1 };
     in >> ull;
   }
-  else if (k == '2')
+  else if (k == 2 && exist(k, key))
   {
     CmplIO cmpl{ key.data.key2 };
     in >> cmpl;
   }
-  else if (k == '3')
+  else if (k == 3 && exist(k, key))
   {
     StringIO str{ key.data.key3 };
     in >> str;
@@ -114,7 +122,9 @@ std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &&key)
   else
   {
     in.setstate(std::ios::failbit);
+    return in;
   }
+  key.done -= (1 << k);
   return in;
 }
 
@@ -142,11 +152,12 @@ std::istream & evstyunichev::operator>>(std::istream &in, DataStruct &data)
   }
   DataStruct temp;
   in >> DelimiterIO{ '(' };
-  in >> KeyIO{ temp };
-  in >> KeyIO{ temp };
-  in >> KeyIO{ temp };
+  KeyIO key{ temp, 14 };
+  in >> key;
+  in >> key;
+  in >> key;
   in >> DelimitersIO{ ":)" };
-  if (in)
+  if (in && !key.done)
   {
     data = temp;
   }
@@ -230,5 +241,4 @@ bool evstyunichev::comparator(const DataStruct &a, const DataStruct &b)
     return abscmpl(a.key2) < abscmpl(b.key2);
   }
   return a.key3.size() < b.key3.size();
-
 }
