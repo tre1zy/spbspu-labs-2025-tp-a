@@ -9,8 +9,6 @@
 int main()
 {
   using namespace alymova;
-  StreamGuard os_sg(std::cout);
-  StreamGuard is_sg(std::cin);
 
   std::vector< DataStruct > data;
   while (!std::cin.eof())
@@ -31,4 +29,11 @@ int main()
     data.end(),
     std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
+  /*int a = 0;
+  std::cin >> std::oct >> a;
+  std::cout << std::oct << a;
+  if (std::cin.fail())
+  {
+    std::cout << "\nfail";
+  }*/
 }

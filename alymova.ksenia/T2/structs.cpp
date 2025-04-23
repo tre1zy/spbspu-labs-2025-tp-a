@@ -39,15 +39,16 @@ std::istream& alymova::operator>>(std::istream& in, UllOctIO&& object)
   {
     return in;
   }
-  in >> DelimiterIO{'0'} >> object.i_oct;
-  if (in)
+  alymova::StreamGuard guard(in);
+  in >> DelimiterIO{'0'} >> std::oct >> object.i_oct;
+  /*if (in)
   {
     std::string s_oct = std::to_string(object.i_oct);
     if ((s_oct.find('8') != std::string::npos) || (s_oct.find('9') != std::string::npos))
     {
       in.setstate(std::ios::failbit);
     }
-  }
+  }*/
   return in;
 }
 
@@ -138,9 +139,10 @@ std::ostream& alymova::operator<<(std::ostream& out, const DataStruct& object)
   {
     return out;
   }
+  alymova::StreamGuard guard(out);
   out << "(";
   out << ":key1 ";
-  out << '0' << object.key1;
+  out << '0' << std::oct << object.key1;
   out << ":key2 ";
   out << "'" << object.key2 << "'";
   out << ":key3 ";

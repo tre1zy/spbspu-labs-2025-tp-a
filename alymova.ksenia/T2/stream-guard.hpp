@@ -9,7 +9,7 @@ namespace alymova
   public:
     StreamGuard(const StreamGuard&) = delete;
     StreamGuard(StreamGuard&&) = delete;
-    StreamGuard(std::basic_ios< char >& s);
+    explicit StreamGuard(std::basic_ios< char >& s);
     ~StreamGuard();
   private:
     std::basic_ios< char >& s_;
