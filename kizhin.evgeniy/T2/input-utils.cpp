@@ -24,51 +24,49 @@ namespace kizhin {
   std::istream& operator>>(std::istream&, Nominator&&);
   std::istream& operator>>(std::istream&, Denominator&&);
   std::istream& operator>>(std::istream&, Rational&&);
+
+  std::istream& inputKey(std::istream&, const std::string&, DataStruct&);
 }
 
-struct kizhin::Delimiter
+struct kizhin::Delimiter final
 {
   char val;
 };
 
-struct kizhin::OneOfDelimiters
+struct kizhin::OneOfDelimiters final
 {
   const std::string& val;
 };
 
-struct kizhin::Double
+struct kizhin::Double final
 {
   double& val;
 };
 
-struct kizhin::Label
+struct kizhin::Label final
 {
   const std::string& val;
 };
 
-struct kizhin::String
+struct kizhin::String final
 {
   std::string& val;
 };
 
-struct kizhin::Nominator
+struct kizhin::Nominator final
 {
   long long& val;
 };
 
-struct kizhin::Denominator
+struct kizhin::Denominator final
 {
   unsigned long long& val;
 };
 
-struct kizhin::Rational
+struct kizhin::Rational final
 {
   DataStruct::Rational& val;
 };
-
-namespace kizhin {
-  std::istream& inputKey(std::istream&, const std::string&, DataStruct&);
-}
 
 std::istream& kizhin::operator>>(std::istream& in, Delimiter&& dest)
 {
@@ -160,6 +158,23 @@ std::istream& kizhin::operator>>(std::istream& in, Label&& dest)
   return in;
 }
 
+std::istream& kizhin::inputKey(std::istream& in, const std::string& key, DataStruct& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  if (key == "key1") {
+    return in >> Double{ dest.key1 };
+  } else if (key == "key2") {
+    return in >> Rational{ dest.key2 };
+  } else if (key == "key3") {
+    return in >> String{ dest.key3 };
+  }
+  in.setstate(std::ios::failbit);
+  return in;
+}
+
 std::istream& kizhin::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
@@ -179,23 +194,6 @@ std::istream& kizhin::operator>>(std::istream& in, DataStruct& dest)
   if ((in >> Delimiter{ ')' }) && keys.empty()) {
     dest = input;
   }
-  return in;
-}
-
-std::istream& kizhin::inputKey(std::istream& in, const std::string& key, DataStruct& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry) {
-    return in;
-  }
-  if (key == "key1") {
-    return in >> Double{ dest.key1 };
-  } else if (key == "key2") {
-    return in >> Rational{ dest.key2 };
-  } else if (key == "key3") {
-    return in >> String{ dest.key3 };
-  }
-  in.setstate(std::ios::failbit);
   return in;
 }
 

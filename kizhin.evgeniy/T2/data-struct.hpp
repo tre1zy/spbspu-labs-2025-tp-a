@@ -9,7 +9,7 @@ namespace kizhin {
   bool operator<(const DataStruct&, const DataStruct&);
 }
 
-struct kizhin::DataStruct
+struct kizhin::DataStruct final
 {
   double key1;
   struct Rational

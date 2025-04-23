@@ -16,25 +16,26 @@ namespace kizhin {
   std::ostream& operator<<(std::ostream&, const Rational&);
 }
 
-struct kizhin::Label
+struct kizhin::Label final
 {
   const std::string& val;
 };
 
-struct kizhin::String
+struct kizhin::String final
 {
   const std::string& val;
 };
 
-struct kizhin::Double
+struct kizhin::Double final
 {
   const double& val;
 };
 
-struct kizhin::Rational
+struct kizhin::Rational final
 {
   const DataStruct::Rational& val;
 };
+
 std::ostream& kizhin::operator<<(std::ostream& out, const Label& data)
 {
   std::ostream::sentry sentry(out);

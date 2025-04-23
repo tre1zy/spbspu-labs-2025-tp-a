@@ -7,11 +7,11 @@ namespace kizhin {
   class StreamGuard;
 }
 
-class kizhin::StreamGuard
+class kizhin::StreamGuard final
 {
 public:
-  StreamGuard(std::basic_ios< char >&);
   StreamGuard(const StreamGuard&) = delete;
+  explicit StreamGuard(std::basic_ios< char >&);
   ~StreamGuard();
 
   StreamGuard& operator=(const StreamGuard&) = delete;
