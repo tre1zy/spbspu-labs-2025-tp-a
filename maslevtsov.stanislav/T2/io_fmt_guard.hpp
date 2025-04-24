@@ -7,7 +7,7 @@ namespace maslevtsov {
   class IOFmtGuard
   {
   public:
-    IOFmtGuard(std::basic_ios< char >& s);
+    explicit IOFmtGuard(std::basic_ios< char >& s);
     ~IOFmtGuard();
 
   private:

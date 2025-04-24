@@ -3,32 +3,37 @@
 #include "io_fmt_guard.hpp"
 
 namespace {
-  struct DelimiterIO
+  struct DelimiterIn
   {
-    char exp_;
+    char exp;
   };
 
-  struct LabelIO
+  struct LabelIn
   {
-    std::string exp_;
+    std::string exp;
   };
 
-  struct DoubleIO
+  struct DoubleIn
   {
-    double& ref_;
+    double& ref;
   };
 
-  struct UllIO
+  struct DoubleOut
   {
-    unsigned long long& ref_;
+    const double& ref;
   };
 
-  struct StringIO
+  struct UllIn
   {
-    std::string& ref_;
+    unsigned long long& ref;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+  struct StringIn
+  {
+    std::string& ref;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimiterIn&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -36,13 +41,13 @@ namespace {
     }
     char c = '0';
     in >> c;
-    if (in && (c != dest.exp_)) {
+    if (in && (c != dest.exp)) {
       in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, LabelIO& dest)
+  std::istream& operator>>(std::istream& in, LabelIn& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -52,11 +57,11 @@ namespace {
     if (!std::getline(in, data, ' ')) {
       in.setstate(std::ios::failbit);
     }
-    dest.exp_ = data;
+    dest.exp = data;
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+  std::istream& operator>>(std::istream& in, DoubleIn&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -68,14 +73,43 @@ namespace {
       in.setstate(std::ios::failbit);
     }
     try {
-      dest.ref_ = std::stod(n);
+      dest.ref = std::stod(n);
     } catch (const std::exception& e) {
       in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, UllIO&& dest)
+  std::ostream& operator<<(std::ostream& out, const DoubleOut& dest)
+  {
+    std::ostream::sentry sentry(out);
+    if (!sentry) {
+      return out;
+    }
+    maslevtsov::IOFmtGuard fmtguard(out);
+    if (dest.ref == 0.0) {
+      out << "0.0e0";
+    } else {
+      int exponent = static_cast< int >(std::floor(std::log10(std::abs(dest.ref))));
+      double mantissa = dest.ref / std::pow(10.0, exponent);
+      if (mantissa >= 10.0) {
+        mantissa /= 10.0;
+        exponent += 1;
+      } else if (mantissa < 1.0) {
+        mantissa *= 10.0;
+        exponent -= 1;
+      }
+      out << std::fixed << std::setprecision(1);
+      if (exponent > 0) {
+        out << mantissa << 'e' << '+' << exponent;
+      } else {
+        out << mantissa << 'e' << exponent;
+      }
+    }
+    return out;
+  }
+
+  std::istream& operator>>(std::istream& in, UllIn&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -87,20 +121,20 @@ namespace {
       in.setstate(std::ios::failbit);
     }
     try {
-      dest.ref_ = std::stoull(n);
+      dest.ref = std::stoull(n);
     } catch (const std::exception& e) {
       in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, StringIO&& dest)
+  std::istream& operator>>(std::istream& in, StringIn&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
       return in;
     }
-    return std::getline(in >> DelimiterIO{'"'}, dest.ref_, '"');
+    return std::getline(in >> DelimiterIn{'"'}, dest.ref, '"');
   }
 }
 
@@ -111,19 +145,19 @@ std::istream& maslevtsov::operator>>(std::istream& in, DataStruct& dest)
     return in;
   }
   DataStruct result;
-  in >> DelimiterIO{'('} >> DelimiterIO{':'};
+  in >> DelimiterIn{'('} >> DelimiterIn{':'};
   for (std::size_t i = 0; i < 3ull; ++i) {
-    LabelIO label{""};
+    LabelIn label{""};
     in >> label;
-    if (label.exp_ == "key1") {
-      in >> DoubleIO{result.key1_};
-    } else if (label.exp_ == "key2") {
-      in >> UllIO{result.key2_};
-    } else if (label.exp_ == "key3") {
-      in >> StringIO{result.key3_} >> DelimiterIO{':'};
+    if (label.exp == "key1") {
+      in >> DoubleIn{result.key1};
+    } else if (label.exp == "key2") {
+      in >> UllIn{result.key2};
+    } else if (label.exp == "key3") {
+      in >> StringIn{result.key3} >> DelimiterIn{':'};
     }
   }
-  in >> DelimiterIO{')'};
+  in >> DelimiterIn{')'};
   if (in) {
     dest = result;
   }
@@ -137,27 +171,8 @@ std::ostream& maslevtsov::operator<<(std::ostream& out, const DataStruct& dest)
     return out;
   }
   IOFmtGuard fmtguard(out);
-  out << "(:key1 ";
-  if (dest.key1_ == 0.0) {
-    out << "0.0e0";
-  } else {
-    int exponent = static_cast< int >(std::floor(std::log10(std::abs(dest.key1_))));
-    double mantissa = dest.key1_ / std::pow(10.0, exponent);
-    if (mantissa >= 10.0) {
-      mantissa /= 10.0;
-      exponent += 1;
-    } else if (mantissa < 1.0) {
-      mantissa *= 10.0;
-      exponent -= 1;
-    }
-    out << std::fixed << std::setprecision(1);
-    if (exponent > 0) {
-      out << mantissa << 'e' << '+' << exponent;
-    } else {
-      out << mantissa << 'e' << exponent;
-    }
-  }
-  out << ":key2 " << dest.key2_ << "ull:";
-  out << "key3 \"" << dest.key3_ << "\":)";
+  out << "(:key1 " << DoubleOut{dest.key1};
+  out << ":key2 " << dest.key2 << "ull:";
+  out << "key3 \"" << dest.key3 << "\":)";
   return out;
 }
