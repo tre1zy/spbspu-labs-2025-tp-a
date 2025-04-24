@@ -87,7 +87,7 @@ std::istream& demehin::io::operator>>(std::istream& in, KeyNumIO& dest)
   }
   std::string label = "";
   in >> label;
-  if (label.substr(0, 3) != "key")
+  if (label.substr(0, 3) != "key" || label.size() > 4)
   {
     in.setstate(std::ios::failbit);
   }
