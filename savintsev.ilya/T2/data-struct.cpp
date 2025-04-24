@@ -90,7 +90,7 @@ std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & data
 
 bool savintsev::operator<(const DataStruct & a, const DataStruct & b)
 {
-  if (a.key1 != b.key1) 
+  if (a.key1 != b.key1)
   {
     return a.key1 < b.key1;
   }
