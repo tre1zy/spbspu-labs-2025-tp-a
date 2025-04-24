@@ -3,6 +3,7 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+#include <set>
 #include "scope_guard.hpp"
 
 namespace
@@ -108,11 +109,21 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
     using dbl = DoubleIO;
     using ll = LlIO;
     using str = StringIO;
+
+    std::set< int > usedKeys;
     in >> sep{ '(' } >> sep{ ':' };
     for (size_t i = 0; i < 3; i++)
     {
       keyNum key_num{ 0 };
       in >> key_num;
+
+      if (usedKeys.count(key_num.key) > 0)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      usedKeys.insert(key_num.key);
+
       if (key_num.key == '1')
       {
         in >> ll{ input.key1 } >> sep{ ':' };
@@ -124,6 +135,11 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
       else if (key_num.key == '3')
       {
         in >> str{ input.key3 } >> sep{ ':' };
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        return in;
       }
     }
     in >> sep { ')' };
