@@ -1,5 +1,5 @@
-#include "data-struct.hpp"
 #include <iostream>
+#include "data-struct.hpp"
 
 bool belyaev::operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
