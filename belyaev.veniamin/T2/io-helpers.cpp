@@ -33,29 +33,7 @@ std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
   return in;
 }
 
-std::istream& belyaev::operator>>(std::istream& in, const LabelIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  for (char expectedChar : dest.expected)
-  {
-    char currentDest = '0';
-    in.get(currentDest);
-    if (!in || (currentDest != expectedChar))
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-  }
-
-  return in;
-}
-
-std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIO& dest)
+std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -169,15 +147,24 @@ std::istream& belyaev::operator>>(std::istream& in, const PairLLIO&& dest)
   }
 
   using sep = DelimeterIO;
-  bool cs = true;
-  in >> sep{'(', cs};
-  in >> sep{':', cs};
-  in >> sep{'N', cs};
+  in >> sep{'('};
+  in >> sep{':'};
+  in >> sep{'N'};
   in >> dest.value.first;
-  in >> sep{':', cs};
-  in >> sep{'D', cs};
+  in >> sep{':'};
+  in >> sep{'D'};
   in >> dest.value.second;
-  in >> sep{':', cs};
-  in >> sep{')', cs};
+  in >> sep{':'};
+  in >> sep{')'};
   return in;
+}
+
+std::istream& belyaev::operator>>(std::istream& in, const StringIO& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  return std::getline(in >> DelimeterIO{'"'}, dest.value, '"');
 }

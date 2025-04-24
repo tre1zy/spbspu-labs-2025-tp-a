@@ -14,6 +14,7 @@ namespace belyaev
   };
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
   std::istream& operator>>(std::istream& in, DataStruct& dst);
-  std::istream& operator<<(std::ostream& out, const DataStruct& dst);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dst);
 }
+
 #endif

@@ -10,12 +10,7 @@ namespace belyaev
   {
     char expected;
     bool caseSensitive;
-    DelimeterIO(char expected_, bool caseSensitive_);
-  };
-
-  struct LabelIO
-  {
-    std::string expected;
+    DelimeterIO(char expected_, bool caseSensitive_ = true);
   };
 
   struct DoubleEIO
@@ -28,12 +23,17 @@ namespace belyaev
     std::pair< long long, unsigned long long >& value;
   };
 
-  std::istream& operator>>(std::istream& in, const LabelIO&& dest);
+  struct StringIO
+  {
+    std::string& value;
+  };
+
   std::istream& operator>>(std::istream& in, const DelimeterIO&& dest);
-  std::ostream& operator<<(std::ostream& out, const DoubleEIO& dest);
+  std::ostream& operator<<(std::ostream& out, const DoubleEIO&& dest);
   std::ostream& operator<<(std::ostream& out, const PairLLIO& dest);
   std::istream& operator>>(std::istream& in, const DoubleEIO&& dest);
   std::istream& operator>>(std::istream& in, const PairLLIO&& dest);
+  std::istream& operator>>(std::istream& in, const StringIO& dest);
 }
 
 #endif
