@@ -108,7 +108,7 @@ std::istream& duhanina::operator>>(std::istream& in, DataStruct& dest)
   bool k2 = false;
   bool k3 = false;
   std::string label;
-  while (in >> label && label != ")")
+  while (in >> label)
   {
     if (label == "key1" && !k1)
     {
@@ -125,13 +125,12 @@ std::istream& duhanina::operator>>(std::istream& in, DataStruct& dest)
       in >> StringIO{ temp.key3 };
       k3 = true;
     }
-    else
+    else if (label == ")")
     {
-      in.setstate(std::ios::failbit);
+      break;
     }
-    in >> DelimiterIO{':'};
+    in >> DelimiterIO{ ':' };
   }
-  in >> DelimiterIO{')'};
   if (in && k1 && k2 && k3)
   {
     dest = temp;
