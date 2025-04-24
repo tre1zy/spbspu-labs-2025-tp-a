@@ -18,4 +18,5 @@ namespace belyaev
       std::basic_ios< char >::fmtflags flags_;
   };
 }
+
 #endif

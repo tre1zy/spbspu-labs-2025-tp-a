@@ -170,7 +170,6 @@ std::istream& belyaev::operator>>(std::istream& in, const PairLLIO&& dest)
 
   using sep = DelimeterIO;
   bool cs = true;
-
   in >> sep{'(', cs};
   in >> sep{':', cs};
   in >> sep{'N', cs};
