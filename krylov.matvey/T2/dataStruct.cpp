@@ -12,7 +12,7 @@ std::ostream& krylov::operator<<(std::ostream& out, const DataStruct& data)
   StreamGuard guard(out);
   out << "(";
   out << ":key1 " << "0b" << data.key1;
-  out << ":key2 " << "0x" << data.key2;
+  out << ":key2 " << "0x" << std::hex << data.key2;
   out << ":key3 " << "\"" << data.key3 << "\"";
   out << ":)";
   return out;
