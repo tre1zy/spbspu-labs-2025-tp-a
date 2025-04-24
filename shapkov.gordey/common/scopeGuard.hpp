@@ -6,7 +6,7 @@ namespace shapkov
 {
   class ScopeGuard
   {
-    public:
+  public:
     explicit ScopeGuard(std::basic_ios< char >& s);
     ScopeGuard(const ScopeGuard&) = delete;
     ScopeGuard(ScopeGuard&&) = delete;
