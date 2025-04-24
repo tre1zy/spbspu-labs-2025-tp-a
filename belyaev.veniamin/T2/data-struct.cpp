@@ -29,7 +29,7 @@ std::istream& belyaev::operator>>(std::istream& in, DataStruct& dst)
   DataStruct newDS;
   bool hasKeys[] = {false, false, false};
   in >> DelimeterIO{'('};
-  
+
   for (int i = 0; i < 3; i++)
   {
     in >> DelimeterIO{':'};
