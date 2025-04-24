@@ -11,9 +11,14 @@ namespace savintsev
     char exp_;
   };
 
-  struct DoubleIO
+  struct DoubleI
   {
     double & ref_;
+  };
+
+  struct DoubleO
+  {
+    double exp_;
   };
 
   struct UllIO
@@ -32,12 +37,12 @@ namespace savintsev
   };
 
   std::istream & operator>>(std::istream & in, DelimiterIO && dest);
-  std::istream & operator>>(std::istream & in, DoubleIO && dest);
+  std::istream & operator>>(std::istream & in, DoubleI && dest);
   std::istream & operator>>(std::istream & in, StringIO && dest);
   std::istream & operator>>(std::istream & in, UllIO && dest);
   std::istream & operator>>(std::istream & in, LabelIO & dest);
 
-  std::ostream & operator<<(std::ostream & out, const DoubleIO & dest);
+  std::ostream & operator<<(std::ostream & out, const DoubleO & dest);
 }
 
 #endif

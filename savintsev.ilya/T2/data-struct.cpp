@@ -11,13 +11,13 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
     return in;
   }
 
-  savintsev::DataStruct temp;
+  DataStruct temp;
   bool has_key1 = false, has_key2 = false, has_key3 = false;
 
   try
   {
-    in >> savintsev::DelimiterIO{'('};
-    in >> savintsev::DelimiterIO{':'};
+    in >> DelimiterIO{'('};
+    in >> DelimiterIO{':'};
 
     for (size_t i = 0; i < 3; ++i)
     {
@@ -26,17 +26,17 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
 
       if (label.exp_ == "key1")
       {
-        in >> savintsev::DoubleIO{temp.key1};
+        in >> DoubleI{temp.key1};
         has_key1 = true;
       }
       else if (label.exp_ == "key2")
       {
-        in >> savintsev::UllIO{temp.key2};
+        in >> UllIO{temp.key2};
         has_key2 = true;
       }
       else if (label.exp_ == "key3")
       {
-        in >> savintsev::StringIO{temp.key3};
+        in >> StringIO{temp.key3};
         has_key3 = true;
       }
       else
@@ -44,10 +44,10 @@ std::istream & savintsev::operator>>(std::istream & in, DataStruct & dest)
         throw std::runtime_error("Unknown key");
       }
 
-      in >> savintsev::DelimiterIO{':'};
+      in >> DelimiterIO{':'};
     }
 
-    in >> savintsev::DelimiterIO{')'};
+    in >> DelimiterIO{')'};
 
     if (!(has_key1 && has_key2 && has_key3))
     {
@@ -72,12 +72,12 @@ std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & data
     return out;
   }
 
-  savintsev::ScopeGuard guard(out);
+  ScopeGuard guard(out);
 
   out << "(:";
 
   out << "key1 ";
-  out << DoubleIO{const_cast< double & >(data.key1)} << ":";
+  out << DoubleO{data.key1} << ":";
 
   out << "key2 ";
   out << '0' << std::oct << data.key2 << ":";
@@ -86,4 +86,17 @@ std::ostream & savintsev::operator<<(std::ostream & out, const DataStruct & data
   out << '"' << data.key3 << "\":)";
 
   return out;
+}
+
+bool savintsev::operator<(const DataStruct & a, const DataStruct & b)
+{
+  if (a.key1 != b.key1) 
+  {
+    return a.key1 < b.key1;
+  }
+  if (a.key2 != b.key2)
+  {
+    return a.key2 < b.key2;
+  }
+  return a.key3.length() < b.key3.length();
 }

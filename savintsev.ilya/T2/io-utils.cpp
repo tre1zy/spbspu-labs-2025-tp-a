@@ -20,7 +20,7 @@ std::istream & savintsev::operator>>(std::istream & in, DelimiterIO && dest)
   return in;
 }
 
-std::istream & savintsev::operator>>(std::istream & in, DoubleIO && dest)
+std::istream & savintsev::operator>>(std::istream & in, DoubleI && dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -102,18 +102,18 @@ std::istream & savintsev::operator>>(std::istream & in, LabelIO & dest)
   return in;
 }
 
-std::ostream & savintsev::operator<<(std::ostream & out, const DoubleIO & dest)
+std::ostream & savintsev::operator<<(std::ostream & out, const DoubleO & dest)
 {
   savintsev::ScopeGuard guard(out);
 
-  if (dest.ref_ == 0.0)
+  if (dest.exp_ == 0.0)
   {
     out << "0.0e+0";
     return out;
   }
 
   int exponent = 0;
-  double mantissa = dest.ref_;
+  double mantissa = dest.exp_;
 
   while (std::abs(mantissa) >= 10.0)
   {
