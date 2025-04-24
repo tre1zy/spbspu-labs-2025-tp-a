@@ -44,7 +44,7 @@ namespace duhanina
   class Iofmtguard
   {
   public:
-    Iofmtguard(std::basic_ios< char >& s);
+    explicit Iofmtguard(std::basic_ios< char >& s);
     ~Iofmtguard();
 
   private:
