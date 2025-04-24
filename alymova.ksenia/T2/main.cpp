@@ -29,11 +29,4 @@ int main()
     data.end(),
     std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
-  /*int a = 0;
-  std::cin >> std::oct >> a;
-  std::cout << std::oct << a;
-  if (std::cin.fail())
-  {
-    std::cout << "\nfail";
-  }*/
 }

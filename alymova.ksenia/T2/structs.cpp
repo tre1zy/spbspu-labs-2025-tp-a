@@ -24,10 +24,15 @@ std::istream& alymova::operator>>(std::istream& in, LabelIO&& object)
   {
     return in;
   }
-  std::string s;
-  if ((in >> s) && s != object.exp)
+  char c;
+  for (size_t i = 0; i < object.exp.size(); i++)
   {
-    in.setstate(std::ios::failbit);
+    in >> c;
+    if (c != object.exp[i])
+    {
+      in.setstate(std::ios::failbit);
+      break;
+    }
   }
   return in;
 }
@@ -41,14 +46,6 @@ std::istream& alymova::operator>>(std::istream& in, UllOctIO&& object)
   }
   alymova::StreamGuard guard(in);
   in >> DelimiterIO{'0'} >> std::oct >> object.i_oct;
-  /*if (in)
-  {
-    std::string s_oct = std::to_string(object.i_oct);
-    if ((s_oct.find('8') != std::string::npos) || (s_oct.find('9') != std::string::npos))
-    {
-      in.setstate(std::ios::failbit);
-    }
-  }*/
   return in;
 }
 
