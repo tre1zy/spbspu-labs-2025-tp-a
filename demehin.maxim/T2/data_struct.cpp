@@ -91,7 +91,7 @@ std::istream& demehin::io::operator>>(std::istream& in, KeyNumIO& dest)
   {
     in.setstate(std::ios::failbit);
   }
-  dest.key = label.back();
+  dest.key = label.back() - '0';
   return in;
 }
 
@@ -110,7 +110,7 @@ std::istream& demehin::operator>>(std::istream& in, DataStruct& dest)
     using ll = LlIO;
     using str = StringIO;
 
-    std::array< bool, 3 > usedKeys;
+    std::array< bool, 3 > usedKeys{ };
     in >> sep{ '(' } >> sep{ ':' };
     for (size_t i = 0; i < 3; i++)
     {
