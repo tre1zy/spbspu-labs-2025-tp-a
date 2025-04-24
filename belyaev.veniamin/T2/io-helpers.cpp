@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "io-helpers.hpp"
 #include "stream-guard.hpp"
 
@@ -63,16 +64,12 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIO&& dest)
     mantissa *= 10.0;
   }
 
-  out << mantissa;
+  out << std::fixed << std::setprecision(1) << mantissa;
 
   out << "e";
   if (exp >= 0)
   {
     out << "+";
-  }
-  else
-  {
-    out << "-";
   }
   out << exp;
 
