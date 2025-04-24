@@ -50,8 +50,8 @@ namespace dribas
   struct KeyI
   {
     std::string& key;
-    const std::string expected;
-    bool exict = false;
+    const std::string& expected;
+    bool status = false;
   };
 
   std::istream& operator>>(std::istream&, Data&);
@@ -66,7 +66,7 @@ namespace dribas
   std::ostream& operator<<(std::ostream&, const StringO&&);
   std::ostream& operator<<(std::ostream&, const Data&);
 
-  bool compare(const Data&, const Data&);
+  bool compare(const Data&, const Data&) noexcept;
 }
 
 

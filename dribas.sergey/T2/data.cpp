@@ -7,7 +7,7 @@
 
 namespace dribas
 {
-  bool compare(const Data& lhs, const Data& rhs)
+  bool compare(const Data& lhs, const Data& rhs) noexcept
   {
     if (lhs.key1 != rhs.key1) {
       return lhs.key1 < rhs.key1;
@@ -120,10 +120,10 @@ namespace dribas
     }
     StreamGuard guard(in);
     in >> key.key;
-    if (key.key != key.expected && key.exict) {
+    if (key.key != key.expected && key.status) {
       in.setstate(std::ios::failbit);
     }
-    key.exict = true;
+    key.status = true;
     return in;
   }
 

@@ -11,16 +11,12 @@ int main() {
 
   std::vector< Data > data;
 
-  while(true) {
+  while(!std::cin.eof()) {
     std::copy(
-    std::istream_iterator< Data >(std::cin),
-    std::istream_iterator< Data >(),
-    std::back_inserter(data)
+      std::istream_iterator< Data >(std::cin),
+      std::istream_iterator< Data >(),
+      std::back_inserter(data)
     );
-
-    if (std::cin.eof()) {
-      break;
-    }
 
     if (!std::cin) {
       std::cin.clear();
