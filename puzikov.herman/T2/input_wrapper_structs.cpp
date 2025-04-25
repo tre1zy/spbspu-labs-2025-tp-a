@@ -10,7 +10,7 @@ std::istream &puzikov::input::operator>>(std::istream &in, Character &&dest)
     return in;
   }
 
-  char c = 0;
+  char c;
   in.get(c);
   if (in && std::tolower(c) != std::tolower(dest.exp))
   {
@@ -60,8 +60,8 @@ std::istream &puzikov::input::operator>>(std::istream &in, PairValue &&dest)
     return in;
   }
 
-  long long n = 0;
-  unsigned long long d = 0;
+  long long n;
+  unsigned long long d;
   in >> Character {'('} >> Character {':'} >> Character {'N'} >> n;
   in >> Character {':'} >> Character {'D'} >> d;
   in >> Character {':'} >> Character {')'} >> Character {':'};
