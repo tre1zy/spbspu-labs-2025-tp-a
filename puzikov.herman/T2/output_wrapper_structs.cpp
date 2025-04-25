@@ -11,18 +11,17 @@ unsigned puzikov::output::calcBitWidth(unsigned long long num)
   return static_cast< int >(std::log2(num)) + 1;
 }
 
-void puzikov::output::fillBinRepresentationString(unsigned long long num, std::string &binString)
+std::ostream &puzikov::output::outputBinRepresentation(unsigned long long num, std::ostream &os)
 {
   int bitWidth = calcBitWidth(num);
-  binString.resize(2 + bitWidth);
-  binString[0] = '0';
-  binString[1] = 'b';
+  os << '0';
+  os << 'b';
 
   for (int i = bitWidth - 1; i >= 0; --i)
   {
-    binString[2 + i] = (num % 2) ? '1' : '0';
-    num /= 2;
+    os << ((num >> i) & 1);
   }
+  return os;
 }
 
 std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &source)
@@ -39,9 +38,7 @@ std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &sou
     return out << "0b01";
   }
 
-  std::string binString;
-  fillBinRepresentationString(source.ref, binString);
-  return out << binString;
+  return outputBinRepresentation(source.ref, out);
 }
 
 std::ostream &puzikov::output::operator<<(std::ostream &out, const PairValue &source)
