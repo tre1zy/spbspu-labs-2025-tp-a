@@ -7,7 +7,7 @@ namespace puzikov
 {
   struct FormatGuard
   {
-    FormatGuard(std::basic_ios< char > &s);
+    explicit FormatGuard(std::basic_ios< char > &s);
     ~FormatGuard();
     FormatGuard(const FormatGuard &) = delete;
     FormatGuard(FormatGuard &&) = delete;
