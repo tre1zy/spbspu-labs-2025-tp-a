@@ -6,7 +6,7 @@ int main()
   std::copy(std::istream_iterator< DataStruct >(std::cin),
     std::istream_iterator<DataStruct>(),
     std::back_inserter(dataVec));
-  std::erase_if(dataVec, [](const DataStruct& d) { return d.empty(); });
+  std::enable_if(dataVec, [](const DataStruct& d) { return d.empty(); });
   std::sort(dataVec.begin(), dataVec.end(), [](const DataStruct& a, const DataStruct& b)
   {
     if (a.key1 != b.key1) return a.key1 < b.key1;
