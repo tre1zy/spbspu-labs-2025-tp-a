@@ -26,7 +26,7 @@ namespace puzikov
     };
     std::ostream &operator<<(std::ostream &out, const StringValue &source);
 
-    int calcBitWidth(unsigned long long num);
+    unsigned calcBitWidth(unsigned long long num);
     void fillBinRepresentationString(unsigned long long num, std::string &binString);
   } // namespace output
 } // namespace puzikov

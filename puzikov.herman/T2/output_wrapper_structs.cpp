@@ -2,7 +2,7 @@
 #include "format_guard.hpp"
 #include <cmath>
 
-int puzikov::output::calcBitWidth(unsigned long long num)
+unsigned puzikov::output::calcBitWidth(unsigned long long num)
 {
   if (num == 0)
   {
