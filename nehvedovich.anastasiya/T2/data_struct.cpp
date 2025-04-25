@@ -58,7 +58,7 @@ std::istream &nehvedovich::operator>>(std::istream &in, data_struct &dest)
 
   if (in)
   {
-    dest = tmp;
+    dest = std::move(tmp);
   }
   return in;
 }

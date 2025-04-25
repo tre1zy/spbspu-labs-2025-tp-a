@@ -8,8 +8,13 @@ namespace nehvedovich
   class FormatGuard
   {
   public:
-    FormatGuard(std::basic_ios< char > &s);
+    explicit FormatGuard(std::basic_ios< char > &s);
     ~FormatGuard();
+
+    FormatGuard(const FormatGuard &) = delete;
+    FormatGuard(FormatGuard &&) = delete;
+    FormatGuard &operator=(const FormatGuard &) = delete;
+    FormatGuard &operator=(FormatGuard &&) = delete;
 
   private:
     std::basic_ios< char > &s_;
