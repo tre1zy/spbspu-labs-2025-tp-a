@@ -51,7 +51,7 @@ namespace dribas
   {
     std::string& key;
     const std::string& expected;
-    bool status = false;
+    bool wasVerified = false;
   };
 
   std::istream& operator>>(std::istream&, Data&);

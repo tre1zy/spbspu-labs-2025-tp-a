@@ -120,10 +120,10 @@ namespace dribas
     }
     StreamGuard guard(in);
     in >> key.key;
-    if (key.key != key.expected && key.status) {
+    if (key.key != key.expected && key.wasVerified) {
       in.setstate(std::ios::failbit);
     }
-    key.status = true;
+    key.wasVerified = true;
     return in;
   }
 
