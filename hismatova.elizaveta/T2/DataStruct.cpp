@@ -15,6 +15,10 @@ int quotesCount(const std::string& str)
 std::istream& operator>>(std::istream& in, DataStruct& data)
 {
   std::string line;
+  DataStruct tempData;
+  data.key1 = tempData.key1;
+  data.key2 = tempData.key2;
+  data.key3 = tempData.key3;
   if (!std::getline(in, line))
   {
     return in;
@@ -26,7 +30,6 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
   try
   {
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-    DataStruct tempData;
     std::istringstream iss(line.substr(1, line.size() - 2));
     std::string token;
     while (std::getline(iss, token, ':'))
@@ -124,6 +127,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
     data.key1 = tempData.key1;
     data.key2 = tempData.key2;
     data.key3 = tempData.key3;
+
   }
   catch (...)
   {
@@ -133,9 +137,10 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
 }
 std::ostream& operator<<(std::ostream& out, const DataStruct& data)
 {
-  out << std::fixed << std::setprecision(1);
   out << "(:key1 " << data.key1 << "ull"
-      << ":key2 #c(" << data.key2.real() << " " << data.key2.imag() << ")"
+      << ":key2 #c(" << std::fixed << std::setprecision(1)
+      << static_cast<double>(data.key2.real()) << " "
+      << static_cast<double>(data.key2.imag()) << ")"
       << ":key3 \"" << data.key3 << "\":)";
   return out;
 }
