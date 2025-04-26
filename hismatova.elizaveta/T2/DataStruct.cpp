@@ -1,5 +1,17 @@
 #include "DataStruct.hpp"
 
+int quotesCount(const std::string& str)
+{
+  int count = 0;
+  for (const auto c: str)
+  {
+    if (c == '"')
+    {
+      ++count;
+    }
+  }
+  return count;
+}
 std::istream& operator>>(std::istream& in, DataStruct& data)
 {
   std::string line;
@@ -19,11 +31,25 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
     std::string token;
     while (std::getline(iss, token, ':'))
     {
-      if (token.empty())
-      {
-        continue;
-      }
+      if (token.empty()) continue;
       std::string key = token.substr(0, 4);
+      if (key == "key3")
+      {
+        if (quotesCount(token) < 2)
+        {
+          token += ':';
+        }
+        while (quotesCount(token) < 2)
+        {
+          char c;
+          iss >> c;
+          if (iss.eof())
+          {
+            return in;
+          }
+          token += c;
+        }
+      }
       std::string value = token.substr(4);
       std::istringstream val_stream(value);
       if (key == "key1")
@@ -82,8 +108,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
         {
           return in;
         }
-        std::string value;
-        val_stream >> value;
+        std::string value = val_stream.str().substr(1);
         if (value.size() < 2 || value.front() != '"' || value.back() != '"')
         {
           return in;
