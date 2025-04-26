@@ -133,6 +133,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
 }
 std::ostream& operator<<(std::ostream& out, const DataStruct& data)
 {
+  out << std::fixed << std::setprecision(1);
   out << "(:key1 " << data.key1 << "ull"
       << ":key2 #c(" << data.key2.real() << " " << data.key2.imag() << ")"
       << ":key3 \"" << data.key3 << "\":)";
