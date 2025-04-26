@@ -17,19 +17,13 @@ std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
 
   char c = '0';
   in >> c;
-  if (!dest.caseSensitive)
+  if (dest.caseSensitive)
   {
-    if (in && (tolower(c) != dest.expected))
-    {
-      in.setstate(std::ios::failbit);
-    }
+    c = static_cast<char>(tolower(c));
   }
-  else
+  if (in && (c != dest.expected))
   {
-    if (in && (c != dest.expected))
-    {
-      in.setstate(std::ios::failbit);
-    }
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
