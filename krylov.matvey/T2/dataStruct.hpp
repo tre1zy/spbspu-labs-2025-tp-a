@@ -10,9 +10,11 @@ namespace krylov
     unsigned long long key2;
     std::string key3;
   };
+
   std::ostream &operator<<(std::ostream &out, const DataStruct &data);
   std::istream &operator>>(std::istream &in, DataStruct &data);
   bool operator<(const DataStruct &lhs, const DataStruct &rhs);
+
   struct DelimiterIO
   {
     char delim;
@@ -25,11 +27,17 @@ namespace krylov
   };
   std::istream &operator>>(std::istream &in, UllHexIO &&dest);
 
-  struct UllBinIO
+  struct UllBinI
   {
     unsigned long long int &ref;
   };
-  std::istream &operator>>(std::istream &in, UllBinIO &&dest);
+  std::istream &operator>>(std::istream &in, UllBinI &&dest);
+
+  struct UllBinO
+  {
+    const unsigned long long int &ref;
+  };
+  std::ostream &operator<<(std::ostream &out, const UllBinO &&dest);
 
   struct StringIO
   {

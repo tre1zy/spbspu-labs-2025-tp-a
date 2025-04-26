@@ -11,8 +11,8 @@ std::ostream& krylov::operator<<(std::ostream& out, const DataStruct& data)
   }
   StreamGuard guard(out);
   out << "(";
-  out << ":key1 " << "0b" << data.key1;
-  out << ":key2 " << "0x" << std::hex << data.key2;
+  out << ":key1 " << "0b" << UllBinO{ data.key1 };
+  out << ":key2 " << "0x" << std::hex << std::uppercase << data.key2;
   out << ":key3 " << "\"" << data.key3 << "\"";
   out << ":)";
   return out;
@@ -34,7 +34,7 @@ std::istream& krylov::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& krylov::operator>>(std::istream& in, UllBinIO&& dest)
+std::istream& krylov::operator>>(std::istream& in, UllBinI&& dest)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -43,6 +43,24 @@ std::istream& krylov::operator>>(std::istream& in, UllBinIO&& dest)
   }
   in >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' } >> dest.ref;
   return in;
+}
+
+std::ostream& krylov::operator<<(std::ostream& out, const UllBinO&& dest)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+  if (dest.ref != 0)
+  {
+    out << "0" << dest.ref;
+  }
+  else
+  {
+    out << dest.ref;
+  }
+  return out;
 }
 
 std::istream& krylov::operator>>(std::istream& in, UllHexIO&& dest)
@@ -84,7 +102,7 @@ std::istream& krylov::operator>>(std::istream& in, DataStruct& data)
     in >> key;
     if (key == "key1")
     {
-      in >> UllBinIO{ input.key1 };
+      in >> UllBinI{ input.key1 };
       in >> DelimiterIO{ ':' };
       ++count;
     }
