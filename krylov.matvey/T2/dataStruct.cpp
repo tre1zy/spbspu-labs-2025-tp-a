@@ -95,9 +95,9 @@ std::istream& krylov::operator>>(std::istream& in, DataStruct& data)
   DataStruct input;
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
   std::string key;
-  constexpr size_t key_numbers = 3;
+  constexpr size_t keysNumbers = 3;
   size_t count = 0;
-  while (count < key_numbers && in)
+  while (count < keysNumbers && in)
   {
     in >> key;
     if (key == "key1")
