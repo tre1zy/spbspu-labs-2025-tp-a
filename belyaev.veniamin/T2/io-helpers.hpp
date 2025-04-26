@@ -9,8 +9,7 @@ namespace belyaev
   struct DelimeterIO
   {
     char expected;
-    bool caseSensitive;
-    DelimeterIO(char expected_, bool caseSensitive_ = true);
+    DelimeterIO(char expected_);
   };
 
   struct DoubleEIO

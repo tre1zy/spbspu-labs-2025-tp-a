@@ -2,9 +2,8 @@
 #include "io-helpers.hpp"
 #include "stream-guard.hpp"
 
-belyaev::DelimeterIO::DelimeterIO(char expected_, bool caseSensitive_):
-  expected(expected_),
-  caseSensitive(caseSensitive_)
+belyaev::DelimeterIO::DelimeterIO(char expected_):
+  expected(expected_)
 {}
 
 std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
@@ -17,10 +16,6 @@ std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
 
   char c = '0';
   in >> c;
-  if (dest.caseSensitive)
-  {
-    c = static_cast<char>(tolower(c));
-  }
   if (in && (c != dest.expected))
   {
     in.setstate(std::ios::failbit);
