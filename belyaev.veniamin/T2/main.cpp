@@ -10,7 +10,7 @@ int main()
   using namespace belyaev;
 
   std::vector< DataStruct > data;
-  while (!std::cin.eof())
+  while (!std::cin.eof() && !std::cin.bad())
   {
     if (std::cin.fail())
     {
@@ -22,6 +22,12 @@ int main()
       std::istream_iterator< DataStruct >{},
       std::back_inserter(data)
     );
+  }
+
+  if (std::cin.bad())
+  {
+    std::cerr << "Input error.\n";
+    return 2;
   }
 
   std::sort(data.begin(), data.end());
