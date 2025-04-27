@@ -1,7 +1,6 @@
-#include "io-utils.hpp"
+#include "data-struct.hpp"
 #include <iomanip>
 #include <iostream>
-#include <string>
 #include "stream-guard.hpp"
 
 namespace kizhin {
@@ -16,22 +15,22 @@ namespace kizhin {
   std::ostream& operator<<(std::ostream&, const Rational&);
 }
 
-struct kizhin::Label final
+struct kizhin::Label
 {
   const std::string& val;
 };
 
-struct kizhin::String final
+struct kizhin::String
 {
   const std::string& val;
 };
 
-struct kizhin::Double final
+struct kizhin::Double
 {
   const double& val;
 };
 
-struct kizhin::Rational final
+struct kizhin::Rational
 {
   const DataStruct::Rational& val;
 };

@@ -7,7 +7,7 @@ namespace kizhin {
   class StreamGuard;
 }
 
-class kizhin::StreamGuard final
+class kizhin::StreamGuard
 {
 public:
   StreamGuard(const StreamGuard&) = delete;

@@ -1,8 +1,7 @@
-#include "io-utils.hpp"
+#include "data-struct.hpp"
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <string>
 #include <vector>
 #include "stream-guard.hpp"
 
@@ -28,42 +27,42 @@ namespace kizhin {
   std::istream& inputKey(std::istream&, const std::string&, DataStruct&);
 }
 
-struct kizhin::Delimiter final
+struct kizhin::Delimiter
 {
   char val;
 };
 
-struct kizhin::OneOfDelimiters final
+struct kizhin::OneOfDelimiters
 {
   const std::string& val;
 };
 
-struct kizhin::Double final
+struct kizhin::Double
 {
   double& val;
 };
 
-struct kizhin::Label final
+struct kizhin::Label
 {
   const std::string& val;
 };
 
-struct kizhin::String final
+struct kizhin::String
 {
   std::string& val;
 };
 
-struct kizhin::Nominator final
+struct kizhin::Nominator
 {
   long long& val;
 };
 
-struct kizhin::Denominator final
+struct kizhin::Denominator
 {
   unsigned long long& val;
 };
 
-struct kizhin::Rational final
+struct kizhin::Rational
 {
   DataStruct::Rational& val;
 };
