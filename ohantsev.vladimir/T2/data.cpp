@@ -1,5 +1,4 @@
 #include "data.h"
-#include <sstream>
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
