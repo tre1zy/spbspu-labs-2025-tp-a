@@ -1,6 +1,7 @@
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
 #include <vector>
+#include <istream>
 
 namespace demehin
 {
