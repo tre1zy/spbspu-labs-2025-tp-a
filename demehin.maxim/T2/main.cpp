@@ -1,22 +1,20 @@
-#include "data_struct.hpp"
 #include <vector>
 #include <iterator>
-#include <sstream>
 #include <iostream>
-#include <iomanip>
 #include <limits>
 #include <algorithm>
+#include "data_struct.hpp"
 
 int main()
 {
-  std::vector< demehin::DataStruct > data;
+  using demehin::DataStruct;
+  using istrIter = std::istream_iterator< DataStruct >;
+  using ostrIter = std::ostream_iterator< DataStruct >;
+
+  std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
-    std::copy(
-      std::istream_iterator< demehin::DataStruct >(std::cin),
-      std::istream_iterator< demehin::DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(istrIter(std::cin), istrIter(), std::back_inserter(data));
 
     if (!std::cin)
     {
@@ -27,11 +25,7 @@ int main()
 
   std::sort(data.begin(), data.end());
 
-  std::copy(
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< demehin::DataStruct >(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), ostrIter(std::cout, "\n"));
 }
 
 

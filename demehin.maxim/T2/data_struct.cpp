@@ -1,9 +1,8 @@
 #include "data_struct.hpp"
 #include <cctype>
 #include <cmath>
-#include <sstream>
 #include <iomanip>
-#include <set>
+#include <array>
 #include "scope_guard.hpp"
 #include <delimiter.hpp>
 
@@ -34,11 +33,15 @@ std::istream& demehin::io::operator>>(std::istream& in, DoubleIO&& dest)
     return in;
   }
 
-  std::istringstream iss(num);
-  if (!(iss >> dest.ref))
+  try
+  {
+    dest.ref = std::stod(num);
+  }
+  catch (...)
   {
     in.setstate(std::ios::failbit);
   }
+
   return in;
 }
 
