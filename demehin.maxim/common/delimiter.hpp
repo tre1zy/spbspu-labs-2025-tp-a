@@ -12,5 +12,4 @@ namespace demehin::io
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 
-
 #endif
