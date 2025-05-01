@@ -1,4 +1,6 @@
 #include "geometry.hpp"
+#include <algorithm>
+#include <iterator>
 #include <delimiter.hpp>
 
 namespace
@@ -30,18 +32,26 @@ std::istream& demehin::operator>>(std::istream& in, Polygon& plg)
   }
 
   size_t vrtx_cnt;
-  if (!(in >> vrtx_cnt))
+  if (!(in >> vrtx_cnt) || vrtx_cnt < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  Point pt;
-  for (size_t i = 0; i < vrtx_cnt; i++)
+  std::vector< Point > pts(vrtx_cnt);
+  std::copy_n(std::istream_iterator< Point >(in), vrtx_cnt, pts.begin());
+
+  if (!in)
   {
-    in >> pt;
-    plg.points.push_back(pt);
+    in.setstate(std::ios::failbit);
+    return in;
   }
 
+  plg.points = pts;
   return in;
 }
+
+//double demehin::getPlgArea(const Polygon& plg)
+//{
+  //double area = 0;
+//}

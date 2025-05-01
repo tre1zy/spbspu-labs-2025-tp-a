@@ -18,6 +18,8 @@ namespace demehin
 
   std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
+
+  double getPlgArea(const Polygon&);
 }
 
 #endif
