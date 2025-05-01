@@ -1,6 +1,6 @@
 #include "scopeGuard.hpp"
 
-shapkov::ScopeGuard::ScopeGuard(std::basic_ios< char >& s) :
+shapkov::ScopeGuard::ScopeGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
   precision_(s.precision()),

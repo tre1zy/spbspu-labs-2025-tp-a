@@ -4,10 +4,10 @@
 
 namespace shapkov
 {
-  struct delimiterIO
+  struct DelimiterIO
   {
     char exp;
   };
-  std::istream& operator>>(std::istream& in, delimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 #endif

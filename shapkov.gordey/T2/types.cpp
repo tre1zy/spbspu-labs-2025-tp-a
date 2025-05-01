@@ -1,10 +1,10 @@
 #include "types.hpp"
-#include <delimiter.hpp>
-#include <scopeGuard.hpp>
 #include <iomanip>
 #include <string>
+#include <delimiter.hpp>
+#include <scopeGuard.hpp>
 
-using check = shapkov::delimiterIO;
+using check = shapkov::DelimiterIO;
 std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
 {
   std::istream::sentry s(in);
@@ -35,7 +35,7 @@ std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
   return in;
 }
 
-shapkov::ratio::ratio(const std::pair<long long, unsigned long long>& p):
+shapkov::Ratio::Ratio(const std::pair<long long, unsigned long long>& p):
   value(p)
 {}
 
@@ -96,15 +96,10 @@ std::ostream& shapkov::operator<<(std::ostream& out, const doubleScientificIO& r
   ScopeGuard scopeGuard(out);
   double value = rhs.key;
   char sign = '-';
-  bool toDivide = false;
   int degree = 0;
   if (value > 1)
   {
     sign = '+';
-    toDivide = true;
-  }
-  if (toDivide)
-  {
     while (value >= 10)
     {
       degree += 1;

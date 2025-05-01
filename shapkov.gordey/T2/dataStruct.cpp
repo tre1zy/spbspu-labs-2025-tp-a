@@ -1,5 +1,6 @@
 #include "dataStruct.hpp"
 #include <delimiter.hpp>
+#include "types.hpp"
 
 std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
 {
@@ -9,7 +10,7 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
     return in;
   }
   DataStruct input;
-  using check = delimiterIO;
+  using check = DelimiterIO;
   using dbl = doubleScientificIO;
   using ratio = ratioIO;
   using str = stringIO;
@@ -27,7 +28,7 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
     else if (key == "key2" && !hasKey[1])
     {
       hasKey[1] = true;
-      shapkov::ratio tempRatio(input.key2);
+      shapkov::Ratio tempRatio(input.key2);
       in >> ratio{ tempRatio };
       input.key2 = tempRatio.value;
       in >> check{ ':' };
@@ -59,7 +60,7 @@ std::ostream& shapkov::operator<<(std::ostream& out, const DataStruct& rhs)
     return out;
   }
   out << "(:key1 ";
-  out << doubleScientificIO{ const_cast<double&>(rhs.key1) };
+  out << doubleScientificIO{ const_cast< double& >(rhs.key1) };
   out << ":key2 (:N ";
   out << rhs.key2.first;
   out << ":D ";

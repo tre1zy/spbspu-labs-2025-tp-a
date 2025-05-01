@@ -1,6 +1,5 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
-#include "types.hpp"
 #include <iostream>
 
 namespace shapkov
