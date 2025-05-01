@@ -3,8 +3,8 @@
 #include <cmath>
 #include <iomanip>
 #include <array>
-#include "scope_guard.hpp"
 #include <delimiter.hpp>
+#include "scope_guard.hpp"
 
 namespace
 {
@@ -72,7 +72,7 @@ std::istream& demehin::io::operator>>(std::istream& in, KeyNumIO& dest)
   {
     return in;
   }
-  std::string label = "";
+  std::string label;
   in >> label;
   if (label.substr(0, 3) != "key" || label.size() > 4)
   {
