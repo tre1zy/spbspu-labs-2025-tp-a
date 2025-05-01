@@ -28,11 +28,6 @@ namespace demehin
       long long& ref;
     };
 
-    struct DelimiterIO
-    {
-      char exp;
-    };
-
     struct KeyNumIO
     {
       int key;
@@ -45,7 +40,6 @@ namespace demehin
 
     std::istream& operator>>(std::istream& in, DoubleIO&& dest);
     std::istream& operator>>(std::istream& in, LlIO&& dest);
-    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
     std::istream& operator>>(std::istream& in, StringIO&& dest);
     std::istream& operator>>(std::istream& in, KeyNumIO& dest);
     std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest);
