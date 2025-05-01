@@ -31,20 +31,15 @@ std::istream& ohantsev::operator>>(std::istream& in, MultDelimiterIO&& dest)
   return in;
 }
 
-std::istream& ohantsev::operator>>(std::istream& in, TypenameIO&& dest)
+bool ohantsev::TypenameCheck(const std::string& scanned, const Suffix& suffix)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
+  if (scanned.size() < suffix.highCase.size() || suffix.highCase.size() != suffix.lowCase.size())
   {
-    return in;
+    return false;
   }
-  std::string name;
-  in >> name;
-  if (std::find(dest.exp.cbegin(), dest.exp.cend(), name) == dest.exp.cend())
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
+  std::size_t suffixStart = scanned.size() - suffix.highCase.size();
+  std::string scannedSuffix = scanned.substr(suffixStart);
+  return (scannedSuffix == suffix.highCase) || (scannedSuffix == suffix.lowCase);
 }
 
 std::istream& ohantsev::operator>>(std::istream& in, DoubleI&& dest)
@@ -88,6 +83,7 @@ std::istream& ohantsev::operator>>(std::istream& in, DoubleI&& dest)
 
 std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
 {
+  static constexpr std::size_t SUFFIX_LENGTH = 3;
   std::istream::sentry sentry(in);
   if (!sentry)
   {
@@ -95,16 +91,24 @@ std::istream& ohantsev::operator>>(std::istream& in, UllI&& dest)
   }
   std::string ull = "";
   std::getline(in, ull, ':');
-  if (ull != "" && ull[0] != '-')
+  if (!TypenameCheck(ull, Suffix{ "ull", "ULL" }) || ull[0] == '-')
   {
-    std::istringstream ullSource(ull);
-    ullSource >> dest.ref >> TypenameIO{ { "ull", "ULL" } };
-    if ((!ullSource.fail()) && (ullSource.eof()))
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  try
+  {
+    std::size_t processedCount;
+    dest.ref = std::stoull(ull, &processedCount);
+    if (processedCount < ull.size() - SUFFIX_LENGTH)
     {
-      return in;
+      in.setstate(std::ios::failbit);
     }
   }
-  in.setstate(std::ios::failbit);
+  catch (...)
+  {
+    in.setstate(std::ios::failbit);
+  }
   return in;
 }
 
@@ -130,14 +134,14 @@ std::istream& ohantsev::operator>>(std::istream& in, LabelIO&& dest)
   int ID;
   in >> ID;
   int position = ID - 1;
-  bool isValid = (position >= 0) && (static_cast< std::size_t >(position) < Data::FIELDS_COUNT) && (!dest.filled[position]);
+  bool isValid = (position >= 0) && (static_cast< std::size_t >(position) < DataStruct::FIELDS_COUNT) && (!dest.filled[position]);
   if (in && !isValid)
   {
     in.setstate(std::ios::failbit);
   }
   else
   {
-    dest.ID = static_cast< KeyID >(ID);
+    dest.ID = static_cast< DataStruct::KeyID >(ID);
     dest.filled[position] = true;
   }
   return in;
@@ -150,19 +154,19 @@ std::istream& ohantsev::operator>>(std::istream& in, KeyIO&& dest)
   {
     return in;
   }
-  KeyID ID;
+  DataStruct::KeyID ID;
   in >> LabelIO{ ID, dest.filled };
   if (!in.fail())
   {
     switch (ID)
     {
-    case KeyID::DBL:
+    case DataStruct::KeyID::DBL:
       in >> DoubleI{ dest.data.key1 };
       break;
-    case KeyID::ULL:
+    case DataStruct::KeyID::ULL:
       in >> UllI{ dest.data.key2 };
       break;
-    case KeyID::STR:
+    case DataStruct::KeyID::STR:
       in >> StringI{ dest.data.key3 };
       break;
     }
@@ -170,7 +174,7 @@ std::istream& ohantsev::operator>>(std::istream& in, KeyIO&& dest)
   return in;
 }
 
-std::istream& ohantsev::operator>>(std::istream& in, Data& dest)
+std::istream& ohantsev::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -178,7 +182,7 @@ std::istream& ohantsev::operator>>(std::istream& in, Data& dest)
     return in;
   }
   iofmtguard guard(in);
-  std::array< bool, Data::FIELDS_COUNT > filledKeys{ false };
+  std::array< bool, DataStruct::FIELDS_COUNT > filledKeys{ false };
   in >> MultDelimiterIO{ "(:" };
   in >> KeyIO{ dest, filledKeys };
   in >> KeyIO{ dest, filledKeys };
@@ -220,7 +224,7 @@ std::ostream& ohantsev::operator<<(std::ostream& out, StringO&& dest)
   return (out << '"' << dest.ref << '"');
 }
 
-std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
+std::ostream& ohantsev::operator<<(std::ostream& out, const DataStruct& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -234,7 +238,7 @@ std::ostream& ohantsev::operator<<(std::ostream& out, const Data& dest)
   return out;
 }
 
-bool ohantsev::Data::operator<(const ohantsev::Data& rhs) const noexcept
+bool ohantsev::DataStruct::operator<(const ohantsev::DataStruct& rhs) const noexcept
 {
   if (key1 != rhs.key1)
   {
