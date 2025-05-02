@@ -8,10 +8,10 @@
 int main()
 {
   using filonova::DataStruct;
-  using input_it_t = std::istream_iterator<DataStruct>;
-  using output_it_t = std::ostream_iterator<DataStruct>;
+  using input_it_t = std::istream_iterator< DataStruct >;
+  using output_it_t = std::ostream_iterator< DataStruct >;
 
-  std::vector<DataStruct> data;
+  std::vector< DataStruct > data;
 
   while (!std::cin.eof())
   {
@@ -19,7 +19,7 @@ int main()
     if (std::cin.fail())
     {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 

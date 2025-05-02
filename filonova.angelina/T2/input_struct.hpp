@@ -20,7 +20,7 @@ namespace filonova
 
   struct ComplexValue
   {
-    std::complex<double> &ref;
+    std::complex< double > &ref;
   };
   std::istream &operator>>(std::istream &in, ComplexValue &&dest);
 
@@ -30,6 +30,6 @@ namespace filonova
   };
   std::istream &operator>>(std::istream &in, StringValue &&dest);
 
-} // namespace filonova
+} 
 
 #endif

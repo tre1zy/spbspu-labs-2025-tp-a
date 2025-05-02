@@ -23,6 +23,6 @@ namespace filonova
     char fill_;
   };
 
-} // namespace filonova
+} 
 
 #endif

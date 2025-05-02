@@ -10,7 +10,7 @@ namespace filonova
   struct DataStruct
   {
     unsigned long long key1;
-    std::complex<double> key2;
+    std::complex< double > key2;
     std::string key3;
   };
 
@@ -18,6 +18,6 @@ namespace filonova
   std::istream &operator>>(std::istream &in, DataStruct &dest);
   std::ostream &operator<<(std::ostream &out, const DataStruct &src);
 
-} // namespace filonova
+} 
 
 #endif

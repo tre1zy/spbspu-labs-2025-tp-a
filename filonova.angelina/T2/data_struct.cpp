@@ -31,28 +31,55 @@ std::istream &filonova::operator>>(std::istream &in, DataStruct &dest)
 
   in >> sep{'('};
 
-  for (size_t i = 0; i < 3; i++)
+  size_t keysRead = 0;
+  bool key1Read = false, key2Read = false, key3Read = false;
+
+  while (keysRead < 3)
   {
     std::string key;
     in >> sep{':'} >> key;
 
     if (key == "key1")
     {
+      if (key1Read)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       in >> hex{input.key1};
+      key1Read = true;
     }
     else if (key == "key2")
     {
+      if (key2Read)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       in >> cmp{input.key2};
+      key2Read = true;
     }
     else if (key == "key3")
     {
+      if (key3Read)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       in >> str{input.key3};
+      key3Read = true;
     }
     else
     {
       in.setstate(std::ios::failbit);
       return in;
     }
+
+    if (!in)
+    {
+      return in;
+    }
+    ++keysRead;
   }
 
   in >> sep{':'} >> sep{')'};
@@ -83,3 +110,4 @@ std::ostream &filonova::operator<<(std::ostream &out, const DataStruct &src)
 
   return out;
 }
+
