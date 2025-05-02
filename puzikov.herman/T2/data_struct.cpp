@@ -3,6 +3,7 @@
 #include "output_wrapper_structs.hpp"
 #include "format_guard.hpp"
 
+#include <bitset>
 #include <istream>
 
 bool puzikov::operator<(const DataStruct &a, const DataStruct &b)
@@ -28,31 +29,42 @@ std::istream &puzikov::operator>>(std::istream &in, DataStruct &dest)
   {
     return in;
   }
+  std::bitset< 3 > keys_found;
+  bool valid = true;
 
   in >> input::Character {'('} >> input::Character {':'};
-  for (std::size_t i = 0; i < 3; ++i)
+
+  for (std::size_t i = 0; i < 3 && valid; ++i)
   {
     std::string key;
     in >> key;
-    if (key == "key1")
+
+    if (key == "key1" && !keys_found[0])
     {
       in >> input::ULLValue {dest.key1};
+      keys_found.set(0);
     }
-    else if (key == "key2")
+    else if (key == "key2" && !keys_found[1])
     {
       in >> input::PairValue {dest.key2};
+      keys_found.set(1);
     }
-    else if (key == "key3")
+    else if (key == "key3" && !keys_found[2])
     {
       in >> input::StringValue {dest.key3};
+      keys_found.set(2);
     }
     else
     {
-      in.setstate(std::ios::failbit);
-      break;
+      valid = false;
     }
   }
-
+  
+  if (!valid || !keys_found.all())
+  {
+    in.setstate(std::ios::failbit);
+  }
+  
   in >> input::Character {')'};
   return in;
 }
