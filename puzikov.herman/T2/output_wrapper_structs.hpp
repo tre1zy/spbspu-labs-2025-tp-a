@@ -24,9 +24,6 @@ namespace puzikov
       const std::string &ref;
     };
     std::ostream &operator<<(std::ostream &out, const StringValue &source);
-
-    unsigned calcBitWidth(unsigned long long num);
-    std::ostream &outputBinRepresentation(unsigned long long num, std::ostream &os);
   }
 }
 

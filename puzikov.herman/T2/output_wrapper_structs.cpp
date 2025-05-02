@@ -2,26 +2,29 @@
 #include "format_guard.hpp"
 #include <cmath>
 
-unsigned puzikov::output::calcBitWidth(unsigned long long num)
+namespace
 {
-  if (num == 0)
+  unsigned calcBitWidth(unsigned long long num)
   {
-    return 1;
+    if (num == 0)
+    {
+      return 1;
+    }
+    return static_cast< unsigned >(std::log2(num)) + 1;
   }
-  return static_cast< unsigned >(std::log2(num)) + 1;
-}
 
-std::ostream &puzikov::output::outputBinRepresentation(unsigned long long num, std::ostream &os)
-{
-  int bitWidth = calcBitWidth(num);
-  os << '0';
-  os << 'b';
-
-  for (int i = bitWidth - 1; i >= 0; --i)
+  std::ostream &outputBinRepresentation(unsigned long long num, std::ostream &os)
   {
-    os << ((num >> i) & 1);
+    int bitWidth = calcBitWidth(num);
+    os << '0';
+    os << 'b';
+
+    for (int i = bitWidth - 1; i >= 0; --i)
+    {
+      os << ((num >> i) & 1);
+    }
+    return os;
   }
-  return os;
 }
 
 std::ostream &puzikov::output::operator<<(std::ostream &out, const ULLValue &source)
