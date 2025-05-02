@@ -1,11 +1,26 @@
 #include "geometry.hpp"
 #include <algorithm>
 #include <iterator>
+#include <numeric>
+#include <functional>
 #include <delimiter.hpp>
 
 namespace
 {
   using namespace demehin::io;
+
+  struct AreaCalc
+  {
+    const demehin::Point& pt0;
+    demehin::Point pt1;
+
+    double operator()(double area, const demehin::Point& pt2)
+    {
+      area += 0.5 * std::abs((pt1.x - pt0.x) * (pt2.y - pt0.y) - (pt2.x - pt0.x) * (pt1.y - pt0.y));
+      pt1 = pt2;
+      return area;
+    }
+  };
 }
 
 std::istream& demehin::operator>>(std::istream& in, Point& pt)
@@ -51,7 +66,8 @@ std::istream& demehin::operator>>(std::istream& in, Polygon& plg)
   return in;
 }
 
-//double demehin::getPlgArea(const Polygon& plg)
-//{
-  //double area = 0;
-//}
+double demehin::getPlgArea(const Polygon& plg)
+{
+  AreaCalc area{ plg.points[0], plg.points[1] };
+  return std::accumulate(plg.points.begin() + 2, plg.points.end(), 0.0, std::ref(area));
+}

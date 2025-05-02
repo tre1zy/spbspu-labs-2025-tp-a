@@ -2,25 +2,54 @@
 #include <limits>
 #include <algorithm>
 #include <iterator>
+#include <fstream>
+#include <map>
+#include <functional>
 #include "geometry.hpp"
+#include "commands.hpp"
 
-
-int main()
+int main(int argc, char* argv[])
 {
   using demehin::Polygon;
   using istrIter = std::istream_iterator< Polygon >;
   //using ostrIter = std::ostream_iterator< Polygon >;
 
-  std::vector< Polygon > plgs;
-  while (!std::cin.eof())
+  if (argc != 2)
   {
-    std::copy(istrIter(std::cin), istrIter(), std::back_inserter(plgs));
-    if (!std::cin)
+    return 1;
+  }
+
+  std::ifstream file(argv[1]);
+  std::vector< Polygon > plgs;
+  while (!file.eof())
+  {
+    std::copy(istrIter(file), istrIter(), std::back_inserter(plgs));
+    if (!file)
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      file.clear();
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::cout << plgs.size() << "\n";
-  std::cout << plgs[1].points[0].x << " " << plgs[1].points[0].y << "\n";
+
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(demehin::printAreaSum, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      cmds.at(command)();
+      std::cout << "\n";
+    }
+    catch (...)
+    {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
 }
