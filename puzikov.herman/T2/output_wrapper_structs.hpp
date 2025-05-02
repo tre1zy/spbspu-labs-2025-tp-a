@@ -1,7 +1,6 @@
 #ifndef OUTPUT_WRAPPER_STRUCTS
 #define OUTPUT_WRAPPER_STRUCTS
 
-#include <cmath>
 #include <ostream>
 
 namespace puzikov
@@ -28,7 +27,7 @@ namespace puzikov
 
     unsigned calcBitWidth(unsigned long long num);
     std::ostream &outputBinRepresentation(unsigned long long num, std::ostream &os);
-  } // namespace output
-} // namespace puzikov
+  }
+}
 
 #endif

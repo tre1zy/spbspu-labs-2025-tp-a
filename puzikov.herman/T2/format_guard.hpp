@@ -18,6 +18,6 @@ namespace puzikov
     std::basic_ios< char >::fmtflags fmt_;
     char fill_;
   };
-} // namespace puzikov
+}
 
 #endif

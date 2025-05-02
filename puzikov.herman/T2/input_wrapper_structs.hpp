@@ -32,6 +32,6 @@ namespace puzikov
       std::string &ref;
     };
     std::istream &operator>>(std::istream &in, StringValue &&dest);
-  } // namespace input
-} // namespace puzikov
+  }
+}
 #endif
