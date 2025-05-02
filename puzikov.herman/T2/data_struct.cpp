@@ -59,12 +59,12 @@ std::istream &puzikov::operator>>(std::istream &in, DataStruct &dest)
       valid = false;
     }
   }
-  
+
   if (!valid || !keys_found.all())
   {
     in.setstate(std::ios::failbit);
   }
-  
+
   in >> input::Character {')'};
   return in;
 }
