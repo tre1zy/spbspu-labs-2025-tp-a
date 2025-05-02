@@ -30,6 +30,6 @@ namespace filonova
   };
   std::istream &operator>>(std::istream &in, StringValue &&dest);
 
-} 
+}
 
 #endif
