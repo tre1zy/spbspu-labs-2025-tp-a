@@ -8,7 +8,7 @@ unsigned puzikov::output::calcBitWidth(unsigned long long num)
   {
     return 1;
   }
-  return static_cast< int >(std::log2(num)) + 1;
+  return static_cast< unsigned >(std::log2(num)) + 1;
 }
 
 std::ostream &puzikov::output::outputBinRepresentation(unsigned long long num, std::ostream &os)
