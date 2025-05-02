@@ -83,6 +83,11 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
 
 void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
+  if (plgs.size() == 0)
+  {
+    throw std::invalid_argument("not enough figures");
+  }
+
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA")
@@ -103,6 +108,11 @@ void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& pl
 
 void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
+  if (plgs.size() == 0)
+  {
+    throw std::invalid_argument("not enough figures");
+  }
+
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA")
@@ -119,4 +129,27 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
   {
     throw std::invalid_argument("unknown command");
   }
+}
+
+void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
+{
+  std::vector< Polygon > tmp;
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "EVEN")
+  {
+    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), isEvenVrts);
+  }
+  else if (subcommand == "ODD")
+  {
+    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), isOddVrts);
+  }
+  else
+  {
+    size_t vrt_cnt = std::stoull(subcommand);
+    VrtCntCheck check{ vrt_cnt };
+    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), check);
+  }
+
+  out << tmp.size();
 }
