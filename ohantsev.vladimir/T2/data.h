@@ -69,8 +69,8 @@ namespace ohantsev
 
   struct Suffix
   {
-    std::string lowCase;
-    std::string highCase;
+    const std::string& lowCase;
+    const std::string& highCase;
   };
 
   struct KeyIO
