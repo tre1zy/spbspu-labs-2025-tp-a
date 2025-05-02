@@ -26,6 +26,16 @@ namespace
       return plg.points.size() == cnt;
     }
   };
+
+  bool compareVrtCnt(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
+  {
+    return plg1.points.size() < plg2.points.size();
+  }
+
+  bool compareArea(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
+  {
+    return getPlgArea(plg1) < getPlgArea(plg2);
+  }
 }
 
 void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
@@ -69,4 +79,44 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
     res /= plgs.size();
   }
   out << std::setprecision(1) << std::fixed << res;
+}
+
+void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    auto res = (*std::max_element(plgs.cbegin(), plgs.cend(), compareArea));
+    out << getPlgArea(res);
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    auto res = (*std::max_element(plgs.cbegin(), plgs.cend(), compareVrtCnt));
+    out << res.points.size();
+  }
+  else
+  {
+    throw std::invalid_argument("unknown command");
+  }
+}
+
+void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    auto res = (*std::min_element(plgs.cbegin(), plgs.cend(), compareArea));
+    out << std::setprecision(1) << std::fixed << getPlgArea(res);
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    auto res = (*std::min_element(plgs.cbegin(), plgs.cend(), compareVrtCnt));
+    out << std::setprecision(1) << std::fixed << res.points.size();
+  }
+  else
+  {
+    throw std::invalid_argument("unknown command");
+  }
 }

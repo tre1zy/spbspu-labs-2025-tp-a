@@ -5,7 +5,9 @@
 
 namespace demehin
 {
-  void printAreaSum(std::istream& in, const std::vector< Polygon >& plg, std::ostream&);
+  void printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
+  void printMaxValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
+  void printMinValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
 }
 
 #endif

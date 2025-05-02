@@ -33,6 +33,8 @@ int main(int argc, char* argv[])
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(demehin::printAreaSum, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  cmds["MAX"] = std::bind(demehin::printMaxValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  cmds["MIN"] = std::bind(demehin::printMinValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())
