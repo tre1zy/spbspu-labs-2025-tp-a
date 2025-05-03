@@ -68,7 +68,7 @@ namespace khokhryakova
     if (!sentry)
     {
       return in;
-    }1
+    }
     in >> DelimiterIO{ '"' };
     std::getline(in, dest.ref, '"');
     return in;
