@@ -36,6 +36,11 @@ namespace
   {
     return getPlgArea(plg1) < getPlgArea(plg2);
   }
+
+  bool isPerm(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
+  {
+    return std::is_permutation(plg1.points.cbegin(), plg1.points.cend(), plg2.points.cbegin());
+  }
 }
 
 void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
@@ -55,7 +60,7 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
   {
     if (plgs.size() == 0)
     {
-      throw std::invalid_argument("not enough figures");
+      throw std::invalid_argument("not enough shapes");
     }
     tmp = plgs;
   }
@@ -85,7 +90,7 @@ void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& pl
 {
   if (plgs.size() == 0)
   {
-    throw std::invalid_argument("not enough figures");
+    throw std::invalid_argument("not enough shapes");
   }
 
   std::string subcommand;
@@ -110,7 +115,7 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
 {
   if (plgs.size() == 0)
   {
-    throw std::invalid_argument("not enough figures");
+    throw std::invalid_argument("not enough shapes");
   }
 
   std::string subcommand;
@@ -152,4 +157,15 @@ void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs,
   }
 
   out << tmp.size();
+}
+
+void demehin::printPermsCnt(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
+{
+  Polygon plg;
+  in >> plg;
+  if (plg.points.size() < 3)
+  {
+    throw std::invalid_argument("incorrect shape");
+  }
+  out << std::count_if(plgs.cbegin(), plgs.cend(), std::bind(isPerm, std::placeholders::_1, plg));
 }

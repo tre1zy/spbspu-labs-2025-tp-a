@@ -9,6 +9,7 @@ namespace demehin
   void printMaxValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
   void printMinValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
   void printCountOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
+  void printPermsCnt(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out);
 }
 
 #endif

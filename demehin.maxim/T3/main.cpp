@@ -12,7 +12,6 @@ int main(int argc, char* argv[])
 {
   using demehin::Polygon;
   using istrIter = std::istream_iterator< Polygon >;
-  //using ostrIter = std::ostream_iterator< Polygon >;
 
   if (argc != 2)
   {
@@ -36,6 +35,7 @@ int main(int argc, char* argv[])
   cmds["MAX"] = std::bind(demehin::printMaxValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
   cmds["MIN"] = std::bind(demehin::printMinValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
   cmds["COUNT"] = std::bind(demehin::printCountOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  cmds["PERMS"] = std::bind(demehin::printPermsCnt, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())

@@ -23,6 +23,11 @@ namespace
   };
 }
 
+bool demehin::operator==(const Point& pt1, const Point& pt2)
+{
+  return pt1.x == pt2.x && pt1.y == pt2.y;
+}
+
 std::istream& demehin::operator>>(std::istream& in, Point& pt)
 {
   std::istream::sentry sentry(in);
