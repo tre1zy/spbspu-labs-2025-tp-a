@@ -22,6 +22,8 @@ namespace shapkov
   Polygon makeTriangle(size_t i, const std::vector< Point >& pts);
   void polygonToTriangles(const Polygon& p, std::vector< Polygon >& triangles);
   double getArea(const Polygon& p);
+  bool isEven(const Polygon& p);
+  bool isOdd(const Polygon& p);
 }
 
 #endif

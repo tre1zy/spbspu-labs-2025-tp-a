@@ -112,3 +112,13 @@ double shapkov::getArea(const Polygon& p)
   area = std::accumulate(areas.begin(), areas.end(), 0.0);
   return area;
 }
+
+bool shapkov::isEven(const Polygon& p)
+{
+  return p.points.size() % 2 == 0;
+}
+
+bool shapkov::isOdd(const Polygon& p)
+{
+  return !isEven(p);
+}
