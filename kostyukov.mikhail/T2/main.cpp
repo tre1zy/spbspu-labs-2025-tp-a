@@ -2,6 +2,7 @@
 #include <iterator>
 #include <limits>
 #include <vector>
+#include <iostream>
 #include "dataStruct.hpp"
 
 int main()
@@ -18,7 +19,7 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::sort(data.begin(), data.end(), kostyukov::comparator);
+  std::sort(data.begin(), data.end());
   std::copy(std::begin(data), std::end(data),
             std::ostream_iterator< kostyukov::DataStruct >(std::cout, "\n"));
   return 0;

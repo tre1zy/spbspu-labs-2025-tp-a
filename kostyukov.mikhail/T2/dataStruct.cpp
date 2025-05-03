@@ -1,8 +1,12 @@
 #include "dataStruct.hpp"
 #include "scopeGuard.hpp"
-#include <bitset>
+#include <climits>
+#include <exception>
 #include <iostream>
 #include <string>
+#include <bitset>
+#include <limits>
+#include <cctype>
 
 std::istream &kostyukov::operator>>(std::istream &in, DelimiterIO &&dest)
 {
@@ -27,67 +31,36 @@ std::istream &kostyukov::operator>>(std::istream &in, StringIO &&dest)
   {
     return in;
   }
-  std::string temp;
+  ScopeGuard scopeGrd(in);
   in >> DelimiterIO{ '"' };
-  std::getline(in, temp, '"');
+  std::getline(in, dest.ref, '"');
   in >> DelimiterIO{ ':' };
-  if (in)
-  {
-    dest.ref = temp;
-  }
   return in;
 }
 
-std::istream &kostyukov::operator>>(std::istream &in, UllIO &&dest)
+bool readUll(std::istream& in, unsigned long long& value, size_t base)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  in >> DelimiterIO{ '0' };
-  char prefix = '0';
-  in >> prefix;
-  int base = 0;
-  prefix = std::tolower(prefix);
-  if (prefix == 'b' && dest.format == UllIO::Format::BIN)
-  {
-    base = 2;
-  }
-  else if (prefix == 'x' && dest.format == UllIO::Format::HEX)
-  {
-    base = 16;
-  }
-  else
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
   std::string digits;
   std::getline(in, digits, ':');
   if (digits.empty())
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    return false;
   }
   try
   {
     size_t processedChars = 0;
-    unsigned long long value = std::stoull(digits, &processedChars, base);
+    unsigned long long tempValue = std::stoull(digits, &processedChars, base);
     if (processedChars != digits.length())
     {
-      in.setstate(std::ios::failbit);
+      return false;
     }
-    else
-    {
-      dest.ref = value;
-    }
+    value = tempValue;
+    return true;
   }
-  catch (const std::exception &)
+  catch(const std::exception&)
   {
-    in.setstate(std::ios::failbit);
+    return false;
   }
-  return in;
 }
 
 std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
@@ -97,33 +70,58 @@ std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
   {
     return in;
   }
+  ScopeGuard scopeGrd(in);
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
   DataStruct temp{};
-  const size_t COUNT_KEYS_EXPECTED = 3;
-  for (size_t i = 0; i < COUNT_KEYS_EXPECTED; i++)
+  const size_t EXPECTED_KEY_COUNT = 3;
+  const size_t KEY_NAME_LENGTH = 4;
+  for (size_t i = 0; i < EXPECTED_KEY_COUNT; ++i)
   {
     std::string key = "";
-    if ((in >> key) && (key.size() == 4) && (key.substr(0, 3) == "key"))
+    in >> key;
+    if (!in || key.length() != KEY_NAME_LENGTH || key.substr(0,3) != "key")
     {
-      char keyNum = key.back();
-      switch (keyNum)
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    char keyNum = key.back();
+    bool readSuccess = false;
+    char p1 = '\0',
+         p2 = '\0';
+    in >> p1;
+    if (keyNum == '1' && p1 == '0')
+    {
+      in >> p2;
+      if (in && std::tolower(p2) == 'b')
       {
-        case '1':
-          in >> UllIO{temp.key1, UllIO::Format::BIN};
-          break;
-        case '2':
-          in >> UllIO{temp.key2, UllIO::Format::HEX};
-          break;
-        case '3':
-          in >> StringIO{temp.key3};
-          break;
-        default:
-          in.setstate(std::ios::failbit);
+        readSuccess = readUll(in, temp.key1, 2);
+      }
+    }
+    else if (keyNum == '2' && p1 == '0')
+    {
+      in >> p2;
+      if (in && std::tolower(p2) == 'x')
+      {
+        readSuccess = readUll(in, temp.key2, 16);
+      }
+    }
+    else if (keyNum == '3')
+    {
+      if (p1 == '"')
+      {
+        in.putback(p1);
+        in >> StringIO{ temp.key3 };
+        readSuccess = static_cast< bool >(in);
       }
     }
     else
     {
+      readSuccess = false;
+    }
+    if (!readSuccess)
+    {
       in.setstate(std::ios::failbit);
+      return in;
     }
   }
   in >> DelimiterIO{ ')' };
@@ -134,7 +132,7 @@ std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
   return in;
 }
 
-std::ostream &kostyukov::operator<<(std::ostream &out, const UllIO &&dest)
+std::ostream &kostyukov::operator<<(std::ostream &out, BinUllIO &&dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -142,37 +140,55 @@ std::ostream &kostyukov::operator<<(std::ostream &out, const UllIO &&dest)
     return out;
   }
   ScopeGuard scopeGrd(out);
-  if (dest.format == UllIO::Format::BIN)
+  out << "0b";
+  if (dest.value == 0)
   {
-    std::string binStr = std::bitset< 64 >(dest.ref).to_string();
-    size_t firstOne = binStr.find('1');
-    out << "0b";
-    if (firstOne == std::string::npos)
+    out << '0';
+    return out;
+  }
+  const size_t ULL_BIT_COUNT = std::numeric_limits< unsigned long long >::digits;
+  std::bitset< ULL_BIT_COUNT > bits(dest.value);
+  bool leadingZeros = true;
+  for (size_t i = 0; i < ULL_BIT_COUNT; ++i)
+  {
+    size_t bit_index = ULL_BIT_COUNT - 1 - i;
+    if (bits[bit_index])
+    {
+      leadingZeros = false;
+      out << '1';
+    }
+    else if (!leadingZeros)
     {
       out << '0';
     }
-    else
-    {
-      std::string binSubStr = binStr.substr(firstOne);
-      if (binSubStr == "1")
-      {
-        out << "01";
-      }
-      else
-      {
-        out << binSubStr;
-      }
-    }
   }
-  else
+  if (dest.value == 1)
   {
-    out << "0x" << std::hex << std::uppercase << dest.ref;
+    out << '1';
   }
   return out;
 }
 
-std::ostream &kostyukov::operator<<(std::ostream &out, const StringIO &&dest)
+std::ostream &kostyukov::operator<<(std::ostream &out, HexUllIO &&dest)
 {
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  ScopeGuard scopeGrd(out);
+  out << "0x" << std::hex << std::uppercase << dest.value;
+  return out; 
+}
+
+std::ostream &kostyukov::operator<<(std::ostream &out, ConstStringIO &&dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  ScopeGuard scopeGrd(out);
   return out << '"' << dest.ref << '"';
 }
 
@@ -183,23 +199,23 @@ std::ostream &kostyukov::operator<<(std::ostream &out, const DataStruct &dest)
   {
     return out;
   }
-  unsigned long long ullBin = dest.key1;
-  unsigned long long ullHex = dest.key2;
-  std::string string = dest.key3;
-  out << "(:key1 " << UllIO{ ullBin, UllIO::BIN } << ":key2 "
-      << UllIO{ ullHex, UllIO::HEX } << ":key3 " << StringIO{ string } << ":)";
+  ScopeGuard scopeGrd(out);
+  out << "(:key1 " << BinUllIO{ dest.key1 }
+      << ":key2 " << HexUllIO{ dest.key2 }
+      << ":key3 " << ConstStringIO{ dest.key3 }
+      << ":)";
   return out;
 }
 
-bool kostyukov::comparator(const DataStruct &lhs, const DataStruct &rhs)
+bool kostyukov::DataStruct::operator<(const DataStruct &rhs) const
 {
-  if (lhs.key1 != rhs.key1)
+  if (key1 != rhs.key1)
   {
-    return lhs.key1 < rhs.key1;
+    return key1 < rhs.key1;
   }
-  else if (lhs.key2 != rhs.key2)
+  else if (key2 != rhs.key2)
   {
-    return lhs.key2 < rhs.key2;
+    return key2 < rhs.key2;
   }
-  return lhs.key3.size() < rhs.key3.size();
+  return key3.length() < rhs.key3.length();
 }
