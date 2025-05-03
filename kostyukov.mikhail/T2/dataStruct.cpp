@@ -177,7 +177,7 @@ std::ostream& kostyukov::operator<<(std::ostream& out, HexUllIO&& dest)
   }
   ScopeGuard scopeGrd(out);
   out << "0x" << std::hex << std::uppercase << dest.value;
-  return out; 
+  return out;
 }
 
 std::ostream& kostyukov::operator<<(std::ostream& out, ConstStringIO&& dest)
