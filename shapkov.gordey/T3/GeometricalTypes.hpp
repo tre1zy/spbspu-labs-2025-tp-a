@@ -7,7 +7,7 @@ namespace shapkov
 {
   struct Point
   {
-    int x, y;
+    double x, y;
   };
   struct Polygon
   {
@@ -17,6 +17,11 @@ namespace shapkov
   std::ostream& operator<<(std::ostream& out, const Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
   std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
+  double getDistance(const Point& p1, const Point& p2);
+  double getAreaOfTriangle(const Polygon& p);
+  Polygon makeTriangle(size_t i, const std::vector< Point >& pts);
+  void polygonToTriangles(const Polygon& p, std::vector< Polygon >& triangles);
+  double getArea(const Polygon& p);
 }
 
 #endif
