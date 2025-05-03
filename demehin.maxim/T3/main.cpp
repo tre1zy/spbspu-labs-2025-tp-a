@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
   cmds["MIN"] = std::bind(demehin::printMinValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
   cmds["COUNT"] = std::bind(demehin::printCountOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
   cmds["PERMS"] = std::bind(demehin::printPermsCnt, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  cmds["RIGHTSHAPES"] = std::bind(demehin::printRightsCnt, std::cref(plgs), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())
