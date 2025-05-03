@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
+#include <limits>
 #include "DataStruct.h"
 int main()
 {
@@ -13,7 +14,7 @@ int main()
     {
       data.push_back(temp);
     }
-    else
+    else if (!std::cin.eof())
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

@@ -1,6 +1,5 @@
 #include "DataStruct.h"
 #include <iomanip>
-#include <cmath>
 #include <limits>
 namespace khokhryakova
 {
@@ -19,24 +18,32 @@ namespace khokhryakova
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, ComplexIO&& dest)
+  std::istream& operator>>(std::istream& in, LongLongIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
     {
       return in;
     }
-    double real = 0.0;
-    double imag = 0.0;
-    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' } >> DelimiterIO{ '(' };
-    in >> real >> imag >> DelimiterIO{ ')' };
-    if (in)
+    long long number_value = 0;
+    in >> number_value;
+    if (!in)
     {
-      dest.ref = { real, imag };
+      return in;
+    }
+    char first_char = '0', second_char = '0';
+    in >> first_char >> second_char;
+    if (in && (first_char == 'l' || first_char == 'L') &&
+              (second_char == 'l' || second_char == 'L'))
+    {
+      dest.ref = number_value;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
-
   std::istream& operator>>(std::istream& in, RationalIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -44,34 +51,28 @@ namespace khokhryakova
     {
       return in;
     }
-    long long N = 0;
-    unsigned long long D = 1;
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' } >> N;
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> D >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
-    if (in)
+    in >> DelimiterIO{'('} >> DelimiterIO{':'} >> DelimiterIO{'N'};
+    in >> dest.ref.first;
+    in >> DelimiterIO{':'} >> DelimiterIO{'D'};
+    in >> dest.ref.second;
+    in >> DelimiterIO{':'} >> DelimiterIO{')'};
+    if (dest.ref.second == 0)
     {
-      dest.ref = { N, D };
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
-
   std::istream& operator>>(std::istream& in, StringIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
     {
       return in;
-    }
-    std::string temp;
+    }1
     in >> DelimiterIO{ '"' };
-    std::getline(in, temp, '"');
-    if (in)
-    {
-      dest.ref = temp;
-    }
+    std::getline(in, dest.ref, '"');
     return in;
   }
-
   std::istream& operator>>(std::istream& in, DataStruct& dest)
   {
     std::istream::sentry sentry(in);
@@ -80,39 +81,36 @@ namespace khokhryakova
       return in;
     }
     DataStruct temp;
-    bool key1 = false, key2 = false, key3 = false;
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
     for (size_t i = 0; i < 3; ++i)
     {
       std::string key;
-      if ((in >> key) && (key.size() == 4) && key.substr(0, 3) == "key")
+      in >> key;
+      if (key == "key1" && !hasKey1)
       {
-        switch (key.back())
-        {
-        case '1':
-          in >> ComplexIO{ temp.key1 };
-          key1 = true;
-          break;
-        case '2':
-          in >> RationalIO{ temp.key2 };
-          key2 = true;
-          break;
-        case '3':
-          in >> StringIO{ temp.key3 };
-          key3 = true;
-          break;
-        default:
-          in.setstate(std::ios::failbit);
-        }
+        in >> LongLongIO{temp.key1};
+        hasKey1 = true;
+      }
+      else if (key == "key2" && !hasKey2)
+      {
+        in >> RationalIO{temp.key2};
+        hasKey2 = true;
+      }
+      else if (key == "key3" && !hasKey3)
+      {
+        in >> StringIO{temp.key3};
+        hasKey3 = true;
       }
       else
       {
         in.setstate(std::ios::failbit);
+        return in;
       }
-      in >> DelimiterIO{ ':' };
+      in >> DelimiterIO{':'};
     }
     in >> DelimiterIO{ ')' };
-    if (in && key1 && key2 && key3)
+    if (hasKey1 && hasKey2 && hasKey3)
     {
       dest = temp;
     }
@@ -122,42 +120,36 @@ namespace khokhryakova
     }
     return in;
   }
-
   std::ostream& operator<<(std::ostream& out, const DataStruct& src)
   {
+    Iofmtguard guard(out);
     std::ostream::sentry sentry(out);
     if (!sentry)
     {
       return out;
     }
-    std::ios_base::fmtflags flags = out.flags();
-    out << std::fixed << std::setprecision(1);
-    out << "(:key1 #c(" << src.key1.real() << " " << src.key1.imag() << ")";
+    out << "(:key1 " << src.key1 << "ll";
     out << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)";
     out << ":key3 \"" << src.key3 << "\":)";
-    out.flags(flags);
     return out;
   }
 
   bool operator<(const DataStruct& a, const DataStruct& b)
   {
-    double a_mod = std::abs(a.key1);
-    double b_mod = std::abs(b.key1);
-    if (a_mod != b_mod)
+    if (a.key1 != b.key1)
     {
-      return a_mod < b_mod;
+      return a.key1 < b.key1;
     }
-    double a_ratio = static_cast<double>(a.key2.first) / a.key2.second;
-    double b_ratio = static_cast<double>(b.key2.first) / b.key2.second;
-    if (a_ratio != b_ratio)
+    const auto left = a.key2.first * b.key2.second;
+    const auto right = b.key2.first * a.key2.second;
+    if (left != right)
     {
-      return a_ratio < b_ratio;
+      return left < right;
     }
     if (a.key3.length() != b.key3.length())
     {
       return a.key3.length() < b.key3.length();
     }
-    return a.key3 < b.key3;
+      return a.key3 < b.key3;
   }
-
 }

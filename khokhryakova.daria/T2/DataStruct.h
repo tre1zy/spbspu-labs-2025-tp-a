@@ -1,15 +1,23 @@
 #ifndef DATASTRUCT_H
 #define DATASTRUCT_H
 #include <iostream>
-#include <complex>
 #include <string>
 #include <utility>
 
 namespace khokhryakova
 {
+  class Iofmtguard
+  {
+  public:
+    explicit Iofmtguard(std::ostream& s) : s_(s), flags_(s.flags()) {}
+    ~Iofmtguard() { s_.flags(flags_); }
+  private:
+    std::ostream& s_;
+    std::ios_base::fmtflags flags_;
+  };
   struct DataStruct
   {
-    std::complex<double> key1;
+    long long key1;
     std::pair<long long, unsigned long long> key2;
     std::string key3;
   };
@@ -19,9 +27,9 @@ namespace khokhryakova
     char exp;
   };
 
-  struct ComplexIO
+  struct LongLongIO
   {
-    std::complex<double>& ref;
+    long long& ref;
   };
 
   struct RationalIO
@@ -35,13 +43,11 @@ namespace khokhryakova
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, ComplexIO&& dest);
+  std::istream& operator>>(std::istream& in, LongLongIO&& dest);
   std::istream& operator>>(std::istream& in, RationalIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& src);
-
   bool operator<(const DataStruct& a, const DataStruct& b);
 }
-
 #endif
