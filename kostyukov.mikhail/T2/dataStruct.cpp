@@ -148,6 +148,11 @@ std::ostream& kostyukov::operator<<(std::ostream& out, BinUllIO&& dest)
   const size_t ULL_BIT_COUNT = std::numeric_limits< unsigned long long >::digits;
   std::bitset< ULL_BIT_COUNT > bits(dest.value);
   bool leadingZeros = true;
+  if (dest.value == 1)
+  {
+    out << "01";
+    return out;
+  }
   for (size_t i = 0; i < ULL_BIT_COUNT; ++i)
   {
     size_t bit_index = ULL_BIT_COUNT - 1 - i;
@@ -161,11 +166,7 @@ std::ostream& kostyukov::operator<<(std::ostream& out, BinUllIO&& dest)
       out << '0';
     }
   }
-  if (dest.value == 1)
-  {
-    out << '1';
-  }
-  return out;
+    return out;
 }
 
 std::ostream& kostyukov::operator<<(std::ostream& out, HexUllIO&& dest)
