@@ -1,6 +1,6 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
-#include <iostream>
+#include <iosfwd>
 #include <string>
 
 namespace kostyukov
@@ -10,10 +10,10 @@ namespace kostyukov
     unsigned long long key1 = 0;
     unsigned long long key2 = 0;
     std::string key3 = "";
-    bool operator<(const DataStruct &rhs) const;
+    bool operator<(const DataStruct& rhs) const;
   };
-  std::istream &operator>>(std::istream &in, DataStruct &dest);
-  std::ostream &operator<<(std::ostream &out, const DataStruct &dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
   struct BinUllIO
   {
     unsigned long long value;
@@ -24,20 +24,20 @@ namespace kostyukov
   };
   struct StringIO
   {
-    std::string &ref;
+    std::string& ref;
   };
   struct ConstStringIO
   {
-    const std::string &ref;
+    const std::string& ref;
   };
   struct DelimiterIO
   {
     char expected;
   };
-  std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
-  std::istream &operator>>(std::istream &in, StringIO &&dest);
-  std::ostream &operator<<(std::ostream &out, BinUllIO &&dest);
-  std::ostream &operator<<(std::ostream &out, HexUllIO &&dest);
-  std::ostream &operator<<(std::ostream &out, ConstStringIO &&dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::ostream& operator<<(std::ostream& out, BinUllIO&& dest);
+  std::ostream& operator<<(std::ostream& out, HexUllIO&& dest);
+  std::ostream& operator<<(std::ostream& out, ConstStringIO&& dest);
 }
 #endif

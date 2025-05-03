@@ -1,14 +1,13 @@
 #include "dataStruct.hpp"
 #include "scopeGuard.hpp"
-#include <climits>
-#include <exception>
 #include <iostream>
 #include <string>
 #include <bitset>
+#include <iomanip>
 #include <limits>
 #include <cctype>
 
-std::istream &kostyukov::operator>>(std::istream &in, DelimiterIO &&dest)
+std::istream& kostyukov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -24,7 +23,7 @@ std::istream &kostyukov::operator>>(std::istream &in, DelimiterIO &&dest)
   return in;
 }
 
-std::istream &kostyukov::operator>>(std::istream &in, StringIO &&dest)
+std::istream& kostyukov::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -63,7 +62,7 @@ bool readUll(std::istream& in, unsigned long long& value, size_t base)
   }
 }
 
-std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
+std::istream& kostyukov::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -132,7 +131,7 @@ std::istream &kostyukov::operator>>(std::istream &in, DataStruct &dest)
   return in;
 }
 
-std::ostream &kostyukov::operator<<(std::ostream &out, BinUllIO &&dest)
+std::ostream& kostyukov::operator<<(std::ostream& out, BinUllIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -169,7 +168,7 @@ std::ostream &kostyukov::operator<<(std::ostream &out, BinUllIO &&dest)
   return out;
 }
 
-std::ostream &kostyukov::operator<<(std::ostream &out, HexUllIO &&dest)
+std::ostream& kostyukov::operator<<(std::ostream& out, HexUllIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -181,7 +180,7 @@ std::ostream &kostyukov::operator<<(std::ostream &out, HexUllIO &&dest)
   return out; 
 }
 
-std::ostream &kostyukov::operator<<(std::ostream &out, ConstStringIO &&dest)
+std::ostream& kostyukov::operator<<(std::ostream& out, ConstStringIO&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -192,7 +191,7 @@ std::ostream &kostyukov::operator<<(std::ostream &out, ConstStringIO &&dest)
   return out << '"' << dest.ref << '"';
 }
 
-std::ostream &kostyukov::operator<<(std::ostream &out, const DataStruct &dest)
+std::ostream& kostyukov::operator<<(std::ostream& out, const DataStruct& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -207,7 +206,7 @@ std::ostream &kostyukov::operator<<(std::ostream &out, const DataStruct &dest)
   return out;
 }
 
-bool kostyukov::DataStruct::operator<(const DataStruct &rhs) const
+bool kostyukov::DataStruct::operator<(const DataStruct& rhs) const
 {
   if (key1 != rhs.key1)
   {
