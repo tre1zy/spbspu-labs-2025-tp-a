@@ -4,7 +4,9 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
+#include <iomanip>
 #include "functors.hpp"
+#include <scopeGuard.hpp>
 
 void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
@@ -12,6 +14,7 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
   {
     throw std::logic_error("no polygons");
   }
+  ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
   double area = 0.0;
@@ -46,7 +49,7 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
     std::transform(Polygons.begin(), Polygons.end(), areas.begin(), getArea);
     area = std::accumulate(areas.begin(), areas.end(), 0.0);
   }
-  out << area << '\n';
+  out << std::fixed << std::setprecision(1) << area << '\n';
 }
 void shapkov::max(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
@@ -54,13 +57,14 @@ void shapkov::max(std::istream& in, std::ostream& out, const VecOfPolygons& src)
   {
     throw std::logic_error("no polygons");
   }
+  ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA")
   {
     std::vector< double > areas(src.size());
     std::transform(src.begin(), src.end(), areas.begin(), getArea);
-    out << (*std::max_element(areas.begin(), areas.end())) << '\n';
+    out << std::fixed << std::setprecision(1) << (*std::max_element(areas.begin(), areas.end())) << '\n';
   }
   else if (subcommand == "VERTEXES")
   {
@@ -77,13 +81,14 @@ void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
   {
     throw std::logic_error("no polygons");
   }
+  ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA")
   {
     std::vector< double > areas(src.size());
     std::transform(src.begin(), src.end(), areas.begin(), getArea);
-    out << (*std::min_element(areas.begin(), areas.end())) << '\n';
+    out << std::fixed << std::setprecision(1) << (*std::min_element(areas.begin(), areas.end())) << '\n';
   }
   else if (subcommand == "VERTEXES")
   {

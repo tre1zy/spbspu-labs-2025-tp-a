@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <iterator>
 #include <limits>
@@ -7,14 +8,19 @@
 #include "cmds.hpp"
 #include "GeometricalTypes.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
   using shapkov::Polygon;
-  std::vector< Polygon > data(4);
-  std::cin >> data[0];
-  std::cin >> data[1];
-  std::cin >> data[2];
-  std::cin >> data[3];
+  using inputIt = std::istream_iterator< Polygon >;
+
+  if (argc != 2)
+  {
+    return 1;
+  }
+
+  std::ifstream file(argv[1]);
+  std::vector< Polygon > data;
+  std::copy(inputIt(file), inputIt(), std::back_inserter(data));
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(shapkov::area, std::ref(std::cin), std::ref(std::cout), std::cref(data));

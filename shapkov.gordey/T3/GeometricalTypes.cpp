@@ -49,13 +49,14 @@ std::istream& shapkov::operator>>(std::istream& in, Polygon& polygon)
     return in;
   };
   int vertexes = 0;
-  in >> vertexes;
-  std::vector< Point > temp;
-  std::copy_n(std::istream_iterator< Point >(in), vertexes, std::back_inserter(temp));
-  if (in)
+  if (!(in >> vertexes) || vertexes < 3)
   {
-    polygon.points = temp;
+    in.setstate(std::ios::failbit);
+    return in;
   }
+  std::vector< Point > points;
+  std::copy_n(std::istream_iterator< Point >(in), vertexes, std::back_inserter(points));
+  polygon.points = points;
   return in;
 }
 
@@ -105,13 +106,11 @@ void shapkov::polygonToTriangles(const Polygon& p, std::vector< Polygon >& trian
 
 double shapkov::getArea(const Polygon& p)
 {
-  double area = 0;
   std::vector< Polygon > triangles;
   polygonToTriangles(p, triangles);
   std::vector< double > areas;
   std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTriangle);
-  area = std::accumulate(areas.begin(), areas.end(), 0.0);
-  return area;
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
 bool shapkov::isEven(const Polygon& p)
