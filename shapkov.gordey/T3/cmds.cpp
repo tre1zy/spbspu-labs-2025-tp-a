@@ -10,10 +10,6 @@
 
 void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
-  if (src.empty())
-  {
-    throw std::logic_error("no polygons");
-  }
   ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
@@ -48,6 +44,11 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
     std::vector< double > areas(Polygons.size());
     std::transform(Polygons.begin(), Polygons.end(), areas.begin(), getArea);
     area = std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
+  if (src.empty())
+  {
+    out << std::fixed << std::setprecision(1) << 0 << '\n';
+    return;
   }
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
@@ -103,7 +104,8 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
 {
   if (src.empty())
   {
-    throw std::logic_error("no polygons");
+    out << 0 << '\n';
+    return;
   }
   std::string subcommand;
   in >> subcommand;
@@ -125,13 +127,17 @@ void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
 {
   if (src.empty())
   {
-    throw std::logic_error("no polygons");
+    out << 0 << '\n';
+    return;
   }
   out << std::count_if(src.begin(), src.end(), isRectangle) << '\n';
 }
 void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   Polygon p;
-  in >> p;
+  if (!(in >> p))
+  {
+    throw std::logic_error("wrong polygon");
+  }
   out << std::count_if(src.begin(), src.end(), isSame{p}) << '\n';
 }
