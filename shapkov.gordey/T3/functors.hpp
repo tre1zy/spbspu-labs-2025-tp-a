@@ -7,10 +7,9 @@ namespace shapkov
   struct HasSize
   {
     size_t size;
-    bool operator()(const Polygon& p) const {
-      return p.points.size() == size;
-    }
+    bool operator()(const Polygon& p) const;
   };
+  bool compareDouble(double d1, double d2, double epsilon = 1e-9);
 }
 
 #endif

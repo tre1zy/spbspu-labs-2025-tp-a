@@ -116,3 +116,12 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
     out << std::count_if(src.begin(), src.end(), HasSize{vertexes}) << '\n';
   }
 }
+
+void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
+{
+  if (src.empty())
+  {
+    throw std::logic_error("no polygons");
+  }
+  out << std::count_if(src.begin(), src.end(), isRectangle) << '\n';
+}

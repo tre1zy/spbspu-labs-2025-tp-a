@@ -25,6 +25,7 @@ namespace shapkov
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);
   bool compareByVertexes(const Polygon& p1, const Polygon& p2);
+  bool isRectangle(const Polygon& p);
 }
 
 #endif

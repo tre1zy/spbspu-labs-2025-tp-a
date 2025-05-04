@@ -5,6 +5,7 @@
 #include <limits>
 #include <numeric>
 #include "math.h"
+#include "functors.hpp"
 #include <delimiter.hpp>
 
 using check = shapkov::DelimiterIO;
@@ -126,4 +127,19 @@ bool shapkov::isOdd(const Polygon& p)
 bool shapkov::compareByVertexes(const Polygon& p1, const Polygon& p2)
 {
   return p1.points.size() < p2.points.size();
+}
+
+bool shapkov::isRectangle(const Polygon& p)
+{
+  if (p.points.size() != 4)
+  {
+    return false;
+  }
+  double sideA = getDistance(p.points[0], p.points[1]);
+  double sideB = getDistance(p.points[2], p.points[1]);
+  double sideC = getDistance(p.points[3], p.points[2]);
+  double sideD = getDistance(p.points[3], p.points[0]);
+  double diagAC = getDistance(p.points[0], p.points[2]);
+  double diagAC1 = sqrt(pow((sideA), 2) + pow((sideB), 2));
+  return (compareDouble(diagAC, diagAC1) && compareDouble(sideA, sideC) && compareDouble(sideB, sideD));
 }

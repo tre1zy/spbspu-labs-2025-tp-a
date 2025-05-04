@@ -11,6 +11,7 @@ namespace shapkov
   void max(std::istream& in, std::ostream& out, const VecOfPolygons& src);
   void min(std::istream& in, std::ostream& out, const VecOfPolygons& src);
   void count(std::istream& in, std::ostream& out, const VecOfPolygons& src);
+  void rects(std::ostream& out, const VecOfPolygons& src);
 }
 
 #endif
