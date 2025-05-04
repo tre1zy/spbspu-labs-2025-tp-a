@@ -39,6 +39,10 @@ namespace
 
   bool isPerm(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
   {
+    if (plg1.points.size() != plg2.points.size())
+    {
+      return false;
+    }
     return std::is_permutation(plg1.points.cbegin(), plg1.points.cend(), plg2.points.cbegin());
   }
 
@@ -127,7 +131,7 @@ void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& pl
   if (subcommand == "AREA")
   {
     auto res = (*std::max_element(plgs.cbegin(), plgs.cend(), compareArea));
-    out << getPlgArea(res);
+    out << std::setprecision(1) << std::fixed << getPlgArea(res);
   }
   else if (subcommand == "VERTEXES")
   {
@@ -181,6 +185,10 @@ void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs,
   else
   {
     size_t vrt_cnt = std::stoull(subcommand);
+    if (vrt_cnt < 3)
+    {
+      throw std::invalid_argument("wrong parameter");
+    }
     VrtCntCheck check{ vrt_cnt };
     std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), check);
   }
