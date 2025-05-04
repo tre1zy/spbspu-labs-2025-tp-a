@@ -32,6 +32,10 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
   }
   else if (subcommand == "MEAN")
   {
+    if (src.empty())
+    {
+      throw std::logic_error("no polygons");
+    }
     std::vector< double > areas(src.size());
     std::transform(src.begin(), src.end(), areas.begin(), getArea);
     area = std::accumulate(areas.begin(), areas.end(), 0.0) / src.size();
@@ -39,16 +43,15 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
   else
   {
     size_t vertexes = std::stoi(subcommand);
+    if (vertexes < 3)
+    {
+      throw std::logic_error("wrong number of vertexes");
+    }
     VecOfPolygons Polygons;
     std::copy_if(src.begin(), src.end(), std::back_inserter(Polygons), isSize{vertexes});
     std::vector< double > areas(Polygons.size());
     std::transform(Polygons.begin(), Polygons.end(), areas.begin(), getArea);
     area = std::accumulate(areas.begin(), areas.end(), 0.0);
-  }
-  if (src.empty())
-  {
-    out << std::fixed << std::setprecision(1) << 0 << '\n';
-    return;
   }
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
@@ -102,24 +105,38 @@ void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 }
 void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
-  if (src.empty())
-  {
-    out << 0 << '\n';
-    return;
-  }
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "EVEN")
   {
+    if (src.empty())
+    {
+      out << 0 << '\n';
+      return;
+    }
     out << std::count_if(src.begin(), src.end(), isEven) << '\n';
   }
   else if (subcommand == "ODD")
   {
+    if (src.empty())
+    {
+      out << 0 << '\n';
+      return;
+    }
     out << std::count_if(src.begin(), src.end(), isOdd) << '\n';
   }
   else
   {
+    if (src.empty())
+    {
+      out << 0 << '\n';
+      return;
+    }
     size_t vertexes = std::stoi(subcommand);
+    if (vertexes < 3)
+    {
+      throw std::logic_error("wrong number of vertexes");
+    }
     out << std::count_if(src.begin(), src.end(), isSize{vertexes}) << '\n';
   }
 }
