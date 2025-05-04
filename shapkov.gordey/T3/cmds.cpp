@@ -10,7 +10,7 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
 {
   if (src.empty())
   {
-    throw std::logic_error("points empty");
+    throw std::logic_error("no polygons");
   }
   std::string subcommand;
   in >> subcommand;
@@ -52,7 +52,7 @@ void shapkov::max(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   if (src.empty())
   {
-    throw std::logic_error("points empty");
+    throw std::logic_error("no polygons");
   }
   std::string subcommand;
   in >> subcommand;
@@ -75,7 +75,7 @@ void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   if (src.empty())
   {
-    throw std::logic_error("points empty");
+    throw std::logic_error("no polygons");
   }
   std::string subcommand;
   in >> subcommand;
@@ -94,7 +94,25 @@ void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
     throw std::logic_error("unknown subcommand");
   }
 }
-/*void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& src)
+void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
-
-}*/
+  if (src.empty())
+  {
+    throw std::logic_error("no polygons");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "EVEN")
+  {
+    out << std::count_if(src.begin(), src.end(), isEven) << '\n';
+  }
+  else if (subcommand == "ODD")
+  {
+    out << std::count_if(src.begin(), src.end(), isOdd) << '\n';
+  }
+  else
+  {
+    size_t vertexes = std::stoi(subcommand);
+    out << std::count_if(src.begin(), src.end(), HasSize{vertexes}) << '\n';
+  }
+}
