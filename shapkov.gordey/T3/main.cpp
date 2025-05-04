@@ -22,6 +22,7 @@ int main()
   cmds["MIN"] = std::bind(shapkov::min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["COUNT"] = std::bind(shapkov::count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["RECTS"] = std::bind(shapkov::rects, std::ref(std::cout), std::cref(data));
+  cmds["SAME"] = std::bind(shapkov::same, std::ref(std::cin), std::ref(std::cout), std::cref(data));
 
   std::string command;
   while (!(std::cin >> command).eof())
