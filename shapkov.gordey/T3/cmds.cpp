@@ -46,17 +46,55 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
     std::transform(Polygons.begin(), Polygons.end(), areas.begin(), getArea);
     area = std::accumulate(areas.begin(), areas.end(), 0.0);
   }
-  out << area;
+  out << area << '\n';
 }
-/*void shapkov::max(std::istream& in, std::ostream& out, const VecOfPolygons& src)
+void shapkov::max(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
-
+  if (src.empty())
+  {
+    throw std::logic_error("points empty");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    std::vector< double > areas(src.size());
+    std::transform(src.begin(), src.end(), areas.begin(), getArea);
+    out << (*std::max_element(areas.begin(), areas.end())) << '\n';
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    out << (std::max_element(src.begin(), src.end(), compareByVertexes)->points.size()) << '\n';
+  }
+  else
+  {
+    throw std::logic_error("unknown subcommand");
+  }
 }
 void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
-
+  if (src.empty())
+  {
+    throw std::logic_error("points empty");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    std::vector< double > areas(src.size());
+    std::transform(src.begin(), src.end(), areas.begin(), getArea);
+    out << (*std::min_element(areas.begin(), areas.end())) << '\n';
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    out << (std::min_element(src.begin(), src.end(), compareByVertexes)->points.size()) << '\n';
+  }
+  else
+  {
+    throw std::logic_error("unknown subcommand");
+  }
 }
-void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& src)
+/*void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
 
 }*/

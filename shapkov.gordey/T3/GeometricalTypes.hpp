@@ -24,6 +24,7 @@ namespace shapkov
   double getArea(const Polygon& p);
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);
+  bool compareByVertexes(const Polygon& p1, const Polygon& p2);
 }
 
 #endif

@@ -122,3 +122,8 @@ bool shapkov::isOdd(const Polygon& p)
 {
   return !isEven(p);
 }
+
+bool shapkov::compareByVertexes(const Polygon& p1, const Polygon& p2)
+{
+  return p1.points.size() < p2.points.size();
+}

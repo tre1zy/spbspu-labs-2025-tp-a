@@ -15,14 +15,11 @@ int main()
   std::cin >> data[1];
   std::cin >> data[2];
   std::cin >> data[3];
-  for (size_t i = 0; i < 4; i++)
-  {
-    std::cout << shapkov::getArea(data[i]) << '\n';
-  }
+
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(shapkov::area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  //cmds["max"] = std::bind(kas::max, std::cref(points), std::ref(std::cin), std::ref(std::cout));
-  //cmds["add"] = std::bind(kas::add, std::ref(points), std::ref(std::cin));
+  cmds["MAX"] = std::bind(shapkov::max, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MIN"] = std::bind(shapkov::min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
 
   std::string command;
   while (!(std::cin >> command).eof())
