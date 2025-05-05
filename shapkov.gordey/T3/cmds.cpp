@@ -127,15 +127,15 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
   }
   else
   {
-    if (src.empty())
-    {
-      out << 0 << '\n';
-      return;
-    }
     size_t vertexes = std::stoi(subcommand);
     if (vertexes < 3)
     {
       throw std::logic_error("wrong number of vertexes");
+    }
+    if (src.empty())
+    {
+      out << 0 << '\n';
+      return;
     }
     out << std::count_if(src.begin(), src.end(), isSize{vertexes}) << '\n';
   }
