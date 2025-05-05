@@ -1,11 +1,11 @@
 #include "streamGuard.hpp"
 
 maslov::StreamGuard::StreamGuard(std::basic_ios< char > & s):
-  s_(s),
   width_(s.width()),
-  fill_(s.fill()),
   precision_(s.precision()),
-  fmt_(s.flags())
+  fmt_(s.flags()),
+  s_(s),
+  fill_(s.fill())
 {}
 
 maslov::StreamGuard::~StreamGuard()

@@ -84,17 +84,16 @@ std::istream & maslov::operator>>(std::istream & in, CharLitIO && dest)
   {
     return in;
   }
-  char c;
+  maslov::StreamGuard guard(in);
   in >> std::noskipws;
+  char c;
   if(!(in >> c))
   {
     in.setstate(std::ios::failbit);
-    in >> std::skipws;
     return in;
   }
   dest.ref = c;
   in >> DelimiterIO{'\''};
-  in >> std::skipws;
   return in;
 }
 
@@ -109,6 +108,7 @@ std::istream & maslov::operator>>(std::istream & in, StringIO && dest)
   {
     return in;
   }
+  maslov::StreamGuard guard(in);
   in >> std::noskipws;
   char c;
   while ((in >> c) && (c != '"'))
@@ -119,7 +119,6 @@ std::istream & maslov::operator>>(std::istream & in, StringIO && dest)
   {
     in.setstate(std::ios::failbit);
   }
-  in >> std::skipws;
   return in;
 }
 
