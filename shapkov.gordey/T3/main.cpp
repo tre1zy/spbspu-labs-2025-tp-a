@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -11,7 +12,6 @@
 int main(int argc, char* argv[])
 {
   using shapkov::Polygon;
-  using inputIt = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
@@ -19,14 +19,15 @@ int main(int argc, char* argv[])
   }
 
   std::ifstream file(argv[1]);
+  std::string poly;
   std::vector< Polygon > data;
-  while (!file.eof())
+  while (std::getline(file, poly))
   {
-    std::copy(inputIt(file), inputIt(), std::back_inserter(data));
-    if (!file)
+    std::istringstream iss(poly);
+    Polygon polygon;
+    if (iss >> polygon)
     {
-      file.clear();
-      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      data.push_back(polygon);
     }
   }
 

@@ -154,6 +154,8 @@ void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src
   Polygon p;
   if (!(in >> p))
   {
+    in.clear();
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     throw std::logic_error("wrong polygon");
   }
   out << std::count_if(src.begin(), src.end(), isSame{p}) << '\n';

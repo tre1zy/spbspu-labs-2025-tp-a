@@ -5,7 +5,7 @@
 #include <limits>
 #include <numeric>
 #include <sstream>
-#include "math.h"
+#include <cmath>
 #include "functors.hpp"
 #include <delimiter.hpp>
 
@@ -24,11 +24,13 @@ std::istream& shapkov::operator>>(std::istream& in, Point& point)
   in >> check{ ';' };
   in >> y;
   in >> check{ ')' };
-  if (in)
+  if (!in)
   {
-    point.x = x;
-    point.y = y;
+    in.setstate(std::ios::failbit);
+    return in;
   }
+  point.x = x;
+  point.y = y;
   return in;
 }
 
