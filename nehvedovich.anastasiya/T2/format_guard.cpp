@@ -12,7 +12,7 @@ nehvedovich::FormatGuard::FormatGuard(std::basic_ios< char > &s):
 nehvedovich::FormatGuard::~FormatGuard()
 {
   s_.width(width_);
-  s_.fill(fill_);
   s_.precision(precision_);
   s_.flags(fmt_);
+  s_.fill(fill_);
 }
