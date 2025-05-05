@@ -126,12 +126,12 @@ double shapkov::getArea(const Polygon& p)
 
 bool shapkov::isEven(const Polygon& p)
 {
-  return p.points.size() % 2 == 0;
+  return p.points.size() != 0 && p.points.size() % 2 == 0;
 }
 
 bool shapkov::isOdd(const Polygon& p)
 {
-  return !isEven(p);
+  return p.points.size() != 0 && p.points.size() % 2 != 0;
 }
 
 bool shapkov::compareByVertexes(const Polygon& p1, const Polygon& p2)

@@ -109,20 +109,10 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
   in >> subcommand;
   if (subcommand == "EVEN")
   {
-    if (src.empty())
-    {
-      out << 0 << '\n';
-      return;
-    }
     out << std::count_if(src.begin(), src.end(), isEven) << '\n';
   }
   else if (subcommand == "ODD")
   {
-    if (src.empty())
-    {
-      out << 0 << '\n';
-      return;
-    }
     out << std::count_if(src.begin(), src.end(), isOdd) << '\n';
   }
   else
@@ -132,21 +122,11 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
     {
       throw std::logic_error("wrong number of vertexes");
     }
-    if (src.empty())
-    {
-      out << 0 << '\n';
-      return;
-    }
     out << std::count_if(src.begin(), src.end(), isSize{vertexes}) << '\n';
   }
 }
 void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
 {
-  if (src.empty())
-  {
-    out << 0 << '\n';
-    return;
-  }
   out << std::count_if(src.begin(), src.end(), isRectangle) << '\n';
 }
 void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src)
@@ -154,8 +134,6 @@ void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src
   Polygon p;
   if (!(in >> p))
   {
-    in.clear();
-    in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     throw std::logic_error("wrong polygon");
   }
   out << std::count_if(src.begin(), src.end(), isSame{p}) << '\n';
