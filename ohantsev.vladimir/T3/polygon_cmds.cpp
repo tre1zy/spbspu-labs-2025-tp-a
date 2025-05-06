@@ -51,7 +51,7 @@ void ohantsev::Area::operator()()
     static constexpr std::size_t TRIANGLE_VERTEXES_COUNT = 3;
     std::size_t processedCount;
     std::size_t num = std::stoull(subcmd, &processedCount);
-    if (processedCount < subcmd.size() || num < TRIANGLE_VERTEXES_COUNT);
+    if (processedCount < subcmd.size() || num < TRIANGLE_VERTEXES_COUNT)
     {
       throw std::invalid_argument("invalid subcommand");
     }
