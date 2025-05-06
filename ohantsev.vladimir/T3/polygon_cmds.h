@@ -70,5 +70,13 @@ namespace ohantsev
     PolygonCmdsHandler(std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out);
     void operator()() override;
   };
+
+  void perms(const std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out);
+  Polygon getSorted(const Polygon& polygon);
+
+  void rects(const std::vector< Polygon >& polygons, std::ostream& out);
+  bool isRect(const Polygon& polygon);
+  Point getVec(const Point& lhs, const Point& rhs);
+  bool isOrthogonal(const Point& lhs, const Point& rhs);
 }
 #endif

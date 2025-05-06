@@ -77,3 +77,26 @@ std::istream& ohantsev::operator>>(std::istream& in, Polygon& polygon)
   }
   return in;
 }
+
+bool ohantsev::Point::operator<(const Point& rhs) const noexcept
+{
+  if (x != rhs.x)
+  {
+    return x < rhs.x;
+  }
+  return y < rhs.y;
+}
+
+bool ohantsev::Point::operator==(const Point& rhs) const noexcept
+{
+  return x == rhs.x && y == rhs.y;
+}
+
+bool ohantsev::Polygon::operator==(const Polygon& rhs) const noexcept
+{
+  if (size() != rhs.size())
+  {
+    return false;
+  }
+  return std::equal(points.begin(), points.end(), rhs.points.begin());
+}
