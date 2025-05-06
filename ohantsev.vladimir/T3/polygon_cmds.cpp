@@ -48,9 +48,10 @@ void ohantsev::Area::operator()()
   }
   catch(const std::out_of_range&)
   {
+    static constexpr std::size_t TRIANGLE_VERTEXES_COUNT = 3;
     std::size_t processedCount;
     std::size_t num = std::stoull(subcmd, &processedCount);
-    if (processedCount < subcmd.size())
+    if (processedCount < subcmd.size() || num < TRIANGLE_VERTEXES_COUNT);
     {
       throw std::invalid_argument("invalid subcommand");
     }
@@ -172,9 +173,10 @@ void ohantsev::Count::operator()()
   }
   catch(const std::out_of_range&)
   {
+    static constexpr std::size_t TRIANGLE_VERTEXES_COUNT = 3;
     std::size_t processedCount;
     std::size_t num = std::stoull(subcmd, &processedCount);
-    if (processedCount < subcmd.size())
+    if (processedCount < subcmd.size() || num < TRIANGLE_VERTEXES_COUNT)
     {
       throw std::invalid_argument("invalid subcommand");
     }
@@ -250,7 +252,7 @@ void ohantsev::perms(const std::vector< Polygon >& polygons,  std::istream& in, 
   sorted.reserve(polygons.size());
   auto equalToExample = std::bind(&Polygon::operator==, &example, _1);
   std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(sorted), getSorted);
-  out << std::count_if(sorted.cbegin(), sorted.cend(), equalToExample);
+  out << std::count_if(sorted.cbegin(), sorted.cend(), equalToExample) << '\n';
 }
 
 void ohantsev::rects(const std::vector< Polygon >& polygons, std::ostream& out)
