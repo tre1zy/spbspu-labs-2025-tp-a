@@ -9,7 +9,7 @@
 #include <vector>
 #include <iomanip>
 #include <algorithm>
-#include <bitset> 
+#include <bitset>
 
 namespace fedorova
 {
