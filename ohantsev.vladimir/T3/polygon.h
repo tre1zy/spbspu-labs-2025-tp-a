@@ -8,12 +8,15 @@ namespace ohantsev
   struct Point
   {
     int x, y;
+    bool operator<(const Point& rhs) const noexcept;
+    bool operator==(const Point& rhs) const noexcept;
   };
 
   struct Polygon
   {
     std::vector< Point > points;
     std::size_t size() const noexcept;
+    bool operator==(const Polygon& rhs) const noexcept;
   };
 
   struct DelimiterIO

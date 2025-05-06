@@ -14,7 +14,14 @@ double ohantsev::getArea(const Polygon& polygon)
 {
   std::vector< int > counting;
   counting.reserve(polygon.size());
-  std::transform(polygon.points.cbegin(), polygon.points.cend() - 1, polygon.points.cbegin() + 1, std::back_inserter(counting), areaGaussPairSum);
+  std::transform
+  (
+    polygon.points.cbegin(),
+    polygon.points.cend() - 1,
+    polygon.points.cbegin() + 1,
+    std::back_inserter(counting),
+    areaGaussPairSum
+  );
   counting.push_back(areaGaussPairSum(polygon.points.back(), polygon.points.front()));
   return std::abs(std::accumulate(counting.begin(), counting.end(), 0)) / 2.0;
 }
@@ -69,4 +76,27 @@ std::istream& ohantsev::operator>>(std::istream& in, Polygon& polygon)
     std::copy_n(std::istream_iterator< Point >(in), size, std::back_inserter(polygon.points));
   }
   return in;
+}
+
+bool ohantsev::Point::operator<(const Point& rhs) const noexcept
+{
+  if (x != rhs.x)
+  {
+    return x < rhs.x;
+  }
+  return y < rhs.y;
+}
+
+bool ohantsev::Point::operator==(const Point& rhs) const noexcept
+{
+  return x == rhs.x && y == rhs.y;
+}
+
+bool ohantsev::Polygon::operator==(const Polygon& rhs) const noexcept
+{
+  if (size() != rhs.size())
+  {
+    return false;
+  }
+  return std::equal(points.begin(), points.end(), rhs.points.begin());
 }

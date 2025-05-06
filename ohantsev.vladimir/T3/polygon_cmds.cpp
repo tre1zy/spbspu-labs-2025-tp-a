@@ -1,5 +1,6 @@
 #include "polygon_cmds.h"
 #include <map>
+#include <array>
 #include <string>
 #include <vector>
 #include <limits>
@@ -54,7 +55,7 @@ void ohantsev::Area::operator()()
       throw std::invalid_argument("invalid subcommand");
     }
     numOfVertexes(object_, out_, num);
-  } 
+  }
 }
 
 double ohantsev::Area::accumulateArea(const std::vector< Polygon >& polygons)
@@ -178,7 +179,7 @@ void ohantsev::Count::operator()()
       throw std::invalid_argument("invalid subcommand");
     }
     numOfVertexes(object_, out_, num);
-  } 
+  }
 }
 
 void ohantsev::Count::odd(const std::vector< Polygon >& polygons, std::ostream& out)
@@ -204,6 +205,8 @@ ohantsev::PolygonCmdsHandler::PolygonCmdsHandler(std::vector< Polygon >& polygon
   add("MAX", Max{ polygons, in, out });
   add("MIN", Min{ polygons, in, out });
   add("COUNT", Count{ polygons, in, out });
+  add("PERMS", std::bind(perms, std::cref(polygons), std::ref(in), std::ref(out)));
+  add("RECTS", std::bind(rects, std::cref(polygons), std::ref(out)));
 }
 
 void ohantsev::PolygonCmdsHandler::operator()()
@@ -225,4 +228,71 @@ void ohantsev::PolygonCmdsHandler::operator()()
       }
       in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+}
+
+auto ohantsev::getSorted(const Polygon& polygon) -> Polygon
+{
+  Polygon res = polygon;
+  std::sort(res.points.begin(), res.points.end());
+  return res;
+}
+
+void ohantsev::perms(const std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out)
+{
+  using namespace std::placeholders;
+  Polygon example;
+  if (!(in >> example))
+  {
+    throw std::invalid_argument("invalid perms polygon");
+  }
+  std::sort(example.points.begin(), example.points.end());
+  std::vector< Polygon > sorted;
+  sorted.reserve(polygons.size());
+  auto equalToExample = std::bind(&Polygon::operator==, &example, _1);
+  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(sorted), getSorted);
+  out << std::count_if(sorted.cbegin(), sorted.cend(), equalToExample);
+}
+
+void ohantsev::rects(const std::vector< Polygon >& polygons, std::ostream& out)
+{
+  out << std::count_if(polygons.cbegin(), polygons.cend(), isRect) << '\n';
+}
+
+auto ohantsev::getVec(const Point& lhs, const Point& rhs) -> Point
+{
+  return Point{ rhs.x - lhs.x, rhs.y - lhs.y };
+}
+
+bool ohantsev::isOrthogonal(const Point& lhs, const Point& rhs)
+{
+  return (lhs.x * rhs.x + lhs.y * rhs.y) == 0;
+}
+
+bool ohantsev::isRect(const Polygon& polygon)
+{
+  static constexpr std::size_t RECT_VERTEX_COUNT = 4;
+  if (polygon.size() != RECT_VERTEX_COUNT)
+  {
+    return false;
+  }
+  std::array< Point, RECT_VERTEX_COUNT > geomVects;
+  std::transform
+  (
+    polygon.points.cbegin(),
+    polygon.points.cend() - 1,
+    polygon.points.cbegin() + 1,
+    geomVects.begin(),
+    getVec
+  );
+  geomVects.back() = getVec(polygon.points.back(), polygon.points.front());
+  std::array< bool, RECT_VERTEX_COUNT - 1 > orthogonal;
+  std::transform
+  (
+    geomVects.cbegin(),
+    geomVects.cend() - 1,
+    geomVects.cbegin() + 1,
+    orthogonal.begin(),
+    isOrthogonal
+  );
+  return std::find(orthogonal.cbegin(), orthogonal.cend(), true) != orthogonal.cend();
 }
