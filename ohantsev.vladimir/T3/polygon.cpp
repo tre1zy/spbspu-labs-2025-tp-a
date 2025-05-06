@@ -14,7 +14,14 @@ double ohantsev::getArea(const Polygon& polygon)
 {
   std::vector< int > counting;
   counting.reserve(polygon.size());
-  std::transform(polygon.points.cbegin(), polygon.points.cend() - 1, polygon.points.cbegin() + 1, std::back_inserter(counting), areaGaussPairSum);
+  std::transform
+  (
+    polygon.points.cbegin(),
+    polygon.points.cend() - 1,
+    polygon.points.cbegin() + 1,
+    std::back_inserter(counting),
+    areaGaussPairSum
+  );
   counting.push_back(areaGaussPairSum(polygon.points.back(), polygon.points.front()));
   return std::abs(std::accumulate(counting.begin(), counting.end(), 0)) / 2.0;
 }

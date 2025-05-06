@@ -54,7 +54,7 @@ void ohantsev::Area::operator()()
       throw std::invalid_argument("invalid subcommand");
     }
     numOfVertexes(object_, out_, num);
-  } 
+  }
 }
 
 double ohantsev::Area::accumulateArea(const std::vector< Polygon >& polygons)
@@ -178,7 +178,7 @@ void ohantsev::Count::operator()()
       throw std::invalid_argument("invalid subcommand");
     }
     numOfVertexes(object_, out_, num);
-  } 
+  }
 }
 
 void ohantsev::Count::odd(const std::vector< Polygon >& polygons, std::ostream& out)
