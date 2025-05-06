@@ -9,7 +9,6 @@ bool shak::operator<(const DataStruct &left, const DataStruct &right)
   {
     return left.key1 < right.key1;
   }
-
   else if (left.key2 != right.key2)
   {
     return left.key2 < right.key2;
@@ -28,34 +27,51 @@ std::istream &shak::operator>>(std::istream &in, DataStruct &dest)
     return in;
   }
   DataStruct data;
-  using check = DelimiterIO;
-  using ch = ChrLit;
-  using rat = RatLsp;
-  using str = Str;
-  in >> check{'('};
+  bool key1Read = false;
+  bool key2Read = false;
+  bool key3Read = false;
+  in >> DelimiterIO{'('};
   for (size_t i = 0; i < 3; ++i)
   {
     std::string key;
-    in >> check{':'} >> key;
+    in >> DelimiterIO{':'} >> key;
     if (key == "key1")
     {
-      in >> ch{data.key1};
+      if (key1Read)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in >> ChrLit{data.key1};
+      key1Read = true;
     }
     else if (key == "key2")
     {
-      in >> rat{data.key2};
+      if (key2Read)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in >> RatLsp{data.key2};
+      key2Read = true;
     }
     else if (key == "key3")
     {
-      in >> str{data.key3};
+      if (key3Read)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in >> Str{data.key3};
+      key3Read = true;
     }
     else
     {
       in.setstate(std::ios::failbit);
-      break;
     }
   }
-  in >> check{':'} >> check{')'};
+  in >> DelimiterIO{':'} >> DelimiterIO{')'};
+
   if (in)
   {
     dest = data;

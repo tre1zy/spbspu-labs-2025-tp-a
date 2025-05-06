@@ -8,13 +8,15 @@ namespace shak
   {
   public:
     StreamGuard(std::basic_ios< char > &s);
+    StreamGuard(const StreamGuard &) = delete;
+    StreamGuard(StreamGuard &&) = delete;
     ~StreamGuard();
 
   private:
     std::basic_ios< char > &s_;
-    char fill_;
     std::streamsize precision_;
     std::basic_ios< char >::fmtflags flags_;
+    char fill_;
   };
 }
 #endif
