@@ -2,14 +2,14 @@
 
 shak::StreamGuard::StreamGuard(std::basic_ios< char > &s):
   s_(s),
-  fill_(s.fill()),
   precision_(s.precision()),
-  flags_(s.flags())
+  flags_(s.flags()),
+  fill_(s.fill())
 {}
 
 shak::StreamGuard::~StreamGuard()
 {
-  s_.fill(fill_);
   s_.precision(precision_);
   s_.flags(flags_);
+  s_.fill(fill_);
 }
