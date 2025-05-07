@@ -3,23 +3,8 @@
 #include <iomanip>
 #include <algorithm>
 #include <cctype>
-#include "iofmtguard.h"
-
-std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char c;
-  in >> c;
-  if (in && (c != dest.exp))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
+#include <delimiter.h>
+#include <iofmtguard.h>
 
 std::istream& ohantsev::operator>>(std::istream& in, MultDelimiterIO&& dest)
 {

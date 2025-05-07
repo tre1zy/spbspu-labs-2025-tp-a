@@ -21,11 +21,6 @@ namespace ohantsev
     };
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   struct MultDelimiterIO
   {
     const std::string& exp;
@@ -80,7 +75,6 @@ namespace ohantsev
   };
 
   bool TypenameCheck(const std::string& scanned, const Suffix& suffix);
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, MultDelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleI&& dest);
   std::istream& operator>>(std::istream& in, UllI&& dest);
