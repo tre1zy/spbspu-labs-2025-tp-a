@@ -42,6 +42,10 @@ std::istream &abramov::operator>>(std::istream &in, Point &p)
   {
     p = tmp;
   }
+  else
+  {
+    throw std::logic_error("fail\n");
+  }
   return in;
 }
 
