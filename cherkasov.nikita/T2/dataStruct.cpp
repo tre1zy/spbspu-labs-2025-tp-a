@@ -43,21 +43,25 @@ namespace cherkasov
   {
     StreamGuard g(in);
     in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('};
-    double re = 0.0, im = 0.0;
+    double re = 0.0;
+    double im = 0.0;
     in >> re;
-    if (in.peek() == '+' || in.peek() == '-')
+    char sign = in.peek();
+    if (sign == '+' || sign == '-')
     {
       in >> im;
     }
     in >> ExpectChar{')'};
-    if (in) io.c = {re, im};
+    if (in)
     {
-      return in;
+      io.c = std::complex<double>(re, im);
     }
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, Rational&& io)
   {
+    StreamGuard guard(in);
     in >> ExpectChar{'('} >> ExpectChar{':'} >> Label{"N"} >> io.rat.first
        >> ExpectChar{':'} >> Label{"D"} >> io.rat.second
        >> ExpectChar{':'} >> ExpectChar{')'};
@@ -89,64 +93,59 @@ namespace cherkasov
       return in;
     }
     DataStruct temp;
-    in >> ExpectChar{'('} >> ExpectChar{':'};
-    while (true)
+    bool hasKey1 = false;
+    bool hasKey2 = false;
+    bool hasKey3 = false;
+    in >> ExpectChar{'('};
+    while (in)
     {
-      std::string f;
-      in >> f;
-      if (f == "key1")
+      std::string label;
+      in >> ExpectChar{':'} >> label;
+
+      if (label == "key1" && !hasKey1)
       {
-        if (in.peek() == '"')
-        {
-          std::string string;
-          in >> Strings{string};
-        }
-        else if (in.peek() == '#')
+        if (in.peek() == '#')
         {
           in >> Complex{temp.key1};
+          hasKey1 = true;
         }
         else
         {
-          double val;
-          in >> val;
+          std::string dummy;
+          in >> dummy;
         }
       }
-      else if (f== "key2")
+      else if (label == "key2" && !hasKey2)
       {
         if (in.peek() == '(')
         {
           in >> Rational{temp.key2};
+          hasKey2 = true;
         }
         else
         {
-          std::string string;
-          in >> string;
+          std::string dummy;
+          in >> dummy;
         }
       }
-      else if (f == "key3")
+      else if (label == "key3" && !hasKey3)
       {
         in >> Strings{temp.key3};
+        hasKey3 = true;
       }
       else
       {
         in.setstate(std::ios::failbit);
         break;
       }
-      if (in.peek() == ':')
-      {
-        in >> ExpectChar{':'};
-        if (in.peek() == ')')
-        {
-          in >> ExpectChar{')'};
-          break;
-        }
-      }
-      else
+
+      if (hasKey1 && hasKey2 && hasKey3)
       {
         break;
       }
     }
-    if (in)
+    in >> ExpectChar{':'} >> ExpectChar{')'};
+    if (in && hasKey1 && hasKey2 && hasKey3)
     {
       obj = temp;
     }
@@ -157,7 +156,10 @@ namespace cherkasov
   {
     StreamGuard guard(out);
     out << "(:key1 #c(" << std::fixed << std::setprecision(1) << obj.key1.real();
-    if (obj.key1.imag() >= 0) out << "+";
+    if (obj.key1.imag() >= 0)
+    {
+      out << "+";
+    }
     out << obj.key1.imag() << ")";
     out << ":key2 (:N" << obj.key2.first << ":D" << obj.key2.second << ":)";
     out << ":key3 \"" << obj.key3 << "\":)";
