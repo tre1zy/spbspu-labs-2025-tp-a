@@ -19,7 +19,7 @@ namespace cherkasov
     return key3.size() < other.key3.size();
   }
 
-  std::istream& operator>>(std::istream & in, ExpectChar && d)
+  std::istream & operator>>(std::istream & in, ExpectChar && d)
   {
     char c;
     if (!(in >> std::ws >> c) || c != d.exp)
@@ -59,7 +59,7 @@ namespace cherkasov
     return in;
   }
 
-  std::istream& operator>>(std::istream & in, Rational && io)
+  std::istream & operator>>(std::istream & in, Rational && io)
   {
     StreamGuard guard(in);
     in >> ExpectChar{'('} >> ExpectChar{':'} >> Label{"N"} >> io.rat.first >> std::ws
