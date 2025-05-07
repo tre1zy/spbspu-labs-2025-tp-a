@@ -2,6 +2,7 @@
 #include "streamGuard.hpp"
 #include <sstream>
 #include <cmath>
+#include <iomanip>
 
 namespace cherkasov
 {
@@ -18,10 +19,10 @@ namespace cherkasov
     return key3.size() < other.key3.size();
   }
 
-  std::istream & operator>>(std::istream & in, ExpectChar && d)
+  std::istream& operator>>(std::istream & in, ExpectChar && d)
   {
     char c;
-    if (!(in >> c) || c != d.exp)
+    if (!(in >> std::ws >> c) || c != d.exp)
     {
       in.setstate(std::ios::failbit);
     }
@@ -31,7 +32,7 @@ namespace cherkasov
   std::istream & operator>>(std::istream & in, Label && l)
   {
     std::string tmp;
-    if (!(in >> tmp) || tmp != l.exp)
+    if (!(in >> std::ws >> tmp) || tmp != l.exp)
     {
       in.setstate(std::ios::failbit);
     }
@@ -41,16 +42,16 @@ namespace cherkasov
   std::istream & operator>>(std::istream & in, Complex && io)
   {
     StreamGuard g(in);
-    in >> ExpectChar{ '#' } >> ExpectChar{ 'c' } >> ExpectChar{ '(' };
+    in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('} >> std::ws;
     double re = 0.0;
     double im = 0.0;
-    in >> re;
+    in >> re >> std::ws;
     char sign = in.peek();
     if (sign == '+' || sign == '-')
     {
-      in >> im;
+      in >> im >> std::ws;
     }
-    in >> ExpectChar{ ')' };
+    in >> ExpectChar{')'};
     if (in)
     {
       io.c = std::complex< double >(re, im);
@@ -58,20 +59,23 @@ namespace cherkasov
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, Rational && io)
+  std::istream& operator>>(std::istream & in, Rational && io)
   {
-    in >> ExpectChar{ '(' } >> Label{ "N" } >> io.rat.first
-       >> ExpectChar{ ':' } >> Label{ "D" } >> io.rat.second
-       >> ExpectChar{ ':' } >> ExpectChar{ ')' };
+    StreamGuard guard(in);
+    in >> ExpectChar{'('} >> ExpectChar{':'} >> Label{"N"} >> io.rat.first >> std::ws
+       >> ExpectChar{':'} >> Label{"D"} >> io.rat.second >> std::ws
+       >> ExpectChar{':'} >> ExpectChar{')'};
     return in;
   }
 
   std::istream & operator>>(std::istream & in, Strings && io)
   {
     StreamGuard guard(in);
-    in >> std::noskipws >> ExpectChar{ '"' };
+    in >> std::noskipws >> ExpectChar{'"'};
     char ch;
-    while (in >> ch && ch != '"')
+    io.s.clear();
+    
+    while (in.get(ch) && ch != '"')
     {
       if (ch == '\n')
       {
@@ -79,6 +83,11 @@ namespace cherkasov
         break;
       }
       io.s += ch;
+    }
+    
+    if (ch != '"')
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -90,60 +99,59 @@ namespace cherkasov
     {
       return in;
     }
+    
     DataStruct temp;
     bool k1 = false, k2 = false, k3 = false;
-    in >> ExpectChar{ '(' };
-    while (in)
+    in >> ExpectChar{'('} >> std::ws;
+    while (in && !(k1 && k2 && k3))
     {
       std::string label;
-      in >> label;
-      if (!in)
+      in >> ExpectChar{':'} >> label >> std::ws;
+      if (label == "key1" && !k1)
       {
-        break;
-      }
-      if (label == ":key1" && !k1)
-      {
-        in >> Complex{ temp.key1 };
+        in >> Complex{temp.key1};
         k1 = true;
       }
-      else if (label == ":key2" && !k2)
+      else if (label == "key2" && !k2)
       {
-        in >> Rational{ temp.key2 };
+        in >> Rational{temp.key2};
         k2 = true;
       }
-      else if (label == ":key3" && !k3)
+      else if (label == "key3" && !k3)
       {
-        in >> Strings{ temp.key3 };
+        in >> Strings{temp.key3};
         k3 = true;
-      }
-      else if (label == ":" && k1 && k2 && k3)
-      {
-        break;
       }
       else
       {
         in.setstate(std::ios::failbit);
-        return in;
+        break;
       }
+      in >> std::ws;
     }
-    in >> ExpectChar{ ')' };
-    if (in)
+    in >> ExpectChar{':'} >> ExpectChar{')'};
+    if (in && k1 && k2 && k3)
     {
       obj = temp;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
 
   std::ostream & operator<<(std::ostream & out, const DataStruct & obj)
   {
-    out << "(:key1 #c(" << obj.key1.real();
+    StreamGuard guard(out);
+    out << "(:key1 #c(" << std::fixed << std::setprecision(1) << obj.key1.real();
     if (obj.key1.imag() >= 0)
-      out << "+" << obj.key1.imag();
-    else
-      out << obj.key1.imag();
-    out << "):";
-    out << "key2 (:N" << obj.key2.first << ":D " << obj.key2.second << ":):";
-    out << "key3 \"" << obj.key3 << "\":)";
+    {
+      out << "+";
+      out << obj.key1.imag() << ")";
+      out << ":key2 (:N" << obj.key2.first << ":D" << obj.key2.second << ":)";
+      out << ":key3 \"" << obj.key3 << "\":)";
+    }
     return out;
   }
 }
