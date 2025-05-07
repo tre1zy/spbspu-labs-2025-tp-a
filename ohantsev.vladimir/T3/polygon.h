@@ -19,14 +19,8 @@ namespace ohantsev
     bool operator==(const Polygon& rhs) const noexcept;
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   double getArea(const Polygon& polygon);
   int areaGaussPairSum(const Point& lhs, const Point& rhs);
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, Point& rhs);
   std::istream& operator>>(std::istream& in, Polygon& rhs);
 }

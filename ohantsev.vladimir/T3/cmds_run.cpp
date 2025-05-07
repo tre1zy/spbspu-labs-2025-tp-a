@@ -6,7 +6,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
-#include "iofmtguard.h"
+#include <iofmtguard.h>
 #include "polygon_cmds.h"
 
 void ohantsev::fillPolygons(std::vector< Polygon >& polygons, std::ifstream& in)

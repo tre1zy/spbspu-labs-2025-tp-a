@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <delimiter.h>
 
 int ohantsev::areaGaussPairSum(const Point& lhs, const Point& rhs)
 {
@@ -29,22 +30,6 @@ double ohantsev::getArea(const Polygon& polygon)
 std::size_t ohantsev::Polygon::size() const noexcept
 {
   return points.size();
-}
-
-std::istream& ohantsev::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char c;
-  in >> c;
-  if (in && (c != dest.exp))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
 }
 
 std::istream& ohantsev::operator>>(std::istream& in, Point& point)
