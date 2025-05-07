@@ -111,7 +111,7 @@ namespace cherkasov
     }
     return in;
   }
-  
+
   std::istream& operator>>(std::istream& in, DataStruct& obj)
   {
     std::istream::sentry sentry(in);
@@ -126,7 +126,6 @@ namespace cherkasov
     {
       std::string label;
       in >> ExpectChar{':'} >> label;
-      
       if (label == "key1" && !k1)
       {
         in >> Complex{temp.key1};
@@ -147,13 +146,11 @@ namespace cherkasov
         in.setstate(std::ios::failbit);
         break;
       }
-      
       if (k1 && k2 && k3)
       {
         break;
       }
     }
-    
     in >> ExpectChar{':'} >> ExpectChar{')'};
     if (in && k1 && k2 && k3)
     {
