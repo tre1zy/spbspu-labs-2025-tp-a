@@ -9,9 +9,13 @@ namespace cherkasov
   bool DataStruct::operator<(const DataStruct& other) const
   {
     if (std::abs(key1) != std::abs(other.key1))
+    {
       return std::abs(key1) < std::abs(other.key1);
+    }
     if (key2 != other.key2)
+    {
       return key2 < other.key2;
+    }
     return key3.size() < other.key3.size();
   }
 
@@ -19,7 +23,9 @@ namespace cherkasov
   {
     char c;
     if (!(in >> c) || c != d.exp)
+    { 
       in.setstate(std::ios::failbit);
+    }
     return in;
   }
 
@@ -27,7 +33,9 @@ namespace cherkasov
   {
     std::string tmp;
     if (!(in >> tmp) || tmp != l.exp)
+    {
       in.setstate(std::ios::failbit);
+    }
     return in;
   }
 
@@ -38,10 +46,14 @@ namespace cherkasov
     double re = 0.0, im = 0.0;
     in >> re;
     if (in.peek() == '+' || in.peek() == '-')
+    {
       in >> im;
+    }
     in >> ExpectChar{')'};
     if (in) io.c = {re, im};
-    return in;
+    {
+      return in;
+    }
   }
 
   std::istream& operator>>(std::istream& in, Rational&& io)
@@ -74,36 +86,66 @@ namespace cherkasov
     std::istream::sentry s(in);
     if (!s) return in;
     DataStruct temp;
-    bool k1 = false, k2 = false, k3 = false;
-    in >> ExpectChar{'('};
-    while (in)
+    in >> ExpectChar{'('} >> ExpectChar{':'};
+    while (true) 
     {
-      std::string label;
-      in >> ExpectChar{':'} >> label;
-      if (label == "key1" && !k1)
+      std::string f;
+      in >> f;
+      if (f == "key1")
       {
-        in >> Complex{temp.key1};
-        k1 = true;
+        if (in.peek() == '"')
+        {
+          std::string dummy;
+          in >> Strings{dummy};
+        } 
+        else if (in.peek() == '#')
+        {
+          in >> Complex{temp.key1};
+        }
+        else
+        {
+          double val;
+          in >> val;
+        }
       }
-      else if (label == "key2" && !k2)
+      else if (f== "key2")
       {
-        in >> Rational{temp.key2};
-        k2 = true;
+        if (in.peek() == '(')
+        {
+          in >> Rational{temp.key2};
+        }
+        else {
+          std::string dummy;
+          in >> dummy;
+        }
       }
-      else if (label == "key3" && !k3)
+      else if (f == "key3")
       {
         in >> Strings{temp.key3};
-        k3 = true;
       }
       else
       {
         in.setstate(std::ios::failbit);
         break;
       }
-      if (k1 && k2 && k3) break;
+      if (in.peek() == ':')
+      {
+        in >> ExpectChar{':'};
+        if (in.peek() == ')')
+        {
+          in >> ExpectChar{')'};
+          break;
+        }
+      }
+      else
+      {
+        break;
+      }
     }
-    in >> ExpectChar{':'} >> ExpectChar{')'};
-    if (in && k1 && k2 && k3) obj = temp;
+    if (in) 
+    {
+      obj = temp;
+    }
     return in;
   }
 
