@@ -6,7 +6,7 @@
 
 namespace cherkasov
 {
-  bool DataStruct::operator<(const DataStruct & other) const
+  bool DataStruct::operator<(const DataStruct& other) const
   {
     if (std::abs(key1) != std::abs(other.key1))
     {
@@ -19,62 +19,88 @@ namespace cherkasov
     return key3.size() < other.key3.size();
   }
 
-  std::istream & operator>>(std::istream & in, ExpectChar && d)
+  std::istream& operator>>(std::istream& in, ExpectChar&& d)
   {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
     char c;
-    if (!(in >> std::ws >> c) || c != d.exp)
+    in >> c;
+    if (!in || c != d.exp)
     {
       in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, Label && l)
+  std::istream& operator>>(std::istream& in, Label&& l)
   {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
     std::string tmp;
-    if (!(in >> std::ws >> tmp) || tmp != l.exp)
+    in >> tmp;
+    if (!in || tmp != l.exp)
     {
       in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, Complex && io)
+  std::istream& operator>>(std::istream& in, Complex&& io)
   {
-    StreamGuard g(in);
-    in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('} >> std::ws;
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+    StreamGuard guard(in);
+    in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('};
     double re = 0.0;
     double im = 0.0;
-    in >> re >> std::ws;
+    in >> re;
     char sign = in.peek();
     if (sign == '+' || sign == '-')
     {
-      in >> im >> std::ws;
+      in >> im;
     }
     in >> ExpectChar{')'};
     if (in)
     {
-      io.c = std::complex< double >(re, im);
+      io.c = std::complex<double>(re, im);
     }
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, Rational && io)
+  std::istream& operator>>(std::istream& in, Rational&& io)
   {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
     StreamGuard guard(in);
-    in >> ExpectChar{'('} >> ExpectChar{':'} >> Label{"N"} >> io.rat.first >> std::ws
-       >> ExpectChar{':'} >> Label{"D"} >> io.rat.second >> std::ws
+    in >> ExpectChar{'('} >> ExpectChar{':'} >> Label{"N"} >> io.rat.first
+       >> ExpectChar{':'} >> Label{"D"} >> io.rat.second
        >> ExpectChar{':'} >> ExpectChar{')'};
     return in;
   }
 
-  std::istream & operator>>(std::istream & in, Strings && io)
+  std::istream& operator>>(std::istream& in, Strings&& io)
   {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
     StreamGuard guard(in);
     in >> std::noskipws >> ExpectChar{'"'};
     char ch;
-    io.s.clear();
-    while (in.get(ch) && ch != '"')
+    while (in >> ch && ch != '"')
     {
       if (ch == '\n')
       {
@@ -83,27 +109,24 @@ namespace cherkasov
       }
       io.s += ch;
     }
-    if (ch != '"')
-    {
-      in.setstate(std::ios::failbit);
-    }
     return in;
   }
-
-  std::istream & operator>>(std::istream & in, DataStruct & obj)
+  
+  std::istream& operator>>(std::istream& in, DataStruct& obj)
   {
-    std::istream::sentry s(in);
-    if (!s)
+    std::istream::sentry sentry(in);
+    if (!sentry)
     {
       return in;
     }
     DataStruct temp;
     bool k1 = false, k2 = false, k3 = false;
-    in >> ExpectChar{'('} >> std::ws;
-    while (in && !(k1 && k2 && k3))
+    in >> ExpectChar{'('};
+    while (true)
     {
       std::string label;
-      in >> ExpectChar{':'} >> label >> std::ws;
+      in >> ExpectChar{':'} >> label;
+      
       if (label == "key1" && !k1)
       {
         in >> Complex{temp.key1};
@@ -124,31 +147,37 @@ namespace cherkasov
         in.setstate(std::ios::failbit);
         break;
       }
-      in >> std::ws;
+      
+      if (k1 && k2 && k3)
+      {
+        break;
+      }
     }
+    
     in >> ExpectChar{':'} >> ExpectChar{')'};
     if (in && k1 && k2 && k3)
     {
       obj = temp;
     }
-    else
-    {
-      in.setstate(std::ios::failbit);
-    }
     return in;
   }
 
-  std::ostream & operator<<(std::ostream & out, const DataStruct & obj)
+  std::ostream& operator<<(std::ostream& out, const DataStruct& obj)
   {
+    std::ostream::sentry sentry(out);
+    if (!sentry)
+    {
+      return out;
+    }
     StreamGuard guard(out);
     out << "(:key1 #c(" << std::fixed << std::setprecision(1) << obj.key1.real();
     if (obj.key1.imag() >= 0)
     {
       out << "+";
-      out << obj.key1.imag() << ")";
-      out << ":key2 (:N" << obj.key2.first << ":D" << obj.key2.second << ":)";
-      out << ":key3 \"" << obj.key3 << "\":)";
     }
+    out << obj.key1.imag() << ")";
+    out << ":key2 (:N" << obj.key2.first << ":D" << obj.key2.second << ":)";
+    out << ":key3 \"" << obj.key3 << "\":)";
     return out;
   }
 }
