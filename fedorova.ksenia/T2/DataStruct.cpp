@@ -55,6 +55,7 @@ namespace fedorova
     is >> b;
     if (b != 'b' && b != 'B') {
       is.setstate(std::ios::failbit);
+      dest.ref = "";
       return is;
     }
 
