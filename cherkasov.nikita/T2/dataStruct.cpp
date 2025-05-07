@@ -142,7 +142,7 @@ namespace cherkasov
         break;
       }
     }
-    if (in) 
+    if (in)
     {
       obj = temp;
     }
