@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <numeric>
 #include <functional>
+#include <scope_guard.hpp>
 #include "geometry.hpp"
 
 namespace
@@ -116,6 +117,7 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
   {
     res /= plgs.size();
   }
+  iofmtguard fmtguard(out);
   out << std::setprecision(1) << std::fixed << res;
 }
 
@@ -131,6 +133,7 @@ void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& pl
   if (subcommand == "AREA")
   {
     auto res = (*std::max_element(plgs.cbegin(), plgs.cend(), compareArea));
+    iofmtguard fmtguard(out);
     out << std::setprecision(1) << std::fixed << getPlgArea(res);
   }
   else if (subcommand == "VERTEXES")
@@ -153,6 +156,7 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
 
   std::string subcommand;
   in >> subcommand;
+  iofmtguard fmtguard(out);
   if (subcommand == "AREA")
   {
     auto res = (*std::min_element(plgs.cbegin(), plgs.cend(), compareArea));
