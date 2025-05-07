@@ -51,7 +51,7 @@ namespace fedorova
     if (!s) return is;
 
     is >> DelimiterIO{ '0' };
-    char b = '';
+    char b = '0';
     is >> b;
     if (b != 'b' && b != 'B') {
       is.setstate(std::ios::failbit);
@@ -60,7 +60,7 @@ namespace fedorova
     }
 
     std::string bits = "";
-    char c = '';
+    char c = '0';
     while (is.get(c)) {
       if (c == '0' || c == '1') {
         bits += c;
