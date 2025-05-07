@@ -29,25 +29,13 @@ namespace cherkasov
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Label&& l)
-  {
-    std::string tmp;
-    if (!(in >> tmp) || tmp != l.exp)
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
-
   std::istream& operator>>(std::istream& in, Complex&& io)
   {
     StreamGuard g(in);
     in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('};
-    double re = 0.0;
-    double im = 0.0;
+    double re = 0.0, im = 0.0;
     in >> re;
-    char sign = in.peek();
-    if (sign == '+' || sign == '-')
+    if (in.peek() == '+' || in.peek() == '-')
     {
       in >> im;
     }
@@ -62,8 +50,8 @@ namespace cherkasov
   std::istream& operator>>(std::istream& in, Rational&& io)
   {
     StreamGuard guard(in);
-    in >> ExpectChar{'('} >> ExpectChar{':'} >> Label{"N"} >> io.rat.first
-       >> ExpectChar{':'} >> Label{"D"} >> io.rat.second
+    in >> ExpectChar{'('} >> ExpectChar{':'} >> ExpectChar{'N'} >> io.rat.first
+       >> ExpectChar{':'} >> ExpectChar{'D'} >> io.rat.second
        >> ExpectChar{':'} >> ExpectChar{')'};
     return in;
   }
@@ -101,8 +89,7 @@ namespace cherkasov
     {
       std::string label;
       in >> ExpectChar{':'} >> label;
-
-      if (label == "key1" && !hasKey1)
+      if (label == "key1")
       {
         if (in.peek() == '#')
         {
@@ -111,11 +98,11 @@ namespace cherkasov
         }
         else
         {
-          std::string dummy;
-          in >> dummy;
+         std::string dummy;
+          std::getline(in, dummy, ':');
         }
       }
-      else if (label == "key2" && !hasKey2)
+      else if (label == "key2")
       {
         if (in.peek() == '(')
         {
@@ -125,10 +112,10 @@ namespace cherkasov
         else
         {
           std::string dummy;
-          in >> dummy;
+          std::getline(in, dummy, ':');
         }
       }
-      else if (label == "key3" && !hasKey3)
+      else if (label == "key3")
       {
         in >> Strings{temp.key3};
         hasKey3 = true;
@@ -138,13 +125,16 @@ namespace cherkasov
         in.setstate(std::ios::failbit);
         break;
       }
-
-      if (hasKey1 && hasKey2 && hasKey3)
+      if (in.peek() == ':')
       {
-        break;
+        in >> ExpectChar{':'};
+        if (in.peek() == ')')
+        {
+          in >> ExpectChar{')'};
+          break;
+        }
       }
     }
-    in >> ExpectChar{':'} >> ExpectChar{')'};
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
       obj = temp;
