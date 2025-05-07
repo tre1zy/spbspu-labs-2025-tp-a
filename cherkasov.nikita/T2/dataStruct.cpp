@@ -74,7 +74,6 @@ namespace cherkasov
     in >> std::noskipws >> ExpectChar{'"'};
     char ch;
     io.s.clear();
-    
     while (in.get(ch) && ch != '"')
     {
       if (ch == '\n')
@@ -84,7 +83,6 @@ namespace cherkasov
       }
       io.s += ch;
     }
-    
     if (ch != '"')
     {
       in.setstate(std::ios::failbit);
@@ -99,7 +97,6 @@ namespace cherkasov
     {
       return in;
     }
-    
     DataStruct temp;
     bool k1 = false, k2 = false, k3 = false;
     in >> ExpectChar{'('} >> std::ws;
