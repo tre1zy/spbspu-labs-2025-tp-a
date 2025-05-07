@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <array>
 #include <delimiter.hpp>
-#include "scope_guard.hpp"
+#include <scope_guard.hpp>
 
 namespace
 {
