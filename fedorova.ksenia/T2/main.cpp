@@ -26,16 +26,16 @@ int main() {
   while (!std::cin.eof())
   {
     DataStruct temp;
-    if (std::cin >> temp) {
-      data.push_back(temp);
-    }
-    else if (std::cin.eof()) {
-      break;
-    }
-    else {
+    if (std::cin.fail())
+    {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
+    std::copy(
+      std::istream_iterator< DataStruct >(std::cin),
+      std::istream_iterator< DataStruct >(),
+      std::back_inserter(data)
+    );
   }
 
   std::sort(data.begin(), data.end(), compareDataStruct);
@@ -48,5 +48,3 @@ int main() {
 
   return 0;
 }
-
-

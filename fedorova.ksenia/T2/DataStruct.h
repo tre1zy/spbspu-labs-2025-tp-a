@@ -16,7 +16,7 @@ namespace fedorova
   struct DataStruct
   {
     unsigned long long key1;
-    unsigned long long key2;
+    std::string key2;
     std::string key3;
   };
 
@@ -33,7 +33,7 @@ namespace fedorova
 
   struct ULLBinaryIO
   {
-    unsigned long long& ref;
+    std::string& ref;
   };
 
   struct StringIO

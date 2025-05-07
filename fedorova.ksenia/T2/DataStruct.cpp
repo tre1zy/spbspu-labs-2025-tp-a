@@ -46,42 +46,35 @@ namespace fedorova
     return is;
   }
 
-  std::istream& operator>>(std::istream& is, ULLBinaryIO&& dest)
-  {
-    std::istream::sentry sentry(is);
-    if (!sentry)
-    {
-      return is;
-    }
+  std::istream& operator>>(std::istream& is, ULLBinaryIO&& dest) {
+    std::istream::sentry s(is);
+    if (!s) return is;
 
-    std::string binStr;
-    is >> binStr;
-    if (is && binStr.substr(0, 2) != "0b" && binStr.substr(0, 2) != "0B")
-    {
+    is >> DelimiterIO{ '0' };
+    char b;
+    is >> b;
+    if (b != 'b' && b != 'B') {
       is.setstate(std::ios::failbit);
       return is;
     }
 
-    if (binStr.length() <= 2)
-    {
+    std::string bits;
+    char c;
+    while (is.get(c)) {
+      if (c == '0' || c == '1') {
+        bits += c;
+      }
+      else {
+        is.unget();
+        break;
+      }
+    }
+
+    if (bits.empty()) {
       is.setstate(std::ios::failbit);
       return is;
     }
-
-    if (binStr.substr(2).find_first_not_of("01") != std::string::npos)
-    {
-      is.setstate(std::ios::failbit);
-      return is;
-    }
-
-    try
-    {
-      dest.ref = std::stoull(binStr.substr(2), nullptr, 2);
-    }
-    catch (...)
-    {
-      is.setstate(std::ios::failbit);
-    }
+    dest.ref = bits;
 
     return is;
   }
@@ -94,7 +87,7 @@ namespace fedorova
       return is;
     }
 
-    return std::getline(is >> DelimiterIO{ '"' }, dest.ref, '"');
+    return std::getline(is >> DelimiterIO{ '\"' }, dest.ref, '\"');
   }
 
   std::istream& operator>>(std::istream& is, LabelIO&& dest)
@@ -105,14 +98,16 @@ namespace fedorova
       return is;
     }
 
-    std::string key;
-    is >> key;
-
-    if (is && key != dest.exp)
+    char key;
+    for (size_t i = 0; i < dest.exp.size(); i++)
     {
-      is.setstate(std::ios::failbit);
+      is >> key;
+      if (key != dest.exp[i])
+      {
+        is.setstate(std::ios::failbit);
+        break;
+      }
     }
-
     return is;
   }
 
@@ -135,20 +130,22 @@ namespace fedorova
       {
         std::string fieldName;
         is >> fieldName;
-
         if (fieldName == ":key1" && key1)
         {
           is >> ULLLiteralIO{ data.key1 };
+          in.key1 = data.key1;
           key1 = false;
         }
         else if (fieldName == ":key2" && key2)
         {
           is >> ULLBinaryIO{ data.key2 };
+          in.key2 = data.key2;
           key2 = false;
         }
         else if (fieldName == ":key3" && key3)
         {
           is >> StringIO{ data.key3 };
+          in.key3 = data.key3;
           key3 = false;
         }
         else
@@ -156,9 +153,6 @@ namespace fedorova
           is.setstate(std::ios::failbit);
           break;
         }
-
-        if (is.peek() == ')') break;
-        is >> DelimiterIO{ ':' };
       }
     }
 
@@ -167,7 +161,7 @@ namespace fedorova
       data = in;
     }
 
-    is >> DelimiterIO{ ')' };
+    is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
     return is;
   }
 
@@ -182,34 +176,24 @@ namespace fedorova
     iofmtguard fmtguard(os);
 
     os << "(:"
-      << "key1 " << data.key1 << "ull:"
-      << "key2 0b";
-
-    if (data.key2 == 0) {
-      os << '0';
-    }
-    else {
-      bool leading_zero = true;
-      for (int i = 63; i >= 0; i--) {
-        bool bit = (data.key2 >> i) & 1;
-        if (bit) leading_zero = false;
-        if (!leading_zero) {
-          os << (bit ? '1' : '0');
-        }
-      }
-    }
-
-    os << ":key3 \"" << data.key3 << "\":)";
+      << "key1 " << data.key1 << "ull" << ":"
+      << "key2 " << "0b" << data.key2 << ":"
+      << "key3 " << "\"" << data.key3 << "\""
+      << ":)";
 
     return os;
   }
 
-  iofmtguard::iofmtguard(std::basic_ios<char>& s)
-    : s_(s), width_(s.width()), fill_(s.fill()),
-    precision_(s.precision()), fmt_(s.flags()) {
-  }
+  iofmtguard::iofmtguard(std::basic_ios< char >& s) :
+    s_(s),
+    width_(s.width()),
+    fill_(s.fill()),
+    precision_(s.precision()),
+    fmt_(s.flags())
+  {}
 
-  iofmtguard::~iofmtguard() {
+  iofmtguard::~iofmtguard()
+  {
     s_.width(width_);
     s_.fill(fill_);
     s_.precision(precision_);
