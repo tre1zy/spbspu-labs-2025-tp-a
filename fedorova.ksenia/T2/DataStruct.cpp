@@ -72,7 +72,6 @@ namespace fedorova
 
     if (bits.empty()) {
       is.setstate(std::ios::failbit);
-      return is;
     }
     dest.ref = bits;
 
