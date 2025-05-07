@@ -23,7 +23,7 @@ namespace cherkasov
   {
     char c;
     if (!(in >> c) || c != d.exp)
-    { 
+    {
       in.setstate(std::ios::failbit);
     }
     return in;
@@ -84,10 +84,13 @@ namespace cherkasov
   std::istream& operator>>(std::istream& in, DataStruct& obj)
   {
     std::istream::sentry s(in);
-    if (!s) return in;
+    if (!s)
+    {
+      return in;
+    }
     DataStruct temp;
     in >> ExpectChar{'('} >> ExpectChar{':'};
-    while (true) 
+    while (true)
     {
       std::string f;
       in >> f;
@@ -95,9 +98,9 @@ namespace cherkasov
       {
         if (in.peek() == '"')
         {
-          std::string dummy;
-          in >> Strings{dummy};
-        } 
+          std::string string;
+          in >> Strings{string};
+        }
         else if (in.peek() == '#')
         {
           in >> Complex{temp.key1};
@@ -114,9 +117,10 @@ namespace cherkasov
         {
           in >> Rational{temp.key2};
         }
-        else {
-          std::string dummy;
-          in >> dummy;
+        else
+        {
+          std::string string;
+          in >> string;
         }
       }
       else if (f == "key3")
