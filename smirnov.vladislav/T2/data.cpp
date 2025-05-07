@@ -71,26 +71,18 @@ namespace smirnov
 
     std::string str;
     in >> std::ws;
-    char a = '0';
-    char b = '0';
-    a = in.get();
-    a = in.peek();
-
-    if (a == '0' && (b == 'x' || b == 'X'))
+    char prefix[2];
+    in.read(prefix, 2);
+    if (!in || prefix[0] != '0' || (prefix[1] != 'x' && prefix[1] != 'X'))
     {
-      in.get();
-      in >> std::hex >> dest.ref;
-      if (!in)
-      {
-        in.setstate(std::ios::failbit);
-      }
+      in.setstate(std::ios::failbit);
+      return in;
     }
-    else
+    in >> std::hex >> dest.ref;
+    if (!in)
     {
-      in.unget();
       in.setstate(std::ios::failbit);
     }
-
     return in;
   }
 
@@ -147,7 +139,7 @@ namespace smirnov
       switch (keyNumber)
       {
       case 1:
-        if (hasKey1 || in.peek() == '"')
+        if (hasKey1)
         {
           in.setstate(std::ios::failbit);
           break;
