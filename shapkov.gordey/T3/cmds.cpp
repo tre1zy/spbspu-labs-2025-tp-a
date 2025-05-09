@@ -131,10 +131,11 @@ void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
 }
 void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
-  Polygon p;
-  if (!(in >> p))
+  Polygon polygon;
+  in >> polygon;
+  if (!in || in.peek() != '\n')
   {
     throw std::logic_error("wrong polygon");
   }
-  out << std::count_if(src.begin(), src.end(), isSame{p}) << '\n';
+  out << std::count_if(src.begin(), src.end(), isSame{polygon}) << '\n';
 }
