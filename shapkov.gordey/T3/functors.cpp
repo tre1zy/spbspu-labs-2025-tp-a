@@ -19,6 +19,10 @@ double shapkov::pointDeltaSum::operator()(const Point& a, const Point& b) const
 
 bool shapkov::isSame::operator()(const Polygon& src) const
 {
+  if (src.size != p.size())
+  {
+    return false;
+  }
   using namespace std::placeholders;
   double deltaX = p.points[0].x - src.points[0].x;
   double deltaY = p.points[0].y - src.points[0].y;

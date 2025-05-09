@@ -129,6 +129,7 @@ void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
 {
   out << std::count_if(src.begin(), src.end(), isRectangle) << '\n';
 }
+
 void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   Polygon polygon;
