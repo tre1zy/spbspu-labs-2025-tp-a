@@ -134,7 +134,7 @@ void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src
 {
   Polygon polygon;
   in >> polygon;
-  if (!in)
+  if (!in || in.peek() != '\n')
   {
     throw std::logic_error("wrong polygon");
   }
