@@ -49,20 +49,24 @@ std::istream& shapkov::operator>>(std::istream& in, Polygon& polygon)
   if (!s)
   {
     return in;
-  }
-  size_t vertexes;
+  };
+  size_t vertexes = 0;
   if (!(in >> vertexes) || vertexes < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
+  std::string futurePolygon;
+  std::getline(in, futurePolygon);
+  std::istringstream iss(futurePolygon);
   std::vector< Point > points;
-  using inputIt = std::istream_iterator< Point >;
-  std::copy_n(inputIt{ in }, vertexes, std::back_inserter(points));
-  if (in && points.size() == vertexes)
+  std::copy(std::istream_iterator< Point >(iss), std::istream_iterator< Point >(), std::back_inserter(points));
+  if (points.size() != vertexes)
   {
-    polygon.points = points;
+    in.setstate(std::ios::failbit);
+    return in;
   }
+  polygon.points = points;
   return in;
 }
 
