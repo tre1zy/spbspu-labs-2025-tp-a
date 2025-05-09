@@ -19,7 +19,7 @@ double shapkov::pointDeltaSum::operator()(const Point& a, const Point& b) const
 
 bool shapkov::isSame::operator()(const Polygon& src) const
 {
-  if (src.size != p.size())
+  if (src.points.size() != p.points.size())
   {
     return false;
   }
