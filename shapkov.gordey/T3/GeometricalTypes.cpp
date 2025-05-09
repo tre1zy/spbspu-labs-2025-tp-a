@@ -3,7 +3,6 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
-#include <sstream>
 #include <cmath>
 #include "functors.hpp"
 #include <delimiter.hpp>
@@ -56,17 +55,17 @@ std::istream& shapkov::operator>>(std::istream& in, Polygon& polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::string futurePolygon;
-  std::getline(in, futurePolygon);
-  std::istringstream iss(futurePolygon);
-  std::vector< Point > points;
-  std::copy(std::istream_iterator< Point >(iss), std::istream_iterator< Point >(), std::back_inserter(points));
-  if (points.size() != vertexes)
+  std::vector< Point > points(vertexes, Point{0, 0});
+  using inputIt = std::istream_iterator< Point >;
+  std::copy_n(inputIt(in), vertexes, points.begin());
+  if (in && points.size() == vertexes)
+  {
+    polygon.points = points;
+  }
+  else
   {
     in.setstate(std::ios::failbit);
-    return in;
   }
-  polygon.points = points;
   return in;
 }
 
