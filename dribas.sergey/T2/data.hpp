@@ -5,7 +5,7 @@
 
 namespace dribas
 {
-  struct Data
+  struct DataStruct
   {
     double key1;
     unsigned long long key2;
@@ -54,7 +54,7 @@ namespace dribas
     bool wasVerified = false;
   };
 
-  std::istream& operator>>(std::istream&, Data&);
+  std::istream& operator>>(std::istream&, DataStruct&);
   std::istream& operator>>(std::istream&, DelimiterIO&&);
   std::istream& operator>>(std::istream&, DoubleI&&);
   std::istream& operator>>(std::istream&, UllI&&);
@@ -64,9 +64,9 @@ namespace dribas
   std::ostream& operator<<(std::ostream&, const DoubleO&&);
   std::ostream& operator<<(std::ostream&, const UllO&&);
   std::ostream& operator<<(std::ostream&, const StringO&&);
-  std::ostream& operator<<(std::ostream&, const Data&);
+  std::ostream& operator<<(std::ostream&, const DataStruct&);
 
-  bool compare(const Data&, const Data&) noexcept;
+  bool compare(const DataStruct&, const DataStruct&) noexcept;
 }
 
 
