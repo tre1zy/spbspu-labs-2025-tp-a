@@ -57,7 +57,7 @@ std::istream& shapkov::operator>>(std::istream& in, Polygon& polygon)
   }
   std::vector< Point > points(vertexes, Point{0, 0});
   using inputIt = std::istream_iterator< Point >;
-  std::copy_n(inputIt(in), vertexes, points.begin());
+  std::copy_n(inputIt{in}, vertexes, points.begin());
   if (in && points.size() == vertexes)
   {
     polygon.points = points;
@@ -77,7 +77,8 @@ std::ostream& shapkov::operator<<(std::ostream& out, const Polygon& polygon)
     return out;
   }
   out << polygon.points.size();
-  std::copy(std::begin(polygon.points), std::end(polygon.points), std::ostream_iterator< Point >(out, ""));
+  using outputIt = std::ostream_iterator< Point >;
+  std::copy(std::begin(polygon.points), std::end(polygon.points), outputIt{out, ""});
   return out;
 }
 
