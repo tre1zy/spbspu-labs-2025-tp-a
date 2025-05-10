@@ -7,7 +7,7 @@
 
 namespace dribas
 {
-  bool compare(const Data& lhs, const Data& rhs) noexcept
+  bool compare(const DataStruct& lhs, const DataStruct& rhs) noexcept
   {
     if (lhs.key1 != rhs.key1) {
       return lhs.key1 < rhs.key1;
@@ -127,7 +127,7 @@ namespace dribas
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Data& data)
+  std::istream& operator>>(std::istream& in, DataStruct& data)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -135,7 +135,7 @@ namespace dribas
     }
     StreamGuard guard(in);
 
-    Data temp;
+    DataStruct temp;
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
 
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
@@ -163,7 +163,7 @@ namespace dribas
     return in;
   }
 
-  std::ostream& operator<<(std::ostream& out, const Data& data)
+  std::ostream& operator<<(std::ostream& out, const DataStruct& data)
   {
     std::ostream::sentry sentry(out);
     if (!sentry) {
@@ -178,7 +178,6 @@ namespace dribas
     out << ':';
     out << StringO{ data.key3 };
     out << ":)";
-    out << '\n';
 
     return out;
   }
