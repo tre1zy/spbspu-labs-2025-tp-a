@@ -81,9 +81,22 @@ namespace
   void maxVertex(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareVertex));
-    detail::ScopeGuard scope(out);
     out << max.points.size();
   }
+
+  void minArea(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
+  {
+    auto min = (*std::min_element(polygons.begin(), polygons.end(), compareArea));
+    detail::ScopeGuard scope(out);
+    out << std::fixed << std::setprecision(1) << kiselev::getArea(min);
+  }
+
+  void minVertex(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
+  {
+    auto min = (*std::min_element(polygons.begin(), polygons.end(), compareVertex));
+    out << min.points.size();
+  }
+
 }
 
 void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -123,6 +136,27 @@ void kiselev::max(std::istream& in, std::ostream& out, const std::vector< Polygo
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(maxVertex, std::cref(polygons), std::ref(out));
+  try
+  {
+    subcommands.at(subcommand);
+  }
+  catch (...)
+  {
+    throw std::logic_error("Unknown command");
+  }
+}
+
+void kiselev::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (polygons.empty())
+  {
+    throw std::logic_error("No polygons");
+  }
+  std::map< std::string, std::function< void() > > subcommands;
+  subcommands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(out));
+  subcommands["VERTEXES"] = std::bind(minVertex, std::cref(polygons), std::ref(out));
   try
   {
     subcommands.at(subcommand);
