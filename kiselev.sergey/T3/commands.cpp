@@ -215,3 +215,10 @@ void kiselev::rects(std::ostream& out, const std::vector< Polygon >& polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), isRect);
 }
+
+void kiselev::lessArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  Polygon poly;
+  in >> poly;
+  out << std::count_if(polygons.begin(), polygons.end(), std::bind(compareArea, std::placeholders::_1, getArea(poly)));
+}
