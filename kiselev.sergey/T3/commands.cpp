@@ -97,6 +97,28 @@ namespace
     out << min.points.size();
   }
 
+  template< typename Predicate >
+  void countIf(const std::vector< kiselev::Polygon >& polygons, Predicate p, std::ostream& out)
+  {
+    std::vector< kiselev::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
+    out << filtered.size() << "\n";
+  }
+
+  void countEven(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
+  {
+    countIf(polygons, isEven, out);
+  }
+
+  void countOdd(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
+  {
+    countIf(polygons, isOdd, out);
+  }
+
+  void countNum(const std::vector< kiselev::Polygon >& polygons, std::ostream& out, size_t n)
+  {
+    countIf(polygons, VertexPred{ n }, out);
+  }
 }
 
 void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -164,5 +186,27 @@ void kiselev::min(std::istream& in, std::ostream& out, const std::vector< Polygo
   catch (...)
   {
     throw std::logic_error("Unknown command");
+  }
+}
+
+void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::string subcommand;
+  in >> subcommand;
+  std::map< std::string, std::function< void() > > subcommands;
+  subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
+  subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
+  try
+  {
+    subcommands.at(subcommand)();
+  }
+  catch (...)
+  {
+    size_t n = std::stoull(subcommand);
+    if (n < 3)
+    {
+      throw std::logic_error("Few vertices");
+    }
+    countNum(polygons, out, n);
   }
 }
