@@ -53,8 +53,14 @@ namespace
   }
   double areaMean(const std::vector< kiselev::Polygon >& polygons)
   {
-    bool all = true;
-    return areaSum(polygons, all) / polygons.size();
+    struct AllPred
+    {
+      bool operator()(const kiselev::Polygon&)
+      {
+        return true;
+      }
+    };
+    return areaSum(polygons, AllPred()) / polygons.size();
   }
   double areaNum(const std::vector< kiselev::Polygon >& polygons, size_t n)
   {
@@ -68,7 +74,7 @@ namespace
 
   bool compareArea(const kiselev::Polygon& poly1, const kiselev::Polygon& poly2)
   {
-    return getArea(poly1) < getArea(poly2);
+    return kiselev::getArea(poly1) < kiselev::getArea(poly2);
   }
 
   void maxArea(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
@@ -220,5 +226,6 @@ void kiselev::lessArea(std::istream& in, std::ostream& out, const std::vector< P
 {
   Polygon poly;
   in >> poly;
-  out << std::count_if(polygons.begin(), polygons.end(), std::bind(compareArea, std::placeholders::_1, getArea(poly)));
+  using namespace std::placeholders;
+  out << std::count_if(polygons.begin(), polygons.end(), std::bind(compareArea, _1, poly)) << "\n";
 }
