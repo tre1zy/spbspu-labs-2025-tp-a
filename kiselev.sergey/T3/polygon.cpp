@@ -53,15 +53,14 @@ std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
   }
   detail::ScopeGuard scope(in);
   size_t count = 0;
-  in >> count;
-  if (count < 3)
+  if (!(in >> count) || count < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
   std::vector< Point > temp;
   temp.reserve(count);
-  std::copy(std::istream_iterator< Point >(in), std::istream_iterator< Point >(), std::back_inserter(temp));
+  std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
   if (in)
   {
     polygon.points = std::move(temp);
