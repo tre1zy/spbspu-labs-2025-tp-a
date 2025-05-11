@@ -1,6 +1,7 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 #include <istream>
+#include <ostream>
 #include <vector>
 
 namespace kiselev
@@ -18,6 +19,8 @@ namespace kiselev
 
   std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
+  std::ostream& operator<<(std::ostream&, const Point&);
+  std::ostream& operator<<(std::ostream&, const Polygon&);
   double getArea(const Polygon&);
   bool isRect(const Polygon&);
 

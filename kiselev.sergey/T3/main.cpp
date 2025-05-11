@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -25,8 +26,8 @@ int main(int argc, char** argv)
     std::copy(istreamIt(file), istreamIt(), std::back_inserter(polygons));
     if (!file)
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      file.clear();
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 

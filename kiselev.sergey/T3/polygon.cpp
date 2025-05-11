@@ -27,7 +27,7 @@ namespace
     return std::sqrt(std::pow((p1.x - p2.x), 2) + std::pow((p1.y - p2.y), 2));
   }
 }
-/*
+
 std::istream& kiselev::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sentry(in);
@@ -37,13 +37,14 @@ std::istream& kiselev::operator>>(std::istream& in, Point& point)
   }
   detail::ScopeGuard scope(in);
   Point temp;
-  in >> DelimeterIO{ '(' } >> temp.x >> DelimeterIO{ ';' } >> temp.y >> DelimeterIO{ ')' };
+  in >> DelimeterIO{ '(' } >> point.x >> DelimeterIO{ ';' } >> point.y >> DelimeterIO{ ')' };
   if (in)
   {
     point = temp;
   }
   return in;
 }
+
 
 std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
 {
@@ -59,8 +60,7 @@ std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > temp;
-  temp.reserve(count);
+  std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
   if (in)
   {
@@ -68,49 +68,21 @@ std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
   }
   return in;
 }
-*/
-std::istream& kiselev::operator>>(std::istream& in, Point& pt)
+
+std::ostream& kiselev::operator<<(std::ostream& out, const Point& p)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  {
-    using sep = DelimeterIO;
-
-    return in >> sep{ '(' } >> pt.x >> sep{ ';' } >> pt.y >> sep{ ')' };
-  }
+  return out << "(" << p.x << ";" << p.y << ")";
 }
 
-std::istream& kiselev::operator>>(std::istream& in, Polygon& plg)
+std::ostream& kiselev::operator<<(std::ostream& out, const Polygon& pol)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
+  for (size_t i = 0; i < pol.points.size(); ++i)
   {
-    return in;
+    out << pol.points[i] << " ";
   }
-
-  size_t vrtx_cnt;
-  if (!(in >> vrtx_cnt) || vrtx_cnt < 3)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  std::vector< Point > pts(vrtx_cnt);
-  std::copy_n(std::istream_iterator< Point >(in), vrtx_cnt, pts.begin());
-
-  if (!in)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  plg.points = pts;
-  return in;
+  return out << "\n";
 }
+
 double kiselev::getArea(const Polygon& polygon)
 {
   AreaCalculator calc{ &polygon.points.back() };

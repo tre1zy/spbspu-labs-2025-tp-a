@@ -25,6 +25,10 @@ namespace
     return !isEven(poly);
   }
 
+  bool isAll(const kiselev::Polygon&)
+  {
+    return true;
+  }
   struct VertexPred
   {
     size_t count;
@@ -53,14 +57,7 @@ namespace
   }
   double areaMean(const std::vector< kiselev::Polygon >& polygons)
   {
-    struct AllPred
-    {
-      bool operator()(const kiselev::Polygon&)
-      {
-        return true;
-      }
-    };
-    return areaSum(polygons, AllPred()) / polygons.size();
+    return areaSum(polygons, isAll) / polygons.size();
   }
   double areaNum(const std::vector< kiselev::Polygon >& polygons, size_t n)
   {
@@ -104,26 +101,27 @@ namespace
   }
 
   template< typename Predicate >
-  void countIf(const std::vector< kiselev::Polygon >& polygons, Predicate p, std::ostream& out)
+  size_t countIf(const std::vector< kiselev::Polygon >& polygons, Predicate p)
   {
-    std::vector< kiselev::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
-    out << filtered.size() << "\n";
+    //std::vector< kiselev::Polygon > filtered;
+    //std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
+    //out << filtered.size() << "\n";
+    return std::count_if(polygons.begin(), polygons.end(), p);
   }
 
   void countEven(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
   {
-    countIf(polygons, isEven, out);
+    out << countIf(polygons, isEven) << "\n";
   }
 
   void countOdd(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
   {
-    countIf(polygons, isOdd, out);
+    out << countIf(polygons, isOdd) << "\n";
   }
 
   void countNum(const std::vector< kiselev::Polygon >& polygons, std::ostream& out, size_t n)
   {
-    countIf(polygons, VertexPred{ n }, out);
+    out << countIf(polygons, VertexPred{ n }) << "\n";
   }
 }
 
