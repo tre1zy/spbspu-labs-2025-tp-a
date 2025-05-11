@@ -7,12 +7,12 @@
 
 namespace dribas
 {
-  std::ostream printArea(const std::vector< Poligon >&, std::istream&);
-  std::ostream printMax(const std::vector< Poligon >&, std::istream&);
-  std::ostream printMin(const std::vector< Poligon >&, std::istream&);
-  std::ostream printCount(const std::vector< Poligon >&, std::istream&);
-  std::ostream printLessArea(const std::vector< Poligon >&, std::istream&);
-  std::ostream printLessArea(const std::vector< Poligon >&, std::istream&);
+  void printArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
+  void printMax(const std::vector< Poligon >&, std::istream&, std::ostream&);
+  void printMin(const std::vector< Poligon >&, std::istream&, std::ostream&);
+  void printCount(const std::vector< Poligon >&, std::istream&, std::ostream&);
+  void printLessArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
+  void printLessArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
 }
 
 #endif
