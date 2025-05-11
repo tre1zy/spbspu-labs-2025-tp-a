@@ -58,7 +58,7 @@ namespace kazak
     c1 = in.get();
     c2 = in.peek();
 
-    if (c1 == '0' && (c2 == 'x' || c2 == 'X'))
+    if (c1 == '0' && (!in.eof()) && (c2 == 'x' || c2 == 'X'))
     {
       in.get();
       in >> std::hex >> dest.ref;
