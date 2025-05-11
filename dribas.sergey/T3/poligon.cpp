@@ -6,6 +6,21 @@
 #include <streamGuard.hpp>
 #include <delimiter.hpp>
 
+namespace
+{
+  struct Gauss
+  {
+    const dribas::Point& pt;
+    dribas::Point ptNext;
+    double operator()(double res, const dribas::Point& ptLast)
+    {
+      res += std::abs((ptLast.x - pt.x) * (ptNext.y - pt.y) - (ptNext.x - pt.x) * (ptLast.y - pt.y)) / 2;
+      ptNext = ptLast;
+      return res;
+    }
+  };
+}
+
 namespace dribas
 {
   bool operator==(const Point& r, const Point& l)
@@ -28,7 +43,7 @@ namespace dribas
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Polygon& plg)
+  std::istream& operator>>(std::istream& in, Poligon& plg)
   {
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -52,19 +67,7 @@ namespace dribas
     plg.points = pnts;
     return in;
   }
-
-  struct Gauss
-  {
-    const Point& pt;
-    Point ptNext;
-    double operator()(double res, const Point& ptLast)
-    {
-      res += std::abs((ptLast.x - pt.x) * (ptNext.y - pt.y) - (ptNext.x - pt.x) * (ptLast.y - pt.y)) / 2;
-      ptNext = ptLast;
-      return res;
-    }
-  };
-  double polygonArea(const Polygon& poligon)
+  double getPoligonArea(const Poligon& poligon)
   {
     Gauss area{ poligon.points[0], poligon.points[1] };
     return std::accumulate(poligon.points.begin() + 2, poligon.points.end(), 0., std::ref(area));

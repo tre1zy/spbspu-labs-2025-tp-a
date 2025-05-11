@@ -12,15 +12,15 @@ namespace dribas
     int y;
   };
 
-  struct Polygon
+  struct Poligon
   {
     std::vector< Point > points;
   };
 
   bool operator==(const Point&, const Point&);
   std::istream& operator>>(std::istream&, Point&);
-  std::istream& operator>>(std::istream&, Polygon&);
-  double getPoligonArea(const Polygon&);
+  std::istream& operator>>(std::istream&, Poligon&);
+  double getPoligonArea(const Poligon&);
 }
 
 #endif
