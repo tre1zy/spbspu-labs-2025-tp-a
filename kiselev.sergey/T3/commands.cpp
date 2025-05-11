@@ -129,7 +129,11 @@ void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polyg
 {
   std::string subcommand;
   in >> subcommand;
-  double res = 0;
+  if (polygons.empty())
+  {
+    throw std::logic_error("No polygons");
+  }
+  double res = 0.0;
   std::map< std::string, std::function< double() > > subcommands;
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
   subcommands["ODD"] = std::bind(areaOdd, std::cref(polygons));
@@ -197,6 +201,10 @@ void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Poly
 {
   std::string subcommand;
   in >> subcommand;
+  if (polygons.empty())
+  {
+    throw std::logic_error("No polygons");
+  }
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
   subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
