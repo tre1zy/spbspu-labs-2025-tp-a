@@ -5,24 +5,27 @@
 #include <numeric>
 #include <iostream>
 
+using plgCmp = std::function< bool(const dribas::Poligon&, const dribas::Poligon&) >;
+using plgPrdct = std::function< bool(const dribas::Poligon&) >;
+
 namespace
 {
-  bool isEven(const dribas::Poligon& plg)
+  bool isnEven(const dribas::Poligon& plg)
   {
     return plg.points.size() % 2;
   }
 
-  bool isnEven(const dribas::Poligon& plg)
+  bool isEven(const dribas::Poligon& plg)
   {
-    return !isEven(plg);
+    return !isnEven(plg);
   }
 
-  bool isNumofVErtex(const dribas::Poligon& plg, size_t vertx)
+  bool isNumOfVertex(const dribas::Poligon& plg, size_t vertx)
   {
     return plg.points.size() == vertx;
   }
 
-  void printAreaPrediacte(const std::vector< dribas::Poligon >& plg, std::ostream& out, std::function< bool(const dribas::Poligon&) > predicate)
+  void printAreaPredicate(const std::vector< dribas::Poligon >& plg, std::ostream& out, const plgPrdct predicate)
   {
     std::vector< dribas::Poligon > temp;
     std::copy_if(plg.cbegin(), plg.cend(), std::back_inserter(temp), predicate);
@@ -33,22 +36,15 @@ namespace
     out <<  std::accumulate(areas.begin(), areas.end(), 0);
   }
 
-  void printMinMaxVertxe(const std::vector< dribas::Poligon >& plg, std::ostream& out, std::function< bool(const dribas::Poligon&) > compare)
+  bool areaCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)
   {
-    auto it = *std::max_element(plg.begin(), plg.end(), compare);
-    out << it.points.size();
+    return dribas::getPoligonArea(lhs) < dribas::getPoligonArea(rhs);
   }
 
-  void printMinMaxVertxe(const std::vector< dribas::Poligon >& plg, std::ostream& out, std::function< bool(const dribas::Poligon&) > compare)
+  bool vertexCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)
   {
-    auto it = *std::max_element(plg.begin(), plg.end(), compare);
-    out << dribas::getPoligonArea(it);
+    return lhs.points.size() < rhs.points.size();
   }
-
-  // bool getMinЬфчArea(dribas::Poligon& plg, std::ostream& out, std::istream& in, bool Compare)
-  // {
-  //   return 
-  // }
 
   void printNumofVertex(const std::vector< dribas::Poligon >& plg, std::istream& in, std::ostream& out)
   {
@@ -56,10 +52,46 @@ namespace
     if (!(in >> vertex)) {
       throw std::invalid_argument("Invalid vertex count input");
     }
-    printAreaPrediacte(plg, out, std::bind(isNumofVErtex, std::placeholders::_1, vertex));
+    printAreaPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
   }
 
+  void printVertexMax(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
+  {
+    auto poligon = *std::max_element(plgs.begin(), plgs.end(), compare);
+    out << poligon.points.size();
+  }
 
+  void printAreaMax(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
+  {
+    auto poligon = *std::max_element(plgs.begin(), plgs.end(), compare);
+    out << dribas::getPoligonArea(poligon);
+  }
+
+  void printVertexMin(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
+  {
+  auto poligon = *std::min_element(plgs.begin(), plgs.end(), compare);
+    out << poligon.points.size();
+  }
+
+  void printAreaMin(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
+  {
+    auto poligon = *std::min_element(plgs.begin(), plgs.end(), compare);
+    out << dribas::getPoligonArea(poligon);
+  }
+
+  void printCountPredicate(const std::vector< dribas::Poligon >& plg, std::ostream& out, const plgPrdct predicate)
+  {
+    out << std::count_if(plg.cbegin(), plg.cend(), predicate);
+  }
+
+  void printCountNumofVertex(const std::vector< dribas::Poligon >& plg, std::istream& in, std::ostream& out)
+  {
+    size_t vertex = 0;
+    if (!(in >> vertex)) {
+      throw std::invalid_argument("Invalid vertex count input");
+    }
+    printCountPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
+  }
 }
 
 namespace dribas
@@ -69,15 +101,55 @@ namespace dribas
     if (!plg.size()) {
       throw std::out_of_range("No figure found");
     }
-    std::string command;
     std::map< std::string, std::function< void() > > cmds;
-    cmds["EVEN"] = std::bind(printAreaPrediacte, std::cref(plg), std::ref(out), std::cref(isEven));
-    cmds["ODD"] = std::bind(printAreaPrediacte, std::cref(plg), std::ref(out), std::cref(isnEven));
+    cmds["<EVEN>"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
+    cmds["<ODD>"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
     cmds["<num-of-vertexes>"] = std::bind(printNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
+
+    std::string command; 
+    in >> command;
+    cmds.at(command);
   }
 
-  void printMax(const std::vector< Poligon >&, std::istream&, std::ostream&)
+  void printMax(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
   {
+    if (!plg.size()) {
+      throw std::overflow_error("NO figure found");
+    }
+    std::map< std::string, std::function< void() > > cmds;
+    cmds["<AREA>"] = std::bind(printAreaMax, std::cref(plg), std::ref(out), areaCompare);
+    cmds["<VERTEXES>"] = std::bind(printVertexMax, std::cref(plg), std::ref(out), vertexCompare);
 
+    std::string command; 
+    in >> command;
+    cmds.at(command);
+  }
+
+  void printMin(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
+  {
+    if (!plg.size()) {
+      throw std::overflow_error("NO figure found");
+    }
+    std::map< std::string, std::function< void() > > cmds;
+    cmds["<AREA>"] = std::bind(printAreaMin, std::cref(plg), std::ref(out), areaCompare);
+    cmds["<VERTEXES>"] = std::bind(printVertexMin, std::cref(plg), std::ref(out), vertexCompare);
+    std::string command; 
+    in >> command;
+    cmds.at(command);
+  }
+
+  void printCount(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
+  {
+    if (!plg.size()) {
+      throw std::out_of_range("No figure found");
+    }
+    std::map< std::string, std::function< void() > > cmds;
+    cmds["<EVEN>"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
+    cmds["<ODD>"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
+    cmds["<num-of-vertexes>"] = std::bind(printCountNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
+
+    std::string command; 
+    in >> command;
+    cmds.at(command);
   }
 }
