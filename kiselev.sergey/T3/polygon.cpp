@@ -14,7 +14,7 @@ namespace
   struct AreaCalculator
   {
     kiselev::Point point;
-    double operator()(double area, kiselev::Point& point2)
+    double operator()(double area, const kiselev::Point& point2)
     {
       area += (point.x * point2.y) - (point2.x * point.y);
       point = point2;
