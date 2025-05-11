@@ -10,6 +10,6 @@ namespace kiselev
   void min(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void count(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void lessArea(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void rects(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void rects(std::ostream&, const std::vector< Polygon >&);
 }
 #endif

@@ -1,9 +1,11 @@
 #include "polygon.hpp"
+#include <algorithm>
 #include <cmath>
 #include <istream>
 #include <iterator>
 #include <vector>
 #include <numeric>
+#include <functional>
 #include "scopeGuard.hpp"
 #include "delimeters.hpp"
 
@@ -19,6 +21,11 @@ namespace
       return area;
     }
   };
+
+  double distance(const kiselev::Point p1, const kiselev::Point& p2)
+  {
+    return std::sqrt(std::pow((p1.x - p2.x), 2) + std::pow((p1.y - p2.y), 2));
+  }
 }
 std::istream& kiselev::operator>>(std::istream& in, Point& point)
 {
@@ -67,4 +74,13 @@ double kiselev::getArea(const Polygon& polygon)
   AreaCalculator calc{ &polygon.points.back() };
   double area = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, std::ref(calc));
   return std::abs(area) / 2.0;
+}
+
+bool kiselev::isRect(const Polygon& poly)
+{
+  if (poly.points.size() != 4)
+  {
+    return false;
+  }
+  return (distance(poly.points[0], poly.points[2]) == distance(poly.points[1], poly.points[3]));
 }

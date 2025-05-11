@@ -210,3 +210,8 @@ void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Poly
     countNum(polygons, out, n);
   }
 }
+
+void kiselev::rects(std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), isRect);
+}

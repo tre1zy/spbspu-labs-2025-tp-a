@@ -32,11 +32,11 @@ int main(int argc, char** argv)
 
   std::map< std::string, std::function< void() > > commands;
   commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["LESSAREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RECTS"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["LESSAREA"] = std::bind(lessArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["RECTS"] = std::bind(rects,std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (!(std::cin >> command).eof())
