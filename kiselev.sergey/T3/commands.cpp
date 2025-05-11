@@ -15,21 +15,15 @@
 
 namespace
 {
-  struct EvenPred
+  bool isEven(const kiselev::Polygon& poly)
   {
-    bool operator()(const kiselev::Polygon& poly)
-    {
-      return poly.points.size() % 2 == 0;
-    }
-  };
+    return poly.points.size() % 2 == 0;
+  }
 
-  struct OddPred
+  bool isOdd(const kiselev::Polygon& poly)
   {
-    bool operator()(const kiselev::Polygon& poly)
-    {
-      return poly.points.size() % 2 != 0;
-    }
-  };
+    return !isEven(poly);
+  }
 
   struct VertexPred
   {
@@ -51,11 +45,11 @@ namespace
   }
   double areaEven(const std::vector< kiselev::Polygon >& polygons)
   {
-    return areaSum(polygons, EvenPred());
+    return areaSum(polygons, isEven);
   }
   double areaOdd(const std::vector< kiselev::Polygon >& polygons)
   {
-    return areaSum(polygons, OddPred());
+    return areaSum(polygons, isOdd);
   }
   double areaMean(const std::vector< kiselev::Polygon >& polygons)
   {
@@ -65,6 +59,30 @@ namespace
   double areaNum(const std::vector< kiselev::Polygon >& polygons, size_t n)
   {
     return areaSum(polygons, VertexPred{ n });
+  }
+
+  bool compareVertex(const kiselev::Polygon& poly1, const kiselev::Polygon& poly2)
+  {
+    return poly1.points.size() < poly2.points.size();
+  }
+
+  bool compareArea(const kiselev::Polygon& poly1, const kiselev::Polygon& poly2)
+  {
+    return getArea(poly1) < getArea(poly2);
+  }
+
+  void maxArea(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
+  {
+    auto max = (*std::max_element(polygons.begin(), polygons.end(), compareArea));
+    detail::ScopeGuard scope(out);
+    out << std::fixed << std::setprecision(1) << kiselev::getArea(max);
+  }
+
+  void maxVertex(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
+  {
+    auto max = (*std::max_element(polygons.begin(), polygons.end(), compareVertex));
+    detail::ScopeGuard scope(out);
+    out << max.points.size();
   }
 }
 
@@ -92,4 +110,25 @@ void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   }
   detail::ScopeGuard scope(out);
   out << std::fixed << std::setprecision(1) << res << "\n";
+}
+
+void kiselev::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (polygons.empty())
+  {
+    throw std::logic_error("No polygons");
+  }
+  std::map< std::string, std::function< void() > > subcommands;
+  subcommands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(out));
+  subcommands["VERTEXES"] = std::bind(maxVertex, std::cref(polygons), std::ref(out));
+  try
+  {
+    subcommands.at(subcommand);
+  }
+  catch (...)
+  {
+    throw std::logic_error("Unknown command");
+  }
 }
