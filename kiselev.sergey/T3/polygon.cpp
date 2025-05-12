@@ -27,7 +27,7 @@ namespace
     return std::sqrt(std::pow((p1.x - p2.x), 2) + std::pow((p1.y - p2.y), 2));
   }
 }
-/*
+
 std::istream& kiselev::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sentry(in);
@@ -36,12 +36,7 @@ std::istream& kiselev::operator>>(std::istream& in, Point& point)
     return in;
   }
   detail::ScopeGuard scope(in);
-  Point temp;
   in >> DelimeterIO{ '(' } >> point.x >> DelimeterIO{ ';' } >> point.y >> DelimeterIO{ ')' };
-  if (in)
-  {
-    point = temp;
-  }
   return in;
 }
 
@@ -68,49 +63,7 @@ std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
   }
   return in;
 }
-*/
-std::istream& kiselev::operator>>(std::istream& in, Point& pt)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
 
-  {
-    using sep = DelimeterIO;
-
-    return in >> sep{ '(' } >> pt.x >> sep{ ';' } >> pt.y >> sep{ ')' };
-  }
-}
-
-std::istream& kiselev::operator>>(std::istream& in, Polygon& plg)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  size_t vrtx_cnt;
-  if (!(in >> vrtx_cnt) || vrtx_cnt < 3)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  std::vector< Point > pts(vrtx_cnt);
-  std::copy_n(std::istream_iterator< Point >(in), vrtx_cnt, pts.begin());
-
-  if (!in)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  plg.points = pts;
-  return in;
-}
 std::ostream& kiselev::operator<<(std::ostream& out, const Point& p)
 {
   return out << "(" << p.x << ";" << p.y << ")";

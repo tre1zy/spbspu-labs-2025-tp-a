@@ -1,8 +1,5 @@
 #include "commands.hpp"
 #include <algorithm>
-#include <cstddef>
-#include <ios>
-#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <map>
@@ -10,6 +7,7 @@
 #include <iomanip>
 #include <vector>
 #include <numeric>
+#include <limits>
 #include "polygon.hpp"
 #include "scopeGuard.hpp"
 
@@ -78,26 +76,26 @@ namespace
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareArea));
     detail::ScopeGuard scope(out);
-    out << std::fixed << std::setprecision(1) << kiselev::getArea(max);
+    out << std::fixed << std::setprecision(1) << kiselev::getArea(max) << "\n";
   }
 
   void maxVertex(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareVertex));
-    out << max.points.size();
+    out << max.points.size() << "\n";
   }
 
   void minArea(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareArea));
     detail::ScopeGuard scope(out);
-    out << std::fixed << std::setprecision(1) << kiselev::getArea(min);
+    out << std::fixed << std::setprecision(1) << kiselev::getArea(min) << "\n";
   }
 
   void minVertex(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareVertex));
-    out << min.points.size();
+    out << min.points.size() << "\n";
   }
 
   template< typename Predicate >
@@ -128,10 +126,6 @@ void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polyg
 {
   std::string subcommand;
   in >> subcommand;
-  if (polygons.empty())
-  {
-    throw std::logic_error("No polygons");
-  }
   double res = 0.0;
   std::map< std::string, std::function< double() > > subcommands;
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
@@ -167,7 +161,7 @@ void kiselev::max(std::istream& in, std::ostream& out, const std::vector< Polygo
   subcommands["VERTEXES"] = std::bind(maxVertex, std::cref(polygons), std::ref(out));
   try
   {
-    subcommands.at(subcommand);
+    subcommands.at(subcommand)();
   }
   catch (...)
   {
@@ -188,7 +182,7 @@ void kiselev::min(std::istream& in, std::ostream& out, const std::vector< Polygo
   subcommands["VERTEXES"] = std::bind(minVertex, std::cref(polygons), std::ref(out));
   try
   {
-    subcommands.at(subcommand);
+    subcommands.at(subcommand)();
   }
   catch (...)
   {
@@ -200,10 +194,6 @@ void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Poly
 {
   std::string subcommand;
   in >> subcommand;
-  if (polygons.empty())
-  {
-    throw std::logic_error("No polygons");
-  }
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
   subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
@@ -224,13 +214,18 @@ void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Poly
 
 void kiselev::rects(std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  out << std::count_if(polygons.begin(), polygons.end(), isRect);
+  out << std::count_if(polygons.begin(), polygons.end(), isRect) << "\n";
 }
 
 void kiselev::lessArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   Polygon poly;
   in >> poly;
+  if (!in || in.peek() != '\n')
+  {
+    in.clear();
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   using namespace std::placeholders;
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(compareArea, _1, poly)) << "\n";
 }
