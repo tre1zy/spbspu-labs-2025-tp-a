@@ -55,6 +55,10 @@ namespace
   }
   double areaMean(const std::vector< kiselev::Polygon >& polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("No polygons");
+    }
     return areaSum(polygons, isAll) / polygons.size();
   }
   double areaNum(const std::vector< kiselev::Polygon >& polygons, size_t n)
