@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+#include <iomanip>
+#include <streamGuard.hpp>
 
 using plgCmp = std::function< bool(const dribas::Poligon&, const dribas::Poligon&) >;
 using plgPrdct = std::function< bool(const dribas::Poligon&) >;
@@ -33,7 +35,9 @@ namespace
     std::vector< double > areas;
     std::transform(temp.begin(), temp.end(), std::back_inserter(areas), dribas::getPoligonArea);
 
-    out <<  std::accumulate(areas.begin(), areas.end(), 0);
+    double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+    dribas::StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1) << total;
   }
 
   bool areaCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)
@@ -46,12 +50,8 @@ namespace
     return lhs.points.size() < rhs.points.size();
   }
 
-  void printNumofVertex(const std::vector< dribas::Poligon >& plg, std::istream& in, std::ostream& out)
+  void printNumofVertex(const std::vector< dribas::Poligon >& plg, size_t vertex, std::ostream& out)
   {
-    size_t vertex = 0;
-    if (!(in >> vertex)) {
-      throw std::invalid_argument("Invalid vertex count input");
-    }
     printAreaPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
   }
 
@@ -64,13 +64,15 @@ namespace
   void printAreaMax(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
   {
     auto poligon = *std::max_element(plgs.begin(), plgs.end(), compare);
-    out << dribas::getPoligonArea(poligon);
+    dribas::StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1) << dribas::getPoligonArea(poligon);
   }
 
   void printVertexMin(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
   {
-  auto poligon = *std::min_element(plgs.begin(), plgs.end(), compare);
-    out << poligon.points.size();
+    auto poligon = *std::min_element(plgs.begin(), plgs.end(), compare);
+    dribas::StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1) << dribas::getPoligonArea(poligon);
   }
 
   void printAreaMin(const std::vector< dribas::Poligon >& plgs, std::ostream& out, const plgCmp& compare)
@@ -84,12 +86,8 @@ namespace
     out << std::count_if(plg.cbegin(), plg.cend(), predicate);
   }
 
-  void printCountNumofVertex(const std::vector< dribas::Poligon >& plg, std::istream& in, std::ostream& out)
+  void printCountNumofVertex(const std::vector< dribas::Poligon >& plg, size_t vertex, std::ostream& out)
   {
-    size_t vertex = 0;
-    if (!(in >> vertex)) {
-      throw std::invalid_argument("Invalid vertex count input");
-    }
     printCountPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
   }
 
@@ -126,29 +124,47 @@ namespace
     std::iota(indices.begin(), indices.end(), 0);
     return std::any_of(indices.begin(), indices.end(), predicate);
   }
+
+  void printAreaMean(const std::vector< dribas::Poligon >& plg, std::ostream& out)
+  {
+    if (!plg.size()) {
+      throw std::invalid_argument("");
+    }
+    std::vector< double > areas;
+    std::transform(plg.begin(), plg.end(), std::back_inserter(areas), dribas::getPoligonArea);
+
+    dribas::StreamGuard guard(out);
+    double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << std::fixed << std::setprecision(1) << total / plg.size();
+  }
 }
 
 namespace dribas
 {
   void printArea(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
   {
-    if (!plg.size()) {
-      throw std::overflow_error("No figure found");
-    }
     std::map< std::string, std::function< void() > > cmds;
     cmds["EVEN"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
     cmds["ODD"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
-    cmds["num-of-vertexes"] = std::bind(printNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
+    cmds["MEAN"] = std::bind(printAreaMean, std::cref(plg), std::ref(out));
 
     std::string command;
     in >> command;
-    cmds.at(command)();
+    try {
+      int num = std::stoi(command);
+      if (num < 3) {
+        throw std::invalid_argument("");
+      }
+      printNumofVertex(plg, num, out);
+    } catch (std::exception&) {
+      cmds.at(command)();
+    }
   }
 
   void printMax(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
   {
     if (!plg.size()) {
-      throw std::overflow_error("NO figure found");
+      throw std::invalid_argument("no figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
     cmds["AREA"] = std::bind(printAreaMax, std::cref(plg), std::ref(out), areaCompare);
@@ -162,7 +178,7 @@ namespace dribas
   void printMin(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
   {
     if (!plg.size()) {
-      throw std::overflow_error("NO figure found");
+      throw std::invalid_argument("no figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
     cmds["AREA"] = std::bind(printAreaMin, std::cref(plg), std::ref(out), areaCompare);
@@ -174,24 +190,24 @@ namespace dribas
 
   void printCount(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
   {
-    if (!plg.size()) {
-      throw std::out_of_range("No figure found");
-    }
     std::map< std::string, std::function< void() > > cmds;
     cmds["EVEN"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
     cmds["ODD"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
-    cmds["num-of-vertexes"] = std::bind(printCountNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
-
     std::string command;
     in >> command;
-    cmds.at(command)();
+    try {
+      int num = std::stoi(command);
+      if (num < 3) {
+        throw std::invalid_argument("");
+      }
+      printCountNumofVertex(plg, num, out);
+    } catch (std::exception&) {
+      cmds.at(command)();
+    }
   }
 
   void printLessArea(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
   {
-    if (!plg.size()) {
-      throw std::out_of_range("No figure found");
-    }
     Poligon temp;
     if (!(in >> temp)) {
       throw std::invalid_argument("Invalid argument for less are poligon");

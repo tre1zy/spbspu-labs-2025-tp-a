@@ -44,7 +44,6 @@ int main(int argc, char* argv[])
       cmds.at(command)();
       std::cout << "\n";
     } catch (std::exception& e) {
-      std::cerr << e.what() << '\n';
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
