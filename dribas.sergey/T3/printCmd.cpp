@@ -119,13 +119,13 @@ namespace
 
   };
 
-bool hasPlgRightAngle(const dribas::Poligon& plg)
-{
-  hasRightAngle predicate{plg};
-  std::vector< size_t > indices(plg.points.size());
-  std::iota(indices.begin(), indices.end(), 0);
-  return std::any_of(indices.begin(), indices.end(), predicate);
-}
+  bool hasPlgRightAngle(const dribas::Poligon& plg)
+  {
+    hasRightAngle predicate{plg};
+    std::vector< size_t > indices(plg.points.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    return std::any_of(indices.begin(), indices.end(), predicate);
+  }
 }
 
 namespace dribas
