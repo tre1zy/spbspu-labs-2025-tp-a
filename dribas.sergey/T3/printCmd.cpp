@@ -42,7 +42,7 @@ namespace
 
   bool areaCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)
   {
-    return dribas::getPoligonArea(lhs) < dribas::getPoligonArea(rhs);
+    return dribas::getPoligonArea(lhs) <= dribas::getPoligonArea(rhs);
   }
 
   bool vertexCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)

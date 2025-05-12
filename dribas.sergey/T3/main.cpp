@@ -19,15 +19,15 @@ int main(int argc, char* argv[])
 
   std::ifstream file(argv[1]);
   std::vector< dribas::Poligon > plgs;
-  std::copy(std::istream_iterator<dribas::Poligon>(file),
-          std::istream_iterator<dribas::Poligon>(),
-          std::back_inserter(plgs));
-
-  if (!file.is_open()) {
-    std::cerr << "Error opening file: " << argv[1] << std::endl;
-    return 1;
+  while (!file.eof())
+  {
+    std::copy(std::istream_iterator< Poligon >(file), std::istream_iterator< Poligon >(), std::back_inserter(plgs));
+    if (!file)
+    {
+      file.clear();
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
-
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(printArea, std::cref(plgs), std::ref(std::cin), std::ref(std::cout));
   cmds["MAX"] = std::bind(printMax, std::cref(plgs), std::ref(std::cin), std::ref(std::cout));
