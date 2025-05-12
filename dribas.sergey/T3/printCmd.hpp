@@ -12,7 +12,7 @@ namespace dribas
   void printMin(const std::vector< Poligon >&, std::istream&, std::ostream&);
   void printCount(const std::vector< Poligon >&, std::istream&, std::ostream&);
   void printLessArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
-  void printLessArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
+  void printRightShapes(const std::vector< Poligon >&, std::ostream&);
 }
 
 #endif

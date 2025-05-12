@@ -92,6 +92,38 @@ namespace
     }
     printCountPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
   }
+
+  struct hasRightAngle
+  {
+    const dribas::Poligon& polygon;
+
+    bool operator()(size_t i) const {
+      if (i + 2 >= polygon.points.size())
+      {
+        return false;
+      }
+      return isRightAngle(polygon.points[i], polygon.points[i + 1], polygon.points[i + 2]);
+    }
+  
+  private:
+    bool isRightAngle(const dribas::Point& a, const dribas::Point& b, const dribas::Point& c) const
+    {
+      double abx = b.x - a.x;
+      double aby = b.y - a.y;
+      double acx = c.x - a.x;
+      double acy = c.y - a.y;
+      double dotProduct = abx * acx + aby * acy;
+      return std::abs(dotProduct) < 0.00005;
+    }
+  };
+
+  bool hasPlgRightAngle(const dribas::Poligon& plg)
+  {
+    hasRightAngle predicate{plg};
+    std::vector<size_t> indices(plg.points.size() - 2);
+    std::iota(indices.begin(), indices.end(), 0);
+    return std::any_of(indices.begin(), indices.end(), predicate);
+  }
 }
 
 namespace dribas
@@ -99,7 +131,7 @@ namespace dribas
   void printArea(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
   {
     if (!plg.size()) {
-      throw std::out_of_range("No figure found");
+      throw std::overflow_error("No figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
     cmds["<EVEN>"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
@@ -151,5 +183,22 @@ namespace dribas
     std::string command; 
     in >> command;
     cmds.at(command);
+  }
+
+  void printLessArea(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
+  {
+    if (!plg.size()) {
+      throw std::out_of_range("No figure found");
+    }
+    Poligon temp;
+    if (!(in >> temp)) {
+      throw std::invalid_argument("Invalid argument for less are poligon");
+    }
+    printCountPredicate(plg, out, std::bind(areaCompare, std::placeholders::_1, temp));
+  }
+
+  void printRightShapes(const std::vector< Poligon >& plg, std::ostream& out)
+  {
+    out << std::count_if(plg.begin(), plg.end(), hasPlgRightAngle);
   }
 }
