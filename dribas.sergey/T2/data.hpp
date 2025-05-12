@@ -27,11 +27,6 @@ namespace dribas
     std::string& ref;
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   struct UllO
   {
     const unsigned long long& ref;
@@ -55,7 +50,6 @@ namespace dribas
   };
 
   std::istream& operator>>(std::istream&, DataStruct&);
-  std::istream& operator>>(std::istream&, DelimiterIO&&);
   std::istream& operator>>(std::istream&, DoubleI&&);
   std::istream& operator>>(std::istream&, UllI&&);
   std::istream& operator>>(std::istream&, StringI&&);
