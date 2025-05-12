@@ -124,7 +124,6 @@ bool hasPlgRightAngle(const dribas::Poligon& plg)
   hasRightAngle predicate{plg};
   std::vector< size_t > indices(plg.points.size());
   std::iota(indices.begin(), indices.end(), 0);
-  
   return std::any_of(indices.begin(), indices.end(), predicate);
 }
 }
@@ -141,7 +140,7 @@ namespace dribas
     cmds["ODD"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
     cmds["num-of-vertexes"] = std::bind(printNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
 
-    std::string command; 
+    std::string command;
     in >> command;
     cmds.at(command)();
   }
@@ -155,7 +154,7 @@ namespace dribas
     cmds["AREA"] = std::bind(printAreaMax, std::cref(plg), std::ref(out), areaCompare);
     cmds["VERTEXES"] = std::bind(printVertexMax, std::cref(plg), std::ref(out), vertexCompare);
 
-    std::string command; 
+    std::string command;
     in >> command;
     cmds.at(command)();
   }
@@ -168,7 +167,7 @@ namespace dribas
     std::map< std::string, std::function< void() > > cmds;
     cmds["AREA"] = std::bind(printAreaMin, std::cref(plg), std::ref(out), areaCompare);
     cmds["VERTEXES"] = std::bind(printVertexMin, std::cref(plg), std::ref(out), vertexCompare);
-    std::string command; 
+    std::string command;
     in >> command;
     cmds.at(command)();
   }
@@ -183,7 +182,7 @@ namespace dribas
     cmds["ODD"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
     cmds["num-of-vertexes"] = std::bind(printCountNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
 
-    std::string command; 
+    std::string command;
     in >> command;
     cmds.at(command)();
   }

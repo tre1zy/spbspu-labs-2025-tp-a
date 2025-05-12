@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   std::copy(std::istream_iterator<dribas::Poligon>(file),
           std::istream_iterator<dribas::Poligon>(),
           std::back_inserter(plgs));
-  
+
   if (!file.is_open()) {
     std::cerr << "Error opening file: " << argv[1] << std::endl;
     return 1;
