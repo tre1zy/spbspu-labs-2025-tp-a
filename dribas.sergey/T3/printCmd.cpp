@@ -97,33 +97,36 @@ namespace
   {
     const dribas::Poligon& polygon;
 
-    bool operator()(size_t i) const {
-      if (i + 2 >= polygon.points.size())
-      {
-        return false;
-      }
-      return isRightAngle(polygon.points[i], polygon.points[i + 1], polygon.points[i + 2]);
-    }
-  
-  private:
-    bool isRightAngle(const dribas::Point& a, const dribas::Point& b, const dribas::Point& c) const
+    bool operator()(size_t i) const 
     {
-      double abx = b.x - a.x;
-      double aby = b.y - a.y;
-      double acx = c.x - a.x;
-      double acy = c.y - a.y;
-      double dotProduct = abx * acx + aby * acy;
-      return std::abs(dotProduct) < 0.00005;
+      size_t n = polygon.points.size();
+      size_t prev = (i + n - 1) % n;
+      size_t curr = i;
+      size_t next = (i + 1) % n;
+
+      const dribas::Point& a = polygon.points[prev];
+      const dribas::Point& b = polygon.points[curr];
+      const dribas::Point& c = polygon.points[next];
+
+      double ba_x = a.x - b.x;
+      double ba_y = a.y - b.y;
+      double bc_x = c.x - b.x;
+      double bc_y = c.y - b.y;
+
+      double dot = ba_x * bc_x + ba_y * bc_y;
+      return std::abs(dot) < 0.0004;
     }
+
   };
 
-  bool hasPlgRightAngle(const dribas::Poligon& plg)
-  {
-    hasRightAngle predicate{plg};
-    std::vector<size_t> indices(plg.points.size() - 2);
-    std::iota(indices.begin(), indices.end(), 0);
-    return std::any_of(indices.begin(), indices.end(), predicate);
-  }
+bool hasPlgRightAngle(const dribas::Poligon& plg)
+{
+  hasRightAngle predicate{plg};
+  std::vector< size_t > indices(plg.points.size());
+  std::iota(indices.begin(), indices.end(), 0);
+  
+  return std::any_of(indices.begin(), indices.end(), predicate);
+}
 }
 
 namespace dribas
@@ -134,13 +137,13 @@ namespace dribas
       throw std::overflow_error("No figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
-    cmds["<EVEN>"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
-    cmds["<ODD>"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
-    cmds["<num-of-vertexes>"] = std::bind(printNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
+    cmds["EVEN"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
+    cmds["ODD"] = std::bind(printAreaPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
+    cmds["num-of-vertexes"] = std::bind(printNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
 
     std::string command; 
     in >> command;
-    cmds.at(command);
+    cmds.at(command)();
   }
 
   void printMax(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
@@ -149,12 +152,12 @@ namespace dribas
       throw std::overflow_error("NO figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
-    cmds["<AREA>"] = std::bind(printAreaMax, std::cref(plg), std::ref(out), areaCompare);
-    cmds["<VERTEXES>"] = std::bind(printVertexMax, std::cref(plg), std::ref(out), vertexCompare);
+    cmds["AREA"] = std::bind(printAreaMax, std::cref(plg), std::ref(out), areaCompare);
+    cmds["VERTEXES"] = std::bind(printVertexMax, std::cref(plg), std::ref(out), vertexCompare);
 
     std::string command; 
     in >> command;
-    cmds.at(command);
+    cmds.at(command)();
   }
 
   void printMin(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
@@ -163,11 +166,11 @@ namespace dribas
       throw std::overflow_error("NO figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
-    cmds["<AREA>"] = std::bind(printAreaMin, std::cref(plg), std::ref(out), areaCompare);
-    cmds["<VERTEXES>"] = std::bind(printVertexMin, std::cref(plg), std::ref(out), vertexCompare);
+    cmds["AREA"] = std::bind(printAreaMin, std::cref(plg), std::ref(out), areaCompare);
+    cmds["VERTEXES"] = std::bind(printVertexMin, std::cref(plg), std::ref(out), vertexCompare);
     std::string command; 
     in >> command;
-    cmds.at(command);
+    cmds.at(command)();
   }
 
   void printCount(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
@@ -176,13 +179,13 @@ namespace dribas
       throw std::out_of_range("No figure found");
     }
     std::map< std::string, std::function< void() > > cmds;
-    cmds["<EVEN>"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
-    cmds["<ODD>"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
-    cmds["<num-of-vertexes>"] = std::bind(printCountNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
+    cmds["EVEN"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isEven));
+    cmds["ODD"] = std::bind(printCountPredicate, std::cref(plg), std::ref(out), std::cref(isnEven));
+    cmds["num-of-vertexes"] = std::bind(printCountNumofVertex, std::cref(plg), std::ref(in), std::ref(out));
 
     std::string command; 
     in >> command;
-    cmds.at(command);
+    cmds.at(command)();
   }
 
   void printLessArea(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
