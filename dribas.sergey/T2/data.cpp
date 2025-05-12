@@ -3,7 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
-#include "streamGuard.hpp"
+#include <streamGuard.hpp>
+#include <delimiter.hpp>
 
 namespace dribas
 {
@@ -70,7 +71,7 @@ namespace dribas
     }
     StreamGuard guard(in);
 
-    return in >> dbl.ref >> DelimiterIO{ 'd' };
+    return in >> dbl.ref >> DelimiterI{ 'd' };
   }
 
   std::istream& operator>>(std::istream& in, UllI&& ull)
@@ -81,7 +82,7 @@ namespace dribas
     }
     StreamGuard guard(in);
 
-    return in >> DelimiterIO{ '0' } >> DelimiterIO{ 'x' } >> std::hex >> ull.ref;
+    return in >> DelimiterI{ '0' } >> DelimiterI{ 'x' } >> std::hex >> ull.ref;
   }
 
   std::istream& operator>>(std::istream& in, StringI&& str)
@@ -92,24 +93,7 @@ namespace dribas
     }
     StreamGuard guard(in);
 
-    return std::getline(in >> DelimiterIO{ '"' }, str.ref, '"');
-  }
-
-  std::istream& operator>>(std::istream& in, DelimiterIO&& delimiter)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry) {
-      return in;
-    }
-    StreamGuard guard(in);
-
-    char c = '0';
-    in >> c;
-    if (in && std::tolower(c) != delimiter.exp) {
-      in.setstate(std::ios::failbit);
-    }
-
-    return in;
+    return std::getline(in >> DelimiterI{ '"' }, str.ref, '"');
   }
 
   std::istream& operator>>(std::istream& in, KeyI&& key)
@@ -136,7 +120,7 @@ namespace dribas
     StreamGuard guard(in);
 
     DataStruct temp;
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+    in >> DelimiterI{ '(' } >> DelimiterI{ ':' };
 
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
 
@@ -154,9 +138,9 @@ namespace dribas
       } else if (key == "key3") {
         in >> StringI{ temp.key3 };
       }
-      in >> DelimiterIO{ ':' };
+      in >> DelimiterI{ ':' };
     }
-    in >> DelimiterIO{ ')' };
+    in >> DelimiterI{ ')' };
     if (in) {
       data = temp;
     }
