@@ -103,10 +103,9 @@ namespace
   template< typename Predicate >
   size_t countIf(const std::vector< kiselev::Polygon >& polygons, Predicate p)
   {
-    //std::vector< kiselev::Polygon > filtered;
-    //std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
-    //out << filtered.size() << "\n";
-    return std::count_if(polygons.begin(), polygons.end(), p);
+    std::vector< kiselev::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
+    return filtered.size();
   }
 
   void countEven(const std::vector< kiselev::Polygon >& polygons, std::ostream& out)
