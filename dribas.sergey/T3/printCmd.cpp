@@ -97,7 +97,7 @@ namespace
   {
     const dribas::Poligon& polygon;
 
-    bool operator()(size_t i) const 
+    bool operator()(size_t i) const
     {
       size_t n = polygon.points.size();
       size_t prev = (i + n - 1) % n;
