@@ -6,6 +6,8 @@
 
 namespace evstyunichev
 {
+  constexpr unsigned int EmptyKey = 14;
+
   struct DataStruct
   {
     unsigned long long key1;

@@ -9,7 +9,7 @@
 
 namespace
 {
-  bool exist(unsigned int k, evstyunichev::KeyIO &dest)
+  bool avaliable(unsigned int k, evstyunichev::KeyIO &dest)
   {
     return (1 << k) & dest.done;
   }
@@ -104,17 +104,17 @@ std::istream & evstyunichev::operator>>(std::istream &in, KeyIO &key)
     std::noskipws(in);
     in >> k;
   }
-  if (k == 1 && exist(k, key))
+  if (k == 1 && avaliable(k, key))
   {
     UllIO ull{ key.data.key1 };
     in >> ull;
   }
-  else if (k == 2 && exist(k, key))
+  else if (k == 2 && avaliable(k, key))
   {
     CmplIO cmpl{ key.data.key2 };
     in >> cmpl;
   }
-  else if (k == 3 && exist(k, key))
+  else if (k == 3 && avaliable(k, key))
   {
     StringIO str{ key.data.key3 };
     in >> str;
@@ -152,7 +152,7 @@ std::istream & evstyunichev::operator>>(std::istream &in, DataStruct &data)
   }
   DataStruct temp;
   in >> DelimiterIO{ '(' };
-  KeyIO key{ temp, 14 };
+  KeyIO key{ temp, EmptyKey };
   in >> key;
   in >> key;
   in >> key;
