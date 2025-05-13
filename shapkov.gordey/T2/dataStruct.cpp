@@ -1,6 +1,6 @@
 #include "dataStruct.hpp"
 #include <delimiter.hpp>
-#include "types.hpp"
+#include "iomanipulators.hpp"
 
 std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
 {
