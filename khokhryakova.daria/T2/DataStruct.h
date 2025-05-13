@@ -9,12 +9,13 @@ namespace khokhryakova
   class Iofmtguard
   {
   public:
-    explicit Iofmtguard(std::ostream& s) : s_(s), flags_(s.flags()) {}
-    ~Iofmtguard() { s_.flags(flags_); }
+    explicit Iofmtguard(std::ostream& s);
+    ~Iofmtguard();
   private:
     std::ostream& s_;
     std::ios_base::fmtflags flags_;
   };
+
   struct DataStruct
   {
     long long key1;

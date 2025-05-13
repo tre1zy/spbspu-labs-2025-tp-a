@@ -12,7 +12,7 @@ int main()
     khokhryakova::DataStruct temp;
     if (std::cin >> temp)
     {
-      data.push_back(temp);
+      std::copy(&temp, &temp + 1, std::back_inserter(data));
     }
     else if (!std::cin.eof())
     {

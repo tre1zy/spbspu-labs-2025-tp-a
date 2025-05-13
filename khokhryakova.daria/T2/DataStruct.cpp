@@ -3,6 +3,11 @@
 #include <limits>
 namespace khokhryakova
 {
+  Iofmtguard::Iofmtguard(std::ostream& s) : s_(s), flags_(s.flags()) {}
+  Iofmtguard::~Iofmtguard()
+  {
+    s_.flags(flags_);
+  }
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -17,7 +22,12 @@ namespace khokhryakova
     }
     return in;
   }
-
+  bool check_for_ll_suffix(std::istream& in)
+  {
+    char first_char = '0', second_char = '0';
+    in >> first_char >> second_char;
+    return (first_char == 'l' || first_char == 'L') && (second_char == 'l' || second_char == 'L');
+  }
   std::istream& operator>>(std::istream& in, LongLongIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -31,10 +41,8 @@ namespace khokhryakova
     {
       return in;
     }
-    char first_char = '0', second_char = '0';
-    in >> first_char >> second_char;
-    if (in && (first_char == 'l' || first_char == 'L') &&
-              (second_char == 'l' || second_char == 'L'))
+    bool has_ll_suffix = check_for_ll_suffix(in);
+    if (in && has_ll_suffix)
     {
       dest.ref = number_value;
     }
@@ -150,6 +158,6 @@ namespace khokhryakova
     {
       return a.key3.length() < b.key3.length();
     }
-      return a.key3 < b.key3;
+    return a.key3 < b.key3;
   }
 }
