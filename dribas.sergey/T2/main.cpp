@@ -6,7 +6,8 @@
 
 #include "data.hpp"
 
-int main() {
+int main()
+{
   using namespace dribas;
   using ositer = std::ostream_iterator< DataStruct >;
   using isiter = std::istream_iterator< DataStruct >;
