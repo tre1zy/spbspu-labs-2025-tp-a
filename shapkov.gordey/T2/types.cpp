@@ -5,7 +5,7 @@
 #include <scopeGuard.hpp>
 
 using check = shapkov::DelimiterIO;
-std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
+std::istream& shapkov::operator>>(std::istream& in, DoubleScientificIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -35,11 +35,7 @@ std::istream& shapkov::operator>>(std::istream& in, doubleScientificIO&& rhs)
   return in;
 }
 
-shapkov::Ratio::Ratio(const std::pair<long long, unsigned long long>& p):
-  value(p)
-{}
-
-std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
+std::istream& shapkov::operator>>(std::istream& in, RatioIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -55,12 +51,12 @@ std::istream& shapkov::operator>>(std::istream& in, ratioIO&& rhs)
   in >> check{ ':' } >> check{ ')' };
   if (in)
   {
-    rhs.key.value = { llTemp, ullTemp };
+    rhs.key = { llTemp, ullTemp };
   }
   return in;
 }
 
-std::istream& shapkov::operator>>(std::istream& in, stringIO&& rhs)
+std::istream& shapkov::operator>>(std::istream& in, StringIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -71,7 +67,7 @@ std::istream& shapkov::operator>>(std::istream& in, stringIO&& rhs)
   return std::getline(in, rhs.key, '"');
 }
 
-std::istream& shapkov::operator>>(std::istream& in, labelIO&& rhs)
+std::istream& shapkov::operator>>(std::istream& in, LabelIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
@@ -86,7 +82,7 @@ std::istream& shapkov::operator>>(std::istream& in, labelIO&& rhs)
   return in;
 }
 
-std::ostream& shapkov::operator<<(std::ostream& out, const doubleScientificIO& rhs)
+std::ostream& shapkov::operator<<(std::ostream& out, const DoubleScientificIO& rhs)
 {
   std::ostream::sentry s(out);
   if (!s)

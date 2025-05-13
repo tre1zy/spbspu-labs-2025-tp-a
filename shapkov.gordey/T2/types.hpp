@@ -1,35 +1,30 @@
-#ifndef TYPES_HPP
-#define TYPES_HPP
+#ifndef IO_TYPES_HPP
+#define IO_TYPES_HPP
 #include <iostream>
 #include <string>
 
 namespace shapkov
 {
-  struct doubleScientificIO
+  struct DoubleScientificIO
   {
     double& key;
   };
-  struct Ratio
+  struct RatioIO
   {
-    std::pair< long long, unsigned long long > value;
-    Ratio(const std::pair<long long, unsigned long long>& p);
+    std::pair< long long, unsigned long long >& key;
   };
-  struct ratioIO
-  {
-    Ratio& key;
-  };
-  struct stringIO
+  struct StringIO
   {
     std::string& key;
   };
-  struct labelIO
+  struct LabelIO
   {
     const std::string& exp;
   };
-  std::istream& operator>>(std::istream& in, doubleScientificIO&& rhs);
-  std::istream& operator>>(std::istream& in, ratioIO&& rhs);
-  std::istream& operator>>(std::istream& in, stringIO&& rhs);
-  std::istream& operator>>(std::istream& in, labelIO&& rhs);
-  std::ostream& operator<<(std::ostream& out, const doubleScientificIO& rhs);
+  std::istream& operator>>(std::istream& in, DoubleScientificIO&& rhs);
+  std::istream& operator>>(std::istream& in, RatioIO&& rhs);
+  std::istream& operator>>(std::istream& in, StringIO&& rhs);
+  std::istream& operator>>(std::istream& in, LabelIO&& rhs);
+  std::ostream& operator<<(std::ostream& out, const DoubleScientificIO& rhs);
 }
 #endif

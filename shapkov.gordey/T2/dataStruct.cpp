@@ -11,9 +11,9 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
   }
   DataStruct input;
   using check = DelimiterIO;
-  using dbl = doubleScientificIO;
-  using ratio = ratioIO;
-  using str = stringIO;
+  using dbl = DoubleScientificIO;
+  using ratio = RatioIO;
+  using str = StringIO;
   bool hasKey[3] = { false, false, false };
   std::string key = "";
   in >> check{ '(' } >> check{ ':' };
@@ -28,9 +28,7 @@ std::istream& shapkov::operator>>(std::istream& in, DataStruct& rhs)
     else if (key == "key2" && !hasKey[1])
     {
       hasKey[1] = true;
-      shapkov::Ratio tempRatio(input.key2);
-      in >> ratio{ tempRatio };
-      input.key2 = tempRatio.value;
+      in >> ratio{ input.key2 };
       in >> check{ ':' };
     }
     else if (key == "key3" && !hasKey[2])
@@ -60,7 +58,7 @@ std::ostream& shapkov::operator<<(std::ostream& out, const DataStruct& rhs)
     return out;
   }
   out << "(:key1 ";
-  out << doubleScientificIO{ const_cast< double& >(rhs.key1) };
+  out << DoubleScientificIO{ const_cast< double& >(rhs.key1) };
   out << ":key2 (:N ";
   out << rhs.key2.first;
   out << ":D ";
