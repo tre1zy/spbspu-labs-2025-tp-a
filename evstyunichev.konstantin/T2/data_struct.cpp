@@ -152,7 +152,7 @@ std::istream & evstyunichev::operator>>(std::istream &in, DataStruct &data)
   }
   DataStruct temp;
   in >> DelimiterIO{ '(' };
-  KeyIO key{ temp, EmptyKey };
+  KeyIO key{ temp, (UllKey | CmplKey | StrKey) };
   in >> key;
   in >> key;
   in >> key;

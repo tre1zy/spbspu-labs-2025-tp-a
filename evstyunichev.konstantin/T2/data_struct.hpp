@@ -6,7 +6,7 @@
 
 namespace evstyunichev
 {
-  constexpr unsigned int EmptyKey = 14;
+  constexpr unsigned int UllKey = 2, CmplKey = 4, StrKey = 8;
 
   struct DataStruct
   {
