@@ -1,5 +1,6 @@
 #include "data.h"
 #include <cctype>
+#include <set>
 #include "guard.h"
 
 std::istream& mezentsev::operator>>(std::istream& input, DelimiterIO&& dest)
@@ -71,12 +72,13 @@ std::istream& mezentsev::operator>>(std::istream& in, DataStruct& dest)
   DataStruct temp;
   using del = DelimitersIO;
   in >> del{ "(:" };
-  for (int i = 1; i < 4; i++)
+  std::set< int > usedKeys;
+  for (int i = 0; i < 3; i++)
   {
     in >> del{ "key" };
     int a;
     in >> a;
-    if (a != i)
+    if (usedKeys.count(a) > 0)
     {
       in.setstate(std::ios::failbit);
       break;
