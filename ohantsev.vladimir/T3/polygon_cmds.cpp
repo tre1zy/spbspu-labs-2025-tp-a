@@ -1,5 +1,4 @@
 #include "polygon_cmds.h"
-#include <map>
 #include <array>
 #include <string>
 #include <vector>

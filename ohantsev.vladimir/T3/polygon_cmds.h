@@ -1,8 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#include <map>
 #include <vector>
-#include <string>
 #include <iosfwd>
 #include <functional>
 #include "polygon.h"
@@ -10,7 +8,6 @@
 
 namespace ohantsev
 {
-
   bool isOdd(const Polygon& polygon) noexcept;
   bool isEven(const Polygon& polygon) noexcept;
   bool thisSize(const Polygon& polygon, std::size_t size) noexcept;
