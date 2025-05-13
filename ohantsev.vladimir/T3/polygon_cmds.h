@@ -1,5 +1,5 @@
-#ifndef COMMANDS_H
-#define COMMANDS_H
+#ifndef POLYGON_COMMANDS_H
+#define POLYGON_COMMANDS_H
 #include <vector>
 #include <iosfwd>
 #include <functional>
