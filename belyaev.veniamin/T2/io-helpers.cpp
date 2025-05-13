@@ -1,10 +1,6 @@
-#include <iomanip>
 #include "io-helpers.hpp"
+#include <iomanip>
 #include "stream-guard.hpp"
-
-belyaev::DelimeterIO::DelimeterIO(char expected_):
-  expected(expected_)
-{}
 
 std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
 {
@@ -23,7 +19,7 @@ std::istream& belyaev::operator>>(std::istream& in, const DelimeterIO&& dest)
   return in;
 }
 
-std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIO&& dest)
+std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIOOut&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -46,7 +42,6 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIO&& dest)
     exp++;
     mantissa /= 10.0;
   }
-
   while (std::abs(mantissa) < 1.0)
   {
     exp--;
@@ -82,7 +77,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& dest)
   return out;
 }
 
-std::istream& belyaev::operator>>(std::istream& in, const DoubleEIO&& dest)
+std::istream& belyaev::operator>>(std::istream& in, const DoubleEIOIn&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)

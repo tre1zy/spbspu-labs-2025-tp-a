@@ -1,4 +1,3 @@
-#include <iostream>
 #include "data-struct.hpp"
 #include "io-helpers.hpp"
 #include "stream-guard.hpp"
@@ -9,7 +8,6 @@ bool belyaev::operator<(const DataStruct& lhs, const DataStruct& rhs)
   {
     return lhs.key1 < rhs.key1;
   }
-
   if (lhs.key2 != rhs.key2)
   {
     return lhs.key2 < rhs.key2;
@@ -39,17 +37,17 @@ std::istream& belyaev::operator>>(std::istream& in, DataStruct& dst)
 
     int keyNum = 0;
     in >> keyNum;
-    if (keyNum == 1)
+    if (keyNum == 1 && !hasKeys[0])
     {
-      in >> DoubleEIO{newDS.key1};
+      in >> DoubleEIOIn{newDS.key1};
       hasKeys[0] = true;
     }
-    else if (keyNum == 2)
+    else if (keyNum == 2 && !hasKeys[1])
     {
       in >> PairLLIO{newDS.key2};
       hasKeys[1] = true;
     }
-    else if (keyNum == 3)
+    else if (keyNum == 3 && !hasKeys[2])
     {
       in >> StringIO{newDS.key3};
       hasKeys[2] = true;
@@ -85,8 +83,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DataStruct& dst)
   }
   StreamGuard guard(out);
   out << "(";
-  double firstKey = dst.key1;
-  out << ":key1 " << DoubleEIO{firstKey};
+  out << ":key1 " << DoubleEIOOut{dst.key1};
   out << ":key2 " << "(:N " << dst.key2.first << ":D " << dst.key2.second << ":)";
   out << ":key3 \"" << dst.key3 << "\"";
   out << ":)";
