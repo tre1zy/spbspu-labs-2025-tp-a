@@ -1,16 +1,22 @@
 #ifndef GUARD_H
 #define GUARD_H
 #include <ios>
-class Guard
+
+namespace mezentsev
 {
-public:
-  Guard(std::basic_ios< char >& s);
-  ~Guard();
-private:
-  std::basic_ios< char >& s_;
-  std::streamsize width_;
-  char fill_;
-  std::streamsize precision_;
-  std::basic_ios< char >::fmtflags fmt_;
-};
+  class Guard
+  {
+  public:
+    Guard(const Guard&) = delete;
+    Guard(Guard&&) = delete;
+    explicit Guard(std::basic_ios< char >& s);
+    ~Guard();
+  private:
+    std::basic_ios< char >& s_;
+    std::basic_ios< char >::fmtflags fmt_;
+    std::streamsize width_;
+    std::streamsize precision_;
+    char fill_;
+  };
+}
 #endif

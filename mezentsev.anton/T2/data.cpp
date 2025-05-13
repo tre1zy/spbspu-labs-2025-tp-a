@@ -60,7 +60,7 @@ std::istream& mezentsev::operator>>(std::istream& in, LongLongIO&& dest)
   return in;
 }
 
-std::istream& mezentsev::operator>>(std::istream& in, Data& dest)
+std::istream& mezentsev::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -68,14 +68,19 @@ std::istream& mezentsev::operator>>(std::istream& in, Data& dest)
     return in;
   }
   Guard scope(in);
-  Data temp;
+  DataStruct temp;
   using del = DelimitersIO;
   in >> del{ "(:" };
-  for (int i = 0; i < 3; i++)
+  for (int i = 1; i < 4; i++)
   {
     in >> del{ "key" };
     int a;
     in >> a;
+    if (a != i)
+    {
+      in.setstate(std::ios::failbit);
+      break;
+    }
     switch(a)
     {
     case 1:
@@ -114,7 +119,7 @@ std::ostream& mezentsev::operator<<(std::ostream &output, const LongLongIO&& des
   return output << dest.def << "ll";
 }
 
-std::ostream& mezentsev::operator<<(std::ostream& output, const Data& dest)
+std::ostream& mezentsev::operator<<(std::ostream& output, const DataStruct& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -131,7 +136,7 @@ std::ostream& mezentsev::operator<<(std::ostream& output, const Data& dest)
   return output;
 }
 
-bool mezentsev::compare(const Data& lhs, const Data& rhs)
+bool mezentsev::compare(const DataStruct& lhs, const DataStruct& rhs)
 {
   if (lhs.key1 != rhs.key1)
   {

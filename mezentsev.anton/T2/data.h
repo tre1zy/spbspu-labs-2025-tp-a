@@ -5,7 +5,7 @@
 
 namespace mezentsev
 {
-  struct Data
+  struct DataStruct
   {
     long long key1;
     char key2;
@@ -39,8 +39,8 @@ namespace mezentsev
   std::ostream& operator<<(std::ostream& output, const LongLongIO&& dest);
   std::ostream& operator<<(std::ostream& output, const CharIO&& dest);
   std::ostream& operator<<(std::ostream& output, const StringIO&& dest);
-  std::istream& operator>>(std::istream& input, Data& dest);
-  std::ostream& operator<<(std::ostream& output, const Data& dest);
-  bool compare(const Data& lhs, const Data& rhs);
+  std::istream& operator>>(std::istream& input, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& output, const DataStruct& dest);
+  bool compare(const DataStruct& lhs, const DataStruct& rhs);
 }
 #endif

@@ -6,15 +6,13 @@
 
 int main()
 {
-  std::vector< mezentsev::Data > data;
+  using namespace mezentsev;
+  using isIterator = std::istream_iterator< DataStruct >;
+  using osIterator = std::ostream_iterator< DataStruct >;
+  std::vector< DataStruct > data;
   while(!std::cin.eof())
   {
-    std::copy
-    (
-      std::istream_iterator< mezentsev::Data >(std::cin),
-      std::istream_iterator< mezentsev::Data >(),
-      std::back_inserter(data)
-    );
+    std::copy(isIterator(std::cin), isIterator(), std::back_inserter(data));
     if (!std::cin)
     {
       std::cin.clear();
@@ -22,11 +20,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), mezentsev::compare);
-  std::copy
-  (
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< mezentsev::Data >(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), osIterator(std::cout, "\n"));
   return 0;
 }
