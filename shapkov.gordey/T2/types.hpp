@@ -1,5 +1,5 @@
-#ifndef IO_TYPES_HPP
-#define IO_TYPES_HPP
+#ifndef INPUT_OUTPUT_TYPES_FOR_DATA_STRUCT_HPP
+#define INPUT_OUTPUT_TYPES_FOR_DATA_STRUCT_HPP
 #include <iostream>
 #include <string>
 
