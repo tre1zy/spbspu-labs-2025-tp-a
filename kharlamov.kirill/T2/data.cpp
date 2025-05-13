@@ -60,26 +60,32 @@ std::istream& kharlamov::operator>>(std::istream& in, kharlamov::DataStruct& des
   {
     return in;
   }
-  Guard scope(in);
+  Guard scope{ in };
   DataStruct temp;
   using sep = kharlamov::SymbolIO;
   in >> sep{ '(' };
+  bool haskey1 = false;
+  bool haskey2 = false;
+  bool haskey3 = false;
   for (int i = 0; i < 3; i++)
   {
     in >> sep{ ':' } >> sep{ 'k' } >> sep{ 'e' } >> sep{ 'y' };
     int a;
     in >> a;
-    if (a == 1)
+    if (a == 1 && !haskey1)
     {
       in >> LongLongIO{ temp.key1 };
+      haskey1 = true;
     }
-    else if (a == 2)
+    else if (a == 2 && !haskey2)
     {
       in >> UnsignedLongLongIO{ temp.key2 };
+      haskey2 = true;
     }
-    else if (a == 3)
+    else if (a == 3 && !haskey3)
     {
       in >> StringIO{ temp.key3 };
+      haskey3 = true;
     }
     else
     {
@@ -87,9 +93,13 @@ std::istream& kharlamov::operator>>(std::istream& in, kharlamov::DataStruct& des
     }
   }
   in >> sep{ ':' } >> sep{ ')' };
-  if (in)
+  if (in && haskey1 && haskey2 && haskey3)
   {
-    dest = temp;
+    dest = std::move(temp);
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
@@ -114,7 +124,7 @@ std::ostream& kharlamov::operator<<(std::ostream& out, const kharlamov::DataStru
   {
     return out;
   }
-  Guard scope(out);
+  Guard scope{ out };
   out << "(:key1 " << src.key1 << "ll";
   out << ":key2 " << src.key2 << "ull";
   out << ":key3 \"" << src.key3 << "\":)";

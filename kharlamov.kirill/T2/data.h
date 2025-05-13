@@ -8,30 +8,30 @@ namespace kharlamov
 {
   struct DataStruct
   {
-  long long key1 = 0;
-  unsigned long long key2 = 0;
-  std::string key3;
+    long long key1;
+    unsigned long long key2;
+    std::string key3;
   };
 
   bool compare(const DataStruct& lhs, const DataStruct& rhs);
 
   struct SymbolIO
   {
-  char exp;
+    char exp;
   };
 
   struct LongLongIO
   {
-  long long& ref;
+    long long& ref;
   };
 
   struct UnsignedLongLongIO
   {
-  unsigned long long& ref;
+    unsigned long long& ref;
   };
   struct StringIO
   {
-  std::string& ref;
+    std::string& ref;
   };
 
   std::istream& operator>>(std::istream& in, SymbolIO&& dest);
@@ -41,5 +41,4 @@ namespace kharlamov
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
 }
-
 #endif
