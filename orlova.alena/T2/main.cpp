@@ -4,9 +4,18 @@
 
 bool compareDataStructs(const orlova::DataStruct& a, const orlova::DataStruct& b)
 {
-  if (a.key1 != b.key1) return a.key1 < b.key1;
-  if (a.key2 != b.key2) return a.key2 < b.key2;
-  return a.key3.length() < b.key3.length();
+  if (a.key1 != b.key1) 
+  {
+    return a.key1 < b.key1;
+  }
+  else if (a.key2 != b.key2) 
+  {
+    return a.key2 < b.key2;
+  }
+  else
+  {
+    return a.key3.length() < b.key3.length();
+  }
 }
 
 int main()
@@ -20,12 +29,12 @@ int main()
     if (std::cin.fail())
     {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
 
     std::copy(
-      std::istream_iterator< DataStruct >(std::cin),
-      std::istream_iterator< DataStruct >(),
+      std::istream_iterator< DataStruct >{std::cin},
+      std::istream_iterator< DataStruct >{},
       std::back_inserter(data)
     );
   }
