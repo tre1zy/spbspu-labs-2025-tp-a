@@ -99,12 +99,17 @@ std::istream& tkach::operator>>(std::istream& in, UllIO&& dest)
     return in;
   }
   std::string str;
-  if (!std::getline(in, str, ':') || str.empty())
+  char c;
+  if (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
+  {
+    in >> c;
+    str += c;
+  }
+  if (!in || str.empty())
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  in.putback(':');
   try
   {
     size_t right_symbols = 0;
