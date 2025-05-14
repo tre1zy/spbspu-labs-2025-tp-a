@@ -10,7 +10,7 @@ std::ostream & maslov::operator<<(std::ostream & out, const DataStruct & data)
   {
     return out;
   }
-  maslov::StreamGuard guard(out);
+  StreamGuard guard(out);
   out << "(";
   out << ":key1 " << DoubleSciIO{const_cast< double & >(data.key1)};
   out << ":key2 '" << data.key2;
@@ -43,19 +43,16 @@ std::istream & maslov::operator>>(std::istream & in, DoubleSciIO && dest)
     return in;
   }
   std::string str;
-  char c;
   bool hasExp = false;
-  while ((in >> c) && (c != ':'))
+  char c;
+  while (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
   {
+    in >> c;
     if (c == 'e' || c == 'E')
     {
       hasExp = true;
     }
     str += c;
-  }
-  if (in)
-  {
-    in.putback(c);
   }
   if (!hasExp)
   {
@@ -84,7 +81,7 @@ std::istream & maslov::operator>>(std::istream & in, CharLitIO && dest)
   {
     return in;
   }
-  maslov::StreamGuard guard(in);
+  StreamGuard guard(in);
   in >> std::noskipws;
   char c;
   if(!(in >> c))
@@ -108,7 +105,7 @@ std::istream & maslov::operator>>(std::istream & in, StringIO && dest)
   {
     return in;
   }
-  maslov::StreamGuard guard(in);
+  StreamGuard guard(in);
   in >> std::noskipws;
   char c;
   while ((in >> c) && (c != '"'))
@@ -137,17 +134,17 @@ std::istream & maslov::operator>>(std::istream & in, DataStruct & data)
     in >> DelimiterIO{':'};
     std::string name;
     in >> name;
-    if (name == "key1")
+    if (name == "key1" && !hasKey1)
     {
       in >> DoubleSciIO{temp.key1};
       hasKey1 = true;
     }
-    else if (name == "key2")
+    else if (name == "key2" && !hasKey2)
     {
       in >> CharLitIO{temp.key2};
       hasKey2 = true;
     }
-    else if (name == "key3")
+    else if (name == "key3" && !hasKey3)
     {
       in >> StringIO{temp.key3};
       hasKey3 = true;
@@ -157,11 +154,6 @@ std::istream & maslov::operator>>(std::istream & in, DataStruct & data)
       in.setstate(std::ios::failbit);
       return in;
     }
-  }
-  if (!hasKey1 || !hasKey2 || !hasKey3)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
   }
   in >> DelimiterIO{':'};
   in >> DelimiterIO{')'};
