@@ -1,9 +1,10 @@
 #include <algorithm>
-#include <vector>
+#include <iostream>
 #include <limits>
 #include <iterator>
+#include <vector>
 #include "data.h"
-#include <iostream>
+
 
 int main()
 {
