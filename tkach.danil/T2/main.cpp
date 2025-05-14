@@ -24,14 +24,13 @@ namespace
 
 int main()
 {
-  std::vector< tkach::DataStruct > data;
+  using namespace tkach;
+  using istreamIT = std::istream_iterator< tkach::DataStruct >;
+  using ostreamIT = std::ostream_iterator< tkach::DataStruct >;
+  std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
-    std::copy(
-      std::istream_iterator< tkach::DataStruct >(std::cin),
-      std::istream_iterator< tkach::DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(istreamIT{std::cin}, istreamIT{}, std::back_inserter(data));
     if (std::cin.fail())
     {
       std::cin.clear();
@@ -39,10 +38,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), comp);
-  std::copy(
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< tkach::DataStruct >(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), ostreamIT{std::cout, "\n"});
   return 0;
 }

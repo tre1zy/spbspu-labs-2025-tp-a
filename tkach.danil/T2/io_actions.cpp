@@ -18,13 +18,23 @@ namespace
     using namespace tkach;
     if (key == "key1")
     {
-      if (in >> DoubleIO{temp.key1})
+      if (keys[0])
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      if (!keys[0] && in >> DoubleIO{temp.key1})
       {
         keys[0] = true;
       }
     }
     else  if (key == "key2")
     {
+      if (keys[1])
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       if (in >> UllIO{temp.key2})
       {
         keys[1] = true;
@@ -32,6 +42,11 @@ namespace
     }
     else if (key == "key3")
     {
+      if (keys[2])
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       if (in >> StringIO{temp.key3})
       {
         keys[2] = true;
@@ -44,6 +59,7 @@ namespace
     return in;
   }
 }
+
 std::istream& tkach::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
@@ -148,9 +164,12 @@ std::istream& tkach::operator>>(std::istream& in, DataStruct& dest)
     in >> DelimiterIO{':'};
     std::string key;
     in >> key;
-    inputKey(in, key, temp, keys);
+    if (!inputKey(in, key, temp, keys))
+    {
+      return in;
+    }
   }
-  for (auto key : keys)
+  for (auto key: keys)
   {
     if (key == false)
     {
@@ -164,7 +183,7 @@ std::istream& tkach::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& tkach::operator<<(std::ostream& out, const UllIO& dest)
+std::ostream& tkach::operator<<(std::ostream& out, const ConstUllIO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -176,7 +195,7 @@ std::ostream& tkach::operator<<(std::ostream& out, const UllIO& dest)
   return out;
 }
 
-std::ostream& tkach::operator<<(std::ostream& out, const DoubleIO& dest)
+std::ostream& tkach::operator<<(std::ostream& out, const ConstDoubleIO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -188,7 +207,7 @@ std::ostream& tkach::operator<<(std::ostream& out, const DoubleIO& dest)
   return out;
 }
 
-std::ostream& tkach::operator<<(std::ostream& out, const tkach::DataStruct& dest)
+std::ostream& tkach::operator<<(std::ostream& out, const DataStruct& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -197,8 +216,8 @@ std::ostream& tkach::operator<<(std::ostream& out, const tkach::DataStruct& dest
   }
   tkach::StreamGuard guard(out);
   out << "(";
-  out << ":key1 " << DoubleIO{const_cast< double & >(dest.key1)};
-  out << ":key2 " << UllIO{const_cast< size_t & >(dest.key2)};
+  out << ":key1 " << ConstDoubleIO{dest.key1};
+  out << ":key2 " << ConstUllIO{dest.key2};
   out << ":key3 \"" << dest.key3 << "\":)";
   return out;
 }
