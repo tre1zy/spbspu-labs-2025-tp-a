@@ -16,7 +16,7 @@ namespace trukhanov
       return lhs.key2 < rhs.key2;
     }
     return lhs.key3.length() < rhs.key3.length();
-    }
+  }
 
   std::istream& operator>>(std::istream& in, DataStruct& dest)
   {
