@@ -4,11 +4,11 @@
 
 bool compareDataStructs(const orlova::DataStruct& a, const orlova::DataStruct& b)
 {
-  if (a.key1 != b.key1) 
+  if (a.key1 != b.key1)
   {
     return a.key1 < b.key1;
   }
-  else if (a.key2 != b.key2) 
+  else if (a.key2 != b.key2)
   {
     return a.key2 < b.key2;
   }
