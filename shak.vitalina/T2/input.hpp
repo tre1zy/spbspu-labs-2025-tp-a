@@ -5,22 +5,22 @@
 
 namespace shak
 {
-  struct ChrLit
+  struct ChrLitIO
   {
     char &ref;
   };
-  std::istream &operator>>(std::istream &in, ChrLit &&dest);
+  std::istream &operator>>(std::istream &in, ChrLitIO &&dest);
 
-  struct RatLsp
+  struct RatLspIO
   {
     std::pair< long long, unsigned long long > &ref;
   };
-  std::istream &operator>>(std::istream &in, RatLsp &&dest);
+  std::istream &operator>>(std::istream &in, RatLspIO &&dest);
 
-  struct Str
+  struct StrIO
   {
     std::string &ref;
   };
-  std::istream &operator>>(std::istream &in, Str &&dest);
+  std::istream &operator>>(std::istream &in, StrIO &&dest);
 }
 #endif

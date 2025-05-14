@@ -7,7 +7,7 @@ namespace shak
   class StreamGuard
   {
   public:
-    StreamGuard(std::basic_ios< char > &s);
+    explicit StreamGuard(std::basic_ios< char > &s);
     StreamGuard(const StreamGuard &) = delete;
     StreamGuard(StreamGuard &&) = delete;
     ~StreamGuard();

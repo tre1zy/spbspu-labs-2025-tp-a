@@ -2,7 +2,7 @@
 #include "delimiter.hpp"
 
 using check = shak::DelimiterIO;
-std::istream &shak::operator>>(std::istream &in, ChrLit &&dest)
+std::istream &shak::operator>>(std::istream &in, ChrLitIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -13,7 +13,7 @@ std::istream &shak::operator>>(std::istream &in, ChrLit &&dest)
   return in;
 }
 
-std::istream &shak::operator>>(std::istream &in, RatLsp &&dest)
+std::istream &shak::operator>>(std::istream &in, RatLspIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -33,7 +33,7 @@ std::istream &shak::operator>>(std::istream &in, RatLsp &&dest)
   return in;
 }
 
-std::istream &shak::operator>>(std::istream &in, Str &&dest)
+std::istream &shak::operator>>(std::istream &in, StrIO &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)

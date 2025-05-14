@@ -42,7 +42,7 @@ std::istream &shak::operator>>(std::istream &in, DataStruct &dest)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> ChrLit{data.key1};
+      in >> ChrLitIO{data.key1};
       key1Read = true;
     }
     else if (key == "key2")
@@ -52,7 +52,7 @@ std::istream &shak::operator>>(std::istream &in, DataStruct &dest)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> RatLsp{data.key2};
+      in >> RatLspIO{data.key2};
       key2Read = true;
     }
     else if (key == "key3")
@@ -62,7 +62,7 @@ std::istream &shak::operator>>(std::istream &in, DataStruct &dest)
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> Str{data.key3};
+      in >> StrIO{data.key3};
       key3Read = true;
     }
     else
