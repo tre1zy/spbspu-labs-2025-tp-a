@@ -99,7 +99,7 @@ std::istream& tkach::operator>>(std::istream& in, UllIO&& dest)
     return in;
   }
   std::string str;
-  char c;
+  char c = '\0';
   while (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
   {
     in >> c;
