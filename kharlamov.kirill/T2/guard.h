@@ -8,14 +8,16 @@ namespace kharlamov
   class Guard
   {
   public:
-  Guard(std::basic_ios< char >& s);
-  ~Guard();
+    explicit Guard(std::basic_ios< char >& s);
+    Guard(const Guard&) = delete;
+    Guard(Guard&&) = delete;
+    ~Guard();
   private:
-  std::basic_ios< char >& s_;
-  std::streamsize width_;
-  char fill_;
-  std::streamsize precision_;
-  std::basic_ios< char >::fmtflags fmt_;
+    std::basic_ios< char >& s_;
+    std::basic_ios< char >::fmtflags fmt_;
+    std::streamsize width_;
+    std::streamsize precision_;
+    char fill_;
   };
 }
 
