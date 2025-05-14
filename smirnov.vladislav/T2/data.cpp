@@ -120,7 +120,7 @@ namespace smirnov
       return in;
     }
 
-    iofmtguard guard(in);
+    Iofmtguard guard(in);
     DataStruct temp{};
     bool hasKey1 = false;
     bool hasKey2 = false;
@@ -190,7 +190,7 @@ namespace smirnov
     {
       return out;
     }
-    iofmtguard guard(out);
+    Iofmtguard guard(out);
 
     double value = std::abs(dest.ref);
     bool is_negative = (dest.ref < 0);
@@ -239,7 +239,7 @@ namespace smirnov
     unsigned long long ullval = 0;
     dbval = src.key1;
     ullval = src.key2;
-    iofmtguard guard(out);
+    Iofmtguard guard(out);
     out << "(:key1 " << smirnov::DoubleIO{ dbval };
     out << ":key2 " << smirnov::UllIO{ ullval };
     out << ":key3 \"" << src.key3 << "\":)";
