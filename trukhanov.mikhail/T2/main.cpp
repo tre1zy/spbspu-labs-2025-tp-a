@@ -6,37 +6,49 @@
 #include <algorithm>
 #include "data_struct.hpp"
 
+using trukhanov::DataStruct;
+
+namespace
+{
+  bool compareDataStructs(const DataStruct& a, const DataStruct& b)
+  {
+    if (a.key1 != b.key1)
+    {
+      return a.key1 < b.key1;
+    }
+    if (a.key2 != b.key2)
+    {
+      return a.key2 < b.key2;
+    }
+    return a.key3.length() < b.key3.length();
+  }
+}
+
 int main()
 {
-    using Trukhanov::DataStruct;
+  std::vector<DataStruct> data;
+  std::string line;
 
-    std::vector<DataStruct> data;
-    std::string line;
-
-    while (std::getline(std::cin, line))
+  while (!std::cin.eof())
+  {
+    std::getline(std::cin, line);
+    if (line.empty())
     {
-        std::istringstream iss(line);
-        DataStruct ds;
-
-        if (iss >> ds)
-        {
-            data.push_back(ds);
-        }
-        iss.clear();
+      continue;
     }
 
-    std::sort(data.begin(), data.end(), [](const DataStruct& a, const DataStruct& b) {
-        if (a.key1 != b.key1) return a.key1 < b.key1;
-        if (a.key2 != b.key2) return a.key2 < b.key2;
-        return a.key3.length() < b.key3.length();
-        });
+    std::istringstream iss(line);
+    DataStruct ds;
 
-    std::copy(
-        data.begin(),
-        data.end(),
-        std::ostream_iterator<DataStruct>(std::cout, "\n")
-    );
+    if (iss >> ds)
+    {
+      data.push_back(ds);
+    }
+  }
 
-    return 0;
+  std::sort(data.begin(), data.end(), compareDataStructs);
+  std::copy(data.begin(), data.end(), std::ostream_iterator<DataStruct>(std::cout, "\n"));
+
+  return 0;
 }
 
