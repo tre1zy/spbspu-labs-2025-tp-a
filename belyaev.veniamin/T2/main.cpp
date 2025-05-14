@@ -7,8 +7,8 @@
 int main()
 {
   using namespace belyaev;
-  typedef std::istream_iterator< DataStruct > istreamDS;
-  typedef std::ostream_iterator< DataStruct > ostreamDS;
+  using istreamDS = std::istream_iterator< DataStruct >;
+  using ostreamDS = std::ostream_iterator< DataStruct >;
 
   std::vector< DataStruct > data;
   while (!std::cin.eof() && !std::cin.bad())

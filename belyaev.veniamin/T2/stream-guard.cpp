@@ -1,11 +1,11 @@
 #include "stream-guard.hpp"
 
 belyaev::StreamGuard::StreamGuard(std::basic_ios< char >& s):
-  fill_(s.fill()),
+  s_(s),
   width_(s.width()),
   precision_(s.precision()),
-  s_(s),
-  flags_(s.flags())
+  flags_(s.flags()),
+  fill_(s.fill())
 {}
 
 belyaev::StreamGuard::~StreamGuard()
