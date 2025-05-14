@@ -48,7 +48,7 @@ std::istream& orlova::operator>>(std::istream& in, UnsignedLongLongIO&& dest)
   {
     return in;
   }
-  iofmtguard i(in);
+  IoGuard i(in);
   in >> DelimiterIO{ '0' } >> std::oct >> dest.ref;
   return in;
 }

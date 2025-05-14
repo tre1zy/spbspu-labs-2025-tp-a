@@ -44,11 +44,11 @@ namespace orlova
     std::string exp;
   };
 
-  class IoFmtGuard
+  class IoGuard
   {
   public:
-    explicit IoFmtGuard(std::basic_ios< char >& s);
-    ~IoFmtGuard();
+    explicit IoGuard(std::basic_ios< char >& s);
+    ~IoGuard();
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;
