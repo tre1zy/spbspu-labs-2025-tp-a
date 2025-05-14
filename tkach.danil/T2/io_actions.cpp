@@ -100,7 +100,7 @@ std::istream& tkach::operator>>(std::istream& in, UllIO&& dest)
   }
   std::string str;
   char c;
-  if (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
+  while (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
   {
     in >> c;
     str += c;
