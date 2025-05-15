@@ -35,21 +35,18 @@ std::istream &shiryaeva::operator>>(std::istream &in, DataStruct &dest)
     std::string key;
     in >> sep{':'} >> key;
 
-    if (key == "key1")
+    if (key == "key1" && !hasKey1)
     {
-      if (hasKey1) { in.setstate(std::ios::failbit); return in; }
       in >> hex{input.key1};
       hasKey1 = true;
     }
-    else if (key == "key2")
+    else if (key == "key2" && !hasKey2)
     {
-      if (hasKey2) { in.setstate(std::ios::failbit); return in; }
       in >> chr{input.key2};
       hasKey2 = true;
     }
-    else if (key == "key3")
+    else if (key == "key3" && !hasKey3)
     {
-      if (hasKey3) { in.setstate(std::ios::failbit); return in; }
       in >> str{input.key3};
       hasKey3 = true;
     }
