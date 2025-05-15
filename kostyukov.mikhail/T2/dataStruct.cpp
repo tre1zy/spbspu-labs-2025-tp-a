@@ -1,11 +1,13 @@
 #include "dataStruct.hpp"
-#include "scopeGuard.hpp"
-#include <iostream>
-#include <string>
+
 #include <bitset>
-#include <iomanip>
-#include <limits>
 #include <cctype>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <string>
+
+#include "scopeGuard.hpp"
 
 std::istream& kostyukov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
@@ -56,7 +58,7 @@ bool readUll(std::istream& in, unsigned long long& value, size_t base)
     value = tempValue;
     return true;
   }
-  catch(const std::exception&)
+  catch (const std::exception&)
   {
     return false;
   }
@@ -71,6 +73,10 @@ std::istream& kostyukov::operator>>(std::istream& in, DataStruct& dest)
   }
   ScopeGuard scopeGrd(in);
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+  if (!in)
+  {
+    return in;
+  }
   DataStruct temp{};
   const size_t EXPECTED_KEY_COUNT = 3;
   const size_t KEY_NAME_LENGTH = 4;
@@ -78,46 +84,73 @@ std::istream& kostyukov::operator>>(std::istream& in, DataStruct& dest)
   {
     std::string key = "";
     in >> key;
-    if (!in || key.length() != KEY_NAME_LENGTH || key.substr(0,3) != "key")
+    if (!in || key.length() != KEY_NAME_LENGTH || key.substr(0, 3) != "key")
     {
       in.setstate(std::ios::failbit);
       return in;
     }
     char keyNum = key.back();
     bool readSuccess = false;
-    char p1 = '\0',
-         p2 = '\0';
-    in >> p1;
-    if (keyNum == '1' && p1 == '0')
+    in >> std::ws;
+    if (keyNum == '1')
     {
-      in >> p2;
-      if (in && std::tolower(p2) == 'b')
+      if (in.peek() == '0')
       {
-        readSuccess = readUll(in, temp.key1, 2);
+        in.ignore();
+        char nextChar = static_cast<char>(std::tolower(in.peek()));
+        if (nextChar == 'b')
+        {
+          in.ignore();
+          readSuccess = readUll(in, temp.key1, 2);
+        }
+        else
+        {
+          readSuccess = false;
+        }
+      }
+      else
+      {
+        readSuccess = false;
       }
     }
-    else if (keyNum == '2' && p1 == '0')
+    else if (keyNum == '2')
     {
-      in >> p2;
-      if (in && std::tolower(p2) == 'x')
+      if (in.peek() == '0')
       {
-        readSuccess = readUll(in, temp.key2, 16);
+        in.ignore();
+        char nextChar = static_cast<char>(std::tolower(in.peek()));
+        if (nextChar == 'x')
+        {
+          in.ignore();
+          readSuccess = readUll(in, temp.key2, 16);
+        }
+        else
+        {
+          readSuccess = false;
+        }
+      }
+      else
+      {
+        readSuccess = false;
       }
     }
     else if (keyNum == '3')
     {
-      if (p1 == '"')
+      if (in.peek() == '"')
       {
-        in.putback(p1);
         in >> StringIO{ temp.key3 };
-        readSuccess = static_cast< bool >(in);
+        readSuccess = static_cast<bool>(in);
+      }
+      else
+      {
+        readSuccess = false;
       }
     }
     else
     {
       readSuccess = false;
     }
-    if (!readSuccess)
+    if (!readSuccess && in.good())
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -166,7 +199,7 @@ std::ostream& kostyukov::operator<<(std::ostream& out, BinUllIO&& dest)
       out << '0';
     }
   }
-    return out;
+  return out;
 }
 
 std::ostream& kostyukov::operator<<(std::ostream& out, HexUllIO&& dest)
@@ -200,10 +233,8 @@ std::ostream& kostyukov::operator<<(std::ostream& out, const DataStruct& dest)
     return out;
   }
   ScopeGuard scopeGrd(out);
-  out << "(:key1 " << BinUllIO{ dest.key1 }
-      << ":key2 " << HexUllIO{ dest.key2 }
-      << ":key3 " << ConstStringIO{ dest.key3 }
-      << ":)";
+  out << "(:key1 " << BinUllIO{ dest.key1 } << ":key2 " << HexUllIO{ dest.key2 } << ":key3 "
+    << ConstStringIO{ dest.key3 } << ":)";
   return out;
 }
 

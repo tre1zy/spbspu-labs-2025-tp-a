@@ -1,18 +1,20 @@
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <limits>
 #include <vector>
-#include <iostream>
+
 #include "dataStruct.hpp"
 
 int main()
 {
-  std::vector< kostyukov::DataStruct > data;
+  using kostyukov::DataStruct;
+  using DataStructInputIt = std::istream_iterator< DataStruct >;
+  using DataStructOutputIt = std::ostream_iterator< DataStruct >;
+  std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
-    std::copy(std::istream_iterator< kostyukov::DataStruct >(std::cin),
-              std::istream_iterator< kostyukov::DataStruct >(),
-              std::back_inserter(data));
+    std::copy(DataStructInputIt(std::cin), DataStructInputIt(), std::back_inserter(data));
     if (std::cin.fail())
     {
       std::cin.clear();
@@ -20,7 +22,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end());
-  std::copy(std::begin(data), std::end(data),
-            std::ostream_iterator< kostyukov::DataStruct >(std::cout, "\n"));
+  std::copy(std::begin(data), std::end(data), DataStructOutputIt(std::cout, "\n"));
   return 0;
 }

@@ -1,7 +1,6 @@
 #include "scopeGuard.hpp"
-#include <iostream>
 
-kostyukov::ScopeGuard::ScopeGuard(std::basic_ios< char >& s) :
+kostyukov::ScopeGuard::ScopeGuard(std::basic_ios< char >& s):
   precision_(s.precision()),
   width_(s.width()),
   s_(s),
