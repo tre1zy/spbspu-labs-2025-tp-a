@@ -17,10 +17,10 @@ namespace shiryaeva
     FormatGuard &operator=(FormatGuard &&) = delete;
 
   private:
-    std::streamsize precision_;
-    char fill_;
-    std::basic_ios< char >::fmtflags fmt_;
     std::basic_ios< char > &s_;
+    char fill_;
+    std::streamsize precision_;
+    std::basic_ios< char >::fmtflags fmt_;
   };
 
   class OutputFormatter
