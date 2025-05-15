@@ -145,7 +145,7 @@ std::ostream& kushekbaev::operator<<(std::ostream& out, const DataStruct& obj)
     return out;
   }
   out << "(:";
-  out << "key1 " << ULLBinaryO{ obj.key1 };
+  out << "key1 " << "0b" << ULLBinaryO{ obj.key1 };
   out << ":";
   out << "key2 " << "\'" << obj.key2 << "\'";
   out << ":";
