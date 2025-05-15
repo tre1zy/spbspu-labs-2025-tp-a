@@ -12,11 +12,8 @@ int main()
 
   while (!std::cin.eof())
   {
-    std::copy(
-      std::istream_iterator<DataStruct>(std::cin),
-      std::istream_iterator<DataStruct>(),
-      std::back_inserter(data)
-    );
+    using Iter = std::istream_iterator<DataStruct>;
+    std::copy(Iter(std::cin), Iter(), std::back_inserter(data));
 
     if (std::cin.fail())
     {

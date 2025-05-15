@@ -29,42 +29,51 @@ std::istream &shiryaeva::operator>>(std::istream &in, DataStruct &dest)
   using chr = CharIO;
   using str = StringIO;
 
-  in >> sep{'('};
-
+  bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
   for (size_t i = 0; i < 3; ++i)
   {
     std::string key;
     in >> sep{':'} >> key;
-
+  
     if (key == "key1")
     {
+      if (hasKey1) { in.setstate(std::ios::failbit); return in; }
       in >> hex{input.key1};
+      hasKey1 = true;
     }
     else if (key == "key2")
     {
+      if (hasKey2) { in.setstate(std::ios::failbit); return in; }
       in >> chr{input.key2};
+      hasKey2 = true;
     }
     else if (key == "key3")
     {
+      if (hasKey3) { in.setstate(std::ios::failbit); return in; }
       in >> str{input.key3};
+      hasKey3 = true;
     }
     else
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-  }
+  } 
 
   in >> sep{':'} >> sep{')'};
 
-  if (in)
+  if (in && hasKey1 && hasKey2 && hasKey3)
   {
     dest = input;
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
 
-std::ostream &shiryaeva::operator<<(std::ostream &out, const DataStruct &src)
+std::ostream& shiryaeva::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -72,11 +81,8 @@ std::ostream &shiryaeva::operator<<(std::ostream &out, const DataStruct &src)
     return out;
   }
 
-  shiryaeva::FormatGuard guard(out);
-
-  out << "(:key1 0x" << std::hex << std::uppercase << src.key1;
-  out << ":key2 '" << src.key2 << "'";
-  out << ":key3 \"" << src.key3 << "\":)";
-
+  FormatGuard guard(out);
+  OutputFormatter formatter(out);
+  formatter(src.key1, src.key2, src.key3);
   return out;
 }

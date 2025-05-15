@@ -1,5 +1,5 @@
-#include "input_struct.hpp"
 #include "format_guard.hpp"
+#include "input_struct.hpp"
 #include <iomanip>
 
 std::istream &shiryaeva::operator>>(std::istream &in, DelimiterIO &&dest)
@@ -26,7 +26,7 @@ std::istream &shiryaeva::operator>>(std::istream &in, HexUllIO &&dest)
     return in;
   }
 
-  shiryaeva::FormatGuard guard(in);
+  FormatGuard guard(in);
   in >> DelimiterIO{'0'} >> DelimiterIO{'x'};
   in >> std::hex >> dest.ref;
   return in;
