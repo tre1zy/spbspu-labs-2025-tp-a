@@ -8,22 +8,18 @@
 
 namespace
 {
-  struct Gauss {
-    dribas::Point prev;
-    dribas::Point first;
-    double area = 0.0;
-
-    double operator()(double res, const dribas::Point& current) {
-      res += (prev.x * current.y - current.x * prev.y);
-      prev = current;
+  struct Gauss
+  {
+    const dribas::Point& firstPt;
+    dribas::Point currentPt;
+    double operator()(double res, const dribas::Point& nextPt) {
+      double a = (currentPt.x - firstPt.x) * (nextPt.y - firstPt.y);
+      double b = (nextPt.x - firstPt.x) * (currentPt.y - firstPt.y);
+      res += std::abs(a - b);
+      currentPt = nextPt;
       return res;
     }
-
-    double close() {
-      area =  (prev.x * first.y - first.x * prev.y);
-      return area;
-    }
-};
+  };
 }
 
 namespace dribas
@@ -64,18 +60,18 @@ namespace dribas
     std::vector< Point > pnts(size);
     std::copy_n(std::istream_iterator< Point >(in), size, pnts.begin());
 
-    if (!in) {
+    if (!in || (in.peek() != '\n' && in.peek() != EOF)) {
       in.setstate(std::ios::failbit);
       return in;
     }
     plg.points = pnts;
     return in;
   }
+
   double getPoligonArea(const Poligon& poligon)
   {
-    Gauss gauss{poligon.points[0]};
-    double area = std::accumulate(poligon.points.begin() + 1, poligon.points.end(), 0.0, std::ref(gauss));
-    gauss.close();
-    return std::abs(area + gauss.area) / 2.0;
+    Gauss areaCalc{ poligon.points[0], poligon.points[1] };
+    double area = std::accumulate(poligon.points.begin() + 2, poligon.points.end(), 0.0, std::ref(areaCalc));
+    return area / 2.0;
   }
 }
