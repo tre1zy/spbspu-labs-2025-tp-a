@@ -2,6 +2,7 @@
 #include <iostream>
 #include <limits>
 #include <iterator>
+#include <iostream>
 #include <vector>
 #include "data.h"
 int main()
@@ -13,7 +14,7 @@ int main()
   std::vector< dataSt > data;
   while (!std::cin.eof())
   {
-    std::copy(istreamIter(std::cin),istreamIter(),std::back_inserter(data));
+    std::copy(istreamIter(std::cin), istreamIter(), std::back_inserter(data));
 
     if (!std::cin)
     {
@@ -23,6 +24,6 @@ int main()
   }
 
   std::sort(data.begin(), data.end(), horoshilov::compareData);
-  std::copy(std::begin(data),std::end(data),ostreamIter(std::cout, "\n"));
+  std::copy(std::begin(data), std::end(data), ostreamIter(std::cout, "\n"));
   return 0;
 }
