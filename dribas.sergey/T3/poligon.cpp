@@ -3,6 +3,8 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
+#include <string>
+#include <iostream>
 #include <streamGuard.hpp>
 #include <delimiter.hpp>
 
@@ -57,14 +59,16 @@ namespace dribas
       in.setstate(std::ios::failbit);
       return in;
     }
+
+    std::string line;
+    std::getline(std::cin, line);
+
     std::vector< Point > pnts(size);
     std::copy_n(std::istream_iterator< Point >(in), size, pnts.begin());
-
-    if (!in || (in.peek() != '\n' && in.peek() != EOF)) {
-      in.setstate(std::ios::failbit);
-      return in;
+    if (in)
+    {
+      plg.points = std::move(pnts);
     }
-    plg.points = pnts;
     return in;
   }
 
