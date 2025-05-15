@@ -19,10 +19,14 @@ namespace kushekbaev
     char exp;
   };
 
-  struct ULLBinaryIO
+  struct ULLBinaryI
   {
     unsigned long long& ref;
-    std::size_t& leadingZeroes;
+  };
+
+  struct ULLBinaryO
+  {
+    const unsigned long long& ref;
   };
 
   struct ChrLitIO
@@ -36,11 +40,11 @@ namespace kushekbaev
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& obj);
-  std::istream& operator>>(std::istream& in, ULLBinaryIO&& obj);
+  std::istream& operator>>(std::istream& in, ULLBinaryI&& obj);
   std::istream& operator>>(std::istream& in, ChrLitIO&& obj);
   std::istream& operator>>(std::istream& in, StringIO&& obj);
   std::istream& operator>>(std::istream& in, DataStruct& obj);
-  std::ostream& operator<<(std::istream& out, const ULLBinaryIO& obj);
+  std::ostream& operator<<(std::ostream& out, const ULLBinaryO&& obj);
   std::ostream& operator<<(std::ostream& out, const DataStruct& obj);
 }
 

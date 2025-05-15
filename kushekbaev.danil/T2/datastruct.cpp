@@ -30,7 +30,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, DelimiterIO&& obj)
   return in;
 }
 
-std::istream& kushekbaev::operator>>(std::istream& in, ULLBinaryIO&& obj)
+std::istream& kushekbaev::operator>>(std::istream& in, ULLBinaryI&& obj)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -38,19 +38,6 @@ std::istream& kushekbaev::operator>>(std::istream& in, ULLBinaryIO&& obj)
     return in;
   }
   in >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' } >> obj.ref;
-  if (in)
-  {
-    unsigned long long tmp = obj.ref;
-    while (tmp > 0)
-    {
-      if (tmp % 10 >= 2)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      tmp /= 10;
-    }
-  }
   return in;
 }
 
@@ -97,7 +84,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& obj)
       in >> label;
       if (label == ":key1" && !hasKey1)
       {
-        in >> ULLBinaryIO{ tmp.key1 };
+        in >> ULLBinaryI{ tmp.key1 };
         hasKey1 = true;
       }
       else if (label == ":key2" && !hasKey2)
@@ -132,22 +119,22 @@ std::istream& kushekbaev::operator>>(std::istream& in, DataStruct& obj)
   return in;
 }
 
-std::ostream& kushekbaev::operator<<(std:ostream& out, const ULLBinaryIO& obj)
+std::ostream& kushekbaev::operator<<(std::ostream& out, const ULLBinaryO&& obj)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
   {
     return out;
   }
+  if (obj.ref != 0)
+  {
+    out << "0" << obj.ref;
+  }
   else
   {
-    out << "0b";
-    for (std::size_t i = 0; i < obj.leadingZeroes; ++i)
-    {
-      out << "0";
-    }
     out << obj.ref;
   }
+  return out;
 }
 
 std::ostream& kushekbaev::operator<<(std::ostream& out, const DataStruct& obj)
@@ -158,7 +145,7 @@ std::ostream& kushekbaev::operator<<(std::ostream& out, const DataStruct& obj)
     return out;
   }
   out << "(:";
-  out << "key1 " << ULLBinaryIO{ obj, leadingZeroes };
+  out << "key1 " << ULLBinaryO{ obj.key1 };
   out << ":";
   out << "key2 " << "\'" << obj.key2 << "\'";
   out << ":";
