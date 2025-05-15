@@ -9,7 +9,7 @@ int main()
   using istreamIter = std::istream_iterator< horoshilov::DataStruct >;
   using ostreamIter = std::ostream_iterator< horoshilov::DataStruct >;
   using dataSt = horoshilov::DataStruct;
-  
+
   std::vector< dataSt > data;
   while (!std::cin.eof())
   {
@@ -26,4 +26,3 @@ int main()
   std::copy(std::begin(data),std::end(data),ostreamIter(std::cout, "\n"));
   return 0;
 }
-
