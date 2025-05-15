@@ -29,6 +29,8 @@ std::istream &shiryaeva::operator>>(std::istream &in, DataStruct &dest)
   using chr = CharIO;
   using str = StringIO;
 
+  in >> sep{'('};
+
   bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
   for (size_t i = 0; i < 3; ++i)
   {
