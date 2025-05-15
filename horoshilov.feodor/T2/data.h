@@ -1,6 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <array>
 #include <iostream>
 #include <string>
 
@@ -16,6 +17,7 @@ namespace horoshilov
   struct KeyIO
   {
     DataStruct& data;
+    std::array< bool, 4 > usedKeys = { false };
   };
 
   struct DelimiterIO

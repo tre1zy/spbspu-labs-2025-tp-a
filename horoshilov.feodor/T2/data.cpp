@@ -5,196 +5,220 @@
 #include <cmath>
 #include <iomanip>
 #include "guard.h"
-
 namespace horoshilov
 {
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    char c = 0;
-    if (in >> c && std::tolower(c) != dest.exp)
-    {
-      in.setstate(std::ios::failbit);
-    }
+    return in;
+  }
+  char c = 0;
+  if (in >> c && std::tolower(c) != dest.exp)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> dest.ref >> DelimiterIO{ 'd' };
+  return in;
+}
+
+std::istream& operator>>(std::istream& in, DoubleSciIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+  std::string numberStr;
+  std::getline(in, numberStr, ':');
+
+  bool hasExponent = false;
+  for (auto chr: numberStr)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
+    if (chr == 'e' || chr == 'E')
     {
-      return in;
+      hasExponent = true;
+      break;
     }
-    in >> dest.ref >> DelimiterIO{ 'd' };
+  }
+  if (!hasExponent)
+  {
+    in.setstate(std::ios::failbit);
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, DoubleSciIO&& dest)
+  try
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
+    dest.ref = std::stod(numberStr);
+  }
+  catch (...)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
 
-    std::string numberStr;
-    std::getline(in, numberStr, ':');
-
-    bool hasExponent = false;
-    for (auto chr: numberStr)
-    {
-      if (chr == 'e' || chr == 'E')
-      {
-        hasExponent = true;
-        break;
-      }
-    }
-    if (!hasExponent)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    try
-    {
-      dest.ref = std::stod(numberStr);
-    }
-    catch (...)
-    {
-      in.setstate(std::ios::failbit);
-    }
+std::istream& operator>>(std::istream& in, StringIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
     return in;
   }
+  std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+  return in >> DelimiterIO{ ':' };
+}
 
-  std::istream& operator>>(std::istream& in, StringIO&& dest)
+std::istream& operator>>(std::istream& input, KeyIO&& dest)
+{
+  std::istream::sentry sentry(input);
+  if (!sentry)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
-    return in >> DelimiterIO{ ':' };
-  }
-
-  std::istream& operator>>(std::istream& input, KeyIO&& dest)
-  {
-    std::istream::sentry sentry(input);
-    if (!sentry)
-    {
-      return input;
-    }
-    input >> DelimiterIO{ 'k' } >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' };
-    int key;
-    input >> key;
-    switch (key)
-    {
-    case 1:
-      input >> DoubleIO{ dest.data.key1 } >> DelimiterIO{ ':' };
-      break;
-    case 2:
-      input >> DoubleSciIO{ dest.data.key2 };
-      break;
-    case 3:
-      input >> StringIO{ dest.data.key3 };
-      break;
-    default:
-      input.setstate(std::ios::failbit);
-    }
     return input;
   }
-
-  std::istream& operator>>(std::istream& input, DataStruct& dest)
+  input >> DelimiterIO{ 'k' } >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' };
+  int key;
+  input >> key;
+  if (key < 1 || key > 3 || dest.usedKeys[key])
   {
-    std::istream::sentry sentry(input);
-    if (!sentry)
-    {
-      return input;
-    }
-    DataStruct temp;
-    Guard guardian(input);
-    {
-      input >> DelimiterIO{ '(' } >> DelimiterIO{':'};
-      input >> KeyIO{ temp };
-      input >> KeyIO{ temp };
-      input >> KeyIO{ temp };
-      input >> DelimiterIO{ ')' };
-    }
-    if (input)
-    {
-      dest = temp;
-    }
+    input.setstate(std::ios::failbit);
+  }
+  dest.usedKeys[key] = true;
+  switch (key)
+  {
+  case 1:
+    input >> DoubleIO{ dest.data.key1 } >> DelimiterIO{ ':' };
+    break;
+  case 2:
+    input >> DoubleSciIO{ dest.data.key2 };
+    break;
+  case 3:
+    input >> StringIO{ dest.data.key3 };
+    break;
+  default:
+    input.setstate(std::ios::failbit);
+  }
+  return input;
+}
+
+std::istream& operator>>(std::istream& input, DataStruct& dest)
+{
+  std::istream::sentry sentry(input);
+  if (!sentry)
+  {
     return input;
   }
-
-  std::ostream& operator<<(std::ostream& output, const DoubleIO&& dest)
+  DataStruct temp;
+  Guard guardian(input);
   {
-    return output << std::fixed << std::setprecision(1) << dest.ref << "d";
+    input >> DelimiterIO{ '(' } >> DelimiterIO{':'};
+    input >> KeyIO{ temp };
+    input >> KeyIO{ temp };
+    input >> KeyIO{ temp };
+    input >> DelimiterIO{ ')' };
   }
-
-  std::ostream& operator<<(std::ostream& out, const DoubleSciIO&& dest)
+  if (input)
   {
-    double mant = dest.ref;
-    int order = 0;
-    if (mant != 0)
-    {
-      while (std::abs(mant) < 1)
-      {
-        mant *= 10;
-        order--;
-      }
-      while (std::abs(mant) >= 9.995)
-      {
-        mant /= 10;
-        order++;
-      }
-      mant = std::round(mant * 100) / 100.0;
-    }
-    out << std::fixed << std::setprecision(1) << mant;
-    out << 'e' << std::showpos << order;
+    dest = temp;
+  }
+  return input;
+}
+
+std::ostream& operator<<(std::ostream& output, const DoubleIO&& dest)
+{
+  std::ostream::sentry sentry(output);
+  if (!sentry)
+  {
+    return output;
+  }
+  Guard scope(output);
+  return output << std::fixed << std::setprecision(1) << dest.ref << "d";
+}
+
+std::ostream& operator<<(std::ostream& out, const DoubleSciIO&& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
     return out;
   }
-
-  std::ostream& operator<<(std::ostream& output, const StringIO&& dest)
+  Guard scope(out);
+  double mant = dest.ref;
+  int order = 0;
+  if (mant != 0)
   {
-    return output << "\"" << dest.ref << "\"";
-  }
-
-  std::ostream& operator<<(std::ostream& output, const DataStruct& dest)
-  {
-    std::ostream::sentry sentry(output);
-    if (!sentry)
+    while (std::abs(mant) < 1)
     {
-      return output;
+      mant *= 10;
+      order--;
     }
+    while (std::abs(mant) >= 9.995)
+    {
+      mant /= 10;
+      order++;
+    }
+    mant = std::round(mant * 100) / 100.0;
+  }
+  out << std::fixed << std::setprecision(1) << mant;
+  out << 'e' << std::showpos << order;
+  return out;
+}
 
-    double dbl = dest.key1;
-    double dblsc = dest.key2;
-    std::string str = dest.key3;
+std::ostream& operator<<(std::ostream& output, const StringIO&& dest)
+{
+  std::ostream::sentry sentry(output);
+  if (!sentry)
+  {
+    return output;
+  }
+  return output << "\"" << dest.ref << "\"";
+}
 
-    Guard guard(output);
-    output << "(:key1 " << DoubleIO{ dbl };
-    output << ":key2 " << DoubleSciIO{ dblsc };
-    output << ":key3 " << StringIO{ str } << ":)";
-
+std::ostream& operator<<(std::ostream& output, const DataStruct& dest)
+{
+  std::ostream::sentry sentry(output);
+  if (!sentry)
+  {
     return output;
   }
 
-  bool compareData(const DataStruct& a, const DataStruct& b)
-  {
-    if (a.key1 != b.key1)
-    {
-      return a.key1 < b.key1;
-    }
-    if (a.key2 != b.key2)
-    {
-      return a.key2 < b.key2;
-    }
-    return a.key3.size() < b.key3.size();
-  }
+  double dbl = dest.key1;
+  double dblsc = dest.key2;
+  std::string str = dest.key3;
+
+  Guard guard(output);
+  output << "(:key1 " << DoubleIO{ dbl };
+  output << ":key2 " << DoubleSciIO{ dblsc };
+  output << ":key3 " << StringIO{ str } << ":)";
+
+  return output;
 }
+
+
+bool compareData(const DataStruct& a, const DataStruct& b)
+{
+  if (a.key1 != b.key1)
+  {
+    return a.key1 < b.key1;
+  }
+  if (a.key2 != b.key2)
+  {
+    return a.key2 < b.key2;
+  }
+  return a.key3.size() < b.key3.size();
+}
+
+}
+

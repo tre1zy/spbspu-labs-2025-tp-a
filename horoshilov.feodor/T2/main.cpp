@@ -7,7 +7,7 @@
 int main()
 {
   using dataSt = horoshilov::DataStruct;
-  using istreamIter = std::istream_iterator< dataSt>;
+  using istreamIter = std::istream_iterator< dataSt >;
   using ostreamIter = std::ostream_iterator< dataSt >;
 
   std::vector< dataSt > data;
