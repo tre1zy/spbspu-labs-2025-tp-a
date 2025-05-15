@@ -60,7 +60,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DoubleEIOOut&& dest)
   return out;
 }
 
-std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIO& dest)
+std::ostream& belyaev::operator<<(std::ostream& out, const PairLLIOOut&& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -119,7 +119,7 @@ std::istream& belyaev::operator>>(std::istream& in, const DoubleEIOIn&& dest)
   return in;
 }
 
-std::istream& belyaev::operator>>(std::istream& in, const PairLLIO&& dest)
+std::istream& belyaev::operator>>(std::istream& in, const PairLLIOIn&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)

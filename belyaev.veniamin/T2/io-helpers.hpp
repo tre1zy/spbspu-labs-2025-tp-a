@@ -21,9 +21,14 @@ namespace belyaev
     double value;
   };
 
-  struct PairLLIO
+  struct PairLLIOIn
   {
     std::pair< long long, unsigned long long >& value;
+  };
+
+  struct PairLLIOOut
+  {
+    std::pair< long long, unsigned long long > value;
   };
 
   struct StringIO
@@ -33,9 +38,9 @@ namespace belyaev
 
   std::istream& operator>>(std::istream& in, const DelimeterIO&& dest);
   std::ostream& operator<<(std::ostream& out, const DoubleEIOOut&& dest);
-  std::ostream& operator<<(std::ostream& out, const PairLLIO& dest);
+  std::ostream& operator<<(std::ostream& out, const PairLLIOOut&& dest);
   std::istream& operator>>(std::istream& in, const DoubleEIOIn&& dest);
-  std::istream& operator>>(std::istream& in, const PairLLIO&& dest);
+  std::istream& operator>>(std::istream& in, const PairLLIOIn&& dest);
   std::istream& operator>>(std::istream& in, const StringIO& dest);
 }
 

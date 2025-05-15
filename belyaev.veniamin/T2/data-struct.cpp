@@ -44,7 +44,7 @@ std::istream& belyaev::operator>>(std::istream& in, DataStruct& dst)
     }
     else if (keyNum == 2 && !hasKeys[1])
     {
-      in >> PairLLIO{newDS.key2};
+      in >> PairLLIOIn{newDS.key2};
       hasKeys[1] = true;
     }
     else if (keyNum == 3 && !hasKeys[2])
@@ -84,7 +84,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const DataStruct& dst)
   StreamGuard guard(out);
   out << "(";
   out << ":key1 " << DoubleEIOOut{dst.key1};
-  out << ":key2 " << "(:N " << dst.key2.first << ":D " << dst.key2.second << ":)";
+  out << ":key2 " << PairLLIOOut{dst.key2};
   out << ":key3 \"" << dst.key3 << "\"";
   out << ":)";
   return out;
