@@ -1,39 +1,11 @@
 #include <functional>
-#include <algorithm>
 #include <iterator>
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <limits>
 #include <map>
-
-namespace maslov
-{
-  struct Point
-  {
-    int x, y;
-  };
-
-  struct Polygon
-  {
-    std::vector< Point > points;
-  };
-
-  void maslov::getArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
-  {}
-
-  void maslov::getMax(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
-  {}
-
-  void maslov::getMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
-  {}
-
-  void maslov::getEcho(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
-  {}
-
-  void maslov::getRects(std::ostream & out, const std::vector< Polygon > & polygons)
-  {}
-}
+#include "commands.hpp"
+#include "ioGeometry.hpp"
 
 int main(int argc, char * argv[])
 {
