@@ -7,13 +7,13 @@
 int main()
 {
   using dataSt = horoshilov::DataStruct;
-  using istreamIter = std::istream_iterator< dataSt >;
+  using istreamIter = std::istream_iterator< dataSt>;
   using ostreamIter = std::ostream_iterator< dataSt >;
 
   std::vector< dataSt > data;
   while (!std::cin.eof())
   {
-    std::copy(istreamIter(std::cin), istreamIter(), std::back_inserter(data));
+    std::copy(istreamIter(std::cin),istreamIter(),std::back_inserter(data));
 
     if (!std::cin)
     {
@@ -23,6 +23,6 @@ int main()
   }
 
   std::sort(data.begin(), data.end(), horoshilov::compareData);
-  std::copy(std::begin(data), std::end(data), ostreamIter(std::cout, "\n"));
+  std::copy(std::begin(data),std::end(data),ostreamIter(std::cout, "\n"));
   return 0;
 }
