@@ -3,15 +3,14 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 namespace horoshilov
 {
   struct DataStruct
   {
-    double key1 = 0;
-    double key2 = 0;
-    std::string key3 = "";
+    double key1;
+    double key2;
+    std::string key3;
   };
 
   struct KeyIO
