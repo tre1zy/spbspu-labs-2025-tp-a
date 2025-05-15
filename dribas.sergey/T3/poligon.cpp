@@ -8,17 +8,22 @@
 
 namespace
 {
-  struct Gauss
-  {
-    const dribas::Point& pt;
-    dribas::Point ptNext;
-    double operator()(double res, const dribas::Point& ptLast)
-    {
-      res += std::abs((ptLast.x - pt.x) * (ptNext.y - pt.y) - (ptNext.x - pt.x) * (ptLast.y - pt.y)) / 2;
-      ptNext = ptLast;
+  struct Gauss {
+    dribas::Point prev;
+    dribas::Point first;
+    double area = 0.0;
+
+    double operator()(double res, const dribas::Point& current) {
+      res += (prev.x * current.y - current.x * prev.y);
+      prev = current;
       return res;
     }
-  };
+
+    double close() {
+      area =  (prev.x * first.y - first.x * prev.y);
+      return area;
+    }
+};
 }
 
 namespace dribas
@@ -63,13 +68,14 @@ namespace dribas
       in.setstate(std::ios::failbit);
       return in;
     }
-
     plg.points = pnts;
     return in;
   }
   double getPoligonArea(const Poligon& poligon)
   {
-    Gauss area{ poligon.points[0], poligon.points[1] };
-    return std::accumulate(poligon.points.begin() + 2, poligon.points.end(), 0., std::ref(area));
+    Gauss gauss{poligon.points[0]};
+    double area = std::accumulate(poligon.points.begin() + 1, poligon.points.end(), 0.0, std::ref(gauss));
+    gauss.close();
+    return std::abs(area + gauss.area) / 2.0;
   }
 }
