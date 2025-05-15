@@ -34,7 +34,7 @@ std::istream &shiryaeva::operator>>(std::istream &in, DataStruct &dest)
   {
     std::string key;
     in >> sep{':'} >> key;
-  
+
     if (key == "key1")
     {
       if (hasKey1) { in.setstate(std::ios::failbit); return in; }
@@ -58,7 +58,7 @@ std::istream &shiryaeva::operator>>(std::istream &in, DataStruct &dest)
       in.setstate(std::ios::failbit);
       return in;
     }
-  } 
+  }
 
   in >> sep{':'} >> sep{')'};
 
