@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <iterator>
 #include <iostream>
@@ -7,9 +6,9 @@
 #include "data.h"
 int main()
 {
-  using istreamIter = std::istream_iterator< horoshilov::DataStruct >;
-  using ostreamIter = std::ostream_iterator< horoshilov::DataStruct >;
   using dataSt = horoshilov::DataStruct;
+  using istreamIter = std::istream_iterator< dataSt >;
+  using ostreamIter = std::ostream_iterator< dataSt >;
 
   std::vector< dataSt > data;
   while (!std::cin.eof())
