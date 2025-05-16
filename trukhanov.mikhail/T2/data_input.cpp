@@ -3,7 +3,7 @@
 
 namespace trukhanov
 {
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+  std::istream& trukhanov::operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -20,7 +20,7 @@ namespace trukhanov
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, LabelIO&& dest)
+  std::istream& trukhanov::operator>>(std::istream& in, LabelIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -41,7 +41,7 @@ namespace trukhanov
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, OctalULLIO&& dest)
+  std::istream& trukhanov::operator>>(std::istream& in, OctalULLIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -54,7 +54,7 @@ namespace trukhanov
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, RationalIO&& dest)
+  std::istream& trukhanov::operator>>(std::istream& in, RationalIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -87,7 +87,7 @@ namespace trukhanov
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, StringIO&& dest)
+  std::istream& trukhanov::operator>>(std::istream& in, StringIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -98,4 +98,3 @@ namespace trukhanov
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
   }
 }
-

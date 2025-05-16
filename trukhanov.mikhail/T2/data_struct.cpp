@@ -5,7 +5,7 @@
 
 namespace trukhanov
 {
-  bool operator<(const DataStruct& lhs, const DataStruct& rhs)
+  bool trukhanov::operator<(const DataStruct& lhs, const DataStruct& rhs)
   {
     if (lhs.key1 != rhs.key1)
     {
@@ -18,7 +18,7 @@ namespace trukhanov
     return lhs.key3.length() < rhs.key3.length();
   }
 
-  std::istream& operator>>(std::istream& in, DataStruct& dest)
+  std::istream& trukhanov::operator>>(std::istream& in, DataStruct& dest)
   {
     DataStruct temp{};
     bool hasKey1 = false;
@@ -89,7 +89,7 @@ namespace trukhanov
     return in;
   }
 
-  std::ostream& operator<<(std::ostream& out, const DataStruct& src)
+  std::ostream& trukhanov::operator<<(std::ostream& out, const DataStruct& src)
   {
     StreamGuard guard(out);
     out << "(:key1 0" << std::oct << src.key1 << std::dec;
