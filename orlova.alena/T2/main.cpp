@@ -21,8 +21,8 @@ bool compareDataStructs(const orlova::DataStruct& a, const orlova::DataStruct& b
 int main()
 {
   using orlova::DataStruct;
-  using istreamDS = std::istream_operator< DataStruct >;
-  using ostreamDS = std::ostream_operator< DataStruct >;
+  using istreamDS = std::istream_iterator< DataStruct >;
+  using ostreamDS = std::ostream_iterator< DataStruct >;
 
   std::vector< DataStruct > data;
   while (!std::cin.eof())
