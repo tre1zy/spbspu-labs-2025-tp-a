@@ -458,3 +458,25 @@ void shapkov::intersect(std::istream& in, std::ostream& out, FrequencyDictionary
   }
   dict.dicts.emplace(std::move(newDictId), std::move(temp));
 }
+
+void shapkov::save(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
+{
+  std::string fileName;
+  in >> fileName;
+  std::ofstream save(fileName);
+  if (!save.is_open())
+  {
+    out << "<FAILED TO OPEN FILE>\n";
+    return;
+  }
+  for (const auto& pair: dict.dicts)
+  {
+    save << "[" << pair.first << "]\n";
+    save << "size=" << pair.second.size << '\n';
+    for (const auto& word_pair: pair.second.dictionary)
+    {
+      save << word_pair.first << '\t' << word_pair.second << '\n';
+    }
+  }
+  out << "<SAVED SUCCESSFULLY>\n";
+}
