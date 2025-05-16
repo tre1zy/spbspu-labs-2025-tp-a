@@ -91,7 +91,6 @@ void shapkov::similar_frequency(std::istream& in, std::ostream& out, const Frequ
   std::string word;
   size_t delta = 0;
   in >> word >> delta;
-  isAnagram anagramChecker{ word };
   size_t freqCnt = 0;
   for (const auto& dict_pair: dict.dicts)
   {
@@ -308,9 +307,9 @@ void shapkov::compare(std::istream& in, std::ostream& out, const FrequencyDictio
   out << "FREQUENCY COMPARISON\n";
   size_t max_freq = std::max(freq1, freq2);
   size_t width = 40;
-  out << id1 << ": " << static_cast<char>(178) << std::string(width * freq1 / max_freq, static_cast<char>(178));
+  out << id1 << ": " << '#' << std::string(width * freq1 / max_freq, '#');
   out << " " << freq1 << "\n";
-  out << id2 << ": " << static_cast<char>(178) << std::string(width * freq2 / max_freq, static_cast<char>(178));
+  out << id2 << ": " << '#' << std::string(width * freq2 / max_freq, '#');
   out << " " << freq2 << "\n\n";
   out << "TEXT ENTROPY (bits/word)\n";
   out << id1 << ": " << std::fixed << std::setprecision(2) << entropy1 << "\n";
@@ -398,7 +397,7 @@ void shapkov::diff(std::istream& in, std::ostream& out, FrequencyDictionary& dic
     out << "<TEXT NOT FOUND>\n";
     return;
   }
-  OneFreqDict temp(text1->second);
+  OneFreqDict temp;
   for (const auto& word_pair: text1->second.dictionary)
   {
     if (text2->second.dictionary.find(word_pair.first) == text2->second.dictionary.end())
@@ -414,6 +413,11 @@ void shapkov::diff(std::istream& in, std::ostream& out, FrequencyDictionary& dic
       temp.dictionary[word_pair.first] = word_pair.second;
       temp.size += word_pair.second;
     }
+  }
+  if (temp.dictionary.empty())
+  {
+    out << "<NO DIFFERENCES>\n";
+    return;
   }
   dict.dicts.emplace(std::move(newDictId), std::move(temp));
 }
