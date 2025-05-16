@@ -4,7 +4,7 @@
 
 shapkov::isAnagram::isAnagram(const std::string word)
 {
-  for (char c : word)
+  for (char c: word)
   {
     letterFreq[c]++;
   }
@@ -13,7 +13,7 @@ shapkov::isAnagram::isAnagram(const std::string word)
 bool shapkov::isAnagram::operator()(const std::string word)
 {
   std::unordered_map< char, size_t > srcLetterFreq;
-  for (char c : word)
+  for (char c: word)
   {
     srcLetterFreq[c]++;
   }

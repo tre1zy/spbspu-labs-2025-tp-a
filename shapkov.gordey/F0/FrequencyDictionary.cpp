@@ -493,18 +493,23 @@ void shapkov::load(std::ostream& out, const std::string fileName, FrequencyDicti
   std::string line;
   std::string currentDictName;
   OneFreqDict* currentDict = nullptr;
-  while (std::getline(file, line)) {
-    if (line.empty()) {
+  while (std::getline(file, line))
+  {
+    if (line.empty())
+    {
       currentDict = nullptr;
     }
-    else if (line[0] == '[') {
+    else if (line[0] == '[')
+    {
       currentDictName = line.substr(1, line.size() - 2);
       currentDict = &dict.dicts[currentDictName];
     }
-    else if (line.find("size=") == 0) {
+    else if (line.find("size=") == 0)
+    {
       currentDict->size = std::stoul(line.substr(5));
     }
-    else {
+    else
+    {
       size_t tabPos = line.find('\t');
       std::string word = line.substr(0, tabPos);
       size_t count = std::stoul(line.substr(tabPos + 1));
