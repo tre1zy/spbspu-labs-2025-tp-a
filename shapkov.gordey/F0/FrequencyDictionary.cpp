@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <algorithm>
 #include "functors.hpp"
-#include <ScopeGuard.hpp>
+#include <scopeGuard.hpp>
 
 void shapkov::analyze_text(std::istream& in, std::ostream& out, FrequencyDictionary& dict)
 {
@@ -374,7 +374,7 @@ void shapkov::merge(std::istream& in, std::ostream& out, FrequencyDictionary& di
     return;
   }
   OneFreqDict temp(text1->second);
-  for (const auto word_pair: text2->second.dictionary)
+  for (const auto& word_pair: text2->second.dictionary)
   {
     temp.dictionary[word_pair.first] += word_pair.second;
   }
@@ -399,7 +399,7 @@ void shapkov::diff(std::istream& in, std::ostream& out, FrequencyDictionary& dic
     return;
   }
   OneFreqDict temp(text1->second);
-  for (const auto word_pair: text1->second.dictionary)
+  for (const auto& word_pair: text1->second.dictionary)
   {
     if (text2->second.dictionary.find(word_pair.first) == text2->second.dictionary.end())
     {
@@ -407,7 +407,7 @@ void shapkov::diff(std::istream& in, std::ostream& out, FrequencyDictionary& dic
       temp.size += word_pair.second;
     }
   }
-  for (const auto word_pair: text2->second.dictionary)
+  for (const auto& word_pair: text2->second.dictionary)
   {
     if (text1->second.dictionary.find(word_pair.first) == text1->second.dictionary.end())
     {
@@ -442,7 +442,7 @@ void shapkov::intersect(std::istream& in, std::ostream& out, FrequencyDictionary
     smallerDict = &text2->second.dictionary;
     largerDict = &text1->second.dictionary;
   }
-  for (const auto word_pair: *smallerDict)
+  for (const auto& word_pair: *smallerDict)
   {
     auto word = largerDict->find(word_pair.first);
     if (word != largerDict->end())

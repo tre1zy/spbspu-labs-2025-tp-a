@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <functional>
+#include <limits>
 #include "FrequencyDictionary.hpp"
 
 int main()
