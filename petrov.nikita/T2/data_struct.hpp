@@ -19,6 +19,11 @@ namespace petrov
     char exp;
   };
 
+  struct LabelIO
+  {
+    std::string exp;
+  };
+
   struct DoubleIO
   {
     double & ref;
@@ -36,7 +41,6 @@ namespace petrov
 
   struct StreamGuard
   {
-  public:
     explicit StreamGuard(std::basic_ios< char > & s);
     ~StreamGuard();
   private:
@@ -48,7 +52,9 @@ namespace petrov
   };
 
   std::istream & operator>>(std::istream & in, DelimiterIO && dest);
+  std::istream & operator>>(std::istream & in, LabelIO && dest);
   std::istream & operator>>(std::istream & in, DoubleIO && dest);
+  std::istream & operator>>(std::istream & in, LongLongIO && dest);
   std::istream & operator>>(std::istream & in, StringIO && dest);
   std::istream & operator>>(std::istream & in, DataStruct & dest);
   std::ostream & operator<<(std::ostream & out, const DataStruct & dest);

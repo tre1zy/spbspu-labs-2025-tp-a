@@ -1,8 +1,8 @@
 #include <vector>
+#include <iostream>
+#include <limits>
 #include <algorithm>
 #include <iterator>
-#include <functional>
-#include <iostream>
 #include "data_struct.hpp"
 
 namespace
@@ -29,24 +29,17 @@ namespace
 int main()
 {
   using namespace petrov;
+  using data_struct_istream_it = std::istream_iterator< DataStruct >;
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
     if (!std::cin)
     {
       std::cin.clear();
-      std::cin.ignore(1024, '\n');
+      std::cin.ignore(std::numeric_limits< size_t >::max(), '\n');
     }
-    std::copy(
-      std::istream_iterator< DataStruct >(std::cin),
-      std::istream_iterator< DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(data_struct_istream_it(std::cin), data_struct_istream_it(), std::back_inserter(data));
   }
   std::sort(data.begin(), data.end(), compareDataStructs);
-  std::copy(
-      std::begin(data),
-      std::end(data),
-      std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), std::ostream_iterator< DataStruct >(std::cout, "\n"));
 }
