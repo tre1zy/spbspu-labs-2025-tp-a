@@ -233,8 +233,9 @@ std::ostream& kostyukov::operator<<(std::ostream& out, const DataStruct& dest)
     return out;
   }
   ScopeGuard scopeGrd(out);
-  out << "(:key1 " << BinUllIO{ dest.key1 } << ":key2 " << HexUllIO{ dest.key2 } << ":key3 "
-    << ConstStringIO{ dest.key3 } << ":)";
+  out << "(:key1 " << BinUllIO{ dest.key1 };
+  out << ":key2 " << HexUllIO{ dest.key2 };
+  out << ":key3 " << ConstStringIO{ dest.key3 } << ":)";
   return out;
 }
 
