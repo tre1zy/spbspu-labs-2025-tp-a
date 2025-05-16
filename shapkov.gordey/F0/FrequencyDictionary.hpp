@@ -33,5 +33,6 @@ namespace shapkov
   void diff(std::istream& in, std::ostream& out, FrequencyDictionary& dict);
   void merge(std::istream& in, std::ostream& out, FrequencyDictionary& dict);
   void save(std::istream& in, std::ostream& out, const FrequencyDictionary& dict);
+  void load(std::ostream& out, const std::string fileName, FrequencyDictionary& dict);
 }
 #endif

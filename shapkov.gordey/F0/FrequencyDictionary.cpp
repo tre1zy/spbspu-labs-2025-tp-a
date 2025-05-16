@@ -480,3 +480,36 @@ void shapkov::save(std::istream& in, std::ostream& out, const FrequencyDictionar
   }
   out << "<SAVED SUCCESSFULLY>\n";
 }
+
+void shapkov::load(std::ostream& out, const std::string fileName, FrequencyDictionary& dict)
+{
+  std::ifstream file(fileName);
+  if (!file.is_open())
+  {
+    out << "<FILE NOT FOUND>\n";
+    return;
+  }
+  dict.dicts.clear();
+  std::string line;
+  std::string currentDictName;
+  OneFreqDict* currentDict = nullptr;
+  while (std::getline(file, line)) {
+    if (line.empty()) {
+      currentDict = nullptr;
+    }
+    else if (line[0] == '[') {
+      currentDictName = line.substr(1, line.size() - 2);
+      currentDict = &dict.dicts[currentDictName];
+    }
+    else if (line.find("size=") == 0) {
+      currentDict->size = std::stoul(line.substr(5));
+    }
+    else {
+      size_t tabPos = line.find('\t');
+      std::string word = line.substr(0, tabPos);
+      size_t count = std::stoul(line.substr(tabPos + 1));
+      currentDict->dictionary[word] = count;
+    }
+  }
+  out << "<LOADED SUCCESSFULLY>\n";
+}

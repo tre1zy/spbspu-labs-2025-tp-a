@@ -4,9 +4,13 @@
 #include <limits>
 #include "FrequencyDictionary.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
   shapkov::FrequencyDictionary dict;
+  if (argc == 2)
+  {
+      shapkov::load(std::cout, argv[1], dict);
+  }
   std::unordered_map< std::string, std::function< void() > > cmds;
   cmds["ANALYZETEXT"] = std::bind(shapkov::analyze_text, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
   cmds["PRINT"] = std::bind(shapkov::print, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
@@ -22,6 +26,7 @@ int main()
   cmds["INTERSECT"] = std::bind(shapkov::intersect, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
   cmds["DIFF"] = std::bind(shapkov::diff, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
   cmds["MERGE"] = std::bind(shapkov::merge, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
+  cmds["SAVE"] = std::bind(shapkov::save, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
 
   std::string command;
   while (!(std::cin >> command).eof())
