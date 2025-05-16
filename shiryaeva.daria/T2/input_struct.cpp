@@ -66,3 +66,16 @@ std::istream &shiryaeva::operator>>(std::istream &in, StringIO &&dest)
   std::getline(in, dest.ref, '"');
   return in;
 }
+
+std::ostream& shiryaeva::operator<<(std::ostream& out, const HexUllO& src) {
+    FormatGuard guard(out);
+    return out << "0x" << std::hex << std::uppercase << src.ref;
+}
+
+std::ostream& shiryaeva::operator<<(std::ostream& out, const CharO& src) {
+    return out << "'" << src.ref << "'";
+}
+
+std::ostream& shiryaeva::operator<<(std::ostream& out, const StringO& src) {
+    return out << "\"" << src.ref << "\"";
+}

@@ -79,9 +79,9 @@ std::ostream& shiryaeva::operator<<(std::ostream& out, const DataStruct& src)
   {
     return out;
   }
-
   FormatGuard guard(out);
-  OutputFormatter formatter(out);
-  formatter(src.key1, src.key2, src.key3);
+  out << "(:key1 " << HexUllO{src.key1};
+  out << ":key2 " << CharO{src.key2};
+  out << ":key3 " << StringO{src.key3} << ":)";
   return out;
 }

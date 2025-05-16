@@ -28,6 +28,21 @@ namespace shiryaeva
     std::string &ref;
   };
   std::istream &operator>>(std::istream &in, StringIO &&dest);
+
+  struct HexUllO {
+    const unsigned long long& ref;
+  };
+  std::ostream& operator<<(std::ostream& out, const HexUllO& src);
+
+  struct CharO {
+    const char& ref;
+  };
+  std::ostream& operator<<(std::ostream& out, const CharO& src);
+
+  struct StringO {
+    const std::string& ref;
+  };
+  std::ostream& operator<<(std::ostream& out, const StringO& src);
 }
 
 #endif

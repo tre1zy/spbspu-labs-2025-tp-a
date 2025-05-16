@@ -18,19 +18,10 @@ namespace shiryaeva
 
   private:
     std::basic_ios< char > &s_;
-    char fill_;
+    std::streamsize width_;
     std::streamsize precision_;
     std::basic_ios< char >::fmtflags fmt_;
-  };
-
-  class OutputFormatter
-  {
-  public:
-    explicit OutputFormatter(std::ostream& out);
-    void operator()(unsigned long long key1, char key2, const std::string& key3);
-
-  private:
-    std::ostream& out_;
+    char fill_;
   };
 }
 

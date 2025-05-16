@@ -5,27 +5,17 @@
 
 shiryaeva::FormatGuard::FormatGuard(std::basic_ios< char >& s) :
   s_(s),
-  fill_(s.fill()),
+  width_(s.width()),
   precision_(s.precision()),
-  fmt_(s.flags())
+  fmt_(s.flags()),
+  fill_(s.fill())
 {
 }
 
 shiryaeva::FormatGuard::~FormatGuard()
 {
-  s_.fill(fill_);
+  s_.width(width_);
   s_.precision(precision_);
   s_.flags(fmt_);
-}
-
-shiryaeva::OutputFormatter::OutputFormatter(std::ostream& out):
-  out_(out)
-{
-}
-
-void shiryaeva::OutputFormatter::operator()(unsigned long long key1, char key2, const std::string& key3)
-{
-  out_ << "(:key1 0x" << std::hex << std::uppercase << key1;
-  out_ << ":key2 '" << key2 << "'";
-  out_ << ":key3 \"" << key3 << "\":)";
+  s_.fill(fill_);
 }
