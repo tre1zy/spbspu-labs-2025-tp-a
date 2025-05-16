@@ -4,7 +4,7 @@
 #include <iosfwd>
 #include <functional>
 #include "polygon.h"
-#include "command_handler.h"
+#include <command_handler.h>
 
 namespace ohantsev
 {
