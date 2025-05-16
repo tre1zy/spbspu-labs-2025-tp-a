@@ -26,7 +26,6 @@ namespace orlova
   struct LongLongIO
   {
     long long& ref;
-    std::string suffix;
   };
 
   struct UnsignedLongLongIO

@@ -26,17 +26,7 @@ std::istream& orlova::operator>>(std::istream& in, LongLongIO&& dest)
   in >> dest.ref;
   if (in)
   {
-    std::string suffix;
-    std::getline(in, suffix, ':');
-    in.putback(':');
-    if (suffix != "ll" && suffix != "LL")
-    {
-      in.setstate(std::ios::failbit);
-    }
-    else
-    {
-      dest.suffix = suffix;
-    }
+    in >> DelimiterIO{ 'l' } >> DelimiterIO { 'l' };
   }
   return in;
 }
