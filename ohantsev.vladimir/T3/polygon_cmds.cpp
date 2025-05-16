@@ -225,7 +225,7 @@ void ohantsev::PolygonCmdsHandler::operator()()
       out_ << "<INVALID COMMAND>\n";
       if (in_.fail())
       {
-        in_.clear(std::cin.rdstate() ^ std::ios::failbit);
+        in_.clear(in_.rdstate() ^ std::ios::failbit);
       }
       in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
