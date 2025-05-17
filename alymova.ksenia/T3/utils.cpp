@@ -29,10 +29,6 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   catch (...)
   {
     size_t vertexes = getVertexes(command);
-    if (vertexes < 3)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
     res = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
   }
   out << std::fixed << std::setprecision(1) << res;

@@ -90,7 +90,12 @@ size_t alymova::getVertexes(std::string str)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  return std::stoull(str);
+  size_t vertexes = std::stoull(str);
+  if (vertexes < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  return vertexes;
 }
 
 double alymova::multPoints(const Point& point1, const Point& point2)
