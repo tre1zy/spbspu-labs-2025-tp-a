@@ -60,7 +60,6 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
     {"EVEN", isPolygonEven},
     {"ODD", std::not1(std::function< bool(const Polygon&) >(isPolygonEven))}
   };
-  size_t res;
   std::string command;
   in >> command;
   try
