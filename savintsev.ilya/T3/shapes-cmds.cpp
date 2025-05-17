@@ -54,7 +54,7 @@ void savintsev::area(std::istream & in, std::ostream & out, const std::vector< P
     CheckPolygonVert is{num};
     std::vector< Polygon > temp;
     std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is);
-    out << std::accumulate(temp.begin(), temp.end(), 0, sum_with_area) << '\n';
+    out << std::accumulate(temp.begin(), temp.end(), 0.0, sum_with_area) << '\n';
     return;
   }
   in.clear();
@@ -74,6 +74,10 @@ void savintsev::area(std::istream & in, std::ostream & out, const std::vector< P
   }
   else if (subcommand == "MEAN")
   {
+    if (data.empty())
+    {
+      throw std::runtime_error("area: div by zero: no polygons");
+    }
     out << std::accumulate(data.begin(), data.end(), 0.0, sum_with_area) / data.size();
   }
   else
@@ -119,6 +123,10 @@ void savintsev::max(std::istream & in, std::ostream & out, const std::vector< Po
 {
   std::string subcommand;
   in >> subcommand;
+  if (data.empty())
+  {
+    throw std::runtime_error("max: no polygons for search");
+  }
   if (subcommand == "AREA")
   {
     ScopeGuard guard(out);
@@ -141,6 +149,10 @@ void savintsev::min(std::istream & in, std::ostream & out, const std::vector< Po
 {
   std::string subcommand;
   in >> subcommand;
+  if (data.empty())
+  {
+    throw std::runtime_error("max: no polygons for search");
+  }
   if (subcommand == "AREA")
   {
     ScopeGuard guard(out);
