@@ -1,6 +1,7 @@
 #include "shapes.hpp"
 #include <iterator>
 #include <algorithm>
+#include <string>
 
 std::istream& alymova::operator>>(std::istream& in, DelimiterIO&& object)
 {

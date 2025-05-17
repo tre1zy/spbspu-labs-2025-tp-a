@@ -21,5 +21,9 @@ namespace alymova
 
   double multPoints(const Point& point1, const Point& point2);
   bool isPolygonEven(const Polygon& polygon);
+  int compareMaxPointX(int value, const Point& point);
+  int compareMaxPointY(int value, const Point& point);
+  int compareMinPointX(int value, const Point& point);
+  int compareMinPointY(int value, const Point& point);
 }
 #endif

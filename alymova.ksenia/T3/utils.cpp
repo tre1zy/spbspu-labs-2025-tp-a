@@ -77,10 +77,14 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
   }
 }
 
-void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+/*void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
+  int maxX = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].x, compareMaxPointX);
+  int maxY = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].y, compareMaxPointY);
+  int minX = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].x, compareMinPointX);
+  int minY = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].y, compareMinPointY);
 
-}
+}*/
 
 alymova::CommandDataset alymova::complectCommands()
 {

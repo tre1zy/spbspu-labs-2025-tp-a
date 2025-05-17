@@ -103,3 +103,23 @@ bool alymova::isPolygonEven(const Polygon& polygon)
   return polygon.points.size() % 2 == 0;
 }
 
+int alymova::compareMaxPointX(int value, const Point& point)
+{
+  return std::max(value, point.x);
+}
+
+int alymova::compareMaxPointY(int value, const Point& point)
+{
+  return std::max(value, point.y);
+}
+
+int alymova::compareMinPointX(int value, const Point& point)
+{
+  return std::min(value, point.x);
+}
+
+int alymova::compareMinPointY(int value, const Point& point)
+{
+  return std::min(value, point.y);
+}
+
