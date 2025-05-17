@@ -134,25 +134,23 @@ std::istream & petrov::operator>>(std::istream & in, DataStruct & data)
         {
           used_keys[0] = true;
           in >> dbl{ input.key1 };
-          in >> sep{ ':' };
         }
         else if (!used_keys[1] && key == '2')
         {
           used_keys[1] = true;
           in >> lli{ input.key2 };
-          in >> sep{ ':' };
         }
         else if (!used_keys[2] && key == '3')
         {
           used_keys[2] = true;
           in >> str{ input.key3 };
-          in >> sep{ ':' };
         }
         else
         {
           in.setstate(std::ios_base::failbit);
         }
       }
+      in >> sep{ ':' };
     }
     in >> sep{ ')' };
   }
