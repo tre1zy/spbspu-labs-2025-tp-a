@@ -4,7 +4,6 @@
 #include <iterator>
 #include <functional>
 #include <vector>
-#include <sstream>
 #include <limits>
 #include <iomanip>
 #include "utils.hpp"
@@ -13,7 +12,7 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using CommandDataset = std::map< std::string, std::function< double(const std::vector< Polygon >&) > >;
+  using CommandDataset = std::map< std::string, std::function< void(const std::vector< Polygon >&) > >;
   
   if (argc != 2)
   {
@@ -49,14 +48,12 @@ int main(int argc, char** argv)
   {
     try
     {
-      std::cout << std::fixed << std::setprecision(1)
-      << commands.at(command)(std::cref(polygons)) << '\n';
+      commands.at(command)(std::cref(polygons));
+      std::cout << '\n';
     }
     catch(const std::exception& e)
     {
       std::cout << e.what() << '\n';
     }
   }
-
-
 }
