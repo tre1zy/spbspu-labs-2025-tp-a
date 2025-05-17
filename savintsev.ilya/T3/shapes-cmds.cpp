@@ -20,6 +20,14 @@ namespace
   {
     return a.points.size() % 2;
   }
+  bool compare_areas(const savintsev::Polygon & a, const savintsev::Polygon & b)
+  {
+    return calc_polygon_area(a) < calc_polygon_area(b);
+  }
+  bool compare_vert_amt(const savintsev::Polygon & a, const savintsev::Polygon & b)
+  {
+    return a.points.size() < b.points.size();
+  }
   struct CheckPolygonVert
   {
     bool operator()(const savintsev::Polygon & a)
@@ -83,7 +91,7 @@ void savintsev::count(std::istream & in, std::ostream & out, const std::vector< 
   {
     if (num <= 2)
     {
-      throw std::runtime_error("area: invalid arg");
+      throw std::runtime_error("count: invalid arg");
     }
     CheckPolygonVert is{num};
     out << std::count_if(data.begin(), data.end(), is) << '\n';
@@ -107,27 +115,54 @@ void savintsev::count(std::istream & in, std::ostream & out, const std::vector< 
   out << '\n';
 }
 
+void savintsev::max(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    ScopeGuard guard(out);
+    out.precision(1);
+    out << std::fixed;
+    out << calc_polygon_area(*(std::max_element(data.begin(), data.end(), compare_areas)));
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    out << std::max_element(data.begin(), data.end(), compare_vert_amt)->points.size();
+  }
+  else
+  {
+    throw std::runtime_error("max: invalid arg");
+  }
+  out << '\n';
+}
+
+void savintsev::min(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    ScopeGuard guard(out);
+    out.precision(1);
+    out << std::fixed;
+    out << calc_polygon_area(*(std::min_element(data.begin(), data.end(), compare_areas)));
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    out << std::min_element(data.begin(), data.end(), compare_vert_amt)->points.size();
+  }
+  else
+  {
+    throw std::runtime_error("min: invalid arg");
+  }
+  out << '\n';
+}
+
 void savintsev::print(std::ostream & out, const std::vector< Polygon > & data)
 {
   for (size_t i = 0; i < data.size(); ++i)
   {
     out << data[i] << '\n';
   }
-}
-
-double savintsev::calc_polygon_area(Polygon a)
-{
-  size_t n = a.points.size();
-  if (n < 3)
-  {
-    return 0.0;
-  }
-
-  double area = 0.0;
-  for (size_t i = 0; i < n; ++i)
-  {
-    size_t j = (i + 1) % n;
-    area += (a.points[i].x * a.points[j].y) - (a.points[j].x * a.points[i].y);
-  }
-  return 0.5 * abs(area);
 }

@@ -20,6 +20,8 @@ namespace savintsev
 
   std::istream & operator>>(std::istream & in, Polygon & dest);
   std::ostream & operator<<(std::ostream & out, const Polygon & dest);
+
+  double calc_polygon_area(Polygon a);
 }
 
 #endif

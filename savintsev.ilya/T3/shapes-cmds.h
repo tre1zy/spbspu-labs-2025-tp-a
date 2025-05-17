@@ -10,8 +10,6 @@ namespace savintsev
   void max(std::istream & in, std::ostream & out, const std::vector< Polygon > & data);
   void min(std::istream & in, std::ostream & out, const std::vector< Polygon > & data);
   void print(std::ostream & out, const std::vector< Polygon > & data);
-
-  double calc_polygon_area(Polygon a);
 }
 
 #endif
