@@ -28,19 +28,17 @@ namespace rychkov
 
 int main()
 {
-  std::vector< rychkov::DataStruct > values;
-  while (!std::cin.eof() && !std::cin.bad())
+  using data_t = rychkov::DataStruct;
+  std::vector< data_t > values;
+  while (std::cin)
   {
-    using Iter = std::istream_iterator< rychkov::DataStruct >;
-    std::copy(Iter(std::cin), Iter(), std::back_inserter(values));
-    if (!std::cin.eof() && !std::cin.bad())
-    {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
+    using Iter = std::istream_iterator< data_t >;
+    std::copy(Iter{std::cin}, Iter{}, std::back_inserter(values));
+    std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
-  std::sort(values.begin(), values.end(), rychkov::ds_compare());
+  std::sort(values.begin(), values.end(), rychkov::ds_compare{});
 
   std::cout << std::setprecision(1);
-  std::copy(values.begin(), values.end(), std::ostream_iterator< rychkov::DataStruct >(std::cout, "\n"));
+  std::copy(values.begin(), values.end(), std::ostream_iterator< data_t >{std::cout, "\n"});
 }

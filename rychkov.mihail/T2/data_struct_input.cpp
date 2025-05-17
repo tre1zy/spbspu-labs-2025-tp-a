@@ -78,17 +78,15 @@ std::istream& rychkov::operator>>(std::istream& in, DataStruct& link)
   {
     return in;
   }
-  unsigned char entered = 0b000;
-  size_t matched = -1;
-  while (entered != 0b111)
+  field_register< 3 > entered;
+  while (!entered.full())
   {
-    if ((in >> iofmt::anyof(&matched, ":key1", ":key2", ":key3")) && !(entered & (1 << matched)))
+    size_t key_id = -1;
+    if (!(in >> iofmt::anyof(&key_id, ":key1", ":key2", ":key3")) || !entered.reg(key_id))
+    {}
+    else if (in >> iofmt::anyof(true, " ", "\t", "\n") >> iofmt::nth_ds_field{key_id, link})
     {
-      if (in >> iofmt::anyof(true, " ", "\t", "\n") >> iofmt::nth_ds_field{matched, link})
-      {
-        entered |= (1 << matched);
-        continue;
-      }
+      continue;
     }
     in.setstate(std::ios::failbit);
     return in;

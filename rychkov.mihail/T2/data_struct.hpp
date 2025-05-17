@@ -2,6 +2,7 @@
 #define DATA_STRUCT_HPP
 
 #include <string>
+#include <limits>
 #include <iosfwd>
 
 namespace rychkov
@@ -14,6 +15,30 @@ namespace rychkov
   };
   std::istream& operator>>(std::istream& in, DataStruct& link);
   std::ostream& operator<<(std::ostream& in, const DataStruct& link);
+
+  template< size_t N >
+  class field_register
+  {
+  public:
+    static constexpr size_t capacity = N;
+    bool reg(size_t i) noexcept
+    {
+      if ((i >= capacity) || (mask & (1 << i)))
+      {
+        return false;
+      }
+      mask |= (1 << i);
+      return true;
+    }
+    bool full() const noexcept
+    {
+      return (mask & ~(~0ULL << capacity)) == ~(~0ULL << capacity);
+    }
+  private:
+    using size_type = size_t;
+    static_assert(N < std::numeric_limits< size_type >::digits, "failed to make bitset");
+    size_type mask = 0b0;
+  };
 
   namespace iofmt
   {
