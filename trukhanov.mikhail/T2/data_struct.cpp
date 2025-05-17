@@ -3,98 +3,95 @@
 #include "data_input.hpp"
 #include "stream_guard.hpp"
 
-namespace trukhanov
+bool trukhanov::operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
-  bool trukhanov::operator<(const DataStruct& lhs, const DataStruct& rhs)
+  if (lhs.key1 != rhs.key1)
   {
-    if (lhs.key1 != rhs.key1)
-    {
-      return lhs.key1 < rhs.key1;
-    }
-    if (lhs.key2 != rhs.key2)
-    {
-      return lhs.key2 < rhs.key2;
-    }
-    return lhs.key3.length() < rhs.key3.length();
+    return lhs.key1 < rhs.key1;
   }
-
-  std::istream& trukhanov::operator>>(std::istream& in, DataStruct& dest)
+  if (lhs.key2 != rhs.key2)
   {
-    DataStruct temp{};
-    bool hasKey1 = false;
-    bool hasKey2 = false;
-    bool hasKey3 = false;
+    return lhs.key2 < rhs.key2;
+  }
+  return lhs.key3.length() < rhs.key3.length();
+}
 
-    StreamGuard guard(in);
+std::istream& trukhanov::operator>>(std::istream& in, DataStruct& dest)
+{
+  DataStruct temp{};
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
 
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+  StreamGuard guard(in);
 
-    while (in)
+  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+
+  while (in)
+  {
+    if (in.peek() == ')')
     {
-      if (in.peek() == ')')
-      {
-        break;
-      }
-
-      std::string field;
-      in >> LabelIO{ "key" } >> field;
-
-      if (field == "1")
-      {
-        in >> OctalULLIO{ temp.key1 };
-        hasKey1 = true;
-      }
-      else if (field == "2")
-      {
-        in >> RationalIO{ temp.key2 };
-        hasKey2 = true;
-      }
-      else if (field == "3")
-      {
-        in >> StringIO{ temp.key3 };
-        hasKey3 = true;
-      }
-      else
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-
-      if (in.peek() == ':')
-      {
-        in >> DelimiterIO{ ':' };
-      }
-      else if (in.peek() == ')')
-      {
-        break;
-      }
-      else
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
+      break;
     }
 
-    in >> DelimiterIO{ ')' };
+    std::string field;
+    in >> LabelIO{ "key" } >> field;
 
-    if (hasKey1 && hasKey2 && hasKey3)
+    if (field == "1")
     {
-      dest = temp;
+      in >> OctalULLIO{ temp.key1 };
+      hasKey1 = true;
+    }
+    else if (field == "2")
+    {
+      in >> RationalIO{ temp.key2 };
+      hasKey2 = true;
+    }
+    else if (field == "3")
+    {
+      in >> StringIO{ temp.key3 };
+      hasKey3 = true;
     }
     else
     {
       in.setstate(std::ios::failbit);
+      return in;
     }
 
-    return in;
+    if (in.peek() == ':')
+    {
+      in >> DelimiterIO{ ':' };
+    }
+    else if (in.peek() == ')')
+    {
+      break;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
   }
 
-  std::ostream& trukhanov::operator<<(std::ostream& out, const DataStruct& src)
+  in >> DelimiterIO{ ')' };
+
+  if (hasKey1 && hasKey2 && hasKey3)
   {
-    StreamGuard guard(out);
-    out << "(:key1 0" << std::oct << src.key1 << std::dec;
-    out << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)";
-    out << ":key3 " << '"' << src.key3 << '"' << ":)";
-    return out;
+    dest = temp;
   }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
+}
+
+std::ostream& trukhanov::operator<<(std::ostream& out, const DataStruct& src)
+{
+  StreamGuard guard(out);
+  out << "(:key1 0" << std::oct << src.key1 << std::dec;
+  out << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)";
+  out << ":key3 " << '"' << src.key3 << '"' << ":)";
+  return out;
 }
