@@ -16,6 +16,7 @@ namespace alymova
   void maxAndMin(const MaxMinSubcommands& subs, std::istream& in,
     std::ostream& out,const std::vector< Polygon >& polygons);
   void count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
+  void inFrame(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
 
   CommandDataset complectCommands();
 }
