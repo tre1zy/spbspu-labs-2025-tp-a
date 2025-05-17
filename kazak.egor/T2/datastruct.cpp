@@ -1,7 +1,7 @@
 #include "datastruct.hpp"
 #include "stream_guard.hpp"
 
-bool operator<(const DataStruct& lhs, const DataStruct& rhs)
+bool kazak::operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
   if (lhs.key1 != rhs.key1)
   {
@@ -21,7 +21,7 @@ bool operator<(const DataStruct& lhs, const DataStruct& rhs)
   return lhs.key3 < rhs.key3;
 }
 
-std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream &kazak::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
 
@@ -41,7 +41,7 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, ULLHexIO&& dest)
+std::istream &kazak::operator>>(std::istream& in, ULLHexIO&& dest)
 {
   std::istream::sentry sentry(in);
 
@@ -74,7 +74,7 @@ std::istream& operator>>(std::istream& in, ULLHexIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, RationalIO&& dest)
+std::istream &kazak::operator>>(std::istream& in, RationalIO&& dest)
 {
   std::istream::sentry sentry(in);
 
@@ -99,7 +99,7 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, StringIO&& dest)
+std::istream &kazak::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry sentry(in);
 
@@ -111,7 +111,7 @@ std::istream& operator>>(std::istream& in, StringIO&& dest)
   return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
 
-std::istream& operator>>(std::istream& in, LabelIO&& dest)
+std::istream &kazak::operator>>(std::istream& in, LabelIO&& dest)
 {
   std::istream::sentry sentry(in);
 
@@ -130,7 +130,7 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, DataStruct& dest)
+std::istream &kazak::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
 
@@ -228,7 +228,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& src)
+std::ostream &kazak::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
 
