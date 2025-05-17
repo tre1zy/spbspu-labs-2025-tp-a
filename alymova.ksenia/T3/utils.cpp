@@ -4,7 +4,7 @@
 #include <exception>
 #include <string>
 #include <iomanip>
-#include "sub-commands.hpp"
+#include "sub-utils.hpp"
 
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
@@ -58,7 +58,7 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
 
   CountSubcommands subs{
     {"EVEN", isPolygonEven},
-    {"ODD", std::not_fn(isPolygonEven)}
+    {"ODD", std::not1(std::function< bool(const Polygon&) >(isPolygonEven))}
   };
   size_t res;
   std::string command;
