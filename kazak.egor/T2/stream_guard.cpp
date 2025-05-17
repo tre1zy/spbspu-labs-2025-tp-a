@@ -1,6 +1,6 @@
 #include "stream_guard.hpp"
 
-kazak::StreamGuard::StreamGuard(std::basic_ios< char >& s) :
+kazak::StreamGuard::StreamGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
   fill_(s.fill()),
