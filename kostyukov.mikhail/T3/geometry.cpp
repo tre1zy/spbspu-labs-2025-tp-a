@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <istream>
 #include <iterator>
+#include <numeric>
 #include <vector>
 
 #include "delimiter.hpp"
@@ -46,4 +47,24 @@ std::istream& kostyukov::operator>>(std::istream& in, Polygon& polygon)
     polygon.points = std::move(temp);
   }
   return in;
+}
+
+namespace
+{
+  struct AreaCalculator
+  {
+    kostyukov::Point point1;
+    double operator()(double area, const kostyukov::Point& point2)
+    {
+      area += (point1.x * point2.y) - (point1.y * point2.x);
+      point1 = point2;
+      return area;
+    }
+  };
+}
+double kostyukov::getArea(const Polygon& polygon)
+{
+  AreaCalculator areaCalc{ polygon.points.back() };
+  double area = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, std::ref(areaCalc));
+  return (std::abs(area) / 2.0);
 }

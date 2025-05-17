@@ -18,5 +18,6 @@ namespace kostyukov
 
   std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
+  double getArea(const Polygon&);
 }
 #endif
