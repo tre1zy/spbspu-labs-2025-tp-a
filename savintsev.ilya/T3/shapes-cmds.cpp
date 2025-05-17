@@ -6,9 +6,17 @@
 
 namespace
 {
+  double sum_with_area(double sum, const savintsev::Polygon & a)
+  {
+    return savintsev::calc_polygon_area(a) + sum;
+  }
   bool is_polygon_even(const savintsev::Polygon & a)
   {
     return !(a.points.size() % 2);
+  }
+  bool is_polygon_odd(const savintsev::Polygon & a)
+  {
+    return a.points.size() % 2;
   }
   struct CheckPolygonVert
   {
@@ -22,19 +30,40 @@ namespace
 
 void savintsev::area(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
 {
+  size_t num = 0;
+  in >> num;
+  if (in)
+  {
+    CheckPolygonVert is{num};
+    std::vector< Polygon > temp;
+    std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is);
+    out << std::accumulate(temp.begin(), temp.end(), 0, sum_with_area) << '\n';
+    return;
+  }
+  in.clear();
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "EVEN")
   {
-    data.size();
-    //double area = 0;
-    //std::accumulate(data.begin(), data.end(), area);
+    std::vector< Polygon > temp;
+    std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is_polygon_even);
+    out << std::accumulate(temp.begin(), temp.end(), 0, sum_with_area);
   }
   else if (subcommand == "ODD")
   {
-
+    std::vector< Polygon > temp;
+    std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is_polygon_odd);
+    out << std::accumulate(temp.begin(), temp.end(), 0, sum_with_area);
   }
-  out << "lox\n";
+  else if (subcommand == "MEAN")
+  {
+    out << std::accumulate(data.begin(), data.end(), 0, sum_with_area) / data.size();
+  }
+  else
+  {
+    throw std::runtime_error("area: invalid arg");
+  }
+  out << '\n';
 }
 
 void savintsev::count(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
@@ -56,7 +85,7 @@ void savintsev::count(std::istream & in, std::ostream & out, const std::vector< 
   }
   else if (subcommand == "ODD")
   {
-    out << data.size() - std::count_if(data.begin(), data.end(), is_polygon_even);
+    out << std::count_if(data.begin(), data.end(), is_polygon_odd);
   }
   else
   {
