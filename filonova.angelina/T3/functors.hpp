@@ -49,6 +49,6 @@ namespace filonova
     static double getDistanceSquared(const Point &a, const Point &b);
   };
 
-} // namespace filonova
+}
 
 #endif
