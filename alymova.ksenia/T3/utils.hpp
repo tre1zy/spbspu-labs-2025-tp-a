@@ -27,6 +27,7 @@ namespace alymova
   double count(std::istream& in, const std::vector< Polygon >& polygons);
 
   bool isDigit(char c);
+  size_t getVertexes(std::string str);
 
   CommandDataset complectCommands();
 }

@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
   using namespace alymova;
   using CommandDataset = std::map< std::string, std::function< void(const std::vector< Polygon >&) > >;
-  
+
   if (argc != 2)
   {
     std::cerr << "<INVALID ARGUMENTS>\n";
