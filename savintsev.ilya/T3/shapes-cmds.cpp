@@ -1,8 +1,10 @@
 #include "shapes-cmds.h"
 #include <string>
 #include <algorithm>
+#include <iomanip>
 #include <numeric>
 #include <cmath>
+#include <scope-guard.hpp>
 
 namespace
 {
@@ -31,9 +33,16 @@ namespace
 void savintsev::area(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
 {
   size_t num = 0;
+  ScopeGuard guard(out);
+  out.precision(1);
+  out << std::fixed;
   in >> num;
   if (in)
   {
+    if (num <= 2)
+    {
+      throw std::runtime_error("area: invalid arg");
+    }
     CheckPolygonVert is{num};
     std::vector< Polygon > temp;
     std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is);
@@ -47,17 +56,17 @@ void savintsev::area(std::istream & in, std::ostream & out, const std::vector< P
   {
     std::vector< Polygon > temp;
     std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is_polygon_even);
-    out << std::accumulate(temp.begin(), temp.end(), 0, sum_with_area);
+    out << std::accumulate(temp.begin(), temp.end(), 0.0, sum_with_area);
   }
   else if (subcommand == "ODD")
   {
     std::vector< Polygon > temp;
     std::copy_if(data.begin(), data.end(), std::back_inserter(temp), is_polygon_odd);
-    out << std::accumulate(temp.begin(), temp.end(), 0, sum_with_area);
+    out << std::accumulate(temp.begin(), temp.end(), 0.0, sum_with_area);
   }
   else if (subcommand == "MEAN")
   {
-    out << std::accumulate(data.begin(), data.end(), 0, sum_with_area) / data.size();
+    out << std::accumulate(data.begin(), data.end(), 0.0, sum_with_area) / data.size();
   }
   else
   {
@@ -72,6 +81,10 @@ void savintsev::count(std::istream & in, std::ostream & out, const std::vector< 
   in >> num;
   if (in)
   {
+    if (num <= 2)
+    {
+      throw std::runtime_error("area: invalid arg");
+    }
     CheckPolygonVert is{num};
     out << std::count_if(data.begin(), data.end(), is) << '\n';
     return;

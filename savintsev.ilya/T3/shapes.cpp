@@ -48,6 +48,11 @@ std::istream & savintsev::operator>>(std::istream & in, Polygon & dest)
   {
     return in;
   }
+  if (n <= 2)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
 
   Polygon data;
 
