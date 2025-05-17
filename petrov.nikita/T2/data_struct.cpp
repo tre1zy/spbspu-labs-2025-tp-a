@@ -122,30 +122,35 @@ std::istream & petrov::operator>>(std::istream & in, DataStruct & data)
     using dbl = DoubleIO;
     using lli = LongLongIO;
     using str = StringIO;
-    bool used_keys[3] = { false, false, false };
     in >> sep{ '(' };
     in >> sep{ ':' };
+    bool used_keys[3] = { false, false, false };
+    char key = '0';
     for (size_t i = 0; i < 3; i++)
     {
-      if (in >> lbl{ "key" })
+      if (in >> lbl{ "key" } && in >> key)
       {
-        if (!used_keys[0] && in >> sep{ '1' })
+        if (!used_keys[0] && key == '1')
         {
           used_keys[0] = true;
           in >> dbl{ input.key1 };
           in >> sep{ ':' };
         }
-        else if (!used_keys[1] && in >> sep{ '2' })
+        else if (!used_keys[1] && key == '2')
         {
           used_keys[1] = true;
           in >> lli{ input.key2 };
           in >> sep{ ':' };
         }
-        else if (!used_keys[2] && in >> sep{ '3' })
+        else if (!used_keys[2] && key == '3')
         {
           used_keys[2] = true;
           in >> str{ input.key3 };
           in >> sep{ ':' };
+        }
+        else
+        {
+          in.setstate(std::ios_base::failbit);
         }
       }
     }
