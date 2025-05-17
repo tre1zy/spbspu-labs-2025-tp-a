@@ -10,7 +10,8 @@
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   using namespace std::placeholders;
-  AreaSubcommandDataset subs{
+
+  AreaSubcommands subs{
     {"EVEN", areaEven},
     {"ODD", areaOdd},
     {"MEAN", std::bind(areaMean, _1, _2, polygons.size())}
@@ -28,11 +29,7 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   }
   catch (...)
   {
-    if (std::count_if(command.begin(), command.end(), isDigit) != command.size())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    size_t vertexes = std::stoull(command);
+    size_t vertexes = getVertexes(command);
     res = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
   }
   out << std::fixed << std::setprecision(1) << res;
@@ -89,7 +86,7 @@ double alymova::areaPolygon(const Polygon& polygon)
   return std::abs(res) / 2.0;
 }
 
-void alymova::maxAndMin(const MaxMinSubcommandDataset& subs, std::istream& in,
+void alymova::maxAndMin(const MaxMinSubcommands& subs, std::istream& in,
   std::ostream& out, const std::vector< Polygon >& polygons)
 {
   if (polygons.empty())
@@ -127,28 +124,68 @@ size_t alymova::compareMinVertexes(size_t value, const Polygon& polygon)
   return std::min(value, polygon.points.size());
 }
 
+void alymova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  using namespace std::placeholders;
+
+  CountSubcommands subs{
+    {"EVEN", isPolygonEven},
+    {"ODD", std::not_fn(isPolygonEven)}
+  };
+  size_t res;
+  std::string command;
+  in >> command;
+  try
+  {
+    out << std::count_if(polygons.begin(), polygons.end(), subs.at(command));
+  }
+  catch(const std::exception& e)
+  {
+    size_t vertexes = getVertexes(command);
+    out << std::count_if(polygons.begin(), polygons.end(), std::bind(isEqualSize, vertexes, _1));
+  }
+}
+
 bool alymova::isDigit(char c)
 {
   return std::isdigit(c);
 }
 
+bool alymova::isEqualSize(size_t size, const Polygon& polygon)
+{
+  return size == polygon.points.size();
+}
+
+size_t alymova::getVertexes(std::string str)
+{
+  if (!std::all_of(str.begin(), str.end(), isDigit))
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  return std::stoull(str);
+}
+
 alymova::CommandDataset alymova::complectCommands()
 {
   using namespace std::placeholders;
+
   return
   {
     {"AREA", std::bind(area, std::ref(std::cin), std::ref(std::cout), _1)},
-    {"MAX", std::bind(maxAndMin,
-      MaxMinSubcommandDataset{{"AREA", compareMaxArea}, {"VERTEXES", compareMaxVertexes}},
+    {"MAX", std::bind(
+      maxAndMin,
+      MaxMinSubcommands{{"AREA", compareMaxArea}, {"VERTEXES", compareMaxVertexes}},
       std::ref(std::cin),
       std::ref(std::cout),
       _1)
     },
-    {"MIN", std::bind(maxAndMin,
-      MaxMinSubcommandDataset{{"AREA", compareMinArea}, {"VERTEXES", compareMinVertexes}},
+    {"MIN", std::bind(
+      maxAndMin,
+      MaxMinSubcommands{{"AREA", compareMinArea}, {"VERTEXES", compareMinVertexes}},
       std::ref(std::cin),
       std::ref(std::cout),
       _1)
-    }
+    },
+    {"COUNT", std::bind(count, std::ref(std::cin), std::ref(std::cout), _1)}
   };
 }

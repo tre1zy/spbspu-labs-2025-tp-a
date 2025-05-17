@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     std::copy(
       std::istream_iterator< Polygon >(file),
       std::istream_iterator< Polygon >(),
-      std::back_insert_iterator(polygons)
+      std::back_inserter(polygons)
     );
   }
 
