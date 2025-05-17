@@ -40,7 +40,8 @@ int main(int argc, char * argv[])
   }
 
   std::map< std::string, std::function< void() > > cmds;
-  cmds["AREA"] = std::bind(savintsev::area, std::ref(std::cin), std::cref(data));
+  cmds["AREA"] = std::bind(savintsev::area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["COUNT"] = std::bind(savintsev::count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["PRINT"] = std::bind(savintsev::print, std::ref(std::cout), std::cref(data));
 
   for (std::string command; std::cin >> command;)
