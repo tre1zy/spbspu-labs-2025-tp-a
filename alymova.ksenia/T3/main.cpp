@@ -53,6 +53,7 @@ int main(int argc, char** argv)
     }
     catch(const std::exception& e)
     {
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << e.what() << '\n';
     }
   }

@@ -18,7 +18,7 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   double res;
   std::string command;
   in >> command;
-  if (command != "EVEN" && command != "ODD" && polygons.empty())
+  if (command == "MEAN" && polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -39,10 +39,11 @@ void alymova::maxAndMin(const MaxMinSubcommands& subs, std::istream& in,
 {
   if (polygons.empty())
   {
-    throw std::logic_error("<INVALID ERRROR>");
+    throw std::logic_error("<INVALID COMMAND>");
   }
   std::string command;
   in >> command;
+  std::cout << command << '\n';
   if (command == "AREA")
   {
     double res = std::accumulate(polygons.begin(), polygons.end(), areaPolygon(polygons[0]), subs.at(command));
@@ -56,6 +57,10 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
 {
   using namespace std::placeholders;
 
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   CountSubcommands subs{
     {"EVEN", isPolygonEven},
     {"ODD", std::not1(std::function< bool(const Polygon&) >(isPolygonEven))}
