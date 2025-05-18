@@ -11,12 +11,14 @@ namespace kostyukov
     int y;
   };
 
+  std::istream& operator>>(std::istream&, Point&);
+  bool operator==(const Point&, const Point&);
+
   struct Polygon
   {
     std::vector< Point > points;
   };
 
-  std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
   double getArea(const Polygon&);
 }

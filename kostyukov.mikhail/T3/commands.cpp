@@ -1,6 +1,7 @@
 #include "commands.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <iomanip>
 #include <iterator>
 #include <numeric>
@@ -21,6 +22,11 @@ namespace
   bool isOdd(const kostyukov::Polygon& polygon)
   {
     return !isEven(polygon);
+  }
+
+  bool isPermutation(const kostyukov::Polygon& polygon1, const kostyukov::Polygon& polygon2)
+  {
+    return std::is_permutation(polygon1.points.cbegin(), polygon1.points.cend(), polygon2.points.cbegin());
   }
 
   bool forAll(const kostyukov::Polygon&)
@@ -245,4 +251,18 @@ void kostyukov::count(std::istream& in, std::ostream& out, const std::vector< Po
   }
   ScopeGuard scopeGrd(out);
   out << std::fixed << std::setprecision(1) << result;
+}
+
+void kostyukov::permsCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (polygon.points.size() < 3)
+  {
+    throw std::invalid_argument("polygon must have 3 or more vertexes");
+  }
+  {
+    using namespace std::placeholders;
+    out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(isPermutation, _1, polygon));
+  }
 }

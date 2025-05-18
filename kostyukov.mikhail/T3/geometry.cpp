@@ -27,6 +27,11 @@ std::istream& kostyukov::operator>>(std::istream& in, Point& point)
   return in;
 }
 
+bool kostyukov::operator==(const Point& point1, const Point& point2)
+{
+  return (point1.x == point2.x && point1.y == point2.y) || (point1.x == point2.y && point1.y == point2.x);
+}
+
 std::istream& kostyukov::operator>>(std::istream& in, Polygon& polygon)
 {
   std::istream::sentry sentry(in);
