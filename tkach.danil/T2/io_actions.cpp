@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <iomanip>
+#include <common_io_actions.hpp>
 #include "data_struct.hpp"
 #include "streamguard.hpp"
 
@@ -58,22 +59,6 @@ namespace
     }
     return in;
   }
-}
-
-std::istream& tkach::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char c = '0';
-  in >> c;
-  if (in && (c != dest.exp))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
 }
 
 std::istream& tkach::operator>>(std::istream& in, DoubleIO&& dest)
