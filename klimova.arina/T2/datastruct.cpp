@@ -90,6 +90,8 @@ std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
     }
     for (int i = 0; i < 3; i++)
     {
+      std::string label;
+      in >> lbl{ label };
       if (label == "key1")
       {
         in >> dbl{ input.key1 };
@@ -107,8 +109,9 @@ std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
         in.setstate(std::ios::failbit);
         break;
       }
-      in >> DelimiterIO{ ':' };
+      in >> sep{ ':' };
     }
+    in >> sep{ ')' };
   }
   if (in)
   {
