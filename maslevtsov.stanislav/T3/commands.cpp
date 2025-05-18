@@ -51,7 +51,7 @@ namespace {
 
   bool compare_vertex_num_less(const maslevtsov::Polygon& lhs, const maslevtsov::Polygon& rhs)
   {
-    return lhs.points.size() < lhs.points.size();
+    return lhs.points.size() < rhs.points.size();
   }
 }
 
@@ -119,12 +119,8 @@ void maslevtsov::get_min(const std::vector< Polygon >& polygons, std::istream& i
 
 void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  std::size_t temp = 0;
-  temp = polygons.empty();
-  ++temp;
   std::string subcommand;
   in >> subcommand;
-  out << "COUNT " << subcommand << '\n';
 }
 
 void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
