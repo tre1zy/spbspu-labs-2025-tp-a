@@ -40,10 +40,10 @@ namespace
   template< typename Parameter >
   double sumAreasIf(const std::vector< kostyukov::Polygon >& polygons, Parameter param)
   {
-    std::vector< kostyukov::Polygon > suitablePolygon;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(suitablePolygon), param);
+    std::vector< kostyukov::Polygon > suitablePolygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(suitablePolygons), param);
     std::vector< double > areas;
-    std::transform(suitablePolygon.begin(), suitablePolygon.end(), std::back_inserter(areas), kostyukov::getArea);
+    std::transform(suitablePolygons.begin(), suitablePolygons.end(), std::back_inserter(areas), kostyukov::getArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
@@ -69,6 +69,29 @@ namespace
       throw std::invalid_argument("no polygons for mean area");
     }
     return sumAreasIf(polygons, forAll) / polygons.size();
+  }
+
+  template < typename Parameter >
+  size_t countPolygonsIf(const std::vector< kostyukov::Polygon >& polygons, Parameter param)
+  {
+    std::vector< kostyukov::Polygon > suitablePolygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(suitablePolygons), param);
+    return suitablePolygons.size();
+  }
+
+  size_t countForEven(const std::vector< kostyukov::Polygon >& polygons)
+  {
+    return countPolygonsIf(polygons, isEven);
+  }
+
+  size_t countForOdd(const std::vector< kostyukov::Polygon >& polygons)
+  {
+    return countPolygonsIf(polygons, isOdd);
+  }
+
+  size_t countForNum(const std::vector< kostyukov::Polygon >& polygons, size_t countVertexes)
+  {
+    return countPolygonsIf(polygons, VertexExpected{ countVertexes });
   }
 
   bool areaComparator(const kostyukov::Polygon& polygon1, const kostyukov::Polygon& polygon2)
@@ -101,7 +124,7 @@ namespace
 
   size_t minForVertexes(const std::vector< kostyukov::Polygon >& polygons)
   {
-    kostyukov::Polygon min = (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator));
+    kostyukov::Polygon min = (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator));
     return min.points.size();
   }
 }
@@ -188,4 +211,38 @@ void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     throw std::invalid_argument("invalid subcommand");
   }
+}
+
+void kostyukov::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::string subcommand;
+  in >> subcommand;
+  size_t result = 0;
+  if (subcommand == "EVEN")
+  {
+    result = countForEven(polygons);
+  }
+  else if (subcommand == "ODD")
+  {
+    result = countForOdd(polygons);
+  }
+  else
+  {
+    size_t countVertexes = 0;
+    try
+    {
+      countVertexes = std::stoull(subcommand);
+    }
+    catch (const std::invalid_argument&)
+    {
+      throw std::invalid_argument("invalid subcommand or number format");
+    }
+    if (countVertexes < 3)
+    {
+      throw std::invalid_argument("polygon must have 3 or more vertexes");
+    }
+    result = countForNum(polygons, countVertexes);
+  }
+  ScopeGuard scopeGrd(out);
+  out << std::fixed << std::setprecision(1) << result;
 }

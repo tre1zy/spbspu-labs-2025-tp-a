@@ -62,6 +62,7 @@ namespace
     }
   };
 }
+
 double kostyukov::getArea(const Polygon& polygon)
 {
   AreaCalculator areaCalc{ polygon.points.back() };
