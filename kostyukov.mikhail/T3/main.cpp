@@ -37,6 +37,7 @@ int main(int argc, char** argv)
   commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["PERMS"] = std::bind(permsCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["RIGHTSHAPES"] = std::bind(rightShapesCount, std::ref(std::cout), std::cref(polygons));
   std::string command;
   while (!(std::cin >> command).eof())
   {
