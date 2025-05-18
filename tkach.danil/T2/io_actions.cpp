@@ -4,8 +4,8 @@
 #include <cmath>
 #include <iomanip>
 #include <common_io_actions.hpp>
+#include <streamguard.hpp>
 #include "data_struct.hpp"
-#include "streamguard.hpp"
 
 namespace
 {

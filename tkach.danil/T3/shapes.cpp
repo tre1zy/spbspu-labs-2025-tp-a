@@ -10,7 +10,8 @@ std::istream& tkach::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  in >> DelimiterIO{'('} >> point.x >> DelimiterIO{';'} >> point.y >> DelimiterIO{'('};
+  in >> DelimiterIO{'('} >> point.x >> DelimiterIO{';'} >> point.y >> DelimiterIO{')'};
+  return in;
 }
 
 std::istream& tkach::operator>>(std::istream& in, Polygon& polygon)
@@ -27,7 +28,7 @@ std::istream& tkach::operator>>(std::istream& in, Polygon& polygon)
     return in;
   }
   std::vector< Point > temp(count);
-  std::copy_n(std::istream_iterator< Point >(in), count, temp);
+  std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
   if (!in)
   {
     in.setstate(std::ios::failbit);

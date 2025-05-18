@@ -7,18 +7,13 @@
 #include <string>
 #include <map>
 #include "shapes.hpp"
+#include "commands.hpp"
 
-int main(const int argc, const char* const * const argv)
+int main()
 {
   using namespace tkach;
   using istreamIT = std::istream_iterator< Polygon >;
-  using ostreamIT = std::ostream_iterator< Polygon >;
-  if (argc != 2)
-  {
-    std::cerr << "Error: incorrect input\n";
-    return 1;
-  }
-  std::fstream in(argv[1]);
+  std::fstream in("/home/danil/spbspu-labs-2025-tp-a/tkach.danil/T3/input.txt");
   if (!in.is_open())
   {
     std::cerr << "File is not open\n";
@@ -35,6 +30,7 @@ int main(const int argc, const char* const * const argv)
     }
   }
   std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(printArea, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   std::string command;
   while (!(std::cin >> command).eof()) {
     try
