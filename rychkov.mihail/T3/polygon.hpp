@@ -2,6 +2,7 @@
 #define POLYGON_HPP
 
 #include <vector>
+#include <iosfwd>
 
 namespace rychkov
 {
@@ -13,6 +14,8 @@ namespace rychkov
   {
     std::vector< Point > vertexes;
   };
+  std::istream& operator>>(std::istream& in, Point& point);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
 }
 
 #endif

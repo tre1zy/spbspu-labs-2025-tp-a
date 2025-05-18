@@ -55,6 +55,11 @@ namespace rychkov
   {
     double operator()(const Polygon& polygon);
   };
+  struct area_accumulator
+  {
+    Point prev;
+    double operator()(const Point& polygon);
+  };
 }
 
 #endif

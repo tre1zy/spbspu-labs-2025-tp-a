@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <iterator>
+#include <algorithm>
+#include <limits>
 
 bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
 {
@@ -15,6 +18,13 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
   {
     context.err << "failed to open file \"" << argv[1] << "\"\n";
   }
+  while (file)
+  {
+    using Iter = std::istream_iterator< Polygon >;
+    std::copy(Iter{file}, Iter{}, std::back_inserter(polygons_));
+    file.clear(file.rdstate() & ~std::ios::failbit);
+    file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
   return true;
 }
 
@@ -23,15 +33,15 @@ size_t rychkov::parse_as_count(ParserContext& context)
   std::istream::sentry sentry{context.in};
   if (!sentry)
   {
-    return -1;
+    return ~0ULL;
   }
-  size_t result = -1;
+  size_t result = ~0ULL;
   if ((context.in.peek() != '-') && (context.in >> result))
   {
     return result;
   }
   context.in.clear(context.in.rdstate() & ~std::ios::failbit);
-  return -1;
+  return ~0ULL;
 }
 bool rychkov::MainProcessor::area(ParserContext& context)
 {

@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 #include <map>
 #include "parser.hpp"
 #include "processors.hpp"

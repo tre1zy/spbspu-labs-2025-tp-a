@@ -41,7 +41,7 @@ namespace rychkov
       processor(std::forward< P >(proc)),
       context(parse_context),
       call_map_(std::forward< M >(call_map)),
-      has_own_parser_(false),
+      has_own_parser_(true),
       extern_parser_(own_parser)
     {}
 
