@@ -1,6 +1,9 @@
 #include "data_input.hpp"
 #include "stream_guard.hpp"
 
+using Del = trukhanov::DelimiterIO;
+using Lbl = trukhanov::LabelIO;
+
 std::istream& trukhanov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
@@ -60,22 +63,15 @@ std::istream& trukhanov::operator>>(std::istream& in, RationalIO&& dest)
     return in;
   }
 
-  long long numerator = 0;
-  unsigned long long denominator = 0;
+  long long num = 0;
+  unsigned long long den = 0;
 
-  in >> DelimiterIO{ '(' }
-      >> DelimiterIO{ ':' }
-      >> LabelIO{ "N" }
-      >> numerator
-      >> DelimiterIO{ ':' }
-      >> LabelIO{ "D" }
-      >> denominator
-      >> DelimiterIO{ ':' }
-      >> DelimiterIO{ ')' };
+  in >> Del{ '(' } >> Del{ ':' } >> Lbl{ "N" } >> num >> Del{ ':' }
+     >> Lbl{ "D" } >> den >> Del{ ':' } >> Del{ ')' };
 
-  if (in && denominator != 0)
+  if (in && den != 0)
   {
-    dest.ref = { numerator, denominator };
+    dest.ref = { num, den };
   }
   else
   {
@@ -95,4 +91,3 @@ std::istream& trukhanov::operator>>(std::istream& in, StringIO&& dest)
 
   return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
-
