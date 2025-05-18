@@ -46,13 +46,10 @@ namespace
       const kostyukov::Point& previous = polygon.points[(i + countVertexes - 1) % countVertexes];
       const kostyukov::Point& current = polygon.points[i];
       const kostyukov::Point& next = polygon.points[(i + 1) % countVertexes];
-
       double vector1_x = current.x - previous.x;
       double vector1_y = current.y - previous.y;
-      
       double vector2_x = next.x - current.x;
       double vector2_y = next.y - current.y;
-
       double scalarProduct = vector1_x * vector2_x + vector1_y * vector2_y;
       if (scalarProduct == 0)
       {
