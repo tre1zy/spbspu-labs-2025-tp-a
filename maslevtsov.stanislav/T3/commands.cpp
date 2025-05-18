@@ -119,8 +119,12 @@ void maslevtsov::get_min(const std::vector< Polygon >& polygons, std::istream& i
 
 void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
+  std::size_t temp = 0;
+  temp = polygons.empty();
+  ++temp;
   std::string subcommand;
   in >> subcommand;
+  out << "COUNT " << subcommand << '\n';
 }
 
 void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
