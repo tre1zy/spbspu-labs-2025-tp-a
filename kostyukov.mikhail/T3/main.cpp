@@ -46,14 +46,14 @@ int main(int argc, char** argv)
       commands.at(command)();
       std::cout << '\n';
     }
-    catch (const std::exception& error)
+    catch (const std::exception&)
     {
       if (std::cin.fail())
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << error.what() << '\n';
+      std::cerr << "<INVALID COMMAND>\n";
     }
   }
   return 0;
