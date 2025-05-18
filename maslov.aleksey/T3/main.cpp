@@ -37,7 +37,8 @@ int main(int argc, char * argv[])
   cmds["AREA"] = std::bind(maslov::getArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MAX"] = std::bind(maslov::getMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MIN"] = std::bind(maslov::getMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["ECHO"] = std::bind(maslov::getEcho, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COUNT"] = std::bind(maslov::getCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["ECHO"] = std::bind(maslov::getEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
   cmds["RECTS"] = std::bind(maslov::getRects, std::ref(std::cout), std::cref(polygons));
 
   std::string command;
