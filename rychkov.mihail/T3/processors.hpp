@@ -51,6 +51,10 @@ namespace rychkov
     bool count(ParserContext& context);
   };
   size_t parse_as_count(ParserContext& context);
+  struct get_area
+  {
+    double operator()(const Polygon& polygon);
+  };
 }
 
 #endif

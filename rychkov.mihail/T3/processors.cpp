@@ -1,7 +1,7 @@
 #include "processors.hpp"
 
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <fstream>
 
 bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
 {
@@ -82,3 +82,4 @@ bool rychkov::MainProcessor::count(ParserContext& context)
   parser.run();
   return true;
 }
+
