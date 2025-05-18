@@ -1,9 +1,13 @@
 #ifndef SUB_COMMANDS_HPP
 #define SUB_COMMANDS_HPP
 #include "shapes.hpp"
+#include <functional>
 
 namespace alymova
 {
+  using namespace std::placeholders;
+  using Predicate = std::function< int(int, const Point& point) >;
+
   double areaEven(double value, const Polygon& polygon);
   double areaOdd(double value, const Polygon& polygon);
   double areaMean(double value, const Polygon& polygon, size_t size);
@@ -21,9 +25,11 @@ namespace alymova
 
   double multPoints(const Point& point1, const Point& point2);
   bool isPolygonEven(const Polygon& polygon);
-  int compareMaxPointX(int value, const Point& point);
-  int compareMaxPointY(int value, const Point& point);
-  int compareMinPointX(int value, const Point& point);
-  int compareMinPointY(int value, const Point& point);
+  int compareMaxXPoint(int value, const Point& point);
+  int compareMaxYPoint(int value, const Point& point);
+  int compareMinXPoint(int value, const Point& point);
+  int compareMinYPoint(int value, const Point& point);
+  int findMaxMinXYPolygon(int start, const Polygon& polygon, Predicate pred);
+  int findMaxMinXYVector(int start, const std::vector< Polygon >& polygons, Predicate pred);
 }
 #endif

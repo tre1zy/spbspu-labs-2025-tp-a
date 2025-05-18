@@ -54,8 +54,12 @@ int main(int argc, char** argv)
     }
     catch(const std::exception& e)
     {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << e.what() << '\n';
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 }

@@ -73,14 +73,36 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
   }
 }
 
-/*void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  int maxX = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].x, compareMaxPointX);
-  int maxY = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].y, compareMaxPointY);
-  int minX = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].x, compareMinPointX);
-  int minY = std::accumulate(polygons.begin(), polygons.end(), polygons[0].points[0].y, compareMinPointY);
+  using namespace std::placeholders;
 
-}*/
+  Polygon framed;
+  in >> framed;
+  if (in.fail() && polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  int start_frame_x = framed.points[0].x;
+  int start_frame_y = framed.points[0].y;
+  int max_framed_x = findMaxMinXYPolygon(start_frame_x, framed, compareMaxXPoint);
+  int max_framed_y = findMaxMinXYPolygon(start_frame_y, framed, compareMaxYPoint);
+  int min_framed_x = findMaxMinXYPolygon(start_frame_x, framed, compareMinXPoint);
+  int min_framed_y = findMaxMinXYPolygon(start_frame_y, framed, compareMinYPoint);
+
+  int start_x = polygons[0].points[0].x;
+  int start_y = polygons[0].points[0].y;
+  int max_x = findMaxMinXYVector(start_x, polygons, compareMaxXPoint);
+  int max_y = findMaxMinXYVector(start_y, polygons, compareMaxYPoint);
+  int min_x = findMaxMinXYVector(start_x, polygons, compareMinXPoint);
+  int min_y = findMaxMinXYVector(start_y, polygons, compareMinYPoint);
+  if (max_framed_x <= max_x && max_framed_y <= max_y && min_framed_x >= min_x && min_framed_y >= min_y)
+  {
+    out << "<TRUE>";
+    return;
+  }
+  out << "<FALSE>";
+}
 
 alymova::CommandDataset alymova::complectCommands()
 {
@@ -103,6 +125,7 @@ alymova::CommandDataset alymova::complectCommands()
       std::ref(std::cout),
       _1)
     },
-    {"COUNT", std::bind(count, std::ref(std::cin), std::ref(std::cout), _1)}
+    {"COUNT", std::bind(count, std::ref(std::cin), std::ref(std::cout), _1)},
+    {"INFRAME", std::bind(inFrame, std::ref(std::cin), std::ref(std::cout), _1)}
   };
 }

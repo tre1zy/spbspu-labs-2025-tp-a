@@ -108,23 +108,33 @@ bool alymova::isPolygonEven(const Polygon& polygon)
   return polygon.points.size() % 2 == 0;
 }
 
-int alymova::compareMaxPointX(int value, const Point& point)
+int alymova::compareMaxXPoint(int value, const Point& point)
 {
   return std::max(value, point.x);
 }
 
-int alymova::compareMaxPointY(int value, const Point& point)
+int alymova::compareMaxYPoint(int value, const Point& point)
 {
   return std::max(value, point.y);
 }
 
-int alymova::compareMinPointX(int value, const Point& point)
+int alymova::compareMinXPoint(int value, const Point& point)
 {
   return std::min(value, point.x);
 }
 
-int alymova::compareMinPointY(int value, const Point& point)
+int alymova::compareMinYPoint(int value, const Point& point)
 {
   return std::min(value, point.y);
 }
 
+int alymova::findMaxMinXYPolygon(int start, const Polygon& polygon, Predicate pred)
+{
+  return std::accumulate(polygon.points.begin(), polygon.points.end(), start, pred);
+}
+
+int alymova::findMaxMinXYVector(int start, const std::vector< Polygon >& polygons, Predicate pred)
+{
+  return std::accumulate(polygons.begin(), polygons.end(), start,
+    std::bind(findMaxMinXYPolygon, _1, _2, pred));
+}
