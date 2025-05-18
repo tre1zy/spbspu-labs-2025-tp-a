@@ -67,7 +67,7 @@ std::istream& trukhanov::operator>>(std::istream& in, RationalIO&& dest)
   unsigned long long den = 0;
 
   in >> Del{ '(' } >> Del{ ':' } >> Lbl{ "N" } >> num >> Del{ ':' }
-     >> Lbl{ "D" } >> den >> Del{ ':' } >> Del{ ')' };
+  in >> Lbl{ "D" } >> den >> Del{ ':' } >> Del{ ')' };
 
   if (in && den != 0)
   {
