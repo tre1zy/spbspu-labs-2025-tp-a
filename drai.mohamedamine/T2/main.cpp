@@ -1,26 +1,28 @@
-#include "data.hpp"
-
-#include <iterator>
-#include <vector>
 #include <algorithm>
-#include <limits>
 #include <iostream>
+#include <iterator>
+#include <limits>
+#include <vector>
 
 int main()
 {
-  using amine::DataStruct;
-  std::vector<DataStruct> data;
-  while (!std::cin.eof())
-  {
-    std::copy(std::istream_iterator<DataStruct>(std::cin), std::istream_iterator<DataStruct>(),
-              std::back_inserter(data));
-    if (std::cin.fail())
+    using DataVector = std::vector<amine::DataStruct>;
+    constexpr auto max_ignore = std::numeric_limits<std::streamsize>::max();
+    
+    DataVector data;
+    while (!std::cin.eof())
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::copy(std::istream_iterator<amine::DataStruct>(std::cin),
+                 std::istream_iterator<amine::DataStruct>(),
+                 std::back_inserter(data));
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cin.ignore(max_ignore, '\n');
+        }
     }
-  }
-  std::sort(data.begin(), data.end());
-  std::copy(std::begin(data), std::end(data), std::ostream_iterator<DataStruct>(std::cout, "\n"));
-  return 0;
+    std::sort(data.begin(), data.end());
+    std::copy(data.begin(), data.end(),
+             std::ostream_iterator<amine::DataStruct>(std::cout, "\n"));
+    return 0;
 }
