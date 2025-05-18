@@ -36,14 +36,32 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
   {
     return in;
   }
-  polygon.points.clear();
   size_t cnt_points;
   in >> cnt_points;
-  std::copy_n(
-    std::istream_iterator< Point >(in),
-    cnt_points,
-    std::back_inserter(polygon.points)
-  );
+  if (cnt_points < 3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  polygon.points.clear();
+  in >> std::noskipws;
+  for (size_t i = 0; i < cnt_points; i++)
+  {
+    if (in.peek() == '\n')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    Point point;
+    in >> DelimiterIO{' '} >> point;
+    polygon.points.push_back(point);
+    if (in.fail() || in.eof())
+    {
+      return in;
+    }
+  }
+  in >> DelimiterIO{'\n'};
+  in >> std::skipws;
   return in;
 }
 

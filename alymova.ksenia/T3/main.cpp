@@ -41,6 +41,7 @@ int main(int argc, char** argv)
       std::back_inserter(polygons)
     );
   }
+  //std::copy(polygons.begin(), polygons.end(), std::ostream_iterator< Polygon >(std::cout, "\n"));
 
   CommandDataset commands = complectCommands();
   std::string command;
