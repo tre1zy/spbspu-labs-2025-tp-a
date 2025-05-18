@@ -34,6 +34,33 @@ namespace
     return true;
   }
 
+  bool hasRightAngles(const kostyukov::Polygon& polygon)
+  {
+    size_t countVertexes = polygon.points.size();
+    if (countVertexes < 3)
+    {
+      return false;
+    }
+    for (size_t i = 0; i < countVertexes; ++i)
+    {
+      const kostyukov::Point& previous = polygon.points[(i + countVertexes - 1) % countVertexes];
+      const kostyukov::Point& current = polygon.points[i];
+      const kostyukov::Point& next = polygon.points[(i + 1) % countVertexes];
+
+      double vector1_x = current.x - previous.x;
+      double vector1_y = current.y - previous.y;
+      
+      double vector2_x = next.x - current.x;
+      double vector2_y = next.y - current.y;
+
+      double scalarProduct = vector1_x * vector2_x + vector1_y * vector2_y;
+      if (scalarProduct == 0)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
   struct VertexExpected
   {
     size_t count;
@@ -171,6 +198,7 @@ void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Pol
   }
   ScopeGuard scopeGrd(out);
   out << std::fixed << std::setprecision(1) << result;
+  return;
 }
 
 void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -194,6 +222,7 @@ void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     throw std::invalid_argument("invalid subcommand");
   }
+  return;
 }
 
 void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -217,6 +246,7 @@ void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     throw std::invalid_argument("invalid subcommand");
   }
+  return;
 }
 
 void kostyukov::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -251,6 +281,7 @@ void kostyukov::count(std::istream& in, std::ostream& out, const std::vector< Po
   }
   ScopeGuard scopeGrd(out);
   out << std::fixed << std::setprecision(1) << result;
+  return;
 }
 
 void kostyukov::permsCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -265,4 +296,11 @@ void kostyukov::permsCount(std::istream& in, std::ostream& out, const std::vecto
     using namespace std::placeholders;
     out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(isPermutation, _1, polygon));
   }
+  return;
+}
+
+void kostyukov::rightShapesCount(std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  out << std::count_if(polygons.cbegin(), polygons.cend(), hasRightAngles);
+  return;
 }

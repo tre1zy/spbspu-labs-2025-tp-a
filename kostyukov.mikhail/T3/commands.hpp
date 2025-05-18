@@ -7,11 +7,11 @@
 
 namespace kostyukov
 {
-  void area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
-  void max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygon);
-  void min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygon);
-  void count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygon);
-  void permsCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygon);
-  void rightShapesCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygon);
+  void area(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void max(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void min(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void count(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void permsCount(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void rightShapesCount(std::ostream&, const std::vector< Polygon >&);
 }
 #endif
