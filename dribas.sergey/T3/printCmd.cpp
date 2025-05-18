@@ -209,7 +209,8 @@ namespace dribas
   void printLessArea(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
   {
     Poligon temp;
-    if (!(in >> temp)) {
+    in >> temp;
+    if (!in || in.peek() != '\n') {
       throw std::invalid_argument("Invalid argument for less are poligon");
     }
     printCountPredicate(plg, out, std::bind(areaCompare, std::placeholders::_1, temp));
