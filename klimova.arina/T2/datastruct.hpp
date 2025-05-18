@@ -1,18 +1,15 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
 
-#include <iostream>
-#include <iomanip>
 #include <string>
 #include <complex>
-#include <limits>
 
-namespace nspace
+namespace klimova
 {
   struct DataStruct
   {
     double key1;
-    std::complex<double> key2;
+    std::complex< double > key2;
     std::string key3;
   };
 
@@ -28,7 +25,7 @@ namespace nspace
 
   struct ComplexIO
   {
-    std::complex<double>& ref;
+    std::complex< double >& ref;
   };
 
   struct StringIO

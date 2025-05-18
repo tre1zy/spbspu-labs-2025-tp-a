@@ -8,27 +8,33 @@
 
 int main()
 {
-  using nspace::DataStruct;
+  using klimova::DataStruct;
+  using IteratorIn = std::istream_iterator< DataStruct >;
+  using IteratirOut = std::ostream_iterator< DataStruct >;
+  using Limits = std::numeric_limits<std::streamsize>;
+  auto& in = std::cin;
+  auto& out = std::cout;
+
   std::vector< DataStruct > data;
-  while (!std::cin.eof())
+  while (!in.eof())
   {
-    if (std::cin.fail())
+    if (in.fail())
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      in.clear();
+      in.ignore(Limits:::max(), '\n');
     }
     std::copy(
-      std::istream_iterator< DataStruct >(std::cin),
-      std::istream_iterator< DataStruct >(),
+      IteratorIn(in),
+      IteratorIn(),
       std::back_inserter(data)
     );
   }
-  std::sort(data.begin(), data.end(), nspace::compareData);
+  std::sort(data.begin(), data.end(), compareData);
   std::copy
   (
     data.begin(),
     data.end(),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
+    IteratorOut(out, "\n")
   );
 
 return 0;

@@ -88,7 +88,8 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
     {
       return in;
     }
-    while (true)
+    bool keepReading = true;
+    while (keepReading)
     {
       std::string label;
       if (!(in >> lbl{ label }))
@@ -109,7 +110,7 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
       }
       else if (label == ")")
       {
-        break;
+        keepReading = false;
       }
       else
       {
@@ -125,7 +126,7 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
   }
   if (in)
   {
-    dest = input;
+    dest = ctd::move(input);
   }
   return in;
 }
