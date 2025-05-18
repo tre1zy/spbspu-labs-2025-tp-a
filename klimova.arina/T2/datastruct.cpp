@@ -40,7 +40,7 @@ std::istream& klimova::operator>>(std::istream& in, ComplexIO&& dest)
   in >> real >> imag >> DelimiterIO{ ')' };
   if (in)
   {
-    dest.ref = std::complex<double>(real, imag);
+    dest.ref = std::complex< double >(real, imag);
   }
   return in;
 }
