@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "geometry.hpp"
-#include "../common/scopeGuard.hpp"
+#include "scopeGuard.hpp"
 
 namespace
 {
