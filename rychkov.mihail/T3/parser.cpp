@@ -13,3 +13,9 @@ bool rychkov::ParserContext::eol()
   }
   return true;
 }
+void rychkov::ParserContext::parse_error()
+{
+  out << "<INVALID COMMAND>\n";
+  in.clear(in.rdstate() & ~std::ios::failbit);
+  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+}

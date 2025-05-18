@@ -16,6 +16,7 @@ namespace rychkov
     std::ostream& err;
 
     bool eol();
+    void parse_error();
   };
   template< class Proc >
   class Parser
@@ -32,18 +33,30 @@ namespace rychkov
     Parser(ParserContext parse_context, P proc, M&& call_map):
       processor(std::forward< P >(proc)),
       context(parse_context),
-      call_map_(std::forward< M >(call_map))
+      call_map_(std::forward< M >(call_map)),
+      has_own_parser_(false)
+    {}
+    template< class P = parser_processor, class M = map_type >
+    Parser(ParserContext parse_context, P proc, M&& call_map, call_signature own_parser):
+      processor(std::forward< P >(proc)),
+      context(parse_context),
+      call_map_(std::forward< M >(call_map)),
+      has_own_parser_(false),
+      extern_parser_(own_parser)
     {}
 
     bool available() const noexcept
     {
-      return !call_map_.empty() && !context.in.eof() && !context.in.bad();
+      return !call_map_.empty() && context.in;
     }
     bool run()
     {
-      if (available() && context.in.fail())
+      if (has_own_parser_)
       {
-        context.in.clear();
+        if ((processor.*extern_parser_)(context))
+        {
+          return available();
+        }
       }
       std::string command;
       if (context.in >> command)
@@ -58,17 +71,14 @@ namespace rychkov
         }
         catch(...)
         {}
-        context.out << "<INVALID COMMAND>\n";
-        if (available())
-        {
-          context.in.clear();
-          context.in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-        }
+        context.parse_error();
       }
       return available();
     }
   private:
     const map_type call_map_;
+    bool has_own_parser_;
+    call_signature extern_parser_;
   };
 }
 
