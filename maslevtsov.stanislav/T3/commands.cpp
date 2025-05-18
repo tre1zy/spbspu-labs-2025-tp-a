@@ -89,6 +89,9 @@ void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& 
 
 void maslevtsov::get_max(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
+  if (polygons.empty()) {
+    throw std::invalid_argument("no polygons");
+  }
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA") {
@@ -104,6 +107,9 @@ void maslevtsov::get_max(const std::vector< Polygon >& polygons, std::istream& i
 
 void maslevtsov::get_min(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
+  if (polygons.empty()) {
+    throw std::invalid_argument("no polygons");
+  }
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA") {
