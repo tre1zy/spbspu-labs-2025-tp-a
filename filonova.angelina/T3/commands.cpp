@@ -53,7 +53,7 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
     area = std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  out << std::fixed << std::setprecision(1) << area << '\n';
+  out << std::fixed << std::setprecision(1) << area;
 }
 
 void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -72,7 +72,7 @@ void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polyg
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
 
     double maxArea = *std::max_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << maxArea << '\n';
+    out << std::fixed << std::setprecision(1) << maxArea;
   }
   else if (subcmd == "VERTEXES")
   {
@@ -80,7 +80,7 @@ void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polyg
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(vertexCounts), GetPolygonVertexCount{});
 
     size_t maxVertexes = *std::max_element(vertexCounts.begin(), vertexCounts.end());
-    out << maxVertexes << '\n';
+    out << maxVertexes;
   }
   else
   {
@@ -104,7 +104,7 @@ void filonova::min(std::istream &in, std::ostream &out, const std::vector< Polyg
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
 
     double minArea = *std::min_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << minArea << '\n';
+    out << std::fixed << std::setprecision(1) << minArea;
   }
   else if (subcmd == "VERTEXES")
   {
@@ -112,7 +112,7 @@ void filonova::min(std::istream &in, std::ostream &out, const std::vector< Polyg
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(vertexCounts), GetPolygonVertexCount{});
 
     size_t minVertexes = *std::min_element(vertexCounts.begin(), vertexCounts.end());
-    out << minVertexes << '\n';
+    out << minVertexes;
   }
   else
   {
@@ -146,7 +146,7 @@ void filonova::count(std::istream &in, std::ostream &out, const std::vector< Pol
     result = std::count_if(polygons.begin(), polygons.end(), HasVertexCount{vertexes});
   }
 
-  out << result << '\n';
+  out << result;
 }
 
 void filonova::intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -159,11 +159,11 @@ void filonova::intersections(std::istream &in, std::ostream &out, const std::vec
   }
 
   size_t count = std::count_if(polygons.begin(), polygons.end(), IntersectsWith{inputPolygon});
-  out << count << '\n';
+  out << count;
 }
 
 void filonova::rects(std::ostream &out, const std::vector< Polygon > &polygons)
 {
   size_t count = std::count_if(polygons.begin(), polygons.end(), filonova::IsRectangle{});
-  out << count << '\n';
+  out << count;
 }

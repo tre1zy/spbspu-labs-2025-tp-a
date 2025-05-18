@@ -12,14 +12,14 @@ int main(int argc, char *argv[])
 
   if (argc != 2)
   {
-    std::cerr << "Usage: " << argv[0] << " <polygons_file>\n";
+    std::cerr << "<INVALID>\n";
     return 1;
   }
 
   std::ifstream file(argv[1]);
   if (!file)
   {
-    std::cerr << "Error: Cannot open file " << argv[1] << '\n';
+    std::cerr << "<INVALID>\n";
     return 1;
   }
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>\n\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 
