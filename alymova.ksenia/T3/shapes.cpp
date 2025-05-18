@@ -64,9 +64,9 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
   {
     polygon = std::move(tested);
   }
-  //in >> std::noskipws;
-  //in >> DelimiterIO{'\n'};
-  //in >> std::skipws;
+  in >> std::noskipws;
+  in >> DelimiterIO{'\n'};
+  in >> std::skipws;
   return in;
 }
 
