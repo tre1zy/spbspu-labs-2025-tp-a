@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <string>
 
-shiryaeva::FormatGuard::FormatGuard(std::basic_ios< char >& s) :
+shiryaeva::FormatGuard::FormatGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
   precision_(s.precision()),

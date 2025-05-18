@@ -8,17 +8,17 @@
 int main()
 {
   using namespace shiryaeva;
-  std::vector<DataStruct> data;
+  std::vector< DataStruct > data;
 
   while (!std::cin.eof())
   {
-    using Iter = std::istream_iterator<DataStruct>;
-    std::copy(Iter(std::cin), Iter(), std::back_inserter(data));
+    using InIter = std::istream_iterator< DataStruct >;
+    std::copy(InIter(std::cin), InIter(), std::back_inserter(data));
 
     if (std::cin.fail())
     {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
@@ -29,11 +29,9 @@ int main()
   }
 
   std::sort(data.begin(), data.end());
-  std::copy(
-    data.begin(),
-    data.end(),
-    std::ostream_iterator<DataStruct>(std::cout, "\n")
-  );
+  using OutIter = std::ostream_iterator< DataStruct >;
+  OutIter out(std::cout, "\n");
+  std::copy(data.begin(), data.end(), out);
 
   return 0;
 }
