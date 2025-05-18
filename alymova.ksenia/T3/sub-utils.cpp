@@ -54,6 +54,11 @@ double alymova::areaPolygon(const Polygon& polygon)
   return std::abs(res) / 2.0;
 }
 
+double alymova::multPoints(const Point& point1, const Point& point2)
+{
+  return point1.x * point2.y - point1.y * point2.x;
+}
+
 double alymova::compareMaxArea(double value, const Polygon& polygon)
 {
   return std::max(value, areaPolygon(polygon));
@@ -67,45 +72,6 @@ size_t alymova::compareMaxVertexes(size_t value, const Polygon& polygon)
 double alymova::compareMinArea(double value, const Polygon& polygon)
 {
   return std::min(value, areaPolygon(polygon));
-}
-
-size_t alymova::compareMinVertexes(size_t value, const Polygon& polygon)
-{
-  return std::min(value, polygon.points.size());
-}
-
-bool alymova::isDigit(char c)
-{
-  return std::isdigit(c);
-}
-
-bool alymova::isEqualSize(size_t size, const Polygon& polygon)
-{
-  return size == polygon.points.size();
-}
-
-size_t alymova::getVertexes(std::string str)
-{
-  if (!std::all_of(str.begin(), str.end(), isDigit))
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  size_t vertexes = std::stoull(str);
-  if (vertexes < 3)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  return vertexes;
-}
-
-double alymova::multPoints(const Point& point1, const Point& point2)
-{
-  return point1.x * point2.y - point1.y * point2.x;
-}
-
-bool alymova::isPolygonEven(const Polygon& polygon)
-{
-  return polygon.points.size() % 2 == 0;
 }
 
 int alymova::compareMaxXPoint(int value, const Point& point)
@@ -137,4 +103,38 @@ int alymova::findMaxMinXYVector(int start, const std::vector< Polygon >& polygon
 {
   return std::accumulate(polygons.begin(), polygons.end(), start,
     std::bind(findMaxMinXYPolygon, _1, _2, pred));
+}
+
+size_t alymova::compareMinVertexes(size_t value, const Polygon& polygon)
+{
+  return std::min(value, polygon.points.size());
+}
+
+bool alymova::isDigit(char c)
+{
+  return std::isdigit(c);
+}
+
+bool alymova::isEqualSize(size_t size, const Polygon& polygon)
+{
+  return size == polygon.points.size();
+}
+
+bool alymova::isPolygonEven(const Polygon& polygon)
+{
+  return polygon.points.size() % 2 == 0;
+}
+
+size_t alymova::getVertexes(std::string str)
+{
+  if (!std::all_of(str.begin(), str.end(), isDigit))
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  size_t vertexes = std::stoull(str);
+  if (vertexes < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  return vertexes;
 }

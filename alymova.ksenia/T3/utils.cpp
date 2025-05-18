@@ -8,9 +8,7 @@
 
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  using namespace std::placeholders;
-
-  AreaSubcommands subs{
+  AreaMaxMinSubcommands subs{
     {"EVEN", areaEven},
     {"ODD", areaOdd},
     {"MEAN", std::bind(areaMean, _1, _2, polygons.size())}
@@ -34,7 +32,7 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   out << std::fixed << std::setprecision(1) << res;
 }
 
-void alymova::maxAndMin(const MaxMinSubcommands& subs, std::istream& in,
+void alymova::maxAndMin(const AreaMaxMinSubcommands& subs, std::istream& in,
   std::ostream& out, const std::vector< Polygon >& polygons)
 {
   if (polygons.empty())
@@ -54,8 +52,6 @@ void alymova::maxAndMin(const MaxMinSubcommands& subs, std::istream& in,
 
 void alymova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  using namespace std::placeholders;
-
   CountSubcommands subs{
     {"EVEN", isPolygonEven},
     {"ODD", std::not1(std::function< bool(const Polygon&) >(isPolygonEven))}
@@ -75,11 +71,9 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
 
 void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  using namespace std::placeholders;
-
   Polygon framed;
   in >> framed;
-  if (in.fail() && polygons.empty())
+  if (in.fail() || polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -96,6 +90,7 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
   int max_y = findMaxMinXYVector(start_y, polygons, compareMaxYPoint);
   int min_x = findMaxMinXYVector(start_x, polygons, compareMinXPoint);
   int min_y = findMaxMinXYVector(start_y, polygons, compareMinYPoint);
+
   if (max_framed_x <= max_x && max_framed_y <= max_y && min_framed_x >= min_x && min_framed_y >= min_y)
   {
     out << "<TRUE>";
@@ -106,21 +101,19 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
 
 alymova::CommandDataset alymova::complectCommands()
 {
-  using namespace std::placeholders;
-
   return
   {
     {"AREA", std::bind(area, std::ref(std::cin), std::ref(std::cout), _1)},
     {"MAX", std::bind(
       maxAndMin,
-      MaxMinSubcommands{{"AREA", compareMaxArea}, {"VERTEXES", compareMaxVertexes}},
+      AreaMaxMinSubcommands{{"AREA", compareMaxArea}, {"VERTEXES", compareMaxVertexes}},
       std::ref(std::cin),
       std::ref(std::cout),
       _1)
     },
     {"MIN", std::bind(
       maxAndMin,
-      MaxMinSubcommands{{"AREA", compareMinArea}, {"VERTEXES", compareMinVertexes}},
+      AreaMaxMinSubcommands{{"AREA", compareMinArea}, {"VERTEXES", compareMinVertexes}},
       std::ref(std::cin),
       std::ref(std::cout),
       _1)
