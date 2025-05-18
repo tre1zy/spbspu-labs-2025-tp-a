@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <exception>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -32,6 +33,9 @@ int main(int argc, char** argv)
   }
   std::map< std::string, std::function< void() > > commands;
   commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string command;
   while (!(std::cin >> command).eof())
   {
@@ -40,14 +44,14 @@ int main(int argc, char** argv)
       commands.at(command)();
       std::cout << '\n';
     }
-    catch(...)
+    catch(const std::exception& error)
     {
       if (std::cin.fail())
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << "invalid command\n";
+      std::cerr << error.what() << '\n';
     }
   }
   return 0;
