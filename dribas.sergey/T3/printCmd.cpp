@@ -128,7 +128,7 @@ namespace
   void printAreaMean(const std::vector< dribas::Poligon >& plg, std::ostream& out)
   {
     if (!plg.size()) {
-      throw std::invalid_argument("");
+      throw std::invalid_argument("No poligon found");
     }
     std::vector< double > areas;
     std::transform(plg.begin(), plg.end(), std::back_inserter(areas), dribas::getPoligonArea);

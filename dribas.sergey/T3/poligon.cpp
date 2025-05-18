@@ -14,7 +14,8 @@ namespace
   {
     const dribas::Point& firstPt;
     dribas::Point currentPt;
-    double operator()(double res, const dribas::Point& nextPt) {
+    double operator()(double res, const dribas::Point& nextPt)
+    {
       double a = (currentPt.x - firstPt.x) * (nextPt.y - firstPt.y);
       double b = (nextPt.x - firstPt.x) * (currentPt.y - firstPt.y);
       res += std::abs(a - b);

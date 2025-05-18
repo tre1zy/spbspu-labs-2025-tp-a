@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
   using namespace dribas;
 
   if (argc != 2) {
-    std::cerr << "no parametrs found" << '\n';
+    std::cerr << "No parametrs found" << '\n';
     return 1;
   }
 
@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(printArea, std::cref(plgs), std::ref(std::cin), std::ref(std::cout));
   cmds["MAX"] = std::bind(printMax, std::cref(plgs), std::ref(std::cin), std::ref(std::cout));
@@ -36,13 +37,11 @@ int main(int argc, char* argv[])
   cmds["LESSAREA"] = std::bind(printLessArea, std::cref(plgs), std::ref(std::cin), std::ref(std::cout));
   cmds["RIGHTSHAPES"] = std::bind(printRightShapes, std::cref(plgs), std::ref(std::cout));
 
-
   std::string command;
-  while (!(std::cin >> command).eof())
-  {
+  while (!(std::cin >> command).eof()) {
     try {
       cmds.at(command)();
-      std::cout << "\n";
+      std::cout << '\n';
     } catch (std::exception& e) {
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
