@@ -1,6 +1,6 @@
 #include "iofmtguard.hpp"
 
-nspace::Iofmtguard::Iofmtguard(std::basic_ios< char >& s) :
+klimova::Iofmtguard::Iofmtguard(std::basic_ios< char >& s) :
   s_(s),
   width_(s.width()),
   fill_(s.fill()),
@@ -8,7 +8,7 @@ nspace::Iofmtguard::Iofmtguard(std::basic_ios< char >& s) :
   fmt_(s.flags())
 {}
 
-nspace::Iofmtguard::~Iofmtguard()
+klimova::Iofmtguard::~Iofmtguard()
 {
   s_.width(width_);
   s_.fill(fill_);

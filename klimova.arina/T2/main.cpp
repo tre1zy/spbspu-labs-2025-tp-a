@@ -10,7 +10,7 @@ int main()
 {
   using klimova::DataStruct;
   using IteratorIn = std::istream_iterator< DataStruct >;
-  using IteratirOut = std::ostream_iterator< DataStruct >;
+  using IteratorOut = std::ostream_iterator< DataStruct >;
   using Limits = std::numeric_limits<std::streamsize>;
   auto& in = std::cin;
   auto& out = std::cout;
@@ -21,7 +21,7 @@ int main()
     if (in.fail())
     {
       in.clear();
-      in.ignore(Limits:::max(), '\n');
+      in.ignore(Limits::max(), '\n');
     }
     std::copy(
       IteratorIn(in),

@@ -1,7 +1,7 @@
 #include "datastruct.hpp"
 #include "iofmtguard.hpp"
 
-std::istream& nspace::operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream& klimova::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -17,7 +17,7 @@ std::istream& nspace::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& nspace::operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& klimova::operator>>(std::istream& in, DoubleIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -27,7 +27,7 @@ std::istream& nspace::operator>>(std::istream& in, DoubleIO&& dest)
   return in >> dest.ref >> DelimiterIO{ 'd' };
 }
 
-std::istream& nspace::operator>>(std::istream& in, ComplexIO&& dest)
+std::istream& klimova::operator>>(std::istream& in, ComplexIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -45,7 +45,7 @@ std::istream& nspace::operator>>(std::istream& in, ComplexIO&& dest)
   return in;
 }
 
-std::istream& nspace::operator>>(std::istream& in, StringIO&& dest)
+std::istream& klimova::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -55,7 +55,7 @@ std::istream& nspace::operator>>(std::istream& in, StringIO&& dest)
   return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
 
-std::istream& nspace::operator>>(std::istream& in, LabelIO&& dest)
+std::istream& klimova::operator>>(std::istream& in, LabelIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -65,7 +65,7 @@ std::istream& nspace::operator>>(std::istream& in, LabelIO&& dest)
   return in >> dest.ref;
 }
 
-std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
+std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -126,12 +126,12 @@ std::istream& nspace::operator>>(std::istream& in, DataStruct& dest)
   }
   if (in)
   {
-    dest = ctd::move(input);
+    dest = std::move(input);
   }
   return in;
 }
 
-std::ostream& nspace::operator<<(std::ostream& out, const DataStruct& src)
+std::ostream& klimova::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -147,7 +147,7 @@ std::ostream& nspace::operator<<(std::ostream& out, const DataStruct& src)
   return out;
 }
 
-bool nspace::compareData(const DataStruct& a, const DataStruct& b)
+bool klimova::compareData(const DataStruct& a, const DataStruct& b)
 {
   if (a.key1 != b.key1)
   {
