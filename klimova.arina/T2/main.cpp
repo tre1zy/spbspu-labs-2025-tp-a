@@ -9,6 +9,7 @@
 int main()
 {
   using klimova::DataStruct;
+  using klimova::compareData;
   using IteratorIn = std::istream_iterator< DataStruct >;
   using IteratorOut = std::ostream_iterator< DataStruct >;
   using Limits = std::numeric_limits<std::streamsize>;
