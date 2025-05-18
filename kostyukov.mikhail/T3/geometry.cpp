@@ -6,7 +6,7 @@
 #include <numeric>
 #include <vector>
 
-#include "delimiter.hpp"
+#include "../common/delimiter.hpp"
 
 std::istream& kostyukov::operator>>(std::istream& in, Point& point)
 {
