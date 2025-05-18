@@ -179,7 +179,7 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
   in >> inPolygon;
   std::vector< maslov::Polygon > filtered;
   std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::SamePolygon{inPolygon});
-  std::vector< Polygon > result;   
+  std::vector< Polygon > result;
   dublicatePolygon(polygons, inPolygon, result);
   polygons = std::move(result);
   out << filtered.size() << '\n';

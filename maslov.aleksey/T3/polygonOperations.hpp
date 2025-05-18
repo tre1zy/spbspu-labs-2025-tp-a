@@ -46,7 +46,7 @@ namespace maslov
     VectorProduct calc{polygon.points[0]};
     std::vector< double > areas;
     const auto & begin = polygon.points.begin();
-    const auto & end = polygon.points.end();   
+    const auto & end = polygon.points.end();
     std::transform(begin + 1, end - 1, begin + 2, std::back_inserter(areas), calc);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
     }
@@ -103,7 +103,7 @@ namespace maslov
 
   struct EchoTransformer
   {
-    const Polygon inPolygon; 
+    const Polygon inPolygon;
     std::vector< Polygon > operator()(const Polygon & polygon) const
     {
       if (polygon == inPolygon)
@@ -115,7 +115,7 @@ namespace maslov
   };
 
   void dublicatePolygon(const std::vector< Polygon > & polygons, const Polygon & inPolygon,
-      std::vector< Polygon > & result) 
+      std::vector< Polygon > & result)
   {
     for (const auto & poly : polygons)
     {
