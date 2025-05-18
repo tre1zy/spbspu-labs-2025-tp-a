@@ -46,28 +46,25 @@ namespace dribas
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Poligon& plg)
+  std::istream& dribas::operator>>(std::istream& in, Poligon& plg)
   {
     std::istream::sentry sentry(in);
-    if (!sentry) {
+    if (!sentry)
+    {
       return in;
     }
-    StreamGuard guard(in);
-
+    StreamGuard scope(in);
     size_t size = 0;
-    if (!(in >> size) || size < 3) {
+    if (!(in >> size) || size < 3)
+    {
       in.setstate(std::ios::failbit);
       return in;
     }
-
-    std::string line;
-    std::getline(std::cin, line);
-
-    std::vector< Point > pnts(size);
-    std::copy_n(std::istream_iterator< Point >(in), size, pnts.begin());
+    std::vector< Point > temp(size);
+    std::copy_n(std::istream_iterator< Point >(in), size, temp.begin());
     if (in)
     {
-      plg.points = std::move(pnts);
+      plg.points = std::move(temp);
     }
     return in;
   }
