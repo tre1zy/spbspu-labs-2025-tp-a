@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iterator>
+#include <memory_resource>
 #include <numeric>
 #include <stdexcept>
 #include <string>
@@ -31,7 +32,7 @@ namespace
   struct VertexExpected
   {
     size_t count;
-    bool operator()(const kostyukov::Polygon& polygon)
+    bool operator()(const kostyukov::Polygon& polygon) const
     {
       return polygon.points.size() == count;
     }
@@ -70,6 +71,23 @@ namespace
     }
     return sumAreasIf(polygons, forAll) / polygons.size();
   }
+
+  bool areaComparator(const kostyukov::Polygon& polygon1, const kostyukov::Polygon& polygon2)
+  {
+    return kostyukov::getArea(polygon1) < kostyukov::getArea(polygon2);
+  }
+
+  double maxForArea(const std::vector< kostyukov::Polygon >& polygons)
+  {
+    kostyukov::Polygon max = (*std::max_element(polygons.begin(), polygons.end(), areaComparator));
+    return kostyukov::getArea(max);
+  }
+
+  double minForArea(const std::vector< kostyukov::Polygon >& polygons)
+  {
+    kostyukov::Polygon min = (*std::min_element(polygons.begin(), polygons.end(), areaComparator));
+    return kostyukov::getArea(min);
+  }
 }
 
 void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -107,5 +125,39 @@ void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Pol
     result = areaForNum(polygons, countVertexes);
   }
   ScopeGuard scopeGrd(out);
+  out << std::fixed << std::setprecision(1) << result;
+}
+
+void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("no polygons for max");
+  }
+  double result = 0.0;
+  if (subcommand == "AREA")
+  {
+    result = maxForArea(polygons);
+  }
+  kostyukov::ScopeGuard scopeGrd(out);
+  out << std::fixed << std::setprecision(1) << result;
+}
+
+void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("no polygons for min");
+  }
+  double result = 0.0;
+  if (subcommand == "AREA")
+  {
+    result = minForArea(polygons);
+  }
+  kostyukov::ScopeGuard scopeGrd(out);
   out << std::fixed << std::setprecision(1) << result;
 }
