@@ -26,11 +26,6 @@ namespace
 
 namespace dribas
 {
-  bool operator==(const Point& r, const Point& l)
-  {
-    return r.x == l.x && r.y == l.y;
-  }
-
   std::istream& operator>>(std::istream& in, Point& point)
   {
     std::istream::sentry sentry(in);
@@ -46,7 +41,7 @@ namespace dribas
     return in;
   }
 
-  std::istream& dribas::operator>>(std::istream& in, Poligon& plg)
+  std::istream& operator>>(std::istream& in, Poligon& plg)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
