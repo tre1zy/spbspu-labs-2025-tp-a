@@ -52,6 +52,7 @@ void shapkov::word_info(std::istream& in, std::ostream& out, const FrequencyDict
     out << "<TEXT NOT FOUND>\n";
     return;
   }
+  cleanWord(word);
   auto wrd = text->second.dictionary.find(word);
   if (wrd == text->second.dictionary.end())
   {
@@ -67,6 +68,7 @@ void shapkov::anagrams(std::istream& in, std::ostream& out, const FrequencyDicti
 {
   std::string word;
   in >> word;
+  cleanWord(word);
   isAnagram anagramChecker{ word };
   size_t anagramsCnt = 0;
   for (const auto& dict_pair: dict.dicts)
@@ -91,6 +93,7 @@ void shapkov::similar_frequency(std::istream& in, std::ostream& out, const Frequ
   std::string word;
   size_t delta = 0;
   in >> word >> delta;
+  cleanWord(word);
   size_t freqCnt = 0;
   for (const auto& dict_pair: dict.dicts)
   {
