@@ -110,7 +110,7 @@ std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
       }
       else if (label == ")")
       {
-        keepReading = false;
+        break;
       }
       else
       {
