@@ -88,14 +88,8 @@ std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
     {
       return in;
     }
-    bool keepReading = true;
-    while (keepReading)
+    for (int i = 0; i < 3; i++)
     {
-      std::string label;
-      if (!(in >> lbl{ label }))
-      {
-        break;
-      }
       if (label == "key1")
       {
         in >> dbl{ input.key1 };
@@ -108,21 +102,12 @@ std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
       {
         in >> str{ input.key3 };
       }
-      else if (label == ")")
-      {
-        keepReading = false;
-        continue;
-      }
       else
       {
         in.setstate(std::ios::failbit);
-        keepReading = false;
+        break;
       }
-
-      if (!(in >> DelimiterIO{ ':' }))
-      {
-        keepReading = false;
-      }
+      in >> DelimiterIO{ ':' };
     }
   }
   if (in)
