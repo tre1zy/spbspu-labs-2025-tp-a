@@ -12,7 +12,6 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using CommandDataset = std::map< std::string, std::function< void(const std::vector< Polygon >&) > >;
 
   if (argc != 2)
   {
@@ -28,7 +27,7 @@ int main(int argc, char** argv)
   }
 
   std::vector< Polygon > polygons;
-  while(!file.eof())
+  while (!file.eof())
   {
     if (file.fail())
     {
@@ -47,17 +46,17 @@ int main(int argc, char** argv)
   std::string command;
   while (!(std::cin >> command).eof())
   {
+    if (std::cin.fail())
+    {
+      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+    }
     try
     {
       commands.at(command)(std::cref(polygons));
       std::cout << '\n';
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
-      if (std::cin.fail())
-      {
-        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
-      }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }

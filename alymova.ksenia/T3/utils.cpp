@@ -18,7 +18,7 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   in >> command;
   if (command == "MEAN" && polygons.empty())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    throw std::logic_error("");
   }
   try
   {
@@ -37,7 +37,7 @@ void alymova::maxAndMin(const AreaMaxMinSubcommands& subs, std::istream& in,
 {
   if (polygons.empty())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    throw std::logic_error("");
   }
   std::string command;
   in >> command;
@@ -62,7 +62,7 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     out << std::count_if(polygons.begin(), polygons.end(), subs.at(command));
   }
-  catch(const std::exception& e)
+  catch (const std::exception& e)
   {
     size_t vertexes = getVertexes(command);
     out << std::count_if(polygons.begin(), polygons.end(), std::bind(isEqualSize, vertexes, _1));
@@ -75,7 +75,7 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
   in >> framed;
   if (in.fail() || polygons.empty())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    throw std::logic_error("");
   }
   int start_frame_x = framed.points[0].x;
   int start_frame_y = framed.points[0].y;
@@ -101,23 +101,22 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
 
 alymova::CommandDataset alymova::complectCommands()
 {
-  return
-  {
+  return {
     {"AREA", std::bind(area, std::ref(std::cin), std::ref(std::cout), _1)},
     {"MAX", std::bind(
       maxAndMin,
       AreaMaxMinSubcommands{{"AREA", compareMaxArea}, {"VERTEXES", compareMaxVertexes}},
       std::ref(std::cin),
       std::ref(std::cout),
-      _1)
-    },
+      _1
+    )},
     {"MIN", std::bind(
       maxAndMin,
       AreaMaxMinSubcommands{{"AREA", compareMinArea}, {"VERTEXES", compareMinVertexes}},
       std::ref(std::cin),
       std::ref(std::cout),
-      _1)
-    },
+      _1
+    )},
     {"COUNT", std::bind(count, std::ref(std::cin), std::ref(std::cout), _1)},
     {"INFRAME", std::bind(inFrame, std::ref(std::cin), std::ref(std::cout), _1)}
   };

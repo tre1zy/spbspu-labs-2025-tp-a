@@ -74,6 +74,11 @@ double alymova::compareMinArea(double value, const Polygon& polygon)
   return std::min(value, areaPolygon(polygon));
 }
 
+size_t alymova::compareMinVertexes(size_t value, const Polygon& polygon)
+{
+  return std::min(value, polygon.points.size());
+}
+
 int alymova::compareMaxXPoint(int value, const Point& point)
 {
   return std::max(value, point.x);
@@ -103,11 +108,6 @@ int alymova::findMaxMinXYVector(int start, const std::vector< Polygon >& polygon
 {
   return std::accumulate(polygons.begin(), polygons.end(), start,
     std::bind(findMaxMinXYPolygon, _1, _2, pred));
-}
-
-size_t alymova::compareMinVertexes(size_t value, const Polygon& polygon)
-{
-  return std::min(value, polygon.points.size());
 }
 
 bool alymova::isDigit(char c)

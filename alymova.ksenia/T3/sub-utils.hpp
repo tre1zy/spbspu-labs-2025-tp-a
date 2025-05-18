@@ -16,9 +16,9 @@ namespace alymova
   double multPoints(const Point& point1, const Point& point2);
 
   double compareMaxArea(double value, const Polygon& polygon);
-    size_t compareMaxVertexes(size_t value, const Polygon& polygon);
+  size_t compareMaxVertexes(size_t value, const Polygon& polygon);
   double compareMinArea(double value, const Polygon& polygon);
-    size_t compareMinVertexes(size_t value, const Polygon& polygon);
+  size_t compareMinVertexes(size_t value, const Polygon& polygon);
 
   int compareMaxXPoint(int value, const Point& point);
   int compareMaxYPoint(int value, const Point& point);
