@@ -42,9 +42,10 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
-  polygon.points.clear();
-  in >> std::noskipws;
-  for (size_t i = 0; i < cnt_points; i++)
+  //polygon.points.clear();
+  Polygon tested;
+  std::copy_n(std::istream_iterator< Point >(in), cnt_points, std::back_inserter(tested.points));
+  /*for (size_t i = 0; i < cnt_points; i++)
   {
     if (in.peek() == '\n')
     {
@@ -58,9 +59,14 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
     {
       return in;
     }
+  }*/
+  if (in)
+  {
+    polygon = std::move(tested);
   }
-  in >> DelimiterIO{'\n'};
-  in >> std::skipws;
+  //in >> std::noskipws;
+  //in >> DelimiterIO{'\n'};
+  //in >> std::skipws;
   return in;
 }
 
