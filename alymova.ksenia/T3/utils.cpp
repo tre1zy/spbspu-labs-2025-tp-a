@@ -99,7 +99,7 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
   out << "<FALSE>";
 }
 
-void alymova::rightShapes(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void alymova::rightShapes(std::ostream& out, const std::vector< Polygon >& polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), haveRightAngles);
 }
@@ -124,6 +124,6 @@ alymova::CommandDataset alymova::complectCommands(std::istream& in, std::ostream
     )},
     {"COUNT", std::bind(count, std::ref(in), std::ref(out), _1)},
     {"INFRAME", std::bind(inFrame, std::ref(in), std::ref(out), _1)},
-    {"RIGHTSHAPES", std::bind(rightShapes, std::ref(in), std::ref(out), _1)}
+    {"RIGHTSHAPES", std::bind(rightShapes, std::ref(out), _1)}
   };
 }
