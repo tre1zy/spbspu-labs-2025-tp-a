@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iomanip>
 #include <iterator>
-#include <memory_resource>
 #include <numeric>
 #include <stdexcept>
 #include <string>
@@ -77,16 +76,33 @@ namespace
     return kostyukov::getArea(polygon1) < kostyukov::getArea(polygon2);
   }
 
+  bool vertexesComparator(const kostyukov::Polygon& polygon1, const kostyukov::Polygon& polygon2)
+  {
+    return polygon1.points.size() < polygon2.points.size();
+  }
+
   double maxForArea(const std::vector< kostyukov::Polygon >& polygons)
   {
     kostyukov::Polygon max = (*std::max_element(polygons.begin(), polygons.end(), areaComparator));
     return kostyukov::getArea(max);
   }
 
+  size_t maxForVertexes(const std::vector< kostyukov::Polygon >& polygons)
+  {
+    kostyukov::Polygon max = (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator));
+    return max.points.size();
+  }
+
   double minForArea(const std::vector< kostyukov::Polygon >& polygons)
   {
     kostyukov::Polygon min = (*std::min_element(polygons.begin(), polygons.end(), areaComparator));
     return kostyukov::getArea(min);
+  }
+
+  size_t minForVertexes(const std::vector< kostyukov::Polygon >& polygons)
+  {
+    kostyukov::Polygon min = (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator));
+    return min.points.size();
   }
 }
 
@@ -114,7 +130,7 @@ void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Pol
     {
       countVertexes = std::stoull(subcommand);
     }
-    catch (const std::invalid_argument& error)
+    catch (const std::invalid_argument&)
     {
       throw std::invalid_argument("invalid subcommand or number format");
     }
@@ -130,34 +146,46 @@ void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Pol
 
 void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  std::string subcommand;
-  in >> subcommand;
   if (polygons.empty())
   {
     throw std::invalid_argument("no polygons for max");
   }
-  double result = 0.0;
+  std::string subcommand;
+  in >> subcommand;
+  kostyukov::ScopeGuard scopeGrd(out);
   if (subcommand == "AREA")
   {
-    result = maxForArea(polygons);
+    out << std::fixed << std::setprecision(1) << maxForArea(polygons);
   }
-  kostyukov::ScopeGuard scopeGrd(out);
-  out << std::fixed << std::setprecision(1) << result;
+  else if (subcommand == "VERTEXES")
+  {
+    out << std::fixed << std::setprecision(1) << maxForVertexes(polygons);
+  }
+  else
+  {
+    throw std::invalid_argument("invalid subcommand");
+  }
 }
 
 void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  std::string subcommand;
-  in >> subcommand;
   if (polygons.empty())
   {
     throw std::invalid_argument("no polygons for min");
   }
-  double result = 0.0;
+  std::string subcommand;
+  in >> subcommand;
+  kostyukov::ScopeGuard scopeGrd(out);
   if (subcommand == "AREA")
   {
-    result = minForArea(polygons);
+    out << std::fixed << std::setprecision(1) << minForArea(polygons);
   }
-  kostyukov::ScopeGuard scopeGrd(out);
-  out << std::fixed << std::setprecision(1) << result;
+  else if (subcommand == "VERTEXES")
+  {
+    out << std::fixed << std::setprecision(1) << minForVertexes(polygons);
+  }
+  else
+  {
+    throw std::invalid_argument("invalid subcommand");
+  }
 }
