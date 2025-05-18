@@ -1,6 +1,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <map>
 #include "shapes.hpp"
@@ -20,6 +21,13 @@ int main(int argc, char** argv)
     return 1;
   }
   std::vector< Polygon > polygons;
+  while (!fin.eof()) {
+    std::copy(std::istream_iterator< Polygon >(fin), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+    if (!fin) {
+      fin.clear();
+      fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
   std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
   commands["AREA"] = std::bind(get_area, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
   commands["MAX"] = std::bind(get_max, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
@@ -28,14 +36,14 @@ int main(int argc, char** argv)
   commands["ECHO"] = std::bind(echo, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
   commands["RMECHO"] = std::bind(remove_echo, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
   std::string command;
-  while (!(fin >> command).eof()) {
+  while (!(std::cin >> command).eof()) {
     try {
-      commands.at(command)(fin, std::cout);
+      commands.at(command)(std::cin, std::cout);
     } catch (...) {
-      if (fin.fail()) {
-        fin.clear(fin.rdstate() ^ std::ios::failbit);
+      if (std::cin.fail()) {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
-      fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
   }
