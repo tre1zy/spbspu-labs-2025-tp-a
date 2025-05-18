@@ -110,17 +110,18 @@ std::istream& klimova::operator>>(std::istream& in, DataStruct& dest)
       }
       else if (label == ")")
       {
-        break;
+        keepReading = false;
+        continue;
       }
       else
       {
         in.setstate(std::ios::failbit);
-        break;
+        keepReading = false;
       }
 
       if (!(in >> DelimiterIO{ ':' }))
       {
-        break;
+        keepReading = false;
       }
     }
   }
