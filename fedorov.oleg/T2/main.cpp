@@ -8,8 +8,8 @@
 int main()
 {
   using namespace fedorov;
-  using input_it_t = std::istream_iterator<DataStruct>;
-  using output_it_t = std::ostream_iterator<DataStruct>;
+  using input_it_t = std::istream_iterator< DataStruct >;
+  using output_it_t = std::ostream_iterator< DataStruct >;
 
   std::vector<DataStruct> data(input_it_t{std::cin}, input_it_t{});
 
