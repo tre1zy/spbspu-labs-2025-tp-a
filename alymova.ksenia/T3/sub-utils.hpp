@@ -27,6 +27,10 @@ namespace alymova
   int findMaxMinXYPolygon(int start, const Polygon& polygon, Predicate pred);
   int findMaxMinXYVector(int start, const std::vector< Polygon >& polygons, Predicate pred);
 
+  bool haveRightAngles(const Polygon& polygon);
+  bool isRightAngle(const Point& point1, const Point& point2);
+  Point getSide(const Point& point1, const Point& point2);
+
   bool isDigit(char c);
   bool isEqualSize(size_t size, const Polygon& polygon);
   bool isPolygonEven(const Polygon& polygon);

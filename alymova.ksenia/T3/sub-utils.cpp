@@ -110,6 +110,39 @@ int alymova::findMaxMinXYVector(int start, const std::vector< Polygon >& polygon
     std::bind(findMaxMinXYPolygon, _1, _2, pred));
 }
 
+bool alymova::haveRightAngles(const Polygon& polygon)
+{
+  std::vector< Point > sides;
+  std::transform(
+    polygon.points.begin() + 1,
+    polygon.points.end(),
+    polygon.points.begin(),
+    std::back_inserter(sides),
+    getSide
+  );
+  sides.push_back(getSide(polygon.points.front(), polygon.points.back()));
+  sides.push_back(sides.front());
+  std::vector< bool > isRightShape;
+  std::transform(
+    sides.begin() + 1,
+    sides.end(),
+    sides.begin(),
+    std::back_inserter(isRightShape),
+    isRightAngle
+  );
+  return std::accumulate(isRightShape.begin(), isRightShape.end(), 0) > 0;
+}
+
+bool alymova::isRightAngle(const Point& point1, const Point& point2)
+{
+  return (point1.x * point2.x + point1.y * point2.y) == 0;
+}
+
+alymova::Point alymova::getSide(const Point& point1, const Point& point2)
+{
+  return {point1.x - point2.x, point1.y - point2.y};
+}
+
 bool alymova::isDigit(char c)
 {
   return std::isdigit(c);

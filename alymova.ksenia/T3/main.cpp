@@ -40,16 +40,11 @@ int main(int argc, char** argv)
       std::back_inserter(polygons)
     );
   }
-  //std::copy(polygons.begin(), polygons.end(), std::ostream_iterator< Polygon >(std::cout, "\n"));
 
-  CommandDataset commands = complectCommands();
+  CommandDataset commands = complectCommands(std::cin, std::cout);
   std::string command;
   while (!(std::cin >> command).eof())
   {
-    if (std::cin.fail())
-    {
-      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
-    }
     try
     {
       commands.at(command)(std::cref(polygons));
@@ -57,6 +52,10 @@ int main(int argc, char** argv)
     }
     catch (const std::exception& e)
     {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }

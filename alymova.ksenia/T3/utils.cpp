@@ -99,25 +99,31 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
   out << "<FALSE>";
 }
 
-alymova::CommandDataset alymova::complectCommands()
+void alymova::rightShapes(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), haveRightAngles);
+}
+
+alymova::CommandDataset alymova::complectCommands(std::istream& in, std::ostream& out)
 {
   return {
-    {"AREA", std::bind(area, std::ref(std::cin), std::ref(std::cout), _1)},
+    {"AREA", std::bind(area, std::ref(in), std::ref(out), _1)},
     {"MAX", std::bind(
       maxAndMin,
       AreaMaxMinSubcommands{{"AREA", compareMaxArea}, {"VERTEXES", compareMaxVertexes}},
-      std::ref(std::cin),
-      std::ref(std::cout),
+      std::ref(in),
+      std::ref(out),
       _1
     )},
     {"MIN", std::bind(
       maxAndMin,
       AreaMaxMinSubcommands{{"AREA", compareMinArea}, {"VERTEXES", compareMinVertexes}},
-      std::ref(std::cin),
-      std::ref(std::cout),
+      std::ref(in),
+      std::ref(out),
       _1
     )},
-    {"COUNT", std::bind(count, std::ref(std::cin), std::ref(std::cout), _1)},
-    {"INFRAME", std::bind(inFrame, std::ref(std::cin), std::ref(std::cout), _1)}
+    {"COUNT", std::bind(count, std::ref(in), std::ref(out), _1)},
+    {"INFRAME", std::bind(inFrame, std::ref(in), std::ref(out), _1)},
+    {"RIGHTSHAPES", std::bind(rightShapes, std::ref(in), std::ref(out), _1)}
   };
 }
