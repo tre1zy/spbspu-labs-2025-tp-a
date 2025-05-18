@@ -46,7 +46,7 @@ int main(int argc, char** argv)
       commands.at(command)();
       std::cout << '\n';
     }
-    catch(const std::exception& error)
+    catch (const std::exception& error)
     {
       if (std::cin.fail())
       {
