@@ -22,12 +22,12 @@ namespace {
 
   double add_main_diagonal(const maslevtsov::Point& lhs, const maslevtsov::Point& rhs)
   {
-    return lhs.x * rhs.y;
+    return lhs.y * rhs.x;
   }
 
   double subtract_sub_diagonal(const maslevtsov::Point& lhs, const maslevtsov::Point& rhs)
   {
-    return -(lhs.y * rhs.x);
+    return -(lhs.x * rhs.y);
   }
 
   double get_polygon_area(const maslevtsov::Polygon& polygon)
