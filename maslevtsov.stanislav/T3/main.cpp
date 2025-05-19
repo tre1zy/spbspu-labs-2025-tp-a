@@ -22,11 +22,11 @@ int main(int argc, char** argv)
   }
   std::vector< Polygon > polygons;
   while (!fin.eof()) {
-    std::copy(std::istream_iterator< Polygon >(fin), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
     if (fin.fail()) {
-      fin.clear(file.rdstate() ^ std::ios_base::failbit);
+      fin.clear();
       fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+    std::copy(std::istream_iterator< Polygon >(fin), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
   std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
   commands["AREA"] = std::bind(get_area, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
