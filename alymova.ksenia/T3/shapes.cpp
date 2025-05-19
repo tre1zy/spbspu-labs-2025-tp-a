@@ -3,21 +3,7 @@
 #include <iterator>
 #include <functional>
 #include <string>
-
-std::istream& alymova::operator>>(std::istream& in, DelimiterIO&& object)
-{
-  std::istream::sentry s(in);
-  if (!s)
-  {
-    return in;
-  }
-  char delim;
-  if (in >> delim && delim != object.exp)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
+#include <delimiter-io.hpp>
 
 std::istream& alymova::operator>>(std::istream& in, Point& point)
 {

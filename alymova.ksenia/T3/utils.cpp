@@ -4,10 +4,12 @@
 #include <exception>
 #include <string>
 #include <iomanip>
+#include <stream-guard.hpp>
 #include "sub-utils.hpp"
 
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
+  StreamGuard guard(in);
   AreaMaxMinSubcommands subs{
     {"EVEN", areaEven},
     {"ODD", areaOdd},
@@ -35,6 +37,7 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
 void alymova::maxAndMin(const AreaMaxMinSubcommands& subs, std::istream& in,
   std::ostream& out, const std::vector< Polygon >& polygons)
 {
+  StreamGuard guard(in);
   if (polygons.empty())
   {
     throw std::logic_error("");
