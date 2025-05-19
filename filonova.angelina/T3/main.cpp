@@ -53,13 +53,12 @@ int main(int argc, char *argv[])
       if (it != cmds.end())
       {
         it->second();
+        std::cout << "\n";
       }
       else
       {
-        std::cout << "<INVALID COMMAND>\n";
         std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
-      std::cout << "\n";
     }
     catch (...)
     {
@@ -68,7 +67,6 @@ int main(int argc, char *argv[])
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>\n";
     }
   }
 
