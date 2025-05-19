@@ -23,5 +23,5 @@ namespace nehvedovich
     std::basic_ios< char >::fmtflags fmt_;
     char fill_;
   };
-} // namespace nehvedovich
+}
 #endif

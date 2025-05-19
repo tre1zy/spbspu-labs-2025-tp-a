@@ -1,4 +1,4 @@
-#include "wrappers.hpp"
+#include "wrappers_io.hpp"
 
 #include <iostream>
 
@@ -31,13 +31,13 @@ std::istream &nehvedovich::operator>>(std::istream &in, UnsignedLongLongIO &&des
   char temp = 0;
   bool gotdigit = false;
 
-  while (in >> temp && std::isdigit(temp))
+  while (std::isdigit(in.peek()))
   {
+    in >> temp;
     gotdigit = true;
     num *= 10;
     num += (temp - '0');
   }
-  in.unget();
 
   if (!gotdigit)
   {
@@ -45,7 +45,7 @@ std::istream &nehvedovich::operator>>(std::istream &in, UnsignedLongLongIO &&des
     return in;
   }
 
-  if (in >> a >> b >> c && tolower(a) == 'u' && tolower(b) == 'l' && tolower(c) == 'l')
+  if (in >> a >> b >> c && std::tolower(a) == 'u' && std::tolower(b) == 'l' && std::tolower(c) == 'l')
   {
     dest.ref = num;
   }

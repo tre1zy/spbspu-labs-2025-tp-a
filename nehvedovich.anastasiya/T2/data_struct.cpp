@@ -1,9 +1,11 @@
 #include "data_struct.hpp"
-#include "format_guard.hpp"
-#include "wrappers.hpp"
+
 #include <iostream>
 
-std::ostream &nehvedovich::operator<<(std::ostream &out, const data_struct &src)
+#include "format_guard.hpp"
+#include "wrappers_io.hpp"
+
+std::ostream &nehvedovich::operator<<(std::ostream &out, const DataStruct &src)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -19,7 +21,7 @@ std::ostream &nehvedovich::operator<<(std::ostream &out, const data_struct &src)
   return out;
 }
 
-std::istream &nehvedovich::operator>>(std::istream &in, data_struct &dest)
+std::istream &nehvedovich::operator>>(std::istream &in, DataStruct &dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -27,7 +29,7 @@ std::istream &nehvedovich::operator>>(std::istream &in, data_struct &dest)
     return in;
   }
 
-  data_struct tmp {};
+  DataStruct tmp {};
   std::string key_value {};
   {
     using sep = DelimiterIO;
@@ -63,7 +65,7 @@ std::istream &nehvedovich::operator>>(std::istream &in, data_struct &dest)
   return in;
 }
 
-bool nehvedovich::operator<(const data_struct &lhs, const data_struct &rhs)
+bool nehvedovich::operator<(const DataStruct &lhs, const DataStruct &rhs)
 {
   if (lhs.key1 != rhs.key1)
   {

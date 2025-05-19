@@ -1,5 +1,5 @@
-#ifndef WRAPPERS_HPP
-#define WRAPPERS_HPP
+#ifndef WRAPPERS_IO_HPP
+#define WRAPPERS_IO_HPP
 
 #include <string>
 
@@ -26,5 +26,5 @@ namespace nehvedovich
   std::istream &operator>>(std::istream &in, UnsignedLongLongIO &&dest);
   std::istream &operator>>(std::istream &in, CharIO &&dest);
   std::istream &operator>>(std::istream &in, StringIO &&dest);
-} // namespace nehvedovich
+}
 #endif
