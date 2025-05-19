@@ -45,12 +45,13 @@ std::istream& maslevtsov::operator>>(std::istream& in, Polygon& rhs)
   }
   std::size_t vertex_num = 0;
   in >> vertex_num;
-  if (vertex_num < 3) {
+  if (!in || vertex_num < 3) {
     in.setstate(std::ios::failbit);
     return in;
   }
   std::copy_n(std::istream_iterator< Point >(in), vertex_num, std::back_inserter(rhs.points));
-  if (!in || rhs.points.size() != vertex_num) {
+  bool is_same_vertexes = std::unique(rhs.points.begin(), rhs.points.end()) == rhs.points.end();
+  if (!in || rhs.points.size() != vertex_num || is_same_vertexes) {
     rhs.points.clear();
     in.setstate(std::ios::failbit);
   }
