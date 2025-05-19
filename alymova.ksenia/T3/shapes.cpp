@@ -12,7 +12,12 @@ std::istream& alymova::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  in >> DelimiterIO{'('} >> point.x >> DelimiterIO{';'} >> point.y >> DelimiterIO{')'};
+  Point tested;
+  in >> DelimiterIO{'('} >> tested.x >> DelimiterIO{';'} >> tested.y >> DelimiterIO{')'};
+  if (in)
+  {
+    point = tested;
+  }
   return in;
 }
 
