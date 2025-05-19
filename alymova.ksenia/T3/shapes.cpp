@@ -69,10 +69,7 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
 
 bool alymova::insertIfNotNextEnter(std::istream& in, const Point& point, std::vector< Point >& tested)
 {
-  in >> std::noskipws;
   char c = in.peek();
-  in >> std::skipws;
-
   if (c != '\n')
   {
     tested.push_back(point);
