@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   while (!fin.eof()) {
     std::copy(std::istream_iterator< Polygon >(fin), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
     if (fin.fail()) {
-      fin.clear(fin.rdstate() ^ std::ios_base::failbit);
+      fin.clear();
       fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
@@ -36,14 +36,14 @@ int main(int argc, char** argv)
   commands["ECHO"] = std::bind(echo, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
   commands["RMECHO"] = std::bind(remove_echo, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
   std::string command;
-  while (!(std::cin >> command).eof()) {
+  while (std::cin >> command) {
     try {
       commands.at(command)(std::cin, std::cout);
       std::cout << '\n';
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
-      std::cin.clear(std::cin.rdstate() ^ std::ios_base::failbit);
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
