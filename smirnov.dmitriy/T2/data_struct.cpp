@@ -4,6 +4,7 @@
 #include <cctype>
 #include <algorithm>
 #include <string>
+#include <vector>
 
 namespace smirnov {
     namespace {
@@ -70,9 +71,7 @@ namespace smirnov {
         if (start == std::string::npos || end == std::string::npos) return false;
 
         std::string trimmed = line.substr(start, end - start + 1);
-        if (trimmed.size() < 4 ||
-            trimmed.substr(0, 2) != "(:" ||
-            trimmed.substr(trimmed.size() - 2) != ":)") return false;
+        if (trimmed.size() < 4 || trimmed.substr(0, 2) != "(:" || trimmed.substr(trimmed.size() - 2) != ":)") return false;
 
         std::string inner = trimmed.substr(2, trimmed.size() - 4);
         auto pairs = splitKeyValuePairs(inner);
@@ -121,18 +120,10 @@ namespace smirnov {
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
         os << "(:key1 ";
         std::ostringstream oss;
-        oss << std::fixed << ds.key1;
+        oss << ds.key1;
         std::string num_str = oss.str();
-        size_t dot_pos = num_str.find('.');
-        if (dot_pos == std::string::npos) {
+        if (num_str.find('.') == std::string::npos) {
             num_str += ".0";
-        }
-        else {
-            size_t last_non_zero = num_str.find_last_not_of('0');
-            if (last_non_zero != std::string::npos && last_non_zero > dot_pos) {
-                num_str.erase(last_non_zero + 1, std::string::npos);
-            }
-            if (num_str.back() == '.') num_str += "0";
         }
         os << num_str << "d:key2 0b";
 
@@ -155,3 +146,4 @@ namespace smirnov {
         return a.key3.size() < b.key3.size();
     }
 }
+

@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 namespace smirnov {
     struct DataStruct {
@@ -12,9 +11,10 @@ namespace smirnov {
         std::string key3;
     };
 
-    bool compareDataStruct(const DataStruct& a, const DataStruct& b);
+    bool parseLine(const std::string& line, DataStruct& ds);
     std::istream& operator>>(std::istream& is, DataStruct& ds);
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
+    bool compareDataStruct(const DataStruct& a, const DataStruct& b);
 }
 
-#endif
+#endif 
