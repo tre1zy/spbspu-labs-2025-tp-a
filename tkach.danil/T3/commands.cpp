@@ -14,10 +14,10 @@ namespace
   {
     const tkach::Polygon& poly;
     size_t index;
-    double operator()(double area, const tkach::Point& p)
+    double operator()(double area, const tkach::Point& polygon)
     {
       size_t next = (index + 1) % poly.points.size();
-      area += (p.x * poly.points[next].y) - (p.y * poly.points[next].x);
+      area += (polygon.x * poly.points[next].y) - (polygon.y * poly.points[next].x);
       index++;
       return area;
     }
@@ -43,13 +43,13 @@ namespace
     const tkach::Polygon& poly;
     double deltax;
     double deltay;
-    bool operator()(const tkach::Polygon& p)
+    bool operator()(const tkach::Polygon& polygon)
     {
-      if (poly.points.size() != p.points.size())
+      if (poly.points.size() != polygon.points.size())
       {
         return false;
       }
-      std::vector< tkach::Point > temp = p.points;
+      std::vector< tkach::Point > temp = polygon.points;
       std::sort(temp.begin(), temp.end(), pointCmp);
       deltax = temp[0].x - poly.points[0].x;
       deltay = temp[0].y - poly.points[0].y;
@@ -218,6 +218,10 @@ void tkach::printSame(std::istream& in, std::ostream& out, const std::vector< Po
 {
   Polygon target;
   in >> target;
+  if (data.empty())
+  {
+    out << 0 << "\n";
+  }
   if (target.points.size() < 3)
   {
     throw std::logic_error("Error: not polygin");
@@ -234,10 +238,6 @@ void tkach::printRects(std::ostream& out, const std::vector< Polygon >& data)
 
 void tkach::printCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
-  if (data.empty())
-  {
-    throw std::logic_error("Error: zero polygons");
-  }
   using sub_commands_map = std::map< std::string, std::function< std::vector< Polygon >() > >;
   StreamGuard guard(out);
   sub_commands_map sub_cmds;
@@ -255,7 +255,7 @@ void tkach::printCount(std::istream& in, std::ostream& out, const std::vector< P
     size_t count = std::stoull(sub_cmd);
     if (count < 3)
     {
-      throw std::logic_error("Error: no polygon");
+      throw std::logic_error("Error: not polygon");
     }
     cleared = clearedCount(data, count);
   }
@@ -286,7 +286,7 @@ void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Po
     size_t count = std::stoull(sub_cmd);
     if (count < 3)
     {
-      throw std::logic_error("Error: no polygon");
+      throw std::logic_error("Error: not polygon");
     }
     cleared = clearedCount(data, count);
   }

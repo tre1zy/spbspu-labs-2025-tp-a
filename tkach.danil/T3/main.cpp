@@ -9,11 +9,16 @@
 #include "shapes.hpp"
 #include "commands.hpp"
 
-int main()
+int main(const int argc, const char* const* const argv)
 {
   using namespace tkach;
   using istreamIT = std::istream_iterator< Polygon >;
-  std::fstream in("/home/danil/spbspu-labs-2025-tp-a/tkach.danil/T3/input.txt");
+  if (argc != 2)
+  {
+    std::cerr << "Error: incorrect input\n";
+    return 1;
+  }
+  std::fstream in(argv[1]);
   if (!in.is_open())
   {
     std::cerr << "File is not open\n";
