@@ -152,12 +152,21 @@ void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::ist
 
 void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  std::size_t temp = 0;
-  temp = polygons.empty();
-  ++temp;
-  std::string subcommand;
-  in >> subcommand;
-  out << "ECHO " << subcommand << '\n';
+  Polygon polygon;
+  if (!(in >> polygon)) {
+    throw std::invalid_argument("invalid polygon");
+  }
+  auto same_with_arg = std::bind(is_same, polygon, std::placeholders::_1);
+  std::size_t additional_size = std::count_if(polygons.begin(), polygons.end(), same_with_arg);
+  std::vector< Polygon > with_echoes(polygons.size() + additional_size);
+  for (auto it = polygons.begin(); it != polygons.end(); ++it) {
+    with_echoes.push_back(*it);
+    if (same_with_arg(*it)) {
+      with_echoes.push_back(*it);
+    }
+  }
+  polygons = with_echoes;
+  out << additional_size;
 }
 
 void maslevtsov::remove_echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
