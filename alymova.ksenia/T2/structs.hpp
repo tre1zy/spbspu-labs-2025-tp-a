@@ -17,10 +17,6 @@ namespace alymova
   {
     std::string& s;
   };
-  struct DelimiterIO
-  {
-    char exp;
-  };
   struct LabelIO
   {
     std::string exp;
@@ -33,7 +29,6 @@ namespace alymova
 
     bool operator<(const DataStruct& other);
   };
-  std::istream& operator>>(std::istream& in, DelimiterIO&& object);
   std::istream& operator>>(std::istream& in, LabelIO&& object);
   std::istream& operator>>(std::istream& in, UllOctIO&& object);
   std::istream& operator>>(std::istream& in, ChrLitIO&& object);
