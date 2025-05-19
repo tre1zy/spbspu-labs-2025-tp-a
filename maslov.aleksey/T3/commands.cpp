@@ -173,6 +173,10 @@ void maslov::getCount(std::istream & in, std::ostream & out, const std::vector< 
 
 void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon > & polygons)
 {
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
   Polygon inPolygon;
   in >> inPolygon;
   size_t count = std::count_if(polygons.begin(), polygons.end(), SamePolygon{inPolygon});
