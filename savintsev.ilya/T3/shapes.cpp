@@ -81,20 +81,3 @@ std::ostream & savintsev::operator<<(std::ostream & out, const Polygon & dest)
   }
   return out;
 }
-
-double savintsev::calc_polygon_area(Polygon a)
-{
-  size_t n = a.points.size();
-  if (n < 3)
-  {
-    return 0.0;
-  }
-
-  double area = 0.0;
-  for (size_t i = 0; i < n; ++i)
-  {
-    size_t j = (i + 1) % n;
-    area += (a.points[i].x * a.points[j].y) - (a.points[j].x * a.points[i].y);
-  }
-  return 0.5 * abs(area);
-}

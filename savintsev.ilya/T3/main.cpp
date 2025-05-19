@@ -40,11 +40,12 @@ int main(int argc, char * argv[])
   }
 
   std::map< std::string, std::function< void() > > cmds;
-  cmds["AREA"] = std::bind(savintsev::area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["MAX"] = std::bind(savintsev::max, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["MIN"] = std::bind(savintsev::min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["COUNT"] = std::bind(savintsev::count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["PRINT"] = std::bind(savintsev::print, std::ref(std::cout), std::cref(data));
+  cmds["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["INTERSECTIONS"] = std::bind(intersections, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["PRINT"] = std::bind(print, std::ref(std::cout), std::cref(data));
 
   for (std::string command; std::cin >> command;)
   {

@@ -5,6 +5,7 @@
 #include <numeric>
 #include <cmath>
 #include <scope-guard.hpp>
+#include "geometry-utils.h"
 
 namespace
 {
@@ -35,6 +36,29 @@ namespace
       return a.points.size() == num;
     }
     size_t num;
+  };
+  struct CheckIntersect
+  {
+    bool operator()(const savintsev::Polygon & a)
+    {
+      size_t n = a.points.size();
+      for (size_t i = 0; i < n; ++i)
+      {
+        size_t m = p.points.size();
+        for (size_t j = 0; j < m; ++j)
+        {
+          const savintsev::Point & a1 = a.points[((i + 1) == n) ? 0 : i + 1];
+          const savintsev::Point & p1 = p.points[((j + 1) == m) ? 0 : j + 1];
+          bool is_intersect = savintsev::is_lines_int(p.points[j], p1, a.points[j], a1);
+          if (is_intersect)
+          {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    const savintsev::Polygon & p;
   };
 }
 
@@ -151,7 +175,7 @@ void savintsev::min(std::istream & in, std::ostream & out, const std::vector< Po
   in >> subcommand;
   if (data.empty())
   {
-    throw std::runtime_error("max: no polygons for search");
+    throw std::runtime_error("min: no polygons for search");
   }
   if (subcommand == "AREA")
   {
@@ -171,6 +195,28 @@ void savintsev::min(std::istream & in, std::ostream & out, const std::vector< Po
   out << '\n';
 }
 
+void savintsev::intersections(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
+{
+  Polygon p;
+  in >> p;
+  if (!in)
+  {
+    throw std::runtime_error("intersections: invalid polygon desc");
+  }
+  CheckIntersect check{p};
+  out << std::count_if(data.begin(), data.end(), check) << '\n';
+}
+/*
+void savintsev::same(std::istream &in, std::ostream &out, const std::vector<Polygon> &data)
+{
+  Polygon p;
+  in >> p;
+  if (!in)
+  {
+    throw std::runtime_error("same: invalid polygon desc");
+  }
+}
+*/
 void savintsev::print(std::ostream & out, const std::vector< Polygon > & data)
 {
   for (size_t i = 0; i < data.size(); ++i)
