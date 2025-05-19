@@ -26,8 +26,8 @@ int main(int argc, char * argv[])
   {
     if (file.fail())
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      file.clear();
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(iIterator(file), iIterator(), std::back_inserter(polygons));
   }

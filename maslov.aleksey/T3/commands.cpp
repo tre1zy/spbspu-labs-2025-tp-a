@@ -36,6 +36,10 @@ namespace
 
   void getAreaMean(std::ostream & out, const std::vector< maslov::Polygon > & polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::runtime_error("ERROR: there are no polygons");
+    }
     maslov::StreamGuard guard(out);
     std::vector< double > areas;
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::AreaCalculator{});
@@ -89,10 +93,6 @@ namespace
 
 void maslov::getArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::runtime_error("ERROR: there are no polygons");
-  }
   std::string subcmd;
   in >> subcmd;
   if (subcmd == "EVEN")
@@ -146,10 +146,6 @@ void maslov::getMin(std::istream & in, std::ostream & out, const std::vector< Po
 
 void maslov::getCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::runtime_error("ERROR: there are no polygons");
-  }
   std::string subcmd;
   in >> subcmd;
   if (subcmd == "EVEN")
