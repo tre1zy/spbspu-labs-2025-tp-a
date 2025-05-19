@@ -17,4 +17,4 @@ namespace smirnov {
     bool compareDataStruct(const DataStruct& a, const DataStruct& b);
 }
 
-#endif 
+#endif
