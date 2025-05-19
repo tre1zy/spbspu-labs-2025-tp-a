@@ -126,12 +126,20 @@ void maslevtsov::get_min(const std::vector< Polygon >& polygons, std::istream& i
 
 void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  std::size_t temp = 0;
-  temp = polygons.empty();
-  ++temp;
   std::string subcommand;
   in >> subcommand;
-  out << "COUNT " << subcommand << '\n';
+  if (subcommand == "EVEN") {
+    out << std::count_if(polygons.cbegin(), polygons.cend(), is_even_vertex_num) << '\n';
+  } else if (subcommand == "ODD") {
+    out << std::count_if(polygons.cbegin(), polygons.cend(), is_odd_vertex_num) << '\n';
+  } else {
+    std::size_t vertex_num = std::stoull(subcommand);
+    if (vertex_num < 3) {
+      throw std::invalid_argument("invalid polygon");
+    }
+    auto vertex_predicate = std::bind(is_equal_vertex_num, vertex_num, std::placeholders::_1);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), vertex_predicate) << '\n';
+  }
 }
 
 void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
