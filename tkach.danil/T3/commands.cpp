@@ -217,14 +217,9 @@ void tkach::printMin(std::istream& in, std::ostream& out, const std::vector< Pol
 void tkach::printSame(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
   Polygon target;
-  in >> target;
-  if (data.empty())
+  if (!(in >> target) || target.points.size() < 3)
   {
-    out << 0 << "\n";
-  }
-  if (target.points.size() < 3)
-  {
-    throw std::logic_error("Error: not polygin");
+    throw std::logic_error("Error: not polygon");
   }
   std::sort(target.points.begin(), target.points.end(), pointCmp);
   PolySame cmp{target, 0, 0};
@@ -264,10 +259,6 @@ void tkach::printCount(std::istream& in, std::ostream& out, const std::vector< P
 
 void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
-  if (data.empty())
-  {
-    throw std::logic_error("Error: zero polygons");
-  }
   using sub_commands_map = std::map< std::string, std::function< std::vector< Polygon >() > >;
   StreamGuard guard(out);
   sub_commands_map sub_cmds;
@@ -293,7 +284,7 @@ void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Po
   std::vector< double > areas;
   std::transform(cleared.begin(), cleared.end(), std::back_inserter(areas), calculatePolygonArea);
   out << std::fixed << std::setprecision(1);
-  if (sub_cmd == "MEAN")
+  if (sub_cmd == "MEAN" && !areas.empty())
   {
     out << std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size() << "\n";
   }
