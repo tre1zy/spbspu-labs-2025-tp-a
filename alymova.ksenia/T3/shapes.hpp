@@ -21,8 +21,6 @@ namespace alymova
   std::istream& operator>>(std::istream& in, DelimiterIO&& object);
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
-  std::ostream& operator<<(std::ostream& out, const Point& point);
-  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 
   bool insertIfNotNextEnter(std::istream& in, const Point& point, std::vector< Point >& dop);
 }

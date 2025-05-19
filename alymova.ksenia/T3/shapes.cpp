@@ -67,34 +67,7 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
-std::ostream& alymova::operator<<(std::ostream& out, const Point& point)
-{
-  std::ostream::sentry s(out);
-  if (!s)
-  {
-    return out;
-  }
-  std::cout << '(' << point.x << ';' << point.y << ')';
-  return out;
-}
-
-std::ostream& alymova::operator<<(std::ostream& out, const Polygon& polygon)
-{
-  std::ostream::sentry s(out);
-  if (!s)
-  {
-    return out;
-  }
-  std::copy_n(
-    polygon.points.begin(),
-    polygon.points.size() - 1,
-    std::ostream_iterator< Point >(out, " ")
-  );
-  out << polygon.points[polygon.points.size() - 1];
-  return out;
-}
-
-bool alymova::insertIfNotNextEnter(std::istream& in, const Point& point, std::vector< Point >& dop)
+bool alymova::insertIfNotNextEnter(std::istream& in, const Point& point, std::vector< Point >& tested)
 {
   in >> std::noskipws;
   char c = in.peek();
@@ -102,7 +75,7 @@ bool alymova::insertIfNotNextEnter(std::istream& in, const Point& point, std::ve
 
   if (c != '\n')
   {
-    dop.push_back(point);
+    tested.push_back(point);
     return false;
   }
   return true;
