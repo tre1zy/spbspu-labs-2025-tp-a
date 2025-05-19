@@ -1,27 +1,22 @@
 #include "data_struct.hpp"
-#include <vector>
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
-int main()
-{
-    using  smirnov::Data;
+int main() {
+    using namespace smirnov;
 
-    std::vector<Data> data;
+    std::vector<DataStruct> data;
 
-    std::copy(
-        std::istream_iterator<Data>(std::cin),
-        std::istream_iterator<Data>(),
-        std::back_inserter(data)
-    );
+    std::copy(std::istream_iterator<DataStruct>(std::cin),
+        std::istream_iterator<DataStruct>(),
+        std::back_inserter(data));
 
-    std::sort(data.begin(), data.end(), [](const Data& a, const Data& b) {
-        if (a.key1 != b.key1) return a.key1 < b.key1;
-        if (a.key2 != b.key2) return a.key2 < b.key2;
-        return a.key3.length() < b.key3.length();
-        });
+    std::sort(data.begin(), data.end(), compareDataStruct);
 
-    std::copy(data.begin(), data.end(), std::ostream_iterator<Data>(std::cout, "\n"));
+    std::copy(data.cbegin(), data.cend(),
+        std::ostream_iterator<DataStruct>(std::cout, "\n"));
+
     return 0;
 }
 
