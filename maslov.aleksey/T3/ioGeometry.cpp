@@ -1,5 +1,6 @@
 #include "ioGeometry.hpp"
 #include <ioDelimiter.hpp>
+#include <algorithm>
 #include <iterator>
 #include <iostream>
 
@@ -22,21 +23,20 @@ std::istream & maslov::operator>>(std::istream & in, Polygon & dest)
     return in;
   }
   size_t num = 0;
-  if (!(in >> num))
+  if (!(in >> num) || num < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  for (size_t i = 0; i < num; ++i)
+  std::vector< Point > temp(num);
+  using iIterator = std::istream_iterator< Point >;
+  std::copy_n(iIterator(in), num, temp.begin());
+  if (!in)
   {
-    Point point;
-    if (!(in >> point))
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    dest.points.push_back(point);
+    in.setstate(std::ios::failbit);
+    return in;
   }
+  dest.points = std::move(temp);
   return in;
 }
 

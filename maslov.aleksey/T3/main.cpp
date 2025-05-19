@@ -25,12 +25,12 @@ int main(int argc, char * argv[])
   std::vector< Polygon > polygons;
   while (!file.eof())
   {
-    std::copy(iIterator(file), iIterator(), std::back_inserter(polygons));
-    if (!file)
+    if (file.fail())
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+    std::copy(iIterator(file), iIterator(), std::back_inserter(polygons));
   }
 
   std::map< std::string, std::function< void() > > cmds;
