@@ -22,12 +22,12 @@ namespace {
 
   double add_main_diagonal(const maslevtsov::Point& lhs, const maslevtsov::Point& rhs)
   {
-    return lhs.y * rhs.x;
+    return lhs.x * rhs.y;
   }
 
   double subtract_sub_diagonal(const maslevtsov::Point& lhs, const maslevtsov::Point& rhs)
   {
-    return -(lhs.x * rhs.y);
+    return -(lhs.y * rhs.x);
   }
 
   double get_polygon_area(const maslevtsov::Polygon& polygon)
@@ -35,8 +35,7 @@ namespace {
     std::vector< maslevtsov::Point > second_lace;
     std::copy(++polygon.points.cbegin(), polygon.points.cend(), std::back_inserter(second_lace));
     second_lace.push_back(*polygon.points.cbegin());
-    std::vector< double > to_accumulate;
-    to_accumulate.reserve(polygon.points.size());
+    std::vector< double > to_accumulate(polygon.points.size());
     auto begin_it = polygon.points.cbegin();
     auto end_it = polygon.points.cend();
     double area = 0.0;
