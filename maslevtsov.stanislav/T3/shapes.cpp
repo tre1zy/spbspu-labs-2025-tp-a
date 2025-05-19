@@ -29,7 +29,12 @@ std::istream& maslevtsov::operator>>(std::istream& in, Point& rhs)
   if (!sentry) {
     return in;
   }
-  return in >> DelimiterIn{'('} >> rhs.x >> DelimiterIn{';'} >> rhs.y >> DelimiterIn{')'};
+  Point temp{0, 0};
+  in >> DelimiterIn{'('} >> temp.x >> DelimiterIn{';'} >> temp.y >> DelimiterIn{')'};
+  if (in) {
+    rhs = temp;
+  }
+  return in;
 }
 
 std::istream& maslevtsov::operator>>(std::istream& in, Polygon& rhs)
@@ -42,6 +47,7 @@ std::istream& maslevtsov::operator>>(std::istream& in, Polygon& rhs)
   in >> vertex_num;
   if (vertex_num < 3) {
     in.setstate(std::ios::failbit);
+    return in;
   }
   std::copy_n(std::istream_iterator< Point >(in), vertex_num, std::back_inserter(rhs.points));
   if (!in || rhs.points.size() != vertex_num) {
