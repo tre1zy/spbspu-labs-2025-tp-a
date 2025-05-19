@@ -16,6 +16,7 @@ int main(int argc, char** argv)
   using iIter = std::istream_iterator< Polygon >;
   if (argc != 2)
   {
+    std::cout << "Atleast 2 optional supported commands\n";
     return 1;
   }
   std::ifstream file(argv[1]);
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
   return 0;
