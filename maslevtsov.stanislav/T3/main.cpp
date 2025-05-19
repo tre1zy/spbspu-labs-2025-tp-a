@@ -39,6 +39,7 @@ int main(int argc, char** argv)
   while (!(std::cin >> command).eof()) {
     try {
       commands.at(command)(std::cin, std::cout);
+      std::cout << '\n';
     } catch (...) {
       if (std::cin.fail()) {
         std::cin.clear();

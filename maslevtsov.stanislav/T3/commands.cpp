@@ -93,7 +93,7 @@ void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& 
     result /= filtered.size();
   }
   maslevtsov::IOFmtGuard guard(out);
-  out << std::fixed << std::setprecision(1) << result << '\n';
+  out << std::fixed << std::setprecision(1) << result;
 }
 
 void maslevtsov::get_max(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
@@ -106,9 +106,9 @@ void maslevtsov::get_max(const std::vector< Polygon >& polygons, std::istream& i
   if (subcommand == "AREA") {
     std::vector< double > areas;
     std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), get_polygon_area);
-    out << *std::max_element(areas.cbegin(), areas.cend()) << '\n';
+    out << *std::max_element(areas.cbegin(), areas.cend());
   } else if (subcommand == "VERTEXES") {
-    out << std::max_element(polygons.cbegin(), polygons.cend(), compare_vertex_num_less)->points.size() << '\n';
+    out << std::max_element(polygons.cbegin(), polygons.cend(), compare_vertex_num_less)->points.size();
   } else {
     throw std::invalid_argument("invalid subcommand");
   }
@@ -124,9 +124,9 @@ void maslevtsov::get_min(const std::vector< Polygon >& polygons, std::istream& i
   if (subcommand == "AREA") {
     std::vector< double > areas;
     std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), get_polygon_area);
-    out << *std::min_element(areas.cbegin(), areas.cend()) << '\n';
+    out << *std::min_element(areas.cbegin(), areas.cend());
   } else if (subcommand == "VERTEXES") {
-    out << std::min_element(polygons.cbegin(), polygons.cend(), compare_vertex_num_less)->points.size() << '\n';
+    out << std::min_element(polygons.cbegin(), polygons.cend(), compare_vertex_num_less)->points.size();
   } else {
     throw std::invalid_argument("invalid subcommand");
   }
@@ -137,16 +137,16 @@ void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::ist
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "EVEN") {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), is_even_vertex_num) << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), is_even_vertex_num);
   } else if (subcommand == "ODD") {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), is_odd_vertex_num) << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), is_odd_vertex_num);
   } else {
     std::size_t vertex_num = std::stoull(subcommand);
     if (vertex_num < 3) {
       throw std::invalid_argument("invalid polygon");
     }
     auto same_vertex_num = std::bind(is_equal_vertex_num, vertex_num, std::placeholders::_1);
-    out << std::count_if(polygons.cbegin(), polygons.cend(), same_vertex_num) << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), same_vertex_num);
   }
 }
 
