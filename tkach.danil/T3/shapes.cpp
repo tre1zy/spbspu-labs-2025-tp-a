@@ -29,7 +29,7 @@ std::istream& tkach::operator>>(std::istream& in, Polygon& polygon)
   }
   std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
-  if (!in)
+  if (!in || in.peek() != '\n')
   {
     in.setstate(std::ios::failbit);
     return in;

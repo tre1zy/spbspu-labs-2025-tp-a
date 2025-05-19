@@ -284,9 +284,16 @@ void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Po
   std::vector< double > areas;
   std::transform(cleared.begin(), cleared.end(), std::back_inserter(areas), calculatePolygonArea);
   out << std::fixed << std::setprecision(1);
-  if (sub_cmd == "MEAN" && !areas.empty())
+  if (sub_cmd == "MEAN")
   {
-    out << std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size() << "\n";
+    if (!areas.empty())
+    {
+      out << std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size() << "\n";
+    }
+    else
+    {
+      throw std::logic_error("Error: zero polygons");
+    }
   }
   else
   {
