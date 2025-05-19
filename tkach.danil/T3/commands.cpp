@@ -22,6 +22,41 @@ namespace
       return area;
     }
   };
+  bool pointCmp(const tkach::Point& lhs, const tkach::Point& rhs)
+  {
+    if (lhs.x != rhs.x)
+    {
+      return lhs.x < rhs.x;
+    }
+    else
+    {
+      return lhs.y < rhs.y;
+    }
+  }
+  bool deltaCmp(const tkach::Point& lhs, const tkach::Point& rhs, double deltax, double deltay)
+  {
+    return std::fabs(lhs.x - rhs.x - deltax) < 1e-9 && std::fabs(lhs.y - rhs.y - deltay) < 1e-9;
+  }
+
+  struct PolySame
+  {
+    const tkach::Polygon& poly;
+    double deltax;
+    double deltay;
+    bool operator()(const tkach::Polygon& p)
+    {
+      if (poly.points.size() != p.points.size())
+      {
+        return false;
+      }
+      std::vector< tkach::Point > temp = p.points;
+      std::sort(temp.begin(), temp.end(), pointCmp);
+      deltax = temp[0].x - poly.points[0].x;
+      deltay = temp[0].y - poly.points[0].y;
+      auto cmp = std::bind(deltaCmp, std::placeholders::_1, std::placeholders::_2, deltax, deltay);
+      return std::equal(temp.begin(), temp.end(), poly.points.begin(), cmp);
+    }
+  };
 
   double calculatePolygonArea(const tkach::Polygon& polygon)
   {
@@ -49,64 +84,171 @@ namespace
     return polygon.points.size() == required_count;
   }
 
-  std::vector< tkach::Polygon > filteredEven(const std::vector< tkach::Polygon >& data)
+  std::vector< tkach::Polygon > clearedEven(const std::vector< tkach::Polygon >& data)
   {
-    if (data.empty())
-    {
-      throw std::logic_error("Error: zero polygons");
-    }
     std::vector< tkach::Polygon > result;
     std::copy_if(data.begin(), data.end(), std::back_inserter(result), isEven);
     return result;
   }
 
-  std::vector< tkach::Polygon > filteredOdd(const std::vector< tkach::Polygon >& data)
+  std::vector< tkach::Polygon > clearedOdd(const std::vector< tkach::Polygon >& data)
   {
-    if (data.empty())
-    {
-      throw std::logic_error("Error: zero polygons");
-    }
     std::vector< tkach::Polygon > result;
     std::copy_if(data.begin(), data.end(), std::back_inserter(result), isOdd);
     return result;
   }
 
-  std::vector< tkach::Polygon > filteredMean(const std::vector< tkach::Polygon >& data)
+  std::vector< tkach::Polygon > clearedMean(const std::vector< tkach::Polygon >& data)
   {
-    if (data.empty())
-    {
-      throw std::logic_error("Error: zero polygons");
-    }
     return data;
   }
 
-  std::vector< tkach::Polygon > filteredCount(const std::vector< tkach::Polygon >& data, size_t required_count)
+  std::vector< tkach::Polygon > clearedCount(const std::vector< tkach::Polygon >& data, size_t required_count)
   {
-    if (data.empty())
-    {
-      throw std::logic_error("Error: zero polygons");
-    }
     std::vector< tkach::Polygon > result;
     auto predicate = std::bind(checkVertexCount, std::placeholders::_1, required_count);
     std::copy_if(data.begin(), data.end(), std::back_inserter(result), predicate);
     return result;
   }
+
+  bool compareArea(const tkach::Polygon& lhs, const tkach::Polygon& rhs)
+  {
+    return calculatePolygonArea(lhs) < calculatePolygonArea(rhs);
+  }
+
+  bool compareVertex(const tkach::Polygon& lhs, const tkach::Polygon& rhs)
+  {
+    return lhs.points.size() < rhs.points.size();
+  }
+
+  std::ostream& printMaxArea(std::ostream& out, const std::vector< tkach::Polygon >& data)
+  {
+    double result = calculatePolygonArea(*(std::max_element(data.cbegin(), data.cend(), compareArea)));
+    tkach::StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1) << result << "\n";
+    return out;
+  }
+
+  std::ostream& printMaxVert(std::ostream& out, const std::vector< tkach::Polygon >& data)
+  {
+    int result = (*(std::max_element(data.cbegin(), data.cend(), compareVertex))).points.size();
+    tkach::StreamGuard guard(out);
+    out << result << "\n";
+    return out;
+  }
+
+  std::ostream& printMinArea(std::ostream& out, const std::vector< tkach::Polygon >& data)
+  {
+    double result = calculatePolygonArea(*(std::min_element(data.cbegin(), data.cend(), compareArea)));
+    tkach::StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1) << result << "\n";
+    return out;
+  }
+
+  std::ostream& printMinVert(std::ostream& out, const std::vector< tkach::Polygon >& data)
+  {
+    int result = (*(std::min_element(data.cbegin(), data.cend(), compareVertex))).points.size();
+    tkach::StreamGuard guard(out);
+    out << result << "\n";
+    return out;
+  }
+
+  double getDistance(const tkach::Point& lhs, const tkach::Point& rhs)
+  {
+    return std::sqrt(std::pow((lhs.x - rhs.x), 2) + std::pow((lhs.y - rhs.y), 2));
+  }
+
+  bool isRect(const tkach::Polygon& polygon)
+  {
+    if (polygon.points.size() != 4)
+    {
+      return false;
+    }
+    return (getDistance(polygon.points[0], polygon.points[2]) - getDistance(polygon.points[1], polygon.points[3])) < 1e-9;
+  }
 }
 
-void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
+void tkach::printMax(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
+  if (data.empty())
+  {
+    throw std::logic_error("Error: zero polygons");
+  }
+  using sub_commands_map = std::map< std::string, std::function< std::ostream&() > >;
+  StreamGuard guard(out);
+  sub_commands_map sub_cmds;
+  sub_cmds["AREA"] = std::bind(printMaxArea, std::ref(out), std::cref(data));
+  sub_cmds["VERTEXES"] = std::bind(printMaxVert, std::ref(out), std::cref(data));
+  std::string sub_cmd;
+  in >> sub_cmd;
+  try
+  {
+    sub_cmds.at(sub_cmd)();
+  }
+  catch (...)
+  {
+    throw std::logic_error("Error: not that command");
+  }
+}
+
+void tkach::printMin(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
+{
+  if (data.empty())
+  {
+    throw std::logic_error("Error: zero polygons");
+  }
+  using sub_commands_map = std::map< std::string, std::function< std::ostream&() > >;
+  StreamGuard guard(out);
+  sub_commands_map sub_cmds;
+  sub_cmds["AREA"] = std::bind(printMinArea, std::ref(out), std::cref(data));
+  sub_cmds["VERTEXES"] = std::bind(printMinVert, std::ref(out), std::cref(data));
+  std::string sub_cmd;
+  in >> sub_cmd;
+  try
+  {
+    sub_cmds.at(sub_cmd)();
+  }
+  catch (...)
+  {
+    throw std::logic_error("Error: not that command");
+  }
+}
+
+void tkach::printSame(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
+{
+  Polygon target;
+  in >> target;
+  if (target.points.size() < 3)
+  {
+    throw std::logic_error("Error: not polygin");
+  }
+  std::sort(target.points.begin(), target.points.end(), pointCmp);
+  PolySame cmp{target, 0, 0};
+  out << std::count_if(data.begin(), data.end(), cmp) << '\n';
+}
+
+void tkach::printRects(std::ostream& out, const std::vector< Polygon >& data)
+{
+  out << std::count_if(data.begin(), data.end(), isRect) << "\n";
+}
+
+void tkach::printCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
+{
+  if (data.empty())
+  {
+    throw std::logic_error("Error: zero polygons");
+  }
   using sub_commands_map = std::map< std::string, std::function< std::vector< Polygon >() > >;
   StreamGuard guard(out);
   sub_commands_map sub_cmds;
-  sub_cmds["EVEN"] = std::bind(filteredEven, std::cref(data));
-  sub_cmds["ODD"] = std::bind(filteredOdd, std::cref(data));
-  sub_cmds["MEAN"] = std::bind(filteredMean, std::cref(data));
+  sub_cmds["EVEN"] = std::bind(clearedEven, std::cref(data));
+  sub_cmds["ODD"] = std::bind(clearedOdd, std::cref(data));
   std::string sub_cmd;
   in >> sub_cmd;
-  std::vector< tkach::Polygon > filtered; 
+  std::vector< tkach::Polygon > cleared;
   try
   {
-    filtered = sub_cmds.at(sub_cmd)();
+    cleared = sub_cmds.at(sub_cmd)();
   }
   catch (...)
   {
@@ -115,10 +257,41 @@ void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Po
     {
       throw std::logic_error("Error: no polygon");
     }
-    filtered = filteredCount(data, count);
+    cleared = clearedCount(data, count);
+  }
+  out << cleared.size() << "\n";
+}
+
+void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
+{
+  if (data.empty())
+  {
+    throw std::logic_error("Error: zero polygons");
+  }
+  using sub_commands_map = std::map< std::string, std::function< std::vector< Polygon >() > >;
+  StreamGuard guard(out);
+  sub_commands_map sub_cmds;
+  sub_cmds["EVEN"] = std::bind(clearedEven, std::cref(data));
+  sub_cmds["ODD"] = std::bind(clearedOdd, std::cref(data));
+  sub_cmds["MEAN"] = std::bind(clearedMean, std::cref(data));
+  std::string sub_cmd;
+  in >> sub_cmd;
+  std::vector< tkach::Polygon > cleared;
+  try
+  {
+    cleared = sub_cmds.at(sub_cmd)();
+  }
+  catch (...)
+  {
+    size_t count = std::stoull(sub_cmd);
+    if (count < 3)
+    {
+      throw std::logic_error("Error: no polygon");
+    }
+    cleared = clearedCount(data, count);
   }
   std::vector< double > areas;
-  std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), calculatePolygonArea);
+  std::transform(cleared.begin(), cleared.end(), std::back_inserter(areas), calculatePolygonArea);
   out << std::fixed << std::setprecision(1);
   if (sub_cmd == "MEAN")
   {

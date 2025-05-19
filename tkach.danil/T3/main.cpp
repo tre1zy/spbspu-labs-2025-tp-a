@@ -31,6 +31,11 @@ int main()
   }
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(printArea, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MAX"] = std::bind(printMax, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MIN"] = std::bind(printMin, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["COUNT"] = std::bind(printCount, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["SAME"] = std::bind(printSame, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["RECTS"] = std::bind(printRects, std::ref(std::cout), std::cref(data));
   std::string command;
   while (!(std::cin >> command).eof()) {
     try
