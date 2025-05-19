@@ -1,5 +1,5 @@
 #ifndef STRUCTS_HPP
-#define STRUCT_HPP
+#define STRUCTS_HPP
 #include <string>
 #include <iostream>
 
