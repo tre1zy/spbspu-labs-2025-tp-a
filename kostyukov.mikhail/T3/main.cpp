@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <exception>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -17,7 +16,6 @@ int main(int argc, char** argv)
   using iIter = std::istream_iterator< Polygon >;
   if (argc != 2)
   {
-    std::cerr << "invalid count parameters\n";
     return 1;
   }
   std::ifstream file(argv[1]);
@@ -46,7 +44,7 @@ int main(int argc, char** argv)
       commands.at(command)();
       std::cout << '\n';
     }
-    catch (const std::exception&)
+    catch (...)
     {
       if (std::cin.fail())
       {

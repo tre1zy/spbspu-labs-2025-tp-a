@@ -26,6 +26,10 @@ namespace
 
   bool isPermutation(const kostyukov::Polygon& polygon1, const kostyukov::Polygon& polygon2)
   {
+    if (polygon1.points.size() != polygon2.points.size())
+    {
+      return false;
+    }
     return std::is_permutation(polygon1.points.cbegin(), polygon1.points.cend(), polygon2.points.cbegin());
   }
 
@@ -34,30 +38,6 @@ namespace
     return true;
   }
 
-  bool hasRightAngles(const kostyukov::Polygon& polygon)
-  {
-    size_t countVertexes = polygon.points.size();
-    if (countVertexes < 3)
-    {
-      return false;
-    }
-    for (size_t i = 0; i < countVertexes; ++i)
-    {
-      const kostyukov::Point& previous = polygon.points[(i + countVertexes - 1) % countVertexes];
-      const kostyukov::Point& current = polygon.points[i];
-      const kostyukov::Point& next = polygon.points[(i + 1) % countVertexes];
-      double vector1_x = current.x - previous.x;
-      double vector1_y = current.y - previous.y;
-      double vector2_x = next.x - current.x;
-      double vector2_y = next.y - current.y;
-      double scalarProduct = vector1_x * vector2_x + vector1_y * vector2_y;
-      if (scalarProduct == 0)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
   struct VertexExpected
   {
     size_t count;
@@ -156,6 +136,44 @@ namespace
   {
     kostyukov::Polygon min = (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator));
     return min.points.size();
+  }
+
+  struct rightAnglesInspector
+  {
+    const kostyukov::Polygon polygon;
+    bool operator()(size_t number) const
+    {
+      size_t countVertexes = polygon.points.size();
+      const kostyukov::Point& previous = polygon.points[(number + countVertexes - 1) % countVertexes];
+      const kostyukov::Point& current = polygon.points[number];
+      const kostyukov::Point& next = polygon.points[(number + 1) % countVertexes];
+      double vector1_x = current.x - previous.x;
+      double vector1_y = current.y - previous.y;
+      double vector2_x = next.x - current.x;
+      double vector2_y = next.y - current.y;
+      double scalarProduct = vector1_x * vector2_x + vector1_y * vector2_y;
+      return scalarProduct == 0;
+    }
+  };
+
+  struct AccumulatorRightAngles
+  {
+    const kostyukov::Polygon polygon;
+    bool operator()(bool alreadyHasRightAngle, size_t number) const
+    {
+      if (alreadyHasRightAngle)
+      {
+        return true;
+      }
+      return rightAnglesInspector{ polygon }(number);
+    }
+  };
+
+  bool hasRightAngles(const kostyukov::Polygon& polygon)
+  {
+    std::vector< size_t > numbers(polygon.points.size());
+    std::iota(numbers.begin(), numbers.end(), 0);
+    return std::accumulate(numbers.begin(), numbers.end(), false, AccumulatorRightAngles{ polygon });
   }
 }
 
