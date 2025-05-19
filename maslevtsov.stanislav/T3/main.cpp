@@ -29,21 +29,22 @@ int main(int argc, char** argv)
     std::copy(std::istream_iterator< Polygon >(fin), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
   std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
-  commands["AREA"] = std::bind(get_area, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
-  commands["MAX"] = std::bind(get_max, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
-  commands["MIN"] = std::bind(get_min, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
-  commands["COUNT"] = std::bind(count_vertexes, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
-  commands["ECHO"] = std::bind(echo, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
-  commands["RMECHO"] = std::bind(remove_echo, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
+  using namespace std::placeholders;
+  commands["AREA"] = std::bind(get_area, std::cref(polygons), _1, _2);
+  commands["MAX"] = std::bind(get_max, std::cref(polygons), _1, _2);
+  commands["MIN"] = std::bind(get_min, std::cref(polygons), _1, _2);
+  commands["COUNT"] = std::bind(count_vertexes, std::cref(polygons), _1, _2);
+  commands["ECHO"] = std::bind(echo, std::ref(polygons), _1, _2);
+  commands["RMECHO"] = std::bind(remove_echo, std::ref(polygons), _1, _2);
   std::string command;
-  while (std::cin >> command) {
+  while (!(std::cin >> command).eof()) {
     try {
       commands.at(command)(std::cin, std::cout);
       std::cout << '\n';
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
