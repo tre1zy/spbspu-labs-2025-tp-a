@@ -17,6 +17,8 @@ namespace maslevtsov {
 
   std::istream& operator>>(std::istream& in, Point& rhs);
   std::istream& operator>>(std::istream& in, Polygon& rhs);
+
+  bool operator==(const Point& lhs, const Point& rhs);
 }
 
 #endif
