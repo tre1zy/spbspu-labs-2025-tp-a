@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   {
     if (file.fail())
     {
-      file.clear();
+      file.clear(file.rdstate() ^ std::ios_base::failbit);
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(
