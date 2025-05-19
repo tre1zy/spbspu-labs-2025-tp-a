@@ -41,11 +41,9 @@ int main(int argc, char** argv)
       commands.at(command)(std::cin, std::cout);
       std::cout << '\n';
     } catch (...) {
-      if (std::cin.fail()) {
-        std::cin.clear();
-      }
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
