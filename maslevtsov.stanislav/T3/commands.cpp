@@ -53,6 +53,14 @@ namespace {
   {
     return lhs.points.size() < rhs.points.size();
   }
+
+  bool is_same(const maslevtsov::Polygon& lhs, const maslevtsov::Polygon& rhs)
+  {
+    if (lhs.points.size() != rhs.points.size()) {
+      return false;
+    }
+    return std::mismatch(lhs.points.cbegin(), lhs.points.cend(), rhs.points.cbegin()).first == rhs.points.cend();
+  }
 }
 
 void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
@@ -75,8 +83,8 @@ void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& 
     if (vertex_num < 3) {
       throw std::invalid_argument("invalid polygon");
     }
-    auto vertex_predicate = std::bind(is_equal_vertex_num, vertex_num, std::placeholders::_1);
-    std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(filtered), vertex_predicate);
+    auto same_vertex_num = std::bind(is_equal_vertex_num, vertex_num, std::placeholders::_1);
+    std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(filtered), same_vertex_num);
   }
   std::vector< double > to_accumulate;
   std::transform(filtered.cbegin(), filtered.cend(), std::back_inserter(to_accumulate), get_polygon_area);
@@ -137,8 +145,8 @@ void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::ist
     if (vertex_num < 3) {
       throw std::invalid_argument("invalid polygon");
     }
-    auto vertex_predicate = std::bind(is_equal_vertex_num, vertex_num, std::placeholders::_1);
-    out << std::count_if(polygons.cbegin(), polygons.cend(), vertex_predicate) << '\n';
+    auto same_vertex_num = std::bind(is_equal_vertex_num, vertex_num, std::placeholders::_1);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), same_vertex_num) << '\n';
   }
 }
 
@@ -154,10 +162,15 @@ void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::o
 
 void maslevtsov::remove_echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  std::size_t temp = 0;
-  temp = polygons.empty();
-  ++temp;
-  std::string subcommand;
-  in >> subcommand;
-  out << "RMECHO " << subcommand << '\n';
+  Polygon polygon;
+  if (!(in >> polygon)) {
+    throw std::invalid_argument("invalid polygon");
+  }
+  auto same_with_arg = std::bind(is_same, polygon, std::placeholders::_1);
+  auto same_first_with_arg = std::bind(same_with_arg, std::placeholders::_1);
+  auto same_second_with_arg = std::bind(same_with_arg, std::placeholders::_2);
+  auto same_both_to_arg = std::bind(std::logical_and< bool >{}, same_first_with_arg, same_second_with_arg);
+  auto first_to_erase = std::unique(polygons.begin(), polygons.end(), same_both_to_arg);
+  out << std::distance(first_to_erase, polygons.end());
+  polygons.erase(first_to_erase, polygons.end());
 }
