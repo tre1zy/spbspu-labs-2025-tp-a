@@ -59,7 +59,7 @@ namespace {
     if (lhs.points.size() != rhs.points.size()) {
       return false;
     }
-    return std::mismatch(lhs.points.cbegin(), lhs.points.cend(), rhs.points.cbegin()).first == rhs.points.cend();
+    return std::mismatch(lhs.points.cbegin(), lhs.points.cend(), rhs.points.cbegin()).first == lhs.points.cend();
   }
 }
 
