@@ -1,11 +1,13 @@
 #include "commands.hpp"
-#include <streamGuard.hpp>
 #include <functional>
 #include <algorithm>
-#include <iomanip>
+#include <iterator>
 #include <iostream>
+#include <iomanip>
+#include <numeric>
 #include <string>
 #include <map>
+#include <streamGuard.hpp>
 #include "polygonOperations.hpp"
 
 namespace
@@ -34,10 +36,6 @@ namespace
 
   void getAreaMean(std::ostream & out, const std::vector< maslov::Polygon > & polygons)
   {
-    if (polygons.empty())
-    {
-      throw;
-    }
     maslov::StreamGuard guard(out);
     std::vector< double > areas;
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::AreaCalculator{});
@@ -87,30 +85,14 @@ namespace
     auto result = *std::min_element(polygons.begin(), polygons.end(), maslov::VertexesComparator{});
     out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
   }
-
-  void getCountEven(std::ostream & out, const std::vector< maslov::Polygon > & polygons)
-  {
-    std::vector< maslov::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::IsEven{});
-    out << filtered.size() << '\n';
-  }
-
-  void getCountOdd(std::ostream & out, const std::vector< maslov::Polygon > & polygons)
-  {
-    std::vector< maslov::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::IsOdd{});
-    out << filtered.size() << '\n';
-  }
-
-  void getCountVertexes(std::ostream & out, const std::vector< maslov::Polygon > & polygons, size_t num)
-  {
-    std::vector< maslov::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::SameVertexes{num});
-    out << filtered.size() << '\n';
-  }
 }
+
 void maslov::getArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
   std::string subcmd;
   in >> subcmd;
   if (subcmd == "EVEN")
@@ -134,6 +116,10 @@ void maslov::getArea(std::istream & in, std::ostream & out, const std::vector< P
 
 void maslov::getMax(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["AREA"] = std::bind(getMaxArea, std::ref(out), std::cref(polygons));
   subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
@@ -145,6 +131,10 @@ void maslov::getMax(std::istream & in, std::ostream & out, const std::vector< Po
 
 void maslov::getMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["AREA"] = std::bind(getMinArea, std::ref(out), std::cref(polygons));
   subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
@@ -156,38 +146,48 @@ void maslov::getMin(std::istream & in, std::ostream & out, const std::vector< Po
 
 void maslov::getCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
   std::string subcmd;
   in >> subcmd;
   if (subcmd == "EVEN")
   {
-    getCountEven(out, polygons);
+    out << std::count_if(polygons.begin(), polygons.end(), IsEven{}) << '\n';
   }
   else if (subcmd == "ODD")
   {
-    getCountOdd(out, polygons);
+    out << std::count_if(polygons.begin(), polygons.end(), IsOdd{}) << '\n';
   }
   else
   {
     size_t num = std::stoul(subcmd);
-    getCountVertexes(out, polygons, num);
+    out << std::count_if(polygons.begin(), polygons.end(), SameVertexes{num}) << '\n';
   }
 }
 
 void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon > & polygons)
 {
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
   Polygon inPolygon;
   in >> inPolygon;
-  std::vector< maslov::Polygon > filtered;
-  std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::SamePolygon{inPolygon});
+  size_t count = std::count_if(polygons.begin(), polygons.end(), SamePolygon{inPolygon});
   std::vector< Polygon > result;
-  dublicatePolygon(polygons, inPolygon, result);
+  std::vector< int > temp;
+  std::transform(polygons.begin(), polygons.end(), temp.begin(), EchoInserter{result, inPolygon});
   polygons = std::move(result);
-  out << filtered.size() << '\n';
+  out << count << '\n';
 }
 
 void maslov::getRects(std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  std::vector< maslov::Polygon > filtered;
-  std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::IsRectangle{});
-  out << filtered.size() << '\n';
+  if (polygons.empty())
+  {
+    throw std::runtime_error("ERROR: there are no polygons");
+  }
+  out << std::count_if(polygons.begin(), polygons.end(), IsRectangle{}) << '\n';
 }

@@ -5,7 +5,6 @@
 #include <limits>
 #include <map>
 #include "commands.hpp"
-#include "ioGeometry.hpp"
 
 int main(int argc, char * argv[])
 {

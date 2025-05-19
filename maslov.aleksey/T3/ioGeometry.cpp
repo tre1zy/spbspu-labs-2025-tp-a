@@ -57,3 +57,13 @@ std::ostream & maslov::operator<<(std::ostream & out, const Polygon & dest)
   std::copy(dest.points.begin(), dest.points.end(), oIterator(out, " "));
   return out;
 }
+
+bool maslov::Point::operator==(const Point & rhs) const
+{
+  return x == rhs.x && y == rhs.y;
+}
+
+bool maslov::Polygon::operator==(const Polygon & rhs) const
+{
+  return points == rhs.points;
+}
