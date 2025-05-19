@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
+#include <io_fmt_guard.hpp>
 
 namespace {
 
@@ -27,7 +28,7 @@ namespace {
 
   double subtract_sub_diagonal(const maslevtsov::Point& lhs, const maslevtsov::Point& rhs)
   {
-    return -(lhs.y * rhs.x);
+    return -lhs.y * rhs.x;
   }
 
   double get_polygon_area(const maslevtsov::Polygon& polygon)
@@ -83,7 +84,8 @@ void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& 
   if (subcommand == "MEAN") {
     result /= filtered.size();
   }
-  out << result << '\n';
+  maslevtsov::IOFmtGuard guard(out);
+  out << std::fixed << std::setprecision(1) << result << '\n';
 }
 
 void maslevtsov::get_max(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
