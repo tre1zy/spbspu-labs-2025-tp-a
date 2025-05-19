@@ -17,4 +17,4 @@ namespace smirnov {
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
 }
 
-#endif 
+#endif
