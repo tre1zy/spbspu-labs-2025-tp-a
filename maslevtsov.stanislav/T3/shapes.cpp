@@ -53,7 +53,7 @@ std::istream& maslevtsov::operator>>(std::istream& in, Polygon& rhs)
   if (in.peek() != '\n') {
     std::copy_n(std::istream_iterator< Point >(in), 1, std::back_inserter(rhs.points));
   }
-  if (!in || rhs.points.size() != vertex_num || in.peek() == '\n') {
+  if (!in || rhs.points.size() != vertex_num || in.peek() != '\n') {
     rhs.points.clear();
     in.setstate(std::ios::failbit);
   }
