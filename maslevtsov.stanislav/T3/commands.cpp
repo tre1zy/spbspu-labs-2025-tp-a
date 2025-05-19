@@ -77,7 +77,6 @@ void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& 
       throw std::invalid_argument("no polygons");
     }
     std::copy(polygons.cbegin(), polygons.cend(), std::back_inserter(filtered));
-    return;
   } else {
     std::size_t vertex_num = std::stoull(subcommand);
     if (vertex_num < 3) {
@@ -106,7 +105,8 @@ void maslevtsov::get_max(const std::vector< Polygon >& polygons, std::istream& i
   if (subcommand == "AREA") {
     std::vector< double > areas;
     std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), get_polygon_area);
-    out << *std::max_element(areas.cbegin(), areas.cend());
+    maslevtsov::IOFmtGuard guard(out);
+    out << std::fixed << std::setprecision(1) << *std::max_element(areas.cbegin(), areas.cend());
   } else if (subcommand == "VERTEXES") {
     out << std::max_element(polygons.cbegin(), polygons.cend(), compare_vertex_num_less)->points.size();
   } else {
@@ -124,7 +124,8 @@ void maslevtsov::get_min(const std::vector< Polygon >& polygons, std::istream& i
   if (subcommand == "AREA") {
     std::vector< double > areas;
     std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), get_polygon_area);
-    out << *std::min_element(areas.cbegin(), areas.cend());
+    maslevtsov::IOFmtGuard guard(out);
+    out << std::fixed << std::setprecision(1) << *std::min_element(areas.cbegin(), areas.cend());
   } else if (subcommand == "VERTEXES") {
     out << std::min_element(polygons.cbegin(), polygons.cend(), compare_vertex_num_less)->points.size();
   } else {
