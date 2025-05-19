@@ -29,12 +29,10 @@ std::istream& tkach::operator>>(std::istream& in, Polygon& polygon)
   }
   std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
-  if (!in || in.peek() != '\n')
+  if (in)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    polygon.points = std::move(temp);
   }
-  polygon.points = std::move(temp);
   return in;
 }
 

@@ -217,7 +217,7 @@ void tkach::printMin(std::istream& in, std::ostream& out, const std::vector< Pol
 void tkach::printSame(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
   Polygon target;
-  if (!(in >> target) || target.points.size() < 3)
+  if (!(in >> target) || target.points.size() < 3 || in.peek() != '\n')
   {
     throw std::logic_error("Error: not polygon");
   }
