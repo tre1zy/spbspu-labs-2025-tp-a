@@ -110,6 +110,10 @@ void maslov::getArea(std::istream & in, std::ostream & out, const std::vector< P
   else
   {
     size_t num = std::stoul(subcmd);
+    if (num < 3)
+    {
+      throw std::logic_error("ERROR: the polygon consists of at least 3 vertices");
+    }
     getAreaVertexes(out, polygons, num);
   }
 }
@@ -159,16 +163,16 @@ void maslov::getCount(std::istream & in, std::ostream & out, const std::vector< 
   else
   {
     size_t num = std::stoul(subcmd);
+    if (num < 3)
+    {
+      throw std::logic_error("ERROR: the polygon consists of at least 3 vertices");
+    }
     out << std::count_if(polygons.begin(), polygons.end(), SameVertexes{num}) << '\n';
   }
 }
 
 void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon > & polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::runtime_error("ERROR: there are no polygons");
-  }
   Polygon inPolygon;
   in >> inPolygon;
   size_t count = std::count_if(polygons.begin(), polygons.end(), SamePolygon{inPolygon});
@@ -181,9 +185,5 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
 
 void maslov::getRects(std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::runtime_error("ERROR: there are no polygons");
-  }
   out << std::count_if(polygons.begin(), polygons.end(), IsRectangle{}) << '\n';
 }
