@@ -63,7 +63,7 @@ std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
     in.setstate(std::ios::failbit);
     return in;
   }
-  if (!in)
+  if (in)
   {
     dest.points = std::move(newPoints);
   }
