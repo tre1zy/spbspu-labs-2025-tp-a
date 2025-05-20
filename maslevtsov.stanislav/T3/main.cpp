@@ -4,8 +4,8 @@
 #include <iterator>
 #include <limits>
 #include <map>
-#include "get_area.hpp"
-#include "get_max_min.hpp"
+#include "calc_areas.hpp"
+#include "find_max_min.hpp"
 #include "count.hpp"
 #include "echo_rmecho.hpp"
 
@@ -32,9 +32,9 @@ int main(int argc, char** argv)
   }
   std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
   using namespace std::placeholders;
-  commands["AREA"] = std::bind(get_area, std::cref(polygons), _1, _2);
-  commands["MAX"] = std::bind(get_max, std::cref(polygons), _1, _2);
-  commands["MIN"] = std::bind(get_min, std::cref(polygons), _1, _2);
+  commands["AREA"] = std::bind(calc_areas, std::cref(polygons), _1, _2);
+  commands["MAX"] = std::bind(find_max, std::cref(polygons), _1, _2);
+  commands["MIN"] = std::bind(find_min, std::cref(polygons), _1, _2);
   commands["COUNT"] = std::bind(count_vertexes, std::cref(polygons), _1, _2);
   commands["ECHO"] = std::bind(echo, std::ref(polygons), _1, _2);
   commands["RMECHO"] = std::bind(remove_echo, std::ref(polygons), _1, _2);

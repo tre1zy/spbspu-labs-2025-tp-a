@@ -5,28 +5,28 @@
 #include "functors.hpp"
 
 namespace {
-  void count_even_vertexes(const std::vector< maslevtsov::Polygon >& polygons, std::ostream& out)
+  std::size_t count_even_vertexes(const std::vector< maslevtsov::Polygon >& polygons)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), maslevtsov::is_even_vertex_num);
+    return std::count_if(polygons.cbegin(), polygons.cend(), maslevtsov::is_even_vertex_num);
   }
 
-  void count_odd_vertexes(const std::vector< maslevtsov::Polygon >& polygons, std::ostream& out)
+  std::size_t count_odd_vertexes(const std::vector< maslevtsov::Polygon >& polygons)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), maslevtsov::is_odd_vertex_num);
+    return std::count_if(polygons.cbegin(), polygons.cend(), maslevtsov::is_odd_vertex_num);
   }
 }
 
 void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  std::map< std::string, std::function< void(std::ostream&) > > subcommands;
+  std::map< std::string, std::function< std::size_t() > > subcommands;
   using namespace std::placeholders;
-  subcommands["EVEN"] = std::bind(count_even_vertexes, std::cref(polygons), _1);
-  subcommands["ODD"] = std::bind(count_odd_vertexes, std::cref(polygons), _1);
+  subcommands["EVEN"] = std::bind(count_even_vertexes, std::cref(polygons));
+  subcommands["ODD"] = std::bind(count_odd_vertexes, std::cref(polygons));
 
   std::string subcommand;
   in >> subcommand;
   try {
-    subcommands.at(subcommand)(out);
+    out << subcommands.at(subcommand)();
   } catch (const std::out_of_range&) {
     std::size_t vertex_num = std::stoull(subcommand);
     if (vertex_num < 3) {
