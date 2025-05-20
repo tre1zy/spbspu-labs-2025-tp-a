@@ -26,7 +26,7 @@ namespace smirnov {
         bool parseBinULL(const std::string& s, unsigned long long& out, std::string& raw_bin) {
             if (s.size() < 2) return false;
             if (s[0] != '0' || (s[1] != 'b' && s[1] != 'B')) return false;
-            raw_bin = s.substr(2); 
+            raw_bin = s.substr(2);
             try {
                 size_t pos;
                 out = std::stoull(raw_bin, &pos, 2);
@@ -93,7 +93,7 @@ namespace smirnov {
                 key1_found = true;
             }
             else if (key == "key2") {
-                if (!parseBinULL(value, temp.key2, temp.raw_bin)) return false; 
+                if (!parseBinULL(value, temp.key2, temp.raw_bin)) return false;
                 key2_found = true;
             }
             else if (key == "key3") {

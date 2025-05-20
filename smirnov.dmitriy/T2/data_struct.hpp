@@ -9,7 +9,7 @@ namespace smirnov {
         double key1;
         unsigned long long key2;
         std::string key3;
-        std::string raw_bin; 
+        std::string raw_bin;
     };
 
     bool compareDataStruct(const DataStruct& a, const DataStruct& b);
@@ -17,4 +17,4 @@ namespace smirnov {
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
 }
 
-#endif 
+#endif
