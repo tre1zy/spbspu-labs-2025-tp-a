@@ -4,8 +4,10 @@
 #include <iterator>
 #include <limits>
 #include <map>
-#include "shapes.hpp"
-#include "commands.hpp"
+#include "get_area.hpp"
+#include "get_max_min.hpp"
+#include "count.hpp"
+#include "echo_rmecho.hpp"
 
 int main(int argc, char** argv)
 {
