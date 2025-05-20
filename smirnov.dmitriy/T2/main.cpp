@@ -1,20 +1,25 @@
-#ifndef DATA_STRUCT_HPP
-#define DATA_STRUCT_HPP
-
 #include <iostream>
-#include <string>
+#include <vector>
+#include <algorithm>
+#include "data_struct.hpp"
 
-namespace smirnov {
-    struct DataStruct {
-        double key1;
-        unsigned long long key2;
-        std::string key3;
-    };
+int main() {
+    using smirnov::DataStruct;
+    using smirnov::compareDataStruct;
 
-    bool parseLine(const std::string& line, DataStruct& ds);
-    std::istream& operator>>(std::istream& is, DataStruct& ds);
-    std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
-    bool compareDataStruct(const DataStruct& a, const DataStruct& b);
+    std::vector<DataStruct> data;
+    DataStruct ds;
+
+    while (std::cin >> ds) {
+        data.push_back(ds);
+    }
+
+    std::sort(data.begin(), data.end(), compareDataStruct);
+
+    for (const auto& elem : data) {
+        std::cout << elem << std::endl;
+    }
+
+    return 0;
 }
 
-#endif
