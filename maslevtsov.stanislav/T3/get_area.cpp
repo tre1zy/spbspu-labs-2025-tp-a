@@ -1,5 +1,6 @@
 #include "get_area.hpp"
 #include <numeric>
+#include <algorithm>
 #include <functional>
 #include <io_fmt_guard.hpp>
 #include "functors.hpp"

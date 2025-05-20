@@ -1,5 +1,6 @@
 #include "get_max_min.hpp"
 #include <functional>
+#include <algorithm>
 #include <io_fmt_guard.hpp>
 #include "functors.hpp"
 

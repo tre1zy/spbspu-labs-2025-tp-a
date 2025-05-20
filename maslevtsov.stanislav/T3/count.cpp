@@ -1,5 +1,6 @@
 #include "count.hpp"
 #include <functional>
+#include <algorithm>
 #include "functors.hpp"
 
 void maslevtsov::count_vertexes(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
