@@ -61,6 +61,21 @@ namespace {
     }
     return std::mismatch(lhs.points.cbegin(), lhs.points.cend(), rhs.points.cbegin()).first == lhs.points.cend();
   }
+
+  struct WithSamesInserter
+  {
+    std::vector< maslevtsov::Polygon > with_echos;
+
+    int operator()(maslevtsov::Polygon& polygon, const maslevtsov::Polygon& to_compare)
+    {
+      auto same_with_arg = std::bind(is_same, to_compare, std::placeholders::_1);
+      with_echos.push_back(polygon);
+      if (same_with_arg(polygon)) {
+        with_echos.push_back(polygon);
+      }
+      return 0;
+    }
+  };
 }
 
 void maslevtsov::get_area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
@@ -160,12 +175,9 @@ void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::o
   auto same_with_arg = std::bind(is_same, polygon, std::placeholders::_1);
   std::size_t additional_size = std::count_if(polygons.begin(), polygons.end(), same_with_arg);
   std::vector< Polygon > with_echoes(polygons.size() + additional_size);
-  for (auto it = polygons.begin(); it != polygons.end(); ++it) {
-    with_echoes.push_back(*it);
-    if (same_with_arg(*it)) {
-      with_echoes.push_back(*it);
-    }
-  }
+  std::vector< int > dump;
+  auto inserter = std::bind(WithSamesInserter{with_echoes}, std::placeholders::_1, polygon);
+  std::transform(polygons.begin(), polygons.end(), dump.begin(), inserter);
   polygons = with_echoes;
   out << additional_size;
 }
