@@ -63,6 +63,5 @@ std::istream& maslevtsov::operator>>(std::istream& in, Polygon& rhs)
 
 bool maslevtsov::operator==(const Point& lhs, const Point& rhs)
 {
-  bool temp = (lhs.x == rhs.x) && (lhs.y == rhs.y);
-  return temp;
+  return (lhs.x == rhs.x) && (lhs.y == rhs.y);
 }

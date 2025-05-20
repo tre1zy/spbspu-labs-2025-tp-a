@@ -175,7 +175,7 @@ void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::o
   auto same_with_arg = std::bind(is_same, polygon, std::placeholders::_1);
   std::size_t additional_size = std::count_if(polygons.begin(), polygons.end(), same_with_arg);
   std::vector< Polygon > with_echoes(polygons.size() + additional_size);
-  std::vector< int > dump;
+  std::vector< int > dump(polygons.size() + additional_size);
   auto inserter = std::bind(WithSamesInserter{with_echoes}, std::placeholders::_1, polygon);
   std::transform(polygons.begin(), polygons.end(), dump.begin(), inserter);
   polygons = with_echoes;
