@@ -144,7 +144,7 @@ bool klimova::compareData(const DataStruct& a, const DataStruct& b)
   }
   if (a.key2 != b.key2)
   {
-    return abs(a.key2) < abs(b.key2);
+    return std::abs(a.key2) < std::abs(b.key2);
   }
   return a.key3.length() < b.key3.length();
 }
