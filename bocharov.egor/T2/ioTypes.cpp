@@ -10,7 +10,7 @@ std::ostream & bocharov::operator<<(std::ostream & out, const DataStruct & data)
   {
     return out;
   }
-  StreamGuard guard(out);
+  bocharov::StreamGuard guard(out);
   out << "(";
   out << ":key1 " << DoubleSciIO{const_cast< double & >(data.key1)};
   out << ":key2 '" << data.key2;
@@ -81,7 +81,7 @@ std::istream & bocharov::operator>>(std::istream & in, CharLitIO && dest)
   {
     return in;
   }
-  StreamGuard guard(in);
+  bocharov::StreamGuard guard(in);
   in >> std::noskipws;
   char c;
   if(!(in >> c))
@@ -105,7 +105,7 @@ std::istream & bocharov::operator>>(std::istream & in, StringIO && dest)
   {
     return in;
   }
-  StreamGuard guard(in);
+  bocharov::StreamGuard guard(in);
   in >> std::noskipws;
   char c;
   while ((in >> c) && (c != '"'))
