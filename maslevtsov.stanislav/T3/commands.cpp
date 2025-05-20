@@ -64,7 +64,7 @@ namespace {
 
   struct WithSamesInserter
   {
-    std::vector< maslevtsov::Polygon > with_echos;
+    std::vector< maslevtsov::Polygon >& with_echos;
 
     int operator()(maslevtsov::Polygon& polygon, const maslevtsov::Polygon& to_compare)
     {
