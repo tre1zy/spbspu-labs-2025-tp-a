@@ -9,12 +9,12 @@ namespace smirnov {
         double key1;
         unsigned long long key2;
         std::string key3;
+        std::string raw_bin; 
     };
 
-    bool parseLine(const std::string& line, DataStruct& ds);
+    bool compareDataStruct(const DataStruct& a, const DataStruct& b);
     std::istream& operator>>(std::istream& is, DataStruct& ds);
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
-    bool compareDataStruct(const DataStruct& a, const DataStruct& b);
 }
 
-#endif
+#endif 

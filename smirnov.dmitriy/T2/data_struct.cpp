@@ -23,14 +23,14 @@ namespace smirnov {
             }
         }
 
-        bool parseBinULL(const std::string& s, unsigned long long& out) {
+        bool parseBinULL(const std::string& s, unsigned long long& out, std::string& raw_bin) {
             if (s.size() < 2) return false;
             if (s[0] != '0' || (s[1] != 'b' && s[1] != 'B')) return false;
-            std::string bin_str = s.substr(2);
+            raw_bin = s.substr(2); 
             try {
                 size_t pos;
-                out = std::stoull(bin_str, &pos, 2);
-                return pos == bin_str.size();
+                out = std::stoull(raw_bin, &pos, 2);
+                return pos == raw_bin.size();
             }
             catch (...) {
                 return false;
@@ -71,7 +71,9 @@ namespace smirnov {
         if (start == std::string::npos || end == std::string::npos) return false;
 
         std::string trimmed = line.substr(start, end - start + 1);
-        if (trimmed.size() < 4 || trimmed.substr(0, 2) != "(:" || trimmed.substr(trimmed.size() - 2) != ":)") return false;
+        if (trimmed.size() < 4 ||
+            trimmed.substr(0, 2) != "(:" ||
+            trimmed.substr(trimmed.size() - 2) != ":)") return false;
 
         std::string inner = trimmed.substr(2, trimmed.size() - 4);
         auto pairs = splitKeyValuePairs(inner);
@@ -91,7 +93,7 @@ namespace smirnov {
                 key1_found = true;
             }
             else if (key == "key2") {
-                if (!parseBinULL(value, temp.key2)) return false;
+                if (!parseBinULL(value, temp.key2, temp.raw_bin)) return false; 
                 key2_found = true;
             }
             else if (key == "key3") {
@@ -118,26 +120,20 @@ namespace smirnov {
     }
 
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
-        os << "(:key1 ";
-        std::ostringstream oss;
-        oss << ds.key1;
-        std::string num_str = oss.str();
-        if (num_str.find('.') == std::string::npos) {
+        std::ostringstream oss_key1;
+        oss_key1 << std::fixed << ds.key1;
+        std::string num_str = oss_key1.str();
+        size_t dot_pos = num_str.find('.');
+        if (dot_pos == std::string::npos) {
             num_str += ".0";
         }
-        os << num_str << "d:key2 0b";
-
-        if (ds.key2 == 0) {
-            os << "0";
-        }
         else {
-            std::string bin_str;
-            for (unsigned long long n = ds.key2; n > 0; n /= 2) {
-                bin_str = (n % 2 ? "1" : "0") + bin_str;
-            }
-            os << bin_str;
+            num_str.erase(num_str.find_last_not_of('0') + 1, std::string::npos);
+            if (num_str.back() == '.') num_str += "0";
         }
-        return os << ":key3 \"" << ds.key3 << "\":)";
+
+        os << "(:key1 " << num_str << "d:key2 0b" << ds.raw_bin << ":key3 \"" << ds.key3 << "\":)";
+        return os;
     }
 
     bool compareDataStruct(const DataStruct& a, const DataStruct& b) {
@@ -146,4 +142,3 @@ namespace smirnov {
         return a.key3.size() < b.key3.size();
     }
 }
-
