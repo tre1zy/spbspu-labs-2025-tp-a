@@ -7,7 +7,7 @@ namespace shapkov
 {
   struct isAnagram
   {
-    std::string& word_;
+    std::string& wrd;
     bool operator()(const std::string& word) const;
   };
   struct isPalindrome
@@ -31,6 +31,7 @@ namespace shapkov
     size_t patternMatches = 0;
     bool operator()(const std::string& word);
   };
+  bool CompareByFreq(const std::pair< std::string, size_t >& p1, const std::pair< std::string, size_t >& p2);
 }
 
 #endif

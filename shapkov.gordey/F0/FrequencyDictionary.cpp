@@ -1,7 +1,6 @@
 #include "FrequencyDictionary.hpp"
 #include <fstream>
 #include <cctype>
-#include <regex>
 #include <iomanip>
 #include <algorithm>
 #include <iterator>
@@ -238,16 +237,7 @@ void shapkov::print(std::istream& in, std::ostream& out, const FrequencyDictiona
 
 std::string shapkov::topWord(const OneFreqDict& text)
 {
-  size_t topWordFreq = 0;
-  auto topWord = text.dictionary.begin();
-  for (auto it = text.dictionary.begin(); it != text.dictionary.end(); it++)
-  {
-    if (it->second > topWordFreq)
-    {
-      topWordFreq = it->second;
-      topWord = it;
-    }
-  }
+  auto topWord = std::max_element(text.dictionary.begin(), text.dictionary.end(), CompareByFreq);
   return topWord->first;
 }
 

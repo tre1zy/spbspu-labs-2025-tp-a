@@ -5,7 +5,7 @@
 
 bool shapkov::isAnagram::operator()(const std::string& word) const
 {
-  return word.size() == word_.size() && std::is_permutation(word.begin(), word.end(), word_.begin());
+  return word.size() == wrd.size() && std::is_permutation(word.begin(), word.end(), wrd.begin());
 }
 
 bool shapkov::isPalindrome::operator()(const std::string& word)
@@ -45,4 +45,9 @@ bool shapkov::isPattern::operator()(const std::string& word)
     patternMatches++;
   }
   return isPatt;
+}
+
+bool shapkov::CompareByFreq(const std::pair< std::string, size_t >& p1, const std::pair< std::string, size_t >& p2)
+{
+  return p1.second < p2.second;
 }
