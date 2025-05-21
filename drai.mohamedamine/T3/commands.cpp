@@ -1,11 +1,10 @@
+#include "polygon.hpp"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
 #include <functional>
-
-#include "polygon.hpp"
 
 void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
     int removed = 0;
@@ -93,7 +92,7 @@ void process_commands(std::vector<Polygon>& polygons) {
                         dblResult = std::accumulate(
                             polygons.begin(), polygons.end(), 0.0,
                             [num](double acc, const Polygon& p) {
-                                return acc + ((static_cast<int>(p.points.size()) == num) ? compute_area(p) : 0.0;
+                                return acc + (static_cast<int>(p.points.size()) == num ? compute_area(p) : 0.0);
                             });
                         printDouble = true;
                     }
