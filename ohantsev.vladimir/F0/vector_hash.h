@@ -1,7 +1,7 @@
 #ifndef VECTOR_HASH_H
 #define VECTOR_HASH_H
 #include <vector>
-#include <numeric> 
+#include <numeric>
 
 namespace ohantsev
 {
