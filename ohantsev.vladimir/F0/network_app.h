@@ -2,9 +2,10 @@
 #define NETWORK_H
 #include <string>
 #include <iosfwd>
+#include <iterator>
 #include <unordered_map>
-#include <command_handler.h>
 #include "graph.h"
+#include "command_handler.h"
 
 namespace ohantsev
 {
@@ -13,9 +14,10 @@ namespace ohantsev
   public:
     using graph_type = Graph< std::string >;
     using map_type = std::unordered_map< std::string, graph_type >;
+    using outIter = std::ostream_iterator< std::string >;
     NetworkApp(map_type& networks, std::istream& in, std::ostream& out);
     void operator()() override;
-    void input(std::string filename);
+    void input(const std::string& filename);
 
   private:
     static void create(map_type& networks, std::istream& in);
@@ -36,8 +38,19 @@ namespace ohantsev
     static void merge(map_type& networks, std::istream& in);
     static void save(const map_type& networks, std::istream& in);
 
-    static void printWay(const graph_type::Way& way, std::ostream& out);
-    static void printWays(const std::vector< graph_type::Way >& ways, std::ostream& out);
+    static std::string getName(const map_type::value_type& pair);
+
+    struct PrintWay;
+    struct PrintWays;
+    struct PrintDeviceConnections;
+    struct PrintConnection;
+    struct PrintWayStep;
+    struct ConnectionAdder;
+    struct NetworkMerger;
+    struct NetworkSaver;
+    struct ConnectionSaver;
+    struct DeviceSaver;
+    struct CntSizeAdder;
   };
 
   std::istream& operator>>(std::istream& in, Graph< std::string >& graph);
