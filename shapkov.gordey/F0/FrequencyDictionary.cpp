@@ -229,10 +229,7 @@ void shapkov::print(std::istream& in, std::ostream& out, const FrequencyDictiona
     out << "<TEXT NOT FOUND>\n";
     return;
   }
-  for (const auto& word_pair: text->second.dictionary)
-  {
-    out << word_pair.first << ": " << word_pair.second << '\n';
-  }
+  std::for_each(text->second.dictionary.begin(), text->second.dictionary.end(), PairPrinter{ out });
 }
 
 std::string shapkov::topWord(const OneFreqDict& text)

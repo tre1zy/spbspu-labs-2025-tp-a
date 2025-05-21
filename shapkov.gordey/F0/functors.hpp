@@ -32,6 +32,11 @@ namespace shapkov
     bool operator()(const std::string& word);
   };
   bool CompareByFreq(const std::pair< std::string, size_t >& p1, const std::pair< std::string, size_t >& p2);
+  struct PairPrinter
+  {
+    std::ostream& out;
+    void operator()(const std::pair< std::string, size_t >& p) const;
+  };
 }
 
 #endif

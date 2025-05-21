@@ -51,3 +51,8 @@ bool shapkov::CompareByFreq(const std::pair< std::string, size_t >& p1, const st
 {
   return p1.second < p2.second;
 }
+
+void shapkov::PairPrinter::operator()(const std::pair< std::string, size_t >& p) const
+{
+  out << p.first << ": " << p.second << '\n';
+}
