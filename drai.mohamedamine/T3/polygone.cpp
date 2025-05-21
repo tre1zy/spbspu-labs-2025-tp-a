@@ -51,7 +51,7 @@ bool is_rectangle(const Polygon& poly) {
     Point v2 = p[3] - p[2];
     Point v3 = p[0] - p[3];
 
-    if (dot(v0, v1) != 0 || dot(v1, v2) != 0 || 
+    if (dot(v0, v1) != 0 || dot(v1, v2) != 0 ||
         dot(v2, v3) != 0 || dot(v3, v0) != 0) {
         return false;
     }
