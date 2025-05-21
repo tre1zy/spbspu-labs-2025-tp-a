@@ -35,3 +35,14 @@ std::string shapkov::ExtractFirst::operator()(const std::pair< std::string, size
 {
   return p.first;
 }
+
+bool shapkov::isPattern::operator()(const std::string& word)
+{
+  std::regex patt(pattern);
+  bool isPatt = std::regex_match(word, patt);
+  if (isPatt)
+  {
+    patternMatches++;
+  }
+  return isPatt;
+}

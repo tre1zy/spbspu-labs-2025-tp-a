@@ -209,17 +209,12 @@ void shapkov::show_with_pattern(std::istream& in, std::ostream& out, const Frequ
     out << "<TEXT NOT FOUND>\n";
     return;
   }
-  std::regex patt(pattern);
-  size_t patternMatches = 0;
-  for (const auto& word_pair: text->second.dictionary)
-  {
-    if (std::regex_match(word_pair.first, patt))
-    {
-      out << word_pair.first << '\n';
-      patternMatches++;
-    }
-  }
-  if (patternMatches == 0)
+  isPattern PatternChecker{ pattern };
+  std::vector< std::string > txtWords;
+  auto txt = text->second.dictionary;
+  std::transform(txt.begin(), txt.end(), std::back_inserter(txtWords), ExtractFirst());
+  std::copy_if(txtWords.begin(), txtWords.end(), std::ostream_iterator< std::string >(out, "\n"), std::ref(PatternChecker));
+  if (PatternChecker.patternMatches == 0)
   {
     out << "<NO MATCHES>\n";
   }
