@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
+#include <functional>
 
 #include "polygon.hpp"
 
@@ -71,7 +72,7 @@ void process_commands(std::vector<Polygon>& polygons) {
             }
             else if (arg == "MEAN") {
                 if (polygons.empty()) {
-                    dblResult = 0.0;
+                    invalid = true;
                 } else {
                     double total = std::accumulate(
                         polygons.begin(), polygons.end(), 0.0,
@@ -79,19 +80,23 @@ void process_commands(std::vector<Polygon>& polygons) {
                             return acc + compute_area(p);
                         });
                     dblResult = total / polygons.size();
+                    printDouble = true;
                 }
-                printDouble = true;
             }
             else {
                 bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
                 if (is_num) {
                     int num = std::stoi(arg);
-                    dblResult = std::accumulate(
-                        polygons.begin(), polygons.end(), 0.0,
-                        [num](double acc, const Polygon& p) {
-                            return acc + ((static_cast<int>(p.points.size()) == num) ? compute_area(p) : 0.0);
-                        });
-                    printDouble = true;
+                    if (num < 3) {
+                        invalid = true;
+                    } else {
+                        dblResult = std::accumulate(
+                            polygons.begin(), polygons.end(), 0.0,
+                            [num](double acc, const Polygon& p) {
+                                return acc + ((static_cast<int>(p.points.size()) == num) ? compute_area(p) : 0.0;
+                            });
+                        printDouble = true;
+                    }
                 } else {
                     invalid = true;
                 }
@@ -100,30 +105,24 @@ void process_commands(std::vector<Polygon>& polygons) {
         else if (cmd == "MAX") {
             std::string arg;
             iss >> arg;
-            if (arg == "AREA") {
-                if (polygons.empty()) {
-                    dblResult = 0.0;
-                } else {
-                    auto it = std::max_element(
-                        polygons.begin(), polygons.end(),
-                        [](const Polygon& a, const Polygon& b) {
-                            return compute_area(a) < compute_area(b);
-                        });
-                    dblResult = compute_area(*it);
-                }
+            if (polygons.empty()) {
+                invalid = true;
+            } else if (arg == "AREA") {
+                auto it = std::max_element(
+                    polygons.begin(), polygons.end(),
+                    [](const Polygon& a, const Polygon& b) {
+                        return compute_area(a) < compute_area(b);
+                    });
+                dblResult = compute_area(*it);
                 printDouble = true;
             }
             else if (arg == "VERTEXES") {
-                if (polygons.empty()) {
-                    intResult = 0;
-                } else {
-                    auto it = std::max_element(
-                        polygons.begin(), polygons.end(),
-                        [](const Polygon& a, const Polygon& b) {
-                            return a.points.size() < b.points.size();
-                        });
-                    intResult = it->points.size();
-                }
+                auto it = std::max_element(
+                    polygons.begin(), polygons.end(),
+                    [](const Polygon& a, const Polygon& b) {
+                        return a.points.size() < b.points.size();
+                    });
+                intResult = it->points.size();
             }
             else {
                 invalid = true;
@@ -132,66 +131,64 @@ void process_commands(std::vector<Polygon>& polygons) {
         else if (cmd == "MIN") {
             std::string arg;
             iss >> arg;
-            if (arg == "AREA") {
-                if (polygons.empty()) {
-                    dblResult = 0.0;
-                } else {
-                    auto it = std::min_element(
-                        polygons.begin(), polygons.end(),
-                        [](const Polygon& a, const Polygon& b) {
-                            return compute_area(a) < compute_area(b);
-                        });
-                    dblResult = compute_area(*it);
-                }
+            if (polygons.empty()) {
+                invalid = true;
+            } else if (arg == "AREA") {
+                auto it = std::min_element(
+                    polygons.begin(), polygons.end(),
+                    [](const Polygon& a, const Polygon& b) {
+                        return compute_area(a) < compute_area(b);
+                    });
+                dblResult = compute_area(*it);
                 printDouble = true;
             }
             else if (arg == "VERTEXES") {
-                if (polygons.empty()) {
-                    intResult = 0;
-                } else {
-                    auto it = std::min_element(
-                        polygons.begin(), polygons.end(),
-                        [](const Polygon& a, const Polygon& b) {
-                            return a.points.size() < b.points.size();
-                        });
-                    intResult = it->points.size();
-                }
+                auto it = std::min_element(
+                    polygons.begin(), polygons.end(),
+                    [](const Polygon& a, const Polygon& b) {
+                        return a.points.size() < b.points.size();
+                    });
+                intResult = it->points.size();
             }
             else {
                 invalid = true;
             }
         }
-else if (cmd == "COUNT") {
-    std::string arg;
-    iss >> arg;
-    if (arg == "EVEN") {
-        intResult = std::count_if(
-            polygons.begin(), polygons.end(),
-            [](const Polygon& p) {
-                return p.points.size() % 2 == 0;
-            });
-    }
-    else if (arg == "ODD") {
-        intResult = std::count_if(
-            polygons.begin(), polygons.end(),
-            [](const Polygon& p) {
-                return p.points.size() % 2 != 0;
-            });
-    }
-    else {
-        bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-        if (is_num) {
-            int num = std::stoi(arg);
-            intResult = std::count_if(
-                polygons.begin(), polygons.end(),
-                [num](const Polygon& p) {
-                    return static_cast<int>(p.points.size()) == num;
-                });
-        } else {
-            invalid = true;
+        else if (cmd == "COUNT") {
+            std::string arg;
+            iss >> arg;
+            if (arg == "EVEN") {
+                intResult = std::count_if(
+                    polygons.begin(), polygons.end(),
+                    [](const Polygon& p) {
+                        return p.points.size() % 2 == 0;
+                    });
+            }
+            else if (arg == "ODD") {
+                intResult = std::count_if(
+                    polygons.begin(), polygons.end(),
+                    [](const Polygon& p) {
+                        return p.points.size() % 2 != 0;
+                    });
+            }
+            else {
+                bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
+                if (is_num) {
+                    int num = std::stoi(arg);
+                    if (num < 3) {
+                        invalid = true;
+                    } else {
+                        intResult = std::count_if(
+                            polygons.begin(), polygons.end(),
+                            [num](const Polygon& p) {
+                                return static_cast<int>(p.points.size()) == num;
+                            });
+                    }
+                } else {
+                    invalid = true;
+                }
+            }
         }
-    }
-}
         else if (cmd == "INTERSECTIONS") {
             std::string rest;
             std::getline(iss, rest);
@@ -203,7 +200,7 @@ else if (cmd == "COUNT") {
                     rest = rest.substr(pos);
                 }
                 Polygon query;
-                if (!parse_polygon(rest, query)) {
+                if (!parse_polygon(rest, query) || query.points.size() < 3) {
                     invalid = true;
                 } else {
                     intResult = std::count_if(
@@ -236,14 +233,12 @@ else if (cmd == "COUNT") {
         else {
             invalid = true;
         }
-
         if (!invalid && cmd != "INTERSECTIONS" && cmd != "RMECHO") {
             std::string extra;
             if (iss >> extra) {
                 invalid = true;
             }
         }
-
         if (invalid) {
             std::cout << "<INVALID COMMAND>\n";
         }
