@@ -9,7 +9,6 @@
 void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
     int removed = 0;
     auto it = polygons.begin();
-
     while (it != polygons.end()) {
         if (it->points.size() == query.points.size() &&
             std::equal(it->points.begin(), it->points.end(),
@@ -38,25 +37,19 @@ void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
             ++it;
         }
     }
-
     std::cout << removed << "\n";
 }
-
 void process_commands(std::vector<Polygon>& polygons) {
     std::string line;
-
     while (std::getline(std::cin, line)) {
         if (line.empty()) continue;
-
         std::istringstream iss(line);
         std::string cmd;
         iss >> cmd;
-
         bool invalid = false;
         bool printDouble = false;
         double dblResult = 0.0;
         int intResult = 0;
-
         if (cmd == "AREA") {
             std::string arg;
             iss >> arg;
@@ -64,7 +57,7 @@ void process_commands(std::vector<Polygon>& polygons) {
                 dblResult = std::accumulate(
                     polygons.begin(), polygons.end(), 0.0,
                     [](double acc, const Polygon& p) {
-                        return acc + ((p.points.size() % 2 == 0) ? compute_area(p) : 0.0;
+                        return acc + ((p.points.size() % 2 == 0) ? compute_area(p) : 0.0);
                     });
                 printDouble = true;
             }
@@ -96,7 +89,7 @@ void process_commands(std::vector<Polygon>& polygons) {
                     dblResult = std::accumulate(
                         polygons.begin(), polygons.end(), 0.0,
                         [num](double acc, const Polygon& p) {
-                            return acc + (((int)p.points.size() == num) ? compute_area(p) : 0.0);
+                            return acc + ((static_cast<int>(p.points.size()) == num) ? compute_area(p) : 0.0);
                         });
                     printDouble = true;
                 } else {

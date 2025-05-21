@@ -78,16 +78,14 @@ bool point_in_polygon(const Point& pt, const Polygon& poly) {
     const auto& p = poly.points;
     int n = p.size();
     if (n < 3) return false;
-
     for (int i = 0, j = n - 1; i < n; j = i++) {
         bool cond = (p[i].y > pt.y) != (p[j].y > pt.y);
         bool intersect = cond &&
-            (pt.x < (long double)(p[j].x - p[i].x) * (pt.y - p[i].y) / (p[j].y - p[i].y) + p[i].x);
+            (pt.x < static_cast<long double>(p[j].x - p[i].x) * (pt.y - p[i].y) / (p[j].y - p[i].y) + p[i].x);
         if (intersect) inside = !inside;
     }
     return inside;
 }
-
 bool polygons_intersect(const Polygon& a, const Polygon& b) {
     int na = a.points.size();
     int nb = b.points.size();
