@@ -1,10 +1,11 @@
 #include "FrequencyDictionary.hpp"
 #include <fstream>
 #include <cctype>
-#include <cmath>
 #include <regex>
 #include <iomanip>
 #include <algorithm>
+#include <numeric>
+#include <vector>
 #include "functors.hpp"
 #include <scopeGuard.hpp>
 
@@ -118,13 +119,11 @@ void shapkov::similar_frequency(std::istream& in, std::ostream& out, const Frequ
 
 double shapkov::entropyCount(const OneFreqDict& text)
 {
-  double entropy = 0;
-  for (const auto& word_pair: text.dictionary)
-  {
-    double wordProbability = static_cast<double>(word_pair.second) / static_cast<double>(text.size);
-    entropy -= wordProbability * log2(wordProbability);
-  }
-  return entropy;
+  EntropyCalc calc{text.size};
+  std::vector< double > wordProbs;
+  std::transform(text.dictionary.begin(), text.dictionary.end(), std::back_inserter(wordProbs), calc);
+  double entropy = std::accumulate(wordProbs.begin(), wordProbs.end(), 0.0);
+  return (-1) * entropy;
 }
 
 void shapkov::entropy(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)

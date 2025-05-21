@@ -1,6 +1,7 @@
 #include "functors.hpp"
 #include <algorithm>
 #include <regex>
+#include <cmath>
 
 shapkov::isAnagram::isAnagram(const std::string word):
   word_(word)
@@ -20,4 +21,10 @@ void shapkov::cleanWord(std::string& word) {
   std::regex nonAlpha("[^a-zA-Z`]");
   word = std::regex_replace(word, nonAlpha, "");
   std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+}
+
+double shapkov::EntropyCalc::operator()(std::pair< std::string, size_t > word_pair)
+{
+  double wordProbability = static_cast< double >(word_pair.second) / size;
+  return wordProbability * log2(wordProbability);
 }

@@ -13,6 +13,11 @@ namespace shapkov
   };
   bool isPalindrome(const std::string word);
   void cleanWord(std::string& word);
+  struct EntropyCalc
+  {
+    size_t size;
+    double operator()(std::pair< std::string, size_t >);
+  };
 }
 
 #endif
