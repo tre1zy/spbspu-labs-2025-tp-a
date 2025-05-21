@@ -161,37 +161,37 @@ void process_commands(std::vector<Polygon>& polygons) {
                 invalid = true;
             }
         }
-        else if (cmd == "COUNT") {
-            std::string arg;
-            iss >> arg;
-            if (arg == "EVEN") {
-                intResult = std::count_if(
-                    polygons.begin(), polygons.end(),
-                    [](const Polygon& p) {
-                        return p.points.size() % 2 == 0;
-                    });
-            }
-            else if (arg == "ODD") {
-                intResult = std::count_if(
-                    polygons.begin(), polygons.end(),
-                    [](const Polygon& p) {
-                        return p.points.size() % 2 != 0;
-                    });
-            }
-            else {
-                bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-                if (is_num) {
-                    int num = std::stoi(arg);
-                    intResult = std::count_if(
-                        polygons.begin(), polygons.end(),
-                        [num](const Polygon& p) {
-                            return (int)p.points.size() == num;
-                        });
-                } else {
-                    invalid = true;
-                }
-            }
+else if (cmd == "COUNT") {
+    std::string arg;
+    iss >> arg;
+    if (arg == "EVEN") {
+        intResult = std::count_if(
+            polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 == 0;
+            });
+    }
+    else if (arg == "ODD") {
+        intResult = std::count_if(
+            polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 != 0;
+            });
+    }
+    else {
+        bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
+        if (is_num) {
+            int num = std::stoi(arg);
+            intResult = std::count_if(
+                polygons.begin(), polygons.end(),
+                [num](const Polygon& p) {
+                    return static_cast<int>(p.points.size()) == num;
+                });
+        } else {
+            invalid = true;
         }
+    }
+}
         else if (cmd == "INTERSECTIONS") {
             std::string rest;
             std::getline(iss, rest);
