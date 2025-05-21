@@ -4,6 +4,7 @@
 #include <regex>
 #include <iomanip>
 #include <algorithm>
+#include <iterator>
 #include <numeric>
 #include <vector>
 #include "functors.hpp"
@@ -119,7 +120,7 @@ void shapkov::similar_frequency(std::istream& in, std::ostream& out, const Frequ
 
 double shapkov::entropyCount(const OneFreqDict& text)
 {
-  EntropyCalc calc{text.size};
+  EntropyCalc calc{ text.size };
   std::vector< double > wordProbs;
   std::transform(text.dictionary.begin(), text.dictionary.end(), std::back_inserter(wordProbs), calc);
   double entropy = std::accumulate(wordProbs.begin(), wordProbs.end(), 0.0);
@@ -187,16 +188,12 @@ void shapkov::palindromes(std::istream& in, std::ostream& out, const FrequencyDi
     out << "<TEXT NOT FOUND>\n";
     return;
   }
-  size_t palindromesCnt = 0;
-  for (const auto& word_pair: text->second.dictionary)
-  {
-    if (isPalindrome(word_pair.first))
-    {
-      out << word_pair.first << '\n';
-      palindromesCnt++;
-    }
-  }
-  if (palindromesCnt == 0)
+  isPalindrome PalindromeChecker;
+  std::vector< std::string > txtWords;
+  auto txt = text->second.dictionary;
+  std::transform(txt.begin(), txt.end(), std::back_inserter(txtWords), ExtractFirst());
+  std::copy_if(txtWords.begin(), txtWords.end(), std::ostream_iterator< std::string >(out, "\n"), std::ref(PalindromeChecker));
+  if (PalindromeChecker.palindromesCnt == 0)
   {
     out << "<NO PALINDROMES>\n";
   }

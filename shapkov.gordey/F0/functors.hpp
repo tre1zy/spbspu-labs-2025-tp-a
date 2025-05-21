@@ -8,16 +8,24 @@ namespace shapkov
   struct isAnagram
   {
     std::string word_;
-    isAnagram(const std::string word);
-    bool operator()(const std::string word);
+    bool operator()(const std::string& word) const;
   };
-  bool isPalindrome(const std::string word);
+  struct isPalindrome
+  {
+    size_t palindromesCnt = 0;
+    bool operator()(const std::string& word);
+  };
   void cleanWord(std::string& word);
   struct EntropyCalc
   {
     size_t size;
-    double operator()(std::pair< std::string, size_t >);
+    double operator()(const std::pair< std::string, size_t >& word_pair) const;
   };
+  struct ExtractFirst
+  {
+    std::string operator()(const std::pair< std::string, size_t >& p) const;
+  };
+
 }
 
 #endif
