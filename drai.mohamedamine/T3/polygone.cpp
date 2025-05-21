@@ -24,7 +24,7 @@ double compute_area(const Polygon& poly) {
     const auto& pts = poly.points;
     int n = pts.size();
     if (n < 3) return 0.0;
-    
+
     long long area2 = std::inner_product(
         pts.begin(), pts.end() - 1,
         pts.begin() + 1, 0LL,
@@ -32,7 +32,7 @@ double compute_area(const Polygon& poly) {
         [](const Point& a, const Point& b) {
             return (long long)a.x * b.y - (long long)a.y * b.x;
         });
-    
+
     const Point& last = pts.back();
     const Point& first = pts.front();
     area2 += (long long)last.x * first.y - (long long)last.y * first.x;
@@ -46,7 +46,7 @@ bool is_rectangle(const Polygon& poly) {
     Point v2 = p[3] - p[2];
     Point v3 = p[0] - p[3];
 
-    if (dot(v0, v1) != 0 || dot(v1, v2) != 0 || 
+    if (dot(v0, v1) != 0 || dot(v1, v2) != 0 ||
         dot(v2, v3) != 0 || dot(v3, v0) != 0) {
         return false;
     }
@@ -83,10 +83,10 @@ bool point_in_polygon(const Point& pt, const Polygon& poly) {
     const auto& p = poly.points;
     int n = p.size();
     if (n < 3) return false;
-    
+
     for (int i = 0, j = n - 1; i < n; j = i++) {
         bool cond = (p[i].y > pt.y) != (p[j].y > pt.y);
-        bool intersect = cond && 
+        bool intersect = cond &&
             (pt.x < (long double)(p[j].x - p[i].x) * (pt.y - p[i].y) / (p[j].y - p[i].y) + p[i].x);
         if (intersect) inside = !inside;
     }
@@ -105,7 +105,7 @@ bool polygons_intersect(const Polygon& a, const Polygon& b) {
             }
         }
     }
-    
+
     if (!a.points.empty() && !b.points.empty()) {
         if (point_in_polygon(a.points[0], b) || point_in_polygon(b.points[0], a)) {
             return true;
@@ -118,11 +118,9 @@ bool parse_polygon(const std::string& str, Polygon& poly) {
     std::istringstream iss(str);
     int n;
     if (!(iss >> n) || n <= 0) return false;
-    
     poly.points.clear();
     poly.points.reserve(n);
     char c;
-    
     for (int i = 0; i < n; ++i) {
         Point pt;
         if (!(iss >> c) || c != '(') return false;
@@ -132,7 +130,6 @@ bool parse_polygon(const std::string& str, Polygon& poly) {
         if (!(iss >> c) || c != ')') return false;
         poly.points.push_back(pt);
     }
-    
     iss >> std::ws;
     return iss.eof();
 }

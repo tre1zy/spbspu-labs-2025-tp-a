@@ -1,22 +1,23 @@
-#include "polygon.hpp"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
 
+#include "polygon.hpp"
+
 void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
     int removed = 0;
     auto it = polygons.begin();
-    
+
     while (it != polygons.end()) {
-        if (it->points.size() == query.points.size() && 
+        if (it->points.size() == query.points.size() &&
             std::equal(it->points.begin(), it->points.end(),
                       query.points.begin(), query.points.end(),
                       [](const Point& a, const Point& b) {
                           return a.x == b.x && a.y == b.y;
                       })) {
             auto next_it = it + 1;
-            while (next_it != polygons.end() && 
+            while (next_it != polygons.end() &&
                    next_it->points.size() == query.points.size() &&
                    std::equal(next_it->points.begin(), next_it->points.end(),
                              query.points.begin(), query.points.end(),
@@ -26,7 +27,6 @@ void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
                 ++next_it;
                 ++removed;
             }
-            
             if (next_it != it + 1) {
                 it = polygons.erase(it + 1, next_it);
                 ++removed;
@@ -37,16 +37,16 @@ void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
             ++it;
         }
     }
-    
+
     std::cout << removed << "\n";
 }
 
 void process_commands(std::vector<Polygon>& polygons) {
     std::string line;
-    
+
     while (std::getline(std::cin, line)) {
         if (line.empty()) continue;
-        
+
         std::istringstream iss(line);
         std::string cmd;
         iss >> cmd;
@@ -237,7 +237,7 @@ void process_commands(std::vector<Polygon>& polygons) {
                     process_rmecho(polygons, query);
                 }
             }
-            continue; // RMECHO handles its own output
+            continue;
         }
         else {
             invalid = true;

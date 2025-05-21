@@ -1,6 +1,7 @@
-#include "polygon.hpp"
 #include <fstream>
 #include <iostream>
+
+#include "polygon.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
