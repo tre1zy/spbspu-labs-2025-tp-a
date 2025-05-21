@@ -2,6 +2,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
+#include <numeric>
 
 #include "polygon.hpp"
 
