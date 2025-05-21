@@ -98,7 +98,6 @@ bool polygons_intersect(const Polygon& a, const Polygon& b) {
             }
         }
     }
-
     if (!a.points.empty() && !b.points.empty()) {
         if (point_in_polygon(a.points[0], b) || point_in_polygon(b.points[0], a)) {
             return true;
@@ -106,11 +105,12 @@ bool polygons_intersect(const Polygon& a, const Polygon& b) {
     }
     return false;
 }
-
 bool parse_polygon(const std::string& str, Polygon& poly) {
     std::istringstream iss(str);
     int n;
-    if (!(iss >> n) || n <= 0) return false;
+    if (!(iss >> n) || n <= 0) {
+        return false;
+    }
     poly.points.clear();
     poly.points.reserve(n);
     char c;
@@ -121,8 +121,9 @@ bool parse_polygon(const std::string& str, Polygon& poly) {
         if (!(iss >> c) || c != ';') return false;
         if (!(iss >> pt.y)) return false;
         if (!(iss >> c) || c != ')') return false;
+        if (iss.fail()) return false;
         poly.points.push_back(pt);
     }
     iss >> std::ws;
-    return iss.eof();
+    return iss.eof() && poly.points.size() == static_cast<size_t>(n);
 }
