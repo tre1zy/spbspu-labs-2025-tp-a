@@ -2,22 +2,13 @@
 #include <algorithm>
 #include <regex>
 
-shapkov::isAnagram::isAnagram(const std::string word)
-{
-  for (char c: word)
-  {
-    letterFreq[c]++;
-  }
-}
+shapkov::isAnagram::isAnagram(const std::string word):
+  word_(word)
+{}
 
 bool shapkov::isAnagram::operator()(const std::string word)
 {
-  std::unordered_map< char, size_t > srcLetterFreq;
-  for (char c: word)
-  {
-    srcLetterFreq[c]++;
-  }
-  return srcLetterFreq.size() == letterFreq.size() && srcLetterFreq == letterFreq;
+  return word.size() == word_.size() && std::is_permutation(word.begin(), word.end(), word_.begin());
 }
 
 bool shapkov::isPalindrome(const std::string word)
