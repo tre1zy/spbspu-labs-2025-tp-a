@@ -71,3 +71,22 @@ void shapkov::ProcessDictPair::operator()(const std::pair< std::string, OneFreqD
   ProcessWordPair word_processor{ out, dict_pair.first, checker, counter };
   std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), word_processor);
 }
+
+void shapkov::CheckFrequency::operator()(const std::pair< std::string, size_t >& word_pair) const
+{
+  if ((word_pair.second <= target_freq + delta) && (static_cast< int >(word_pair.second) >= static_cast< int >(target_freq) - delta))
+  {
+    out << dict_name << ": " << word_pair.first << " - " << word_pair.second << '\n';
+    counter++;
+  }
+}
+
+void shapkov::ProcessDictionary::operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const
+{
+  auto wrd = dict_pair.second.dictionary.find(word);
+  if (wrd != dict_pair.second.dictionary.end())
+  {
+    CheckFrequency checker{wrd->second, delta, out, dict_pair.first, counter};
+    std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), checker);
+  }
+}

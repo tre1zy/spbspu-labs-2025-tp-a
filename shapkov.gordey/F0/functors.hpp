@@ -53,6 +53,23 @@ namespace shapkov
     size_t& counter;
     void operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const;
   };
+  struct CheckFrequency
+  {
+    size_t target_freq;
+    int delta;
+    std::ostream& out;
+    const std::string& dict_name;
+    size_t& counter;
+    void operator()(const std::pair< std::string, size_t >& word_pair) const;
+  };
+  struct ProcessDictionary
+  {
+    std::ostream& out;
+    const std::string& word;
+    int delta;
+    size_t& counter;
+    void operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const;
+  };
 }
 
 #endif

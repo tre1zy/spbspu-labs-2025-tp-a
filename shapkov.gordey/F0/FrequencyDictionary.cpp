@@ -83,25 +83,16 @@ void shapkov::anagrams(std::istream& in, std::ostream& out, const FrequencyDicti
 void shapkov::similar_frequency(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
 {
   std::string word;
-  size_t delta = 0;
+  int delta = 0;
   in >> word >> delta;
+  if (!in && delta < 0)
+  {
+    throw std::invalid_argument("Wrong input");
+  }
   cleanWord(word);
   size_t freqCnt = 0;
-  for (const auto& dict_pair: dict.dicts)
-  {
-    auto wrd = dict_pair.second.dictionary.find(word);
-    if (wrd != dict_pair.second.dictionary.end())
-    {
-      for (const auto& word_pair: dict_pair.second.dictionary)
-      {
-        if ((word_pair.second <= wrd->second + delta) && (word_pair.second >= wrd->second - delta))
-        {
-          out << dict_pair.first << ": " << word_pair.first << " - " << word_pair.second << '\n';
-          freqCnt++;
-        }
-      }
-    }
-  }
+  ProcessDictionary processor{ out, word, delta, freqCnt };
+  std::for_each(dict.dicts.begin(), dict.dicts.end(), processor);
   if (freqCnt == 0)
   {
     out << "<NO WORD>\n";
