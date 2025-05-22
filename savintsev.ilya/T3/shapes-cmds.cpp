@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <numeric>
 #include <cmath>
+#include <set>
 #include <scope-guard.hpp>
 #include "geometry-utils.h"
 
@@ -58,6 +59,46 @@ namespace
       }
       return false;
     }
+    const savintsev::Polygon & p;
+  };
+  struct CheckSame
+  {
+    bool operator()(const savintsev::Polygon & a)
+    {
+      if (a.points.size() != p.points.size())
+      {
+        return false;
+      }
+
+      std::set< savintsev::Point > setP(p.points.begin(), p.points.end());
+
+      for (const auto & pa : p.points)
+      {
+        for (const auto & pb : a.points)
+        {
+          int dx = pa.x - pb.x;
+          int dy = pa.y - pb.y;
+
+          bool match = true;
+          for (const auto & q : a.points)
+          {
+            savintsev::Point shifted{q.x + dx, q.y + dy};
+            if (setP.find(shifted) == setP.end())
+            {
+              match = false;
+              break;
+            }
+          }
+
+          if (match)
+          {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
     const savintsev::Polygon & p;
   };
 }
@@ -206,8 +247,8 @@ void savintsev::intersections(std::istream & in, std::ostream & out, const std::
   CheckIntersect check{p};
   out << std::count_if(data.begin(), data.end(), check) << '\n';
 }
-/*
-void savintsev::same(std::istream &in, std::ostream &out, const std::vector<Polygon> &data)
+
+void savintsev::same(std::istream & in, std::ostream & out, const std::vector< Polygon > & data)
 {
   Polygon p;
   in >> p;
@@ -215,8 +256,10 @@ void savintsev::same(std::istream &in, std::ostream &out, const std::vector<Poly
   {
     throw std::runtime_error("same: invalid polygon desc");
   }
+  CheckSame check{p};
+  out << std::count_if(data.begin(), data.end(), check) << '\n';
 }
-*/
+
 void savintsev::print(std::ostream & out, const std::vector< Polygon > & data)
 {
   for (size_t i = 0; i < data.size(); ++i)

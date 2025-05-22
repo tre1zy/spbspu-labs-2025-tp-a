@@ -45,6 +45,7 @@ int main(int argc, char * argv[])
   cmds["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["INTERSECTIONS"] = std::bind(intersections, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["SAME"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["PRINT"] = std::bind(print, std::ref(std::cout), std::cref(data));
 
   for (std::string command; std::cin >> command;)

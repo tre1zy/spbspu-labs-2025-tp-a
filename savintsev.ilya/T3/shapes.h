@@ -10,6 +10,8 @@ namespace savintsev
     int x, y;
   };
 
+  bool operator<(const Point & a, const Point & b);
+
   std::istream & operator>>(std::istream & in, Point & dest);
   std::ostream & operator<<(std::ostream & out, const Point & dest);
 
