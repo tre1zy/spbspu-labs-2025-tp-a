@@ -56,3 +56,18 @@ void shapkov::PairPrinter::operator()(const std::pair< std::string, size_t >& p)
 {
   out << p.first << ": " << p.second << '\n';
 }
+
+void shapkov::ProcessWordPair::operator()(const std::pair< std::string, size_t >& word_pair) const
+{
+  if (checker(word_pair.first))
+  {
+    out << dict_name << ": word - " << word_pair.first << '\n';
+    counter++;
+  }
+}
+
+void shapkov::ProcessDictPair::operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const
+{
+  ProcessWordPair word_processor{ out, dict_pair.first, checker, counter };
+  std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), word_processor);
+}

@@ -2,6 +2,7 @@
 #define FUNCTORS
 #include <unordered_map>
 #include <string>
+#include "FrequencyDictionary.hpp"
 
 namespace shapkov
 {
@@ -36,6 +37,21 @@ namespace shapkov
   {
     std::ostream& out;
     void operator()(const std::pair< std::string, size_t >& p) const;
+  };
+  struct ProcessWordPair
+  {
+    std::ostream& out;
+    const std::string& dict_name;
+    isAnagram& checker;
+    size_t& counter;
+    void operator()(const std::pair< std::string, size_t >& word_pair) const;
+  };
+  struct ProcessDictPair
+  {
+    std::ostream& out;
+    isAnagram& checker;
+    size_t& counter;
+    void operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const;
   };
 }
 

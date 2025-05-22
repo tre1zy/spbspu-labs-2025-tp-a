@@ -72,17 +72,8 @@ void shapkov::anagrams(std::istream& in, std::ostream& out, const FrequencyDicti
   cleanWord(word);
   isAnagram anagramChecker{ word };
   size_t anagramsCnt = 0;
-  for (const auto& dict_pair: dict.dicts)
-  {
-    for (const auto& word_pair: dict_pair.second.dictionary)
-    {
-      if (anagramChecker(word_pair.first))
-      {
-        out << dict_pair.first << ": word - " << word_pair.first << '\n';
-        anagramsCnt++;
-      }
-    }
-  }
+  ProcessDictPair dict_processor{ out, anagramChecker, anagramsCnt };
+  std::for_each(dict.dicts.begin(), dict.dicts.end(), dict_processor);
   if (anagramsCnt == 0)
   {
     out << "<NO ANAGRAMS>\n";
