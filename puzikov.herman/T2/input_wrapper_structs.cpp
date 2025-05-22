@@ -1,5 +1,4 @@
 #include "input_wrapper_structs.hpp"
-
 #include <istream>
 
 std::istream &puzikov::input::operator>>(std::istream &in, Character &&dest)

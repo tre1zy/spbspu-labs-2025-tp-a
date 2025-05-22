@@ -1,6 +1,6 @@
 #include "output_wrapper_structs.hpp"
-#include "format_guard.hpp"
 #include <cmath>
+#include "format_guard.hpp"
 
 namespace
 {

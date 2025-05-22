@@ -1,10 +1,10 @@
-#include "data_struct.hpp"
-
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <vector>
 #include <algorithm>
+#include "data_struct.hpp"
+
 
 int main()
 {
