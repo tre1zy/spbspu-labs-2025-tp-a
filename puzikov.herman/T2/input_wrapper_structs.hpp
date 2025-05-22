@@ -24,7 +24,6 @@ namespace puzikov
     {
       std::pair< long long, unsigned long long > &ref;
     };
-    const std::size_t bitsInByte {8};
     std::istream &operator>>(std::istream &in, PairValue &&dest);
 
     struct StringValue
