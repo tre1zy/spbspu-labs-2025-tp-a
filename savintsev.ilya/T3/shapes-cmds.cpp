@@ -122,7 +122,7 @@ void savintsev::area(std::istream & in, std::ostream & out, const std::vector< P
     out << std::accumulate(temp.begin(), temp.end(), 0.0, sum_with_area) << '\n';
     return;
   }
-  in.clear();
+  in.clear(in.rdstate() ^ std::ios::failbit);
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "EVEN")
@@ -166,7 +166,7 @@ void savintsev::count(std::istream & in, std::ostream & out, const std::vector< 
     out << std::count_if(data.begin(), data.end(), is) << '\n';
     return;
   }
-  in.clear();
+  in.clear(in.rdstate() ^ std::ios::failbit);
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "EVEN")
@@ -240,7 +240,7 @@ void savintsev::intersections(std::istream & in, std::ostream & out, const std::
 {
   Polygon p;
   in >> p;
-  if (!in)
+  if (!in || !(in.peek() == '\n'))
   {
     throw std::runtime_error("intersections: invalid polygon desc");
   }
@@ -252,7 +252,7 @@ void savintsev::same(std::istream & in, std::ostream & out, const std::vector< P
 {
   Polygon p;
   in >> p;
-  if (!in)
+  if (!in || !(in.peek() == '\n'))
   {
     throw std::runtime_error("same: invalid polygon desc");
   }
