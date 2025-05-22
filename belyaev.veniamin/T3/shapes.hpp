@@ -19,6 +19,8 @@ namespace belyaev
   std::ostream& operator<<(std::ostream& out, const Point& src);
   std::istream& operator>>(std::istream& in, Polygon& dest);
   std::ostream& operator<<(std::ostream& out, const Polygon& src);
+
+  bool operator==(const Point& lhs, const Point& rhs);
 }
 
 #endif

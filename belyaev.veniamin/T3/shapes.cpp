@@ -81,4 +81,10 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Polygon& src)
 
   using ostreamPnt = std::ostream_iterator<Point>;
   std::copy(src.points.begin(), src.points.end(), ostreamPnt{out, "\n"});
+  return out;
+}
+
+bool belyaev::operator==(const Point& lhs, const Point& rhs)
+{
+  return (lhs.x == rhs.x && lhs.y == rhs.y);
 }
