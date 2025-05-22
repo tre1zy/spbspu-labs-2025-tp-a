@@ -1,10 +1,9 @@
 #include "data_struct.hpp"
+#include <bitset>
+#include <istream>
 #include "input_wrapper_structs.hpp"
 #include "output_wrapper_structs.hpp"
 #include "format_guard.hpp"
-
-#include <bitset>
-#include <istream>
 
 bool puzikov::operator<(const DataStruct &a, const DataStruct &b)
 {
