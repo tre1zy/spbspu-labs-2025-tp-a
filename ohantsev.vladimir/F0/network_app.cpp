@@ -65,7 +65,7 @@ void ohantsev::NetworkApp::create(map_type& networks, std::istream& in)
 
 void ohantsev::NetworkApp::deleteNetwork(map_type& networks, std::istream& in)
 {
-  std::string name;  
+  std::string name;
   if (in >> name && !networks.erase(name))
   {
     throw std::invalid_argument("Network " + name + " not found");
@@ -121,7 +121,7 @@ void ohantsev::NetworkApp::showNetwork(const map_type& networks, std::istream& i
 void ohantsev::NetworkApp::addDevice(map_type& networks, std::istream& in)
 {
   std::string net;
-  std::string device;  
+  std::string device;
   if (in >> net >> device)
   {
     auto iter = networks.find(net);
@@ -197,7 +197,7 @@ void ohantsev::NetworkApp::deleteDevice(map_type& networks, std::istream& in)
       {
         throw std::invalid_argument("Device " + device + " not found");
       }
-      throw std::invalid_argument("Device " + device + 
+      throw std::invalid_argument("Device " + device +
         " still connected\nUse force_delete_device to whatever remove with connections");
     }
   }
