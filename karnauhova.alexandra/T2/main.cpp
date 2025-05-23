@@ -8,16 +8,13 @@
 int main()
 {
   using namespace karnauhova;
+  using istr_iterator = std::istream_iterator< karnauhova::DataStruct >;
+  using ostr_iter = std::ostream_iterator< karnauhova::DataStruct >;
   std::vector< DataStruct > data;
 
   while (!std::cin.eof())
   {
-    std::copy
-    (
-      std::istream_iterator< karnauhova::DataStruct >(std::cin),
-      std::istream_iterator< karnauhova::DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(istr_iterator(std::cin), istr_iterator(), std::back_inserter(data));
     if (!std::cin)
     {
       std::cin.clear();
@@ -25,10 +22,5 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), compare);
-  std::copy
-  (
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< karnauhova::DataStruct >(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), ostr_iter(std::cout, "\n"));
 }

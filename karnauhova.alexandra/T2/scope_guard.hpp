@@ -1,13 +1,18 @@
 #ifndef SCOPE_GUARD_HPP
 #define SCOPE_GUARD_HPP
 #include <iostream>
+
 namespace karnauhova
 {
   class iofmtguard
   {
   public:
-    iofmtguard(std::basic_ios< char >& s);
+    explicit iofmtguard(std::basic_ios< char >& s);
     ~iofmtguard();
+    iofmtguard(const iofmtguard&) = delete;
+    iofmtguard(iofmtguard&&) = delete;
+    iofmtguard& operator=(const iofmtguard&) = delete;
+    iofmtguard& operator=(iofmtguard&&) = delete;
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;

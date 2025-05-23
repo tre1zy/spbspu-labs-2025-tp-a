@@ -1,5 +1,4 @@
 #include "data_struct.hpp"
-#include <sstream>
 #include <string>
 #include <exception>
 #include <iomanip>
