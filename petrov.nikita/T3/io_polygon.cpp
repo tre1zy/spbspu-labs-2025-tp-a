@@ -78,7 +78,7 @@ std::ostream & petrov::operator<<(std::ostream & out, Polygon & polygon)
     out << polygon.points[i].x;
     out << ';';
     out << polygon.points[i].y;
-    out << ')';  
+    out << ')';
   }
   return out;
 }
