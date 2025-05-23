@@ -1,3 +1,6 @@
+#ifndef IO_POLYGON_HPP
+#define IO_POLYGON_HPP
+
 #include "geometric_shapes.hpp"
 #include <iostream>
 
@@ -24,3 +27,5 @@ namespace petrov
   std::istream & operator>>(std::istream & in, Polygon & polygon);
   std::ostream & operator<<(std::ostream & in, Polygon & polygon);
 }
+
+#endif

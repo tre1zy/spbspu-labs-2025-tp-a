@@ -3,7 +3,12 @@
 #include <vector>
 #include <fstream>
 #include <limits>
+#include <map>
+#include <string>
+#include <functional>
+#include <iomanip>
 #include "io_polygon.hpp"
+#include "commands.hpp"
 
 namespace
 {
@@ -42,6 +47,22 @@ int main(int argc, const char * const * argv)
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(polygon_istream_it(input), polygon_istream_it(), std::back_inserter(polygons));
+  }
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      cmds.at(command)();
+      std::cout << "\n";
+    }
+    catch (...)
+    {
+      std::cerr << "<INVALID COMMAND>";
+      std::cerr << "\n";
+    }
   }
   for (size_t i = 0; i < polygons.size(); i++)
   {

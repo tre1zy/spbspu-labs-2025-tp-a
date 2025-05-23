@@ -1,3 +1,6 @@
+#ifndef GEOMETRIC_SHAPES_HPP
+#define GEOMETRIC_SHAPES_HPP
+
 #include <vector>
 
 namespace petrov
@@ -12,3 +15,5 @@ namespace petrov
     std::vector< Point > points;
   };
 }
+
+#endif
