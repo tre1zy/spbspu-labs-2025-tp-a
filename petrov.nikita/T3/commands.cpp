@@ -81,7 +81,7 @@ void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
 void petrov::sum(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
 {
   double result = 0.0;
-  for (size_t i = 0; i < polygons.size(); i++)
+  for (size_t i = 1; i < polygons.size(); i++)
   {
     if (polygons[i].points.size() == num_of_vertexes)
     {
@@ -126,10 +126,10 @@ void petrov::area(const std::vector< Polygon > & polygons, std::istream & in, st
 
 void petrov::max_area(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  double result = 0.0;
+  double result = calculateArea(polygons[0]);
   StreamGuard outguard(out);
   out << std::fixed << std::setprecision(1);
-  for (size_t i = 0; i < polygons.size(); i++)
+  for (size_t i = 1; i < polygons.size(); i++)
   {
     result = std::max(calculateArea(polygons[i]), result);
   }
@@ -138,8 +138,8 @@ void petrov::max_area(const std::vector< Polygon > & polygons, std::ostream & ou
 
 void petrov::max_vertexes(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  size_t max_vertexes = 0;
-  for (size_t i = 0; i < polygons.size(); i++)
+  size_t max_vertexes = polygons[0].points.size();
+  for (size_t i = 1; i < polygons.size(); i++)
   {
     max_vertexes = std::max(polygons[i].points.size(), max_vertexes);
   }
@@ -151,6 +151,47 @@ void petrov::max(const std::vector< Polygon > & polygons, std::istream & in, std
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["AREA"] = std::bind(max_area, std::cref(polygons), std::ref(out));
   subcmds["VERTEXES"] = std::bind(max_vertexes, std::cref(polygons), std::ref(out));
+  std::string subcommand;
+  if (in >> subcommand)
+  {
+    try
+    {
+      subcmds.at(subcommand)();
+    }
+    catch (...)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+  }
+}
+
+void petrov::min_area(const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  double result = calculateArea(polygons[0]);
+  StreamGuard outguard(out);
+  out << std::fixed << std::setprecision(1);
+  for (size_t i = 1; i < polygons.size(); i++)
+  {
+    result = std::min(calculateArea(polygons[i]), result);
+  }
+  out << result;
+}
+
+void petrov::min_vertexes(const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  size_t min_vertexes = polygons[0].points.size();
+  for (size_t i = 1; i < polygons.size(); i++)
+  {
+    min_vertexes = std::min(polygons[i].points.size(), min_vertexes);
+  }
+  out << min_vertexes;
+}
+
+void petrov::min(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+{
+  std::map< std::string, std::function< void() > > subcmds;
+  subcmds["AREA"] = std::bind(min_area, std::cref(polygons), std::ref(out));
+  subcmds["VERTEXES"] = std::bind(min_vertexes, std::cref(polygons), std::ref(out));
   std::string subcommand;
   if (in >> subcommand)
   {

@@ -23,6 +23,12 @@ namespace petrov
   void max_vertexes(const std::vector< Polygon > & polygons, std::ostream & out);
 
   void max(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
+
+
+  void min_area(const std::vector< Polygon > & polygons, std::ostream & out);
+  void min_vertexes(const std::vector< Polygon > & polygons, std::ostream & out);
+
+  void min(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 }
 
 #endif

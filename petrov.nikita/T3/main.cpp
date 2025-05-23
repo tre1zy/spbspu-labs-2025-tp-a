@@ -33,7 +33,7 @@ int main(int argc, const char * const * argv)
   using polygon_istream_it = std::istream_iterator< Polygon >;
   if (!checkArguments(argc))
   {
-    std::cerr << "ERROR: Too many arguments";
+    std::cerr << "ERROR: Incorrect number of arguments";
     std::cerr << "\n";
     return 1;
   }
@@ -51,6 +51,7 @@ int main(int argc, const char * const * argv)
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   cmds["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   std::string command;
   while (!(std::cin >> command).eof())
   {
