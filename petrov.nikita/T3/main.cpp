@@ -50,6 +50,7 @@ int main(int argc, const char * const * argv)
   }
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   std::string command;
   while (!(std::cin >> command).eof())
   {

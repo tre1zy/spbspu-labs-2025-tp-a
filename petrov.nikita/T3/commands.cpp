@@ -1,5 +1,7 @@
 #include "commands.hpp"
+#include "io_polygon.hpp"
 #include <functional>
+#include <iostream>
 #include <iomanip>
 #include <numeric>
 #include <map>
@@ -37,7 +39,8 @@ double petrov::calculateArea(const Polygon & polygon)
   {
     result += calculateTrapezeArea(polygon.points[i], polygon.points[i + 1]);
   }
-  return result;
+  result += calculateTrapezeArea(polygon.points[polygon.points.size() - 1], polygon.points[0]);
+  return std::abs(result);
 }
 
 void petrov::even(const std::vector< Polygon > & polygons, std::ostream & out)
@@ -88,11 +91,11 @@ void petrov::sum(size_t & num_of_vertexes, const std::vector< Polygon > & polygo
   out << result;
 }
 
-
 void petrov::area(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
 {
   std::map< std::string, std::function< void() > > subcmds;
   size_t num_of_vertexes = 0;
+  StreamGuard outguard(out);
   out << std::fixed << std::setprecision(1);
   subcmds["EVEN"] = std::bind(even, std::cref(polygons), std::ref(out));
   subcmds["ODD"] = std::bind(odd, std::cref(polygons), std::ref(out));
@@ -117,6 +120,47 @@ void petrov::area(const std::vector< Polygon > & polygons, std::istream & in, st
       {
         throw std::logic_error("<INVALID COMMAND>");
       }
+    }
+  }
+}
+
+void petrov::max_area(const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  double result = 0.0;
+  StreamGuard outguard(out);
+  out << std::fixed << std::setprecision(1);
+  for (size_t i = 0; i < polygons.size(); i++)
+  {
+    result = std::max(calculateArea(polygons[i]), result);
+  }
+  out << result;
+}
+
+void petrov::max_vertexes(const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  size_t max_vertexes = 0;
+  for (size_t i = 0; i < polygons.size(); i++)
+  {
+    max_vertexes = std::max(polygons[i].points.size(), max_vertexes);
+  }
+  out << max_vertexes;
+}
+
+void petrov::max(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+{
+  std::map< std::string, std::function< void() > > subcmds;
+  subcmds["AREA"] = std::bind(max_area, std::cref(polygons), std::ref(out));
+  subcmds["VERTEXES"] = std::bind(max_vertexes, std::cref(polygons), std::ref(out));
+  std::string subcommand;
+  if (in >> subcommand)
+  {
+    try
+    {
+      subcmds.at(subcommand)();
+    }
+    catch (...)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
     }
   }
 }
