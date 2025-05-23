@@ -11,8 +11,8 @@ namespace petrov
   double calculateArea(const Polygon & polygon);
 
 
-  void even(const std::vector< Polygon > & polygons, std::ostream & out);
-  void odd(const std::vector< Polygon > & polygons, std::ostream & out);
+  void addIfEven(const std::vector< Polygon > & polygons, std::ostream & out);
+  void addIfOdd(const std::vector< Polygon > & polygons, std::ostream & out);
   void mean(const std::vector< Polygon > & polygons, std::ostream & out);
   void sum(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out);
 
@@ -29,6 +29,12 @@ namespace petrov
   void min_vertexes(const std::vector< Polygon > & polygons, std::ostream & out);
 
   void min(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
+
+  void countIfEven(const std::vector< Polygon > & polygons, std::ostream & out);
+  void countIfOdd(const std::vector< Polygon > & polygons, std::ostream & out);
+  void countIfThisNumber(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out);
+
+  void count(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 }
 
 #endif

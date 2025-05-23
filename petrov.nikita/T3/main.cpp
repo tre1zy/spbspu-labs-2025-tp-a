@@ -52,6 +52,7 @@ int main(int argc, const char * const * argv)
   cmds["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   cmds["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   cmds["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   std::string command;
   while (!(std::cin >> command).eof())
   {
@@ -65,10 +66,5 @@ int main(int argc, const char * const * argv)
       std::cerr << "<INVALID COMMAND>";
       std::cerr << "\n";
     }
-  }
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    std::cout << polygons[i];
-    std::cout << "\n";
   }
 }

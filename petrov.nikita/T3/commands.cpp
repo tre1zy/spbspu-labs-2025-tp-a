@@ -43,7 +43,7 @@ double petrov::calculateArea(const Polygon & polygon)
   return std::abs(result);
 }
 
-void petrov::even(const std::vector< Polygon > & polygons, std::ostream & out)
+void petrov::addIfEven(const std::vector< Polygon > & polygons, std::ostream & out)
 {
   double result = 0.0;
   for (size_t i = 0; i < polygons.size(); i++)
@@ -56,7 +56,7 @@ void petrov::even(const std::vector< Polygon > & polygons, std::ostream & out)
   out << result;
 }
 
-void petrov::odd(const std::vector< Polygon > & polygons, std::ostream & out)
+void petrov::addIfOdd(const std::vector< Polygon > & polygons, std::ostream & out)
 {
   double result = 0.0;
   for (size_t i = 0; i < polygons.size(); i++)
@@ -81,7 +81,7 @@ void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
 void petrov::sum(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
 {
   double result = 0.0;
-  for (size_t i = 1; i < polygons.size(); i++)
+  for (size_t i = 0; i < polygons.size(); i++)
   {
     if (polygons[i].points.size() == num_of_vertexes)
     {
@@ -97,8 +97,8 @@ void petrov::area(const std::vector< Polygon > & polygons, std::istream & in, st
   size_t num_of_vertexes = 0;
   StreamGuard outguard(out);
   out << std::fixed << std::setprecision(1);
-  subcmds["EVEN"] = std::bind(even, std::cref(polygons), std::ref(out));
-  subcmds["ODD"] = std::bind(odd, std::cref(polygons), std::ref(out));
+  subcmds["EVEN"] = std::bind(addIfEven, std::cref(polygons), std::ref(out));
+  subcmds["ODD"] = std::bind(addIfOdd, std::cref(polygons), std::ref(out));
   subcmds["MEAN"] = std::bind(mean, std::cref(polygons), std::ref(out));
   subcmds["SUM"] = std::bind(sum, std::ref(num_of_vertexes), std::cref(polygons), std::ref(out));
   std::string subcommand;
@@ -202,6 +202,77 @@ void petrov::min(const std::vector< Polygon > & polygons, std::istream & in, std
     catch (...)
     {
       throw std::logic_error("<INVALID COMMAND>");
+    }
+  }
+}
+
+void petrov::countIfEven(const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  size_t count = 0;
+  for (size_t i = 0; i < polygons.size(); i++)
+  {
+    if (polygons[i].points.size() % 2 == 1)
+    {
+      count++;
+    }
+  }
+  out << count;
+}
+
+void petrov::countIfOdd(const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  size_t count = 0;
+  for (size_t i = 0; i < polygons.size(); i++)
+  {
+    if (polygons[i].points.size() % 2 == 0)
+    {
+      count++;
+    }
+  }
+  out << count;
+}
+
+void petrov::countIfThisNumber(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
+{
+  size_t count = 0;
+  for (size_t i = 0; i < polygons.size(); i++)
+  {
+    if (polygons[i].points.size() == num_of_vertexes)
+    {
+      count++;
+    }
+  }
+  out << count;
+}
+
+void petrov::count(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+{
+  std::map< std::string, std::function< void() > > subcmds;
+  size_t num_of_vertexes = 0;
+  StreamGuard outguard(out);
+  out << std::fixed << std::setprecision(1);
+  subcmds["EVEN"] = std::bind(countIfEven, std::cref(polygons), std::ref(out));
+  subcmds["ODD"] = std::bind(countIfOdd, std::cref(polygons), std::ref(out));
+  subcmds["NUM"] = std::bind(countIfThisNumber, std::ref(num_of_vertexes), std::cref(polygons), std::ref(out));
+  std::string subcommand;
+  if (in >> subcommand)
+  {
+    if (isDigit(subcommand))
+    {
+      char * p_end;
+      num_of_vertexes = strtoull(subcommand.c_str(), &p_end, subcommand.size() - 1);
+      subcmds["NUM"]();
+    }
+    else
+    {
+      try
+      {
+        subcmds.at(subcommand)();
+      }
+      catch (...)
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
     }
   }
 }
