@@ -82,22 +82,33 @@ std::istream& karnauhova::operator>>(std::istream& in, DataStruct& dest)
     using dbl = DoubleIO;
     using ull = UllIO;
     using str = StringIO;
+    bool key1 = false;
+    bool key2 = false;
+    bool key3 = false;
     in >> symb{'('} >> symb{':'};
     for (size_t i = 0; i < 3; i++)
     {
       key key_num{ 0 };
       in >> key_num;
-      if (key_num.num == '1')
+      if (key_num.num == '1' && !key1)
       {
         in >> dbl{input.key1} >> symb{':'};
+        key1 = true;
       }
-      else if (key_num.num == '2')
+      else if (key_num.num == '2' && !key2)
       {
         in >> ull{input.key2} >> symb{':'};
+        key2 = true;
       }
-      else if (key_num.num == '3')
+      else if (key_num.num == '3' && !key3)
       {
         in >> str{input.key3} >> symb{':'};
+        key3 = true;
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        return in;
       }
     }
     in >> symb{')'};
