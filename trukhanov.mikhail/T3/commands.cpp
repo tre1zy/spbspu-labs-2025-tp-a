@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <numeric>
 #include <string>
-#include <limits>
 #include <iomanip>
+#include <limits>
 #include "functors.hpp"
 #include "polygon.hpp"
 #include "data_input.hpp"
@@ -59,7 +59,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "At least one polygon is required to compute the mean\n";
+        out << "<INVALID COMMAND>\n";
       }
       else
       {
@@ -71,8 +71,14 @@ namespace trukhanov
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
       size_t size = std::stoull(subcommand);
-      double total = std::accumulate(src.begin(), src.end(), 0.0, AccumulateBySize(size));
-      out << total << '\n';
+      if (size < 3) {
+        out << "<INVALID COMMAND>\n";
+      }
+      else
+      {
+        double total = std::accumulate(src.begin(), src.end(), 0.0, AccumulateBySize(size));
+        out << total << '\n';
+      }
     }
     else
     {
@@ -92,7 +98,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "0\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       out << getArea(*std::max_element(src.begin(), src.end(), CompareByArea())) << '\n';
@@ -101,7 +107,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "0\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       out << std::max_element(src.begin(), src.end(), CompareByVertexes())->points.size() << '\n';
@@ -124,7 +130,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "0\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       out << getArea(*std::min_element(src.begin(), src.end(), CompareByArea())) << '\n';
@@ -133,7 +139,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "0\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       out << std::min_element(src.begin(), src.end(), CompareByVertexes())->points.size() << '\n';
@@ -143,7 +149,6 @@ namespace trukhanov
       out << "<INVALID COMMAND>\n";
     }
   }
-
 
   void count(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
@@ -161,7 +166,14 @@ namespace trukhanov
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
       size_t size = std::stoull(subcommand);
-      out << std::count_if(src.begin(), src.end(), isSize{ size }) << '\n';
+      if (size < 3)
+      {
+        out << "<INVALID COMMAND>\n";
+      }
+      else
+      {
+        out << std::count_if(src.begin(), src.end(), isSize{ size }) << '\n';
+      }
     }
     else
     {
@@ -173,7 +185,8 @@ namespace trukhanov
   {
     Polygon polygon;
     in >> polygon;
-    if (!in)
+
+    if (!in || polygon.points.size() < 3)
     {
       out << "<INVALID COMMAND>\n";
       in.clear();
