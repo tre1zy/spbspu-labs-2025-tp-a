@@ -157,22 +157,44 @@ namespace trukhanov
 
     if (subcommand == "EVEN")
     {
-      out << std::count_if(src.begin(), src.end(), IsEvenAndValid()) << '\n';
+      size_t count = 0;
+      for (const auto& poly : src)
+      {
+        if (poly.points.size() % 2 == 0 && poly.points.size() >= 3)
+        {
+          ++count;
+        }
+      }
+      out << count << '\n';
     }
     else if (subcommand == "ODD")
     {
-      out << std::count_if(src.begin(), src.end(), IsOddAndValid()) << '\n';
+      size_t count = 0;
+      for (const auto& poly : src)
+      {
+        if (poly.points.size() % 2 != 0 && poly.points.size() >= 3)
+        {
+          ++count;
+        }
+      }
+      out << count << '\n';
     }
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
       size_t size = std::stoull(subcommand);
-      if (size < 3)
-      {
+      if (size < 3) {
         out << "<INVALID COMMAND>\n";
       }
-      else
-      {
-        out << std::count_if(src.begin(), src.end(), isSize{ size }) << '\n';
+      else {
+        size_t count = 0;
+        for (const auto& poly : src)
+        {
+          if (poly.points.size() == size)
+          {
+            ++count;
+          }
+        }
+        out << count << '\n';
       }
     }
     else
@@ -205,4 +227,3 @@ namespace trukhanov
     out << std::count_if(src.begin(), src.end(), isRight) << '\n';
   }
 }
-
