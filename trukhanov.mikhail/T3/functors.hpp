@@ -35,6 +35,21 @@ namespace trukhanov
   {
     bool operator()(const Polygon& lhs, const Polygon& rhs) const;
   };
+
+  struct HasDuplicates
+  {
+    bool operator()(const Polygon& p) const;
+  };
+
+  struct IsEvenAndValid
+  {
+    bool operator()(const Polygon& p) const;
+  };
+
+  struct IsOddAndValid
+  {
+    bool operator()(const Polygon& p) const;
+  };
 }
 
 #endif

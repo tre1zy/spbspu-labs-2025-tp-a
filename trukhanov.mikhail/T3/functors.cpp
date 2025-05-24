@@ -1,4 +1,5 @@
 #include "functors.hpp"
+#include <algorithm>
 #include "polygon.hpp"
 
 namespace trukhanov
@@ -23,5 +24,35 @@ namespace trukhanov
   bool CompareByVertexes::operator()(const Polygon& lhs, const Polygon& rhs) const
   {
     return compareByVertexes(lhs, rhs);
+  }
+
+  bool HasDuplicates::operator()(const Polygon& p) const
+  {
+    if (p.points.size() < 2)
+    {
+      return false;
+    }
+    for (size_t i = 0; i < p.points.size(); ++i)
+    {
+      for (size_t j = i + 1; j < p.points.size(); ++j)
+      {
+        if (std::abs(p.points[i].x - p.points[j].x) &&
+          std::abs(p.points[i].y - p.points[j].y))
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool IsEvenAndValid::operator()(const Polygon& p) const
+  {
+    return isEven(p) && p.points.size() >= 3;
+  }
+
+  bool IsOddAndValid::operator()(const Polygon& p) const
+  {
+    return isOdd(p) && p.points.size() >= 3;
   }
 }

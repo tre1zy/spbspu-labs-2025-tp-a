@@ -157,11 +157,11 @@ namespace trukhanov
 
     if (subcommand == "EVEN")
     {
-      out << std::count_if(src.begin(), src.end(), isEven) << '\n';
+      out << std::count_if(src.begin(), src.end(), IsEvenAndValid()) << '\n';
     }
     else if (subcommand == "ODD")
     {
-      out << std::count_if(src.begin(), src.end(), isOdd) << '\n';
+      out << std::count_if(src.begin(), src.end(), IsOddAndValid()) << '\n';
     }
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
@@ -186,7 +186,8 @@ namespace trukhanov
     Polygon polygon;
     in >> polygon;
 
-    if (!in || polygon.points.size() < 3)
+    HasDuplicates checkDuplicates;
+    if (!in || polygon.points.size() < 3 || checkDuplicates(polygon))
     {
       out << "<INVALID COMMAND>\n";
       in.clear();
@@ -204,3 +205,4 @@ namespace trukhanov
     out << std::count_if(src.begin(), src.end(), isRight) << '\n';
   }
 }
+
