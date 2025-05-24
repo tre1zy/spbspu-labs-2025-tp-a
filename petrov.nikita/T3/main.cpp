@@ -63,6 +63,8 @@ int main(int argc, const char * const * argv)
     }
     catch (...)
     {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cerr << "<INVALID COMMAND>";
       std::cerr << "\n";
     }
