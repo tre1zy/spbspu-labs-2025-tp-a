@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <numeric>
 #include <string>
+#include <limits>
 #include <iomanip>
 #include "functors.hpp"
 #include "polygon.hpp"
