@@ -65,12 +65,8 @@ int main(int argc, const char * const * argv)
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << "<INVALID COMMAND>";
-      std::cerr << "\n";
+      std::cout << "<INVALID COMMAND>";
+      std::cout << "\n";
     }
-  }
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    std::cout << polygons[i] << "\n";
   }
 }
