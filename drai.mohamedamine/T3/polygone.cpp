@@ -10,23 +10,18 @@
 #include "polygon.hpp"
 
 static const std::size_t RECT_VERTICES = 4;
-
 Point operator-(const Point& a, const Point& b) {
     return Point(a.x - b.x, a.y - b.y);
 }
-
 int dot(const Point& a, const Point& b) {
     return a.x * b.x + a.y * b.y;
 }
-
 int cross(const Point& a, const Point& b) {
     return a.x * b.y - a.y * b.x;
 }
-
 double compute_area(const Polygon& poly) {
     const auto& pts = poly.points;
     if (pts.size() < 3) return 0.0;
-
     long long area2 = std::inner_product(
         pts.begin(), pts.end() - 1,
         pts.begin() + 1, 0LL,
@@ -46,13 +41,11 @@ bool is_rectangle(const Polygon& poly) {
     Point v1 = p[2] - p[1];
     Point v2 = p[3] - p[2];
     Point v3 = p[0] - p[3];
-
     bool all_right_angles =
         (dot(v0, v1) == 0 &&
         (dot(v1, v2) == 0 &&
         (dot(v2, v3) == 0) &&
         (dot(v3, v0) == 0);
-
     if (!all_right_angles) return false;
     auto square_length = [](const Point& v) {
         return static_cast<long long>(v.x) * v.x + static_cast<long long>(v.y) * v.y;
@@ -60,12 +53,10 @@ bool is_rectangle(const Polygon& poly) {
     return square_length(v0) == square_length(v2) &&
            square_length(v1) == square_length(v3);
 }
-
 long long orient(const Point& p, const Point& q, const Point& r) {
-    return static_cast<long long>(q.x - p.x) * (r.y - p.y) - 
+    return static_cast<long long>(q.x - p.x) * (r.y - p.y) -
            static_cast<long long>(q.y - p.y) * (r.x - p.x);
 }
-
 bool on_segment(const Point& p, const Point& q, const Point& r) {
     return q.x >= std::min(p.x, r.x) && q.x <= std::max(p.x, r.x) &&
            q.y >= std::min(p.y, r.y) && q.y <= std::max(p.y, r.y);
