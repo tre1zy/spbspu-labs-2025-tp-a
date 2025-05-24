@@ -48,7 +48,7 @@ void petrov::addIfEven(const std::vector< Polygon > & polygons, std::ostream & o
   double result = 0.0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
-    if (polygons[i].points.size() % 2 == 1)
+    if (polygons[i].points.size() % 2 == 0)
     {
       result += calculateArea(polygons[i]);
     }
@@ -61,7 +61,7 @@ void petrov::addIfOdd(const std::vector< Polygon > & polygons, std::ostream & ou
   double result = 0.0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
-    if (polygons[i].points.size() % 2 == 0)
+    if (polygons[i].points.size() % 2 == 1)
     {
       result += calculateArea(polygons[i]);
     }
@@ -211,7 +211,7 @@ void petrov::countIfEven(const std::vector< Polygon > & polygons, std::ostream &
   size_t count = 0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
-    if (polygons[i].points.size() % 2 == 1)
+    if (polygons[i].points.size() % 2 == 0)
     {
       count++;
     }
@@ -224,7 +224,7 @@ void petrov::countIfOdd(const std::vector< Polygon > & polygons, std::ostream & 
   size_t count = 0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
-    if (polygons[i].points.size() % 2 == 0)
+    if (polygons[i].points.size() % 2 == 1)
     {
       count++;
     }
