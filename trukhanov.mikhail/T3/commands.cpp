@@ -175,6 +175,8 @@ namespace trukhanov
     if (!in)
     {
       out << "<INVALID COMMAND>\n";
+      in.clear();
+      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       return;
     }
 
