@@ -43,7 +43,7 @@ namespace ohantsev
     static void merge(map_type& networks, std::istream& in);
     static void save(const map_type& networks, std::istream& in);
 
-    static std::string getName(const map_type::value_type& pair);    
+    static std::string getName(const map_type::value_type& pair);
 
     struct WayPrinter;
     struct DeviceConnectionsPrinter;
