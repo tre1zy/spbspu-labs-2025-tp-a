@@ -25,30 +25,45 @@ namespace horoshilov
     char exp;
   };
 
-  struct DoubleSciIO
+  struct DoubleSciI
   {
     double& ref;
   };
 
-  struct DoubleIO
+  struct DoubleI
   {
     double& ref;
   };
 
-  struct StringIO
+  struct StringI
   {
     std::string& ref;
   };
 
+  struct DoubleSciO
+  {
+    const double& ref;
+  };
+
+  struct DoubleO
+  {
+    const double& ref;
+  };
+
+  struct StringO
+  {
+    const std::string& ref;
+  };
+  
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, DoubleSciIO&& dest);
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
-  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, DoubleSciI&& dest);
+  std::istream& operator>>(std::istream& in, DoubleI&& dest);
+  std::istream& operator>>(std::istream& in, StringI&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::istream& operator>>(std::istream& input, KeyIO&& dest);
-  std::ostream& operator<<(std::ostream& output, const DoubleSciIO&& dest);
-  std::ostream& operator<<(std::ostream& out, const DoubleIO&& dest);
-  std::ostream& operator<<(std::ostream& output, const StringIO&& dest);
+  std::ostream& operator<<(std::ostream& output, const DoubleSciO& dest);
+  std::ostream& operator<<(std::ostream& out, const DoubleO& dest);
+  std::ostream& operator<<(std::ostream& output, const StringO& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& src);
 
   bool compareData(const DataStruct& a, const DataStruct& b);

@@ -22,7 +22,7 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& operator>>(std::istream& in, DoubleI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -33,7 +33,7 @@ std::istream& operator>>(std::istream& in, DoubleIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, DoubleSciIO&& dest)
+std::istream& operator>>(std::istream& in, DoubleSciI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -70,7 +70,7 @@ std::istream& operator>>(std::istream& in, DoubleSciIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, StringIO&& dest)
+std::istream& operator>>(std::istream& in, StringI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -99,13 +99,13 @@ std::istream& operator>>(std::istream& input, KeyIO&& dest)
   switch (key)
   {
   case 1:
-    input >> DoubleIO{ dest.data.key1 } >> DelimiterIO{ ':' };
+    input >> DoubleI{ dest.data.key1 } >> DelimiterIO{ ':' };
     break;
   case 2:
-    input >> DoubleSciIO{ dest.data.key2 };
+    input >> DoubleSciI{ dest.data.key2 };
     break;
   case 3:
-    input >> StringIO{ dest.data.key3 };
+    input >> StringI{ dest.data.key3 };
     break;
   default:
     input.setstate(std::ios::failbit);
@@ -136,7 +136,7 @@ std::istream& operator>>(std::istream& input, DataStruct& dest)
   return input;
 }
 
-std::ostream& operator<<(std::ostream& output, const DoubleIO&& dest)
+std::ostream& operator<<(std::ostream& output, const DoubleO& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -147,7 +147,7 @@ std::ostream& operator<<(std::ostream& output, const DoubleIO&& dest)
   return output << std::fixed << std::setprecision(1) << dest.ref << "d";
 }
 
-std::ostream& operator<<(std::ostream& out, const DoubleSciIO&& dest)
+std::ostream& operator<<(std::ostream& out, const DoubleSciO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -176,7 +176,7 @@ std::ostream& operator<<(std::ostream& out, const DoubleSciIO&& dest)
   return out;
 }
 
-std::ostream& operator<<(std::ostream& output, const StringIO&& dest)
+std::ostream& operator<<(std::ostream& output, const StringO& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -193,15 +193,11 @@ std::ostream& operator<<(std::ostream& output, const DataStruct& dest)
   {
     return output;
   }
-
-  double dbl = dest.key1;
-  double dblsc = dest.key2;
-  std::string str = dest.key3;
-
   Guard guard(output);
-  output << "(:key1 " << DoubleIO{ dbl };
-  output << ":key2 " << DoubleSciIO{ dblsc };
-  output << ":key3 " << StringIO{ str } << ":)";
+  
+  output << "(:key1 " << DoubleO{ dest.key1 };
+  output << ":key2 " << DoubleSciO{ dest.key2 };
+  output << ":key3 " << StringO{ dest.key3 } << ":)";
 
   return output;
 }
