@@ -2,7 +2,6 @@
 #include <vector>
 #include <limits>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -25,11 +24,6 @@ void ohantsev::fillPolygons(std::vector< Polygon >& polygons, std::ifstream& in)
 
 void ohantsev::cmdsHandle(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  iofmtguard fmt(out);
-  out << std::fixed << std::setprecision(1);
   PolygonCmdsHandler handler(polygons, in, out);
-  while (!in.eof())
-  {
-    handler();
-  }
+  handler.processUntilEOF();
 }

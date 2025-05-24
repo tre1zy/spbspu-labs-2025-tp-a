@@ -3,11 +3,13 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <iomanip>
 #include <numeric>
 #include <iostream>
 #include <iterator>
 #include <algorithm>
 #include <functional>
+#include <iofmtguard.h>
 
 bool ohantsev::isOdd(const Polygon& polygon) noexcept
 {
@@ -30,7 +32,8 @@ bool ohantsev::lessSize(const Polygon& lhs, const Polygon& rhs) noexcept
 }
 
 ohantsev::Area::Area(const std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out):
-  CommandHandler(polygons, in, out)
+  CommandHandler(in, out),
+  polygons_(polygons)
 {
   add("EVEN", std::bind(even, std::cref(polygons), std::ref(out)));
   add("ODD", std::bind(odd, std::cref(polygons), std::ref(out)));
@@ -48,13 +51,13 @@ void ohantsev::Area::operator()()
   catch(const std::out_of_range&)
   {
     static constexpr std::size_t TRIANGLE_VERTEXES_COUNT = 3;
-    std::size_t processedCount;
-    std::size_t num = std::stoull(subcmd, &processedCount);
-    if (processedCount < subcmd.size() || num < TRIANGLE_VERTEXES_COUNT)
+    std::size_t symbolsProcessed;
+    std::size_t vertexes = std::stoull(subcmd, &symbolsProcessed);
+    if (symbolsProcessed < subcmd.size() || vertexes < TRIANGLE_VERTEXES_COUNT)
     {
       throw std::invalid_argument("invalid subcommand");
     }
-    numOfVertexes(object_, out_, num);
+    numOfVertexes(polygons_, out_, vertexes);
   }
 }
 
@@ -100,7 +103,8 @@ void ohantsev::Area::mean(const std::vector< Polygon >& polygons, std::ostream& 
 }
 
 ohantsev::Max::Max(const std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out):
-  CommandHandler(polygons, in, out)
+  CommandHandler(in, out),
+  polygons_(polygons)
 {
   add("AREA", std::bind(area, std::cref(polygons), std::ref(out)));
   add("VERTEXES", std::bind(vertexes, std::cref(polygons), std::ref(out)));
@@ -128,7 +132,8 @@ void ohantsev::Max::vertexes(const std::vector< Polygon >& polygons, std::ostrea
 }
 
 ohantsev::Min::Min(const std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out):
-  CommandHandler(polygons, in, out)
+  CommandHandler(in, out),
+  polygons_(polygons)
 {
   add("AREA", std::bind(area, std::cref(polygons), std::ref(out)));
   add("VERTEXES", std::bind(vertexes, std::cref(polygons), std::ref(out)));
@@ -156,7 +161,8 @@ void ohantsev::Min::vertexes(const std::vector< Polygon >& polygons, std::ostrea
 }
 
 ohantsev::Count::Count(const std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out):
-  CommandHandler(polygons, in, out)
+  CommandHandler(in, out),
+  polygons_(polygons)
 {
   add("EVEN", std::bind(even, std::cref(polygons), std::ref(out)));
   add("ODD", std::bind(odd, std::cref(polygons), std::ref(out)));
@@ -179,7 +185,7 @@ void ohantsev::Count::operator()()
     {
       throw std::invalid_argument("invalid subcommand");
     }
-    numOfVertexes(object_, out_, num);
+    numOfVertexes(polygons_, out_, num);
   }
 }
 
@@ -200,7 +206,7 @@ void ohantsev::Count::numOfVertexes(const std::vector< Polygon >& polygons, std:
 }
 
 ohantsev::PolygonCmdsHandler::PolygonCmdsHandler(std::vector< Polygon >& polygons,  std::istream& in, std::ostream& out):
-  CommandHandler(polygons, in, out)
+  CommandHandler(in, out)
 {
   add("AREA", Area{ polygons, in, out });
   add("MAX", Max{ polygons, in, out });
@@ -212,6 +218,8 @@ ohantsev::PolygonCmdsHandler::PolygonCmdsHandler(std::vector< Polygon >& polygon
 
 void ohantsev::PolygonCmdsHandler::operator()()
 {
+  iofmtguard fmt(out_);
+  out_ << std::fixed << std::setprecision(1);
   try
     {
       CommandHandler::operator()();
@@ -229,6 +237,14 @@ void ohantsev::PolygonCmdsHandler::operator()()
       }
       in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+}
+
+void ohantsev::PolygonCmdsHandler::processUntilEOF()
+{
+  while (!in_.eof())
+  {
+    operator()();
+  }
 }
 
 auto ohantsev::getSorted(const Polygon& polygon) -> Polygon
