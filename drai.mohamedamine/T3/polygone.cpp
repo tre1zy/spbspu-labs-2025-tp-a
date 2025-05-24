@@ -41,11 +41,10 @@ bool is_rectangle(const Polygon& poly) {
     Point v1 = p[2] - p[1];
     Point v2 = p[3] - p[2];
     Point v3 = p[0] - p[3];
-    bool all_right_angles =
-        (dot(v0, v1) == 0 &&
-        (dot(v1, v2) == 0 &&
-        (dot(v2, v3) == 0) &&
-        (dot(v3, v0) == 0);
+    bool all_right_angles = (dot(v0, v1) == 0) &&
+                           (dot(v1, v2) == 0) &&
+                           (dot(v2, v3) == 0) &&
+                           (dot(v3, v0) == 0);
     if (!all_right_angles) return false;
     auto square_length = [](const Point& v) {
         return static_cast<long long>(v.x) * v.x + static_cast<long long>(v.y) * v.y;
@@ -61,26 +60,22 @@ bool on_segment(const Point& p, const Point& q, const Point& r) {
     return q.x >= std::min(p.x, r.x) && q.x <= std::max(p.x, r.x) &&
            q.y >= std::min(p.y, r.y) && q.y <= std::max(p.y, r.y);
 }
-
 bool seg_intersect(const Point& p1, const Point& q1, const Point& p2, const Point& q2) {
     long long o1 = orient(p1, q1, p2);
     long long o2 = orient(p1, q1, q2);
     long long o3 = orient(p2, q2, p1);
     long long o4 = orient(p2, q2, q1);
-
     if (o1 * o2 < 0 && o3 * o4 < 0) return true;
     if (o1 == 0 && on_segment(p1, p2, q1)) return true;
     if (o2 == 0 && on_segment(p1, q2, q1)) return true;
     if (o3 == 0 && on_segment(p2, p1, q2)) return true;
     if (o4 == 0 && on_segment(p2, q1, q2)) return true;
-
     return false;
 }
 bool point_in_polygon(const Point& pt, const Polygon& poly) {
     bool inside = false;
     const auto& p = poly.points;
     if (p.size() < 3) return false;
-
     std::size_t n = p.size();
     for (std::size_t i = 0, j = n - 1; i < n; j = i++) {
         bool cond = (p[i].y > pt.y) != (p[j].y > pt.y);
@@ -90,7 +85,6 @@ bool point_in_polygon(const Point& pt, const Polygon& poly) {
     }
     return inside;
 }
-
 bool polygons_intersect(const Polygon& a, const Polygon& b) {
     if (a.points.empty() || b.points.empty()) return false;
     bool segments_intersect = std::any_of(
@@ -117,20 +111,15 @@ bool parse_polygon(const std::string& str, Polygon& poly) {
     }
     poly.points.clear();
     poly.points.reserve(n);
-    auto parse_point = [&iss]() -> std::optional<Point> {
+    for (int i = 0; i < n; ++i) {
         char c;
         Point pt;
-        if (!(iss >> c) || c != '(') return std::nullopt;
-        if (!(iss >> pt.x)) return std::nullopt;
-        if (!(iss >> c) || c != ';') return std::nullopt;
-        if (!(iss >> pt.y)) return std::nullopt;
-        if (!(iss >> c) || c != ')') return std::nullopt;
-        return pt;
-    };
-    for (int i = 0; i < n; ++i) {
-        auto pt = parse_point();
-        if (!pt) return false;
-        poly.points.push_back(*pt);
+        if (!(iss >> c) || c != '(') return false;
+        if (!(iss >> pt.x)) return false;
+        if (!(iss >> c) || c != ';') return false;
+        if (!(iss >> pt.y)) return false;
+        if (!(iss >> c) || c != ')') return false;
+        poly.points.push_back(pt);
     }
     iss >> std::ws;
     return iss.eof() && poly.points.size() == static_cast<size_t>(n);
