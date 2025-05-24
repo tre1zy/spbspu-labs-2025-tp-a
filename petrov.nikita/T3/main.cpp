@@ -41,10 +41,10 @@ int main(int argc, const char * const * argv)
   std::ifstream input(argv[1]);
   while (!input.eof())
   {
-    if (!std::cin)
+    if (!input)
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      input.clear();
+      input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(polygon_istream_it(input), polygon_istream_it(), std::back_inserter(polygons));
   }
@@ -68,5 +68,9 @@ int main(int argc, const char * const * argv)
       std::cerr << "<INVALID COMMAND>";
       std::cerr << "\n";
     }
+  }
+  for (size_t i = 0; i < polygons.size(); i++)
+  {
+    std::cout << polygons[i] << "\n";
   }
 }

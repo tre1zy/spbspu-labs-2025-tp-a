@@ -42,9 +42,9 @@ std::istream & petrov::operator>>(std::istream & in, Polygon & polygon)
   {
     using sep = DelimeterIO;
     size_t number_of_points = 0;
-    if (in >> number_of_points && number_of_points)
+    if (in >> number_of_points && number_of_points >= 3)
     {
-      std::cout << number_of_points << "\n";
+      std::cout << number_of_points << '\n';
       int x = 0;
       int y = 0;
       for (size_t i = 0; i < number_of_points; i++)
