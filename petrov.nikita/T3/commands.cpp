@@ -70,6 +70,10 @@ void petrov::addIfOdd(const std::vector< Polygon > & polygons, std::ostream & ou
 }
 void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
 {
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   double result = 0.0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
@@ -80,6 +84,10 @@ void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
 
 void petrov::sum(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
 {
+  if (num_of_vertexes < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   double result = 0.0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
@@ -126,6 +134,10 @@ void petrov::area(const std::vector< Polygon > & polygons, std::istream & in, st
 
 void petrov::max_area(const std::vector< Polygon > & polygons, std::ostream & out)
 {
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   double result = calculateArea(polygons[0]);
   StreamGuard outguard(out);
   out << std::fixed << std::setprecision(1);
@@ -138,6 +150,10 @@ void petrov::max_area(const std::vector< Polygon > & polygons, std::ostream & ou
 
 void petrov::max_vertexes(const std::vector< Polygon > & polygons, std::ostream & out)
 {
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   size_t max_vertexes = polygons[0].points.size();
   for (size_t i = 1; i < polygons.size(); i++)
   {
@@ -234,6 +250,10 @@ void petrov::countIfOdd(const std::vector< Polygon > & polygons, std::ostream & 
 
 void petrov::countIfThisNumber(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
 {
+  if (num_of_vertexes < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND");
+  }
   size_t count = 0;
   for (size_t i = 0; i < polygons.size(); i++)
   {
