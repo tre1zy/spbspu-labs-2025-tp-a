@@ -194,7 +194,7 @@ std::ostream& operator<<(std::ostream& output, const DataStruct& dest)
     return output;
   }
   Guard guard(output);
-  
+
   output << "(:key1 " << DoubleO{ dest.key1 };
   output << ":key2 " << DoubleSciO{ dest.key2 };
   output << ":key3 " << StringO{ dest.key3 } << ":)";

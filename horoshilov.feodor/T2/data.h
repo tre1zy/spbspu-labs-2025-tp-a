@@ -54,7 +54,7 @@ namespace horoshilov
   {
     const std::string& ref;
   };
-  
+
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleSciI&& dest);
   std::istream& operator>>(std::istream& in, DoubleI&& dest);
