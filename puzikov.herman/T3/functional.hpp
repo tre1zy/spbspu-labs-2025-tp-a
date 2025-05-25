@@ -7,26 +7,6 @@
 
 namespace puzikov
 {
-  struct AreaAccumulator;
-  struct VerticesComparator;
-  struct AreaComparator;
-  struct CongruentPolygonsCounter;
-  struct AreEqualPoints;
-
-  using PolyVector = std::vector< Polygon >;
-  using AreaIt = PolyVector::const_iterator;
-  using AreaAlgo = AreaIt (*)(AreaIt, AreaIt, const AreaComparator &);
-  using VertIt = PolyVector::const_iterator;
-  using VertAlgo = VertIt (*)(VertIt, VertIt, const VerticesComparator &);
-
-  AreaIt maxAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp);
-  AreaIt minAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp);
-  VertIt maxVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
-  VertIt minVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
-
-  bool is_congruent_by_shift(const Polygon &candidate, const Polygon &reference, std::size_t shift);
-  unsigned count_translation_congruent(const PolyVector &polygons, const Polygon &reference);
-
   struct AreaAccumulator
   {
     AreaAccumulator(const std::string &p):
@@ -81,9 +61,6 @@ namespace puzikov
 
   struct VerticesComparator
   {
-    VerticesComparator()
-    {}
-
     bool operator()(const Polygon &p1, const Polygon &p2) const
     {
       return p1.points.size() < p2.points.size();
@@ -92,9 +69,6 @@ namespace puzikov
 
   struct AreaComparator
   {
-    AreaComparator()
-    {}
-
     bool operator()(const Polygon &p1, const Polygon &p2) const
     {
       return calcPolygonArea(p1) < calcPolygonArea(p2);
@@ -220,13 +194,11 @@ namespace puzikov
       std::vector< std::size_t > shifts(reference.points.size());
       std::iota(shifts.begin(), shifts.end(), 0);
 
-      // Try all cyclic shifts in original order
       if (std::any_of(shifts.begin(), shifts.end(), AnyOfShift(poly.points, reference.points)))
       {
         return true;
       }
 
-      // Try all cyclic shifts in reversed order (opposite orientation)
       std::vector< Point > reversed(poly.points.rbegin(), poly.points.rend());
       if (std::any_of(shifts.begin(), shifts.end(), AnyOfShift(reversed, reference.points)))
       {
@@ -238,6 +210,16 @@ namespace puzikov
 
     const Polygon &reference;
   };
+
+  using AreaIt = std::vector< Polygon >::const_iterator;
+  using AreaAlgo = AreaIt (*)(AreaIt, AreaIt, const AreaComparator &);
+  using VertIt = std::vector< Polygon >::const_iterator;
+  using VertAlgo = VertIt (*)(VertIt, VertIt, const VerticesComparator &);
+
+  AreaIt maxAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp);
+  AreaIt minAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp);
+  VertIt maxVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
+  VertIt minVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
 }
 
 #endif

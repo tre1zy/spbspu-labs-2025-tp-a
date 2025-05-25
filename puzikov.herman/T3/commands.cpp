@@ -4,7 +4,7 @@
 #include <numeric>
 #include "format_guard.hpp"
 
-void puzikov::areaCommand(std::istream &in, std::ostream &out, const PolyVector &polygons)
+void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -42,7 +42,7 @@ void puzikov::areaCommand(std::istream &in, std::ostream &out, const PolyVector 
 }
 
 void puzikov::minmaxCommand(
-    std::istream &in, std::ostream &out, const PolyVector &polygons, AreaAlgo areaAlgo, VertAlgo vertAlgo)
+    std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons, AreaAlgo areaAlgo, VertAlgo vertAlgo)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -80,12 +80,12 @@ void puzikov::minmaxCommand(
   }
 }
 
-void puzikov::maxCommand(std::istream &in, std::ostream &out, const PolyVector &polygons)
+void puzikov::maxCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   minmaxCommand(in, out, polygons, maxAreaElement, maxVertElement);
 }
 
-void puzikov::minCommand(std::istream &in, std::ostream &out, const PolyVector &polygons)
+void puzikov::minCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   minmaxCommand(in, out, polygons, minAreaElement, minVertElement);
 }

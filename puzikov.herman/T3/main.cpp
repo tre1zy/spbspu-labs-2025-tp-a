@@ -30,6 +30,5 @@ int main(int argc, char **argv)
 
   std::copy(polygons.begin(), polygons.end(), output_it_t {std::cout, "\n"});
   puzikov::CommandHandler cmdHandler(polygons);
-
   cmdHandler.readCommands(std::cin, std::cout);
 }

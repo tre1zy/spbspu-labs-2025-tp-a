@@ -1,8 +1,5 @@
 #include "functional.hpp"
 #include <algorithm>
-#include <iterator>
-#include <limits>
-#include <numeric>
 
 puzikov::AreaIt puzikov::maxAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp)
 {

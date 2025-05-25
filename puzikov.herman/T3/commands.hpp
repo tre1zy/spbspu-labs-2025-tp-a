@@ -7,7 +7,7 @@
 namespace puzikov
 {
   void areaCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
-  void minmaxCommand(std::istream &, std::ostream &, const PolyVector &, AreaAlgo, VertAlgo);
+  void minmaxCommand(std::istream &, std::ostream &, const std::vector< Polygon > &, AreaAlgo, VertAlgo);
   void maxCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void minCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void countCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);

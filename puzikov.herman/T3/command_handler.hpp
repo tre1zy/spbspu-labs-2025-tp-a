@@ -19,7 +19,6 @@ namespace puzikov
   private:
     std::string cmd;
     std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
-    std::vector< Polygon > &polys;
   };
 }
 
