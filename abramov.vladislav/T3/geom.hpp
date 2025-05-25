@@ -17,6 +17,12 @@ namespace abramov
     std::vector< Point > points;
   };
   std::istream &operator>>(std::istream &in, Polygon &polygon);
+
+  double getArea(const Polygon &polygon);
+  double areaEven(double s, const Polygon &polygon);
+  double areaOdd(double s, const Polygon &polygon);
+  double areaMean(const std::vector< Polygon > &polygons);
+  double areaVertexes(double s, const Polygon &polygon, size_t vert);
 };
 
 
