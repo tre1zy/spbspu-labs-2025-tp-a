@@ -1,4 +1,5 @@
 #include "data_input.hpp"
+#include <limits>
 
 namespace trukhanov
 {
@@ -38,23 +39,27 @@ namespace trukhanov
 
     size_t n = 0;
     in >> n;
-    if (!in) return in;
+    if (!in || n < 3)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
 
-    polygon.points.clear();
-    polygon.points.reserve(n);
-
+    Polygon temp;
+    temp.points.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
       Point p;
       in >> p;
       if (!in)
       {
-        polygon.points.clear();
-        break;
+        in.setstate(std::ios::failbit);
+        return in;
       }
-      polygon.points.push_back(p);
+      temp.points.push_back(p);
     }
 
+    polygon = std::move(temp);
     return in;
   }
 

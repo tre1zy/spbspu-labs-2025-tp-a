@@ -4,6 +4,7 @@
 #include <fstream>
 #include <limits>
 #include <map>
+#include <sstream>
 #include "commands.hpp"
 #include "polygon.hpp"
 #include "data_input.hpp"
@@ -24,17 +25,24 @@ int main(int argc, char* argv[])
   }
 
   using trukhanov::Polygon;
-  using iIterator = std::istream_iterator< Polygon >;
   std::vector< Polygon > polygons;
+  std::string line;
 
-  try
+  while (std::getline(file, line))
   {
-    std::copy(iIterator(file), iIterator(), std::back_inserter(polygons));
-  }
-  catch (...)
-  {
-    std::cerr << "ERROR: invalid input format\n";
-    return 1;
+    if (line.empty())
+    {
+      continue;
+    }
+
+    std::istringstream iss(line);
+    Polygon poly;
+    iss >> poly;
+
+    if (iss && poly.points.size() >= 3)
+    {
+      polygons.push_back(std::move(poly));
+    }
   }
 
   std::map< std::string, std::function< void() > > cmds;

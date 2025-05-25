@@ -46,13 +46,17 @@ namespace trukhanov
     return false;
   }
 
-  bool IsEvenAndValid::operator()(const Polygon& p) const
-  {
-    return isEven(p) && p.points.size() >= 3;
-  }
+    bool PolygonEqual::operator()(const Polygon& a, const Polygon& b) const
+    {
+      if (a.points.size() != b.points.size())
+      {
+        return false;
+      }
+      return std::equal(a.points.begin(), a.points.end(), b.points.begin());
+    }
 
-  bool IsOddAndValid::operator()(const Polygon& p) const
-  {
-    return isOdd(p) && p.points.size() >= 3;
-  }
+      bool PolygonHasMinSize::operator()(const trukhanov::Polygon& p) const
+      {
+        return p.points.size() >= 3;
+      }
 }

@@ -41,14 +41,14 @@ namespace trukhanov
     bool operator()(const Polygon& p) const;
   };
 
-  struct IsEvenAndValid
+  struct PolygonEqual
   {
-    bool operator()(const Polygon& p) const;
+    bool operator()(const Polygon& a, const Polygon& b) const;
   };
 
-  struct IsOddAndValid
+  struct PolygonHasMinSize
   {
-    bool operator()(const Polygon& p) const;
+    bool operator()(const trukhanov::Polygon& p) const;
   };
 }
 

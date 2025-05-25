@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <numeric>
 #include <string>
+#include <vector>
+#include <functional>
 #include <iomanip>
 #include <limits>
 #include "functors.hpp"
@@ -150,51 +152,42 @@ namespace trukhanov
     }
   }
 
-  void count(std::istream& in, std::ostream& out, const Polygon_vector& src)
+  void trukhanov::count(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
     std::string subcommand;
     in >> subcommand;
 
+    std::vector< Polygon > filtered;
+    std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), PolygonHasMinSize{});
+
+    Polygon_vector unique;
+    for (const auto& p : filtered)
+    {
+      bool alreadyExists = std::any_of(unique.begin(), unique.end(), std::bind(PolygonEqual{}, std::placeholders::_1, p));
+      if (!alreadyExists)
+      {
+        unique.push_back(p);
+      }
+    }
+
     if (subcommand == "EVEN")
     {
-      size_t count = 0;
-      for (const auto& poly : src)
-      {
-        if (poly.points.size() % 2 == 0 && poly.points.size() >= 3)
-        {
-          ++count;
-        }
-      }
-      out << count << '\n';
+      out << std::count_if(unique.begin(), unique.end(), isEven) << '\n';
     }
     else if (subcommand == "ODD")
     {
-      size_t count = 0;
-      for (const auto& poly : src)
-      {
-        if (poly.points.size() % 2 != 0 && poly.points.size() >= 3)
-        {
-          ++count;
-        }
-      }
-      out << count << '\n';
+      out << std::count_if(unique.begin(), unique.end(), isOdd) << '\n';
     }
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
       size_t size = std::stoull(subcommand);
-      if (size < 3) {
+      if (size < 3)
+      {
         out << "<INVALID COMMAND>\n";
       }
-      else {
-        size_t count = 0;
-        for (const auto& poly : src)
-        {
-          if (poly.points.size() == size)
-          {
-            ++count;
-          }
-        }
-        out << count << '\n';
+      else
+      {
+        out << std::count_if(unique.begin(), unique.end(), isSize{ size }) << '\n';
       }
     }
     else
@@ -202,6 +195,7 @@ namespace trukhanov
       out << "<INVALID COMMAND>\n";
     }
   }
+
 
   void lessArea(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
