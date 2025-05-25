@@ -7,15 +7,16 @@ namespace {
 
   std::istream& input_value(std::istream& in, int ids[3], int id, gavrilova::DataStruct& dest)
   {
+    using namespace gavrilova;
     if (!in) {
       return in;
     }
     if (ids[id] == 0) {
-      in >> gavrilova::DoubleIO{dest.key1};
+      in >> DoubleI{dest.key1};
     } else if (ids[id] == 1) {
-      in >> gavrilova::LongLongIO{dest.key2};
+      in >> LongLongIO{dest.key2};
     } else if (ids[id] == 2) {
-      in >> gavrilova::String_with_quotsIO{dest.key3};
+      in >> String_with_quotsIO{dest.key3};
     } else {
       in.setstate(std::ios::failbit);
     }
@@ -52,7 +53,7 @@ std::istream& gavrilova::operator>>(std::istream& in, SymbolIO&& dest)
   return in;
 }
 
-std::istream& gavrilova::operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& gavrilova::operator>>(std::istream& in, DoubleI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -107,7 +108,7 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
   in >> sep{'('};
   in >> sep{':'};
   {
-    std::string key = "beleberda";
+    std::string key = "";
     in >> key;
     if (key == "key2") {
       std::swap(ids[0], ids[1]);
@@ -122,7 +123,7 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
   in >> sep{':'};
 
   {
-    std::string key = "beleberda";
+    std::string key = "";
     in >> key;
     if (key == "key1" && ids[0] == 0) {
       in.setstate(std::ios::failbit);
@@ -141,7 +142,7 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
   }
   in >> sep{':'};
   {
-    std::string key = "beleberda";
+    std::string key = "";
     in >> key;
     if (key == "key1" && ids[2] != 0) {
       in.setstate(std::ios::failbit);
@@ -162,16 +163,27 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& gavrilova::operator<<(std::ostream& out, const DataStruct& src)
+std::ostream& gavrilova::operator<<(std::ostream& out, const DoubleO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry) {
     return out;
   }
   IOStreamGuard fmtguard(out);
-  out << "(:key1 " << src.key1;
-  out << ((std::fmod(src.key1, 1.0) == 0) ? ".0d" : "d");
-  out << ":key2 " << src.key2 << "ll:" << "key3 \"" << src.key3 << "\":)";
+  out << dest.ref;
+  out << ((std::fmod(dest.ref, 1.0) == 0) ? ".0d" : "d");
+  return out;
+}
+
+std::ostream& gavrilova::operator<<(std::ostream& out, const DataStruct& src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry) {
+    return out;
+  }
+  out << "(:key1 " << DoubleO{src.key1};
+  out << ":key2 " << src.key2 << "ll:";
+  out << "key3 \"" << src.key3 << "\":)";
   return out;
 }
 

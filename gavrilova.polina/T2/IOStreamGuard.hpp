@@ -6,7 +6,7 @@
 namespace gavrilova {
   class IOStreamGuard {
   public:
-    IOStreamGuard(std::basic_ios< char >& s);
+    explicit IOStreamGuard(std::basic_ios< char >& s);
     ~IOStreamGuard();
 
   private:
