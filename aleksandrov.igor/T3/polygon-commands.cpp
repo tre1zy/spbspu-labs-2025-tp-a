@@ -119,6 +119,10 @@ namespace aleksandrov
 
   double areaMean(const std::vector< Polygon >& polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("There are no polygons!");
+    }
     struct AreaAccumulator
     {
       double operator()(double sum, const Polygon& polygon) const
