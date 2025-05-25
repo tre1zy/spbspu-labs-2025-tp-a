@@ -69,16 +69,30 @@ void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std:
   {
     throw std::logic_error("Unknown command\n");
   }
-  return;
 }
 
 void abramov::min(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
-  size_t k = 0;
-  in >> k;
-  out << k;
-  polygons[0];
-  return;
+  if (polygons.size() < 1)
+  {
+    throw std::logic_error("Can not find min\n");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    auto p = std::min_element(polygons.begin(), polygons.end(), maxArea);
+    out << getArea(*p);
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    auto p = std::min_element(polygons.begin(), polygons.end(), maxVertexes);
+    out << (*p).points.size();
+  }
+  else
+  {
+    throw std::logic_error("Unknown command\n");
+  }
 }
 
 void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
