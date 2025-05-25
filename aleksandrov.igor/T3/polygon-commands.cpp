@@ -50,6 +50,22 @@ namespace aleksandrov
       sum += multPoints(p.back(), p.front());
       return std::abs(sum) / 2.0;
     }
+
+    struct AreaComparator
+    {
+      bool operator()(const Polygon& a, const Polygon& b) const
+      {
+        return detail::calcArea(a) < detail::calcArea(b);
+      }
+    };
+
+    struct VertexesComparator
+    {
+      bool operator()(const Polygon& a, const Polygon& b) const
+      {
+        return a.points.size() < b.points.size();
+      }
+    };
   }
 
   void getPolygons(std::istream& in, std::vector< Polygon >& polygons)
@@ -132,10 +148,6 @@ namespace aleksandrov
 
   void area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
   {
-    if (polygons.empty())
-    {
-      throw std::logic_error("There are no polygons!");
-    }
     std::string subcommand;
     in >> subcommand;
     out << std::fixed << std::setprecision(1);
@@ -166,21 +178,71 @@ namespace aleksandrov
       out << areaN(polygons, numOfVertexes);
     }
   }
-  void max(const std::vector< Polygon >& polygons, std::ostream& out)
+
+  double maxArea(const std::vector< Polygon >& polygons)
   {
-    if (polygons.empty())
-    {
-      throw std::logic_error("There are no polygons!");
-    }
-    out << "max";
+    return detail::calcArea(*std::max_element(polygons.begin(), polygons.end(), detail::AreaComparator{}));
   }
-  void min(const std::vector< Polygon >& polygons, std::ostream& out)
+
+  size_t maxVertexes(const std::vector< Polygon >& polygons)
+  {
+    return (*std::max_element(polygons.begin(), polygons.end(), detail::VertexesComparator{})).points.size();
+  }
+
+  void max(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
   {
     if (polygons.empty())
     {
       throw std::logic_error("There are no polygons!");
     }
-    out << "min";
+    std::string subcommand;
+    in >> subcommand;
+    out << std::fixed << std::setprecision(1);
+    if (subcommand == "AREA")
+    {
+      out << maxArea(polygons);
+    }
+    else if (subcommand == "VERTEXES")
+    {
+      out << maxVertexes(polygons);
+    }
+    else
+    {
+      throw std::logic_error("Unknown subcommand!");
+    }
+  }
+
+  double minArea(const std::vector< Polygon >& polygons)
+  {
+    return detail::calcArea(*std::min_element(polygons.begin(), polygons.end(), detail::AreaComparator{}));
+  }
+
+  size_t minVertexes(const std::vector< Polygon >& polygons)
+  {
+    return (*std::min_element(polygons.begin(), polygons.end(), detail::VertexesComparator{})).points.size();
+  }
+
+  void min(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+  {
+    if (polygons.empty())
+    {
+      throw std::logic_error("There are no polygons!");
+    }
+    std::string subcommand;
+    in >> subcommand;
+    out << std::fixed << std::setprecision(1);
+    if (subcommand == "AREA")
+    {
+      out << minArea(polygons);
+    }
+    else if (subcommand == "VERTEXES")
+    {
+      out << minVertexes(polygons);
+    }
+    else
+    {
+      throw std::logic_error("Unknown subcommand!");
+    }
   }
 
   size_t countEven(const std::vector< Polygon >& polygons)
@@ -200,10 +262,6 @@ namespace aleksandrov
 
   void count(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
   {
-    if (polygons.empty())
-    {
-      throw std::logic_error("There are no polygons!");
-    }
     std::string subcommand;
     in >> subcommand;
     if (subcommand == "EVEN")

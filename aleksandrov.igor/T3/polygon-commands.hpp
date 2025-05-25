@@ -13,13 +13,21 @@ namespace aleksandrov
     double calcArea(const Polygon&);
   }
   void getPolygons(std::istream&, std::vector< Polygon >&);
+
   double areaEven(const std::vector< Polygon >&);
   double areaOdd(const std::vector< Polygon >&);
   double areaMean(const std::vector< Polygon >&);
   double areaN(const std::vector< Polygon >&);
   void area(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  void max(const std::vector< Polygon >&, std::ostream&);
-  void min(const std::vector< Polygon >&, std::ostream&);
+
+  double maxArea(const std::vector< Polygon >&);
+  size_t maxVertexes(const std::vector< Polygon >&);
+  void max(const std::vector< Polygon >&, std::istream&, std::ostream&);
+
+  double minArea(const std::vector< Polygon >&);
+  size_t minVertexes(const std::vector< Polygon >&);
+  void min(const std::vector< Polygon >&, std::istream&, std::ostream&);
+
   size_t countEven(const std::vector< Polygon >&);
   size_t countOdd(const std::vector< Polygon >&);
   size_t countN(const std::vector< Polygon >&, size_t);
