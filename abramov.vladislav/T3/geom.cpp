@@ -119,3 +119,13 @@ double abramov::areaVertexes(double s, const Polygon &polygon, size_t vert)
   }
   return s;
 }
+
+bool abramov::maxArea(const Polygon &p1, const Polygon &p2)
+{
+  return getArea(p1) < getArea(p2);
+}
+
+bool abramov::maxVertexes(const Polygon &p1, const Polygon &p2)
+{
+  return p1.points.size() < p2.points.size();
+}

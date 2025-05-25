@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include <numeric>
+#include <algorithm>
 #include "geom.hpp"
 
 void abramov::getCommands(std::map< std::string, std::function< void() > > &commands, std::vector< Polygon > &polygons)
@@ -48,10 +49,26 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
 
 void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in)
 {
-  size_t k = 0;
-  in >> k;
-  out << k;
-  polygons[0];
+  if (polygons.size() < 1)
+  {
+    throw std::logic_error("Can not find max\n");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    auto p = std::max_element(polygons.begin(), polygons.end(), maxArea);
+    out << getArea(*p);
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    auto p = std::max_element(polygons.begin(), polygons.end(), maxVertexes);
+    out << (*p).points.size();
+  }
+  else
+  {
+    throw std::logic_error("Unknown command\n");
+  }
   return;
 }
 

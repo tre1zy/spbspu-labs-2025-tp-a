@@ -23,6 +23,8 @@ namespace abramov
   double areaOdd(double s, const Polygon &polygon);
   double areaMean(const std::vector< Polygon > &polygons);
   double areaVertexes(double s, const Polygon &polygon, size_t vert);
+  bool maxArea(const Polygon &p1, const Polygon& p2);
+  bool maxVertexes(const Polygon &p1, const Polygon &p2);
 };
 
 
