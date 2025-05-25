@@ -1,5 +1,6 @@
 #include "datastruct.h"
 #include <stdexcept>
+#include <iterator>
 
 namespace
 {
