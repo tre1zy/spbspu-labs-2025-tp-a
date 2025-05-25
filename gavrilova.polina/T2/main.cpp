@@ -1,8 +1,8 @@
+#include <algorithm>
 #include <iostream>
-#include <vector>
 #include <iterator>
 #include <limits>
-#include <algorithm>
+#include <vector>
 
 #include "DataStruct.hpp"
 
@@ -16,7 +16,7 @@ int main()
     std::cin >> new_struct;
     if (!std::cin) {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     } else {
       data.push_back(new_struct);
     }
@@ -25,8 +25,7 @@ int main()
   std::sort(data.begin(), data.end(), compare);
 
   std::copy(
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
+      std::begin(data),
+      std::end(data),
+      std::ostream_iterator< DataStruct >(std::cout, "\n"));
 }

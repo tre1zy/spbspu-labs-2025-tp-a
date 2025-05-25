@@ -1,25 +1,25 @@
 #include "DataStruct.hpp"
-#include <iomanip>
 #include <cmath>
+#include <iomanip>
 #include "IOStreamGuard.hpp"
 
 namespace {
 
-std::istream& input_value(std::istream& in, int ids[3], int id, gavrilova::DataStruct& dest)
-{
-  if (!in) {
+  std::istream& input_value(std::istream& in, int ids[3], int id, gavrilova::DataStruct& dest)
+  {
+    if (!in) {
+      return in;
+    }
+    if (ids[id] == 0) {
+      in >> gavrilova::DoubleIO{dest.key1};
+    } else if (ids[id] == 1) {
+      in >> gavrilova::LongLongIO{dest.key2};
+    } else if (ids[id] == 2) {
+      in >> gavrilova::String_with_quotsIO{dest.key3};
+    } else {
+      in.setstate(std::ios::failbit);
+    }
     return in;
-  }
-  if (ids[id] == 0) {
-    in >> gavrilova::DoubleIO{ dest.key1 };
-  } else if (ids[id] == 1) {
-    in >> gavrilova::LongLongIO{ dest.key2 };
-  } else if (ids[id] == 2) {
-    in >> gavrilova::String_with_quotsIO{ dest.key3 };
-  } else {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
   }
 
 }
@@ -78,7 +78,7 @@ std::istream& gavrilova::operator>>(std::istream& in, String_with_quotsIO&& dest
   if (!sentry) {
     return in;
   }
-  std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+  std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
   return in;
 }
 
@@ -104,8 +104,8 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
 
   int ids[] = {0, 1, 2};
 
-  in >> sep{ '('};
-  in >> sep{ ':' };
+  in >> sep{'('};
+  in >> sep{':'};
   {
     std::string key = "beleberda";
     in >> key;
@@ -119,7 +119,7 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
     ::input_value(in, ids, 0, input);
   }
 
-  in >> sep{ ':' };
+  in >> sep{':'};
 
   {
     std::string key = "beleberda";
@@ -139,7 +139,7 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
     }
     ::input_value(in, ids, 1, input);
   }
-  in >> sep{ ':' };
+  in >> sep{':'};
   {
     std::string key = "beleberda";
     in >> key;
@@ -154,8 +154,8 @@ std::istream& gavrilova::operator>>(std::istream& in, DataStruct& dest)
     }
     ::input_value(in, ids, 2, input);
   }
-  in >> sep{ ':' };
-  in >> sep{ ')' };
+  in >> sep{':'};
+  in >> sep{')'};
   if (in) {
     dest = input;
   }
@@ -174,7 +174,6 @@ std::ostream& gavrilova::operator<<(std::ostream& out, const DataStruct& src)
   out << ":key2 " << src.key2 << "ll:" << "key3 \"" << src.key3 << "\":)";
   return out;
 }
-
 
 bool gavrilova::compare(const DataStruct& lhs, const DataStruct& rhs)
 {

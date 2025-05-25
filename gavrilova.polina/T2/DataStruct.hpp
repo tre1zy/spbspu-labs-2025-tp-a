@@ -1,47 +1,39 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
 
-#include <string>
 #include <iostream>
 #include <sstream>
+#include <string>
 
-namespace gavrilova
-{
+namespace gavrilova {
 
-  struct DataStruct
-  {
+  struct DataStruct {
     double key1;
     long long key2;
     std::string key3;
   };
 
-  struct DelimiterIO
-  {
+  struct DelimiterIO {
     char exp;
   };
 
-  struct SymbolIO
-  {
+  struct SymbolIO {
     char exp;
   };
 
-  struct DoubleIO
-  {
+  struct DoubleIO {
     double& ref;
   };
 
-  struct LongLongIO
-  {
+  struct LongLongIO {
     long long& ref;
   };
 
-  struct String_with_quotsIO
-  {
+  struct String_with_quotsIO {
     std::string& ref;
   };
 
-  struct StringI_with_spaceIO
-  {
+  struct StringI_with_spaceIO {
     std::string& ref;
   };
 

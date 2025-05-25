@@ -1,6 +1,6 @@
 #include "IOStreamGuard.hpp"
 
-gavrilova::IOStreamGuard::IOStreamGuard(std::basic_ios< char >& s) :
+gavrilova::IOStreamGuard::IOStreamGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
   fill_(s.fill()),

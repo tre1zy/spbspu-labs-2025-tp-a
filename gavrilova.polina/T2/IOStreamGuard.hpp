@@ -3,13 +3,12 @@
 
 #include <iostream>
 
-namespace gavrilova
-{
-  class IOStreamGuard
-  {
+namespace gavrilova {
+  class IOStreamGuard {
   public:
     IOStreamGuard(std::basic_ios< char >& s);
     ~IOStreamGuard();
+
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;
