@@ -27,7 +27,7 @@ namespace
     while (*in != ':')
     {
       if (*in == '1') num++;
-      num < 1;
+      num = num << 1;
       in++;
     }
     return 0;
