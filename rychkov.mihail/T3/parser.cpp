@@ -30,7 +30,7 @@ bool rychkov::eol(std::istream& in)
   using Iter = std::istream_iterator< char >;
   fmtguard guard{in};
   bool bad = false;
-  std::find_if(Iter{in >> std::noskipws}, Iter{}, remove_empty{in, bad});
+  Iter trash = std::find_if(Iter{in >> std::noskipws}, Iter{}, remove_empty{in, bad});
   return !bad;
 }
 void rychkov::ParserContext::parse_error()
