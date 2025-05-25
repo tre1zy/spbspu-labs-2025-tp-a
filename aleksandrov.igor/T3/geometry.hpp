@@ -1,7 +1,7 @@
-#ifndef GEOM_HPP
-#define GEOM_HPP
+#ifndef GEOMETRY_HPP
+#define GEOMETRY_HPP
 
-#include <list>
+#include <vector>
 
 namespace aleksandrov
 {
@@ -13,8 +13,9 @@ namespace aleksandrov
 
   struct Polygon
   {
-    std::list< Point > points;
+    std::vector< Point > points;
   };
 }
 
 #endif
+
