@@ -1,59 +1,56 @@
 #include "commands.hpp"
-#include "functors.hpp"
+
+using namespace std::placeholders;
 
 void filonova::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   std::string subcmd;
   in >> subcmd;
 
-  double area = 0.0;
+  std::vector< Polygon > filteredPolygons;
 
   if (subcmd == "EVEN")
   {
-    std::vector< Polygon > filteredPolygons;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsEven{});
-
-    std::vector< double > areas;
-    std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
-    area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    auto pred = std::bind(IsEven(), _1);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
   }
   else if (subcmd == "ODD")
   {
-    std::vector< Polygon > filteredPolygons;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsOdd{});
-
-    std::vector< double > areas;
-    std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
-    area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    auto pred = std::bind(IsOdd(), _1);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
   }
   else if (subcmd == "MEAN")
   {
     if (polygons.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      out << "<INVALID COMMAND>";
+      return;
     }
 
-    std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
-    area = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
+    double totalArea = ComputeTotalArea()(polygons);
+    out << std::fixed << std::setprecision(1) << totalArea / polygons.size();
+    return;
+  }
+  else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
+  {
+    size_t vertexCount = std::stoul(subcmd);
+    if (vertexCount < MIN_VERTEX_COUNT)
+    {
+      out << "<INVALID COMMAND>";
+      return;
+    }
+
+    auto pred = std::bind(HasVertexCount(vertexCount), _1);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
   }
   else
   {
-    size_t vertexes = std::stoul(subcmd);
-    if (vertexes < MIN_VERTEX_COUNT)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-
-    std::vector< Polygon > filteredPolygons;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), HasVertexCount{vertexes});
-
-    std::vector< double > areas;
-    std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
-    area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << "<INVALID COMMAND>";
+    return;
   }
 
-  out << std::fixed << std::setprecision(1) << area;
+  double totalArea = ComputeTotalArea()(filteredPolygons);
+  out << std::fixed << std::setprecision(1) << totalArea;
 }
 
 void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -61,30 +58,27 @@ void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polyg
   std::string subcmd;
   in >> subcmd;
 
+  out << std::fixed << std::setprecision(1);
+
   if (polygons.empty())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    out << "<INVALID COMMAND>";
+    return;
   }
 
   if (subcmd == "AREA")
   {
-    std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
-
-    double maxArea = *std::max_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << maxArea;
+    auto maxIt = std::max_element(polygons.begin(), polygons.end(), CompareByArea());
+    out << getArea(*maxIt);
   }
   else if (subcmd == "VERTEXES")
   {
-    std::vector< size_t > vertexCounts;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(vertexCounts), GetPolygonVertexCount{});
-
-    size_t maxVertexes = *std::max_element(vertexCounts.begin(), vertexCounts.end());
-    out << maxVertexes;
+    auto maxIt = std::max_element(polygons.begin(), polygons.end(), CompareByVertexes());
+    out << maxIt->points.size();
   }
   else
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    out << "<INVALID COMMAND>";
   }
 }
 
@@ -93,30 +87,27 @@ void filonova::min(std::istream &in, std::ostream &out, const std::vector< Polyg
   std::string subcmd;
   in >> subcmd;
 
+  out << std::fixed << std::setprecision(1);
+
   if (polygons.empty())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    out << "<INVALID COMMAND>";
+    return;
   }
 
   if (subcmd == "AREA")
   {
-    std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
-
-    double minArea = *std::min_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << minArea;
+    auto minIt = std::min_element(polygons.begin(), polygons.end(), CompareByArea());
+    out << getArea(*minIt);
   }
   else if (subcmd == "VERTEXES")
   {
-    std::vector< size_t > vertexCounts;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(vertexCounts), GetPolygonVertexCount{});
-
-    size_t minVertexes = *std::min_element(vertexCounts.begin(), vertexCounts.end());
-    out << minVertexes;
+    auto minIt = std::min_element(polygons.begin(), polygons.end(), CompareByVertexes());
+    out << minIt->points.size();
   }
   else
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    out << "<INVALID COMMAND>";
   }
 }
 
@@ -125,40 +116,75 @@ void filonova::count(std::istream &in, std::ostream &out, const std::vector< Pol
   std::string subcmd;
   in >> subcmd;
 
-  size_t result = 0;
+  size_t count = 0;
 
   if (subcmd == "EVEN")
   {
-    result = std::count_if(polygons.begin(), polygons.end(), IsEven{});
+    auto pred = std::bind(IsEven(), _1);
+    count = std::count_if(polygons.begin(), polygons.end(), pred);
   }
   else if (subcmd == "ODD")
   {
-    result = std::count_if(polygons.begin(), polygons.end(), IsOdd{});
+    auto pred = std::bind(IsOdd(), _1);
+    count = std::count_if(polygons.begin(), polygons.end(), pred);
+  }
+  else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
+  {
+    size_t vertexCount = std::stoul(subcmd);
+    if (vertexCount < MIN_VERTEX_COUNT)
+    {
+      out << "<INVALID COMMAND>";
+      return;
+    }
+
+    auto pred = std::bind(HasVertexCount(vertexCount), _1);
+    count = std::count_if(polygons.begin(), polygons.end(), pred);
   }
   else
   {
-    size_t vertexes = std::stoul(subcmd);
-    if (vertexes < MIN_VERTEX_COUNT)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-
-    result = std::count_if(polygons.begin(), polygons.end(), HasVertexCount{vertexes});
+    out << "<INVALID COMMAND>";
+    return;
   }
 
-  out << result;
+  out << count;
 }
 
 void filonova::intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  Polygon inputPolygon;
-  in >> inputPolygon;
-  if (!in)
+  std::string line;
+  std::getline(in, line);
+
+  if (line.empty())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    out << "<INVALID COMMAND>";
+    return;
   }
 
-  size_t count = std::count_if(polygons.begin(), polygons.end(), IntersectsWith{inputPolygon});
+  std::istringstream lineStream(line);
+
+  Polygon inputPolygon;
+  if (!(lineStream >> inputPolygon))
+  {
+    out << "<INVALID COMMAND>";
+    return;
+  }
+
+  std::string extra;
+  if (lineStream >> extra)
+  {
+    out << "<INVALID COMMAND>";
+    return;
+  }
+
+  if (inputPolygon.points.size() < MIN_VERTEX_COUNT)
+  {
+    out << "<INVALID COMMAND>";
+    return;
+  }
+
+  IntersectsWith intersects(inputPolygon);
+  auto pred = std::bind(intersects, _1);
+  size_t count = std::count_if(polygons.begin(), polygons.end(), pred);
   out << count;
 }
 

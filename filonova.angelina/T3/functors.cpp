@@ -1,41 +1,78 @@
 #include "functors.hpp"
 
-bool filonova::IsEven::operator()(const Polygon &polygon) const
+bool filonova::IsOdd::operator()(const Polygon &p) const
 {
-  return polygon.points.size() % 2 == 0;
+  return (p.points.size() % 2) == 1;
 }
 
-bool filonova::IsOdd::operator()(const Polygon &polygon) const
+bool filonova::IsEven::operator()(const Polygon &p) const
 {
-  return polygon.points.size() % 2 != 0;
+  return (p.points.size() % 2) == 0;
 }
 
-double filonova::GetPolygonArea::operator()(const Polygon &polygon) const
+double filonova::ComputeTotalArea::operator()(const std::vector< Polygon > &polygons) const
 {
-  return getArea(polygon);
+  std::vector< double > areas;
+  areas.reserve(polygons.size());
+
+  std::transform(
+      polygons.begin(), polygons.end(),
+      std::back_inserter(areas),
+      getArea);
+
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
-size_t filonova::GetPolygonVertexCount::operator()(const Polygon &polygon) const
+double filonova::ShoelaceTermCalculator::operator()(const Point &p1, const Point &p2) const
 {
-  return polygon.points.size();
+  return static_cast< double >(p1.x) * p2.y - static_cast< double >(p2.x) * p1.y;
 }
 
-bool filonova::HasVertexCount::operator()(const Polygon &polygon) const
+filonova::HasVertexCount::HasVertexCount(size_t count) : count_(count) {}
+
+bool filonova::HasVertexCount::operator()(const Polygon &p) const
 {
-  return polygon.points.size() == count;
+  return p.points.size() == count_;
 }
+
+bool filonova::CompareByArea::operator()(const Polygon &a, const Polygon &b) const
+{
+  return getArea(a) < getArea(b);
+}
+
+bool filonova::CompareByVertexes::operator()(const Polygon &a, const Polygon &b) const
+{
+  return a.points.size() < b.points.size();
+}
+
+filonova::IntersectsWith::IntersectsWith(const Polygon &polygon) : polygon_(polygon) {}
 
 bool filonova::IntersectsWith::operator()(const Polygon &other) const
 {
-  auto left = std::minmax_element(polygon.points.begin(), polygon.points.end());
+  auto left = std::minmax_element(polygon_.points.begin(), polygon_.points.end());
   auto right = std::minmax_element(other.points.begin(), other.points.end());
   return !((*left.second < *right.first) || (*right.second < *left.first));
+}
+
+double filonova::IsRectangle::dot(const Point &a, const Point &b, const Point &c)
+{
+  double abx = b.x - a.x;
+  double aby = b.y - a.y;
+  double bcx = c.x - b.x;
+  double bcy = c.y - b.y;
+  return abx * bcx + aby * bcy;
+}
+
+double filonova::IsRectangle::getDistanceSquared(const Point &a, const Point &b)
+{
+  double dx = b.x - a.x;
+  double dy = b.y - a.y;
+  return dx * dx + dy * dy;
 }
 
 bool filonova::IsRectangle::operator()(const Polygon &polygon) const
 {
   const auto &points = polygon.points;
-  constexpr size_t RECTANGLE_SIDES = 4;
 
   if (points.size() != RECTANGLE_SIDES)
   {
@@ -59,20 +96,4 @@ bool filonova::IsRectangle::operator()(const Polygon &polygon) const
   }
 
   return true;
-}
-
-double filonova::IsRectangle::dot(const Point &a, const Point &b, const Point &c)
-{
-  double abx = b.x - a.x;
-  double aby = b.y - a.y;
-  double bcx = c.x - b.x;
-  double bcy = c.y - b.y;
-  return abx * bcx + aby * bcy;
-}
-
-double filonova::IsRectangle::getDistanceSquared(const Point &a, const Point &b)
-{
-  double dx = b.x - a.x;
-  double dy = b.y - a.y;
-  return dx * dx + dy * dy;
 }

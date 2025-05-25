@@ -4,51 +4,62 @@
 #include "polygon.hpp"
 
 #include <algorithm>
-#include <cmath>
+#include <numeric>
+
+constexpr size_t RECTANGLE_SIDES = 4;
 
 namespace filonova
 {
-  struct IsEven
-  {
-    bool operator()(const Polygon &polygon) const;
-  };
-
   struct IsOdd
   {
-    bool operator()(const Polygon &polygon) const;
+    bool operator()(const Polygon &p) const;
   };
 
-  struct GetPolygonArea
+  struct IsEven
   {
-    double operator()(const Polygon &polygon) const;
+    bool operator()(const Polygon &p) const;
   };
 
-  struct GetPolygonVertexCount
+  struct ComputeTotalArea
   {
-    size_t operator()(const Polygon &polygon) const;
+    double operator()(const std::vector< Polygon > &polygons) const;
+  };
+
+  struct ShoelaceTermCalculator
+  {
+    double operator()(const Point &p1, const Point &p2) const;
   };
 
   struct HasVertexCount
   {
-    size_t count;
-    bool operator()(const Polygon &polygon) const;
+    size_t count_;
+    HasVertexCount(size_t count);
+    bool operator()(const Polygon &p) const;
+  };
+
+  struct CompareByArea
+  {
+    bool operator()(const Polygon &a, const Polygon &b) const;
+  };
+
+  struct CompareByVertexes
+  {
+    bool operator()(const Polygon &a, const Polygon &b) const;
   };
 
   struct IntersectsWith
   {
-    Polygon polygon;
+    Polygon polygon_;
+    IntersectsWith(const Polygon &polygon);
     bool operator()(const Polygon &other) const;
   };
 
   struct IsRectangle
   {
-    bool operator()(const Polygon &polygon) const;
-
-  private:
     static double dot(const Point &a, const Point &b, const Point &c);
     static double getDistanceSquared(const Point &a, const Point &b);
+    bool operator()(const Polygon &polygon) const;
   };
-
 }
 
 #endif

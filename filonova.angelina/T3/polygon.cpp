@@ -1,4 +1,5 @@
 #include "polygon.hpp"
+#include "functors.hpp"
 #include "input_struct.hpp"
 
 std::istream &filonova::operator>>(std::istream &in, Point &point)
@@ -21,7 +22,7 @@ std::istream &filonova::operator>>(std::istream &in, Point &point)
 
 bool filonova::operator<(const Point &lhs, const Point &rhs)
 {
-  return (lhs.x < rhs.x) || (lhs.x == rhs.x && lhs.y < rhs.y);
+  return (lhs.x < rhs.x) && (lhs.y < rhs.y);
 }
 
 std::istream &filonova::operator>>(std::istream &in, Polygon &polygon)
@@ -40,14 +41,18 @@ std::istream &filonova::operator>>(std::istream &in, Polygon &polygon)
     return in;
   }
 
-  std::vector< Point > points(vertexCount);
-  for (size_t i = 0; i < vertexCount; i++)
+  std::vector< Point > points;
+  points.reserve(vertexCount);
+
+  for (size_t i = 0; i < vertexCount; ++i)
   {
-    in >> points[i];
-    if (!in)
+    Point point;
+    if (!(in >> point))
     {
+      in.setstate(std::ios::failbit);
       return in;
     }
+    points.push_back(point);
   }
 
   polygon.points = std::move(points);
@@ -56,21 +61,22 @@ std::istream &filonova::operator>>(std::istream &in, Polygon &polygon)
 
 double filonova::getArea(const Polygon &polygon)
 {
-  const std::vector< Point > &points = polygon.points;
-
-  size_t vertexCount = points.size();
-  if (vertexCount < MIN_VERTEX_COUNT)
+  const std::vector< Point > &pts = polygon.points;
+  if (pts.size() < MIN_VERTEX_COUNT)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
-  double area = 0.0;
-  for (size_t i = 0; i < vertexCount; ++i)
-  {
-    const Point &p1 = points[i];
-    const Point &p2 = points[(i + 1) % vertexCount];
-    area += static_cast< double >(p1.x) * p2.y - static_cast< double >(p2.x) * p1.y;
-  }
+  std::vector< Point > temp_pts = pts;
+  temp_pts.push_back(pts[0]);
 
-  return std::abs(area) / 2.0;
+  double sum_terms = std::transform_reduce(
+      temp_pts.begin(),
+      temp_pts.end() - 1,
+      temp_pts.begin() + 1,
+      0.0,
+      std::plus< double >(),
+      filonova::ShoelaceTermCalculator());
+
+  return std::abs(sum_terms) / 2.0;
 }

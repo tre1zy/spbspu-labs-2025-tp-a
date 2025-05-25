@@ -23,11 +23,11 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  std::vector< Polygon > plgs;
+  std::vector< Polygon > polygon;
 
   while (!file.eof())
   {
-    std::copy(istrIter(file), istrIter(), std::back_inserter(plgs));
+    std::copy(istrIter(file), istrIter(), std::back_inserter(polygon));
     if (!file)
     {
       file.clear();
@@ -37,12 +37,12 @@ int main(int argc, char *argv[])
 
   std::map< std::string, std::function< void() > > cmds;
 
-  cmds["AREA"] = std::bind(filonova::area, std::ref(std::cin), std::ref(std::cout), std::cref(plgs));
-  cmds["MAX"] = std::bind(filonova::max, std::ref(std::cin), std::ref(std::cout), std::cref(plgs));
-  cmds["MIN"] = std::bind(filonova::min, std::ref(std::cin), std::ref(std::cout), std::cref(plgs));
-  cmds["COUNT"] = std::bind(filonova::count, std::ref(std::cin), std::ref(std::cout), std::cref(plgs));
-  cmds["INTERSECTIONS"] = std::bind(filonova::intersections, std::ref(std::cin), std::ref(std::cout), std::cref(plgs));
-  cmds["RECTS"] = std::bind(filonova::rects, std::ref(std::cout), std::cref(plgs));
+  cmds["AREA"] = std::bind(filonova::area, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
+  cmds["MAX"] = std::bind(filonova::max, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
+  cmds["MIN"] = std::bind(filonova::min, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
+  cmds["COUNT"] = std::bind(filonova::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
+  cmds["INTERSECTIONS"] = std::bind(filonova::intersections, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
+  cmds["RECTS"] = std::bind(filonova::rects, std::ref(std::cout), std::cref(polygon));
 
   std::string command;
   while (!(std::cin >> command).eof())
