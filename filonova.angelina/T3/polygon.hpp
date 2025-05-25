@@ -21,8 +21,8 @@ namespace filonova
   };
   std::istream &operator>>(std::istream &in, Polygon &polygon);
 
+  double triangleArea(const Point &a, const Point &b, const Point &c);
   double getArea(const Polygon &polygon);
-
 }
 
 #endif

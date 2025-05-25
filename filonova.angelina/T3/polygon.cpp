@@ -59,6 +59,14 @@ std::istream &filonova::operator>>(std::istream &in, Polygon &polygon)
   return in;
 }
 
+double filonova::triangleArea(const Point &a, const Point &b, const Point &c)
+{
+  return std::abs(
+             static_cast< double >(a.x) * (b.y - c.y) +
+             static_cast< double >(b.x) * (c.y - a.y) +
+             static_cast< double >(c.x) * (a.y - b.y)) / 2.0;
+}
+
 double filonova::getArea(const Polygon &polygon)
 {
   const std::vector< Point > &pts = polygon.points;
@@ -67,16 +75,11 @@ double filonova::getArea(const Polygon &polygon)
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
-  std::vector< Point > temp_pts = pts;
-  temp_pts.push_back(pts[0]);
-
-  double sum_terms = std::transform_reduce(
-      temp_pts.begin(),
-      temp_pts.end() - 1,
-      temp_pts.begin() + 1,
+  std::vector< size_t > indices(pts.size() - 2);
+  std::iota(indices.begin(), indices.end(), 1);
+  return std::accumulate(
+      indices.begin(),
+      indices.end(),
       0.0,
-      std::plus< double >(),
-      filonova::ShoelaceTermCalculator());
-
-  return std::abs(sum_terms) / 2.0;
+      filonova::TriangleAreaAccumulator(pts));
 }

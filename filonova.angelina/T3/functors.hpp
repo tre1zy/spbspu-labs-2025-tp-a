@@ -25,9 +25,12 @@ namespace filonova
     double operator()(const std::vector< Polygon > &polygons) const;
   };
 
-  struct ShoelaceTermCalculator
+  struct TriangleAreaAccumulator
   {
-    double operator()(const Point &p1, const Point &p2) const;
+    const Point &point;
+    const std::vector< Point > &points;
+    TriangleAreaAccumulator(const std::vector< Point > &pts);
+    double operator()(double sum, size_t i) const;
   };
 
   struct HasVertexCount
