@@ -152,7 +152,7 @@ namespace trukhanov
     }
   }
 
-  void trukhanov::count(std::istream& in, std::ostream& out, const Polygon_vector& src)
+  void count(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
     std::string subcommand;
     in >> subcommand;
