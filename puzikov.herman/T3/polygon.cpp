@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <numeric>
 #include "input_delim.hpp"
 #include "format_guard.hpp"
@@ -106,4 +107,18 @@ double puzikov::calcPolygonArea(const puzikov::Polygon &poly)
   // need an absolute value because the sign of the area depends on whether the points are
   // defined clock-wise (the area would be negative) or counter-clock-wise (the area would be positive)
   return std::abs(area);
+}
+
+void puzikov::readPolygons(std::istream &in, std::vector< Polygon > &polygons)
+{
+  using input_it_t = std::istream_iterator< Polygon >;
+  while (!in.eof())
+  {
+    std::copy(input_it_t(in), input_it_t(), std::back_inserter(polygons));
+    if (in.fail())
+    {
+      in.clear();
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 }

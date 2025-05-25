@@ -23,6 +23,8 @@ namespace puzikov
   std::istream &operator>>(std::istream &in, Polygon &dest);
   std::ostream &operator<<(std::ostream &out, const Polygon &src);
 
+  void readPolygons(std::istream &, std::vector< Polygon > &);
+
   struct PolygonAreaAccumulator;
   double calcPolygonArea(const puzikov::Polygon &poly);
 }

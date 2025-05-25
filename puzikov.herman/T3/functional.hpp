@@ -24,8 +24,6 @@ namespace puzikov
   VertIt maxVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
   VertIt minVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
 
-  void readPolygons(std::istream &, std::vector< Polygon > &);
-
   bool is_congruent_by_shift(const Polygon &candidate, const Polygon &reference, std::size_t shift);
   unsigned count_translation_congruent(const PolyVector &polygons, const Polygon &reference);
 
