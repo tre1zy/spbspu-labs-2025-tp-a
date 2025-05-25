@@ -4,40 +4,40 @@
 #include <algorithm>
 #include <numeric>
 #include <functional>
-#include <type_traits>
+#include <vector>
 
 namespace rychkov
 {
-  static auto get_vertexes = std::bind(std::mem_fn(&Polygon::vertexes), std::placeholders::_1);
-  static auto get_size = std::bind(&decltype(Polygon::vertexes)::size, get_vertexes);
-  static auto accumulator = std::bind(std::plus<>{},
-        std::placeholders::_1, std::bind(get_area{}, std::placeholders::_2));
+  static auto get_points = std::bind(std::mem_fn(&Polygon::points), std::placeholders::_1);
+  static auto get_size = std::bind(&decltype(Polygon::points)::size, get_points);
   static auto iseven = std::bind(std::equal_to<>{}, std::bind(std::modulus<>{}, get_size, 2), 0);
   static auto isodd = std::bind(std::equal_to<>{}, std::bind(std::modulus<>{}, get_size, 2), 1);
 }
 
 bool rychkov::AreaProcessor::even(ParserContext& context)
 {
-  if (!context.eol())
+  if (!eol(context.in))
   {
     return false;
   }
   using namespace std::placeholders;
-  using polygons_container = std::remove_reference_t< decltype(polygons) >;
-  polygons_container::iterator workspace_end = std::partition(polygons.begin(), polygons.end(), iseven);
-  context.out << std::accumulate(polygons.begin(), workspace_end, 0.0, accumulator) << '\n';
+  std::vector< double > temp(polygons_.size(), 0);
+  auto conditional_area = std::bind(if_statement< double >{}, iseven, std::bind(get_area{}, _1), 0);
+  std::transform(polygons_.begin(), polygons_.end(), temp.begin(), conditional_area);
+  context.out << std::accumulate(temp.begin(), temp.end(), 0.0) << '\n';
   return true;
 }
 bool rychkov::AreaProcessor::odd(ParserContext& context)
 {
-  if (!context.eol())
+  if (!eol(context.in))
   {
     return false;
   }
   using namespace std::placeholders;
-  using polygons_container = std::remove_reference_t< decltype(polygons) >;
-  polygons_container::iterator workspace_end = std::partition(polygons.begin(), polygons.end(), isodd);
-  context.out << std::accumulate(polygons.begin(), workspace_end, 0.0, accumulator) << '\n';
+  std::vector< double > temp(polygons_.size(), 0);
+  auto conditional_area = std::bind(if_statement< double >{}, isodd, std::bind(get_area{}, _1), 0);
+  std::transform(polygons_.begin(), polygons_.end(), temp.begin(), conditional_area);
+  context.out << std::accumulate(temp.begin(), temp.end(), 0.0) << '\n';
   return true;
 }
 bool rychkov::AreaProcessor::count(ParserContext& context)
@@ -47,43 +47,47 @@ bool rychkov::AreaProcessor::count(ParserContext& context)
   {
     return false;
   }
-  if (!context.eol())
+  if ((number < 3) || !eol(context.in))
   {
     context.parse_error();
     return true;
   }
-  using polygons_container = std::remove_reference_t< decltype(polygons) >;
-  auto equal_size = std::bind(std::equal_to<>{}, number, std::bind(get_size, std::placeholders::_1));
-  polygons_container::iterator workspace_end = std::partition(polygons.begin(), polygons.end(), equal_size);
-  context.out << std::accumulate(polygons.begin(), workspace_end, 0.0, accumulator) << '\n';
+  using namespace std::placeholders;
+  std::vector< double > temp(polygons_.size(), 0);
+  auto equal_size = std::bind(std::equal_to<>{}, number, get_size);
+  auto conditional_area = std::bind(if_statement< double >{}, equal_size, std::bind(get_area{}, _1), 0);
+  std::transform(polygons_.begin(), polygons_.end(), temp.begin(), conditional_area);
+  context.out << std::accumulate(temp.begin(), temp.end(), 0.0) << '\n';
   return true;
 }
 bool rychkov::AreaProcessor::mean(ParserContext& context)
 {
-  if (!context.eol())
+  if ((polygons_.size() == 0) || !eol(context.in))
   {
     return false;
   }
-  context.out << std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator) / polygons.size() << '\n';
+  std::vector< double > temp(polygons_.size(), 0);
+  std::transform(polygons_.begin(), polygons_.end(), temp.begin(), get_area{});
+  context.out << std::accumulate(temp.begin(), temp.end(), 0.0) / polygons_.size() << '\n';
   return true;
 }
 
 bool rychkov::CountProcessor::even(ParserContext& context)
 {
-  if (!context.eol())
+  if (!eol(context.in))
   {
     return false;
   }
-  context.out << std::count_if(polygons.begin(), polygons.end(), iseven) << '\n';
+  context.out << std::count_if(polygons_.begin(), polygons_.end(), iseven) << '\n';
   return true;
 }
 bool rychkov::CountProcessor::odd(ParserContext& context)
 {
-  if (!context.eol())
+  if (!eol(context.in))
   {
     return false;
   }
-  context.out << std::count_if(polygons.begin(), polygons.end(), isodd) << '\n';
+  context.out << std::count_if(polygons_.begin(), polygons_.end(), isodd) << '\n';
   return true;
 }
 bool rychkov::CountProcessor::count(ParserContext& context)
@@ -93,67 +97,65 @@ bool rychkov::CountProcessor::count(ParserContext& context)
   {
     return false;
   }
-  if (!context.eol())
+  if ((number < 3) || !eol(context.in))
   {
     context.parse_error();
     return true;
   }
-  auto equal_size = std::bind(std::equal_to<>{}, number, std::bind(get_size, std::placeholders::_1));
-  context.out << std::count_if(polygons.begin(), polygons.end(), equal_size) << '\n';
+  auto equal_size = std::bind(std::equal_to<>{}, number, get_size);
+  context.out << std::count_if(polygons_.begin(), polygons_.end(), equal_size) << '\n';
   return true;
 }
 
 bool rychkov::MaxProcessor::area(ParserContext& context)
 {
-  if (!context.eol())
+  if ((polygons_.size() == 0) || !eol(context.in))
   {
     return false;
   }
-  using namespace std::placeholders;
-  get_area calc;
-  static auto compare = std::bind(std::less<>{}, std::bind(calc, _1), std::bind(calc, _2));
-  context.out << calc(*std::max_element(polygons.begin(), polygons.end(), compare)) << '\n';
+  std::vector< double > areas(polygons_.size(), 0);
+  std::transform(polygons_.begin(), polygons_.end(), areas.begin(), get_area{});
+  context.out << *std::max_element(areas.begin(), areas.end()) << '\n';
   return true;
 }
 bool rychkov::MaxProcessor::count(ParserContext& context)
 {
-  if (!context.eol())
+  if ((polygons_.size() == 0) || !eol(context.in))
   {
     return false;
   }
   using namespace std::placeholders;
   static auto compare = std::bind(std::less<>{}, std::bind(get_size, _1), std::bind(get_size, _2));
-  context.out << get_size(*std::max_element(polygons.begin(), polygons.end(), compare)) << '\n';
+  context.out << get_size(*std::max_element(polygons_.begin(), polygons_.end(), compare)) << '\n';
   return true;
 }
 bool rychkov::MinProcessor::area(ParserContext& context)
 {
-  if (!context.eol())
+  if ((polygons_.size() == 0) || !eol(context.in))
   {
     return false;
   }
-  using namespace std::placeholders;
-  get_area calc;
-  static auto compare = std::bind(std::less<>{}, std::bind(calc, _1), std::bind(calc, _2));
-  context.out << calc(*std::min_element(polygons.begin(), polygons.end(), compare)) << '\n';
+  std::vector< double > areas(polygons_.size(), 0);
+  std::transform(polygons_.begin(), polygons_.end(), areas.begin(), get_area{});
+  context.out << *std::min_element(areas.begin(), areas.end()) << '\n';
   return true;
 }
 bool rychkov::MinProcessor::count(ParserContext& context)
 {
-  if (!context.eol())
+  if ((polygons_.size() == 0) || !eol(context.in))
   {
     return false;
   }
   using namespace std::placeholders;
   static auto compare = std::bind(std::less<>{}, std::bind(get_size, _1), std::bind(get_size, _2));
-  context.out << get_size(*std::min_element(polygons.begin(), polygons.end(), compare)) << '\n';
+  context.out << get_size(*std::min_element(polygons_.begin(), polygons_.end(), compare)) << '\n';
   return true;
 }
 
 bool rychkov::MainProcessor::remove_repeates(ParserContext& context)
 {
   Polygon polygon;
-  if (!(context.in >> polygon) || !context.eol())
+  if (!(context.in >> polygon) || !eol(context.in))
   {
     return false;
   }
@@ -167,16 +169,16 @@ bool rychkov::MainProcessor::remove_repeates(ParserContext& context)
       static auto x_equal = std::bind(std::equal_to<>{}, std::bind(get_x, _1), std::bind(get_x, _2));
       static auto y_equal = std::bind(std::equal_to<>{}, std::bind(get_y, _1), std::bind(get_y, _2));
       static auto points_equal = std::bind(std::logical_and<>{}, x_equal, y_equal);
-      return std::equal(lhs.vertexes.begin(), lhs.vertexes.end(),rhs.vertexes.begin(), points_equal);
+      return std::equal(lhs.points.begin(), lhs.points.end(),rhs.points.begin(), points_equal);
     }
   };
-  decltype(polygons_)::iterator workspace_end = std::unique(polygons_.begin(), polygons_.end(), equal{});
-  polygons_.erase(workspace_end, polygons_.end());
+  decltype(polygons_)::iterator new_end = std::unique(polygons_.begin(), polygons_.end(), equal{});
+  polygons_.erase(new_end, polygons_.end());
   return true;
 }
 bool rychkov::MainProcessor::rectangles(ParserContext& context)
 {
-  if (!context.eol())
+  if (!eol(context.in))
   {
     return false;
   }
@@ -184,14 +186,14 @@ bool rychkov::MainProcessor::rectangles(ParserContext& context)
   {
     bool operator()(const Polygon& p)
     {
-      if (p.vertexes.size() != 4)
+      if (p.points.size() != 4)
       {
         return false;
       }
-      bool horis1 = (p.vertexes[0].x == p.vertexes[1].x) && (p.vertexes[2].x == p.vertexes[3].x);
-      bool vert1 = (p.vertexes[1].y == p.vertexes[2].y) && (p.vertexes[3].y == p.vertexes[0].y);
-      bool horis2 = (p.vertexes[1].x == p.vertexes[2].x) && (p.vertexes[3].x == p.vertexes[0].x);
-      bool vert2 = (p.vertexes[0].y == p.vertexes[1].y) && (p.vertexes[2].y == p.vertexes[3].y);
+      bool horis1 = (p.points[0].x == p.points[1].x) && (p.points[2].x == p.points[3].x);
+      bool vert1 = (p.points[1].y == p.points[2].y) && (p.points[3].y == p.points[0].y);
+      bool horis2 = (p.points[1].x == p.points[2].x) && (p.points[3].x == p.points[0].x);
+      bool vert2 = (p.points[0].y == p.points[1].y) && (p.points[2].y == p.points[3].y);
       return (horis1 && vert1) || (horis2 && vert2);
     }
   };
@@ -200,13 +202,21 @@ bool rychkov::MainProcessor::rectangles(ParserContext& context)
 }
 double rychkov::get_area::operator()(const Polygon& polygon)
 {
+  if (polygon.points.size() < 3)
+  {
+    return 0;
+  }
   using namespace std::placeholders;
-  auto accumulator = std::bind(std::plus<>{}, _1, std::bind(area_accumulator{polygon.vertexes.back()}, _2));
-  return std::accumulate(polygon.vertexes.begin(), polygon.vertexes.end(), 0.0, accumulator) / 2;
+  area_accumulator accumulator;
+  std::vector< double > temp(polygon.points.size(), 0);
+  temp[0] = accumulator(polygon.points.back(), polygon.points.front());
+  std::transform(polygon.points.begin(), std::prev(polygon.points.end()), std::next(polygon.points.begin()),
+        std::next(temp.begin()), accumulator);
+  double result = std::accumulate(temp.begin(), temp.end(), 0.0) / 2;
+  return (result < 0 ? -result : result);
 }
-double rychkov::area_accumulator::operator()(const Point& cur)
+double rychkov::area_accumulator::operator()(const Point& prev, const Point& cur)
 {
   double result = prev.x * cur.y - cur.x * prev.y;
-  prev = cur;
   return result;
 }

@@ -1,12 +1,12 @@
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
-#include <iterator>
-#include <map>
 #include "parser.hpp"
 #include "processors.hpp"
 
 int main(int argc, char** argv)
 {
+  std::cout << std::fixed << std::setprecision(1);
   using processor = rychkov::MainProcessor;
   using parser_type = rychkov::Parser< processor >;
   parser_type::map_type call_map = {

@@ -1,17 +1,37 @@
 #include "parser.hpp"
 
+#include <iostream>
 #include <cctype>
+#include <iterator>
+#include <algorithm>
+#include <fmtguard.hpp>
 
-bool rychkov::ParserContext::eol()
+bool rychkov::eol(std::istream& in)
 {
-  for (char c = in.peek(); in.peek() != '\n'; in.get(), c = in.peek())
+  struct remove_empty
   {
-    if (!std::isspace(c))
+    std::istream& in;
+    bool& bad;
+    bool operator()(char c)
     {
+      if (c == '\n')
+      {
+        bad = false;
+        return true;
+      }
+      else if (!std::isspace(c))
+      {
+        bad = true;
+        return true;
+      }
       return false;
     }
-  }
-  return true;
+  };
+  using Iter = std::istream_iterator< char >;
+  fmtguard guard{in};
+  bool bad = false;
+  std::find_if(Iter{in >> std::noskipws}, Iter{}, remove_empty{in, bad});
+  return !bad;
 }
 void rychkov::ParserContext::parse_error()
 {

@@ -1,7 +1,8 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include <iostream>
+#include <iosfwd>
+#include <istream>
 #include <string>
 #include <utility>
 #include <map>
@@ -9,13 +10,13 @@
 
 namespace rychkov
 {
+  bool eol(std::istream& in);
   struct ParserContext
   {
     std::istream& in;
     std::ostream& out;
     std::ostream& err;
 
-    bool eol();
     void parse_error();
   };
   template< class Proc >
@@ -55,8 +56,12 @@ namespace rychkov
       {
         if ((processor.*extern_parser_)(context))
         {
-          return available();
+          return true;
         }
+      }
+      if (!available())
+      {
+        return false;
       }
       std::string command;
       if (context.in >> command)
@@ -66,14 +71,14 @@ namespace rychkov
         {
           if ((call_p != call_map_.end()) && ((processor.*(call_p->second))(context)))
           {
-            return available();
+            return true;
           }
         }
         catch(...)
         {}
         context.parse_error();
       }
-      return available();
+      return true;
     }
   private:
     const map_type call_map_;

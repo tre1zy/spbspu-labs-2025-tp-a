@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iterator>
 #include <algorithm>
-#include <limits>
 
 bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
 {
@@ -17,13 +16,13 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
   if (!file)
   {
     context.err << "failed to open file \"" << argv[1] << "\"\n";
+    return false;
   }
-  while (file)
+  while (file.good())
   {
     using Iter = std::istream_iterator< Polygon >;
     std::copy(Iter{file}, Iter{}, std::back_inserter(polygons_));
     file.clear(file.rdstate() & ~std::ios::failbit);
-    file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
   return true;
 }

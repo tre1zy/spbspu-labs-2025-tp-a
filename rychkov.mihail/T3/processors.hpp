@@ -19,36 +19,52 @@ namespace rychkov
   private:
     std::vector< Polygon > polygons_;
   };
-  struct AreaProcessor
+  class AreaProcessor
   {
-    std::vector< Polygon >& polygons;
-
+  public:
+    AreaProcessor(std::vector< Polygon >& polygons):
+      polygons_(polygons)
+    {}
     bool even(ParserContext& context);
     bool odd(ParserContext& context);
     bool mean(ParserContext& context);
     bool count(ParserContext& context);
+  private:
+    std::vector< Polygon >& polygons_;
   };
-  struct MaxProcessor
+  class MaxProcessor
   {
-    std::vector< Polygon >& polygons;
-
+  public:
+    MaxProcessor(std::vector< Polygon >& polygons):
+      polygons_(polygons)
+    {}
     bool area(ParserContext& context);
     bool count(ParserContext& context);
+  private:
+    std::vector< Polygon >& polygons_;
   };
-  struct MinProcessor
+  class MinProcessor
   {
-    std::vector< Polygon >& polygons;
-
+  public:
+    MinProcessor(std::vector< Polygon >& polygons):
+      polygons_(polygons)
+    {}
     bool area(ParserContext& context);
     bool count(ParserContext& context);
+  private:
+    std::vector< Polygon >& polygons_;
   };
-  struct CountProcessor
+  class CountProcessor
   {
-    std::vector< Polygon >& polygons;
-
+  public:
+    CountProcessor(std::vector< Polygon >& polygons):
+      polygons_(polygons)
+    {}
     bool even(ParserContext& context);
     bool odd(ParserContext& context);
     bool count(ParserContext& context);
+  private:
+    std::vector< Polygon >& polygons_;
   };
   size_t parse_as_count(ParserContext& context);
   struct get_area
@@ -57,8 +73,15 @@ namespace rychkov
   };
   struct area_accumulator
   {
-    Point prev;
-    double operator()(const Point& polygon);
+    double operator()(const Point& prev, const Point& cur);
+  };
+  template< class T >
+  struct if_statement
+  {
+    T operator()(bool cond, T success, T fail)
+    {
+      return cond ? success : fail;
+    }
   };
 }
 

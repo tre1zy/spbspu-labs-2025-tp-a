@@ -8,11 +8,11 @@ namespace rychkov
 {
   struct Point
   {
-    double x, y;
+    int x, y;
   };
   struct Polygon
   {
-    std::vector< Point > vertexes;
+    std::vector< Point > points;
   };
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
