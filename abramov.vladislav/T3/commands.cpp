@@ -97,9 +97,32 @@ void abramov::min(const std::vector< Polygon > &polygons, std::ostream &out, std
 
 void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
-  size_t k = 0;
-  in >> k;
-  out << k;
-  polygons[0];
-  return;
+  using namespace std::placeholders;
+
+  std::string subcommand;
+  in >> subcommand;
+  size_t res = 0;
+  if (subcommand == "EVEN")
+  {
+    res = countEven(polygons);
+  }
+  else if (subcommand == "ODD")
+  {
+    res = countOdd(polygons);
+  }
+  else
+  {
+    size_t vert = 0;
+    if (!(in >> vert))
+    {
+      throw std::logic_error("Unknown command\n");
+    }
+    if (vert < 3)
+    {
+      throw std::logic_error("Too less vertexes\n");
+    }
+    auto f = std::bind(countVertexes, _1, _2, vert);
+    res = std::accumulate(polygons.begin(), polygons.end(), 0, f);
+  }
+  out << res;
 }

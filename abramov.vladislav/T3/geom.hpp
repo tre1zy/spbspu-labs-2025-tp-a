@@ -25,6 +25,9 @@ namespace abramov
   double areaVertexes(double s, const Polygon &polygon, size_t vert);
   bool maxArea(const Polygon &p1, const Polygon& p2);
   bool maxVertexes(const Polygon &p1, const Polygon &p2);
+  size_t countEven(const std::vector< Polygon > &polygons);
+  size_t countOdd(const std::vector< Polygon > &polygons);
+  size_t countVertexes(size_t s, const Polygon &polygon, size_t vert);
 };
 
 

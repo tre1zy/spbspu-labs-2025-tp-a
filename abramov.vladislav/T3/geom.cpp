@@ -34,6 +34,11 @@ namespace
   {
     return polygon.points.size() % 2 == 0;
   }
+
+  bool isOdd(const abramov::Polygon &polygon)
+  {
+    return !isEven(polygon);
+  }
 }
 
 std::istream &abramov::operator>>(std::istream &in, Point &p)
@@ -128,4 +133,23 @@ bool abramov::maxArea(const Polygon &p1, const Polygon &p2)
 bool abramov::maxVertexes(const Polygon &p1, const Polygon &p2)
 {
   return p1.points.size() < p2.points.size();
+}
+
+size_t abramov::countEven(const std::vector< Polygon > &polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isEven);
+}
+
+size_t abramov::countOdd(const std::vector< Polygon > &polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isOdd);
+}
+
+size_t abramov::countVertexes(size_t s, const Polygon &polygon, size_t vert)
+{
+  if (polygon.points.size() == vert)
+  {
+    return s + 1;
+  }
+  return s;
 }
