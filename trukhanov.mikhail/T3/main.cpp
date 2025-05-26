@@ -1,10 +1,9 @@
 #include <functional>
-#include <iterator>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <limits>
 #include <map>
-#include <sstream>
 #include "commands.hpp"
 #include "polygon.hpp"
 #include "data_input.hpp"
@@ -70,6 +69,5 @@ int main(int argc, char* argv[])
       std::cout << "<INVALID COMMAND>\n";
     }
   }
-
   return 0;
 }

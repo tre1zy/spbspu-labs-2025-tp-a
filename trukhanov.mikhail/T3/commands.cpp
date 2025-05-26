@@ -3,7 +3,6 @@
 #include <numeric>
 #include <string>
 #include <vector>
-#include <functional>
 #include <iomanip>
 #include <limits>
 #include "functors.hpp"
@@ -73,7 +72,8 @@ namespace trukhanov
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
       size_t size = std::stoull(subcommand);
-      if (size < 3) {
+      if (size < 3)
+      {
         out << "<INVALID COMMAND>\n";
       }
       else
@@ -154,6 +154,7 @@ namespace trukhanov
 
   void count(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
+    StreamGuard guard(out);
     std::string subcommand;
     in >> subcommand;
 
@@ -188,6 +189,7 @@ namespace trukhanov
 
   void lessArea(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
+    StreamGuard guard(out);
     Polygon polygon;
     in >> polygon;
 
@@ -207,6 +209,7 @@ namespace trukhanov
 
   void right(std::istream&, std::ostream& out, const Polygon_vector& src)
   {
+    StreamGuard guard(out);
     out << std::count_if(src.begin(), src.end(), isRight) << '\n';
   }
 }

@@ -40,7 +40,7 @@ namespace trukhanov
 
   struct PolygonHasMinSize
   {
-    bool operator()(const trukhanov::Polygon& p) const;
+    bool operator()(const Polygon& p) const;
   };
 }
 
