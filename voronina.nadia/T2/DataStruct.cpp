@@ -1,7 +1,11 @@
 #include "DataStruct.h"
-namespace nspace
+#include <iomanip>
+#include <sstream>
+#include <stdexcept>
+
+namespace voronina
 {
-  bool comparator(DataStruct &left, DataStruct &right)
+  bool comparator(const DataStruct &left, const DataStruct &right)
   {
     if (left.key1 == right.key1 && left.key2 == right.key2)
     {
@@ -14,6 +18,21 @@ namespace nspace
     return left.key1 < right.key1;
   }
 
+  std::istream& operator>>(std::istream& in, DelimiterDIO&&)
+  {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+          return in;
+        }        
+        char c = '0';
+        if (in >> c && !(c == 'd' || c == 'D'))
+        {
+          in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+
   std::istream &operator>>(std::istream &in, DelimiterIO &&dest)
   {
     std::istream::sentry sentry(in);
@@ -22,8 +41,7 @@ namespace nspace
       return in;
     }
     char c = '0';
-    in >> c;
-    if (in && (c != dest.exp))
+    if (in >> c && c != dest.exp)
     {
       in.setstate(std::ios::failbit);
     }
@@ -37,14 +55,11 @@ namespace nspace
     {
       return in;
     }
-    char c = '0';
-    in >> dest.ref;
-    in >> c;
-    if (!(c == 'd' || c == 'D'))
+    if (!(in >> dest.ref))
     {
-      in.setstate(std::ios::failbit);
+      return in;
     }
-    return in;
+    return in >> DelimiterDIO{};
   }
 
   std::istream &operator>>(std::istream &in, StringIO &&dest)
@@ -65,12 +80,10 @@ namespace nspace
     {
       return in;
     }
-    in >> DelimiterIO{'0'};
-    in >> dest.ref;
-    if (in && ((std::to_string(dest.ref).find('8')) != std::string::npos ||
-               std::to_string(dest.ref).find('9') != std::string::npos))
+    in >> DelimiterIO{'0'} >> std::oct >> dest.ref;
+    if (in.fail())
     {
-      in.setstate(std::ios::failbit);
+      return in;
     }
     return in;
   }
@@ -92,11 +105,11 @@ namespace nspace
 
       while (flagKey1 || flagKey2 || flagKey3)
       {
-        if (!std::cin)
+        if (!in)
         {
           break;
         }
-        if (std::cin.eof())
+        if (in.eof())
         {
           in.setstate(std::ios::failbit);
           break;
@@ -142,8 +155,8 @@ namespace nspace
     StreamGuard fmtguard(out);
     out << "(";
     out << ":key1 " << std::fixed << std::setprecision(1) << src.key1 << "d";
-    out << ":key2 " << "0" << src.key2;
-    out << ":key3 \"" << src.key3 << "\"";
+    out << ":key2 " << "0" << std::oct << src.key2;
+    out << ":key3 " << std::quoted(src.key3);
     out << ":)";
     return out;
   }

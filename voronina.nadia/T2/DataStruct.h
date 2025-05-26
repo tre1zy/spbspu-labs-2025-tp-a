@@ -1,15 +1,16 @@
 #ifndef DATASTRUCT_H
 #define DATASTRUCT_H
 
-#include <iostream>
+//#include <iostream>
 #include <string>
-#include <iterator>
-#include <vector>
 #include <iomanip>
-#include <cmath>
-#include <algorithm>
+//#include <iterator>
+//#include <vector>
+//#include <iomanip>
+//#include <cmath>
+//#include <algorithm>
 
-namespace nspace
+namespace voronina
 {
   struct DataStruct
   {
@@ -22,6 +23,8 @@ namespace nspace
   {
     char exp;
   };
+
+  struct DelimiterDIO {};
 
   struct DoubleIO
   {
@@ -59,6 +62,6 @@ namespace nspace
   std::istream &operator>>(std::istream &in, DataStruct &dest);
   std::ostream &operator<<(std::ostream &out, const DataStruct &dest);
 
-  bool comparator(DataStruct &left, DataStruct &right);
+  bool comparator(const DataStruct &left, const DataStruct &right);
 }
 #endif
