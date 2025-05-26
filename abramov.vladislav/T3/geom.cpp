@@ -39,11 +39,6 @@ namespace
   {
     return !isEven(polygon);
   }
-
-  bool isPointsEqual(const abramov::Point &p1, const abramov::Point &p2)
-  {
-    return p1.x == p2.x && p1.y == p2.y;
-  }
 }
 
 std::istream &abramov::operator>>(std::istream &in, Point &p)
@@ -157,6 +152,11 @@ size_t abramov::countVertexes(size_t s, const Polygon &polygon, size_t vert)
     return s + 1;
   }
   return s;
+}
+
+bool abramov::isPointsEqual(const Point &p1, const Point &p2)
+{
+  return p1.x == p2.x && p1.y == p2.y;
 }
 
 bool abramov::isPolygonsEqual(const Polygon &p1, const Polygon &p2)

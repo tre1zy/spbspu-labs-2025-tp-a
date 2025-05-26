@@ -28,6 +28,7 @@ namespace abramov
   size_t countEven(const std::vector< Polygon > &polygons);
   size_t countOdd(const std::vector< Polygon > &polygons);
   size_t countVertexes(size_t s, const Polygon &polygon, size_t vert);
+  bool isPointsEqual(const Point &p1, const Point &p2);
   bool isPolygonsEqual(const Polygon &p1, const Polygon &p2);
   bool isPolygonsEqualToExample(const Polygon &p1, const Polygon &p2, const Polygon &ex);
 };

@@ -10,6 +10,7 @@ void abramov::getCommands(std::map< std::string, std::function< void() > > &comm
   commands["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
   commands["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
   commands["RMECHO"] = std::bind(rmecho, std::ref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["PERMS"] = std::bind(perms, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
 }
 
 void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
@@ -140,4 +141,44 @@ void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::i
   polygons.erase(del, polygons.end());
   diff -= polygons.size();
   out << diff;
+}
+
+void abramov::perms(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+{
+  Polygon example;
+  in >> example;
+
+  struct pointsComp
+  {
+    bool operator()(const Point &p1, const Point &p2) const
+    {
+      return std::tie(p1.x, p1.y) < std::tie(p2.x, p2.y);
+    }
+  };
+
+  struct permutationsComp
+  {
+    const Polygon &ex;
+
+    permutationsComp(const Polygon &p):
+      ex(p)
+    {}
+    bool operator()(const Polygon &polygon) const
+    {
+      if (polygon.points.size() != ex.points.size())
+      {
+        return false;
+      }
+      std::vector< Point > sortPolygon = polygon.points;
+      std::vector< Point > sortEx = ex.points;
+      pointsComp cmp;
+      std::sort(sortPolygon.begin(), sortPolygon.end(), cmp);
+      std::sort(sortEx.begin(), sortEx.end(), cmp);
+      return std::equal(sortPolygon.begin(), sortPolygon.end(), sortEx.begin(), isPointsEqual);
+    }
+  };
+
+  permutationsComp cmp(example);
+  size_t count = std::count_if(polygons.begin(), polygons.end(), cmp);
+  out << count;
 }
