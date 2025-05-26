@@ -29,7 +29,7 @@ namespace
 
   int pointsSum(const abramov::Point &p1, const abramov::Point &p2)
   {
-    return p1.x * p2.y - p2.x * p1.y;
+    return p1.x * p2.y - p1.y * p2.x;
   }
 
   bool isEven(const abramov::Polygon &polygon)
@@ -92,11 +92,10 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
 
 double abramov::getArea(const Polygon &polygon)
 {
-  const std::vector< abramov::Point > &points = polygon.points;
-  std::vector< int > sums;
-  std::transform(points.cbegin(), points.cend() - 1, points.cbegin() + 1, std::back_inserter(sums), pointsSum);
-  sums.push_back(pointsSum(points.back(), points.front()));
-  return std::abs(std::accumulate(sums.begin(), sums.end(), 0)) / 2.0;
+  const std::vector< Point > &p = polygon.points;
+  double area = pointsSum(p.back(), p.front());
+  area += std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, pointsSum);
+  return std::abs(area) / 2.0;
 }
 
 double abramov::areaEven(double s, const Polygon &polygon)
