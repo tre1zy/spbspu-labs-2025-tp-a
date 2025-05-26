@@ -35,6 +35,7 @@ int main(int argc, char **argv)
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+//  std::cout << getArea(polygons[0]) << " " << getArea(polygons[0]) << "\n";
   std::map< std::string, std::function< void() > > commands;
   getCommands(commands, polygons);
   std::string command;

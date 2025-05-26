@@ -1,6 +1,8 @@
 #include "commands.hpp"
+#include <iomanip>
 #include <numeric>
 #include <algorithm>
+#include <stream_guard.hpp>
 #include "geom.hpp"
 
 void abramov::getCommands(std::map< std::string, std::function< void() > > &commands, std::vector< Polygon > &polygons)
@@ -17,6 +19,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
 {
   using namespace std::placeholders;
 
+  StreamGuard guard(out);
   std::string subcommand;
   in >> subcommand;
   double res = 0;
@@ -30,6 +33,10 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
   }
   else if (subcommand == "MEAN")
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("Not enough shapes\n");
+    }
     res = areaMean(polygons);
   }
   else
@@ -42,6 +49,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
     auto f = std::bind(areaVertexes, _1, _2, vert);
     res = std::accumulate(polygons.begin(), polygons.end(), 0.0, f);
   }
+  out << std::fixed << std::setprecision(1);
   out << res;
 }
 
