@@ -160,23 +160,13 @@ namespace trukhanov
     std::vector< Polygon > filtered;
     std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), PolygonHasMinSize{});
 
-    Polygon_vector unique;
-    for (const auto& p : filtered)
-    {
-      bool alreadyExists = std::any_of(unique.begin(), unique.end(), std::bind(PolygonEqual{}, std::placeholders::_1, p));
-      if (!alreadyExists)
-      {
-        unique.push_back(p);
-      }
-    }
-
     if (subcommand == "EVEN")
     {
-      out << std::count_if(unique.begin(), unique.end(), isEven) << '\n';
+      out << std::count_if(filtered.begin(), filtered.end(), isEven) << '\n';
     }
     else if (subcommand == "ODD")
     {
-      out << std::count_if(unique.begin(), unique.end(), isOdd) << '\n';
+      out << std::count_if(filtered.begin(), filtered.end(), isOdd) << '\n';
     }
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
     {
@@ -187,7 +177,7 @@ namespace trukhanov
       }
       else
       {
-        out << std::count_if(unique.begin(), unique.end(), isSize{ size }) << '\n';
+        out << std::count_if(filtered.begin(), filtered.end(), isSize{ size }) << '\n';
       }
     }
     else
@@ -195,7 +185,6 @@ namespace trukhanov
       out << "<INVALID COMMAND>\n";
     }
   }
-
 
   void lessArea(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {

@@ -59,6 +59,20 @@ namespace trukhanov
       temp.points.push_back(p);
     }
 
+    std::istream::sentry trailing_sentry(in, true);
+    if (trailing_sentry)
+    {
+
+      Point extra;
+      in >> extra;
+      if (in)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in.clear();
+    }
+
     polygon = std::move(temp);
     return in;
   }

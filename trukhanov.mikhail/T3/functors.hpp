@@ -9,10 +9,7 @@ namespace trukhanov
   struct isSize
   {
     size_t size;
-    bool operator()(const Polygon& p) const
-    {
-      return p.points.size() == size;
-    }
+    bool operator()(const Polygon& p) const;
   };
 
   struct CompareByArea
@@ -39,11 +36,6 @@ namespace trukhanov
   struct HasDuplicates
   {
     bool operator()(const Polygon& p) const;
-  };
-
-  struct PolygonEqual
-  {
-    bool operator()(const Polygon& a, const Polygon& b) const;
   };
 
   struct PolygonHasMinSize

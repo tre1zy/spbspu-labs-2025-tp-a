@@ -4,6 +4,10 @@
 
 namespace trukhanov
 {
+  bool isSize::operator()(const Polygon& p) const {
+    return p.points.size() == size;
+  }
+
   bool CompareByArea::operator()(const Polygon& lhs, const Polygon& rhs) const
   {
     double lhsArea = getArea(lhs);
@@ -46,17 +50,8 @@ namespace trukhanov
     return false;
   }
 
-    bool PolygonEqual::operator()(const Polygon& a, const Polygon& b) const
-    {
-      if (a.points.size() != b.points.size())
-      {
-        return false;
-      }
-      return std::equal(a.points.begin(), a.points.end(), b.points.begin());
-    }
-
-      bool PolygonHasMinSize::operator()(const trukhanov::Polygon& p) const
-      {
-        return p.points.size() >= 3;
-      }
+  bool PolygonHasMinSize::operator()(const trukhanov::Polygon& p) const
+  {
+    return p.points.size() >= 3;
+  }
 }
