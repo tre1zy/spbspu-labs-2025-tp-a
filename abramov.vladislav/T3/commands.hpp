@@ -13,6 +13,7 @@ namespace abramov
   void max(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in);
   void min(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
   void count(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  void rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
 }
 
 #endif

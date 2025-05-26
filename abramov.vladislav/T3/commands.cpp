@@ -5,10 +5,11 @@
 
 void abramov::getCommands(std::map< std::string, std::function< void() > > &commands, std::vector< Polygon > &polygons)
 {
-  commands["AREA"] = std::bind(abramov::area, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["MAX"] = std::bind(abramov::max, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["MIN"] = std::bind(abramov::min, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["COUNT"] = std::bind(abramov::count, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["RMECHO"] = std::bind(rmecho, std::ref(polygons), std::ref(std::cout), std::ref(std::cin));
 }
 
 void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
@@ -125,4 +126,18 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
     res = std::accumulate(polygons.begin(), polygons.end(), 0, f);
   }
   out << res;
+}
+
+void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+{
+  using namespace std::placeholders;
+
+  Polygon example;
+  in >> example;
+  auto f = std::bind(isPolygonsEqualToExample, _1, _2, example);
+  auto del = std::unique(polygons.begin(), polygons.end(), f);
+  size_t diff = polygons.size();
+  polygons.erase(del, polygons.end());
+  diff -= polygons.size();
+  out << diff;
 }
