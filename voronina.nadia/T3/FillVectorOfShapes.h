@@ -14,7 +14,7 @@ namespace voronina
     std::ifstream fin(filename);
     if (!fin.is_open())
     {
-        throw std::invalid_argument("ERROR: Wrong name of file");
+      throw std::invalid_argument("ERROR: Wrong name of file");
     }
     std::vector< Polygon > input;
     while (!fin.eof())

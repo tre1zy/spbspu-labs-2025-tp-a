@@ -93,7 +93,7 @@ namespace voronina
       shape.points.cbegin(), sides.begin(),
       getSide);
     sides[shape.points.size() - 1] = getSide(shape.points[0],
-                                            shape.points[shape.points.size() - 1]);
+      shape.points[shape.points.size() - 1]);
 
     std::vector<bool> hasRightAngleVector(shape.points.size());
     std::transform(
@@ -101,7 +101,7 @@ namespace voronina
       sides.cbegin(), hasRightAngleVector.begin(),
       isRightAngle);
     hasRightAngleVector[sides.size() - 1] = isRightAngle(sides[0],
-                                                        sides[sides.size() - 1]);
+      sides[sides.size() - 1]);
     return std::any_of(
       hasRightAngleVector.cbegin(), hasRightAngleVector.cend(), isTrue);
   }

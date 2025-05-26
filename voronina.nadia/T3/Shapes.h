@@ -6,21 +6,21 @@
 
 namespace voronina
 {
-	struct Point
-	{
-		int x, y;
-		bool operator==(const Point& point) const;
-	};
+  struct Point
+  {
+    int x, y;
+    bool operator==(const Point& point) const;
+  };
 
-	std::istream& operator>>(std::istream& in, Point& point);
+  std::istream& operator>>(std::istream& in, Point& point);
 
-	struct Polygon
-	{
-		std::vector< Point > points;
-		bool operator==(const Polygon& polygon) const;
-	};
+  struct Polygon
+  {
+    std::vector< Point > points;
+    bool operator==(const Polygon& polygon) const;
+  };
 
-	std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
 
 }
 #endif
