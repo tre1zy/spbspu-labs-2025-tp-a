@@ -34,11 +34,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
   }
   else
   {
-    size_t vert = 0;
-    if (!(in >> vert))
-    {
-      throw std::logic_error("Unknown command\n");
-    }
+    size_t vert = std::stoull(subcommand);
     if (vert < 3)
     {
       throw std::logic_error("Too less vertexes\n");
@@ -114,11 +110,7 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
   }
   else
   {
-    size_t vert = 0;
-    if (!(in >> vert))
-    {
-      throw std::logic_error("Unknown command\n");
-    }
+    size_t vert = std::stoull(subcommand);
     if (vert < 3)
     {
       throw std::logic_error("Too less vertexes\n");
