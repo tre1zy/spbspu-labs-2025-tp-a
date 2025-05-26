@@ -20,18 +20,18 @@ namespace voronina
 
   std::istream& operator>>(std::istream& in, DelimiterDIO&&)
   {
-        std::istream::sentry sentry(in);
-        if (!sentry)
-        {
-          return in;
-        }
-        char c = '0';
-        if (in >> c && !(c == 'd' || c == 'D'))
-        {
-          in.setstate(std::ios::failbit);
-        }
-        return in;
-  }
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+    char c = '0';
+    if (in >> c && !(c == 'd' || c == 'D'))
+    {
+      in.setstate(std::ios::failbit);
+      }
+      return in;
+    }
   std::istream &operator>>(std::istream &in, DelimiterIO &&dest)
   {
     std::istream::sentry sentry(in);
