@@ -1,14 +1,8 @@
 #ifndef DATASTRUCT_H
 #define DATASTRUCT_H
 
-//#include <iostream>
 #include <string>
 #include <iomanip>
-//#include <iterator>
-//#include <vector>
-//#include <iomanip>
-//#include <cmath>
-//#include <algorithm>
 
 namespace voronina
 {
@@ -46,7 +40,6 @@ namespace voronina
   public:
     StreamGuard(std::basic_ios<char> &s);
     ~StreamGuard();
-
   private:
     std::basic_ios<char> &s_;
     std::streamsize width_;

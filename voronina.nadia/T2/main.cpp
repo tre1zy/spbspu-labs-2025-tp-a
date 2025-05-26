@@ -14,8 +14,8 @@ int main()
     std::copy(
       std::istream_iterator<DataStruct>(std::cin),
       std::istream_iterator<DataStruct>(),
-      std::back_inserter(data));
-    
+      std::back_inserter(data)
+    );
     if (std::cin.fail())
     {
       std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
