@@ -2,17 +2,26 @@
 #include <iterator>
 #include <fstream>
 #include <limits>
+#include <map>
+#include <functional>
 #include "geom.hpp"
+#include "commands.hpp"
 
 int main(int argc, char **argv)
 {
+  using namespace abramov;
+
   if (argc != 2)
   {
-    std::cerr << "wrong filename\n";
+    std::cerr << "Wrong filename\n";
     return 1;
   }
   std::ifstream input(argv[1]);
-  using namespace abramov;
+  if (!input)
+  {
+    std::cerr << "Wrong input\n";
+    return 1;
+  }
   std::vector< Polygon > polygons;
   while (!input.eof())
   {
@@ -24,6 +33,23 @@ int main(int argc, char **argv)
     {
       input.clear(input.rdstate() ^ std::ios::failbit);
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
+  std::map< std::string, std::function< void() > > commands;
+  getCommands(commands, polygons);
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      commands.at(command)();
+      std::cout << "\n";
+    }
+    catch (...)
+    {
+      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 }
