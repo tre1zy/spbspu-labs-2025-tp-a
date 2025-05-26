@@ -1,7 +1,9 @@
 #include "geom.hpp"
+#include <numeric>
 #include <iterator>
 #include <algorithm>
-#include <numeric>
+#include <functional>
+
 namespace
 {
   struct DelimiterIO
@@ -38,6 +40,11 @@ namespace
   bool isOdd(const abramov::Polygon &polygon)
   {
     return !isEven(polygon);
+  }
+
+  bool isEnoughVertexes(const abramov::Polygon &polygon, size_t k)
+  {
+    return polygon.points.size() == k;
   }
 }
 
@@ -79,6 +86,7 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
     throw std::logic_error("Wrong size\n");
   }
   std::copy_n(std::istream_iterator< Point >(in), k, std::back_inserter(polygon.points));
+  polygon.points.resize(k);
   return in;
 }
 
@@ -145,13 +153,12 @@ size_t abramov::countOdd(const std::vector< Polygon > &polygons)
   return std::count_if(polygons.begin(), polygons.end(), isOdd);
 }
 
-size_t abramov::countVertexes(size_t s, const Polygon &polygon, size_t vert)
+size_t abramov::countVertexes(const std::vector< Polygon > &polygons, size_t vert)
 {
-  if (polygon.points.size() == vert)
-  {
-    return s + 1;
-  }
-  return s;
+  using namespace std::placeholders;
+
+  auto f = std::bind(isEnoughVertexes, _1, vert);
+  return std::count_if(polygons.begin(), polygons.end(), f);
 }
 
 bool abramov::isPointsEqual(const Point &p1, const Point &p2)

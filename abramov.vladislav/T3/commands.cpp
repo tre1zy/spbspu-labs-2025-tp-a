@@ -115,8 +115,7 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
     {
       throw std::logic_error("Too less vertexes\n");
     }
-    auto f = std::bind(countVertexes, _1, _2, vert);
-    res = std::accumulate(polygons.begin(), polygons.end(), 0, f);
+    res = countVertexes(polygons, vert);
   }
   out << res;
 }
