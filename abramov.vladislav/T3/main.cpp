@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     }
     catch (std::logic_error &)
     {
-      input.clear(input.rdstate() ^ std::ios::failbit);
+      input.clear();
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     }
     catch (...)
     {
-      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
