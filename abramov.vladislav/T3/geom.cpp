@@ -85,8 +85,13 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
   {
     throw std::logic_error("Wrong size\n");
   }
-  std::copy_n(std::istream_iterator< Point >(in), k, std::back_inserter(polygon.points));
-  polygon.points.resize(k);
+  std::vector< Point > pts(k);
+  std::copy_n(std::istream_iterator< Point >(in), k, pts.begin());
+  if (!in)
+  {
+    throw std::logic_error("Fail to read\n");
+  }
+  polygon.points = pts;
   return in;
 }
 
