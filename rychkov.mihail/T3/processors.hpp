@@ -1,7 +1,7 @@
 #ifndef PROCESSORS_HPP
 #define PROCESSORS_HPP
 
-#include "parser.hpp"
+#include <parser.hpp>
 #include "polygon.hpp"
 
 namespace rychkov
