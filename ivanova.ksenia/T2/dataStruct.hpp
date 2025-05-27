@@ -2,7 +2,7 @@
 #define DATASTRUCT_HPP
 #include <string>
 
-namespace Ivanova
+namespace ivanova
 {
   struct dataStruct
   {
