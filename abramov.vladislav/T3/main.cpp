@@ -1,8 +1,8 @@
-#include <vector>
-#include <iterator>
-#include <fstream>
-#include <limits>
 #include <map>
+#include <limits>
+#include <vector>
+#include <fstream>
+#include <iterator>
 #include <functional>
 #include "geom.hpp"
 #include "commands.hpp"
@@ -35,7 +35,6 @@ int main(int argc, char **argv)
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-//  std::cout << getArea(polygons[0]) << " " << getArea(polygons[0]) << "\n";
   std::map< std::string, std::function< void() > > commands;
   getCommands(commands, polygons);
   std::string command;

@@ -55,6 +55,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
 
 void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in)
 {
+  StreamGuard guard(out);
   if (polygons.size() < 1)
   {
     throw std::logic_error("Can not find max\n");
@@ -64,6 +65,7 @@ void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std:
   if (subcommand == "AREA")
   {
     auto p = std::max_element(polygons.begin(), polygons.end(), maxArea);
+    out << std::fixed << std::setprecision(1);
     out << getArea(*p);
   }
   else if (subcommand == "VERTEXES")
