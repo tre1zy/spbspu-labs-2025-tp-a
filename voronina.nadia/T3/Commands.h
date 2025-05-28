@@ -13,3 +13,4 @@ namespace voronina
   void rightshapes(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
 }
 #endif
+
