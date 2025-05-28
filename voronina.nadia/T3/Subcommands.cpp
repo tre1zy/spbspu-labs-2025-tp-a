@@ -43,7 +43,7 @@ namespace voronina
 
   double getAreaOfGivenAmountOfVertexes(double areaSum, const Polygon &shape, int vertexes)
   {
-    if (shape.points.size() == vertexes)
+    if (shape.points.size() == static_cast<size_t>(vertexes))
     {
       return areaSum + getAreaOfPolygon(shape);
     }
@@ -79,7 +79,7 @@ namespace voronina
   }
   bool hasGivenAmountOfVertexes(const Polygon &shape, int vertexes)
   {
-    return shape.points.size() == vertexes;
+    return shape.points.size() == static_cast<size_t>(vertexes);
   }
   bool isRightAngle(const Point &side1, const Point &side2)
   {

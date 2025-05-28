@@ -8,8 +8,19 @@
 
 int main(int argc, char* argv[])
 {
-  std::string filename;
-  filename = "test.txt";
+  if (argc != 2)
+  {
+    std::cerr << "<ERROR>\n";
+    return 1;
+  }
+
+  std::ifstream filename;
+  filename.open(argv[1]);
+  if (!filename.is_open())
+  {
+    std::cerr << "<NO SUCH FILE>\n";
+    return 1;
+  }
 
   std::vector< voronina::Polygon > shapes = voronina::fillVectorOfShapes(filename);
 

@@ -9,9 +9,8 @@
 
 namespace voronina
 {
-  inline std::vector< Polygon > fillVectorOfShapes(std::string& filename)
+  inline std::vector< Polygon > fillVectorOfShapes(std::ifstream& fin)
   {
-    std::ifstream fin(filename);
     if (!fin.is_open())
     {
       throw std::invalid_argument("ERROR: Wrong name of file");
