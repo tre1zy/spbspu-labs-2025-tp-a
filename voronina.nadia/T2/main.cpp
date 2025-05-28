@@ -9,7 +9,7 @@ int main()
 {
   using voronina::DataStruct;
   std::vector<DataStruct> data;
-  while (!std::cin.eof() || !std::cin.bad())
+  while (!std::cin.eof())
   {
     std::copy(
       std::istream_iterator<DataStruct>(std::cin),
