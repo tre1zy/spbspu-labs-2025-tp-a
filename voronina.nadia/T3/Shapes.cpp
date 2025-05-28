@@ -91,4 +91,3 @@ namespace voronina
     return (points == polygon.points);
   }
 }
-

@@ -30,4 +30,3 @@ namespace voronina
   bool isTrue(bool element);
 }
 #endif
-

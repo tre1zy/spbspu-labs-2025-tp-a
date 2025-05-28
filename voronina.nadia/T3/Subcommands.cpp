@@ -117,4 +117,3 @@ namespace voronina
     return element != 0;
   }
 }
-
