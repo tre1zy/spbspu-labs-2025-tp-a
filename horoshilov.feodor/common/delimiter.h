@@ -1,5 +1,5 @@
-#ifndef DELIMITER_HPP
-#define DELIMITER_HPP
+#ifndef DELIMITER_H
+#define DELIMITER_H
 #include <istream>
 
 namespace horoshilov

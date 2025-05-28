@@ -1,5 +1,5 @@
-#ifndef SCOPEGUARD_HPP
-#define SCOPEGUARD_HPP
+#ifndef GUARD_H
+#define GUARD_H
 #include <ios>
 
 namespace horoshilov
