@@ -190,16 +190,18 @@ namespace horoshilov
   }
 
 
-    bool compareData(const DataStruct& a, const DataStruct& b)
+  bool compareData(const DataStruct& a, const DataStruct& b)
+  {
+    if (a.key1 != b.key1)
     {
-      if (a.key1 != b.key1)
-      {
-        return a.key1 < b.key1;
-      }
-      if (a.key2 != b.key2)
-      {
-        return a.key2 < b.key2;
-      }
-      return a.key3.size() < b.key3.size();
+      return a.key1 < b.key1;
     }
+    if (a.key2 != b.key2)
+    {
+      return a.key2 < b.key2;
+    }
+    return a.key3.size() < b.key3.size();
   }
+
+}
+

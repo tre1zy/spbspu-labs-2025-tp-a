@@ -18,3 +18,4 @@ namespace horoshilov
     s_.fill(fill_);
   }
 }
+

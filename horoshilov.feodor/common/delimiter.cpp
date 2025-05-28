@@ -11,7 +11,6 @@ namespace horoshilov
       return in;
     }
     Guard guard(in);
-    
     char c = 0;
     if (in >> c && std::tolower(c) != dest.exp)
     {
