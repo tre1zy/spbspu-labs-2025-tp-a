@@ -67,7 +67,7 @@ void max(std::istream& in, std::ostream& out, const std::vector< Polygon >& poly
 
   if (subcmd == "AREA")
   {
-    auto it = std::max_element(polygons.begin(), polygons.end(), 
+    auto it = std::max_element(polygons.begin(), polygons.end(),
     [](const Polygon& a, const Polygon& b) { return getArea(a) < getArea(b); });
     FormatGuard guard(out);
     out << std::fixed << std::setprecision(1) << getArea(*it);
@@ -171,7 +171,6 @@ void intersections(std::istream& in, std::ostream& out, const std::vector< Polyg
             [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
     auto [aMinY, aMaxY] = std::minmax_element(a.points.begin(), a.points.end(),
             [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-        
     auto [bMinX, bMaxX] = std::minmax_element(b.points.begin(), b.points.end(),
             [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
     auto [bMinY, bMaxY] = std::minmax_element(b.points.begin(), b.points.end(),
