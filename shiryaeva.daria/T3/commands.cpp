@@ -157,7 +157,7 @@ void lessarea(std::istream& in, std::ostream& out, const std::vector< Polygon >&
     [targetArea](const Polygon& p) {
       return p.points.size() >= 3 && getArea(p) < targetArea;
     });
-  
+
   out << count;
 }
 
