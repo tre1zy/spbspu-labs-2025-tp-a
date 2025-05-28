@@ -147,17 +147,21 @@ void count(std::istream& in, std::ostream& out, const std::vector< Polygon >& po
 void lessarea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   Polygon target;
-  if (!(in >> target) || target.points.empty())
+  if (!(in >> target) || target.points.size() < 3)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
   double targetArea = getArea(target);
-  out << std::count_if(polygons.begin(), polygons.end(),
-  [targetArea](const Polygon& p) { return getArea(p) < targetArea; });
+  size_t count = std::count_if(polygons.begin(), polygons.end(),
+    [targetArea](const Polygon& p) {
+      return p.points.size() >= 3 && getArea(p) < targetArea;
+    });
+  
+  out << count;
 }
 
-void intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void intersections(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   Polygon target;
   if (!(in >> target) || target.points.empty())
