@@ -164,39 +164,38 @@ void lessarea(std::istream& in, std::ostream& out, const std::vector< Polygon >&
 void intersections(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   Polygon target;
-  if (!(in >> target) || target.points.empty())
+  if (!(in >> target) || target.points.size() < 3)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
   auto bbIntersects = [](const Polygon& a, const Polygon& b)
   {
-    auto minmaxX_a = std::minmax_element(a.points.begin(), a.points.end(),
+    if (a.points.empty() || b.points.empty()) return false;
+
+    auto aMinMaxX = std::minmax_element(a.points.begin(), a.points.end(),
             [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto aMinX = minmaxX_a.first;
-    auto aMaxX = minmaxX_a.second;
-
-    auto minmaxY_a = std::minmax_element(a.points.begin(), a.points.end(),
+    auto aMinMaxY = std::minmax_element(a.points.begin(), a.points.end(),
             [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto aMinY = minmaxY_a.first;
-    auto aMaxY = minmaxY_a.second;
 
-    auto minmaxX_b = std::minmax_element(b.points.begin(), b.points.end(),
+    auto bMinMaxX = std::minmax_element(b.points.begin(), b.points.end(),
             [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto bMinX = minmaxX_b.first;
-    auto bMaxX = minmaxX_b.second;
-
-    auto minmaxY_b = std::minmax_element(b.points.begin(), b.points.end(),
+    auto bMinMaxY = std::minmax_element(b.points.begin(), b.points.end(),
             [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto bMinY = minmaxY_b.first;
-    auto bMaxY = minmaxY_b.second;
 
-    return !(aMaxX->x < bMinX->x || bMaxX->x < aMinX->x ||
-             aMaxY->y < bMinY->y || bMaxY->y < aMinY->y);
+    return !(aMinMaxX.second->x < bMinMaxX.first->x ||
+                bMinMaxX.second->x < aMinMaxX.first->x ||
+                aMinMaxY.second->y < bMinMaxY.first->y ||
+                bMinMaxY.second->y < aMinMaxY.first->y);
   };
 
-  out << std::count_if(polygons.begin(), polygons.end(),
-        [&target, bbIntersects](const Polygon& p) { return bbIntersects(target, p); });
+  size_t count = std::count_if(polygons.begin(), polygons.end(),
+        [&target, bbIntersects](const Polygon& p)
+        {
+          return p.points.size() >= 3 && bbIntersects(target, p);
+        });
+
+  out << count;
 }
 
 }
