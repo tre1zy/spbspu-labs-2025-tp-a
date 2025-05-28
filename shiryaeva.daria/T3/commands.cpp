@@ -167,16 +167,28 @@ void intersections(std::istream& in, std::ostream& out, const std::vector< Polyg
 
   auto bbIntersects = [](const Polygon& a, const Polygon& b)
   {
-    auto [aMinX, aMaxX] = std::minmax_element(a.points.begin(), a.points.end(),
+    auto minmaxX_a = std::minmax_element(a.points.begin(), a.points.end(),
             [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto [aMinY, aMaxY] = std::minmax_element(a.points.begin(), a.points.end(),
-            [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto [bMinX, bMaxX] = std::minmax_element(b.points.begin(), b.points.end(),
-            [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto [bMinY, bMaxY] = std::minmax_element(b.points.begin(), b.points.end(),
-            [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+    auto aMinX = minmaxX_a.first;
+    auto aMaxX = minmaxX_a.second;
 
-    return !(aMaxX->x < bMinX->x || bMaxX->x < aMinX->x || aMaxY->y < bMinY->y || bMaxY->y < aMinY->y);
+    auto minmaxY_a = std::minmax_element(a.points.begin(), a.points.end(),
+            [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+    auto aMinY = minmaxY_a.first;
+    auto aMaxY = minmaxY_a.second;
+
+    auto minmaxX_b = std::minmax_element(b.points.begin(), b.points.end(),
+            [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
+    auto bMinX = minmaxX_b.first;
+    auto bMaxX = minmaxX_b.second;
+
+    auto minmaxY_b = std::minmax_element(b.points.begin(), b.points.end(),
+            [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+    auto bMinY = minmaxY_b.first;
+    auto bMaxY = minmaxY_b.second;
+
+    return !(aMaxX->x < bMinX->x || bMaxX->x < aMinX->x ||
+             aMaxY->y < bMinY->y || bMaxY->y < aMinY->y);
   };
 
   out << std::count_if(polygons.begin(), polygons.end(),

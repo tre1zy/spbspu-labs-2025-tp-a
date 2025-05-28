@@ -27,7 +27,6 @@ int main(int argc, char* argv[])
   using PolygonIter = std::istream_iterator<Polygon>;
   std::vector<Polygon> polygons;
 
-  std::vector< shiryaeva::Polygon > polygons;
   while (!file.eof())
   {
     std::copy(PolygonIter(file), PolygonIter(), std::back_inserter(polygons));
