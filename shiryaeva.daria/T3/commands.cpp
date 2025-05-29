@@ -142,12 +142,12 @@ namespace shiryaeva
         count = std::count_if(polygons.begin(), polygons.end(),
             [](const Polygon& p) { return p.points.size() % 2 != 0 && p.points.size() >= 3; });
       }
-      else (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
+      else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
       {
         size_t num = std::stoul(subcmd);
         if (num < 3)
         {
-            throw std::invalid_argument("<INVALID COMMAND>");
+          throw std::invalid_argument("<INVALID COMMAND>");
         }
         count = std::count_if(polygons.begin(), polygons.end(),
             [num](const Polygon& p) { return p.points.size() == num; });
