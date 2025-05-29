@@ -1,4 +1,3 @@
-#include <sstream>
 #include <cassert>
 #include <iterator>
 #include <algorithm>
