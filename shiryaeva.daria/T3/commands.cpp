@@ -217,7 +217,7 @@ namespace shiryaeva
         [&target, bbIntersects](const Polygon& p) {
             return p.points.size() >= 3 && bbIntersects(target, p);
         });
-        
+
     out << count;
   }
 
