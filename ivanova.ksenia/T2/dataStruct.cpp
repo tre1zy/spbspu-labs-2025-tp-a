@@ -1,5 +1,8 @@
+#include <iomanip>
 #include <sstream>
+#include <bitset>
 #include "dataStruct.hpp"
+
 
 namespace ivanova
 {
@@ -71,21 +74,41 @@ namespace ivanova
 
   std::ostream& operator<<(std::ostream& out, const dataStruct& ds)
   {
-  }
+    out << "(:key1 " << std::scientific << std::setprecision(6) << ds.key1;
 
-  bool compareDataStructs(const ivanova::dataStruct& a, const ivanova::dataStruct& b)
-  {
-    if (a.key1 != b.key1)
+    out << ":key2 0b";
+    std::bitset<64> bits(ds.key2);
+    std::string binaryStr = bits.to_string();
+
+    size_t firstOne = binaryStr.find('1');
+    if (firstOne != std::string::npos)
     {
-      return a.key1 < b.key1;
-    }
-    else if (a.key2 != b.key2)
-    {
-      return a.key2 < b.key2;
+        out << binaryStr.substr(firstOne);
     }
     else
     {
-      return a.key3.length() < b.key3.length();
+        out << "0";
     }
+
+    out << ":key3 \"" << ds.key3 << "\":)";
+
+    out << std::defaultfloat;
+    return out;
+  }
+}
+
+bool compareDataStructs(const ivanova::dataStruct& a, const ivanova::dataStruct& b)
+{
+  if (a.key1 != b.key1)
+  {
+    return a.key1 < b.key1;
+  }
+  else if (a.key2 != b.key2)
+  {
+    return a.key2 < b.key2;
+  }
+  else
+  {
+    return a.key3.length() < b.key3.length();
   }
 }
