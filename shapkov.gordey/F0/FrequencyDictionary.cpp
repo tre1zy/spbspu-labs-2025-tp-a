@@ -336,11 +336,8 @@ void shapkov::merge(std::istream& in, std::ostream& out, FrequencyDictionary& di
     return;
   }
   OneFreqDict temp(text1->second);
-  for (const auto& word_pair: text2->second.dictionary)
-  {
-    temp.dictionary[word_pair.first] += word_pair.second;
-  }
-  temp.size = text1->second.size + text2->second.size;
+  MergeFunctor merger{ temp.dictionary, temp.size };
+  std::for_each(text2->second.dictionary.begin(), text2->second.dictionary.end(), merger);
   dict.dicts.emplace(std::move(newDictId), std::move(temp));
 }
 
@@ -361,22 +358,10 @@ void shapkov::diff(std::istream& in, std::ostream& out, FrequencyDictionary& dic
     return;
   }
   OneFreqDict temp;
-  for (const auto& word_pair: text1->second.dictionary)
-  {
-    if (text2->second.dictionary.find(word_pair.first) == text2->second.dictionary.end())
-    {
-      temp.dictionary[word_pair.first] = word_pair.second;
-      temp.size += word_pair.second;
-    }
-  }
-  for (const auto& word_pair: text2->second.dictionary)
-  {
-    if (text1->second.dictionary.find(word_pair.first) == text1->second.dictionary.end())
-    {
-      temp.dictionary[word_pair.first] = word_pair.second;
-      temp.size += word_pair.second;
-    }
-  }
+  DiffFunctor d1{ text2->second.dictionary, temp.dictionary, temp.size };
+  std::for_each(text1->second.dictionary.begin(), text1->second.dictionary.end(), d1);
+  DiffFunctor d2{ text1->second.dictionary, temp.dictionary, temp.size };
+  std::for_each(text2->second.dictionary.begin(), text2->second.dictionary.end(), d2);
   if (temp.dictionary.empty())
   {
     out << "<NO DIFFERENCES>\n";
@@ -409,15 +394,8 @@ void shapkov::intersect(std::istream& in, std::ostream& out, FrequencyDictionary
     smallerDict = &text2->second.dictionary;
     largerDict = &text1->second.dictionary;
   }
-  for (const auto& word_pair: *smallerDict)
-  {
-    auto word = largerDict->find(word_pair.first);
-    if (word != largerDict->end())
-    {
-      temp.dictionary[word_pair.first] = word_pair.second + word->second;
-      temp.size = temp.size + word_pair.second + word->second;
-    }
-  }
+  IntersectFunctor isect{ *largerDict, temp.dictionary, temp.size };
+  std::for_each(smallerDict->begin(), smallerDict->end(), isect);
   if (temp.dictionary.empty())
   {
     out << "<NO INTERSECTIONS>\n";

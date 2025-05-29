@@ -90,3 +90,28 @@ void shapkov::ProcessDictionary::operator()(const std::pair< std::string, OneFre
     std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), checker);
   }
 }
+
+void shapkov::MergeFunctor::operator()(const std::pair< const std::string, size_t >& p) const
+{
+  dest[p.first] += p.second;
+  size += p.second;
+}
+
+void shapkov::DiffFunctor::operator()(const std::pair< const std::string, size_t >& p) const
+{
+  if (reference.find(p.first) == reference.end())
+  {
+    result[p.first] = p.second;
+    size += p.second;
+  }
+}
+
+void shapkov::IntersectFunctor::operator()(const std::pair< const std::string, size_t >& p) const
+{
+  auto it = reference.find(p.first);
+  if (it != reference.end())
+  {
+    result[p.first] = p.second + it->second;
+    size += p.second + it->second;
+  }
+}

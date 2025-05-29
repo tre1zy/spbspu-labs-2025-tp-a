@@ -70,6 +70,26 @@ namespace shapkov
     size_t& counter;
     void operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const;
   };
+  struct MergeFunctor
+  {
+    std::unordered_map< std::string, size_t >& dest;
+    size_t& size;
+    void operator()(const std::pair< const std::string, size_t >& p) const;
+  };
+  struct DiffFunctor
+  {
+    const std::unordered_map< std::string, size_t >& reference;
+    std::unordered_map< std::string, size_t >& result;
+    size_t& size;
+    void operator()(const std::pair< const std::string, size_t >& p) const;
+  };
+  struct IntersectFunctor
+  {
+    const std::unordered_map< std::string, size_t >& reference;
+    std::unordered_map< std::string, size_t >& result;
+    size_t& size;
+    void operator()(const std::pair< const std::string, size_t >& p) const;
+  };
 }
 
 #endif

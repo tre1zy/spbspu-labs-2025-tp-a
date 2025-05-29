@@ -9,7 +9,7 @@ namespace shapkov
 {
   struct OneFreqDict
   {
-    std::unordered_map< std::string, size_t> dictionary;
+    std::unordered_map< std::string, size_t > dictionary;
     size_t size = 0;
   };
   struct FrequencyDictionary
