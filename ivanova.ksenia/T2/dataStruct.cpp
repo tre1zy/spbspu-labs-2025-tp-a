@@ -1,18 +1,28 @@
 #include "dataStruct.hpp"
 
-bool compareDataStructs(const ivanova::dataStruct& a, const ivanova::dataStruct& b)
+namespace ivanova
 {
-  if (a.key1 != b.key1)
+  std::istream& operator>>(std::istream& in, dataStruct& ds)
   {
-    return a.key1 < b.key1;
   }
-  else if (a.key2 != b.key2)
+
+  std::ostream& operator<<(std::ostream& out, const dataStruct& ds)
   {
-    return a.key2 < b.key2;
   }
-  else
+
+  bool compareDataStructs(const ivanova::dataStruct& a, const ivanova::dataStruct& b)
   {
-    return a.key3.length() < b.key3.length();
+    if (a.key1 != b.key1)
+    {
+      return a.key1 < b.key1;
+    }
+    else if (a.key2 != b.key2)
+    {
+      return a.key2 < b.key2;
+    }
+    else
+    {
+      return a.key3.length() < b.key3.length();
+    }
   }
 }
-
