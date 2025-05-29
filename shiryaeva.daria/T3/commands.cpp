@@ -163,7 +163,7 @@ namespace shiryaeva
   void lessarea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
   {
     Polygon target;
-    if (!(in >> target) || target.points.size() < 3)
+    if (!(in >> target) || target.points.size() < 3 || !in.eof() && in.fail())
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
@@ -180,7 +180,7 @@ namespace shiryaeva
   void intersections(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
   {
     Polygon target;
-    if (!(in >> target) || target.points.size() < 3)
+    if (!(in >> target) || target.points.size() < 3 || !in.eof() && in.fail())
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
