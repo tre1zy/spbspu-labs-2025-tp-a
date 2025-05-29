@@ -18,6 +18,11 @@ namespace shiryaeva
 
   std::istream& operator>>(std::istream& in, Polygon& polygon)
   {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
     size_t vertexCount = 0;
     in >> vertexCount;
 
@@ -28,17 +33,22 @@ namespace shiryaeva
     }
 
     std::vector< Point > points(vertexCount);
-    for (auto& p : points)
+    for (size_t i = 0; i < vertexCount; ++i)
     {
-      if (!(in >> p))
+      Point p;
+      in >> p;
+      if (!in)
       {
+        in.setstate(std::ios::failbit);
         return in;
       }
+      points.push_back(p);
     }
 
     polygon.points = std::move(points);
     return in;
   }
+
   double getArea(const Polygon& polygon)
   {
     double area = 0.0;
