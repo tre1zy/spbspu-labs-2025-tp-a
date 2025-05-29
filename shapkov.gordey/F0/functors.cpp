@@ -86,7 +86,7 @@ void shapkov::ProcessDictionary::operator()(const std::pair< std::string, OneFre
   auto wrd = dict_pair.second.dictionary.find(word);
   if (wrd != dict_pair.second.dictionary.end())
   {
-    CheckFrequency checker{wrd->second, delta, out, dict_pair.first, counter};
+    CheckFrequency checker{ wrd->second, delta, out, dict_pair.first, counter };
     std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), checker);
   }
 }
