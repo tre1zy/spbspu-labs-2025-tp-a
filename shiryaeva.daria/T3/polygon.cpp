@@ -23,6 +23,7 @@ namespace shiryaeva
     {
       return in;
     }
+
     size_t vertexCount = 0;
     in >> vertexCount;
 
@@ -32,7 +33,8 @@ namespace shiryaeva
       return in;
     }
 
-    std::vector< Point > points(vertexCount);
+    std::vector<Point> points;
+    points.reserve(vertexCount);
     for (size_t i = 0; i < vertexCount; ++i)
     {
       Point p;
@@ -42,9 +44,19 @@ namespace shiryaeva
         in.setstate(std::ios::failbit);
         return in;
       }
+      if (std::find(points.begin(), points.end(), p) != points.end())
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+
       points.push_back(p);
     }
-
+    if (points.size() < 3)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     polygon.points = std::move(points);
     return in;
   }
