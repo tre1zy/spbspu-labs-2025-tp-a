@@ -39,6 +39,10 @@ namespace shiryaeva
     for (size_t i = 0; i < vertexCount; ++i)
     {
       Point p;
+<<<<<<< HEAD
+=======
+      in >> p;
+>>>>>>> f08143773329d735976dc3b28149b441c9826710
       if (!(in >> p))
       {
         in.setstate(std::ios::failbit);
@@ -51,7 +55,20 @@ namespace shiryaeva
       }
       points.push_back(p);
     }
+<<<<<<< HEAD
 
+=======
+    if (points.size() < 3 && points.size() != vertexCount)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    if (points.front() == points.back())
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+>>>>>>> f08143773329d735976dc3b28149b441c9826710
     polygon.points = std::move(points);
     return in;
   }
@@ -61,12 +78,19 @@ namespace shiryaeva
     double area = 0.0;
     const auto& points = polygon.points;
     size_t n = points.size();
+<<<<<<< HEAD
 
     if (n < MIN_VERTEX_COUNT)
     {
       return 0.0;
     }
 
+=======
+    if (n < 3)
+    {
+      return 0.0;
+    }
+>>>>>>> f08143773329d735976dc3b28149b441c9826710
     for (size_t i = 0; i < n; ++i)
     {
       const auto& p1 = points[i];

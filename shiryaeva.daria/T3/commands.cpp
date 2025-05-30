@@ -173,6 +173,7 @@ namespace shiryaeva
   void lessarea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
     Polygon target;
+<<<<<<< HEAD
     in >> target;
 
     if (!in || target.points.size() < 3)
@@ -199,6 +200,9 @@ namespace shiryaeva
     };
 
     if (HasDuplicates{}(target))
+=======
+    if (!(in >> target) || target.points.size() < 3 || (!in.eof() && in.fail()))
+>>>>>>> f08143773329d735976dc3b28149b441c9826710
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
@@ -220,9 +224,13 @@ namespace shiryaeva
   void intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
     Polygon target;
+<<<<<<< HEAD
     in >> target;
 
     if (!in || target.points.size() < 3)
+=======
+    if (!(in >> target) || target.points.size() < 3 || (!in.eof() && in.fail()))
+>>>>>>> f08143773329d735976dc3b28149b441c9826710
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
