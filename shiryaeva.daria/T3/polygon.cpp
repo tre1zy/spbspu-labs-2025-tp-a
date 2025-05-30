@@ -2,6 +2,7 @@
 #include "input_struct.hpp"
 #include <algorithm>
 #include <cmath>
+#include <istream>
 
 namespace shiryaeva
 {
@@ -27,19 +28,18 @@ namespace shiryaeva
     size_t vertexCount = 0;
     in >> vertexCount;
 
-    if (!in || vertexCount < 3)
+    if (!in || vertexCount < MIN_VERTEX_COUNT)
     {
       in.setstate(std::ios::failbit);
       return in;
     }
 
-    std::vector<Point> points;
+    std::vector< Point > points;
     points.reserve(vertexCount);
     for (size_t i = 0; i < vertexCount; ++i)
     {
       Point p;
-      in >> p;
-      if (!in)
+      if (!(in >> p))
       {
         in.setstate(std::ios::failbit);
         return in;
@@ -49,14 +49,9 @@ namespace shiryaeva
         in.setstate(std::ios::failbit);
         return in;
       }
-
       points.push_back(p);
     }
-    if (points.size() < 3)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
+
     polygon.points = std::move(points);
     return in;
   }
@@ -67,11 +62,16 @@ namespace shiryaeva
     const auto& points = polygon.points;
     size_t n = points.size();
 
+    if (n < MIN_VERTEX_COUNT)
+    {
+      return 0.0;
+    }
+
     for (size_t i = 0; i < n; ++i)
     {
       const auto& p1 = points[i];
       const auto& p2 = points[(i + 1) % n];
-      area += (p1.x * p2.y) - (p2.x * p1.y);
+      area += (p1.x * p2.y - p2.x * p1.y);
     }
 
     return std::abs(area) / 2.0;

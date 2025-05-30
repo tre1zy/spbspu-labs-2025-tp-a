@@ -1,23 +1,17 @@
 #include "commands.hpp"
-#include "polygon.hpp"
+#include "functors.hpp"
 #include "format_guard.hpp"
 #include <algorithm>
 #include <iomanip>
+#include <limits>
 #include <numeric>
 #include <stdexcept>
 #include <string>
-#include <cctype>
+#include <istream>
+#include <ostream>
 
 namespace shiryaeva
 {
-  double calculateTotalArea(const std::vector< Polygon >& polygons, std::function< bool(size_t) > pred)
-  {
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0,
-        [pred](double sum, const Polygon& p) {
-            return sum + (pred(p.points.size()) ? getArea(p) : 0.0);
-        });
-  }
-
   void area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
     std::string subcmd;
@@ -25,47 +19,67 @@ namespace shiryaeva
 
     FormatGuard guard(out);
     out << std::fixed << std::setprecision(1);
-    try
+
+    if (subcmd == "EVEN")
     {
-      if (subcmd == "EVEN")
-      {
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-        [](double sum, const Polygon& p) {
-          return (p.points.size() % 2 == 0 && p.points.size() >= 3) ? sum + getArea(p) : sum;
-                });
-        out << total;
-      }
-      else if (subcmd == "ODD")
-      {
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-          [](double sum, const Polygon& p) {
-            return (p.points.size() % 2 != 0 && p.points.size() >= 3) ? sum + getArea(p) : sum;
-              });
-        out << total;
-      }
-      else if (subcmd == "MEAN")
-      {
-        if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
-          double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-            [](double sum, const Polygon& p) { return sum + getArea(p); });
-        out << total / polygons.size();
-      }
-      else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
-      {
-        size_t num = std::stoul(subcmd);
-        if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-          [num](double sum, const Polygon& p) {
-            return (p.points.size() == num) ? sum + getArea(p) : sum;
-              });
-        out << total;
-      }
+      std::vector<Polygon> filteredPolygons;
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsEven{});
+
+      std::vector< double > areas;
+      std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      out << total;
     }
-    catch (...)
+    else if (subcmd == "ODD")
     {
+      std::vector< Polygon > filteredPolygons;
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsOdd{});
+
+      std::vector< double > areas;
+      std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      out << total;
+    }
+    else if (subcmd == "MEAN")
+    {
+      if (polygons.empty())
+      {
         throw std::invalid_argument("<INVALID COMMAND>");
+      }
+
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      out << total / areas.size();
+    }
+    else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
+    {
+      size_t num = std::stoul(subcmd);
+      if (num < 3)
+      {
+        throw std::invalid_argument("<INVALID COMMAND>");
+      }
+
+      struct HasSize
+      {
+        size_t size;
+        bool operator()(const Polygon& p) const { return p.points.size() == size; }
+      };
+
+      std::vector< Polygon > filteredPolygons;
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), HasSize{num});
+
+      std::vector< double > areas;
+      std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+      out << total;
+    }
+    else
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
   }
+
   void max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
     if (polygons.empty())
@@ -78,16 +92,18 @@ namespace shiryaeva
 
     if (subcmd == "AREA")
     {
-      auto it = std::max_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) { return getArea(a) < getArea(b); });
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
+      double maxArea = *std::max_element(areas.begin(), areas.end());
       FormatGuard guard(out);
-      out << std::fixed << std::setprecision(1) << getArea(*it);
+      out << std::fixed << std::setprecision(1) << maxArea;
     }
     else if (subcmd == "VERTEXES")
     {
-      auto it = std::max_element(polygons.begin(), polygons.end(),
-              [](const Polygon& a, const Polygon& b) { return a.points.size() < b.points.size(); });
-      out << it->points.size();
+      std::vector< size_t > vertexCounts;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(vertexCounts), GetPolygonVertexCount{});
+      size_t maxVertexes = *std::max_element(vertexCounts.begin(), vertexCounts.end());
+      out << maxVertexes;
     }
     else
     {
@@ -107,16 +123,18 @@ namespace shiryaeva
 
     if (subcmd == "AREA")
     {
-      auto it = std::min_element(polygons.begin(), polygons.end(),
-              [](const Polygon& a, const Polygon& b) { return getArea(a) < getArea(b); });
+      std::vector< double > areas;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), GetPolygonArea{});
+      double minArea = *std::min_element(areas.begin(), areas.end());
       FormatGuard guard(out);
-      out << std::fixed << std::setprecision(1) << getArea(*it);
+      out << std::fixed << std::setprecision(1) << minArea;
     }
     else if (subcmd == "VERTEXES")
     {
-      auto it = std::min_element(polygons.begin(), polygons.end(),
-             [](const Polygon& a, const Polygon& b) { return a.points.size() < b.points.size(); });
-      out << it->points.size();
+      std::vector< size_t > vertexCounts;
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(vertexCounts), GetPolygonVertexCount{});
+      size_t minVertexes = *std::min_element(vertexCounts.begin(), vertexCounts.end());
+      out << minVertexes;
     }
     else
     {
@@ -126,99 +144,123 @@ namespace shiryaeva
 
   void count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
-   std::string subcmd;
-   in >> subcmd;
+    std::string subcmd;
+    in >> subcmd;
 
-    try
+    if (subcmd == "EVEN")
     {
-      size_t count = 0;
-      if (subcmd == "EVEN")
-      {
-        count = std::count_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() % 2 == 0 && p.points.size() >= 3; });
-      }
-      else if (subcmd == "ODD")
-      {
-        count = std::count_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() % 2 != 0 && p.points.size() >= 3; });
-      }
-      else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
-      {
-        size_t num = std::stoul(subcmd);
-        if (num < 3)
-        {
-          throw std::invalid_argument("<INVALID COMMAND>");
-        }
-        count = std::count_if(polygons.begin(), polygons.end(),
-            [num](const Polygon& p) { return p.points.size() == num; });
-      }
-      out << count;
+      out << std::count_if(polygons.begin(), polygons.end(), IsEven{});
     }
-    catch (...)
+    else if (subcmd == "ODD")
+    {
+      out << std::count_if(polygons.begin(), polygons.end(), IsOdd{});
+    }
+    else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
+    {
+      size_t num = std::stoul(subcmd);
+      if (num < 3)
+      {
+        throw std::invalid_argument("<INVALID COMMAND>");
+      }
+      out << std::count_if(polygons.begin(), polygons.end(), HasVertexCount{num});
+    }
+    else
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
   }
 
-  void lessarea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+  void lessarea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
     Polygon target;
-    if (!(in >> target) || target.points.size() < 3)
+    in >> target;
+
+    if (!in || target.points.size() < 3)
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    struct HasDuplicates
+    {
+      bool operator()(const Polygon& p) const
+      {
+        for (size_t i = 0; i < p.points.size(); ++i)
+        {
+          for (size_t j = i + 1; j < p.points.size(); ++j)
+          {
+            if (p.points[i] == p.points[j])
+            {
+              return true;
+            }
+          }
+        }
+          return false;
+      }
+    };
+
+    if (HasDuplicates{}(target))
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
 
     double targetArea = getArea(target);
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-        [targetArea](const Polygon& p) {
-            return p.points.size() >= 3 && getArea(p) < targetArea;
-        });
 
-    out << count;
+    struct LessArea
+    {
+      double area;
+      bool operator()(const Polygon& p) const
+      {
+        return getArea(p) < area;
+      }
+    };
+
+    out << std::count_if(polygons.begin(), polygons.end(), LessArea{targetArea});
   }
 
-  void intersections(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+  void intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
   {
     Polygon target;
-    if (!(in >> target) || target.points.size() < 3)
+    in >> target;
+
+    if (!in || target.points.size() < 3)
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
 
-    auto bbIntersects = [](const Polygon& a, const Polygon& b)
+    struct HasDuplicates
     {
-       if (a.points.empty() || b.points.empty())
-       {
+      bool operator()(const Polygon& p) const
+      {
+        for (size_t i = 0; i < p.points.size(); ++i)
+        {
+          for (size_t j = i + 1; j < p.points.size(); ++j)
+          {
+            if (p.points[i] == p.points[j])
+            {
+              return true;
+            }
+          }
+        }
         return false;
-       }
-      auto aMinX = std::min_element(a.points.begin(), a.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-      auto aMaxX = std::max_element(a.points.begin(), a.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-      auto aMinY = std::min_element(a.points.begin(), a.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-      auto aMaxY = std::max_element(a.points.begin(), a.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+      }
+    };
 
-      auto bMinX = std::min_element(b.points.begin(), b.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-      auto bMaxX = std::max_element(b.points.begin(), b.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-      auto bMinY = std::min_element(b.points.begin(), b.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-      auto bMaxY = std::max_element(b.points.begin(), b.points.end(),
-      [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+    if (HasDuplicates{}(target))
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
 
-      return !(aMaxX->x < bMinX->x || bMaxX->x < aMinX->x ||
-        aMaxY->y < bMinY->y || bMaxY->y < aMinY->y);
-      };
+    struct IntersectsWith
+    {
+      Polygon polygon;
+      bool operator()(const Polygon& other) const
+      {
+        auto left = std::minmax_element(polygon.points.begin(), polygon.points.end());
+        auto right = std::minmax_element(other.points.begin(), other.points.end());
+        return !((*left.second < *right.first) || (*right.second < *left.first));
+      }
+    };
 
-      size_t count = std::count_if(polygons.begin(), polygons.end(),
-        [&target, bbIntersects](const Polygon& p) {
-            return p.points.size() >= 3 && bbIntersects(target, p);
-        });
-
-    out << count;
+    out << std::count_if(polygons.begin(), polygons.end(), IntersectsWith{target});
   }
-
 }
