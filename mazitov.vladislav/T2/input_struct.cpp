@@ -66,7 +66,7 @@ namespace Mazitov
       flag = true;
       binaryValue = (binaryValue << 1) | (c == '1' ? 1 : 0);
     }
-    
+
     if (!flag)
     {
       in.setstate(std::ios::failbit);
