@@ -12,7 +12,7 @@ namespace Mazitov
     if (n == 0)
     {
       return "0";
-    } 
+    }
 
     std::string binary;
     while (n > 0)
@@ -50,10 +50,10 @@ namespace Mazitov
     out << ":key3 \"" << dest.key3 << "\":)";
     return out;
   }
-  std::istream& operator>>(std::istream& in, DataStruct& dest) 
+  std::istream& operator>>(std::istream& in, DataStruct& dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry) 
+    if (!sentry)
     {
       return in;
     }
@@ -66,24 +66,24 @@ namespace Mazitov
       using str = StringIO;
 
       in >> sep{ '(' } >> sep{ ':' };
-      for (int i = 0; i < 3; i++) 
+      for (int i = 0; i < 3; i++)
       {
         std::string key;
         in >> key;
 
-        if (key == "key1") 
+        if (key == "key1")
         {
           in >> dbl{ data.key1 } >> sep{ ':' };
         }
-        else if (key == "key2") 
+        else if (key == "key2")
         {
           in >> ull{ data.key2 } >> sep{ ':' };
         }
-        else if (key == "key3") 
+        else if (key == "key3")
         {
           in >> str{ data.key3 } >> sep{ ':' };
         }
-        else 
+        else
         {
           in.setstate(std::ios::failbit);
           return in;
@@ -91,7 +91,7 @@ namespace Mazitov
       }
       in >> sep{ ')' };
     }
-    if (in) 
+    if (in)
     {
       dest = data;
     }

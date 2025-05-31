@@ -18,7 +18,7 @@ namespace Mazitov
     }
     return in;
   }
-  
+
   std::istream& operator>>(std::istream& in, StringIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -28,7 +28,7 @@ namespace Mazitov
     }
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
   }
-  
+
   std::istream& operator>>(std::istream& in, DoubleIO&& dest)
   {
     std::istream::sentry sentry(in);
