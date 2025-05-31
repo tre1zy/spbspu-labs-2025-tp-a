@@ -21,6 +21,10 @@ namespace Mazitov
       n >>= 1;
     }
     std::reverse(binary.begin(), binary.end());
+    if (binary.size() == 1)
+    {
+      binary = "0" + binary;
+    }
     return binary;
   }
 
