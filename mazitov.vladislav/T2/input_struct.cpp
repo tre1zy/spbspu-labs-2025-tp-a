@@ -36,8 +36,11 @@ namespace Mazitov
     {
       return in;
     }
-    dest.ref = 0.0;
     in >> dest.ref;
+    if (!in)
+    {
+      return in;
+    }
 
     char literal;
     in >> literal;
