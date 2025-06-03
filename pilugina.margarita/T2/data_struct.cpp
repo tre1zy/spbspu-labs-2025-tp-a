@@ -1,8 +1,9 @@
 #include "data_struct.hpp"
+#include <iostream>
+#include <string>
+#include "commands.hpp"
 #include "format_guard.hpp"
 #include "format_wrapper.hpp"
-#include <iostream>
-#include <cctype>
 
 bool pilugina::operator<(const DataStruct &lhs, const DataStruct &rhs)
 {
@@ -17,25 +18,6 @@ bool pilugina::operator<(const DataStruct &lhs, const DataStruct &rhs)
   return lhs.key3.size() < rhs.key3.size();
 }
 
-std::string convertToBinString(unsigned long long num)
-{
-  if (num == 0)
-  {
-    return "0";
-  }
-  if (num == 1)
-  {
-    return "01";
-  }
-  std::string bin;
-  while (num > 0)
-  {
-    bin = (num % 2 ? "1" : "0") + bin;
-    num /= 2;
-  }
-  return bin;
-}
-
 std::ostream &pilugina::operator<<(std::ostream &out, const DataStruct &src)
 {
   std::ostream::sentry sentry(out);
@@ -46,7 +28,8 @@ std::ostream &pilugina::operator<<(std::ostream &out, const DataStruct &src)
   FormatGuard fg(out);
 
   out << "(:key1 0" << std::oct << src.key1;
-  out << ":key2 0b" << convertToBinString(src.key2);
+  out << ":key2 0b";
+  outputBinRepresentation(src.key2);
   out << ":key3 \"" << src.key3 << "\":)";
   return out;
 }
@@ -60,23 +43,46 @@ std::istream &pilugina::operator>>(std::istream &in, DataStruct &dest)
   }
 
   DataStruct tmp {};
+  bool gotKey1 = false;
+  bool gotKey2 = false;
+  bool gotKey3 = false;
+
   in >> DelimiterIO {'('};
 
   std::string field;
   for (int i = 0; i < 3; i++)
   {
     in >> DelimiterIO {':'} >> field;
+
     if (field == "key1")
     {
+      if (gotKey1)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       in >> UnsignedLongLongOCT {tmp.key1};
+      gotKey1 = true;
     }
     else if (field == "key2")
     {
+      if (gotKey2)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       in >> UnsignedLongLongBIN {tmp.key2};
+      gotKey2 = true;
     }
     else if (field == "key3")
     {
+      if (gotKey3)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       in >> StringIO {tmp.key3};
+      gotKey3 = true;
     }
     else
     {
@@ -86,9 +92,14 @@ std::istream &pilugina::operator>>(std::istream &in, DataStruct &dest)
   }
 
   in >> DelimiterIO {':'} >> DelimiterIO {')'};
-  if (in)
+  if (in && gotKey1 && gotKey2 && gotKey3)
   {
     dest = tmp;
   }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+
   return in;
 }

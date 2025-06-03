@@ -26,6 +26,5 @@ namespace pilugina
   std::istream &operator>>(std::istream &in, UnsignedLongLongOCT &&dest);
   std::istream &operator>>(std::istream &in, UnsignedLongLongBIN &&dest);
   std::istream &operator>>(std::istream &in, StringIO &&dest);
-} // namespace pilugina
+}
 #endif
-

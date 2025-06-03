@@ -1,6 +1,6 @@
 #include "format_wrapper.hpp"
-
 #include <iostream>
+#include "commands.hpp"
 
 std::istream &pilugina::operator>>(std::istream &in, DelimiterIO &&dest)
 {
@@ -34,23 +34,25 @@ std::istream &pilugina::operator>>(std::istream &in, UnsignedLongLongOCT &&dest)
   }
 
   unsigned long long num = 0;
-  char temp = 0;
   bool gotDigit = false;
+  char temp;
 
-  while (in.get(temp) && temp >= '0' && temp <= '7')
+  while (isOctalDigit(in.peek()))
   {
-    gotDigit = true;
+    in >> temp;
     num = num * 8 + (temp - '0');
+    gotDigit = true;
   }
-  in.unget();
 
   if (!gotDigit)
   {
     in.setstate(std::ios::failbit);
-    return in;
+  }
+  else
+  {
+    dest.ref = num;
   }
 
-  dest.ref = num;
   return in;
 }
 
@@ -62,8 +64,8 @@ std::istream &pilugina::operator>>(std::istream &in, UnsignedLongLongBIN &&dest)
     return in;
   }
 
-  char prefix[2] = {0};
-  in.get(prefix[0]).get(prefix[1]);
+  char prefix[2];
+  in >> prefix[0] >> prefix[1];
 
   if (prefix[0] != '0' || (tolower(prefix[1]) != 'b'))
   {
@@ -72,23 +74,25 @@ std::istream &pilugina::operator>>(std::istream &in, UnsignedLongLongBIN &&dest)
   }
 
   unsigned long long num = 0;
-  char temp = 0;
   bool gotDigit = false;
+  char temp;
 
-  while (in.get(temp) && (temp == '0' || temp == '1'))
+  while (isBinaryDigit(in.peek()))
   {
-    gotDigit = true;
+    in >> temp;
     num = num * 2 + (temp - '0');
+    gotDigit = true;
   }
-  in.unget();
 
   if (!gotDigit)
   {
     in.setstate(std::ios::failbit);
-    return in;
+  }
+  else
+  {
+    dest.ref = num;
   }
 
-  dest.ref = num;
   return in;
 }
 
