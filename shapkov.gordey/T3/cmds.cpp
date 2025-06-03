@@ -48,7 +48,7 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
       throw std::logic_error("wrong number of vertexes");
     }
     VecOfPolygons Polygons;
-    std::copy_if(src.begin(), src.end(), std::back_inserter(Polygons), isSize{vertexes});
+    std::copy_if(src.begin(), src.end(), std::back_inserter(Polygons), isSize{ vertexes });
     std::vector< double > areas(Polygons.size());
     std::transform(Polygons.begin(), Polygons.end(), areas.begin(), getArea);
     area = std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -122,7 +122,7 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
     {
       throw std::logic_error("wrong number of vertexes");
     }
-    out << std::count_if(src.begin(), src.end(), isSize{vertexes}) << '\n';
+    out << std::count_if(src.begin(), src.end(), isSize{ vertexes }) << '\n';
   }
 }
 void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
@@ -138,5 +138,5 @@ void shapkov::same(std::istream& in, std::ostream& out, const VecOfPolygons& src
   {
     throw std::logic_error("wrong polygon");
   }
-  out << std::count_if(src.begin(), src.end(), isSame{polygon}) << '\n';
+  out << std::count_if(src.begin(), src.end(), isSame{ polygon }) << '\n';
 }
