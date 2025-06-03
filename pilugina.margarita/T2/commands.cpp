@@ -8,6 +8,11 @@ void pilugina::outputBinRepresentation(unsigned long long num)
     std::cout << "01";
     return;
   }
+  else if (num == 0)
+  {
+    std::cout << "0";
+    return;
+  }
 
   while (num > 0)
   {
