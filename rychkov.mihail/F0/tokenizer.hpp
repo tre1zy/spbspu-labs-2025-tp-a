@@ -11,6 +11,8 @@ namespace rychkov
   class Tokenizer
   {
   public:
+    static std::vector< Operator > operators;
+
     void append(char c);
     void print(std::ostream& err) const;
   private:
@@ -21,7 +23,6 @@ namespace rychkov
     std::stack< value_type > waitlist_;
     std::set< typing::Type > types_;
     std::set< entities::Variable > active_variables_;
-    static std::vector< Operator > operators;
   };
 }
 

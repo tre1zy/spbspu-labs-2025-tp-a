@@ -159,3 +159,28 @@ void rychkov::ContentPrinter::operator()(const entities::Literal& literal)
     break;
   }
 }
+void rychkov::ContentPrinter::operator()(const entities::Cast& cast)
+{
+  print_indent();
+  out << "[cast]\n";
+  indent_++;
+  print_indent();
+  out << "<from> ";
+  operator()(cast.from);
+  out << '\n';
+
+  print_indent();
+  out << "<to> ";
+  operator()(cast.to);
+  out << '\n';
+  indent_--;
+}
+void rychkov::ContentPrinter::operator()(const entities::CastOperation& cast)
+{
+  print_indent();
+  out << (cast.is_explicit ? "[explicit cast]\n" : "[implicit cast]\n");
+  indent_++;
+  operator()(cast.cast);
+  operator()(cast.expr);
+  indent_--;
+}

@@ -26,8 +26,11 @@ namespace rychkov
     void operator()(const entities::Enum& structure);
     void operator()(const entities::Union& structure);
     void operator()(const entities::Alias& alias);
-    void operator()(const entities::Literal& literal);
     void operator()(const entities::Declaration& decl);
+
+    void operator()(const entities::Literal& literal);
+    void operator()(const entities::Cast& cast);
+    void operator()(const entities::CastOperation& cast);
 
     void operator()(const DinMemWrapper< entities::Expression >& root);
     void operator()(const entities::Expression& root);

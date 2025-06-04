@@ -28,10 +28,10 @@ namespace rychkov
   {
     enum Type
     {
-      unary,
-      binary,
-      ternary,
-      multiple
+      unary = 1,
+      binary = 2,
+      ternary = 3,
+      multiple = -1
     };
 
     Type type;
@@ -83,10 +83,19 @@ namespace rychkov
     DinMemWrapper(const DinMemWrapper& rhs):
       std::unique_ptr< T >(new T{*rhs})
     {}
+    template< class... Args >
+    DinMemWrapper(Args&&... args):
+      std::unique_ptr< T >(new T{std::forward< Args >(args)...})
+    {}
     DinMemWrapper(DinMemWrapper&&) = default;
     DinMemWrapper& operator=(const DinMemWrapper& rhs)
     {
       static_cast< std::unique_ptr< T >& >(*this) = new T{*rhs};
+    }
+    template< class U >
+    DinMemWrapper& operator=(U&& rhs)
+    {
+      static_cast< std::unique_ptr< T >& >(*this) = new T{std::forward< U >(rhs)};
     }
     DinMemWrapper& operator=(DinMemWrapper&&) = default;
   };
@@ -133,10 +142,20 @@ namespace rychkov
       typing::Type type;
       std::string name;
     };
+    struct Cast
+    {
+      typing::Type from, to;
+    };
     struct Declaration
     {
-      std::variant< Variable, Struct, Enum, Union, Alias, Function > data;
+      std::variant< Variable, Struct, Enum, Union, Alias, Cast, Function > data;
       DinMemWrapper< Expression > value;
+    };
+    struct CastOperation
+    {
+      Cast cast;
+      bool is_explicit = false;
+      DinMemWrapper< Expression > expr;
     };
     struct Literal
     {
@@ -154,7 +173,8 @@ namespace rychkov
     };
     struct Expression
     {
-      using operand = std::variant< DinMemWrapper< Expression >, Variable, Declaration, Literal >;
+      using operand = std::variant< DinMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation >;
+
       Operator* operation;
       typing::Type result_type;
       std::vector< operand > operands;
