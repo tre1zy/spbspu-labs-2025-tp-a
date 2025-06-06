@@ -12,7 +12,7 @@ namespace puzikov
   void minCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void countCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void rmEchoCommand(std::istream &, std::ostream &, std::vector< Polygon > &);
-  void sameCommand(std::istream &, std::ostream &, std::vector< Polygon > &);
+  void sameCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
 }
 
 #endif

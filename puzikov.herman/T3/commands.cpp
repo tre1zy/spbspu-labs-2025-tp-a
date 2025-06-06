@@ -145,7 +145,7 @@ void puzikov::rmEchoCommand(std::istream &in, std::ostream &out, std::vector< Po
   out << counter << '\n';
 }
 
-void puzikov::sameCommand(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
+void puzikov::sameCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -167,6 +167,5 @@ void puzikov::sameCommand(std::istream &in, std::ostream &out, std::vector< Poly
   }
 
   unsigned count = std::count_if(polygons.begin(), polygons.end(), IsTranslationCongruent(reference));
-  ;
   out << count << '\n';
 }

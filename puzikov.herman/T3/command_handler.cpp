@@ -20,12 +20,13 @@ void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
   }
 }
 
-puzikov::CommandHandler::CommandHandler(std::vector< Polygon > &refPolys)
-{
-  commands = {{"AREA", std::bind(puzikov::areaCommand, _1, _2, std::ref(refPolys))},
-              {"MAX", std::bind(puzikov::maxCommand, _1, _2, std::ref(refPolys))},
-              {"MIN", std::bind(puzikov::minCommand, _1, _2, std::ref(refPolys))},
-              {"COUNT", std::bind(puzikov::countCommand, _1, _2, std::ref(refPolys))},
-              {"RMECHO", std::bind(puzikov::rmEchoCommand, _1, _2, std::ref(refPolys))},
-              {"SAME", std::bind(puzikov::sameCommand, _1, _2, std::ref(refPolys))}};
-};
+puzikov::CommandHandler::CommandHandler(std::vector< Polygon > &refPolys):
+  commands{
+        {"AREA", std::bind(puzikov::areaCommand, _1, _2, std::cref(refPolys))},
+        {"MAX", std::bind(puzikov::maxCommand, _1, _2, std::cref(refPolys))},
+        {"MIN", std::bind(puzikov::minCommand, _1, _2, std::cref(refPolys))},
+        {"COUNT", std::bind(puzikov::countCommand, _1, _2, std::cref(refPolys))},
+        {"RMECHO", std::bind(puzikov::rmEchoCommand, _1, _2, std::ref(refPolys))},
+        {"SAME", std::bind(puzikov::sameCommand, _1, _2, std::cref(refPolys))}
+    }
+{};
