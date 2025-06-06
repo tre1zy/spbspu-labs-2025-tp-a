@@ -84,7 +84,7 @@ namespace
   std::vector< double > getAreasIf(const std::vector< Polygon >& plgs, const Predicate& pred)
   {
     std::vector< double > areas;
-    std::vector< demehin::Polygon > filteredPlgs;
+    std::vector< Polygon > filteredPlgs;
     std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(filteredPlgs), pred);
     std::transform(filteredPlgs.begin(), filteredPlgs.end(), std::back_inserter(areas), demehin::getPlgArea);
 
@@ -107,14 +107,14 @@ namespace
     return sumAreaIf(plgs, isOddVrts);
   }
 
-  bool alwaysTrue(const Polygon&)
+  bool noFilter(const Polygon&)
   {
     return true;
   }
 
   double sumAreaAll(const std::vector< Polygon >& plgs)
   {
-    return sumAreaIf(plgs, alwaysTrue);
+    return sumAreaIf(plgs, noFilter);
   }
 
   double sumAreaVrt(const std::vector< Polygon >& plgs, size_t vrt_cnt)
