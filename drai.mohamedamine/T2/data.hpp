@@ -4,6 +4,7 @@
 #include <string>
 #include <complex>
 #include <utility>
+#include <iostream>
 
 namespace amine
 {
