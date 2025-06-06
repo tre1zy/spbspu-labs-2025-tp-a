@@ -4,9 +4,8 @@
 #include <cmath>
 #include <iomanip>
 #include "guard.h"
-namespace horoshilov
-{
-std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+
+std::istream& horoshilov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -21,7 +20,7 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, DoubleI&& dest)
+std::istream& horoshilov::operator>>(std::istream& in, DoubleI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -32,7 +31,7 @@ std::istream& operator>>(std::istream& in, DoubleI&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, DoubleSciI&& dest)
+std::istream& horoshilov::operator>>(std::istream& in, DoubleSciI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -69,7 +68,7 @@ std::istream& operator>>(std::istream& in, DoubleSciI&& dest)
   return in;
 }
 
-std::istream& operator>>(std::istream& in, StringI&& dest)
+std::istream& horoshilov::operator>>(std::istream& in, StringI&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -80,7 +79,7 @@ std::istream& operator>>(std::istream& in, StringI&& dest)
   return in >> DelimiterIO{ ':' };
 }
 
-std::istream& operator>>(std::istream& input, KeyIO&& dest)
+std::istream& horoshilov::operator>>(std::istream& input, KeyIO&& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -112,7 +111,7 @@ std::istream& operator>>(std::istream& input, KeyIO&& dest)
   return input;
 }
 
-std::istream& operator>>(std::istream& input, DataStruct& dest)
+std::istream& horoshilov::operator>>(std::istream& input, DataStruct& dest)
 {
   std::istream::sentry sentry(input);
   if (!sentry)
@@ -135,7 +134,7 @@ std::istream& operator>>(std::istream& input, DataStruct& dest)
   return input;
 }
 
-std::ostream& operator<<(std::ostream& output, const DoubleO& dest)
+std::ostream& horoshilov::operator<<(std::ostream& output, const DoubleO& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -146,7 +145,7 @@ std::ostream& operator<<(std::ostream& output, const DoubleO& dest)
   return output << std::fixed << std::setprecision(1) << dest.ref << "d";
 }
 
-std::ostream& operator<<(std::ostream& out, const DoubleSciO& dest)
+std::ostream& horoshilov::operator<<(std::ostream& out, const DoubleSciO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -175,7 +174,7 @@ std::ostream& operator<<(std::ostream& out, const DoubleSciO& dest)
   return out;
 }
 
-std::ostream& operator<<(std::ostream& output, const StringO& dest)
+std::ostream& horoshilov::operator<<(std::ostream& output, const StringO& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -185,7 +184,7 @@ std::ostream& operator<<(std::ostream& output, const StringO& dest)
   return output << "\"" << dest.ref << "\"";
 }
 
-std::ostream& operator<<(std::ostream& output, const DataStruct& dest)
+std::ostream& horoshilov::operator<<(std::ostream& output, const DataStruct& dest)
 {
   std::ostream::sentry sentry(output);
   if (!sentry)
@@ -201,8 +200,7 @@ std::ostream& operator<<(std::ostream& output, const DataStruct& dest)
   return output;
 }
 
-
-bool compareData(const DataStruct& a, const DataStruct& b)
+bool horoshilov::compareData(const DataStruct& a, const DataStruct& b)
 {
   if (a.key1 != b.key1)
   {
@@ -215,5 +213,4 @@ bool compareData(const DataStruct& a, const DataStruct& b)
   return a.key3.size() < b.key3.size();
 }
 
-}
 
