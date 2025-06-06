@@ -1,13 +1,19 @@
 #include "DataStruct.h"
 #include <iomanip>
 #include <limits>
+
 namespace khokhryakova
 {
-  Iofmtguard::Iofmtguard(std::ostream& s) : s_(s), flags_(s.flags()) {}
+  Iofmtguard::Iofmtguard(std::ostream& s):
+    s_(s),
+    flags_(s.flags())
+  {}
+
   Iofmtguard::~Iofmtguard()
   {
     s_.flags(flags_);
   }
+
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -28,6 +34,7 @@ namespace khokhryakova
     in >> first_char >> second_char;
     return (first_char == 'l' || first_char == 'L') && (second_char == 'l' || second_char == 'L');
   }
+
   std::istream& operator>>(std::istream& in, LongLongIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -52,6 +59,7 @@ namespace khokhryakova
     }
     return in;
   }
+
   std::istream& operator>>(std::istream& in, RationalIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -70,6 +78,7 @@ namespace khokhryakova
     }
     return in;
   }
+
   std::istream& operator>>(std::istream& in, StringIO&& dest)
   {
     std::istream::sentry sentry(in);
@@ -81,6 +90,7 @@ namespace khokhryakova
     std::getline(in, dest.ref, '"');
     return in;
   }
+
   std::istream& operator>>(std::istream& in, DataStruct& dest)
   {
     std::istream::sentry sentry(in);
@@ -128,6 +138,7 @@ namespace khokhryakova
     }
     return in;
   }
+
   std::ostream& operator<<(std::ostream& out, const DataStruct& src)
   {
     Iofmtguard guard(out);

@@ -1,5 +1,6 @@
 #ifndef DATASTRUCT_H
 #define DATASTRUCT_H
+
 #include <iostream>
 #include <string>
 #include <utility>
@@ -19,7 +20,7 @@ namespace khokhryakova
   struct DataStruct
   {
     long long key1;
-    std::pair<long long, unsigned long long> key2;
+    std::pair< long long, unsigned long long > key2;
     std::string key3;
   };
 
@@ -49,6 +50,7 @@ namespace khokhryakova
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& src);
+
   bool operator<(const DataStruct& a, const DataStruct& b);
 }
 #endif
