@@ -9,12 +9,14 @@
 
 namespace
 {
-  bool isEvenVrts(const demehin::Polygon& plg)
+  using demehin::Polygon;
+
+  bool isEvenVrts(const Polygon& plg)
   {
     return plg.points.size() % 2 == 0;
   }
 
-  bool isOddVrts(const demehin::Polygon& plg)
+  bool isOddVrts(const Polygon& plg)
   {
     return !(isEvenVrts(plg));
   }
@@ -23,23 +25,23 @@ namespace
   {
     size_t cnt;
 
-    bool operator()(const demehin::Polygon& plg) const
+    bool operator()(const Polygon& plg) const
     {
       return plg.points.size() == cnt;
     }
   };
 
-  bool compareVrtCnt(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
+  bool compareVrtCnt(const Polygon& plg1, const Polygon& plg2)
   {
     return plg1.points.size() < plg2.points.size();
   }
 
-  bool compareArea(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
+  bool compareArea(const Polygon& plg1, const Polygon& plg2)
   {
     return getPlgArea(plg1) < getPlgArea(plg2);
   }
 
-  bool isPerm(const demehin::Polygon& plg1, const demehin::Polygon& plg2)
+  bool isPerm(const Polygon& plg1, const Polygon& plg2)
   {
     if (plg1.points.size() != plg2.points.size())
     {
@@ -69,7 +71,7 @@ namespace
     }
   };
 
-  bool hasRights(const demehin::Polygon& plg)
+  bool hasRights(const Polygon& plg)
   {
     std::vector< size_t > inds(plg.points.size());
     std::iota(inds.begin(), inds.end(), 0);
@@ -77,52 +79,52 @@ namespace
     return std::any_of(inds.begin(), inds.end(), RightAngleCheck{ plg });
   }
 
-  bool alwaysTrue(const demehin::Polygon&)
-  {
-    return true;
-  }
+  using Predicate = std::function< bool(const Polygon&) >;
 
-  using Predicate = std::function< bool(const demehin::Polygon&) >;
-
-  std::vector< double > getAreasIf(const std::vector< demehin::Polygon >& plgs, const Predicate& pred)
+  std::vector< double > getAreasIf(const std::vector< Polygon >& plgs, const Predicate& pred)
   {
     std::vector< double > areas;
-    std::vector<demehin::Polygon> filteredPlgs;
+    std::vector< demehin::Polygon > filteredPlgs;
     std::copy_if(plgs.begin(), plgs.end(), std::back_inserter(filteredPlgs), pred);
     std::transform(filteredPlgs.begin(), filteredPlgs.end(), std::back_inserter(areas), demehin::getPlgArea);
 
     return areas;
   }
 
-  double sumAreaIf(const std::vector< demehin::Polygon >& plgs, const Predicate& pred)
+  double sumAreaIf(const std::vector< Polygon >& plgs, const Predicate& pred)
   {
     auto areas = getAreasIf(plgs, pred);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  double sumAreaEven(const std::vector< demehin::Polygon >& plgs)
+  double sumAreaEven(const std::vector< Polygon >& plgs)
   {
     return sumAreaIf(plgs, isEvenVrts);
   }
 
-  double sumAreaOdd(const std::vector< demehin::Polygon >& plgs)
+  double sumAreaOdd(const std::vector< Polygon >& plgs)
   {
     return sumAreaIf(plgs, isOddVrts);
   }
 
-  double sumAreaAll(const std::vector< demehin::Polygon >& plgs)
+  bool alwaysTrue(const Polygon&)
+  {
+    return true;
+  }
+
+  double sumAreaAll(const std::vector< Polygon >& plgs)
   {
     return sumAreaIf(plgs, alwaysTrue);
   }
 
-  double sumAreaVrt(const std::vector< demehin::Polygon >& plgs, size_t vrt_cnt)
+  double sumAreaVrt(const std::vector< Polygon >& plgs, size_t vrt_cnt)
   {
     return sumAreaIf(plgs, VrtCntCheck{ vrt_cnt });
   }
 
   struct MeanCalc
   {
-    double operator()(const std::vector< demehin::Polygon >& plgs) const
+    double operator()(const std::vector< Polygon >& plgs) const
     {
       if (plgs.empty())
       {
@@ -131,51 +133,34 @@ namespace
       return sumAreaAll(plgs) / plgs.size();
     }
   };
+
+  void printMaxVrt(std::ostream& out, const std::vector< Polygon >& plgs)
+  {
+    auto plg = *std::max_element(plgs.begin(), plgs.end(), compareVrtCnt);
+    out << plg.points.size() << "\n";
+  }
+
+  void printMaxArea(std::ostream& out, const std::vector< Polygon >& plgs)
+  {
+    auto plg = *std::max_element(plgs.begin(), plgs.end(), compareArea);
+    out << std::setprecision(1) << std::fixed << demehin::getPlgArea(plg);
+  }
+
+  void printMinVrt(std::ostream& out, const std::vector< Polygon >& plgs)
+  {
+    auto plg = *std::min_element(plgs.begin(), plgs.end(), compareVrtCnt);
+    out << plg.points.size() << "\n";
+  }
+
+  void printMinArea(std::ostream& out, const std::vector< Polygon >& plgs)
+  {
+    auto plg = *std::min_element(plgs.begin(), plgs.end(), compareArea);
+    out << std::setprecision(1) << std::fixed << demehin::getPlgArea(plg);
+  }
 }
 
 void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  /*std::string subcommand;
-  in >> subcommand;
-  std::vector< Polygon > tmp;
-  if (subcommand == "EVEN")
-  {
-    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), isEvenVrts);
-  }
-  else if (subcommand == "ODD")
-  {
-    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), isOddVrts);
-  }
-  else if (subcommand == "MEAN")
-  {
-    if (plgs.size() == 0)
-    {
-      throw std::invalid_argument("not enough shapes");
-    }
-    tmp = plgs;
-  }
-  else
-  {
-    size_t vrt_cnt = std::stoull(subcommand);
-    if (vrt_cnt < 3)
-    {
-      throw std::invalid_argument("not enough vertexes");
-    }
-
-    VrtCntCheck check{ vrt_cnt };
-    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), check);
-  }
-
-  std::vector< double > areas;
-  std::transform(tmp.begin(), tmp.end(), std::back_inserter(areas), getPlgArea);
-  double res = std::accumulate(areas.begin(), areas.end(), 0);
-  if (subcommand == "MEAN")
-  {
-    res /= plgs.size();
-  }
-  iofmtguard fmtguard(out);
-  out << std::setprecision(1) << std::fixed << res;*/
-
   std::unordered_map< std::string, std::function< double() > > subcmds;
   subcmds["EVEN"] = std::bind(sumAreaEven, std::cref(plgs));
   subcmds["ODD"] = std::bind(sumAreaOdd, std::cref(plgs));
@@ -205,7 +190,7 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
 
 void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (plgs.size() == 0)
+  /*if (plgs.size() == 0)
   {
     throw std::invalid_argument("not enough shapes");
   }
@@ -226,7 +211,21 @@ void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& pl
   else
   {
     throw std::invalid_argument("unknown command");
+  }*/
+
+  if (plgs.size() == 0)
+  {
+    throw std::invalid_argument("not enough shapes");
   }
+
+  std::unordered_map< std::string, std::function< void() > > subcmds;
+  subcmds["AREA"] = std::bind(printMaxArea, std::ref(out), std::cref(plgs));
+  subcmds["VERTEXES"] = std::bind(printMaxVrt, std::ref(out), std::cref(plgs));
+
+  std::string subcommand;
+  in >> subcommand;
+
+  subcmds.at(subcommand)();
 }
 
 void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
@@ -236,7 +235,7 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
     throw std::invalid_argument("not enough shapes");
   }
 
-  std::string subcommand;
+  /*std::string subcommand;
   in >> subcommand;
   iofmtguard fmtguard(out);
   if (subcommand == "AREA")
@@ -252,7 +251,16 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
   else
   {
     throw std::invalid_argument("unknown command");
-  }
+  }*/
+
+  std::unordered_map< std::string, std::function< void() > > subcmds;
+  subcmds["AREA"] = std::bind(printMinArea, std::ref(out), std::cref(plgs));
+  subcmds["VERTEXES"] = std::bind(printMinVrt, std::ref(out), std::cref(plgs));
+
+  std::string subcommand;
+  in >> subcommand;
+
+  subcmds.at(subcommand)();
 }
 
 void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
