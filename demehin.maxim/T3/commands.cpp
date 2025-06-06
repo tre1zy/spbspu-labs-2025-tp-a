@@ -194,7 +194,7 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
     size_t vrt_cnt = std::stoull(subcommand);
     if (vrt_cnt < 3)
     {
-      std::invalid_argument("not enough vertexes");
+      throw std::invalid_argument("not enough vertexes");
     }
     res = sumAreaVrt(plgs, vrt_cnt);
   }
