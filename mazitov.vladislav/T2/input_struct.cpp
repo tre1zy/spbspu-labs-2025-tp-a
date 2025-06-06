@@ -75,10 +75,6 @@ std::istream& mazitov::operator>>(std::istream& in, UnsignedLongLongBinIO&& dest
   else
   {
     dest.ref = binaryValue;
-    if (c != ':')
-    {
-      in.setstate(std::ios::failbit);
-    }
   }
   return in;
 }
