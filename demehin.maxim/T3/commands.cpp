@@ -79,6 +79,21 @@ namespace
     return std::any_of(inds.begin(), inds.end(), RightAngleCheck{ plg });
   }
 
+  size_t countEven(const std::vector< Polygon >& plgs)
+  {
+    return std::count_if(plgs.cbegin(), plgs.cend(), isEvenVrts);
+  }
+
+  size_t countOdd(const std::vector< Polygon >& plgs)
+  {
+    return std::count_if(plgs.cbegin(), plgs.cend(), isOddVrts);
+  }
+
+  size_t countVrt(const std::vector< Polygon >& plgs, size_t vrt_cnt)
+  {
+    return std::count_if(plgs.cbegin(), plgs.cend(), VrtCntCheck{ vrt_cnt });
+  }
+
   using Predicate = std::function< bool(const Polygon&) >;
 
   std::vector< double > getAreasIf(const std::vector< Polygon >& plgs, const Predicate& pred)
@@ -137,7 +152,7 @@ namespace
   void printMaxVrt(std::ostream& out, const std::vector< Polygon >& plgs)
   {
     auto plg = *std::max_element(plgs.begin(), plgs.end(), compareVrtCnt);
-    out << plg.points.size() << "\n";
+    out << plg.points.size();
   }
 
   void printMaxArea(std::ostream& out, const std::vector< Polygon >& plgs)
@@ -149,7 +164,7 @@ namespace
   void printMinVrt(std::ostream& out, const std::vector< Polygon >& plgs)
   {
     auto plg = *std::min_element(plgs.begin(), plgs.end(), compareVrtCnt);
-    out << plg.points.size() << "\n";
+    out << plg.points.size();
   }
 
   void printMinArea(std::ostream& out, const std::vector< Polygon >& plgs)
@@ -265,7 +280,7 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
 
 void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  std::vector< Polygon > tmp;
+  /*std::vector< Polygon > tmp;
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "EVEN")
@@ -287,7 +302,30 @@ void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs,
     std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), check);
   }
 
-  out << tmp.size();
+  out << tmp.size();*/
+
+  std::unordered_map< std::string, std::function< size_t() > > subcmds;
+  subcmds["EVEN"] = std::bind(countEven, std::cref(plgs));
+  subcmds["ODD"] = std::bind(countOdd, std::cref(plgs));
+
+  std::string subcommand;
+  in >> subcommand;
+  size_t cnt;
+  try
+  {
+    cnt = subcmds.at(subcommand)();
+  }
+  catch (...)
+  {
+    size_t vrt_cnt = std::stoull(subcommand);
+    if (vrt_cnt < 3)
+    {
+      throw std::invalid_argument("wrong parameter");
+    }
+    count = countVrt(plgs, vrt_cnt);
+  }
+
+  out << cnt;
 }
 
 void demehin::printPermsCnt(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
