@@ -2,18 +2,21 @@
 #include <iostream>
 #include <iterator>
 #include <limits>
-#include "args-parser.hpp"
 #include "command-processor.hpp"
 
 int main(int argc, char** argv)
 {
-  using namespace kizhin;
+  if (argc != 2 || argv[1][0] == '\0') {
+    std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    return 1;
+  }
+  const char* filename = argv[1];
   try {
-    const Args args = parseArgs(argc, argv, std::cerr);
-    std::ifstream in(args.filename);
+    std::ifstream in(filename);
     if (!in.is_open()) {
       throw std::logic_error("Failed to open file: " + args.filename);
     }
+    using namespace kizhin;
     using InIt = std::istream_iterator< Polygon >;
     PolygonContainer polygons(InIt{ in }, InIt{});
     constexpr auto maxSize = std::numeric_limits< std::streamsize >::max();
