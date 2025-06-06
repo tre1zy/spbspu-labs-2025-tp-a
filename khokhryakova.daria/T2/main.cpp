@@ -1,30 +1,27 @@
 #include <algorithm>
-#include <iostream>
-#include <iterator>
-#include <vector>
 #include <limits>
+#include <iterator>
+#include <iostream>
+#include <vector>
 #include "DataStruct.h"
 int main()
 {
-  std::vector<khokhryakova::DataStruct> data;
+  using dataStruct = khokhryakova::DataStruct;
+  using istreamIterator = std::istream_iterator<dataSt>;
+  using ostreamIterator = std::ostream_iterator<dataSt>;
+
+  std::vector<dataStruct> data;
   while (!std::cin.eof())
   {
-    khokhryakova::DataStruct temp;
-    if (std::cin >> temp)
-    {
-      std::copy(&temp, &temp + 1, std::back_inserter(data));
-    }
-    else if (!std::cin.eof())
+    std::copy(istreamIterator(std::cin), istreamIterator(), std::back_inserter(data));
+    if (!std::cin)
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+
   std::sort(data.begin(), data.end());
-  std::copy(
-    data.begin(),
-    data.end(),
-    std::ostream_iterator<khokhryakova::DataStruct>(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), ostreamIterator(std::cout, "\n"));
   return 0;
 }
