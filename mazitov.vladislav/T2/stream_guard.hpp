@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace Mazitov
+namespace mazitov
 {
   class StreamGuard
   {

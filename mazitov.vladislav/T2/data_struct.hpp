@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-namespace Mazitov
+namespace mazitov
 {
   struct DataStruct
   {
