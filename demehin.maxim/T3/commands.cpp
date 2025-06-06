@@ -322,7 +322,7 @@ void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs,
     {
       throw std::invalid_argument("wrong parameter");
     }
-    count = countVrt(plgs, vrt_cnt);
+    cnt = countVrt(plgs, vrt_cnt);
   }
 
   out << cnt;
