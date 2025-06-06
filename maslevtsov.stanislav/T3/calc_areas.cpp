@@ -4,7 +4,7 @@
 #include <functional>
 #include <map>
 #include <io_fmt_guard.hpp>
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 
 namespace {
   double calc_areas_sum(const std::vector< maslevtsov::Polygon >& polygons)

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <map>
 #include <io_fmt_guard.hpp>
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 
 namespace {
   void print_max_area(const std::vector< maslevtsov::Polygon >& polygons, std::ostream& out)

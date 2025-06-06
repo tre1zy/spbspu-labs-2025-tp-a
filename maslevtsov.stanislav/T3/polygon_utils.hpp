@@ -1,5 +1,5 @@
-#ifndef FUNCTORS_HPP
-#define FUNCTORS_HPP
+#ifndef POLYGON_UTILS_HPP
+#define POLYGON_UTILS_HPP
 
 #include "shapes.hpp"
 

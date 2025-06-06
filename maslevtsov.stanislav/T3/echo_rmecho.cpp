@@ -1,7 +1,7 @@
 #include "echo_rmecho.hpp"
 #include <functional>
 #include <algorithm>
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 
 void maslevtsov::echo(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {

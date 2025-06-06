@@ -2,7 +2,7 @@
 #include <functional>
 #include <algorithm>
 #include <map>
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 
 namespace {
   std::size_t count_even_vertexes(const std::vector< maslevtsov::Polygon >& polygons)

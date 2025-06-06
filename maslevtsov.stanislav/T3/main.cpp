@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   while (!fin.eof()) {
     std::copy(std::istream_iterator< Polygon >(fin), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
     if (fin.fail()) {
-      fin.clear();
+      fin.clear(std::cin.rdstate() ^ std::ios::failbit);
       fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
