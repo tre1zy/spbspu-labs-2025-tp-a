@@ -3,17 +3,20 @@
 
 #include <iostream>
 
-namespace fedorov {
-struct DelimiterI {
-  char expected;
-};
+namespace fedorov
+{
+  struct DelimiterI
+  {
+    char expected;
+  };
 
-struct DelimiterStr {
-  const char* expected;
-};
+  struct DelimiterStr
+  {
+    const char *expected;
+  };
 
-std::istream& operator>>(std::istream& in, DelimiterI&& exp);
-std::istream& operator>>(std::istream& in, DelimiterStr&& exp);
-} // namespace fedorov
+  std::istream &operator>>(std::istream &in, DelimiterI &&exp);
+  std::istream &operator>>(std::istream &in, DelimiterStr &&exp);
+}
 
 #endif

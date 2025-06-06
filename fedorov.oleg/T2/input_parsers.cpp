@@ -1,27 +1,30 @@
 #include "input_parsers.hpp"
 #include "delimiter.hpp"
 
-std::istream& fedorov::operator>>(std::istream& input, DoubleKey&& key)
+std::istream &fedorov::operator>>(std::istream &input, DoubleKey &&key)
 {
   std::istream::sentry sentry(input);
-  if ( !sentry ) {
+  if (!sentry)
+  {
     return input;
   }
 
   using del = DelimiterI;
   double num = 0;
 
-  input >> num >> del{'d'};
-  if ( input ) {
+  input >> num >> del {'d'};
+  if (input)
+  {
     key.num = num;
   }
   return input;
 }
 
-std::istream& fedorov::operator>>(std::istream& input, ComplexKey&& key)
+std::istream &fedorov::operator>>(std::istream &input, ComplexKey &&key)
 {
   std::istream::sentry sentry(input);
-  if ( !sentry ) {
+  if (!sentry)
+  {
     return input;
   }
 
@@ -30,24 +33,26 @@ std::istream& fedorov::operator>>(std::istream& input, ComplexKey&& key)
   double real = 0;
   double imag = 0;
 
-  input >> delStr{"#c("} >> real >> imag >> del{')'};
+  input >> delStr {"#c("} >> real >> imag >> del {')'};
 
-  if ( input ) {
+  if (input)
+  {
     key.num = {real, imag};
   }
   return input;
 }
 
-std::istream& fedorov::operator>>(std::istream& input, StringKey&& key)
+std::istream &fedorov::operator>>(std::istream &input, StringKey &&key)
 {
   std::istream::sentry guard(input);
-  if ( !guard ) {
+  if (!guard)
+  {
     return input;
   }
 
   using del = DelimiterI;
 
-  input >> del{'"'};
+  input >> del {'"'};
   std::getline(input, key.string, '\"');
   return input;
 }
