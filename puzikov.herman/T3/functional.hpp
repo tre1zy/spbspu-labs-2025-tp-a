@@ -2,6 +2,7 @@
 #define FUNCTIONAL_HPP
 
 #include "polygon.hpp"
+#include <functional>
 #include <vector>
 #include <string>
 
@@ -53,6 +54,8 @@ namespace puzikov
     bool operator()(const Polygon &poly) const;
     const Polygon &reference;
   };
+
+  Point PointGenerator(std::istream &);
 
   using AreaComp = bool (*)(const Polygon &, const Polygon &);
   using VertComp = bool (*)(const Polygon &, const Polygon &);

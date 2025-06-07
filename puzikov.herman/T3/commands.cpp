@@ -45,8 +45,15 @@ void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector
   }
 
   double areaSum;
-  checkVerticesParameter(param);
-  areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
+  try
+  {
+    checkVerticesParameter(param);
+    areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
+  }
+  catch (const std::logic_error &e)
+  {
+    throw std::runtime_error(e.what());
+  }
 
   if (param == "MEAN")
   {

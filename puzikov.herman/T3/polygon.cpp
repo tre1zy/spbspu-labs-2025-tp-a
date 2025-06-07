@@ -5,8 +5,10 @@
 #include <limits>
 #include <numeric>
 #include <sstream>
+#include <functional>
 #include <format_guard.hpp>
 #include <input_wrapper_structs.hpp>
+#include "functional.hpp"
 
 std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
 {
@@ -49,19 +51,15 @@ std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
   in >> vertexCount;
   if (!in || vertexCount < 3)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    throw std::logic_error("Not enough vertices.");
   }
 
   Polygon temp;
-  std::istream_iterator< Point > it(in);
-  std::copy_n(it, vertexCount, std::back_inserter(temp.points));
-
+  std::generate_n(std::back_inserter(temp.points), vertexCount, std::bind(PointGenerator, std::ref(in)));
 
   if (!in)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    throw std::logic_error("Wrong number of vertices.");
   }
 
   std::string remaining;
@@ -71,8 +69,7 @@ std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
     Point dummy;
     if (checker >> dummy)
     {
-      in.setstate(std::ios::failbit);
-      return in;
+      throw std::logic_error("Too many vertices.");
     }
   }
 

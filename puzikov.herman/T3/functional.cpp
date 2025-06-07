@@ -150,6 +150,18 @@ bool puzikov::IsTranslationCongruent::operator()(const Polygon &poly) const
   return false;
 }
 
+puzikov::Point puzikov::PointGenerator(std::istream &in)
+{
+  char c = in.peek();
+  if (c == '\n' || c == EOF)
+  {
+    throw std::runtime_error("BUUUH");
+  }
+  Point p;
+  in >> p;
+  return p;
+}
+
 puzikov::AreaIt puzikov::maxAreaElement(AreaIt first, AreaIt last, AreaComp comp)
 {
   return std::max_element(first, last, comp);
