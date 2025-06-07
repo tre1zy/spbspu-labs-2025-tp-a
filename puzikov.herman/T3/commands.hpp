@@ -6,6 +6,7 @@
 
 namespace puzikov
 {
+  void checkVerticesParameter(const std::string &param);
   void areaCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void minmaxCommand(std::istream &, std::ostream &, const std::vector< Polygon > &, AreaAlgo, VertAlgo);
   void maxCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);

@@ -4,6 +4,22 @@
 #include <numeric>
 #include <format_guard.hpp>
 
+void puzikov::checkVerticesParameter(const std::string &param)
+{
+  try
+  {
+    std::size_t verticesCount = std::stoul(param);
+    if (verticesCount < 3)
+    {
+      throw std::logic_error("Not enough vertices.");
+    }
+  }
+  catch (...)
+  {
+    throw std::runtime_error("<INVALID COMMAND>\n");
+  }
+}
+
 void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   std::istream::sentry sentry(in);
@@ -23,6 +39,7 @@ void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector
   double areaSum;
   try
   {
+    checkVerticesParameter(param);
     areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
   }
   catch (const std::logic_error &)
@@ -107,9 +124,10 @@ void puzikov::countCommand(std::istream &in, std::ostream &out, const std::vecto
   unsigned counter;
   try
   {
+    checkVerticesParameter(param);
     counter = std::accumulate(polygons.begin(), polygons.end(), 0, ShapesAccumulator(param));
   }
-  catch (const std::logic_error &)
+  catch (...)
   {
     out << "<INVALID COMMAND>\n";
     return;

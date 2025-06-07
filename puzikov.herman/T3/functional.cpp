@@ -32,10 +32,6 @@ double puzikov::AreaAccumulator::operator()(double acc, const puzikov::Polygon &
   {
     std::size_t verticesCount = 0;
     verticesCount = std::stoul(param);
-    if (verticesCount < 3)
-    {
-      throw std::logic_error("Not enough vertices");
-    }
 
     if (poly.points.size() == verticesCount)
     {
@@ -79,11 +75,6 @@ double puzikov::ShapesAccumulator::operator()(double acc, const puzikov::Polygon
   {
     std::size_t verticesCount = 0;
     verticesCount = std::stoul(param);
-
-    if (verticesCount < 3)
-    {
-      throw std::logic_error("Not enough vertices");
-    }
 
     if (poly.points.size() == verticesCount)
     {
