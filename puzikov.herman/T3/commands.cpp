@@ -163,15 +163,8 @@ void puzikov::rmEchoCommand(std::istream &in, std::ostream &out, std::vector< Po
       return;
     }
 
-    std::string params;
-    if (!std::getline(in, params))
-    {
-      return;
-    }
-
-    std::istringstream iss(params);
     Polygon reference;
-    if (!(iss >> reference))
+    if (!(in >> reference))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -198,14 +191,8 @@ void puzikov::sameCommand(std::istream &in, std::ostream &out, const std::vector
       return;
     }
 
-    std::string params;
-    if (!(std::getline(in, params)))
-    {
-      return;
-    }
-    std::istringstream iss(params);
     Polygon reference;
-    if (!(iss >> reference))
+    if (!(in >> reference))
     {
       out << "<INVALID COMMAND>\n";
       return;

@@ -4,6 +4,7 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
+#include <sstream>
 #include <format_guard.hpp>
 #include <input_wrapper_structs.hpp>
 
@@ -18,7 +19,6 @@ std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
 
   Point temp {0, 0};
   in >> delim {'('} >> temp.x >> delim {';'} >> temp.y >> delim {')'};
-
   if (in)
   {
     dest = temp;
@@ -49,17 +49,32 @@ std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
   in >> vertexCount;
   if (!in || vertexCount < 3)
   {
+    std::cout << "vertex count\n";
     in.setstate(std::ios::failbit);
     return in;
   }
 
   Polygon temp;
-  std::copy_n(std::istream_iterator< Point >(in), vertexCount, std::back_inserter(temp.points));
+  std::istream_iterator< Point > it(in);
+  std::copy_n(it, vertexCount, std::back_inserter(temp.points));
+
 
   if (!in)
   {
     in.setstate(std::ios::failbit);
     return in;
+  }
+
+  std::string remaining;
+  if (std::getline(in, remaining))
+  {
+    std::istringstream checker(remaining);
+    Point dummy;
+    if (checker >> dummy)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
   }
 
   dest.points = std::move(temp.points);
