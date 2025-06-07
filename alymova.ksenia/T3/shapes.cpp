@@ -38,7 +38,29 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
     return in;
   }
   std::vector< Point > tested;
-  auto it_find = std::find_if(
+  /*auto first = std::istream_iterator< Point >(in);
+  auto result = std::back_inserter(tested);
+  *result = *first;
+  ++result;
+  for (size_t i = 1; i != cnt_points; ++i, (void)++result)
+  {
+    std::cout << *first << '\n';
+    *result = *++first;
+  }*/
+  //std::copy(std::istream_iterator< Point >(in), std::istream_iterator< Point >(), std::back_inserter(tested));
+  auto it = std::istream_iterator< Point >(in);
+  std::transform(
+    it,
+    std::istream_iterator< Point >(),
+    std::back_inserter(tested),
+    std::bind(checkNextEnter, std::ref(in), _1)
+  );
+  //std::cout << tested.size() << '\n';
+  /*for (size_t i = 0; i < tested.size(); i++)
+  {
+    std::cout << tested[i] << '\n';
+  }*/
+  /*auto it_find = std::find_if(
     std::istream_iterator< Point >(in),
     std::istream_iterator< Point >(),
     std::bind(insertIfNotNextEnter, std::ref(in), _1, std::ref(tested))
@@ -46,9 +68,10 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
   if (in)
   {
     tested.push_back(*it_find);
-  }
+  }*/
   if (tested.size() == cnt_points)
   {
+    in.clear(in.rdstate() ^ std::ios_base::failbit);
     polygon.points = std::move(tested);
   }
   else
@@ -58,13 +81,39 @@ std::istream& alymova::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
-bool alymova::insertIfNotNextEnter(std::istream& in, const Point& point, std::vector< Point >& tested)
+std::ostream& alymova::operator<<(std::ostream& out, const Point& point)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+  std::cout << '(' << point.x << ';' << point.y << ')';
+  return out;
+}
+
+std::ostream& alymova::operator<<(std::ostream& out, const Polygon& polygon)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+  std::copy_n(
+    polygon.points.begin(),
+    polygon.points.size() - 1,
+    std::ostream_iterator< Point >(out, " ")
+  );
+  out << polygon.points[polygon.points.size() - 1];
+  return out;
+}
+
+alymova::Point alymova::checkNextEnter(std::istream& in, const Point& point)
 {
   char c = in.peek();
-  if (c != '\n')
+  if (c == '\n')
   {
-    tested.push_back(point);
-    return false;
+    in.setstate(std::ios::failbit);
   }
-  return true;
+  return point;
 }

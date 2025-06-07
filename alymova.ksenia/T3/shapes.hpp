@@ -2,6 +2,7 @@
 #define SHAPES_HPP
 #include <vector>
 #include <iostream>
+#include <iterator>
 
 namespace alymova
 {
@@ -16,7 +17,9 @@ namespace alymova
 
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Point& point);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 
-  bool insertIfNotNextEnter(std::istream& in, const Point& point, std::vector< Point >& dop);
+  Point checkNextEnter(std::istream& in, const Point& point);
 }
 #endif
