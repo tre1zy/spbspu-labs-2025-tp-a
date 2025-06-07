@@ -7,6 +7,7 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "geometry.hpp"
@@ -138,7 +139,7 @@ namespace
     return min.points.size();
   }
 
-  struct rightAnglesInspector
+  struct RightAnglesInspector
   {
     const kostyukov::Polygon polygon;
     bool operator()(size_t number) const
@@ -165,7 +166,7 @@ namespace
       {
         return true;
       }
-      return rightAnglesInspector{ polygon }(number);
+      return RightAnglesInspector{ polygon }(number);
     }
   };
 
@@ -179,38 +180,32 @@ namespace
 
 void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
+  std::unordered_map< std::string, std::function< double() > > subcommands;
   std::string subcommand;
   in >> subcommand;
   double result = 0.0;
-  if (subcommand == "EVEN")
+  subcommands["EVEN"] = std::bind(areaForEven, std::cref(polygons));
+  subcommands["ODD"] = std::bind(areaForOdd, std::cref(polygons));
+  subcommands["MEAN"] = std::bind(meanArea, std::cref(polygons));
+
+  try
   {
-    result = areaForEven(polygons);
+    result = subcommands.at(subcommand)();
   }
-  else if (subcommand == "ODD")
+  catch (const std::invalid_argument&)
   {
-    result = areaForOdd(polygons);
+    throw std::invalid_argument("invalid subcommand or number format");
   }
-  else if (subcommand == "MEAN")
+  catch (...)
   {
-    result = meanArea(polygons);
-  }
-  else
-  {
-    size_t countVertexes = 0;
-    try
-    {
-      countVertexes = std::stoull(subcommand);
-    }
-    catch (const std::invalid_argument&)
-    {
-      throw std::invalid_argument("invalid subcommand or number format");
-    }
+    size_t countVertexes = std::stoull(subcommand);
     if (countVertexes < 3)
     {
-      throw std::invalid_argument("polygon index must be 3 or greater");
+      throw std::invalid_argument("number of vertexes must be 3 or greater");
     }
     result = areaForNum(polygons, countVertexes);
   }
+
   ScopeGuard scopeGrd(out);
   out << std::fixed << std::setprecision(1) << result;
   return;
@@ -222,21 +217,25 @@ void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     throw std::invalid_argument("no polygons for max");
   }
+
+  std::unordered_map< std::string, std::function< double() > > subcommands;
   std::string subcommand;
   in >> subcommand;
-  kostyukov::ScopeGuard scopeGrd(out);
-  if (subcommand == "AREA")
+  subcommands["AREA"] = std::bind(maxForArea, std::cref(polygons));
+  subcommands["COUNT"] = std::bind(maxForVertexes, std::cref(polygons));
+
+  double result = 0.0;
+  try
   {
-    out << std::fixed << std::setprecision(1) << maxForArea(polygons);
+    result = subcommands.at(subcommand)();
   }
-  else if (subcommand == "VERTEXES")
-  {
-    out << std::fixed << std::setprecision(1) << maxForVertexes(polygons);
-  }
-  else
+  catch (const std::invalid_argument&)
   {
     throw std::invalid_argument("invalid subcommand");
   }
+
+  kostyukov::ScopeGuard scopeGrd(out);
+  out << std::fixed << std::setprecision(1) << result;
   return;
 }
 
@@ -246,48 +245,47 @@ void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     throw std::invalid_argument("no polygons for min");
   }
+
+  std::unordered_map< std::string, std::function< double() > > subcommands;
   std::string subcommand;
   in >> subcommand;
-  kostyukov::ScopeGuard scopeGrd(out);
-  if (subcommand == "AREA")
+  subcommands["AREA"] = std::bind(minForArea, std::cref(polygons));
+  subcommands["COUNT"] = std::bind(minForVertexes, std::cref(polygons));
+
+  double result = 0.0;
+  try
   {
-    out << std::fixed << std::setprecision(1) << minForArea(polygons);
+    result = subcommands.at(subcommand)();
   }
-  else if (subcommand == "VERTEXES")
-  {
-    out << std::fixed << std::setprecision(1) << minForVertexes(polygons);
-  }
-  else
+  catch (const std::invalid_argument&)
   {
     throw std::invalid_argument("invalid subcommand");
   }
+
+  kostyukov::ScopeGuard scopeGrd(out);
+  out << std::fixed << std::setprecision(1) << result;
   return;
 }
 
 void kostyukov::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
+  std::unordered_map< std::string, std::function< double() > > subcommands;
   std::string subcommand;
   in >> subcommand;
+  subcommands["EVEN"] = std::bind(countForEven, std::cref(polygons));
+  subcommands["ODD"] = std::bind(countForOdd, std::cref(polygons));
   size_t result = 0;
-  if (subcommand == "EVEN")
+  try
   {
-    result = countForEven(polygons);
+    result = subcommands.at(subcommand)();
   }
-  else if (subcommand == "ODD")
+  catch (const std::invalid_argument&)
   {
-    result = countForOdd(polygons);
+    throw std::invalid_argument("invalid subcommand or number format");
   }
-  else
+  catch (...)
   {
-    size_t countVertexes = 0;
-    try
-    {
-      countVertexes = std::stoull(subcommand);
-    }
-    catch (const std::invalid_argument&)
-    {
-      throw std::invalid_argument("invalid subcommand or number format");
-    }
+    size_t countVertexes = std::stoull(subcommand);
     if (countVertexes < 3)
     {
       throw std::invalid_argument("polygon must have 3 or more vertexes");
