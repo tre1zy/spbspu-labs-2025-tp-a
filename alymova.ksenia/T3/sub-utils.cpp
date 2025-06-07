@@ -4,8 +4,12 @@
 #include <string>
 #include <exception>
 
-double alymova::areaEven(double value, const Polygon& polygon)
+double alymova::areaEven(double value, const Polygon& polygon, size_t size)
 {
+  if (size == 0)
+  {
+    return value;
+  }
   if (isPolygonEven(polygon))
   {
     return value + areaPolygon(polygon);
@@ -13,8 +17,12 @@ double alymova::areaEven(double value, const Polygon& polygon)
   return value;
 }
 
-double alymova::areaOdd(double value, const Polygon& polygon)
+double alymova::areaOdd(double value, const Polygon& polygon, size_t size)
 {
+  if (size != 0)
+  {
+    return value;
+  }
   if (!isPolygonEven(polygon))
   {
     return value + areaPolygon(polygon);

@@ -9,8 +9,10 @@
 
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
+  auto bindEven = std::bind(areaEven, _1, _2, polygons.size());
+  auto bindOdd = std::bind(areaOdd, _1, _2, polygons.size());
   auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
-  AreaMaxMinSubcommands subs{{"EVEN", areaEven}, {"ODD", areaOdd}, {"MEAN", bindMean}};
+  AreaMaxMinSubcommands subs{{"EVEN", bindEven}, {"ODD", bindOdd}, {"MEAN", bindMean}};
 
   double res;
   std::string command;

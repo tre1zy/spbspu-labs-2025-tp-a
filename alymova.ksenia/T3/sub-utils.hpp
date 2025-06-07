@@ -10,8 +10,8 @@ namespace alymova
   template< class T >
   using Comparator = std::function< T(T, T) >;
 
-  double areaEven(double value, const Polygon& polygon);
-  double areaOdd(double value, const Polygon& polygon);
+  double areaEven(double value, const Polygon& polygon, size_t size);
+  double areaOdd(double value, const Polygon& polygon, size_t size);
   double areaMean(double value, const Polygon& polygon, size_t size);
   double areaNumber(double value, const Polygon& polygon, size_t vertexes);
   double areaPolygon(const Polygon& polygon);
