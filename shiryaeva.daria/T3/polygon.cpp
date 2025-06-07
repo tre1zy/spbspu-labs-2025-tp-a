@@ -52,6 +52,12 @@ namespace shiryaeva
       points.push_back(p);
     }
 
+    if (points.size() != vertexCount)
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+
     polygon.points = std::move(points);
     return in;
   }
