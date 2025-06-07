@@ -14,7 +14,15 @@ void puzikov::checkVerticesParameter(const std::string &param)
       throw std::logic_error("Not enough vertices.");
     }
   }
-  catch (...)
+  catch (const std::invalid_argument &)
+  {
+    return;
+  }
+  catch (const std::out_of_range &)
+  {
+    return;
+  }
+  catch (const std::logic_error &)
   {
     throw std::runtime_error("<INVALID COMMAND>\n");
   }
