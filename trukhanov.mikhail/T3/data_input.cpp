@@ -44,17 +44,7 @@ std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 
   Polygon temp;
   temp.points.reserve(n);
-  for (size_t i = 0; i < n; ++i)
-  {
-    Point p;
-    in >> p;
-    if (!in)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    temp.points.push_back(p);
-  }
+  std::copy_n(std::istream_iterator< Point >(in), n, std::back_inserter(temp.points));
 
   std::istream::sentry trailing_sentry(in, true);
   if (trailing_sentry)
@@ -77,9 +67,6 @@ std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 std::ostream& trukhanov::operator<<(std::ostream& out, const Polygon& polygon)
 {
   out << polygon.points.size() << ' ';
-  for (const auto& p : polygon.points)
-  {
-    out << p << ' ';
-  }
+  std::copy(polygon.points.begin(), polygon.points.end(), std::ostream_iterator<Point>(out, " "));
   return out;
 }
