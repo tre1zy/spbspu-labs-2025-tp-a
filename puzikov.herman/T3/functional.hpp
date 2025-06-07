@@ -2,224 +2,69 @@
 #define FUNCTIONAL_HPP
 
 #include "polygon.hpp"
-#include <algorithm>
-#include <numeric>
+#include <vector>
+#include <string>
 
 namespace puzikov
 {
   struct AreaAccumulator
   {
-    AreaAccumulator(const std::string &p):
-      param(p)
-    {}
-
-    double operator()(double acc, const puzikov::Polygon &poly) const
-    {
-      if (param == "ODD")
-      {
-        if (poly.points.size() % 2 == 1)
-        {
-          acc += calcPolygonArea(poly);
-        }
-      }
-      else if (param == "EVEN")
-      {
-        if (poly.points.size() % 2 == 0)
-        {
-          acc += calcPolygonArea(poly);
-        }
-      }
-      else if (param == "MEAN")
-      {
-        acc += calcPolygonArea(poly);
-      }
-      else
-      {
-        int verticesCount = 0;
-        try
-        {
-          verticesCount = std::stoi(param);
-        }
-        catch (...)
-        {
-          throw;
-        }
-
-        if (verticesCount > 0)
-        {
-          if (poly.points.size() == static_cast< std::size_t >(verticesCount))
-          {
-            acc += calcPolygonArea(poly);
-          }
-        }
-      }
-      return acc;
-    }
-
+    AreaAccumulator(const std::string &p);
+    double operator()(double acc, const puzikov::Polygon &poly) const;
     const std::string &param;
   };
 
-  struct VerticesComparator
-  {
-    bool operator()(const Polygon &p1, const Polygon &p2) const
-    {
-      return p1.points.size() < p2.points.size();
-    }
-  };
-
-  struct AreaComparator
-  {
-    bool operator()(const Polygon &p1, const Polygon &p2) const
-    {
-      return calcPolygonArea(p1) < calcPolygonArea(p2);
-    }
-  };
+  bool VerticesComparator(const Polygon &p1, const Polygon &p2);
+  bool AreaComparator(const Polygon &p1, const Polygon &p2);
 
   struct ShapesAccumulator
   {
-    ShapesAccumulator(const std::string &p):
-      param(p)
-    {}
-
-    double operator()(double acc, const puzikov::Polygon &poly) const
-    {
-      if (param == "ODD")
-      {
-        if (poly.points.size() % 2 == 1)
-        {
-          acc++;
-        }
-      }
-      else if (param == "EVEN")
-      {
-        if (poly.points.size() % 2 == 0)
-        {
-          acc++;
-        }
-      }
-      else
-      {
-        int verticesCount = 0;
-        try
-        {
-          verticesCount = std::stoi(param);
-        }
-        catch (...)
-        {
-          throw;
-        }
-
-        if (verticesCount > 0)
-        {
-          if (poly.points.size() == static_cast< std::size_t >(verticesCount))
-          {
-            acc++;
-          }
-        }
-      }
-      return acc;
-    }
+    ShapesAccumulator(const std::string &p);
+    double operator()(double acc, const puzikov::Polygon &poly) const;
     const std::string &param;
   };
 
   struct RmEchoPredicate
   {
-    RmEchoPredicate(const Polygon &poly):
-      ref(poly)
-    {}
-
-    bool operator()(const Polygon &p1, const Polygon &p2)
-    {
-      return (p1 == p2) && (ref == p1);
-    }
-
+    RmEchoPredicate(const Polygon &poly);
+    bool operator()(const Polygon &p1, const Polygon &p2);
     const Polygon &ref;
   };
 
   struct TranslatePoint
   {
-    TranslatePoint(int dx_, int dy_):
-      dx(dx_),
-      dy(dy_)
-    {}
-
-    Point operator()(const Point &p) const
-    {
-      return Point {p.x + dx, p.y + dy};
-    }
-
+    TranslatePoint(int dx_, int dy_);
+    Point operator()(const Point &p) const;
     int dx, dy;
   };
 
   struct AnyOfShift
   {
     using PointVec = std::vector< Point >;
-
-    AnyOfShift(const PointVec &candidate_, const PointVec &reference_):
-      candidate(candidate_),
-      reference(reference_)
-    {}
-
-    bool operator()(std::size_t shift) const
-    {
-      PointVec rotated(candidate.size());
-      std::rotate_copy(candidate.begin(), candidate.begin() + shift, candidate.end(), rotated.begin());
-
-      int dx = reference[0].x - rotated[0].x;
-      int dy = reference[0].y - rotated[0].y;
-
-      PointVec translated(rotated.size());
-      std::transform(rotated.begin(), rotated.end(), translated.begin(), TranslatePoint(dx, dy));
-
-      return std::equal(translated.begin(), translated.end(), reference.begin());
-    }
-
+    AnyOfShift(const PointVec &candidate_, const PointVec &reference_);
+    bool operator()(std::size_t shift) const;
     const PointVec &candidate;
     const PointVec &reference;
   };
 
   struct IsTranslationCongruent
   {
-    IsTranslationCongruent(const Polygon &reference_):
-      reference(reference_)
-    {}
-
-    bool operator()(const Polygon &poly) const
-    {
-      if (poly.points.size() != reference.points.size())
-      {
-        return false;
-      }
-
-      std::vector< std::size_t > shifts(reference.points.size());
-      std::iota(shifts.begin(), shifts.end(), 0);
-
-      if (std::any_of(shifts.begin(), shifts.end(), AnyOfShift(poly.points, reference.points)))
-      {
-        return true;
-      }
-
-      std::vector< Point > reversed(poly.points.rbegin(), poly.points.rend());
-      if (std::any_of(shifts.begin(), shifts.end(), AnyOfShift(reversed, reference.points)))
-      {
-        return true;
-      }
-
-      return false;
-    }
-
+    IsTranslationCongruent(const Polygon &reference_);
+    bool operator()(const Polygon &poly) const;
     const Polygon &reference;
   };
 
+  using AreaComp = bool (*)(const Polygon &, const Polygon &);
+  using VertComp = bool (*)(const Polygon &, const Polygon &);
   using AreaIt = std::vector< Polygon >::const_iterator;
-  using AreaAlgo = AreaIt (*)(AreaIt, AreaIt, const AreaComparator &);
+  using AreaAlgo = AreaIt (*)(AreaIt, AreaIt, AreaComp);
   using VertIt = std::vector< Polygon >::const_iterator;
-  using VertAlgo = VertIt (*)(VertIt, VertIt, const VerticesComparator &);
+  using VertAlgo = VertIt (*)(VertIt, VertIt, VertComp);
 
-  AreaIt maxAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp);
-  AreaIt minAreaElement(AreaIt first, AreaIt last, const AreaComparator &comp);
-  VertIt maxVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
-  VertIt minVertElement(VertIt first, VertIt last, const VerticesComparator &comp);
+  AreaIt maxAreaElement(AreaIt first, AreaIt last, AreaComp comp);
+  AreaIt minAreaElement(AreaIt first, AreaIt last, AreaComp comp);
+  VertIt maxVertElement(VertIt first, VertIt last, VertComp comp);
+  VertIt minVertElement(VertIt first, VertIt last, VertComp comp);
 }
 
 #endif

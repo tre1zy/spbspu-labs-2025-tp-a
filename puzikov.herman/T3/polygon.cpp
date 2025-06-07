@@ -4,15 +4,15 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
-#include "input_delim.hpp"
-#include "format_guard.hpp"
+#include <format_guard.hpp>
+#include <input_wrapper_structs.hpp>
 
 std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
 {
   std::istream::sentry sentry(in);
+  using delim = puzikov::input::Character;
   if (sentry)
   {
-    using delim = puzikov::DelimiterI;
     in >> delim {'('} >> dest.x >> delim {';'} >> dest.y >> delim {')'};
   }
   return in;
@@ -37,6 +37,10 @@ std::istream &puzikov::operator>>(std::istream &in, puzikov::Polygon &dest)
     int n;
     if (in >> n)
     {
+      if (n < 3)
+      {
+        throw std::logic_error("Not enough vertices");
+      }
       dest.points.clear();
       std::copy_n(std::istream_iterator< puzikov::Point > {in}, n, std::back_inserter(dest.points));
     }
@@ -95,17 +99,14 @@ struct puzikov::PolygonAreaAccumulator
   size_t n;
 };
 
-// Shoelace polygon area algo
 double puzikov::calcPolygonArea(const puzikov::Polygon &poly)
 {
   if (poly.points.size() < 3)
   {
-    return 0.0;
+    throw std::invalid_argument("<INVALID COMMAND>");
   }
   double area = std::accumulate(poly.points.begin(), poly.points.end(), 0.0, PolygonAreaAccumulator(poly)) / 2.0;
 
-  // need an absolute value because the sign of the area depends on whether the points are
-  // defined clock-wise (the area would be negative) or counter-clock-wise (the area would be positive)
   return std::abs(area);
 }
 
