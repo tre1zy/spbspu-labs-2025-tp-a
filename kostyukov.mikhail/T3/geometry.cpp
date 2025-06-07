@@ -56,21 +56,25 @@ std::istream& kostyukov::operator>>(std::istream& in, Polygon& polygon)
 
 namespace
 {
-  struct AreaCalculator
+  struct CrossProduct
   {
-    kostyukov::Point point1;
-    double operator()(double area, const kostyukov::Point& point2)
+    double operator()(const kostyukov::Point& point1, const kostyukov::Point& point2) const
     {
-      area += (point1.x * point2.y) - (point1.y * point2.x);
-      point1 = point2;
-      return area;
+      return point1.x * point2.y - point2.x * point1.y;
     }
   };
 }
 
 double kostyukov::getArea(const Polygon& polygon)
 {
-  AreaCalculator areaCalc{ polygon.points.back() };
-  double area = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, std::ref(areaCalc));
-  return (std::abs(area) / 2.0);
+  if (polygon.points.size() < 3)
+  {
+    return 0.0;
+  }
+
+  auto begin = polygon.points.begin();
+  auto end = polygon.points.end();
+  double result = std::inner_product(begin, end - 1, begin + 1, 0.0, std::plus< double >(), CrossProduct{});
+  result += CrossProduct{}(polygon.points.back(), polygon.points.front());
+  return std::abs(result) / 2.0;
 }
