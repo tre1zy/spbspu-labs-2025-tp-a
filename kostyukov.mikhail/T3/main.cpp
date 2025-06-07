@@ -1,13 +1,12 @@
 #include <algorithm>
 #include <fstream>
-#include <functional>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <map>
 #include <string>
 
-#include "commands.hpp"
+#include "commandProcessor.hpp"
 #include "geometry.hpp"
 
 int main(int argc, char** argv)
@@ -30,13 +29,9 @@ int main(int argc, char** argv)
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["PERMS"] = std::bind(permsCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RIGHTSHAPES"] = std::bind(rightShapesCount, std::ref(std::cout), std::cref(polygons));
+  CommandProcessor processor(polygons, std::cin, std::cout);
+  auto commands = processor.getCommands();
+
   std::string command;
   while (!(std::cin >> command).eof())
   {
