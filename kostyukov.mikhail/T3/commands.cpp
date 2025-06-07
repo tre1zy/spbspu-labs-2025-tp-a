@@ -141,7 +141,7 @@ namespace
 
   struct RightAnglesInspector
   {
-    const kostyukov::Polygon polygon;
+    const kostyukov::Polygon& polygon;
     bool operator()(size_t number) const
     {
       size_t countVertexes = polygon.points.size();
@@ -157,24 +157,15 @@ namespace
     }
   };
 
-  struct AccumulatorRightAngles
-  {
-    const kostyukov::Polygon polygon;
-    bool operator()(bool alreadyHasRightAngle, size_t number) const
-    {
-      if (alreadyHasRightAngle)
-      {
-        return true;
-      }
-      return RightAnglesInspector{ polygon }(number);
-    }
-  };
-
   bool hasRightAngles(const kostyukov::Polygon& polygon)
   {
+    if (polygon.points.size() < 3)
+    {
+      return false;
+    }
     std::vector< size_t > numbers(polygon.points.size());
     std::iota(numbers.begin(), numbers.end(), 0);
-    return std::accumulate(numbers.begin(), numbers.end(), false, AccumulatorRightAngles{ polygon });
+    return std::any_of(numbers.begin(), numbers.end(), RightAnglesInspector{ polygon });
   }
 }
 
