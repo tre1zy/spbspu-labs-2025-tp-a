@@ -19,7 +19,7 @@ double alymova::areaEven(double value, const Polygon& polygon, size_t size)
 
 double alymova::areaOdd(double value, const Polygon& polygon, size_t size)
 {
-  if (size != 0)
+  if (size == 0)
   {
     return value;
   }
@@ -102,6 +102,16 @@ int alymova::findMaxMinXYVector(PredicatePoint pred, int start, const std::vecto
 {
   auto bindFind = std::bind(findMaxMinXYPolygon, pred, _1, _2);
   return std::accumulate(polygons.begin(), polygons.end(), start, bindFind);
+}
+
+void alymova::inFrameOutput(std::ostream& out, bool res)
+{
+  if (res)
+  {
+    out << "<TRUE>";
+    return;
+  }
+  out << "<FALSE>";
 }
 
 bool alymova::haveRightAngles(const Polygon& polygon)

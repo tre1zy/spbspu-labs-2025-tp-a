@@ -95,12 +95,7 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
   int min_x = findMaxMinXYVector(compareMinXPoint, start_x, polygons);
   int min_y = findMaxMinXYVector(compareMinYPoint, start_y, polygons);
 
-  if (max_framed_x <= max_x && max_framed_y <= max_y && min_framed_x >= min_x && min_framed_y >= min_y)
-  {
-    out << "<TRUE>";
-    return;
-  }
-  out << "<FALSE>";
+  inFrameOutput(out, (max_framed_x <= max_x && max_framed_y <= max_y && min_framed_x >= min_x && min_framed_y >= min_y));
 }
 
 void alymova::rightShapes(std::ostream& out, const std::vector< Polygon >& polygons)

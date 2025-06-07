@@ -26,6 +26,7 @@ namespace alymova
   int compareMinYPoint(int value, const Point& point);
   int findMaxMinXYPolygon(PredicatePoint pred, int start, const Polygon& polygon);
   int findMaxMinXYVector(PredicatePoint pred, int start, const std::vector< Polygon >& polygons);
+  void inFrameOutput(std::ostream& out, bool res);
 
   bool haveRightAngles(const Polygon& polygon);
   bool isRightAngle(const Point& point1, const Point& point2);
