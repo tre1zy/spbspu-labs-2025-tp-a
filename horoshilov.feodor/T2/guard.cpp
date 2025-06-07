@@ -2,7 +2,7 @@
 
 namespace horoshilov
 {
- horoshilov:: Guard::Guard(std::basic_ios< char >& s):
+ horoshilov::Guard::Guard(std::basic_ios< char >& s):
     s_(s),
     fmt_(s.flags()),
     width_(s.width()),
