@@ -4,9 +4,8 @@
 
 void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
 {
-  while (!in.eof())
+  while (!(in >> cmd).eof())
   {
-    in >> cmd;
     try
     {
       commands.at(cmd)(in, out);

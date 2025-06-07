@@ -11,9 +11,17 @@ std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
 {
   std::istream::sentry sentry(in);
   using delim = puzikov::input::Character;
-  if (sentry)
+  if (!sentry)
   {
-    in >> delim {'('} >> dest.x >> delim {';'} >> dest.y >> delim {')'};
+    return in;
+  }
+
+  Point temp {0, 0};
+  in >> delim {'('} >> temp.x >> delim {';'} >> temp.y >> delim {')'};
+
+  if (in)
+  {
+    dest = temp;
   }
   return in;
 }
@@ -29,22 +37,32 @@ std::ostream &puzikov::operator<<(std::ostream &out, const puzikov::Point &src)
   return out;
 }
 
-std::istream &puzikov::operator>>(std::istream &in, puzikov::Polygon &dest)
+std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
 {
   std::istream::sentry sentry(in);
-  if (sentry)
+  if (!sentry)
   {
-    int n;
-    if (in >> n)
-    {
-      if (n < 3)
-      {
-        throw std::logic_error("Not enough vertices");
-      }
-      dest.points.clear();
-      std::copy_n(std::istream_iterator< puzikov::Point > {in}, n, std::back_inserter(dest.points));
-    }
+    return in;
   }
+
+  size_t vertexCount;
+  in >> vertexCount;
+  if (!in || vertexCount < 3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  Polygon temp;
+  std::copy_n(std::istream_iterator< Point >(in), vertexCount, std::back_inserter(temp.points));
+
+  if (!in)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  dest.points = std::move(temp.points);
   return in;
 }
 
@@ -112,14 +130,19 @@ double puzikov::calcPolygonArea(const puzikov::Polygon &poly)
 
 void puzikov::readPolygons(std::istream &in, std::vector< Polygon > &polygons)
 {
-  using input_it_t = std::istream_iterator< Polygon >;
+  using polygonInputIter = std::istream_iterator< Polygon >;
   while (!in.eof())
   {
-    std::copy(input_it_t(in), input_it_t(), std::back_inserter(polygons));
-    if (in.fail())
+    std::copy(polygonInputIter {in}, polygonInputIter {}, std::back_inserter(polygons));
+    if (!in)
     {
       in.clear();
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+}
+
+void puzikov::writePolygons(std::ostream &out, std::vector< Polygon > &vec)
+{
+  std::copy(vec.begin(), vec.end(), std::ostream_iterator< Polygon >(out, "\n"));
 }

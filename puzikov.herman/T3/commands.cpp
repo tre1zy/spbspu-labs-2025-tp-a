@@ -58,7 +58,14 @@ void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector
 
   if (param == "MEAN")
   {
-    out << areaSum / polygons.size() << '\n';
+    if (polygons.size() != 0)
+    {
+      out << areaSum / polygons.size() << '\n';
+    }
+    else
+    {
+      throw std::logic_error("No mean area when no polygons.");
+    }
   }
   else
   {
@@ -87,8 +94,7 @@ void puzikov::minmaxCommand(
   {
     if (polygons.empty())
     {
-      out << 0.0 << '\n';
-      return;
+      throw std::logic_error("Can't count area if no polygons.");
     }
     auto it = areaAlgo(polygons.begin(), polygons.end(), AreaComparator);
     out << calcPolygonArea(*it) << '\n';
@@ -97,11 +103,14 @@ void puzikov::minmaxCommand(
   {
     if (polygons.empty())
     {
-      out << 0 << '\n';
-      return;
+      throw std::logic_error("Can't count vertices if no polygons.");
     }
     auto it = vertAlgo(polygons.begin(), polygons.end(), VerticesComparator);
     out << it->points.size() << '\n';
+  }
+  else
+  {
+    throw std::logic_error("Wrong min/max command");
   }
 }
 
