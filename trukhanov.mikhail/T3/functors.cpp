@@ -35,18 +35,9 @@ bool trukhanov::HasDuplicates::operator()(const Polygon& p) const
   {
     return false;
   }
-  for (size_t i = 0; i < p.points.size(); ++i)
-  {
-    for (size_t j = i + 1; j < p.points.size(); ++j)
-    {
-      if (std::abs(p.points[i].x - p.points[j].x) &&
-        std::abs(p.points[i].y - p.points[j].y))
-      {
-        return true;
-      }
-    }
-  }
-  return false;
+  std::vector< Point > sortedPoints = p.points;
+  std::sort(sortedPoints.begin(), sortedPoints.end());
+  return std::adjacent_find(sortedPoints.begin(), sortedPoints.end()) != sortedPoints.end();
 }
 
 bool trukhanov::PolygonHasMinSize::operator()(const trukhanov::Polygon& p) const
