@@ -205,29 +205,6 @@ void demehin::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs,
 
 void demehin::printMaxValueOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  /*if (plgs.size() == 0)
-  {
-    throw std::invalid_argument("not enough shapes");
-  }
-
-  std::string subcommand;
-  in >> subcommand;
-  if (subcommand == "AREA")
-  {
-    auto res = (*std::max_element(plgs.cbegin(), plgs.cend(), compareArea));
-    iofmtguard fmtguard(out);
-    out << std::setprecision(1) << std::fixed << getPlgArea(res);
-  }
-  else if (subcommand == "VERTEXES")
-  {
-    auto res = *std::max_element(plgs.cbegin(), plgs.cend(), compareVrtCnt);
-    out << res.points.size();
-  }
-  else
-  {
-    throw std::invalid_argument("unknown command");
-  }*/
-
   if (plgs.size() == 0)
   {
     throw std::invalid_argument("not enough shapes");
@@ -250,24 +227,6 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
     throw std::invalid_argument("not enough shapes");
   }
 
-  /*std::string subcommand;
-  in >> subcommand;
-  iofmtguard fmtguard(out);
-  if (subcommand == "AREA")
-  {
-    auto res = (*std::min_element(plgs.cbegin(), plgs.cend(), compareArea));
-    out << std::setprecision(1) << std::fixed << getPlgArea(res);
-  }
-  else if (subcommand == "VERTEXES")
-  {
-    auto res = (*std::min_element(plgs.cbegin(), plgs.cend(), compareVrtCnt));
-    out << std::setprecision(1) << std::fixed << res.points.size();
-  }
-  else
-  {
-    throw std::invalid_argument("unknown command");
-  }*/
-
   std::unordered_map< std::string, std::function< void() > > subcmds;
   subcmds["AREA"] = std::bind(printMinArea, std::ref(out), std::cref(plgs));
   subcmds["VERTEXES"] = std::bind(printMinVrt, std::ref(out), std::cref(plgs));
@@ -280,30 +239,6 @@ void demehin::printMinValueOf(std::istream& in, const std::vector< Polygon >& pl
 
 void demehin::printCountOf(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  /*std::vector< Polygon > tmp;
-  std::string subcommand;
-  in >> subcommand;
-  if (subcommand == "EVEN")
-  {
-    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), isEvenVrts);
-  }
-  else if (subcommand == "ODD")
-  {
-    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), isOddVrts);
-  }
-  else
-  {
-    size_t vrt_cnt = std::stoull(subcommand);
-    if (vrt_cnt < 3)
-    {
-      throw std::invalid_argument("wrong parameter");
-    }
-    VrtCntCheck check{ vrt_cnt };
-    std::copy_if(plgs.cbegin(), plgs.cend(), std::back_inserter(tmp), check);
-  }
-
-  out << tmp.size();*/
-
   std::unordered_map< std::string, std::function< size_t() > > subcmds;
   subcmds["EVEN"] = std::bind(countEven, std::cref(plgs));
   subcmds["ODD"] = std::bind(countOdd, std::cref(plgs));
