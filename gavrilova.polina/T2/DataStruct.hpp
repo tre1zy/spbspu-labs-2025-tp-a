@@ -2,7 +2,6 @@
 #define DATA_STRUCT_HPP
 
 #include <iostream>
-#include <sstream>
 #include <string>
 
 namespace gavrilova {
@@ -33,7 +32,7 @@ namespace gavrilova {
     long long& ref;
   };
 
-  struct String_with_quotsIO {
+  struct StringWithQuotsIO {
     std::string& ref;
   };
 
@@ -45,7 +44,7 @@ namespace gavrilova {
   std::istream& operator>>(std::istream& in, SymbolIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleI&& dest);
   std::istream& operator>>(std::istream& in, LongLongIO&& dest);
-  std::istream& operator>>(std::istream& in, String_with_quotsIO&& dest);
+  std::istream& operator>>(std::istream& in, StringWithQuotsIO&& dest);
   std::istream& operator>>(std::istream& in, StringI_with_spaceIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const DoubleO& dest);

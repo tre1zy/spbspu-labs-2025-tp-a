@@ -5,7 +5,7 @@
 
 namespace {
 
-  std::istream& input_value(std::istream& in, int ids[3], int id, gavrilova::DataStruct& dest)
+  std::istream& input_value(std::istream& in, int (&ids)[3], int id, gavrilova::DataStruct& dest)
   {
     using namespace gavrilova;
     if (!in) {
@@ -16,7 +16,7 @@ namespace {
     } else if (ids[id] == 1) {
       in >> LongLongIO{dest.key2};
     } else if (ids[id] == 2) {
-      in >> String_with_quotsIO{dest.key3};
+      in >> StringWithQuotsIO{dest.key3};
     } else {
       in.setstate(std::ios::failbit);
     }
@@ -73,7 +73,7 @@ std::istream& gavrilova::operator>>(std::istream& in, LongLongIO&& dest)
   return in;
 }
 
-std::istream& gavrilova::operator>>(std::istream& in, String_with_quotsIO&& dest)
+std::istream& gavrilova::operator>>(std::istream& in, StringWithQuotsIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
