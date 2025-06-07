@@ -180,7 +180,7 @@ void trukhanov::lessArea(std::istream& in, std::ostream& out, const std::vector 
   in >> polygon;
 
   HasDuplicates checkDuplicates;
-  if (!in || polygon.points.size() < 3 || checkDuplicates(polygon))
+  if (!in || polygon.points.size() < 3 || !checkDuplicates(polygon))
   {
     throw std::invalid_argument("Unknown subcommand");
   }
