@@ -65,7 +65,7 @@ std::istream& mazitov::operator>>(std::istream& in, UnsignedLongLongBinIO&& dest
   while (in >> c && (c == '1' || c == '0'))
   {
     flag = true;
-    binaryValue = (binaryValue << 1) | (c == '1' ? : 1 : 0);
+    binaryValue = (binaryValue << 1) | (c == '1' ? 1 : 0);
   }
 
   if (!flag)
