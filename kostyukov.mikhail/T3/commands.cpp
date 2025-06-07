@@ -213,7 +213,7 @@ void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Poly
   std::string subcommand;
   in >> subcommand;
   subcommands["AREA"] = std::bind(maxForArea, std::cref(polygons));
-  subcommands["COUNT"] = std::bind(maxForVertexes, std::cref(polygons));
+  subcommands["VERTEXES"] = std::bind(maxForVertexes, std::cref(polygons));
 
   double result = 0.0;
   try
@@ -241,7 +241,7 @@ void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Poly
   std::string subcommand;
   in >> subcommand;
   subcommands["AREA"] = std::bind(minForArea, std::cref(polygons));
-  subcommands["COUNT"] = std::bind(minForVertexes, std::cref(polygons));
+  subcommands["VERTEXES"] = std::bind(minForVertexes, std::cref(polygons));
 
   double result = 0.0;
   try
