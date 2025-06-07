@@ -1,4 +1,5 @@
 #include "data_input.hpp"
+#include <iterator>
 
 std::istream& trukhanov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
