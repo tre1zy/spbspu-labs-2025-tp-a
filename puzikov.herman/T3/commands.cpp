@@ -45,16 +45,8 @@ void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector
   }
 
   double areaSum;
-  try
-  {
-    checkVerticesParameter(param);
-    areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
-  }
-  catch (const std::logic_error &)
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
+  checkVerticesParameter(param);
+  areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
 
   if (param == "MEAN")
   {
@@ -139,70 +131,48 @@ void puzikov::countCommand(std::istream &in, std::ostream &out, const std::vecto
   }
 
   unsigned counter;
-  try
-  {
-    checkVerticesParameter(param);
-    counter = std::accumulate(polygons.begin(), polygons.end(), 0, ShapesAccumulator(param));
-  }
-  catch (...)
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
+  checkVerticesParameter(param);
+  counter = std::accumulate(polygons.begin(), polygons.end(), 0, ShapesAccumulator(param));
 
   out << counter << '\n';
 }
 
 void puzikov::rmEchoCommand(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
-  try
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return;
-    }
 
-    Polygon reference;
-    if (!(in >> reference))
-    {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-
-    auto last = std::unique(polygons.begin(), polygons.end(), RmEchoPredicate {reference});
-    unsigned counter = std::distance(last, polygons.end());
-    polygons.erase(last, polygons.end());
-    out << counter << '\n';
-  }
-  catch (const std::logic_error &)
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    out << "<INVALID COMMAND>\n";
+    return;
   }
+
+  Polygon reference;
+  if (!(in >> reference))
+  {
+    throw std::logic_error("Invalid polygon.");
+  }
+
+  auto last = std::unique(polygons.begin(), polygons.end(), RmEchoPredicate {reference});
+  unsigned counter = std::distance(last, polygons.end());
+  polygons.erase(last, polygons.end());
+  out << counter << '\n';
 }
 
 void puzikov::sameCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  try
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return;
-    }
 
-    Polygon reference;
-    if (!(in >> reference))
-    {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-
-    unsigned count = std::count_if(polygons.begin(), polygons.end(), IsTranslationCongruent(reference));
-    out << count << '\n';
-  }
-  catch (const std::logic_error &)
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    out << "<INVALID COMMAND>\n";
+    return;
   }
+
+  Polygon reference;
+  if (!(in >> reference))
+  {
+    throw std::logic_error("Invalid polygon.");
+  }
+
+  unsigned count = std::count_if(polygons.begin(), polygons.end(), IsTranslationCongruent(reference));
+  out << count << '\n';
 }

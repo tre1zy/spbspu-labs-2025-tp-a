@@ -10,7 +10,7 @@ void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
     {
       commands.at(cmd)(in, out);
     }
-    catch (...)
+    catch (const std::logic_error &)
     {
       in.clear();
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

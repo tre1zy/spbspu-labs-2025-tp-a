@@ -49,7 +49,6 @@ std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
   in >> vertexCount;
   if (!in || vertexCount < 3)
   {
-    std::cout << "vertex count\n";
     in.setstate(std::ios::failbit);
     return in;
   }
