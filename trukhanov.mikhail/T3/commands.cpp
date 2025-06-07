@@ -12,32 +12,6 @@
 
 namespace trukhanov
 {
-  struct AccumulateEven
-  {
-    double operator()(double sum, const Polygon& p) const
-    {
-      return isEven(p) ? sum + getArea(p) : sum;
-    }
-  };
-
-  struct AccumulateOdd
-  {
-    double operator()(double sum, const Polygon& p) const
-    {
-      return isOdd(p) ? sum + getArea(p) : sum;
-    }
-  };
-
-  struct AccumulateBySize
-  {
-    size_t size;
-    AccumulateBySize(size_t s) : size(s) {}
-    double operator()(double sum, const Polygon& p) const
-    {
-      return (p.points.size() == size) ? sum + getArea(p) : sum;
-    }
-  };
-
   void area(std::istream& in, std::ostream& out, const Polygon_vector& src)
   {
     StreamGuard guard(out);
@@ -48,12 +22,24 @@ namespace trukhanov
 
     if (subcommand == "EVEN")
     {
-      double total = std::accumulate(src.begin(), src.end(), 0.0, AccumulateEven());
+      std::vector<Polygon> filtered;
+      std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), isEven);
+
+      std::vector<double> areas(filtered.size());
+      std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
       out << total << '\n';
     }
     else if (subcommand == "ODD")
     {
-      double total = std::accumulate(src.begin(), src.end(), 0.0, AccumulateOdd());
+      std::vector<Polygon> filtered;
+      std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), isOdd);
+
+      std::vector<double> areas(filtered.size());
+      std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+
+      double total = std::accumulate(areas.begin(), areas.end(), 0.0);
       out << total << '\n';
     }
     else if (subcommand == "MEAN")
@@ -64,9 +50,11 @@ namespace trukhanov
       }
       else
       {
-        double total = std::accumulate(src.begin(), src.end(), 0.0, AccumulateAll());
-        double mean = total / static_cast<double>(src.size());
-        out << mean << '\n';
+        std::vector<double> areas(src.size());
+        std::transform(src.begin(), src.end(), areas.begin(), getArea);
+
+        double total = std::accumulate(areas.begin(), areas.end(), 0.0);
+        out << (total / static_cast<double>(areas.size())) << '\n';
       }
     }
     else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
@@ -78,7 +66,13 @@ namespace trukhanov
       }
       else
       {
-        double total = std::accumulate(src.begin(), src.end(), 0.0, AccumulateBySize(size));
+        std::vector<Polygon> filtered;
+        std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), isSize{ size });
+
+        std::vector<double> areas(filtered.size());
+        std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+
+        double total = std::accumulate(areas.begin(), areas.end(), 0.0);
         out << total << '\n';
       }
     }
