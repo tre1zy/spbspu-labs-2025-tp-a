@@ -46,7 +46,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "<INVALID COMMAND>\n";
+        throw std::invalid_argument("Unknown subcommand");
       }
       else
       {
@@ -62,7 +62,7 @@ namespace trukhanov
       size_t size = std::stoull(subcommand);
       if (size < 3)
       {
-        out << "<INVALID COMMAND>\n";
+        throw std::invalid_argument("Unknown subcommand");
       }
       else
       {
@@ -78,7 +78,7 @@ namespace trukhanov
     }
     else
     {
-      out << "<INVALID COMMAND>\n";
+      throw std::invalid_argument("Unknown subcommand");
     }
   }
 
@@ -94,8 +94,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "<INVALID COMMAND>\n";
-        return;
+        throw std::invalid_argument("Unknown subcommand");
       }
       out << getArea(*std::max_element(src.begin(), src.end(), CompareByArea())) << '\n';
     }
@@ -103,14 +102,13 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "<INVALID COMMAND>\n";
-        return;
+        throw std::invalid_argument("Unknown subcommand");
       }
       out << std::max_element(src.begin(), src.end(), CompareByVertexes())->points.size() << '\n';
     }
     else
     {
-      out << "<INVALID COMMAND>\n";
+      throw std::invalid_argument("Unknown subcommand");
     }
   }
 
@@ -126,8 +124,7 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "<INVALID COMMAND>\n";
-        return;
+        throw std::invalid_argument("Unknown subcommand");
       }
       out << getArea(*std::min_element(src.begin(), src.end(), CompareByArea())) << '\n';
     }
@@ -135,14 +132,13 @@ namespace trukhanov
     {
       if (src.empty())
       {
-        out << "<INVALID COMMAND>\n";
-        return;
+        throw std::invalid_argument("Unknown subcommand");
       }
       out << std::min_element(src.begin(), src.end(), CompareByVertexes())->points.size() << '\n';
     }
     else
     {
-      out << "<INVALID COMMAND>\n";
+      throw std::invalid_argument("Unknown subcommand");
     }
   }
 
@@ -168,7 +164,7 @@ namespace trukhanov
       size_t size = std::stoull(subcommand);
       if (size < 3)
       {
-        out << "<INVALID COMMAND>\n";
+        throw std::invalid_argument("Unknown subcommand");
       }
       else
       {
@@ -177,7 +173,7 @@ namespace trukhanov
     }
     else
     {
-      out << "<INVALID COMMAND>\n";
+      throw std::invalid_argument("Unknown subcommand");
     }
   }
 
@@ -190,10 +186,7 @@ namespace trukhanov
     HasDuplicates checkDuplicates;
     if (!in || polygon.points.size() < 3 || checkDuplicates(polygon))
     {
-      out << "<INVALID COMMAND>\n";
-      in.clear();
-      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      return;
+      throw std::invalid_argument("Unknown subcommand");
     }
 
     double refArea = getArea(polygon);
