@@ -5,25 +5,26 @@
 #include "input_struct.hpp"
 
 
-std::string toBin(unsigned long long n)
+void writeBin(std::ostream& out, unsigned long long n)
 {
   if (n == 0)
   {
-    return "0";
+    out << '0';
+    return;
   }
 
-  std::string binary;
-  while (n > 0)
+  unsigned long long tmp = n;
+  int bits = 0;
+  while (tmp != 0)
   {
-    binary += (n & 1) ? '1' : '0';
-    n >>= 1;
+    tmp >>= 1;
+    bits++;
   }
-  std::reverse(binary.begin(), binary.end());
-  if (binary.size() == 1)
+
+  for (int i = bits - 1; i >= 0; --i)
   {
-    binary = "0" + binary;
+    out << ((n >> 1) & i);
   }
-  return binary;
 }
 
 bool mazitov::operator<(const DataStruct& lhs, const DataStruct& rhs)
@@ -48,7 +49,8 @@ std::ostream& mazitov::operator<<(std::ostream& out, const DataStruct& dest)
   }
   StreamGuard guard(out);
   out << "(:key1 " << std::fixed << std::setprecision(1) << dest.key1 << "d";
-  out << ":key2 0b" << toBin(dest.key2);
+  out << ":key2 0b";
+  writeBin(out, dest.key2);
   out << ":key3 \"" << dest.key3 << "\":)";
   return out;
 }
