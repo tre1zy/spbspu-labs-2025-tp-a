@@ -9,7 +9,7 @@ void writeBin(std::ostream& out, unsigned long long n)
 {
   if (n == 0)
   {
-    out << '0';
+    out << "0";
     return;
   }
 
@@ -21,9 +21,14 @@ void writeBin(std::ostream& out, unsigned long long n)
     bits++;
   }
 
+  if (bits == 1)
+  {
+    out << "0";
+  }
+
   for (int i = bits - 1; i >= 0; --i)
   {
-    out << ((n >> 1) & i);
+    out << ((n >> i) & 1);
   }
 }
 
