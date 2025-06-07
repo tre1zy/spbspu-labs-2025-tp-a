@@ -17,10 +17,10 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   in >> command;
   try
   {
-    size_t empty_tested = subs.at(command)(0.0, *polygons.begin());
+    subs.at(command)(0.0, *polygons.begin());
     res = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs[command]);
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::out_of_range& e)
   {
     size_t vertexes = getVertexes(command);
     res = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
@@ -64,7 +64,7 @@ void alymova::count(std::istream& in, std::ostream& out, const std::vector< Poly
   {
     out << std::count_if(polygons.begin(), polygons.end(), subs.at(command));
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::out_of_range& e)
   {
     size_t vertexes = getVertexes(command);
     out << std::count_if(polygons.begin(), polygons.end(), std::bind(isEqualSize, vertexes, _1));

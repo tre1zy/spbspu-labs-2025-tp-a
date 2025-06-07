@@ -136,12 +136,8 @@ bool alymova::isPolygonEven(const Polygon& polygon)
 
 size_t alymova::getVertexes(const std::string& str)
 {
-  if (!std::all_of(str.begin(), str.end(), isDigit))
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
   size_t vertexes = std::stoull(str);
-  if (vertexes < 3)
+  if (vertexes < 3 || vertexes / str.size() == 0)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }

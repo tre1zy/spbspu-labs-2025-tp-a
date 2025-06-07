@@ -12,7 +12,6 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using StreamIt = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
