@@ -6,12 +6,13 @@
 #include <vector>
 #include <limits>
 #include <iomanip>
-#include "utils.hpp"
+#include "user-commands.hpp"
 #include "shapes.hpp"
 
 int main(int argc, char** argv)
 {
   using namespace alymova;
+  using StreamIt = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
@@ -34,11 +35,7 @@ int main(int argc, char** argv)
       file.clear(file.rdstate() ^ std::ios_base::failbit);
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::copy(
-      std::istream_iterator< Polygon >(file),
-      std::istream_iterator< Polygon >(),
-      std::back_inserter(polygons)
-    );
+    std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
 
   CommandDataset commands = complectCommands(std::cin, std::cout);
