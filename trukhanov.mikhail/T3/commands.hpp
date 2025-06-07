@@ -7,13 +7,12 @@
 
 namespace trukhanov
 {
-  using Polygon_vector = std::vector < Polygon >;
-  void area(std::istream& in, std::ostream& out, const Polygon_vector& src);
-  void max(std::istream& in, std::ostream& out, const Polygon_vector& src);
-  void min(std::istream& in, std::ostream& out, const Polygon_vector& src);
-  void count(std::istream& in, std::ostream& out, const Polygon_vector& src);
-  void lessArea(std::istream& in, std::ostream& out, const Polygon_vector& src);
-  void right(std::istream& in, std::ostream& out, const Polygon_vector& src);
+  void area(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
+  void max(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
+  void min(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
+  void count(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
+  void lessArea(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
+  void right(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
 }
 
 #endif
