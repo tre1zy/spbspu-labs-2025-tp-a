@@ -80,7 +80,7 @@ std::istream& mazitov::operator>>(std::istream& in, DataStruct& dest)
       }
       else if (key == "key2")
       {
-        in >> ull{ data.key2 } >> sep{ ':' };
+        in >> ull{ data.key2 };
       }
       else if (key == "key3")
       {

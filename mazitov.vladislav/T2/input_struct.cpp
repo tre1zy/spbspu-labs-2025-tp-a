@@ -60,23 +60,26 @@ std::istream& mazitov::operator>>(std::istream& in, UnsignedLongLongBinIO&& dest
   in >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' };
 
   char c = 0;
-  std::string binaryStr;
-  while (in >> c && (c == '0' || c == '1'))
+  bool flag = false;
+  unsigned long long binaryValue = 0;
+  while (in >> c && (c == '1' || c == '0'))
   {
-    binaryStr += c;
+    flag = true;
+    binaryValue = (binaryValue << 1) | (c == '1' ? : 1 : 0);
   }
 
-  if (binaryStr.empty())
+  if (!flag)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  unsigned long long binaryValue = 0;
-  for (char bit : binaryStr)
+  if (c != ':')
   {
-    binaryValue = (binaryValue << 1) | (bit == '1' ? 1 : 0);
+    in.setstate(std::ios::failbit);
+    return in;
   }
+
   dest.ref = binaryValue;
   return in;
 }
