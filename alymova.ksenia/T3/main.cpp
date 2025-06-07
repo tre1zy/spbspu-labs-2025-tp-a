@@ -36,11 +36,6 @@ int main(int argc, char** argv)
     }
     std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
-  /*std::cout << polygons.size() << '\n';
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    std::cout << polygons[i] << '\n';
-  }*/
 
   CommandDataset commands = complectCommands(std::cin, std::cout);
   std::string command;
