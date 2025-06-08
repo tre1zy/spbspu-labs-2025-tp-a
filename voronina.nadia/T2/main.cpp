@@ -1,21 +1,19 @@
-#include "DataStruct.h"
 #include <vector>
 #include <algorithm>
 #include <iterator>
 #include <limits>
 #include <iostream>
 
+#include "DataStruct.h"
+
 int main()
 {
   using voronina::DataStruct;
   std::vector<DataStruct> data;
-  while (!std::cin.eof() || !std::cin.bad())
+  while (!std::cin.eof())
   {
-    std::copy(
-      std::istream_iterator<DataStruct>(std::cin),
-      std::istream_iterator<DataStruct>(),
-      std::back_inserter(data)
-    );
+    using InputIterator = std::istream_iterator< DataStruct >;
+    std::copy(InputIterator(std::cin), InputIterator(), std::back_inserter(data));
     if (std::cin.fail())
     {
       std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
@@ -28,10 +26,8 @@ int main()
     std::cerr << "Fatal I/O error\n";
     return 1;
   }
-  std::sort(std::begin(data), std::end(data), voronina::comparator);
-  std::copy(
-    std::begin(data),
-    std::end(data),
-    std::ostream_iterator<DataStruct>(std::cout, "\n"));
+  using OutputIterator = std::ostream_iterator< DataStruct >;
+  std::sort(std::begin(data), std::end(data), voronina::compare);
+  std::copy(std::begin(data), std::end(data), OutputIterator(std::cout, "\n"));
   return 0;
 }
