@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <iomanip>
+#include <ios>
 #include <iterator>
 #include <numeric>
 #include <stdexcept>
@@ -115,28 +116,32 @@ namespace
     return polygon1.points.size() < polygon2.points.size();
   }
 
-  double maxForArea(const std::vector< kostyukov::Polygon >& polygons)
+  void printMaxForArea(std::ostream& out, const std::vector< kostyukov::Polygon >& polygons)
   {
-    kostyukov::Polygon max = (*std::max_element(polygons.begin(), polygons.end(), areaComparator));
-    return kostyukov::getArea(max);
+    kostyukov::Polygon maxPolygon = (*std::max_element(polygons.begin(), polygons.end(), areaComparator));
+    out << std::setprecision(1) << std::fixed << kostyukov::getArea(maxPolygon);
+    return;
   }
 
-  size_t maxForVertexes(const std::vector< kostyukov::Polygon >& polygons)
+  void printMaxForVertexes(std::ostream& out, const std::vector< kostyukov::Polygon >& polygons)
   {
-    kostyukov::Polygon max = (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator));
-    return max.points.size();
+    kostyukov::Polygon maxPolygon = (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator));
+    out << maxPolygon.points.size();
+    return;
   }
 
-  double minForArea(const std::vector< kostyukov::Polygon >& polygons)
+  void printMinForArea(std::ostream& out, const std::vector< kostyukov::Polygon >& polygons)
   {
-    kostyukov::Polygon min = (*std::min_element(polygons.begin(), polygons.end(), areaComparator));
-    return kostyukov::getArea(min);
+    kostyukov::Polygon minPolygon = (*std::min_element(polygons.begin(), polygons.end(), areaComparator));
+    out << std::setprecision(1) << std::fixed << kostyukov::getArea(minPolygon);
+    return;
   }
 
-  size_t minForVertexes(const std::vector< kostyukov::Polygon >& polygons)
+  void printMinForVertexes(std::ostream& out, const std::vector< kostyukov::Polygon >& polygons)
   {
-    kostyukov::Polygon min = (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator));
-    return min.points.size();
+    kostyukov::Polygon minPolygon = (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator));
+    out << minPolygon.points.size();
+    return;
   }
 
   struct RightAnglesInspector
@@ -209,24 +214,14 @@ void kostyukov::max(std::istream& in, std::ostream& out, const std::vector< Poly
     throw std::invalid_argument("no polygons for max");
   }
 
-  std::unordered_map< std::string, std::function< double() > > subcommands;
+  std::unordered_map< std::string, std::function< void() > > subcommands;
+  subcommands["AREA"] = std::bind(printMaxForArea, std::ref(out), std::cref(polygons));
+  subcommands["VERTEXES"] = std::bind(printMaxForVertexes, std::ref(out), std::cref(polygons));
+
   std::string subcommand;
   in >> subcommand;
-  subcommands["AREA"] = std::bind(maxForArea, std::cref(polygons));
-  subcommands["VERTEXES"] = std::bind(maxForVertexes, std::cref(polygons));
 
-  double result = 0.0;
-  try
-  {
-    result = subcommands.at(subcommand)();
-  }
-  catch (const std::invalid_argument&)
-  {
-    throw std::invalid_argument("invalid subcommand");
-  }
-
-  kostyukov::ScopeGuard scopeGrd(out);
-  out << std::fixed << std::setprecision(1) << result;
+  subcommands.at(subcommand)();
   return;
 }
 
@@ -237,24 +232,14 @@ void kostyukov::min(std::istream& in, std::ostream& out, const std::vector< Poly
     throw std::invalid_argument("no polygons for min");
   }
 
-  std::unordered_map< std::string, std::function< double() > > subcommands;
+  std::unordered_map< std::string, std::function< void() > > subcommands;
+  subcommands["AREA"] = std::bind(printMinForArea, std::ref(out), std::cref(polygons));
+  subcommands["VERTEXES"] = std::bind(printMinForVertexes, std::ref(out), std::cref(polygons));
+
   std::string subcommand;
   in >> subcommand;
-  subcommands["AREA"] = std::bind(minForArea, std::cref(polygons));
-  subcommands["VERTEXES"] = std::bind(minForVertexes, std::cref(polygons));
 
-  double result = 0.0;
-  try
-  {
-    result = subcommands.at(subcommand)();
-  }
-  catch (const std::invalid_argument&)
-  {
-    throw std::invalid_argument("invalid subcommand");
-  }
-
-  kostyukov::ScopeGuard scopeGrd(out);
-  out << std::fixed << std::setprecision(1) << result;
+  subcommands.at(subcommand)();
   return;
 }
 
