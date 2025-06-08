@@ -11,8 +11,9 @@ std::ostream & bocharov::operator<<(std::ostream & out, const DataStruct & data)
     return out;
   }
   bocharov::StreamGuard guard(out);
+  double dbl = data.key1;
   out << "(";
-  out << ":key1 " << DoubleSciIO{const_cast< double & >(data.key1)};
+  out << ":key1 " << DoubleSciIO{dbl};
   out << ":key2 '" << data.key2;
   out << "':key3 \"" << data.key3;
   out << "\":)";
@@ -43,16 +44,15 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
     return in;
   }
   std::string str;
+  std::getline(in, str, ':');
   bool hasExp = false;
-  char c;
-  while (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
+  for (auto chr: str)
   {
-    in >> c;
-    if (c == 'e' || c == 'E')
+    if (chr == 'e' || chr == 'E')
     {
       hasExp = true;
+      break;
     }
-    str += c;
   }
   if (!hasExp)
   {
@@ -84,7 +84,7 @@ std::istream & bocharov::operator>>(std::istream & in, CharLitIO && dest)
   bocharov::StreamGuard guard(in);
   in >> std::noskipws;
   char c;
-  if(!(in >> c))
+  if (!(in >> c))
   {
     in.setstate(std::ios::failbit);
     return in;
