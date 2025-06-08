@@ -57,7 +57,6 @@ namespace shiryaeva
       in.setstate(std::ios::failbit);
       return in;
     }
-    
 
     polygon.points = std::move(points);
     return in;
