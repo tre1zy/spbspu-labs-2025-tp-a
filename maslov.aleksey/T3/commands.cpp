@@ -183,7 +183,7 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
   Polygon inPolygon;
   if (!(in >> inPolygon))
   {
-    throw std::runtime_error("ERROR");
+    throw std::runtime_error("ERROR: wrong input");
   }
   std::vector< Polygon > result;
   size_t count = 0;
