@@ -13,12 +13,9 @@ namespace
 {
   struct AreaCalculator
   {
-    kiselev::Point point;
-    double operator()(double area, const kiselev::Point& point2)
+    double operator()(double sum, const kiselev::Point& p1, const kiselev::Point& p2)
     {
-      area += (point.x * point2.y) - (point2.x * point.y);
-      point = point2;
-      return area;
+      return sum + (p1.x * p2.y - p2.x * p1.y);
     }
   };
 
@@ -66,8 +63,11 @@ std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
 
 double kiselev::getArea(const Polygon& polygon)
 {
-  AreaCalculator calc{ polygon.points.back() };
-  double area = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, std::ref(calc));
+  const auto points = polygon.points;
+  const Point first = points.front();
+  const Point last = points.back();
+  double area = std::inner_product(
+    points.begin(), points.end() - 1, points.begin() + 1, last.x * first.y - first.x * last.y, std::plus< double >(), AreaCalculator());
   return std::abs(area) / 2.0;
 }
 
