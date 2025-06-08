@@ -38,7 +38,7 @@ namespace voronina
   class StreamGuard
   {
   public:
-    StreamGuard(std::basic_ios<char> &s);
+    explicit StreamGuard(std::basic_ios<char> &s);
     ~StreamGuard();
   private:
     std::basic_ios<char> &s_;
@@ -54,7 +54,8 @@ namespace voronina
   std::istream &operator>>(std::istream &in, UnsignedLongLongIO &&dest);
   std::istream &operator>>(std::istream &in, DataStruct &dest);
   std::ostream &operator<<(std::ostream &out, const DataStruct &dest);
+  std::istream &operator>>(std::istream &in, DelimiterDIO &&);
 
-  bool comparator(const DataStruct &left, const DataStruct &right);
+  bool compare(const DataStruct &left, const DataStruct &right);
 }
 #endif
