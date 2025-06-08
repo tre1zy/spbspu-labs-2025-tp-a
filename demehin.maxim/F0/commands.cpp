@@ -11,9 +11,9 @@ namespace
   struct TranslationPrinter
   {
     std::ostream& out;
-    mutable bool isFirst = true;
+    bool isFirst = true;
 
-    void operator()(const std::string& tr) const
+    void operator()(const std::string& tr)
     {
       if (!isFirst)
       {
@@ -252,6 +252,52 @@ namespace
       res = std::move(new_res);
     }
   };
+
+  struct WordCollector
+  {
+    std::map< std::string, int >& freq;
+
+    void operator()(const std::pair< std::string, list_t >& unit)
+    {
+      freq[unit.first]++;
+    }
+  };
+
+  struct DictProcessor
+  {
+    const dict_t& dicts;
+    std::map< std::string, int >& freq;
+
+    void operator()(const std::string& name)
+    {
+      const auto& dict = dicts.at(name);
+      std::for_each(dict.begin(), dict.end(), WordCollector{ freq });
+    }
+  };
+
+  struct FreqComparator
+  {
+    bool operator()(const std::pair< std::string, int >& a, const std::pair< std::string, int >& b)
+    {
+      return a.second > b.second || (a.second == b.second && a.first < b.first);
+    }
+  };
+
+  struct ResPrinter
+  {
+    std::ostream& out;
+    int limit;
+    int cnt = 0;
+
+    void operator()(const std::pair< std::string, int >& unit)
+    {
+      if (cnt++ < limit)
+      {
+        out << unit.first << " " << unit.second << "\n";
+      }
+    }
+  };
+
 }
 
 void demehin::printHelp(std::ostream& out)
@@ -396,4 +442,25 @@ void demehin::makeIntersect(std::istream& in, dict_t& dicts)
 void demehin::makeComplement(std::istream& in, dict_t& dicts)
 {
   processOperation(in, dicts, ComplementOperation{ });
+}
+
+void demehin::printMostCommons(std::istream& in, std::ostream& out, const dict_t& dicts)
+{
+  int n, k;
+  in >> n >> k;
+
+  if (n <= 0 || k <= 0)
+  {
+    throw std::logic_error("invalid argument");
+  }
+
+  std::vector< std::string > names(k);
+  std::generate(names.begin(), names.end(), NameReader{ in });
+
+  std::map< std::string, int > freq;
+  std::for_each(names.begin(), names.end(), DictProcessor{ dicts, freq });
+
+  std::vector< std::pair< std::string, int > > sorted(freq.begin(), freq.end());
+  std::sort(sorted.begin(), sorted.end(), FreqComparator{ });
+  std::for_each(sorted.begin(), sorted.end(), ResPrinter{ out, n });
 }
