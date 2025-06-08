@@ -17,7 +17,7 @@ namespace
     std::vector< maslov::Polygon > filtered;
     filtered.reserve(polygons.size());
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::isEven);
-    std::vector< double > areas(polygons.size());
+    std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << result << '\n';
@@ -29,7 +29,7 @@ namespace
     std::vector< maslov::Polygon > filtered;
     filtered.reserve(polygons.size());
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::isOdd);
-    std::vector< double > areas(polygons.size());
+    std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << result << '\n';
@@ -42,7 +42,8 @@ namespace
       throw std::runtime_error("ERROR: there are no polygons");
     }
     maslov::StreamGuard guard(out);
-    std::vector< double > areas(polygons.size());
+    std::vector< double > areas;
+    areas.reserve(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
     out << std::fixed << std::setprecision(1) << result << '\n';
@@ -55,7 +56,7 @@ namespace
     filtered.reserve(polygons.size());
     auto pred = std::bind(maslov::hasNVertexes, std::placeholders::_1, num);
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
-    std::vector< double > areas(polygons.size());
+    std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << result << '\n';
