@@ -1,25 +1,24 @@
 #include "polygon.hpp"
 #include <cmath>
+#include <numeric>
+#include <vector>
+#include "functors.hpp"
 
 namespace trukhanov
 {
   double getArea(const Polygon& polygon)
   {
-    double area = 0.0;
-    size_t n = polygon.points.size();
+    std::size_t n = polygon.points.size();
     if (n < 3)
-    {
       return 0.0;
-    }
 
-    for (size_t i = 0; i < n; ++i)
-    {
-      const Point& p1 = polygon.points[i];
-      const Point& p2 = polygon.points[(i + 1) % n];
-      area += (p1.x * p2.y - p2.x * p1.y);
-    }
+    std::vector<std::size_t> indices(n - 2);
+    std::iota(indices.begin(), indices.end(), 1);
 
-    return std::abs(area) / 2.0;
+    PolygonAreaSum summer(polygon);
+
+    double area = std::accumulate(indices.begin(), indices.end(), 0.0, summer);
+    return area;
   }
 
   bool isEven(const Polygon& polygon)

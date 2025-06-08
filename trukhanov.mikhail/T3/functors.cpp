@@ -1,5 +1,6 @@
 #include "functors.hpp"
 #include <algorithm>
+#include <cmath>
 #include "polygon.hpp"
 
 bool trukhanov::isSize::operator()(const Polygon& p) const
@@ -43,4 +44,21 @@ bool trukhanov::HasDuplicates::operator()(const Polygon& p) const
 bool trukhanov::PolygonHasMinSize::operator()(const trukhanov::Polygon& p) const
 {
   return p.points.size() >= 3;
+}
+
+double trukhanov::TriangleArea::operator()(const Point& a, const Point& b, const Point& c) const
+{
+  return std::abs((a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) / 2.0);
+}
+
+trukhanov::PolygonAreaSum::PolygonAreaSum(const Polygon& polygon) : polygon_(polygon) {}
+
+double trukhanov::PolygonAreaSum::operator()(double sum, size_t i) const
+{
+  const Point& a = polygon_.points[0];
+  const Point& b = polygon_.points[i];
+  const Point& c = polygon_.points[i + 1];
+
+  TriangleArea areaCalc;
+  return sum + areaCalc(a, b, c);
 }

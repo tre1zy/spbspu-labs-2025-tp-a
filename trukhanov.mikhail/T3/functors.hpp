@@ -42,6 +42,21 @@ namespace trukhanov
   {
     bool operator()(const Polygon& p) const;
   };
+
+  struct TriangleArea
+  {
+    double operator()(const Point& a, const Point& b, const Point& c) const;
+  };
+
+  struct PolygonAreaSum
+  {
+    PolygonAreaSum(const Polygon& polygon);
+
+    double operator()(double sum, size_t i) const;
+
+  private:
+    const Polygon& polygon_;
+  };
 }
 
 #endif
