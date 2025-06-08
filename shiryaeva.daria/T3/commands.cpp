@@ -180,6 +180,11 @@ namespace shiryaeva
       throw std::invalid_argument("<INVALID COMMAND>");
     }
 
+    if (in.peek() != '\n' && !in.eof())
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
     struct HasDuplicates
     {
       bool operator()(const Polygon& p) const
@@ -223,6 +228,11 @@ namespace shiryaeva
     in >> target;
 
     if (!in || target.points.size() < 3)
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    if (in.peek() != '\n' && !in.eof())
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
