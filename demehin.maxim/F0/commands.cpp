@@ -1,6 +1,8 @@
 #include "commands.hpp"
 #include <functional>
 #include <algorithm>
+#include <vector>
+#include <fstream>
 
 namespace
 {
@@ -93,6 +95,72 @@ namespace
     std::for_each(words.begin(), words.end(), mod);
   }
 
+  struct WordWriter
+  {
+    std::ostream& out;
+
+    void operator()(const std::string& word) const
+    {
+      out << " " << word;
+    }
+  };
+
+  struct DictUnitWriter
+  {
+    std::ostream& out;
+
+    void operator()(const std::pair< std::string, list_t >& unit) const
+    {
+      out << unit.first;
+      std::for_each(unit.second.begin(), unit.second.end(), WordWriter{ out });
+      out << "\n";
+    }
+  };
+
+  struct DictWriter
+  {
+    std::ostream& out;
+    const std::string& dict_name;
+
+    void operator()(const tree_t& dict) const
+    {
+      out << dict_name << "\n";
+      std::for_each(dict.begin(), dict.end(), DictUnitWriter{ out });
+      out << "\n";
+    }
+  };
+
+  struct DictFilterWriter
+  {
+    const dict_t& dicts;
+    std::ofstream& file;
+
+    void operator()(const std::string& name) const
+    {
+      auto it = dicts.find(name);
+      if (it != dicts.end())
+      {
+        DictWriter{ file, name }(it->second);
+      }
+    }
+  };
+
+  void processWriting(std::istream& in, const dict_t& dicts, std::ios_base::openmode mode)
+  {
+    std::string filename;
+    size_t dicts_cnt;
+    in >> filename >> dicts_cnt;
+
+    std::ofstream file(filename, mode);
+    if (!file)
+    {
+      throw std::logic_error("invalid file");
+    }
+
+    std::vector< std::string > dict_names(dicts_cnt);
+    std::generate(dict_names.begin(), dict_names.end(), NameReader{ in });
+    std::for_each(dict_names.begin(), dict_names.end(), DictFilterWriter{ dicts, file});
+  }
 }
 
 void demehin::printHelp(std::ostream& out)
@@ -110,6 +178,16 @@ void demehin::printHelp(std::ostream& out)
   out << "10. union < newdict > < N > < dictname-1 > ... < dictname-n > - union of N dictionaries\n";
   out << "11. complement < newdict > < N > < dictname-1 > ... < dictname-n > - complemention of N dictionaries\n";
   out << "12. intersect < newdict > < N > < dictname-1 > ... < dictname-n > - intersection of N dictionaries\n";
+}
+
+void demehin::rewriteFile(std::istream& in, const dict_t& dicts)
+{
+  processWriting(in, dicts, std::ios::out);
+}
+
+void demehin::writeToFile(std::istream& in, const dict_t& dicts)
+{
+  processWriting(in, dicts, std::ios::app);
 }
 
 void demehin::createDict(std::istream& in, dict_t& dicts)
