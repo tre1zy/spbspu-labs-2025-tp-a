@@ -1,5 +1,4 @@
 #include "data_struct.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <iterator>

@@ -1,7 +1,7 @@
 #include "data_struct.hpp"
 #include <iostream>
 #include <string>
-#include "commands.hpp"
+#include "utils.hpp"
 #include "format_guard.hpp"
 #include "format_wrapper.hpp"
 
@@ -27,9 +27,8 @@ std::ostream &pilugina::operator<<(std::ostream &out, const DataStruct &src)
   }
   FormatGuard fg(out);
 
-  out << "(:key1 0" << std::oct << src.key1;
-  out << ":key2 0b";
-  outputBinRepresentation(src.key2);
+  out << "(:key1 0" << output::UnsignedLongLongOCT{src.key1};
+  out << ":key2 0b" << output::UnsignedLongLongBIN{src.key2};
   out << ":key3 \"" << src.key3 << "\":)";
   return out;
 }

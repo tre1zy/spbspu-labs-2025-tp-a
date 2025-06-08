@@ -1,6 +1,7 @@
 #include "format_wrapper.hpp"
 #include <iostream>
-#include "commands.hpp"
+#include "utils.hpp"
+#include "format_guard.hpp"
 
 std::istream &pilugina::operator>>(std::istream &in, DelimiterIO &&dest)
 {
@@ -105,4 +106,44 @@ std::istream &pilugina::operator>>(std::istream &in, StringIO &&dest)
   }
 
   return std::getline(in >> DelimiterIO {'"'}, dest.ref, '"');
+}
+
+std::ostream &pilugina::output::operator<<(std::ostream &out, const UnsignedLongLongOCT &dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  FormatGuard fg(out);
+  return out << std::oct << dest.ref;
+}
+
+std::ostream &pilugina::output::operator<<(std::ostream &out, const UnsignedLongLongBIN &dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  FormatGuard fg(out);
+
+  unsigned long long copy = dest.ref;
+  if (copy == 1)
+  {
+    out << "01";
+    return out;
+  }
+  else if (copy == 0)
+  {
+    out << "0";
+    return out;
+  }
+
+  while (copy > 0)
+  {
+    out << copy % 2;
+    copy /= 2;
+  }
+  return out;
 }
