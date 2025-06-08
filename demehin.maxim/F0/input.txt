@@ -1,0 +1,9 @@
+dict1
+apple ap
+banana ba
+orange or
+
+dict2
+apple ap app
+pear pe
+banana bab
