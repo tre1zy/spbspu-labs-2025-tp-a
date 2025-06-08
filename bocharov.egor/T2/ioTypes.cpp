@@ -44,15 +44,16 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
     return in;
   }
   std::string str;
-  std::getline(in, str, ':');
   bool hasExp = false;
-  for (auto chr: str)
+  char c;
+  while (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
   {
-    if (chr == 'e' || chr == 'E')
+    in >> c;
+    if (c == 'e' || c == 'E')
     {
       hasExp = true;
-      break;
     }
+    str += c;
   }
   if (!hasExp)
   {
@@ -61,14 +62,9 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
   }
   try
   {
-    std::size_t processedCount;
-    dest.ref = std::stod(str, &processedCount);
-    if (processedCount < str.size())
-    {
-      in.setstate(std::ios::failbit);
-    }
+    dest.ref = std::stod(str);
   }
-  catch (...)
+  catch (const std::exception &)
   {
     in.setstate(std::ios::failbit);
   }
