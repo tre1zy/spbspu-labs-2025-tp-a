@@ -181,22 +181,21 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
     throw std::runtime_error("ERROR: there are no polygons");
   }
   Polygon inPolygon;
-  in >> inPolygon;
+  if (!(in >> inPolygon))
+  {
+    throw std::runtime_error("ERROR");
+  }
   std::vector< Polygon > result;
   size_t count = 0;
-  auto it = polygons.begin();
-  while (it != polygons.end())
+  result = polygons;
+  for (auto it = polygons.begin(); it != polygons.end(); ++it)
   {
-    it = std::find(it, polygons.end(), inPolygon);
-    if (it != polygons.end())
+    if (*it == inPolygon)
     {
-      result.insert(result.end(), it, it + 1);
-      result.push_back(*it);
+      result.insert(std::find(result.begin(), result.end(), *it) + 1, *it);
       ++count;
-      ++it;
     }
   }
-  result.insert(result.end(), it, polygons.end());
   polygons = std::move(result);
   out << count << '\n';
 }
