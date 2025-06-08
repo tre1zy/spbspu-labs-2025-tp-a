@@ -87,9 +87,9 @@ int main(int argc, char* argv[])
   cmds["addeng"] = std::bind(addEng, std::ref(std::cin), std::ref(dicts));
   cmds["deleteru"] = std::bind(deleteRu, std::ref(std::cin), std::ref(dicts));
   cmds["addru"] = std::bind(addRu, std::ref(std::cin), std::ref(dicts));
-  //cmds["union"] = std::bind(makeUnion, std::ref(std::cin), std::ref(dicts));
-  //cmds["intersect"] = std::bind(makeIntersect, std::ref(std::cin), std::ref(dicts));
-  //cmds["complement"] = std::bind(makeComplement, std::ref(std::cin), std::ref(dicts));
+  cmds["union"] = std::bind(makeUnion, std::ref(std::cin), std::ref(dicts));
+  cmds["intersect"] = std::bind(makeIntersect, std::ref(std::cin), std::ref(dicts));
+  cmds["complement"] = std::bind(makeComplement, std::ref(std::cin), std::ref(dicts));
   cmds["rewritefile"] = std::bind(rewriteFile, std::ref(std::cin), std::cref(dicts));
   cmds["writedicts"] = std::bind(writeToFile, std::ref(std::cin), std::cref(dicts));
   //cmds["mostcommon"] = std::bind(printMostCommons, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));

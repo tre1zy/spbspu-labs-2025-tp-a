@@ -161,6 +161,97 @@ namespace
     std::generate(dict_names.begin(), dict_names.end(), NameReader{ in });
     std::for_each(dict_names.begin(), dict_names.end(), DictFilterWriter{ dicts, file});
   }
+
+  template< typename Operation >
+  struct OperationApplier
+  {
+    const dict_t& dicts;
+    tree_t& res;
+    Operation op;
+
+    void operator()(const std::string& name)
+    {
+      op(res, dicts.at(name));
+    }
+  };
+
+  template< typename Operation >
+  void processOperation(std::istream& in, dict_t& dicts, Operation op)
+  {
+    std::string new_name;
+    size_t cnt;
+    in >> new_name >> cnt;
+
+    list_t dictNames;
+    NameReader reader{ in };
+    std::generate_n(std::back_inserter(dictNames), cnt, reader);
+
+    auto it = dictNames.begin();
+    tree_t res = dicts.at(*it);
+
+    OperationApplier< Operation > applier{ dicts, res, op };
+    std::for_each(++it, dictNames.end(), applier);
+
+    dicts[new_name] = res;
+  }
+
+  struct UnionOperation
+  {
+    void operator()(tree_t& res, const tree_t& dict) const
+    {
+      res.insert(dict.begin(), dict.end());
+    }
+  };
+
+  struct IntersectImpl
+  {
+    const tree_t& dict;
+    tree_t& res;
+
+    void operator()(const std::pair< std::string, list_t >& unit)
+    {
+      if (dict.count(unit.first) != 0)
+      {
+        res.insert(unit);
+      }
+    }
+  };
+
+  struct IntersectOperation
+  {
+    void operator()(tree_t& res, const tree_t& dict) const
+    {
+      tree_t new_res;
+      IntersectImpl intersect{ dict, new_res };
+      std::for_each(res.begin(), res.end(), intersect);
+      res = std::move(new_res);
+    }
+  };
+
+  struct ComplementImpl
+  {
+    const tree_t& dict;
+    tree_t& res;
+
+    void operator()(const std::pair< std::string, list_t >& unit)
+    {
+      if (dict.count(unit.first) == 0)
+      {
+        res.insert(unit);
+      }
+    }
+  };
+
+  struct ComplementOperation
+  {
+    void operator()(tree_t& res, const tree_t& dict) const
+    {
+      tree_t new_res;
+      ComplementImpl complement{ dict, new_res };
+      std::for_each(res.begin(), res.end(), complement);
+      res = std::move(new_res);
+    }
+  };
 }
 
 void demehin::printHelp(std::ostream& out)
@@ -290,4 +381,19 @@ void demehin::deleteRu(std::istream& in, dict_t& dicts)
 void demehin::addRu(std::istream& in, dict_t& dicts)
 {
   modifyTranslations(in, dicts, true);
+}
+
+void demehin::makeUnion(std::istream& in, dict_t& dicts)
+{
+  processOperation(in, dicts, UnionOperation{ });
+}
+
+void demehin::makeIntersect(std::istream& in, dict_t& dicts)
+{
+  processOperation(in, dicts, IntersectOperation{ });
+}
+
+void demehin::makeComplement(std::istream& in, dict_t& dicts)
+{
+  processOperation(in, dicts, ComplementOperation{ });
 }
