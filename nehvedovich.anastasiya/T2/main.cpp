@@ -16,8 +16,7 @@ int main()
 
   while (!std::cin.eof())
   {
-    std::copy(input_it_t {std::cin}, input_it_t {}, std::back_inserter(data));
-    if (std::cin.fail())
+    std::copy(input_it_t{std::cin}, input_it_t{}, std::back_inserter(data));
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
