@@ -122,10 +122,10 @@ bool maslov::hasNVertexes(const Polygon & polygon, size_t num)
 
 double maslov::getPolygonArea(const Polygon & polygon)
 {
-  using namespace std::placeholders;
-  std::vector< double > areas;
+  std::vector< double > areas(polygon.points.size());
   const auto & begin = polygon.points.begin();
   const auto & end = polygon.points.end();
+  using namespace std::placeholders;
   auto calc = std::bind(vectorProduct, polygon.points[0], _1, _2);
   std::transform(begin + 1, end - 1, begin + 2, std::back_inserter(areas), calc);
   return std::accumulate(areas.begin(), areas.end(), 0.0);
