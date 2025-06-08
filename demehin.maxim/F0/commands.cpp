@@ -315,6 +315,9 @@ void demehin::printHelp(std::ostream& out)
   out << "10. union < newdict > < N > < dictname-1 > ... < dictname-n > - union of N dictionaries\n";
   out << "11. complement < newdict > < N > < dictname-1 > ... < dictname-n > - complemention of N dictionaries\n";
   out << "12. intersect < newdict > < N > < dictname-1 > ... < dictname-n > - intersection of N dictionaries\n";
+  out << "13. writedicts < filename > < N > < dictname-1 > ... < dictname-n > - save N dictionaries to file\n";
+  out << "14. rewritefile < filename > < N > < dictname-1 > ... < dictname-n > - rewrite file with N dictionaries\n";
+  out << "15. mostcommon < N > < K > < dictname-1 > ... < dictname-n > - print N most common words in K dictionaries\n";
 }
 
 void demehin::rewriteFile(std::istream& in, const dict_t& dicts)
