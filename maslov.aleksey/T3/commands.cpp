@@ -192,8 +192,8 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
     {
       result.insert(result.end(), it, it + 1);
       result.push_back(*it);
-      count++;
-      ++it; 
+      ++count;
+      ++it;
     }
   }
   result.insert(result.end(), it, polygons.end());

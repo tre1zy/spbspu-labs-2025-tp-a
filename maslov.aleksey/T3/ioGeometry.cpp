@@ -109,7 +109,7 @@ bool maslov::isRectangle(const Polygon & polygon)
   }
   const auto & p = polygon.points;
   bool check = (scalarProduct(p[0], p[1], p[2]) == 0) && (scalarProduct(p[1], p[2], p[3]) == 0);
-  return check && (scalarProduct(p[2], p[3], p[0]) == 0);  
+  return check && (scalarProduct(p[2], p[3], p[0]) == 0);
 }
 
 bool maslov::hasNVertexes(const Polygon & polygon, size_t num)
@@ -123,7 +123,7 @@ double maslov::getPolygonArea(const Polygon & polygon)
   std::vector< double > areas;
   const auto & begin = polygon.points.begin();
   const auto & end = polygon.points.end();
-   auto calc = std::bind(vectorProduct, polygon.points[0], _1, _2);
+  auto calc = std::bind(vectorProduct, polygon.points[0], _1, _2);
   std::transform(begin + 1, end - 1, begin + 2, std::back_inserter(areas), calc);
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
