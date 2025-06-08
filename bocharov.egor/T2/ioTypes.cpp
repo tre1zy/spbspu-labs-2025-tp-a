@@ -43,31 +43,38 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
   {
     return in;
   }
-  std::string str;
-  bool hasExp = false;
-  char c;
-  while (in.peek() != ':' && in.peek() != std::istream::traits_type::eof())
-  {
-    in >> c;
-    if (c == 'e' || c == 'E')
-    {
-      hasExp = true;
-    }
-    str += c;
-  }
-  if (!hasExp)
+
+  std::string doubleHold;
+  if (!std::getline(in, doubleHold, ':'))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
+
+  if (doubleHold.find('e') == doubleHold.find('E'))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
   try
   {
-    dest.ref = std::stod(str);
+    size_t index = 0;
+    double number = std::stod(doubleHold, &index);
+
+    if (index != doubleHold.length())
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in.unget();
+    dest.ref = number;
   }
-  catch (const std::exception &)
+  catch (const std::exception& e)
   {
     in.setstate(std::ios::failbit);
   }
+
   return in;
 }
 
