@@ -1,10 +1,12 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <functional>
 #include "Shapes.h"
 
 namespace voronina
 {
+  using namespace std::placeholders;
   void area(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
   void max(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
   void min(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);

@@ -10,6 +10,7 @@
 
 namespace voronina
 {
+  using namespace std::placeholders;
   double getAreaOfPolygon(const Polygon& shape);
   double getAreaOfTriangle(const Point& p1, const Point& p2, const Point& p3);
   double getAreaForEvenPolygons(double areaSum, const Polygon& shape);

@@ -28,11 +28,9 @@ int main(int argc, char* argv[])
   cmds["AREA"] = std::bind(voronina::area, std::cref(shapes), std::ref(std::cin), std::ref(std::cout));
   cmds["MAX"] = std::bind(voronina::max, std::cref(shapes), std::ref(std::cin), std::ref(std::cout));
   cmds["MIN"] = std::bind(voronina::min, std::cref(shapes), std::ref(std::cin), std::ref(std::cout));
-  cmds["COUNT"] = std::bind(voronina::count, std::ref(shapes), std::ref(std::cin), std::ref(std::cout));
+  cmds["COUNT"] = std::bind(voronina::count, std::cref(shapes), std::ref(std::cin), std::ref(std::cout));
   cmds["MAXSEQ"] = std::bind(voronina::maxseq, std::cref(shapes), std::ref(std::cin), std::ref(std::cout));
-  cmds["RIGHTSHAPES"] = std::bind(
-    voronina::rightshapes, std::cref(shapes),
-    std::ref(std::cin), std::ref(std::cout));
+  cmds["RIGHTSHAPES"] = std::bind(voronina::rightshapes, std::cref(shapes), std::ref(std::cin), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())

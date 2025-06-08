@@ -18,18 +18,14 @@ namespace voronina
     std::vector< Polygon > input;
     while (!fin.eof())
     {
-      std::copy(
-        std::istream_iterator < Polygon > (fin),
-        std::istream_iterator< Polygon >(),
-        std::back_inserter(input)
-        );
+      using IstreamIterator = std::istream_iterator < Polygon >;
+      std::copy(IstreamIterator(fin), IstreamIterator(), std::back_inserter(input));
       if (fin.fail() && !fin.eof())
       {
         fin.clear();
         fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       }
     }
-
     fin.close();
     return input;
   }
