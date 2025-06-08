@@ -8,7 +8,6 @@
 #include <string>
 #include <map>
 #include <streamGuard.hpp>
-#include "polygonOperations.hpp"
 
 namespace
 {
@@ -16,9 +15,9 @@ namespace
   {
     maslov::StreamGuard guard(out);
     std::vector< maslov::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::IsEven{});
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::isEven);
     std::vector< double > areas;
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::AreaCalculator{});
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -27,9 +26,9 @@ namespace
   {
     maslov::StreamGuard guard(out);
     std::vector< maslov::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::IsOdd{});
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::isOdd);
     std::vector< double > areas;
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::AreaCalculator{});
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -42,18 +41,20 @@ namespace
     }
     maslov::StreamGuard guard(out);
     std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::AreaCalculator{});
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getAreaVertexes(std::ostream & out, const std::vector< maslov::Polygon > & polygons, size_t num)
   {
+    using namespace std::placeholders;
     maslov::StreamGuard guard(out);
     std::vector< maslov::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), maslov::SameVertexes{num});
+    auto pred = std::bind(maslov::hasNVertexes, _1, num);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
     std::vector< double > areas;
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::AreaCalculator{});
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -62,7 +63,7 @@ namespace
   {
     maslov::StreamGuard guard(out);
     std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::AreaCalculator{});
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = *std::max_element(areas.begin(), areas.end());
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -70,7 +71,7 @@ namespace
   void getMaxVertexes(std::ostream & out, const std::vector< maslov::Polygon > & polygons)
   {
     maslov::StreamGuard guard(out);
-    auto result = *std::max_element(polygons.begin(), polygons.end(), maslov::VertexesComparator{});
+    auto result = *std::max_element(polygons.begin(), polygons.end(), maslov::compareVertexes);
     out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
   }
 
@@ -78,7 +79,7 @@ namespace
   {
     maslov::StreamGuard guard(out);
     std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::AreaCalculator{});
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::getPolygonArea);
     double result = *std::min_element(areas.begin(), areas.end());
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -86,7 +87,7 @@ namespace
   void getMinVertexes(std::ostream & out, const std::vector< maslov::Polygon > & polygons)
   {
     maslov::StreamGuard guard(out);
-    auto result = *std::min_element(polygons.begin(), polygons.end(), maslov::VertexesComparator{});
+    auto result = *std::min_element(polygons.begin(), polygons.end(), maslov::compareVertexes);
     out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
   }
 }
@@ -154,20 +155,22 @@ void maslov::getCount(std::istream & in, std::ostream & out, const std::vector< 
   in >> subcmd;
   if (subcmd == "EVEN")
   {
-    out << std::count_if(polygons.begin(), polygons.end(), IsEven{}) << '\n';
+    out << std::count_if(polygons.begin(), polygons.end(), isEven) << '\n';
   }
   else if (subcmd == "ODD")
   {
-    out << std::count_if(polygons.begin(), polygons.end(), IsOdd{}) << '\n';
+    out << std::count_if(polygons.begin(), polygons.end(), isOdd) << '\n';
   }
   else
   {
+    using namespace std::placeholders;
     size_t num = std::stoul(subcmd);
     if (num < 3)
     {
       throw std::logic_error("ERROR: the polygon consists of at least 3 vertices");
     }
-    out << std::count_if(polygons.begin(), polygons.end(), SameVertexes{num}) << '\n';
+    auto pred = std::bind(hasNVertexes, _1, num);
+    out << std::count_if(polygons.begin(), polygons.end(), pred) << '\n';
   }
 }
 
@@ -179,15 +182,26 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
   }
   Polygon inPolygon;
   in >> inPolygon;
-  size_t count = std::count_if(polygons.begin(), polygons.end(), SamePolygon{inPolygon});
   std::vector< Polygon > result;
-  std::vector< int > temp;
-  std::transform(polygons.begin(), polygons.end(), temp.begin(), EchoInserter{result, inPolygon});
+  size_t count = 0;
+  auto it = polygons.begin();
+  while (it != polygons.end())
+  {
+    it = std::find(it, polygons.end(), inPolygon);
+    if (it != polygons.end())
+    {
+      result.insert(result.end(), it, it + 1);
+      result.push_back(*it);
+      count++;
+      ++it; 
+    }
+  }
+  result.insert(result.end(), it, polygons.end());
   polygons = std::move(result);
   out << count << '\n';
 }
 
 void maslov::getRects(std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  out << std::count_if(polygons.begin(), polygons.end(), IsRectangle{}) << '\n';
+  out << std::count_if(polygons.begin(), polygons.end(), isRectangle) << '\n';
 }

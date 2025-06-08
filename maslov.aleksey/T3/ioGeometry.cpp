@@ -1,8 +1,31 @@
 #include "ioGeometry.hpp"
 #include <ioDelimiter.hpp>
+#include <functional>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <numeric>
+
+namespace
+{
+  int scalarProduct(const maslov::Point & a,
+      const maslov::Point & b, const maslov::Point & c)
+  {
+    int vectorX1 = b.x - a.x;
+    int vectorY1 = b.y - a.y;
+    int vectorX2 = c.x - b.x;
+    int vectorY2 = c.y - b.y;
+    return vectorX1 * vectorX2 + vectorY1 * vectorY2;
+  }
+
+  double vectorProduct(const maslov::Point & p0,
+      const maslov::Point & p1, const maslov::Point & p2)
+  {
+    double d1 = (p1.x - p0.x) * (p2.y - p0.y);
+    double d2 = (p2.x - p0.x) * (p1.y - p0.y);
+    return 0.5 * std::abs(d1 - d2);
+  }
+}
 
 std::istream & maslov::operator>>(std::istream & in, Point & dest)
 {
@@ -66,4 +89,46 @@ bool maslov::Point::operator==(const Point & rhs) const
 bool maslov::Polygon::operator==(const Polygon & rhs) const
 {
   return points == rhs.points;
+}
+
+bool maslov::isEven(const Polygon & polygon)
+{
+  return polygon.points.size() % 2 == 0;
+}
+
+bool maslov::isOdd(const Polygon & polygon)
+{
+  return !isEven(polygon);
+}
+
+bool maslov::isRectangle(const Polygon & polygon)
+{
+  if (polygon.points.size() != 4)
+  {
+    return false;
+  }
+  const auto & p = polygon.points;
+  bool check = (scalarProduct(p[0], p[1], p[2]) == 0) && (scalarProduct(p[1], p[2], p[3]) == 0);
+  return check && (scalarProduct(p[2], p[3], p[0]) == 0);  
+}
+
+bool maslov::hasNVertexes(const Polygon & polygon, size_t num)
+{
+  return polygon.points.size() == num;
+}
+
+double maslov::getPolygonArea(const Polygon & polygon)
+{
+  using namespace std::placeholders;
+  std::vector< double > areas;
+  const auto & begin = polygon.points.begin();
+  const auto & end = polygon.points.end();
+   auto calc = std::bind(vectorProduct, polygon.points[0], _1, _2);
+  std::transform(begin + 1, end - 1, begin + 2, std::back_inserter(areas), calc);
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
+}
+
+bool maslov::compareVertexes(const Polygon & poly1, const Polygon & poly2)
+{
+  return poly1.points.size() < poly2.points.size();
 }
