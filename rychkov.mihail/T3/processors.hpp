@@ -9,7 +9,10 @@ namespace rychkov
   class MainProcessor
   {
   public:
-    bool init(ParserContext& context, int argc, char** argv);
+    static Parser::map_type< MainProcessor > call_map;
+
+    MainProcessor(int argc, char** argv);
+
     bool area(ParserContext& context);
     bool max(ParserContext& context);
     bool min(ParserContext& context);
@@ -22,9 +25,9 @@ namespace rychkov
   class AreaProcessor
   {
   public:
-    AreaProcessor(std::vector< Polygon >& polygons):
-      polygons_(polygons)
-    {}
+    static Parser::map_type< AreaProcessor > call_map;
+
+    AreaProcessor(std::vector< Polygon >& polygons) noexcept;
     bool even(ParserContext& context);
     bool odd(ParserContext& context);
     bool mean(ParserContext& context);
@@ -35,9 +38,9 @@ namespace rychkov
   class MaxProcessor
   {
   public:
-    MaxProcessor(std::vector< Polygon >& polygons):
-      polygons_(polygons)
-    {}
+    static Parser::map_type< MaxProcessor > call_map;
+
+    MaxProcessor(std::vector< Polygon >& polygons) noexcept;
     bool area(ParserContext& context);
     bool count(ParserContext& context);
   private:
@@ -46,9 +49,9 @@ namespace rychkov
   class MinProcessor
   {
   public:
-    MinProcessor(std::vector< Polygon >& polygons):
-      polygons_(polygons)
-    {}
+    static Parser::map_type< MinProcessor > call_map;
+
+    MinProcessor(std::vector< Polygon >& polygons) noexcept;
     bool area(ParserContext& context);
     bool count(ParserContext& context);
   private:
@@ -57,9 +60,9 @@ namespace rychkov
   class CountProcessor
   {
   public:
-    CountProcessor(std::vector< Polygon >& polygons):
-      polygons_(polygons)
-    {}
+    static Parser::map_type< CountProcessor > call_map;
+
+    CountProcessor(std::vector< Polygon >& polygons) noexcept;
     bool even(ParserContext& context);
     bool odd(ParserContext& context);
     bool count(ParserContext& context);

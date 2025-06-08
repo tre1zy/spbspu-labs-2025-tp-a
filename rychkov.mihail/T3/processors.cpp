@@ -4,28 +4,66 @@
 #include <fstream>
 #include <iterator>
 #include <algorithm>
+#include <stdexcept>
+#include <limits>
 
-bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
+rychkov::Parser::map_type< rychkov::MainProcessor > rychkov::MainProcessor::call_map = {
+      {"AREA", &rychkov::MainProcessor::area},
+      {"MAX", &rychkov::MainProcessor::max},
+      {"MIN", &rychkov::MainProcessor::min},
+      {"COUNT", &rychkov::MainProcessor::count},
+      {"RMECHO", &rychkov::MainProcessor::remove_repeates},
+      {"RECTS", &rychkov::MainProcessor::rectangles}
+    };
+rychkov::Parser::map_type< rychkov::AreaProcessor > rychkov::AreaProcessor::call_map = {
+      {"EVEN", &rychkov::AreaProcessor::even},
+      {"ODD", &rychkov::AreaProcessor::odd},
+      {"MEAN", &rychkov::AreaProcessor::mean}
+    };
+rychkov::Parser::map_type< rychkov::MaxProcessor > rychkov::MaxProcessor::call_map = {
+      {"AREA", &rychkov::MaxProcessor::area},
+      {"VERTEXES", &rychkov::MaxProcessor::count}
+    };
+rychkov::Parser::map_type< rychkov::MinProcessor > rychkov::MinProcessor::call_map = {
+      {"AREA", &rychkov::MinProcessor::area},
+      {"VERTEXES", &rychkov::MinProcessor::count}
+    };
+rychkov::Parser::map_type< rychkov::CountProcessor > rychkov::CountProcessor::call_map = {
+      {"EVEN", &rychkov::CountProcessor::even},
+      {"ODD", &rychkov::CountProcessor::odd}
+    };
+
+rychkov::MainProcessor::MainProcessor(int argc, char** argv)
 {
   if (argc != 2)
   {
-    context.err << "wrong arguments count\n";
-    return false;
+    throw std::invalid_argument("wrong arguments count");
   }
   std::ifstream file{argv[1]};
   if (!file)
   {
-    context.err << "failed to open file \"" << argv[1] << "\"\n";
-    return false;
+    throw std::invalid_argument("failed to open file");
   }
   while (file.good())
   {
     using Iter = std::istream_iterator< Polygon >;
     std::copy(Iter{file}, Iter{}, std::back_inserter(polygons_));
     file.clear(file.rdstate() & ~std::ios::failbit);
+    file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
-  return true;
 }
+rychkov::AreaProcessor::AreaProcessor(std::vector< Polygon >& polygons) noexcept:
+  polygons_(polygons)
+{}
+rychkov::MaxProcessor::MaxProcessor(std::vector< Polygon >& polygons) noexcept:
+  polygons_(polygons)
+{}
+rychkov::MinProcessor::MinProcessor(std::vector< Polygon >& polygons) noexcept:
+  polygons_(polygons)
+{}
+rychkov::CountProcessor::CountProcessor(std::vector< Polygon >& polygons) noexcept:
+  polygons_(polygons)
+{}
 
 size_t rychkov::parse_as_count(ParserContext& context)
 {
@@ -44,51 +82,32 @@ size_t rychkov::parse_as_count(ParserContext& context)
 }
 bool rychkov::MainProcessor::area(ParserContext& context)
 {
-  using processor = rychkov::AreaProcessor;
-  using parser_type = rychkov::Parser< processor >;
-  static parser_type::map_type call_map = {
-        {"EVEN", &processor::even},
-        {"ODD", &processor::odd},
-        {"MEAN", &processor::mean}
-      };
-  static parser_type parser{context, {polygons_}, std::move(call_map), &processor::count};
-  parser.run();
+  rychkov::AreaProcessor processor{polygons_};
+  if (!processor.count(context))
+  {
+    rychkov::Parser::parse(context, processor, rychkov::AreaProcessor::call_map);
+  }
   return true;
 }
 bool rychkov::MainProcessor::max(ParserContext& context)
 {
-  using processor = rychkov::MaxProcessor;
-  using parser_type = rychkov::Parser< processor >;
-  static parser_type::map_type call_map = {
-        {"AREA", &processor::area},
-        {"VERTEXES", &processor::count}
-      };
-  static parser_type parser{context, {polygons_}, std::move(call_map)};
-  parser.run();
+  rychkov::MaxProcessor processor{polygons_};
+  rychkov::Parser::parse(context, processor, rychkov::MaxProcessor::call_map);
   return true;
 }
 bool rychkov::MainProcessor::min(ParserContext& context)
 {
-  using processor = rychkov::MinProcessor;
-  using parser_type = rychkov::Parser< processor >;
-  static parser_type::map_type call_map = {
-        {"AREA", &processor::area},
-        {"VERTEXES", &processor::count}
-      };
-  static parser_type parser{context, {polygons_}, std::move(call_map)};
-  parser.run();
+  rychkov::MinProcessor processor{polygons_};
+  rychkov::Parser::parse(context, processor, rychkov::MinProcessor::call_map);
   return true;
 }
 bool rychkov::MainProcessor::count(ParserContext& context)
 {
-  using processor = rychkov::CountProcessor;
-  using parser_type = rychkov::Parser< processor >;
-  static parser_type::map_type call_map = {
-        {"EVEN", &processor::even},
-        {"ODD", &processor::odd}
-      };
-  static parser_type parser{context, {polygons_}, std::move(call_map), &processor::count};
-  parser.run();
+  rychkov::CountProcessor processor{polygons_};
+  if (!processor.count(context))
+  {
+    rychkov::Parser::parse(context, processor, rychkov::CountProcessor::call_map);
+  }
   return true;
 }
 
