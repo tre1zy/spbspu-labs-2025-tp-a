@@ -1,8 +1,8 @@
 #include "io.hpp"
-#include <iostream>
 #include <cctype>
+#include <iostream>
 
-std::istream &amine::operator>>(std::istream &in, DelimiterIO &&dest)
+std::istream& amine::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -18,7 +18,7 @@ std::istream &amine::operator>>(std::istream &in, DelimiterIO &&dest)
   return in;
 }
 
-std::istream &amine::operator>>(std::istream &in, ComplexIO &&dest)
+std::istream& amine::operator>>(std::istream& in, ComplexIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -26,18 +26,18 @@ std::istream &amine::operator>>(std::istream &in, ComplexIO &&dest)
     return in;
   }
 
-  in >> DelimiterIO{'#'} >> DelimiterIO{'c'} >> DelimiterIO{'('};
+  in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' } >> DelimiterIO{ '(' };
   double real = 0.0, imag = 0.0;
-  in >> real >> imag >> DelimiterIO{')'};
+  in >> real >> imag >> DelimiterIO{ ')' };
 
   if (in)
   {
-    dest.ref = std::complex<double>(real, imag);
+    dest.ref = std::complex< double >(real, imag);
   }
   return in;
 }
 
-std::istream &amine::operator>>(std::istream &in, RationalIO &&dest)
+std::istream& amine::operator>>(std::istream& in, RationalIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -45,15 +45,15 @@ std::istream &amine::operator>>(std::istream &in, RationalIO &&dest)
     return in;
   }
 
-  in >> DelimiterIO{'('} >> DelimiterIO{':'} >> DelimiterIO{'N'};
+  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' };
   long long numerator = 0;
-  in >> numerator >> DelimiterIO{':'} >> DelimiterIO{'D'};
+  in >> numerator >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' };
   unsigned long long denominator = 0;
-  in >> denominator >> DelimiterIO{':'} >> DelimiterIO{')'};
+  in >> denominator >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
 
   if (in && denominator != 0)
   {
-    dest.ref = {numerator, denominator};
+    dest.ref = { numerator, denominator };
   }
   else
   {
@@ -62,12 +62,12 @@ std::istream &amine::operator>>(std::istream &in, RationalIO &&dest)
   return in;
 }
 
-std::istream &amine::operator>>(std::istream &in, StringIO &&dest)
+std::istream& amine::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
-  return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
+  return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }

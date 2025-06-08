@@ -1,8 +1,8 @@
 #ifndef IO_HPP
 #define IO_HPP
 
-#include <string>
 #include <complex>
+#include <string>
 #include <utility>
 
 namespace amine
@@ -13,20 +13,20 @@ namespace amine
   };
   struct ComplexIO
   {
-    std::complex<double> &ref;
+    std::complex< double >& ref;
   };
   struct RationalIO
   {
-    std::pair<long long, unsigned long long> &ref;
+    std::pair< long long, unsigned long long >& ref;
   };
   struct StringIO
   {
-    std::string &ref;
+    std::string& ref;
   };
 
-  std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
-  std::istream &operator>>(std::istream &in, ComplexIO &&dest);
-  std::istream &operator>>(std::istream &in, RationalIO &&dest);
-  std::istream &operator>>(std::istream &in, StringIO &&dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, ComplexIO&& dest);
+  std::istream& operator>>(std::istream& in, RationalIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
 }
 #endif
