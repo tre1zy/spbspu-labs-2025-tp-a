@@ -62,8 +62,8 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
   try
   {
     std::size_t processedCount;
-    dest.ref = std::stod(numberStr, &processedCount);
-    if (processedCount < numberStr.size())
+    dest.ref = std::stod(str, &processedCount);
+    if (processedCount < str.size())
     {
       in.setstate(std::ios::failbit);
     }
