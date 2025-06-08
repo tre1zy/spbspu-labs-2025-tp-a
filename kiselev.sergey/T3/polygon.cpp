@@ -64,20 +64,6 @@ std::istream& kiselev::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
-std::ostream& kiselev::operator<<(std::ostream& out, const Point& p)
-{
-  return out << "(" << p.x << ";" << p.y << ")";
-}
-
-std::ostream& kiselev::operator<<(std::ostream& out, const Polygon& pol)
-{
-  for (size_t i = 0; i < pol.points.size(); ++i)
-  {
-    out << pol.points[i] << " ";
-  }
-  return out << "\n";
-}
-
 double kiselev::getArea(const Polygon& polygon)
 {
   AreaCalculator calc{ polygon.points.back() };
@@ -87,9 +73,5 @@ double kiselev::getArea(const Polygon& polygon)
 
 bool kiselev::isRect(const Polygon& poly)
 {
-  if (poly.points.size() != 4)
-  {
-    return false;
-  }
-  return (distance(poly.points[0], poly.points[2]) == distance(poly.points[1], poly.points[3]));
+  return (poly.points.size() == 4) && (distance(poly.points[0], poly.points[2]) == distance(poly.points[1], poly.points[3]));
 }

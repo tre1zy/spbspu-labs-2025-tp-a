@@ -23,7 +23,7 @@ namespace
     return !isEven(poly);
   }
 
-  bool isAll(const kiselev::Polygon&)
+  bool acceptAll(const kiselev::Polygon&)
   {
     return true;
   }
@@ -59,7 +59,7 @@ namespace
     {
       throw std::logic_error("No polygons");
     }
-    return areaSum(polygons, isAll) / polygons.size();
+    return areaSum(polygons, acceptAll) / polygons.size();
   }
   double areaNum(const std::vector< kiselev::Polygon >& polygons, size_t n)
   {
@@ -126,7 +126,7 @@ namespace
   }
 }
 
-void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void kiselev::doAreaCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string subcommand;
   in >> subcommand;
@@ -152,7 +152,7 @@ void kiselev::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   out << std::fixed << std::setprecision(1) << res << "\n";
 }
 
-void kiselev::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void kiselev::doMaxCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string subcommand;
   in >> subcommand;
@@ -173,7 +173,7 @@ void kiselev::max(std::istream& in, std::ostream& out, const std::vector< Polygo
   }
 }
 
-void kiselev::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void kiselev::doMinCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string subcommand;
   in >> subcommand;
@@ -194,7 +194,7 @@ void kiselev::min(std::istream& in, std::ostream& out, const std::vector< Polygo
   }
 }
 
-void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void kiselev::doCountCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string subcommand;
   in >> subcommand;
@@ -216,12 +216,12 @@ void kiselev::count(std::istream& in, std::ostream& out, const std::vector< Poly
   }
 }
 
-void kiselev::rects(std::ostream& out, const std::vector< Polygon >& polygons)
+void kiselev::doRectsCommand(std::ostream& out, const std::vector< Polygon >& polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), isRect) << "\n";
 }
 
-void kiselev::lessArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+void kiselev::doLessAreaCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   Polygon poly;
   in >> poly;

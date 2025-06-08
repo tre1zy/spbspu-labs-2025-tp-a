@@ -5,11 +5,11 @@
 #include <vector>
 namespace kiselev
 {
-  void area(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void max(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void min(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void count(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void lessArea(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void rects(std::ostream&, const std::vector< Polygon >&);
+  void doAreaCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doMaxCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doMinCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doCountCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doLessAreaCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doRectsCommand(std::ostream&, const std::vector< Polygon >&);
 }
 #endif
