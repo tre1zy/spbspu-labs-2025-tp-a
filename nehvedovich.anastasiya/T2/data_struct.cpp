@@ -29,8 +29,8 @@ std::istream &nehvedovich::operator>>(std::istream &in, DataStruct &dest)
     return in;
   }
 
-  DataStruct tmp {};
-  std::string key_value {};
+  DataStruct tmp{};
+  std::string key_value{};
   {
     using sep = DelimiterIO;
     in >> sep {'('} >> sep {':'};
