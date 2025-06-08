@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
   }
 
   using Polygon = shiryaeva::Polygon;
-  using PolygonIter = std::istream_iterator<Polygon>;
-  std::vector<Polygon> polygons;
+  using PolygonIter = std::istream_iterator< Polygon >;
+  std::vector< Polygon > polygons;
 
   while (!file.eof())
   {

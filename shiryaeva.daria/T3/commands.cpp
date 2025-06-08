@@ -22,7 +22,7 @@ namespace shiryaeva
 
     if (subcmd == "EVEN")
     {
-      std::vector<Polygon> filteredPolygons;
+      std::vector< Polygon > filteredPolygons;
       std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsEven{});
 
       std::vector< double > areas;
@@ -175,35 +175,7 @@ namespace shiryaeva
     Polygon target;
     in >> target;
 
-    if (!in || target.points.size() < 3)
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-
-    if (in.peek() != '\n' && !in.eof())
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-
-    struct HasDuplicates
-    {
-      bool operator()(const Polygon& p) const
-      {
-        for (size_t i = 0; i < p.points.size(); ++i)
-        {
-          for (size_t j = i + 1; j < p.points.size(); ++j)
-          {
-            if (p.points[i] == p.points[j])
-            {
-              return true;
-            }
-          }
-        }
-          return false;
-      }
-    };
-
-    if (HasDuplicates{}(target))
+    if (!in || target.points.size() < 3 || (in.peek() != '\n' && !in.eof()))
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
@@ -227,35 +199,7 @@ namespace shiryaeva
     Polygon target;
     in >> target;
 
-    if (!in || target.points.size() < 3)
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-
-    if (in.peek() != '\n' && !in.eof())
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-
-    struct HasDuplicates
-    {
-      bool operator()(const Polygon& p) const
-      {
-        for (size_t i = 0; i < p.points.size(); ++i)
-        {
-          for (size_t j = i + 1; j < p.points.size(); ++j)
-          {
-            if (p.points[i] == p.points[j])
-            {
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-    };
-
-    if (HasDuplicates{}(target))
+    if (!in || target.points.size() < 3 || (in.peek() != '\n' && !in.eof()))
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
