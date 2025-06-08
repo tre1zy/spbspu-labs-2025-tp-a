@@ -1,5 +1,4 @@
 #include "polygon.hpp"
-#include <cmath>
 #include <algorithm>
 #include <numeric>
 #include <vector>
@@ -77,7 +76,7 @@ bool trukhanov::isRight(const Polygon& polygon)
     return false;
   }
 
-  std::vector<size_t> indices(n);
+  std::vector< size_t > indices(n);
   std::iota(indices.begin(), indices.end(), 0);
 
   return std::any_of(indices.begin(), indices.end(), HasRightAngle(polygon.points));
