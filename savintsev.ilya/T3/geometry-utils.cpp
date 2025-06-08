@@ -63,6 +63,7 @@ bool savintsev::is_on_segment(const Point p, const Point p1, const Point p2)
     return false;
   }
 
-  return p.x >= std::min(p1.x, p2.x) && p.x <= std::max(p1.x, p2.x) &&
-          p.y >= std::min(p1.y, p2.y) && p.y <= std::max(p1.y, p2.y);
+  bool x_in_range = p.x >= std::min(p1.x, p2.x) && p.x <= std::max(p1.x, p2.x);
+  bool y_in_range = p.y >= std::min(p1.y, p2.y) && p.y <= std::max(p1.y, p2.y);
+  return x_in_range && y_in_range;
 }

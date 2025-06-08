@@ -1,13 +1,12 @@
-#ifndef UTILS_H
-#define UTILS_H
-#include <vector>
+#ifndef IO_DELIMITER_HPP
+#define IO_DELIMITER_HPP
 #include <iostream>
 
 namespace savintsev
 {
   struct DelimiterIO
   {
-    char exp;
+    char exp_;
   };
 
   std::istream & operator>>(std::istream & in, DelimiterIO && dest);

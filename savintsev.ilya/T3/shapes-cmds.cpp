@@ -1,5 +1,6 @@
 #include "shapes-cmds.h"
 #include <string>
+#include <iterator>
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
@@ -14,56 +15,119 @@ namespace
   {
     return savintsev::calc_polygon_area(a) + sum;
   }
+
   bool is_polygon_even(const savintsev::Polygon & a)
   {
     return !(a.points.size() % 2);
   }
+
   bool is_polygon_odd(const savintsev::Polygon & a)
   {
     return a.points.size() % 2;
   }
+
   bool compare_areas(const savintsev::Polygon & a, const savintsev::Polygon & b)
   {
     return calc_polygon_area(a) < calc_polygon_area(b);
   }
+
   bool compare_vert_amt(const savintsev::Polygon & a, const savintsev::Polygon & b)
   {
     return a.points.size() < b.points.size();
   }
+
   struct CheckPolygonVert
   {
-    bool operator()(const savintsev::Polygon & a)
+    bool operator()(const savintsev::Polygon & a) const
     {
       return a.points.size() == num;
     }
     size_t num;
   };
-  struct CheckIntersect
+
+  struct PointShifter
   {
-    bool operator()(const savintsev::Polygon & a)
+    bool operator()(const savintsev::Point & point) const
     {
-      size_t n = a.points.size();
-      for (size_t i = 0; i < n; ++i)
+      return shiftedPoints.find(point) != shiftedPoints.end();
+    }
+    const std::set< savintsev::Point > & shiftedPoints;
+  };
+
+  struct PointMatchChecker
+  {
+    bool operator()(const savintsev::Point & q) const
+    {
+      savintsev::Point shifted{q.x + dx, q.y + dy};
+      return shifter(shifted);
+    }
+    int dx;
+    int dy;
+    const PointShifter & shifter;
+  };
+
+  struct InnerPointProcessor
+  {
+    bool operator()(const savintsev::Point & pb) const
+    {
+      int dx = pa.x - pb.x;
+      int dy = pa.y - pb.y;
+      PointShifter shifter{setP};
+      return std::all_of(a.points.begin(), a.points.end(), PointMatchChecker{dx, dy, shifter});
+    }
+    const savintsev::Point & pa;
+    const savintsev::Polygon & a;
+    const std::set< savintsev::Point > & setP;
+  };
+
+  struct PointPairProcessor
+  {
+    bool operator()(const savintsev::Point & pa) const
+    {
+      InnerPointProcessor processor{pa, a, setP};
+      return std::any_of(a.points.begin(), a.points.end(), processor);
+    }
+    const savintsev::Polygon & a;
+    const std::set< savintsev::Point > & setP;
+  };
+
+  struct SegmentIntersectionChecker
+  {
+    bool operator()(const savintsev::Point & p1, const savintsev::Point & p2) const
+    {
+      struct SegmentChecker
       {
-        size_t m = p.points.size();
-        for (size_t j = 0; j < m; ++j)
+        bool operator()(const savintsev::Point & q1) const
         {
-          const savintsev::Point & a1 = a.points[((i + 1) == n) ? 0 : i + 1];
-          const savintsev::Point & p1 = p.points[((j + 1) == m) ? 0 : j + 1];
-          bool is_intersect = savintsev::is_lines_int(p.points[j], p1, a.points[j], a1);
-          if (is_intersect)
-          {
-            return true;
-          }
+          const savintsev::Point & q2 = polygon.points[(std::addressof(q1) - std::addressof(polygon.points[0]) + 1) % polygon.points.size()];
+          return savintsev::is_lines_int(p1, p2, q1, q2);
         }
-      }
-      return false;
+        const savintsev::Polygon & polygon;
+        const savintsev::Point & p1;
+        const savintsev::Point & p2;
+      };
+
+      SegmentChecker checker{p, p1, p2};
+      return std::any_of(p.points.begin(), p.points.end(), checker);
     }
     const savintsev::Polygon & p;
   };
+
+  struct SegmentCheckProcessor
+  {
+    bool operator()(size_t i) const
+    {
+      const savintsev::Point & p1 = polygon.points[i];
+      const savintsev::Point & p2 = polygon.points[(i + 1) % polygon.points.size()];
+      return checker(p1, p2);
+    }
+    const savintsev::Polygon & polygon;
+    const SegmentIntersectionChecker & checker;
+  };
+
   struct CheckSame
   {
-    bool operator()(const savintsev::Polygon & a)
+    bool operator()(const savintsev::Polygon & a) const
     {
       if (a.points.size() != p.points.size())
       {
@@ -71,34 +135,24 @@ namespace
       }
 
       std::set< savintsev::Point > setP(p.points.begin(), p.points.end());
-
-      for (const auto & pa : p.points)
-      {
-        for (const auto & pb : a.points)
-        {
-          int dx = pa.x - pb.x;
-          int dy = pa.y - pb.y;
-
-          bool match = true;
-          for (const auto & q : a.points)
-          {
-            savintsev::Point shifted{q.x + dx, q.y + dy};
-            if (setP.find(shifted) == setP.end())
-            {
-              match = false;
-              break;
-            }
-          }
-
-          if (match)
-          {
-            return true;
-          }
-        }
-      }
-      return false;
+      PointPairProcessor processor{a, setP};
+      return std::any_of(p.points.begin(), p.points.end(), processor);
     }
+    const savintsev::Polygon & p;
+  };
 
+  struct CheckIntersect
+  {
+    bool operator()(const savintsev::Polygon & a) const
+    {
+      SegmentIntersectionChecker checker{p};
+      SegmentCheckProcessor processor{a, checker};
+      
+      std::vector< size_t > indices(a.points.size());
+      std::iota(indices.begin(), indices.end(), 0);
+      
+      return std::any_of(indices.begin(), indices.end(), processor);
+    }
     const savintsev::Polygon & p;
   };
 }
@@ -262,8 +316,5 @@ void savintsev::same(std::istream & in, std::ostream & out, const std::vector< P
 
 void savintsev::print(std::ostream & out, const std::vector< Polygon > & data)
 {
-  for (size_t i = 0; i < data.size(); ++i)
-  {
-    out << data[i] << '\n';
-  }
+  std::copy(data.begin(), data.end(), std::ostream_iterator< Polygon >(out, "\n"));
 }

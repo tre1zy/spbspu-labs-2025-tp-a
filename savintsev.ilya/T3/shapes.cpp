@@ -1,5 +1,7 @@
 #include "shapes.h"
-#include "utils.h"
+#include <algorithm>
+#include <iterator>
+#include <io-delimiter.hpp>
 
 bool savintsev::operator<(const Point & a, const Point & b)
 {
@@ -60,16 +62,14 @@ std::istream & savintsev::operator>>(std::istream & in, Polygon & dest)
   }
 
   Polygon data;
+  data.points.resize(n);
 
-  for (size_t i = 0; i < n; ++i)
+  std::copy_n(std::istream_iterator< Point >(in), n, data.points.begin());
+
+  if (in.fail())
   {
-    Point p;
-    in >> p;
-    if (!in)
-    {
-      return in;
-    }
-    data.points.push_back(p);
+    data.points.clear();
+    return in;
   }
 
   dest = data;
@@ -80,9 +80,10 @@ std::istream & savintsev::operator>>(std::istream & in, Polygon & dest)
 std::ostream & savintsev::operator<<(std::ostream & out, const Polygon & dest)
 {
   out << dest.points.size();
-  for (size_t i = 0; i < dest.points.size(); ++i)
+  if (!dest.points.empty())
   {
-    std::cout << ' ' << dest.points[i];
+    out << ' ' << dest.points.front();
+    std::copy(dest.points.begin() + 1, dest.points.end(), std::ostream_iterator< Point >(out, " "));
   }
   return out;
 }
