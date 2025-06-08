@@ -33,6 +33,66 @@ namespace
       out << "\n";
     }
   };
+
+  struct RuFinder
+  {
+    const std::string& target;
+    list_t& res;
+
+    void operator()(const std::pair< std::string, list_t >& unit)
+    {
+      if (std::find(unit.second.begin(), unit.second.end(), target) != unit.second.end())
+      {
+        res.push_back(unit.first);
+      }
+    }
+  };
+
+  struct NameReader
+  {
+    std::istream& in;
+    std::string operator()()
+    {
+      std::string str;
+      in >> str;
+      return str;
+    }
+  };
+
+  struct TranslationsModifier
+  {
+    list_t& translations;
+    bool isAddOperation;
+
+    void operator()(const std::string& word)
+    {
+      if (isAddOperation)
+      {
+        translations.push_back(word);
+      }
+      else
+      {
+        translations.remove(word);
+      }
+    }
+  };
+
+  void modifyTranslations(std::istream& in, dict_t& dicts, bool isAddOp)
+  {
+    std::string dict_name, eng_word;
+    size_t translations_cnt;
+    in >> dict_name >> eng_word >> translations_cnt;
+
+    auto& dict = dicts.at(dict_name);
+    auto& translations = dict.at(eng_word);
+    list_t words;
+    NameReader reader{ in };
+    TranslationsModifier mod{ translations, isAddOp };
+
+    std::generate_n(std::back_inserter(words), translations_cnt, reader);
+    std::for_each(words.begin(), words.end(), mod);
+  }
+
 }
 
 void demehin::printHelp(std::ostream& out)
@@ -85,4 +145,71 @@ void demehin::printDict(std::istream& in, std::ostream& out, const dict_t& dicts
   in >> name;
   auto dict = dicts.at(name);
   std::for_each(dict.begin(), dict.end(), DictPrinter{ out });
+}
+
+void demehin::getTranslationEng(std::istream& in, std::ostream& out, const dict_t& dicts)
+{
+  std::string dict_name, eng_word;
+  in >> dict_name >> eng_word;
+  auto translations = dicts.at(dict_name).at(eng_word);
+  out << eng_word << ": ";
+  std::for_each(translations.begin(), translations.end(), TranslationPrinter{ out });
+  out << "\n";
+}
+
+void demehin::getTranslationRu(std::istream& in, std::ostream& out, const dict_t& dicts)
+{
+  std::string dict_name, ru_word;
+  in >> dict_name >> ru_word;
+  list_t res;
+  auto dict = dicts.at(dict_name);
+  std::for_each(dict.begin(), dict.end(), RuFinder{ ru_word, res });
+
+  if (res.empty())
+  {
+    throw std::logic_error("no such russian word");
+  }
+
+  out << ru_word << ": ";
+  std::for_each(res.begin(), res.end(), TranslationPrinter{ out });
+  out << "\n";
+}
+
+void demehin::deleteEng(std::istream& in, dict_t& dicts)
+{
+  std::string dict_name, word;
+  in >> dict_name >> word;
+  auto& dict = dicts.at(dict_name);
+  if (dict.erase(word) == false)
+  {
+    throw std::logic_error("no such english word");
+  }
+}
+
+void demehin::addEng(std::istream& in, dict_t& dicts)
+{
+  std::string dict_name, eng_word;
+  size_t cnt;
+  in >> dict_name >> eng_word >> cnt;
+
+  auto& dict = dicts.at(dict_name);
+  if (dict.count(eng_word) > 0)
+  {
+    throw std::logic_error("word already exists");
+  }
+
+  list_t translations;
+  NameReader reader{ in };
+  std::generate_n(std::back_inserter(translations), cnt, reader);
+  dict.insert(std::make_pair(eng_word, translations));
+}
+
+void demehin::deleteRu(std::istream& in, dict_t& dicts)
+{
+  modifyTranslations(in, dicts, false);
+}
+
+void demehin::addRu(std::istream& in, dict_t& dicts)
+{
+  modifyTranslations(in, dicts, true);
 }
