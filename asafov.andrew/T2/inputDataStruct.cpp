@@ -92,55 +92,55 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
   std::istream_iterator<char> in(is);
   std::istream_iterator<char> end;
 
-  if (expect('(', in, end))
+  if (!expect('(', in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (expect(':', in, end))
+  if (!expect(':', in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (readKey(data, in, end))
+  if (!readKey(data, in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (expect(':', in, end))
+  if (!expect(':', in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (readKey(data, in, end))
+  if (!readKey(data, in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (expect(':', in, end))
+  if (!expect(':', in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (readKey(data, in, end))
+  if (!readKey(data, in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (expect(':', in, end))
+  if (!expect(':', in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
     return is;
   }
-  if (expect(')', in, end))
+  if (!expect(')', in, end))
   {
     is.setstate(std::ios::failbit);
     is >> std::skipws;
