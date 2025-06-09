@@ -15,7 +15,7 @@ namespace cherepkov
     StreamGuard& operator=(const StreamGuard&) = delete;
     StreamGuard(StreamGuard&&) = delete;
     StreamGuard& operator=(StreamGuard&&) = delete;
-    
+
    private:
     std::basic_ios< char >& s_;
     std::streamsize precision_;
