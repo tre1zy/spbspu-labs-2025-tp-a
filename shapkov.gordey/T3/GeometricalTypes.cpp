@@ -104,13 +104,12 @@ std::vector< shapkov::Polygon > shapkov::polygonToTriangles(const Polygon& p)
 {
   std::vector< Polygon > triangles;
   size_t size = p.points.size() - 2;
-  std::vector< size_t > indices(size);
-  std::iota(indices.begin(), indices.end(), 0);
-  using namespace std::placeholders;
-  std::transform(
-    indices.begin(), indices.end(),
+  triangles.reserve(size);
+  size_t index = 0;
+  std::generate_n(
     std::back_inserter(triangles),
-    std::bind(makeTriangle, _1, std::cref(p.points))
+    size,
+    std::bind(makeTriangle, std::ref(index), std::cref(p.points))
   );
   return triangles;
 }
