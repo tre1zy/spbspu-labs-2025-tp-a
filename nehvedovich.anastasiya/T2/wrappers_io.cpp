@@ -65,10 +65,10 @@ std::istream &nehvedovich::operator>>(std::istream &in, CharIO &&dest)
     return in;
   }
 
-  in >> DelimiterIO {'\''};
+  in >> DelimiterIO{'\''};
   char c = 0;
   in >> c;
-  in >> DelimiterIO {'\''};
+  in >> DelimiterIO{'\''};
   if (in)
   {
     dest.ref = c;
@@ -84,5 +84,5 @@ std::istream &nehvedovich::operator>>(std::istream &in, StringIO &&dest)
     return in;
   }
 
-  return std::getline(in >> DelimiterIO {'"'}, dest.ref, '"');
+  return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
 }

@@ -33,29 +33,29 @@ std::istream &nehvedovich::operator>>(std::istream &in, DataStruct &dest)
   std::string key_value{};
   {
     using sep = DelimiterIO;
-    in >> sep {'('} >> sep {':'};
+    in >> sep{'('} >> sep{':'};
     for (int i = 0; i < 3; i++)
     {
       in >> key_value;
       if (key_value == "key1")
       {
-        in >> UnsignedLongLongIO {tmp.key1};
+        in >> UnsignedLongLongIO{tmp.key1};
       }
       else if (key_value == "key2")
       {
-        in >> CharIO {tmp.key2};
+        in >> CharIO{tmp.key2};
       }
       else if (key_value == "key3")
       {
-        in >> StringIO {tmp.key3};
+        in >> StringIO{tmp.key3};
       }
       else
       {
         in.setstate(std::ios::failbit);
       }
-      in >> sep {':'};
+      in >> sep{':'};
     }
-    in >> sep {')'};
+    in >> sep{')'};
   }
 
   if (in)
