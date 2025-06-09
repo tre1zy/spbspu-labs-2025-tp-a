@@ -5,58 +5,74 @@
 
 std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
 {
-    std::istream::sentry sentry(in);
-    if (!sentry)
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+      return in;
+  }
+
+  DataStruct temp;
+  size_t keysRead = 0;
+  bool has_key1 = false, has_key2 = false, has_key3 = false;
+
+  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+
+  while (keysRead < 3)
+  {
+    std::string key;
+    in >> key;
+
+    if (key == "key1")
     {
+      if (has_key1)
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        in >> UllLitValue{ temp.key1 };
+        has_key1 = true;
+    }
+    else if (key == "key2")
+    {
+      if (has_key2)
+      {
+        in.setstate(std::ios::failbit);
         return in;
+      }
+        in >> UllBinValue{ temp.key2 };
+        has_key2 = true;
     }
-
-    DataStruct temp;
-    bool has_key1 = false, has_key2 = false, has_key3 = false;
-
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-
-    for (size_t i = 0; i < 3; ++i)
+    else if (key == "key3")
     {
-        std::string key;
-        in >> key;
-
-        if (key == "key1" && !has_key1)
-        {
-            in >> UllLitValue{ temp.key1 };
-            has_key1 = true;
-        }
-        else if (key == "key2" && !has_key2)
-        {
-            in >> UllBinValue{ temp.key2 };
-            has_key2 = true;
-        }
-        else if (key == "key3" && !has_key3)
-        {
-            in >> StringValue{ temp.key3 };
-            has_key3 = true;
-        }
-        else
-        {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        in >> DelimiterIO{ ':' };
-    }
-
-    in >> DelimiterIO{ ')' };
-
-    if (in && has_key1 && has_key2 && has_key3)
-    {
-        dest = std::move(temp);
+      if (has_key3)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+        in >> StringValue{ temp.key3 };
+        has_key3 = true;
     }
     else
     {
         in.setstate(std::ios::failbit);
+        return in;
     }
 
-    return in;
+    if (!in)
+    {
+      return in;
+    }
+    ++keysRead;
+  }
+
+  in >> DelimiterIO{ ')' };
+
+  if (in)
+  {
+      dest = std::move(temp);
+  }
+
+  return in;
 }
 
 std::string convertToBinary(unsigned long long val)
