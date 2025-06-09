@@ -11,4 +11,6 @@ struct DataStruct
     std::string key3;
 };
 
+std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+
 #endif
