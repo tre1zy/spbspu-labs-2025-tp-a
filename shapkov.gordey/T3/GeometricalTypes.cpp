@@ -4,8 +4,8 @@
 #include <iterator>
 #include <numeric>
 #include <cmath>
-#include "functors.hpp"
 #include <delimiter.hpp>
+#include "polygonfunctors.hpp"
 
 using check = shapkov::DelimiterIO;
 
@@ -16,7 +16,7 @@ std::istream& shapkov::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  int x = 0, y = 0;
+  double x = 0, y = 0;
   in >> check{ '(' };
   in >> x;
   in >> check{ ';' };
@@ -27,8 +27,7 @@ std::istream& shapkov::operator>>(std::istream& in, Point& point)
     in.setstate(std::ios::failbit);
     return in;
   }
-  point.x = x;
-  point.y = y;
+  point = { x, y };
   return in;
 }
 
@@ -84,7 +83,7 @@ std::ostream& shapkov::operator<<(std::ostream& out, const Polygon& polygon)
 
 double shapkov::getDistance(const Point& p1, const Point& p2)
 {
-  return sqrt(pow((p1.x - p2.x), 2) + pow((p1.y - p2.y), 2));
+  return std::sqrt(std::pow((p1.x - p2.x), 2) + std::pow((p1.y - p2.y), 2));
 }
 
 double shapkov::getAreaOfTriangle(const Polygon& p)
@@ -93,7 +92,7 @@ double shapkov::getAreaOfTriangle(const Polygon& p)
   double sideB = getDistance(p.points[2], p.points[1]);
   double sideC = getDistance(p.points[0], p.points[2]);
   double halfPerimeter = (sideA + sideB + sideC) / 2;
-  return sqrt(halfPerimeter * (halfPerimeter - sideA) * (halfPerimeter - sideB) * (halfPerimeter - sideC));
+  return std::sqrt(halfPerimeter * (halfPerimeter - sideA) * (halfPerimeter - sideB) * (halfPerimeter - sideC));
 }
 
 shapkov::Polygon shapkov::makeTriangle(size_t i, const std::vector< Point >& pts)
@@ -101,8 +100,9 @@ shapkov::Polygon shapkov::makeTriangle(size_t i, const std::vector< Point >& pts
   return Polygon{ std::vector<Point>{ pts[0], pts[i + 1], pts[i + 2] } };
 }
 
-void shapkov::polygonToTriangles(const Polygon& p, std::vector< Polygon >& triangles)
+std::vector< shapkov::Polygon > shapkov::polygonToTriangles(const Polygon& p)
 {
+  std::vector< Polygon > triangles;
   size_t size = p.points.size() - 2;
   std::vector< size_t > indices(size);
   std::iota(indices.begin(), indices.end(), 0);
@@ -112,12 +112,12 @@ void shapkov::polygonToTriangles(const Polygon& p, std::vector< Polygon >& trian
     std::back_inserter(triangles),
     std::bind(makeTriangle, _1, std::cref(p.points))
   );
+  return triangles;
 }
 
 double shapkov::getArea(const Polygon& p)
 {
-  std::vector< Polygon > triangles;
-  polygonToTriangles(p, triangles);
+  std::vector< Polygon > triangles = polygonToTriangles(p);
   std::vector< double > areas;
   std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTriangle);
   return std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -149,6 +149,6 @@ bool shapkov::isRectangle(const Polygon& p)
   double sideC = getDistance(p.points[3], p.points[2]);
   double sideD = getDistance(p.points[3], p.points[0]);
   double diagAC = getDistance(p.points[0], p.points[2]);
-  double diagAC1 = sqrt(pow((sideA), 2) + pow((sideB), 2));
+  double diagAC1 = std::sqrt(std::pow((sideA), 2) + std::pow((sideB), 2));
   return (compareDouble(diagAC, diagAC1) && compareDouble(sideA, sideC) && compareDouble(sideB, sideD));
 }

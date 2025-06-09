@@ -20,7 +20,7 @@ namespace shapkov
   double getDistance(const Point& p1, const Point& p2);
   double getAreaOfTriangle(const Polygon& p);
   Polygon makeTriangle(size_t i, const std::vector< Point >& pts);
-  void polygonToTriangles(const Polygon& p, std::vector< Polygon >& triangles);
+  std::vector< Polygon > polygonToTriangles(const Polygon& p);
   double getArea(const Polygon& p);
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);

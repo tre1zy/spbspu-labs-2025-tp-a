@@ -1,9 +1,10 @@
-#include "functors.hpp"
+#include "polygonfunctors.hpp"
 #include <cmath>
 #include <functional>
 #include <algorithm>
 
-bool shapkov::isSize::operator()(const Polygon& p) const {
+bool shapkov::isSize(const Polygon& p, size_t size)
+{
   return p.points.size() == size;
 }
 
