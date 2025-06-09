@@ -20,6 +20,10 @@ int main()
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+  if (data.empty())
+  {
+    return 0;
+  }
   std::sort(
     data.begin(),
     data.end(),
