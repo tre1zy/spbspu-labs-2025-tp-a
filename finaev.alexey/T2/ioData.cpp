@@ -1,6 +1,8 @@
 #include "ioData.hpp"
+#include <vector>
 #include <complex>
 #include <iomanip>
+#include <algorithm>
 #include "streamGuard.hpp"
 
 namespace
@@ -94,28 +96,39 @@ std::istream& finaev::operator>>(std::istream& in, DataStruct& rhs)
     using cmpLsp = complexIO;
     using str = stringIO;
     in >> sep{ '(' } >> sep{ ':' };
-    while (true)
+    std::vector< std::string > usedKeys;
+    std::string key = "";
+    while (in >> key && key != ")")
     {
-      std::string key = "";
-      in >> key;
+      if (std::find(usedKeys.begin(), usedKeys.end(), key) != usedKeys.end())
+      {
+        in.setstate(std::ios::failbit);
+        break;
+      }
+      usedKeys.push_back(key);
       if (key == "key1")
       {
-        in >> ll{ input.key1 };
-        in >> sep{':'};
+        if (!(in >> ll{ input.key1 } >> sep{':'}))
+        {
+          in.setstate(std::ios::failbit);
+          break;
+        }
       }
       else if (key == "key2")
       {
-        in >> cmpLsp{ input.key2 };
-        in >> sep{':'};
+        if (!(in >> cmpLsp{ input.key2 } >> sep{':'}))
+        {
+          in.setstate(std::ios::failbit);
+          break;
+        }
       }
       else if (key == "key3")
       {
-        in >> str{ input.key3 };
-        in >> sep{ ':' };
-      }
-      else if (key == ")")
-      {
-        break;
+        if (!(in >> str{ input.key3 } >> sep{':'}))
+        {
+          in.setstate(std::ios::failbit);
+          break;
+        }
       }
       else
       {

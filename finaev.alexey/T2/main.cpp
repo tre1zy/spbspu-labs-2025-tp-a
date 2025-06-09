@@ -10,11 +10,12 @@
 
 int main()
 {
-  std::vector< finaev::DataStruct > dataVect;
-  using istream_iter = std::istream_iterator< finaev::DataStruct >;
+  using finaev::DataStruct;
+  std::vector< DataStruct > dataVect;
+  using istream_iter = std::istream_iterator< DataStruct >;
   while (!std::cin.eof())
   {
-    std::copy(istream_iter(std::cin), istream_iter(), std::back_inserter(dataVect));
+    std::copy(istream_iter{ std::cin }, istream_iter{}, std::back_inserter(dataVect));
     if (std::cin.fail() && !std::cin.eof())
     {
       std::cin.clear();
@@ -22,5 +23,5 @@ int main()
     }
   }
   finaev::dataSort(dataVect.begin(), dataVect.end());
-  std::copy(dataVect.begin(), dataVect.end(), std::ostream_iterator< finaev::DataStruct >(std::cout, "\n"));
+  std::copy(dataVect.begin(), dataVect.end(), std::ostream_iterator< DataStruct >{ std::cout, "\n" });
 }
