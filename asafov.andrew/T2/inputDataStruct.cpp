@@ -89,10 +89,8 @@ namespace
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
   is >> std::noskipws;
-  std::istream_iterator<char> in = is.begin();
-  std::istream_iterator<char> end = is.end();
-
-  bool err = true;
+  std::istream_iterator<char> in(is);
+  std::istream_iterator<char> end;
 
   if (expect('(', in, end))
   {
