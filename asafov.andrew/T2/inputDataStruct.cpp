@@ -7,7 +7,7 @@
 namespace
 {
   bool expect(char expected, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    if (in.failbit) return false;
+    if (in.failbit()) return false;
     if (in == end || *in != expected) return false;
     ++in;
     return true;
@@ -51,7 +51,7 @@ namespace
   }
 
   bool readKey(asafov::DataStruct& data, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    if (in.failbit) return false;
+    if (in.failbit()) return false;
     if (!expect('k', in, end) || !expect('e', in, end) || !expect('y', in, end)) return false;
 
     if (in == end) return false;
