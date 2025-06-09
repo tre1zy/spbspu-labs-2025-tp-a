@@ -7,7 +7,6 @@
 namespace
 {
   bool expect(char expected, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    if (in.failbit()) return false;
     if (in == end || *in != expected) return false;
     ++in;
     return true;
@@ -51,7 +50,6 @@ namespace
   }
 
   bool readKey(asafov::DataStruct& data, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    if (in.failbit()) return false;
     if (!expect('k', in, end) || !expect('e', in, end) || !expect('y', in, end)) return false;
 
     if (in == end) return false;
@@ -91,23 +89,64 @@ namespace
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
   is >> std::noskipws;
-  std::istream_iterator<char> in(is);
-  std::istream_iterator<char> end;
+  std::istream_iterator<char> in = is.begin();
+  std::istream_iterator<char> end = is.end();
 
   bool err = true;
 
-  err = err && expect('(', in, end);
-  err = err && expect(':', in, end);
-  err = err && readKey(data, in, end);
-  err = err && expect(':', in, end);
-  err = err && readKey(data, in, end);
-  err = err && expect(':', in, end);
-  err = err && readKey(data, in, end);
-  err = err && expect(':', in, end);
-  err = err && expect(')', in, end);
-
-  if (!err) {
+  if (expect('(', in, end))
+  {
     is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (expect(':', in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (readKey(data, in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (expect(':', in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (readKey(data, in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (expect(':', in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (readKey(data, in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (expect(':', in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
+  }
+  if (expect(')', in, end))
+  {
+    is.setstate(std::ios::failbit);
+    is >> std::skipws;
+    return is;
   }
 
   is >> std::skipws;
