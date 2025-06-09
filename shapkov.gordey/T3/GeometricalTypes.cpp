@@ -100,17 +100,17 @@ shapkov::Polygon shapkov::makeTriangle(size_t i, const std::vector< Point >& pts
   return Polygon{ std::vector<Point>{ pts[0], pts[i + 1], pts[i + 2] } };
 }
 
+shapkov::Polygon shapkov::TriangleGenerator::operator()()
+{
+  return shapkov::makeTriangle(index++, points);
+}
+
 std::vector< shapkov::Polygon > shapkov::polygonToTriangles(const Polygon& p)
 {
-  std::vector< Polygon > triangles;
   size_t size = p.points.size() - 2;
-  triangles.reserve(size);
+  std::vector< Polygon > triangles(size);
   size_t index = 0;
-  std::generate_n(
-    std::back_inserter(triangles),
-    size,
-    std::bind(makeTriangle, std::ref(index), std::cref(p.points))
-  );
+  std::generate(triangles.begin(), triangles.end(), TriangleGenerator{ index, p.points });
   return triangles;
 }
 

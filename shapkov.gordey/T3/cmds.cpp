@@ -64,9 +64,9 @@ void shapkov::areaVertexes(std::ostream& out, const VecOfPolygons& src, size_t v
 void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   std::unordered_map< std::string, std::function< void() > > areaCmds;
-  areaCmds["EVEN"] = std::bind(areaEven, std::ref(std::cout), std::cref(src));
-  areaCmds["ODD"] = std::bind(areaOdd, std::ref(std::cout), std::cref(src));
-  areaCmds["MEAN"] = std::bind(areaMean, std::ref(std::cout), std::cref(src));
+  areaCmds["EVEN"] = std::bind(areaEven, std::ref(out), std::cref(src));
+  areaCmds["ODD"] = std::bind(areaOdd, std::ref(out), std::cref(src));
+  areaCmds["MEAN"] = std::bind(areaMean, std::ref(out), std::cref(src));
   ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
