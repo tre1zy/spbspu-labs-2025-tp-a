@@ -1,5 +1,0 @@
-dict1
-apple ap
-banana ba
-orange or
-
