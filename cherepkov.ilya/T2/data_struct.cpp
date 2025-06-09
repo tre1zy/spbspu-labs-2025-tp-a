@@ -4,51 +4,73 @@
 
 std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  DataStruct temp;
-  using sep = DelimiterIO;
-  using lit = UllLitValue;
-  using bin = UllBinValue;
-  using str = StringValue;
-
-  in >> sep{ '(' } >> sep{ ':' };
-
-  for (size_t i = 0; i < 3; i++)
-  {
-    std::string key;
-    in >> key;
-
-    if (key == "key1")
+    std::istream::sentry sentry(in);
+    if (!sentry)
     {
-      in >> lit{ temp.key1 };
+        return in;
     }
-    else if (key == "key2")
+
+    DataStruct temp;
+    bool has_key1 = false, has_key2 = false, has_key3 = false;
+
+    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+
+    for (size_t i = 0; i < 3; ++i)
     {
-      in >> bin{ temp.key2 };
+        std::string key;
+        in >> key;
+
+        if (key == "key1" && !has_key1)
+        {
+            in >> UllLitValue{ temp.key1 };
+            has_key1 = true;
+        }
+        else if (key == "key2" && !has_key2)
+        {
+            in >> UllBinValue{ temp.key2 };
+            has_key2 = true;
+        }
+        else if (key == "key3" && !has_key3)
+        {
+            in >> StringValue{ temp.key3 };
+            has_key3 = true;
+        }
+        else
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        in >> DelimiterIO{ ':' };
     }
-    else if (key == "key3")
+
+    in >> DelimiterIO{ ')' };
+
+    if (in && has_key1 && has_key2 && has_key3)
     {
-      in >> str{ temp.key3 };
+        dest = std::move(temp);
     }
     else
     {
-      in.setstate(std::ios::failbit);
-      return in;
+        in.setstate(std::ios::failbit);
     }
-  }
 
-  in >> sep{ ')' };
+    return in;
+}
 
-  if (in)
+std::string convertToBinary(unsigned long long val)
+{
+  if (val == 0)
   {
-    dest = temp;
+    return "0";
   }
-  return in;
+  std::string bin;
+  while (val > 0)
+  {
+    bin.insert(0, std::to_string(val % 2));
+    val /= 2;
+  }
+  return bin;
 }
 
 std::ostream& cherepkov::operator<<(std::ostream& out, const DataStruct& src)
@@ -62,7 +84,7 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const DataStruct& src)
 
   out << "(:";
   out << "key1 " << src.key1 << "ull" << ":";
-  out << "key2 0b" << (src.key2 == 0 ? "" : "0") << ULLtoBinary(src.key2);
+  out << "key2 0b" << (src.key2 == 0 ? "" : "0") << convertToBinary(src.key2);
   out << ":key3 \"" << src.key3;
   out << "\":)";
 

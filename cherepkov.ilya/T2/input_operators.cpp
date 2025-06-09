@@ -73,18 +73,3 @@ std::istream& cherepkov::operator>>(std::istream& in, StringValue&& dest)
 
   return in;
 }
-
-std::string cherepkov::ULLtoBinary(unsigned long long val)
-{
-  if (val == 0)
-  {
-    return "0";
-  }
-  std::string bin;
-  while (val > 0)
-  {
-    bin.insert(0, std::to_string(val % 2));
-    val /= 2;
-  }
-  return bin;
-}

@@ -31,7 +31,6 @@ namespace cherepkov
   std::istream& operator>>(std::istream& in, UllLitValue&& dest);
   std::istream& operator>>(std::istream& in, UllBinValue&& dest);
   std::istream& operator>>(std::istream& in, StringValue&& dest);
-  std::string ULLtoBinary(unsigned long long val);
 
 }
 
