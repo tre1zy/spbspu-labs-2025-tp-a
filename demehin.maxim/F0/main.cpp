@@ -11,7 +11,7 @@ namespace
   using tree_t = std::map< std::string, list_t >;
   using dict_t = std::map< std::string, tree_t >;
 
-  void inputDict(std::istream& in, dict_t& dicts)
+  std::istream& inputDict(std::istream& in, dict_t& dicts)
   {
     std::string dict_name;
     while (std::getline(in, dict_name))
@@ -46,6 +46,7 @@ namespace
       }
       dicts.insert(std::make_pair(dict_name, current_dict));
     }
+    return in;
   }
 }
 
@@ -66,14 +67,23 @@ int main(int argc, char* argv[])
   }
 
   std::ifstream file(argv[1]);
+  if (!file.is_open())
+  {
+    std::cerr << "<INVALID FILE>\n";
+    return 1;
+  }
   dict_t dicts;
   try
   {
-    inputDict(file, dicts);
+    if (!inputDict(file, dicts) && !file.eof())
+    {
+      std::cerr << "<INVALID FILE>\n";
+      return 1;
+    }
   }
   catch (...)
   {
-    std::cerr << "Input error\n";
+    std::cerr << "<RUNTIME ERROR>\n";
     return 1;
   }
 
