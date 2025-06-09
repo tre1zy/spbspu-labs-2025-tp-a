@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iomanip>
+#include <algorithm>
 
 namespace cherepkov
 {

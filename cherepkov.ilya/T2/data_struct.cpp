@@ -2,6 +2,7 @@
 #include "stream_guard.hpp"
 #include "input_operators.hpp"
 
+
 std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
 {
     std::istream::sentry sentry(in);
@@ -65,11 +66,14 @@ std::string convertToBinary(unsigned long long val)
     return "0";
   }
   std::string bin;
+  bin.reserve(64);
+
   while (val > 0)
   {
-    bin.insert(0, std::to_string(val % 2));
+    bin.push_back('0' + (val % 2));
     val /= 2;
   }
+  std::reverse(bin.begin(), bin.end());
   return bin;
 }
 
