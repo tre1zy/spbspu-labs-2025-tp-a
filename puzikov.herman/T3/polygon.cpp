@@ -4,11 +4,8 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
-#include <sstream>
-#include <functional>
 #include <format_guard.hpp>
 #include <input_wrapper_structs.hpp>
-#include "functional.hpp"
 
 std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
 {
@@ -53,27 +50,17 @@ std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
   {
     throw std::logic_error("Not enough vertices.");
   }
-
-  Polygon temp;
-  std::generate_n(std::back_inserter(temp.points), vertexCount, std::bind(PointGenerator, std::ref(in)));
-
-  if (!in)
+  std::vector< Point > points(vertexCount, Point{0, 0});
+  using inputIt = std::istream_iterator< Point >;
+  std::copy_n(inputIt{in}, vertexCount, points.begin());
+  if (in && points.size() == vertexCount)
   {
-    throw std::logic_error("Wrong number of vertices.");
+    dest.points = points;
   }
-
-  std::string remaining;
-  if (std::getline(in, remaining))
+  else
   {
-    std::istringstream checker(remaining);
-    Point dummy;
-    if (checker >> dummy)
-    {
-      throw std::logic_error("Too many vertices.");
-    }
+    in.setstate(std::ios::failbit);
   }
-
-  dest.points = std::move(temp.points);
   return in;
 }
 
@@ -144,8 +131,11 @@ void puzikov::readPolygons(std::istream &in, std::vector< Polygon > &polygons)
   using polygonInputIter = std::istream_iterator< Polygon >;
   while (!in.eof())
   {
-    std::copy(polygonInputIter {in}, polygonInputIter {}, std::back_inserter(polygons));
-    if (!in)
+    try
+    {
+      std::copy(polygonInputIter {in}, polygonInputIter {}, std::back_inserter(polygons));
+    }
+    catch (...)
     {
       in.clear();
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

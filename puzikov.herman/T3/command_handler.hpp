@@ -6,15 +6,14 @@
 #include <string>
 #include "polygon.hpp"
 
-using namespace std::placeholders;
-
 namespace puzikov
 {
   struct CommandHandler
   {
   public:
+    explicit CommandHandler(std::vector< Polygon > &refPolys);
     void readCommands(std::istream &in, std::ostream &out);
-    CommandHandler(std::vector< Polygon > &refPolys);
+    void restoreInputStream(std::istream &in);
 
   private:
     std::string cmd;

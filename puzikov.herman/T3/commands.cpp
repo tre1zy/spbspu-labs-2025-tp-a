@@ -167,7 +167,6 @@ void puzikov::rmEchoCommand(std::istream &in, std::ostream &out, std::vector< Po
 
 void puzikov::sameCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-
   std::istream::sentry sentry(in);
   if (!sentry)
   {
@@ -175,11 +174,18 @@ void puzikov::sameCommand(std::istream &in, std::ostream &out, const std::vector
   }
 
   Polygon reference;
-  if (!(in >> reference))
+  try
   {
-    throw std::logic_error("Invalid polygon.");
+    in >> reference;
   }
-
-  unsigned count = std::count_if(polygons.begin(), polygons.end(), IsTranslationCongruent(reference));
-  out << count << '\n';
+  catch (...)
+  {
+    std::cout << "whoops\n";
+    throw std::runtime_error("WHOOPS");
+  }
+  if (!in || in.peek() != '\n')
+  {
+    throw std::logic_error("wrong polygon");
+  }
+  out << std::count_if(polygons.begin(), polygons.end(), IsTranslationCongruent(reference)) << '\n';
 }

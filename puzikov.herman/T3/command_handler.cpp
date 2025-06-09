@@ -2,6 +2,8 @@
 #include <limits>
 #include "commands.hpp"
 
+using namespace std::placeholders;
+
 void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
 {
   while (!(in >> cmd).eof())
@@ -9,14 +11,27 @@ void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
     try
     {
       commands.at(cmd)(in, out);
+      if (!in)
+      {
+        restoreInputStream(in);
+        out << "<INVALID COMMAND>\n";
+      }
     }
     catch (...)
     {
-      in.clear();
-      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      restoreInputStream(in);
       out << "<INVALID COMMAND>\n";
     }
   }
+}
+
+void puzikov::CommandHandler::restoreInputStream(std::istream &in)
+{
+  if (in.fail())
+  {
+    in.clear(in.rdstate() ^ std::ios::failbit);
+  }
+  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 }
 
 puzikov::CommandHandler::CommandHandler(std::vector< Polygon > &refPolys):

@@ -152,13 +152,18 @@ bool puzikov::IsTranslationCongruent::operator()(const Polygon &poly) const
 
 puzikov::Point puzikov::PointGenerator(std::istream &in)
 {
-  char c = in.peek();
-  if (c == '\n' || c == EOF)
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    throw std::runtime_error("BUUUH");
+    throw std::runtime_error("Not enough points.");
   }
+
+  char c = in.peek();
   Point p;
-  in >> p;
+  if (!(in >> p) || c == '\n')
+  {
+    throw std::runtime_error("Not enough points.");
+  }
   return p;
 }
 
