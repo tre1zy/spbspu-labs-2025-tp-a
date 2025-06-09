@@ -1,4 +1,4 @@
-#include <cassert>
+#include <iostream>
 #include <iterator>
 #include <algorithm>
 #include <vector>
@@ -11,36 +11,21 @@ int main()
   using kazak::DataStruct;
 
   std::vector< DataStruct > data;
-  std::string input;
 
-  while (true)
-  {
-    std::getline(std::cin, input);
-
-    if (input.empty())
-    {
-        break;
-    }
-
-    std::istringstream iss(input);
-
-    while (iss >> std::ws)
-    {
-      DataStruct ds;
-      if (iss >> ds)
-      {
-        data.push_back(ds);
-      }
-      else
-      {
-        iss.clear();
-        break;
-      }
-    }
-  }
+  std::copy(
+    std::istream_iterator< DataStruct >(std::cin),
+    std::istream_iterator< DataStruct >(),
+    std::back_inserter(data)
+  );
 
   std::sort(data.begin(), data.end());
-  std::copy(std::begin(data), std::end(data), std::ostream_iterator<DataStruct>(std::cout, "\n"));
+
+  std::copy(
+    std::begin(data),
+    std::end(data),
+    std::ostream_iterator< DataStruct >(std::cout, "\n")
+  );
 
   return 0;
 }
+
