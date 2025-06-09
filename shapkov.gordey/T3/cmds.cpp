@@ -21,7 +21,6 @@ void shapkov::areaEven(std::ostream& out, const VecOfPolygons& src)
   area = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
-
 void shapkov::areaOdd(std::ostream& out, const VecOfPolygons& src)
 {
   double area = 0.0;
@@ -32,7 +31,6 @@ void shapkov::areaOdd(std::ostream& out, const VecOfPolygons& src)
   area = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
-
 void shapkov::areaMean(std::ostream& out, const VecOfPolygons& src)
 {
   double area = 0.0;
@@ -45,7 +43,6 @@ void shapkov::areaMean(std::ostream& out, const VecOfPolygons& src)
   area = std::accumulate(areas.begin(), areas.end(), 0.0) / src.size();
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
-
 void shapkov::areaVertexes(std::ostream& out, const VecOfPolygons& src, size_t vertexes)
 {
   double area = 0.0;
@@ -60,7 +57,6 @@ void shapkov::areaVertexes(std::ostream& out, const VecOfPolygons& src, size_t v
   area = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
-
 void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   std::unordered_map< std::string, std::function< void() > > areaCmds;
@@ -80,29 +76,39 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
     shapkov::areaVertexes(out, src, vertexes);
   }
 }
+void shapkov::maxArea(std::ostream& out, const VecOfPolygons& src)
+{
+  std::vector< double > areas(src.size());
+  std::transform(src.begin(), src.end(), areas.begin(), getArea);
+  out << std::fixed << std::setprecision(1) << (*std::max_element(areas.begin(), areas.end())) << '\n';
+}
+void shapkov::maxVertexes(std::ostream& out, const VecOfPolygons& src)
+{
+  out << (std::max_element(src.begin(), src.end(), compareByVertexes)->points.size()) << '\n';
+}
 void shapkov::max(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
   if (src.empty())
   {
     throw std::logic_error("no polygons");
   }
+  std::unordered_map< std::string, std::function< void() > > maxCmds;
+  maxCmds["AREA"] = std::bind(maxArea, std::ref(out), std::cref(src));
+  maxCmds["VERTEXES"] = std::bind(maxVertexes, std::ref(out), std::cref(src));
   ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
-  if (subcommand == "AREA")
-  {
-    std::vector< double > areas(src.size());
-    std::transform(src.begin(), src.end(), areas.begin(), getArea);
-    out << std::fixed << std::setprecision(1) << (*std::max_element(areas.begin(), areas.end())) << '\n';
-  }
-  else if (subcommand == "VERTEXES")
-  {
-    out << (std::max_element(src.begin(), src.end(), compareByVertexes)->points.size()) << '\n';
-  }
-  else
-  {
-    throw std::logic_error("unknown subcommand");
-  }
+  maxCmds.at(subcommand)();
+}
+void shapkov::minArea(std::ostream& out, const VecOfPolygons& src)
+{
+  std::vector< double > areas(src.size());
+  std::transform(src.begin(), src.end(), areas.begin(), getArea);
+  out << std::fixed << std::setprecision(1) << (*std::min_element(areas.begin(), areas.end())) << '\n';
+}
+void shapkov::minVertexes(std::ostream& out, const VecOfPolygons& src)
+{
+  out << (std::min_element(src.begin(), src.end(), compareByVertexes)->points.size()) << '\n';
 }
 void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
@@ -110,44 +116,46 @@ void shapkov::min(std::istream& in, std::ostream& out, const VecOfPolygons& src)
   {
     throw std::logic_error("no polygons");
   }
+  std::unordered_map< std::string, std::function< void() > > minCmds;
+  minCmds["AREA"] = std::bind(minArea, std::ref(out), std::cref(src));
+  minCmds["VERTEXES"] = std::bind(minVertexes, std::ref(out), std::cref(src));
   ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
-  if (subcommand == "AREA")
+  minCmds.at(subcommand)();
+}
+void shapkov::countEven(std::ostream& out, const VecOfPolygons& src)
+{
+  out << std::count_if(src.begin(), src.end(), isEven) << '\n';
+}
+void shapkov::countOdd(std::ostream& out, const VecOfPolygons& src)
+{
+  out << std::count_if(src.begin(), src.end(), isOdd) << '\n';
+}
+void shapkov::countVertexes(std::ostream& out, const VecOfPolygons& src, size_t vertexes)
+{
+  if (vertexes < 3)
   {
-    std::vector< double > areas(src.size());
-    std::transform(src.begin(), src.end(), areas.begin(), getArea);
-    out << std::fixed << std::setprecision(1) << (*std::min_element(areas.begin(), areas.end())) << '\n';
+    throw std::logic_error("wrong number of vertexes");
   }
-  else if (subcommand == "VERTEXES")
-  {
-    out << (std::min_element(src.begin(), src.end(), compareByVertexes)->points.size()) << '\n';
-  }
-  else
-  {
-    throw std::logic_error("unknown subcommand");
-  }
+  out << std::count_if(src.begin(), src.end(), std::bind(isSize, _1, vertexes)) << '\n';
 }
 void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& src)
 {
+  std::unordered_map< std::string, std::function< void() > > countCmds;
+  countCmds["EVEN"] = std::bind(countEven, std::ref(out), std::cref(src));
+  countCmds["ODD"] = std::bind(countOdd, std::ref(out), std::cref(src));
+  ScopeGuard scopeGuard(out);
   std::string subcommand;
   in >> subcommand;
-  if (subcommand == "EVEN")
+  try
   {
-    out << std::count_if(src.begin(), src.end(), isEven) << '\n';
+    countCmds.at(subcommand)();
   }
-  else if (subcommand == "ODD")
-  {
-    out << std::count_if(src.begin(), src.end(), isOdd) << '\n';
-  }
-  else
+  catch (...)
   {
     size_t vertexes = std::stoi(subcommand);
-    if (vertexes < 3)
-    {
-      throw std::logic_error("wrong number of vertexes");
-    }
-    out << std::count_if(src.begin(), src.end(), std::bind(isSize, _1, vertexes)) << '\n';
+    shapkov::countVertexes(out, src, vertexes);
   }
 }
 void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
