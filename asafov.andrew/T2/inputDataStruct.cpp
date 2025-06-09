@@ -24,7 +24,7 @@ namespace
     }
 
     if (in == end || *in != '.') return false;
-    buffer += *in++;  // consume '.'
+    buffer += *in++;
 
     while (in != end && std::isdigit(*in)) {
       buffer += *in++;
@@ -56,35 +56,34 @@ namespace
     char keyType = *in++;
 
     if (keyType == '1') {
-      if (!expect('0', in, end) || !expect('b', in, end)) return false;
-      unsigned long long val;
-      if (!readUllBin(val, in, end)) return false;
-      data.key1 = val;
+        if (!expect('0', in, end) || !expect('b', in, end)) return false;
+        unsigned long long val;
+        if (!readUllBin(val, in, end)) return false;
+        data.key1 = val;
     }
     else if (keyType == '2') {
-      if (!expect('#', in, end) || !expect('c', in, end) || !expect('(', in, end)) return false;
-      double re, im;
-      if (!readDouble(re, in, end)) return false;
-      if (in == end || *in++ != ' ') return false;
-      if (!readDouble(im, in, end)) return false;
-      if (!expect(')', in, end)) return false;
-      data.key2 = {re, im};
+        if (!expect('#', in, end) || !expect('c', in, end) || !expect('(', in, end)) return false;
+        double re, im;
+        if (!readDouble(re, in, end)) return false;
+        if (in == end || *in++ != ' ') return false;
+        if (!readDouble(im, in, end)) return false;
+        if (!expect(')', in, end)) return false;
+        data.key2 = {re, im};
     }
     else if (keyType == '3') {
-      if (!expect('"', in, end)) return false;
-      std::string str;
-      while (in != end && *in != '"') {
-        str += *in++;
-      }
-      if (!expect('"', in, end)) return false;
-      data.key3 = str;
+        if (!expect('"', in, end)) return false;
+        std::string str;
+        while (in != end && *in != '"') {
+            str += *in++;
+        }
+        if (!expect('"', in, end)) return false;
+        data.key3 = str;
     }
     else {
-      return false;
+        return false;
     }
-
     return true;
-  }
+}
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
