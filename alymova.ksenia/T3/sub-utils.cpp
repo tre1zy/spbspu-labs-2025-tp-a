@@ -4,6 +4,29 @@
 #include <string>
 #include <exception>
 
+namespace
+{
+  int compareMaxXPoint(int value, const alymova::Point& point)
+  {
+    return std::max(value, point.x);
+  }
+
+  int compareMaxYPoint(int value, const alymova::Point& point)
+  {
+    return std::max(value, point.y);
+  }
+
+  int compareMinXPoint(int value, const alymova::Point& point)
+  {
+    return std::min(value, point.x);
+  }
+
+  int compareMinYPoint(int value, const alymova::Point& point)
+  {
+    return std::min(value, point.y);
+  }
+}
+
 double alymova::areaEven(double value, const Polygon& polygon, size_t size)
 {
   if (size == 0)
@@ -63,45 +86,64 @@ double alymova::multPoints(const Point& point1, const Point& point2)
   return point1.x * point2.y - point1.y * point2.x;
 }
 
-double alymova::compareArea(Comparator< double > cmp, double value, const Polygon& polygon)
+double alymova::maxArea(double value, const Polygon& polygon)
 {
-  return cmp(value, areaPolygon(polygon));
+  return std::max(value, areaPolygon(polygon));
 }
 
-size_t alymova::compareVertexes(Comparator< size_t > cmp, size_t value, const Polygon& polygon)
+double alymova::minArea(double value, const Polygon& polygon)
 {
-  return cmp(value, polygon.points.size());
+  return std::min(value, areaPolygon(polygon));
 }
 
-int alymova::compareMaxXPoint(int value, const Point& point)
+size_t alymova::maxVertexes(size_t value, const Polygon& polygon)
 {
-  return std::max(value, point.x);
+  return std::max(value, polygon.points.size());
 }
 
-int alymova::compareMaxYPoint(int value, const Point& point)
+size_t alymova::minVertexes(size_t value, const Polygon& polygon)
 {
-  return std::max(value, point.y);
+  return std::min(value, polygon.points.size());
 }
 
-int alymova::compareMinXPoint(int value, const Point& point)
+int alymova::findMaxXPolygon(int start, const Polygon& polygon)
 {
-  return std::min(value, point.x);
+  return std::accumulate(polygon.points.begin(), polygon.points.end(), start, compareMaxXPoint);
 }
 
-int alymova::compareMinYPoint(int value, const Point& point)
+int alymova::findMaxYPolygon(int start, const Polygon& polygon)
 {
-  return std::min(value, point.y);
+  return std::accumulate(polygon.points.begin(), polygon.points.end(), start, compareMaxYPoint);
 }
 
-int alymova::findMaxMinXYPolygon(PredicatePoint pred, int start, const Polygon& polygon)
+int alymova::findMinXPolygon(int start, const Polygon& polygon)
 {
-  return std::accumulate(polygon.points.begin(), polygon.points.end(), start, pred);
+  return std::accumulate(polygon.points.begin(), polygon.points.end(), start, compareMinXPoint);
 }
 
-int alymova::findMaxMinXYVector(PredicatePoint pred, int start, const std::vector< Polygon >& polygons)
+int alymova::findMinYPolygon(int start, const Polygon& polygon)
 {
-  auto bindFind = std::bind(findMaxMinXYPolygon, pred, _1, _2);
-  return std::accumulate(polygons.begin(), polygons.end(), start, bindFind);
+  return std::accumulate(polygon.points.begin(), polygon.points.end(), start, compareMinYPoint);
+}
+
+int alymova::findMaxXVector(int start, const std::vector< Polygon >& polygons)
+{
+  return std::accumulate(polygons.begin(), polygons.end(), start, findMaxXPolygon);
+}
+
+int alymova::findMaxYVector(int start, const std::vector< Polygon >& polygons)
+{
+  return std::accumulate(polygons.begin(), polygons.end(), start, findMaxYPolygon);
+}
+
+int alymova::findMinXVector(int start, const std::vector< Polygon >& polygons)
+{
+  return std::accumulate(polygons.begin(), polygons.end(), start, findMinXPolygon);
+}
+
+int alymova::findMinYVector(int start, const std::vector< Polygon >& polygons)
+{
+  return std::accumulate(polygons.begin(), polygons.end(), start, findMinYPolygon);
 }
 
 void alymova::inFrameOutput(std::ostream& out, bool res)
