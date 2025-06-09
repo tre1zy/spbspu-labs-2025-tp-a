@@ -17,9 +17,22 @@ namespace kostyukov
   {
     bool operator()(char c) const;
   };
+  struct IsPunct
+  {
+    bool operator()(const char c) const;
+  };
+  struct WordProcessor
+  {
+    explicit WordProcessor(FrequencyDictionary& dict);
+    void operator()(std::string word);
+    private:
+      FrequencyDictionary& dict_;
+  };
 
   void createDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void deleteDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void loadDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void getFreq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
 }
 
 #endif
