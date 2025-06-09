@@ -159,7 +159,7 @@ namespace
 
     std::vector< std::string > dict_names(dicts_cnt);
     std::generate(dict_names.begin(), dict_names.end(), NameReader{ in });
-    std::for_each(dict_names.begin(), dict_names.end(), DictFilterWriter{ dicts, file});
+    std::for_each(dict_names.begin(), dict_names.end(), DictFilterWriter{ dicts, file });
   }
 
   template< typename Operation >
