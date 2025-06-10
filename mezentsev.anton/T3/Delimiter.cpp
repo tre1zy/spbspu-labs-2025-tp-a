@@ -1,4 +1,4 @@
-#include "Delimiters.h"
+#include "Delimiter.h"
 #include <iostream>
 
 std::istream& mezentsev::operator>>(std::istream& input, DelimiterIO&& dest)
