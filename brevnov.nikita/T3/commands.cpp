@@ -227,8 +227,8 @@ namespace
     bool inside = false;
     for (int i = 0, j = n - 1; i < n; j = i++)
     {
-      const Point& p1 = polygon.points[i];
-      const Point& p2 = polygon.points[j];
+      const brevnov::Point& p1 = polygon.points[i];
+      const brevnov::Point& p2 = polygon.points[j];
       if (((p1.y > point.y) != (p2.y > point.y)) &&
         (point.x < (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x))
       {
