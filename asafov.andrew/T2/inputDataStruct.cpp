@@ -38,72 +38,68 @@ namespace
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   std::string line;
-  if (!std::getline(is, line))
+  while (std::getline(is, line))
   {
-    return is;
-  }
+    DataStruct temp;
+    bool has_key1 = false;
+    bool has_key2 = false;
+    bool has_key3 = false;
 
-  DataStruct temp;
-  bool has_key1 = false;
-  bool has_key2 = false;
-  bool has_key3 = false;
-
-  size_t key1_pos = line.find(":key1 ");
-  if (key1_pos != std::string::npos)
-  {
-    size_t key1_end = line.find(':', key1_pos + 1);
-    if (key1_end != std::string::npos)
+    size_t key1_pos = line.find(":key1 ");
+    if (key1_pos != std::string::npos)
     {
-      std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
-      temp.key1 = parseULLBin(key1_str);
-      if (temp.key1 != 0 || key1_str == "0b0")
+      size_t key1_end = line.find(':', key1_pos + 1);
+      if (key1_end != std::string::npos)
       {
-        has_key1 = true;
+        std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
+        temp.key1 = parseULLBin(key1_str);
+        if (temp.key1 != 0 || key1_str == "0b0")
+        {
+          has_key1 = true;
+        }
       }
+    }
+
+    size_t key2_pos = line.find(":key2 ");
+    if (key2_pos != std::string::npos)
+    {
+      size_t key2_end = line.find(':', key2_pos + 1);
+      if (key2_end != std::string::npos)
+      {
+        std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
+        temp.key2 = parseCmpLsp(key2_str);
+        if (temp.key2 != std::complex< double >{0.0, 0.0} ||
+          key2_str == "#c(0.0 0.0)" ||
+          key2_str == "#c(0 0)" ||
+          key2_str == "#c(0. 0.)")
+        {
+          has_key2 = true;
+        }
+      }
+    }
+
+    size_t key3_pos = line.find(":key3 \"");
+    if (key3_pos != std::string::npos)
+    {
+      size_t quote_pos = key3_pos + 7;
+      size_t closing_quote = line.find('"', quote_pos);
+      if (closing_quote != std::string::npos)
+      {
+        temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
+        if (line.find(':', closing_quote + 1) != std::string::npos)
+        {
+          has_key3 = true;
+        }
+      }
+    }
+
+    if (has_key1 && has_key2 && has_key3)
+    {
+      data = temp;
+      return is;
     }
   }
 
-  size_t key2_pos = line.find(":key2 ");
-  if (key2_pos != std::string::npos)
-  {
-    size_t key2_end = line.find(':', key2_pos + 1);
-    if (key2_end != std::string::npos)
-    {
-      std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
-      temp.key2 = parseCmpLsp(key2_str);
-      if (temp.key2 != std::complex< double >{0.0, 0.0} ||
-        key2_str == "#c(0.0 0.0)" ||
-        key2_str == "#c(0 0)" ||
-        key2_str == "#c(0. 0.)")
-      {
-        has_key2 = true;
-      }
-    }
-  }
-
-  size_t key3_pos = line.find(":key3 \"");
-  if (key3_pos != std::string::npos)
-  {
-    size_t quote_pos = key3_pos + 7;
-    size_t closing_quote = line.find('"', quote_pos);
-    if (closing_quote != std::string::npos)
-    {
-      temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
-      if (line.find(':', closing_quote + 1) != std::string::npos)
-      {
-        has_key3 = true;
-      }
-    }
-  }
-
-  if (has_key1 && has_key2 && has_key3)
-  {
-    data = temp;
-  }
-  else
-  {
-    is.setstate(std::ios::failbit);
-  }
-
+  is.setstate(std::ios::failbit);
   return is;
 }
