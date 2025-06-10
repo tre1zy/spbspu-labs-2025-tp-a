@@ -304,7 +304,7 @@ void brevnov::area(std::istream& in, std::ostream& out, const std::vector< Polyg
     result = area_num(polygons, n);
   }
   brevnov::StreamGuard stream(out);
-  out << std::fixed << std::setprecision(1) << res << "\n";
+  out << std::fixed << std::setprecision(1) << result << "\n";
 }
 
 void brevnov::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -355,7 +355,7 @@ void brevnov::count(std::istream& in, std::ostream& out, const std::vector< Poly
   in >> subcommand;
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["EVEN"] = std::bind(count_even, std::cref(polygons), std::ref(out));
-  subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
+  subcommands["ODD"] = std::bind(count_odd, std::cref(polygons), std::ref(out));
   try
   {
     subcommands.at(subcommand)();
@@ -380,7 +380,7 @@ void brevnov::rightshapes(std::istream& in, std::ostream& out, const std::vector
   out << std::count_if(polygons.cbegin(), polygons.cend(), has_right_angle);
 }
 
-void brevnov::intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& )
+void brevnov::intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
   Polygon p;
   in >> p;

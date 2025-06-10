@@ -16,15 +16,15 @@ namespace
     return p1.x * p2.y - p2.x * p1.y;
   }
 
-  brevnov::Point get_side(const Point &p1, const Point &p2)
+  brevnov::Point get_side(const brevnov::Point &p1, const brevnov::Point &p2)
   {
-    Point newSide;
+    brevnov::Point newSide;
     newSide.x = p1.x - p2.x;
     newSide.y = p1.y - p2.y;
     return newSide;
   }
 
-  bool is_right_angle(const Point &side1, const Point &side2)
+  bool is_right_angle(const brevnov::Point &side1, const brevnov::Point &side2)
   {
     return (side1.x * side2.x + side1.y * side2.y) == 0;
   }
@@ -55,7 +55,7 @@ std::istream& brevnov::operator>>(std::istream& in, Polygon& polygon)
   {
     return in;
   }
-  brevnov::streamGuard stream(in);
+  brevnov::StreamGuard stream(in);
   size_t count = 0;
   if (!(in >> count) || count < 3)
   {
@@ -77,7 +77,7 @@ double brevnov::get_area(const Polygon& polygon)
   const Point first = points.front();
   const Point last = points.back();
   double area = std::inner_product(
-    points.begin(), points.end() - 1, points.begin() + 1, calc_area_term()(last, first), std::plus< double >(), calc_area_term());
+    points.begin(), points.end() - 1, points.begin() + 1, calc_area_term(last, first), std::plus< double >(), calc_area_term());
   return std::abs(area) / 2.0;
 }
 
