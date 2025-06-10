@@ -140,6 +140,21 @@ namespace
   {
     out << countIf(polygons, VertexPred{ n }) << "\n";
   }
+  bool isSame(const Polygon& src) const
+  {
+    if (src.points.size() != p.points.size())
+    {
+      return false;
+    }
+    using namespace std::placeholders;
+    double deltaX = p.points[0].x - src.points[0].x;
+    double deltaY = p.points[0].y - src.points[0].y;
+    double absoluteDelta = deltaX + deltaY;
+    std::vector< double > sumOfDeltaCoords;
+    std::transform(p.points.begin(), p.points.end(), src.points.begin(), std::back_inserter(sumOfDeltaCoords), pointDeltaSum{});
+    size_t counterOfPoints = std::count_if(sumOfDeltaCoords.begin(), sumOfDeltaCoords.end(), std::bind(compareDouble, _1, absoluteDelta, 1e-9));
+    return counterOfPoints == sumOfDeltaCoords.size();
+  }
 }
 
 void kharlamov::doAreaCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -259,28 +274,11 @@ void kharlamov::doMaxSeqCommand(std::istream& in, std::ostream& out, const Polyg
 
 void kharlamov::doSameCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
 {
-  Polygon target;
-  in >> target;
+  Polygon polygon;
+  in >> polygon;
   if (!in || in.peek() != '\n')
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    throw std::logic_error("error polygon");
   }
-  size_t count = 0;
-  for (const auto& poly : polygons)
-  {
-    if (poly.points.size() == target.points.size())
-    {
-      bool isSame = true;
-      for (size_t i = 0; i < poly.points.size(); ++i)
-      {
-        if (poly.points[i].x != target.points[i].x || poly.points[i].y != target.points[i].y)
-        {
-          isSame = false;
-          break;
-        }
-      }
-      if (isSame) count++;
-    }
-  }
-  out << count << "\n";
+  out << std::count_if(src.begin(), src.end(), isSame{ polygon }) << '\n';
 }
