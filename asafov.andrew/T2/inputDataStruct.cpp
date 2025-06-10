@@ -1,115 +1,64 @@
 #include "datastruct.h"
-#include <stdexcept>
-#include <iterator>
+#include <sstream>
 #include <cctype>
-#include <string>
+#include <algorithm>
 
 namespace
 {
-  bool expect(char expected, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    if (in == end || *in != expected) return false;
-    ++in;
-    return true;
-  }
+    unsigned long long parseULLBin(const std::string& str)
+    {
+        if (str.length() < 3 || (str[0] != '0' && str[1] != 'b' && str[0] != '0' && str[1] != 'B'))
+            return 0;
 
-  bool readDouble(double& num, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    std::string buffer;
-
-    if (in != end && (*in == '-' || *in == '+')) {
-      buffer += *in++;
-    }
-
-    while (in != end && std::isdigit(*in)) {
-      buffer += *in++;
-    }
-
-    if (in == end || *in != '.') return false;
-    buffer += *in++;
-
-    while (in != end && std::isdigit(*in)) {
-      buffer += *in++;
-    }
-
-    try {
-      num = std::stod(buffer);
-    } catch (...) {
-      return false;
-    }
-
-    return true;
-  }
-
-  bool readUllBin(unsigned long long& num, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    num = 0;
-    while (in != end && *in != ':') {
-      if (*in != '0' && *in != '1') return false;
-      num = (num << 1) | (*in - '0');
-      ++in;
-    }
-    return true;
-  }
-
-  bool readKey(asafov::DataStruct& data, std::istream_iterator<char>& in, const std::istream_iterator<char>& end) {
-    if (!expect('k', in, end) || !expect('e', in, end) || !expect('y', in, end)) return false;
-
-    if (in == end) return false;
-    char keyType = *in++;
-
-    if (keyType == '1') {
-        if (!expect('0', in, end) || !expect('b', in, end)) return false;
-        unsigned long long val;
-        if (!readUllBin(val, in, end)) return false;
-        data.key1 = val;
-    }
-    else if (keyType == '2') {
-        if (!expect('#', in, end) || !expect('c', in, end) || !expect('(', in, end)) return false;
-        double re, im;
-        if (!readDouble(re, in, end)) return false;
-        if (in == end || *in++ != ' ') return false;
-        if (!readDouble(im, in, end)) return false;
-        if (!expect(')', in, end)) return false;
-        data.key2 = {re, im};
-    }
-    else if (keyType == '3') {
-        if (!expect('"', in, end)) return false;
-        std::string str;
-        while (in != end && *in != '"') {
-            str += *in++;
+        unsigned long long result = 0;
+        for (size_t i = 2; i < str.size(); ++i)
+        {
+            result <<= 1;
+            if (str[i] == '1')
+                result |= 1;
+            else if (str[i] != '0')
+                return 0;
         }
-        if (!expect('"', in, end)) return false;
-        data.key3 = str;
+        return result;
     }
-    else {
-        return false;
+
+    std::complex<double> parseCmpLsp(const std::string& str)
+    {
+        if (str.length() < 5 || str[0] != '#' || str[1] != 'c' || str[2] != '(')
+            return {0.0, 0.0};
+
+        std::string content = str.substr(3, str.size() - 4);
+        std::istringstream iss(content);
+        double real, imag;
+        iss >> real >> imag;
+        return {real, imag};
     }
-    return true;
 }
-}
 
-std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
-    is >> std::noskipws;
-    std::istream_iterator<char> in(is);
-    std::istream_iterator<char> end;
+std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
+{
+    std::string line;
+    std::getline(is, line);
+    
+    size_t key1_pos = line.find(":key1 ");
+    if (key1_pos == std::string::npos) return is;
+    size_t key1_end = line.find(':', key1_pos + 1);
+    if (key1_end == std::string::npos) return is;
+    std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
+    data.key1 = parseULLBin(key1_str);
+    
+    size_t key2_pos = line.find(":key2 ");
+    if (key2_pos == std::string::npos) return is;
+    size_t key2_end = line.find(':', key2_pos + 1);
+    if (key2_end == std::string::npos) return is;
+    std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
+    data.key2 = parseCmpLsp(key2_str);
+    
+    size_t key3_pos = line.find(":key3 \"");
+    if (key3_pos == std::string::npos) return is;
+    size_t key3_end = line.find("\"", key3_pos + 7);
+    if (key3_end == std::string::npos) return is;
+    data.key3 = line.substr(key3_pos + 7, key3_end - (key3_pos + 7));
 
-    DataStruct temp;
-    bool success = true;
-
-    if (!expect('(', in, end)) success = false;
-    if (!expect(':', in, end)) success = false;
-    if (!readKey(temp, in, end)) success = false;
-    if (!expect(':', in, end)) success = false;
-    if (!readKey(temp, in, end)) success = false;
-    if (!expect(':', in, end)) success = false;
-    if (!readKey(temp, in, end)) success = false;
-    if (!expect(':', in, end)) success = false;
-    if (!expect(')', in, end)) success = false;
-
-    if (success) {
-        data = temp;
-    } else {
-        is.setstate(std::ios::failbit);
-    }
-
-    is >> std::skipws;
     return is;
 }

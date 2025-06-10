@@ -37,11 +37,9 @@ namespace
   }
 }
 
-std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
-{
-  std::ostream_iterator<char> oit(os);
-  const std::string out = "(:key1 " + ullBinToStr(data.key1) + ":key2 " +
-    cmpLspToStr(data.key2) + ":key3 \"" + data.key3 + "\":)";
-  for (const auto ch : out) *(oit++) = ch;
-  return os;
+std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data) {
+    os << "(:key1 " << ullBinToStr(data.key1) 
+       << ":key2 " << cmpLspToStr(data.key2) 
+       << ":key3 \"" << data.key3 << "\":)";
+    return os;
 }
