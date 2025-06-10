@@ -67,8 +67,3 @@ double brevnov::get_area(const Polygon& polygon)
     points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
   return std::abs(area) / 2.0;
 }
-
-bool brevnov::is_rect(const Polygon& polygon)
-{
-  return (distance(polygon.points[0], poly.points[2]) == distance(poly.points[1], poly.points[3])) && (polygon.points.size() == 4);
-}
