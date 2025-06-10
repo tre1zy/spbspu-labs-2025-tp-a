@@ -87,65 +87,29 @@ namespace
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
-  is >> std::noskipws;
-  std::istream_iterator<char> in(is);
-  std::istream_iterator<char> end;
+    is >> std::noskipws;
+    std::istream_iterator<char> in(is);
+    std::istream_iterator<char> end;
 
-  if (!expect('(', in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!expect(':', in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!readKey(data, in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!expect(':', in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!readKey(data, in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!expect(':', in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!readKey(data, in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!expect(':', in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
-  if (!expect(')', in, end))
-  {
-    is.setstate(std::ios::failbit);
-    is >> std::skipws;
-    return is;
-  }
+    DataStruct temp;
+    bool success = true;
 
-  is >> std::skipws;
-  return is;
+    if (!expect('(', in, end)) success = false;
+    if (!expect(':', in, end)) success = false;
+    if (!readKey(temp, in, end)) success = false;
+    if (!expect(':', in, end)) success = false;
+    if (!readKey(temp, in, end)) success = false;
+    if (!expect(':', in, end)) success = false;
+    if (!readKey(temp, in, end)) success = false;
+    if (!expect(':', in, end)) success = false;
+    if (!expect(')', in, end)) success = false;
+
+    if (success) {
+        data = temp;
+    } else {
+        is.setstate(std::ios::failbit);
+    }
+
+    is >> std::skipws;
+    return is;
 }
