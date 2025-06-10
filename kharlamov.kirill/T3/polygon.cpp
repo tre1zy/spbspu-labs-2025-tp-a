@@ -4,49 +4,47 @@
 #include "scopeguard.h"
 #include "delimetr.h"
 
-namespace kharlamov
+std::istream& kharlamov::operator>>(std::istream& in, Polygon& polygon)
 {
-  std::istream& kharlamov::operator>>(std::istream& in, Polygon& polygon)
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    size_t count = 0;
-    if (!(in >> count) || count < 3)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    std::vector< Point > temp(count);
-    std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
-    if (in)
-    {
-      polygon.points = std::move(temp);
-    }
     return in;
   }
-
-  bool Polygon::operator==(const Polygon& other) const
+  size_t count = 0;
+  if (!(in >> count) || count < 3)
   {
-    return points == other.points;
-  }
-
-  std::istream& operator>>(std::istream& in, Polygon& poly)
-  {
-    size_t vertexes;
-    in >> vertexes;
-    if (vertexes < 3)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    poly.points.resize(vertexes);
-    for (auto& point : poly.points)
-    {
-      in >> point;
-    }
+    in.setstate(std::ios::failbit);
     return in;
   }
+  std::vector< Point > temp(count);
+  std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
+  if (in)
+  {
+    polygon.points = std::move(temp);
+  }
+  return in;
 }
+
+bool Polygon::operator==(const Polygon& other) const
+{
+  return points == other.points;
+}
+
+std::istream& operator>>(std::istream& in, Polygon& poly)
+{
+  size_t vertexes;
+  in >> vertexes;
+  if (vertexes < 3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  poly.points.resize(vertexes);
+  for (auto& point : poly.points)
+  {
+    in >> point;
+  }
+  return in;
+}
+
