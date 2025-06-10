@@ -45,7 +45,6 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     DataStruct temp;
     bool valid = true;
 
-    // Parse key1
     size_t key1_pos = line.find(":key1 ");
     if (key1_pos == std::string::npos) valid = false;
     size_t key1_end = line.find(':', key1_pos + 1);
@@ -56,7 +55,6 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
         if (temp.key1 == 0 && key1_str != "0b0") valid = false;
     }
 
-    // Parse key2
     size_t key2_pos = line.find(":key2 ");
     if (key2_pos == std::string::npos) valid = false;
     size_t key2_end = line.find(':', key2_pos + 1);
@@ -68,7 +66,6 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
             key2_str != "#c(0 0)" && key2_str != "#c(0. 0.)") valid = false;
     }
 
-    // Parse key3 - modified to handle colons in the string
     size_t key3_pos = line.find(":key3 \"");
     if (key3_pos == std::string::npos) valid = false;
     if (valid) {
@@ -78,7 +75,6 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
             valid = false;
         } else {
             temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
-            // Verify there's a closing colon after the quote
             if (line.find(':', closing_quote + 1) == std::string::npos) {
                 valid = false;
             }
