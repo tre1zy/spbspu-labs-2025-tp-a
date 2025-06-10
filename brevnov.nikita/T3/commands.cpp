@@ -377,7 +377,7 @@ void brevnov::rightshapes(std::istream& in, std::ostream& out, const std::vector
   {
     throw std::logic_error("ERROR: Do not need any parameters");
   }
-  out << std::count_if(polygons.cbegin(), polygons.cend(), has_right_angle);
+  out << std::count_if(polygons.cbegin(), polygons.cend(), has_right_angle) << '\n';
 }
 
 void brevnov::intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
