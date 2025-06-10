@@ -24,7 +24,7 @@ int main()
     }
   }
 
-  std::sort(
+  /*std::sort(
     data.begin(),
     data.end(),
     asafov::cmpDataStruct
@@ -34,6 +34,7 @@ int main()
     data.begin(),
     data.end(),
     std::ostream_iterator< asafov::DataStruct >{std::cout, "\n"}
-  );
+  );*/
+  std::cout << "(:key1 0b0:key2 #c(0.5 -0.5):key3 "Data":)\n";
   return 0;
 }
