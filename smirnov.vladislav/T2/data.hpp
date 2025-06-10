@@ -47,7 +47,7 @@ namespace smirnov
     std::istream& operator>>(std::istream& in, UllIO&& dest);
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
     std::istream& operator>>(std::istream& in, StringIO&& dest);
-    std::istream& operator>>(std::istream& in, KeyNumIO&& dest);
+    std::istream& operator>>(std::istream& in, KeyNumIO& dest);
     std::ostream& operator<<(std::ostream& out, const DoubleIO& dest);
     std::ostream& operator<<(std::ostream& out, const UllIO& dest);
   }

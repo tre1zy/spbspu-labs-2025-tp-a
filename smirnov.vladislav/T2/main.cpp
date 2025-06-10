@@ -23,7 +23,7 @@ int main()
     }
   }
 
-  std::sort(data.begin(), data.end(), smirnov::compare);
+  std::sort(data.begin(), data.end(), smirnov::DataStruct::compare);
   std::copy(std::begin(data), std::end(data), ostreamIt(std::cout, "\n"));
   return 0;
 }
