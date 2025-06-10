@@ -64,22 +64,30 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     if (valid) {
         std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
         temp.key2 = parseCmpLsp(key2_str);
-        if (temp.key2 == std::complex<double>{0.0, 0.0} && key2_str != "#c(0.0 0.0)") valid = false;
+        if (temp.key2 == std::complex<double>{0.0, 0.0} && key2_str != "#c(0.0 0.0)" && key2_str != "#c(0 0)" && key2_str != "#c(0. 0.)") valid = false;
     }
 
-    // Parse key3
+    // Parse key3 - modified to handle colons in the string
     size_t key3_pos = line.find(":key3 \"");
     if (key3_pos == std::string::npos) valid = false;
-    size_t key3_end = line.find("\"", key3_pos + 7);
-    if (key3_end == std::string::npos) valid = false;
     if (valid) {
-        temp.key3 = line.substr(key3_pos + 7, key3_end - (key3_pos + 7));
+        size_t quote_pos = key3_pos + 7;
+        size_t closing_quote = line.find('"', quote_pos);
+        if (closing_quote == std::string::npos) {
+            valid = false;
+        } else {
+            temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
+            // Verify there's a closing colon after the quote
+            if (line.find(':', closing_quote + 1) == std::string::npos) {
+                valid = false;
+            }
+        }
     }
 
     if (valid) {
         data = temp;
     } else {
-        is.setstate(std::ios::failbit); // Mark the stream as failed
+        is.setstate(std::ios::failbit);
     }
 
     return is;
