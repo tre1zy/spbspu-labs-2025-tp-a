@@ -383,4 +383,123 @@ namespace kostyukov
     SameWordPrinter printer = SameWordPrinter{ out, iter1->second, iter2->second, name1, name2 };
     std::for_each(commonKeys.begin(), commonKeys.end(), printer);
   }
+
+  RangeFreqPredicate::RangeFreqPredicate(double minVal, double maxVal):
+    minVal_(minVal),
+    maxVal_(maxVal)
+  {}
+  bool RangeFreqPredicate::operator()(const WordFreqPair& pair) const
+  {
+    return pair.freq >= minVal_ && pair.freq <= maxVal_;
+  }
+  void getRange(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool inRange)
+  {
+    std::string dictName;
+    double leftBorder = 0.0;
+    double rightBorder = 0.0;
+    in >> dictName >> leftBorder >> rightBorder;
+    if (!in || dictName.empty())
+    {
+      out << "<MISSING ARGUMENTS>";
+      return;
+    }
+    if (!isValidName(dictName))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    if (leftBorder < 0.0 || leftBorder > 100.0 ||  rightBorder < 0 || rightBorder > 100.0)
+    {
+      out << "<INVALID ARGUMENT>";
+      return;
+    }
+    if (leftBorder > rightBorder)
+    {
+      out << "<INVALID RANGE>";
+      return;
+    }
+    auto dictIter = dicts.find(dictName);
+    if (dictIter == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    const FrequencyDictionary& dict = dictIter->second;
+    if (dict.counts.empty())
+    {
+      out << "<EMPTY DICTIONARY>";
+      return;
+    }
+    std::vector< WordFreqPair > allPairs;
+    allPairs.reserve(dict.counts.size());
+    auto begin = dict.counts.begin();
+    auto end = dict.counts.end();
+    std::transform(begin, end, std::back_inserter(allPairs), MapToPairTransformer(dict.totalWords));
+    std::vector< WordFreqPair > filteredPairs;
+    filteredPairs.reserve(allPairs.size());
+    RangeFreqPredicate predicate(leftBorder, rightBorder);
+    if (inRange)
+    {
+      std::copy_if(allPairs.begin(), allPairs.end(), std::back_inserter(filteredPairs), predicate);
+    }
+    else
+    {
+      //Вот здесь исправить на другой предикат
+      std::copy_if(allPairs.begin(), allPairs.end(), std::back_inserter(filteredPairs), predicate);
+    }
+    if (filteredPairs.empty())
+    {
+      out << "No words found in this range.";
+      return;
+    }
+    std::sort(filteredPairs.begin(), filteredPairs.end(), FreqComparator(false));
+    std::for_each(filteredPairs.begin(), filteredPairs.end(), PairPrinter(out));
+  }
+  void rangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
+  {
+    getRange(in, out, dicts, true);
+  }
+  void outRangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
+  {
+    getRange(in, out, dicts, false);
+  }
+
+  void clear(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  {
+    std::string dictName;
+    in >> dictName;
+    if (!in || dictName.empty())
+    {
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(dictName))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    auto dictIter = dicts.find(dictName);
+    if (dictIter == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    dictIter->second.counts.clear();
+    dictIter->second.totalWords = 0;
+    out << "Dictionary " << dictName << " has been cleared.";
+  }
+
+  void DictNamePrinter::operator()(const std::pair< const std::string, FrequencyDictionary >& dictPair) const
+  {
+    out << dictPair.first << '\n';
+  }
+  void listDicts(std::ostream& out, const FreqDictManager& dicts)
+  {
+    if (dicts.empty())
+    {
+      out << "<NO DICTIONARIES>";
+      return;
+    }
+    std::for_each(dicts.begin(), dicts.end(), DictNamePrinter{ out });
+  }
 }

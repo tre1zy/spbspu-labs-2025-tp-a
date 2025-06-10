@@ -77,6 +77,21 @@ namespace kostyukov
     void operator()(const std::string& key) const;
   };
 
+  struct RangeFreqPredicate
+  {
+    RangeFreqPredicate(double minVal, double maxVal);
+    bool operator()(const WordFreqPair& pair) const;
+    private:
+      double minVal_;
+      double maxVal_;
+  };
+
+  struct DictNamePrinter
+  {
+    std::ostream& out;
+    void operator()(const std::pair< const std::string, FrequencyDictionary >& dictPair) const;
+  };
+
   struct IsInvalidChar
   {
     bool operator()(char c) const;
@@ -102,5 +117,9 @@ namespace kostyukov
   void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void findUniq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void findSame(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void clear(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void listDicts(std::ostream& out, const FreqDictManager& dicts);
+  void rangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
+  void outRangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
 }
 #endif
