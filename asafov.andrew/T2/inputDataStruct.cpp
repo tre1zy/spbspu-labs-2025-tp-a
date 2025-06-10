@@ -39,21 +39,21 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
     std::string line;
     std::getline(is, line);
-    
+
     size_t key1_pos = line.find(":key1 ");
     if (key1_pos == std::string::npos) return is;
     size_t key1_end = line.find(':', key1_pos + 1);
     if (key1_end == std::string::npos) return is;
     std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
     data.key1 = parseULLBin(key1_str);
-    
+
     size_t key2_pos = line.find(":key2 ");
     if (key2_pos == std::string::npos) return is;
     size_t key2_end = line.find(':', key2_pos + 1);
     if (key2_end == std::string::npos) return is;
     std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
     data.key2 = parseCmpLsp(key2_str);
-    
+
     size_t key3_pos = line.find(":key3 \"");
     if (key3_pos == std::string::npos) return is;
     size_t key3_end = line.find("\"", key3_pos + 7);

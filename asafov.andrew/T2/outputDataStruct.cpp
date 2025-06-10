@@ -38,8 +38,8 @@ namespace
 }
 
 std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data) {
-    os << "(:key1 " << ullBinToStr(data.key1) 
-       << ":key2 " << cmpLspToStr(data.key2) 
+    os << "(:key1 " << ullBinToStr(data.key1)
+       << ":key2 " << cmpLspToStr(data.key2)
        << ":key3 \"" << data.key3 << "\":)";
     return os;
 }

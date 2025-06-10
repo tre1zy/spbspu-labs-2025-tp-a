@@ -8,7 +8,7 @@
 int main()
 {
   std::vector<asafov::DataStruct> data;
-  
+
   while (!std::cin.eof())
   {
     std::copy(
