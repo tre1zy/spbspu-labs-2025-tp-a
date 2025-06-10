@@ -42,7 +42,7 @@ namespace kharlamov
     std::vector< kharlamov::Polygon > filtered;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
     std::vector< double > areas;
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), kiselev::getArea);
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), kharlamov::getArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
   double areaEven(const std::vector< kharlamov::Polygon >& polygons)
