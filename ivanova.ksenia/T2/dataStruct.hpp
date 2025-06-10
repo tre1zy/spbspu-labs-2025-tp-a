@@ -16,6 +16,6 @@ namespace ivanova
   std::ostream& operator<<(std::ostream& out, const dataStruct& ds);
   bool compareDataStructs(const dataStruct& a, const dataStruct& b);
 
-} // ivanova
+}
 
 #endif
