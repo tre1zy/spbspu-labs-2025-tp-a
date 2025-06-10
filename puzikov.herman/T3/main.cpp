@@ -22,7 +22,6 @@ int main(int argc, char **argv)
 
   std::vector< puzikov::Polygon > polygons;
   puzikov::readPolygons(inputFile, polygons);
-  puzikov::writePolygons(std::cout, polygons);
   inputFile.close();
 
   puzikov::CommandHandler cmdHandler(polygons);
