@@ -284,5 +284,5 @@ void kharlamov::doSameCommand(std::istream& in, std::ostream& out, const Polygon
   {
     throw std::logic_error("error polygon");
   }
-  out << std::count_if(src.begin(), src.end(), isSame{ polygon }) << '\n';
+  out << std::count_if(polygons.begin(), polygons.end(), isSame{ polygon }) << '\n';
 }
