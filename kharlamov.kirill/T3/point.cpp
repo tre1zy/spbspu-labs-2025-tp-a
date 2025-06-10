@@ -1,6 +1,7 @@
 #include "point.h"
 #include <iomanip>
 #include <iostream>
+#include "delimetr.h"
 
 namespace kharlamov
 {
