@@ -12,8 +12,8 @@ namespace kharlamov
   void doMaxCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void doMinCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void doCountCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void maxSeq(std::istream& in, std::ostream& out, const PolygonVec& polygons);
-  void same(std::istream& in, std::ostream& out, const PolygonVec& polygons);
+  void doMaxSeqCommands(std::istream& in, std::ostream& out, const PolygonVec& polygons);
+  void doSameCommands(std::istream& in, std::ostream& out, const PolygonVec& polygons);
 }
 
 #endif

@@ -26,8 +26,8 @@ int main(int argc, char** argv)
   commands["MAX"] = std::bind(kharlamov::doMaxCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["MIN"] = std::bind(kharlamov::doMinCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["COUNT"] = std::bind(kharlamov::doCountCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAXSEQ"] = std::bind(kharlamov::domaxSeqCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["SAME"] = std::bind(kharlamov::dosameCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAXSEQ"] = std::bind(kharlamov::doMaxSeqCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["SAME"] = std::bind(kharlamov::doSameCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string cmd;
   while (std::cin >> cmd)

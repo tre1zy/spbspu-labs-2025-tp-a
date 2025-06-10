@@ -16,8 +16,8 @@ namespace
   double getArea(const Polygon& polygon)
   {
   const auto points = polygon.points;
-  const Point first = points.front();
-  const Point last = points.back();
+  const kharlamov::Point first = points.front();
+  const kharlamov::Point last = points.back();
   double area = std::inner_product(
     points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
   return std::abs(area) / 2.0;
@@ -60,7 +60,7 @@ namespace
     std::vector< kharlamov::Polygon > filtered;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
     std::vector< double > areas;
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), kharlamov::getArea);
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
   double areaEven(const std::vector< kharlamov::Polygon >& polygons)
@@ -91,13 +91,13 @@ namespace
 
   bool compareArea(const kharlamov::Polygon& poly1, const kharlamov::Polygon& poly2)
   {
-    return kharlamov::getArea(poly1) < kharlamov::getArea(poly2);
+    return getArea(poly1) < getArea(poly2);
   }
 
   void maxArea(const std::vector< kharlamov::Polygon >& polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareArea));
-    out << std::fixed << std::setprecision(1) << kharlamov::getArea(max) << "\n";
+    out << std::fixed << std::setprecision(1) << getArea(max) << "\n";
   }
 
   void maxVertex(const std::vector< kharlamov::Polygon >& polygons, std::ostream& out)
@@ -109,7 +109,7 @@ namespace
   void minArea(const std::vector< kharlamov::Polygon >& polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareArea));
-    out << std::fixed << std::setprecision(1) << kharlamov::getArea(min) << "\n";
+    out << std::fixed << std::setprecision(1) << getArea(min) << "\n";
   }
 
   void minVertex(const std::vector< kharlamov::Polygon >& polygons, std::ostream& out)
@@ -164,7 +164,7 @@ void kharlamov::doAreaCommand(std::istream& in, std::ostream& out, const std::ve
     }
     res = areaNum(polygons, n);
   }
-  detail::ScopeGuard scope(out);
+  Guard scope(out);
   out << std::fixed << std::setprecision(1) << res << "\n";
 }
 
