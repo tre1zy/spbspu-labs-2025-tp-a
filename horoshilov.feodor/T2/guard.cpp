@@ -7,7 +7,7 @@ horoshilov::Guard::Guard(std::basic_ios< char >& s):
   fill_(s.fill())
 {}
 
-horoshilov:: Guard::~Guard()
+horoshilov::Guard::~Guard()
 {
   s_.flags(fmt_);
   s_.width(width_);
