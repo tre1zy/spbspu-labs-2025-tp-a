@@ -142,8 +142,8 @@ namespace
   }
   struct isSame
   {
-    Polygon& p;
-    bool operator()(const Polygon& src) const
+    kharlamov::Polygon& p;
+    bool operator()(const kharlamov::Polygon& src) const
     {
       if (src.points.size() != p.points.size())
       {
