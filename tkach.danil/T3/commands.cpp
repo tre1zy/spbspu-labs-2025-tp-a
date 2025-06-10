@@ -39,7 +39,7 @@ namespace
   {
     return *std::min_element(polygon.points.cbegin(), polygon.points.cend(), pointCmp);
   }
-  
+
   bool hasPoint(const tkach::Point& delta, const tkach::Point& point, const tkach::Polygon& polygon)
   {
     tkach::Point res = {point.x + delta.x, point.y + delta.y};
@@ -120,7 +120,7 @@ namespace
   {
     return sumPolyVector(poly);
   }
-  
+
   double sumPolyVectorMean(const std::vector< tkach::Polygon >& poly)
   {
     return sumPolyVector(poly) / poly.size();
@@ -130,7 +130,7 @@ namespace
   {
     return sumPolyVector(poly);
   }
-  
+
   std::vector< tkach::Polygon > clearedEven(const std::vector< tkach::Polygon >& data)
   {
     std::vector< tkach::Polygon > result;
