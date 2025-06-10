@@ -1,6 +1,7 @@
 #include "datastruct.h"
 #include <iterator>
 #include <algorithm>
+#include <iomanip>
 
 namespace
 {
