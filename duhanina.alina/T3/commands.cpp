@@ -223,6 +223,56 @@ namespace
   };
 }
 
+  struct CountIfAreaLess
+  {
+    double threshold;
+    explicit CountIfAreaLess(double t):
+      threshold(t)
+    {}
+
+    bool operator()(const Polygon& p) const
+    {
+      return calculateArea(p) < threshold;
+    }
+  };
+
+  struct ConsecutiveEqual
+  {
+    const Polygon& ref;
+    bool operator()(const Polygon& a, const Polygon& b) const
+    {
+      return a == ref && b == ref;
+    }
+  };
+
+  struct EqualToRef
+  {
+    const Polygon& ref;
+
+    bool operator()(const Polygon& p) const
+    {
+      return p == ref;
+    }
+  };
+
+  struct AdjacentDuplicateFinder
+  {
+    const Polygon& ref;
+    bool& first;
+
+    bool operator()(const Polygon& a, const Polygon& b) const
+    {
+      if (a == ref && b == ref)
+      {
+        bool result = !first;
+        first = false;
+        return result;
+      }
+      first = true;
+      return false;
+    }
+  };
+
 void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
   std::string param;
@@ -262,7 +312,7 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
   out << commands.at(param)(plgs);
 }
 
-void duhanina::printCount(std::istream& in, const std::vector<Polygon>& plgs, std::ostream& out)
+void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
   std::string param;
   in >> param;
@@ -276,4 +326,24 @@ void duhanina::printCount(std::istream& in, const std::vector<Polygon>& plgs, st
     return;
   }
   out << commands.at(param)(plgs);
+}
+
+void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+{
+  Polygon ref;
+  in >> ref;
+  double refArea = calculateArea(ref);
+  size_t count = std::count_if(polygons.begin(), polygons.end(), CountIfAreaLess(refArea));
+  out << count;
+}
+
+void duhanina::printRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
+{
+  Polygon ref;
+  in >> ref;
+  bool first_flag = true;
+  auto new_end = std::unique(polygons.begin(), polygons.end(), AdjacentDuplicateFinder{ ref, first_flag });
+  size_t removed_count = std::distance(new_end, polygons.end());
+  polygons.erase(new_end, polygons.end());
+  out << removed_count;
 }
