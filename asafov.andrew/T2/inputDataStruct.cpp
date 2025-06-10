@@ -43,45 +43,48 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     }
 
     DataStruct temp;
-    bool valid = true;
+    bool has_valid_fields = false;
 
     size_t key1_pos = line.find(":key1 ");
-    if (key1_pos == std::string::npos) valid = false;
-    size_t key1_end = line.find(':', key1_pos + 1);
-    if (key1_end == std::string::npos) valid = false;
-    if (valid) {
-        std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
-        temp.key1 = parseULLBin(key1_str);
-        if (temp.key1 == 0 && key1_str != "0b0") valid = false;
-    }
-
-    size_t key2_pos = line.find(":key2 ");
-    if (key2_pos == std::string::npos) valid = false;
-    size_t key2_end = line.find(':', key2_pos + 1);
-    if (key2_end == std::string::npos) valid = false;
-    if (valid) {
-        std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
-        temp.key2 = parseCmpLsp(key2_str);
-        if (temp.key2 == std::complex<double>{0.0, 0.0} && key2_str != "#c(0.0 0.0)" &&
-            key2_str != "#c(0 0)" && key2_str != "#c(0. 0.)") valid = false;
-    }
-
-    size_t key3_pos = line.find(":key3 \"");
-    if (key3_pos == std::string::npos) valid = false;
-    if (valid) {
-        size_t quote_pos = key3_pos + 7;
-        size_t closing_quote = line.find('"', quote_pos);
-        if (closing_quote == std::string::npos) {
-            valid = false;
-        } else {
-            temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
-            if (line.find(':', closing_quote + 1) == std::string::npos) {
-                valid = false;
+    if (key1_pos != std::string::npos) {
+        size_t key1_end = line.find(':', key1_pos + 1);
+        if (key1_end != std::string::npos) {
+            std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
+            temp.key1 = parseULLBin(key1_str);
+            if (temp.key1 != 0 || key1_str == "0b0") {
+                has_valid_fields = true;
             }
         }
     }
 
-    if (valid) {
+    size_t key2_pos = line.find(":key2 ");
+    if (key2_pos != std::string::npos) {
+        size_t key2_end = line.find(':', key2_pos + 1);
+        if (key2_end != std::string::npos) {
+            std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
+            temp.key2 = parseCmpLsp(key2_str);
+            if (temp.key2 != std::complex<double>{0.0, 0.0} ||
+                key2_str == "#c(0.0 0.0)" ||
+                key2_str == "#c(0 0)" ||
+                key2_str == "#c(0. 0.)") {
+                has_valid_fields = true;
+            }
+        }
+    }
+
+    size_t key3_pos = line.find(":key3 \"");
+    if (key3_pos != std::string::npos) {
+        size_t quote_pos = key3_pos + 7;
+        size_t closing_quote = line.find('"', quote_pos);
+        if (closing_quote != std::string::npos) {
+            temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
+            if (line.find(':', closing_quote + 1) != std::string::npos) {
+                has_valid_fields = true;
+            }
+        }
+    }
+
+    if (has_valid_fields) {
         data = temp;
     } else {
         is.setstate(std::ios::failbit);
