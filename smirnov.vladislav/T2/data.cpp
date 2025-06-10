@@ -243,7 +243,7 @@ std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& src)
   return out;
 }
 
-bool smirnov::DataStruct::compare(const DataStruct& a, const DataStruct& b)
+bool smirnov::compare(const DataStruct& a, const DataStruct& b)
 {
   if (a.key1 != b.key1)
   {
