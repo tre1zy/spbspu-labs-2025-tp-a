@@ -43,7 +43,9 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     }
 
     DataStruct temp;
-    bool has_valid_fields = false;
+    bool has_key1 = false;
+    bool has_key2 = false;
+    bool has_key3 = false;
 
     size_t key1_pos = line.find(":key1 ");
     if (key1_pos != std::string::npos) {
@@ -52,7 +54,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
             std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
             temp.key1 = parseULLBin(key1_str);
             if (temp.key1 != 0 || key1_str == "0b0") {
-                has_valid_fields = true;
+                has_key1 = true;
             }
         }
     }
@@ -63,11 +65,11 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
         if (key2_end != std::string::npos) {
             std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
             temp.key2 = parseCmpLsp(key2_str);
-            if (temp.key2 != std::complex<double>{0.0, 0.0} ||
-                key2_str == "#c(0.0 0.0)" ||
-                key2_str == "#c(0 0)" ||
+            if (temp.key2 != std::complex<double>{0.0, 0.0} || 
+                key2_str == "#c(0.0 0.0)" || 
+                key2_str == "#c(0 0)" || 
                 key2_str == "#c(0. 0.)") {
-                has_valid_fields = true;
+                has_key2 = true;
             }
         }
     }
@@ -79,12 +81,12 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
         if (closing_quote != std::string::npos) {
             temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
             if (line.find(':', closing_quote + 1) != std::string::npos) {
-                has_valid_fields = true;
+                has_key3 = true;
             }
         }
     }
 
-    if (has_valid_fields) {
+    if (has_key1 && has_key2 && has_key3) {
         data = temp;
     } else {
         is.setstate(std::ios::failbit);
