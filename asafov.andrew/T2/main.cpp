@@ -7,13 +7,15 @@
 
 int main()
 {
-  std::vector<asafov::DataStruct> data;
+  using asafov::DataStruct;
+
+  std::vector<DataStruct> data;
 
   while (!std::cin.eof())
   {
     std::copy(
-      std::istream_iterator<asafov::DataStruct>{std::cin},
-      std::istream_iterator<asafov::DataStruct>{},
+      std::istream_iterator<DataStruct>{std::cin},
+      std::istream_iterator<DataStruct>{},
       std::back_inserter(data)
     );
 
@@ -33,7 +35,7 @@ int main()
   std::copy(
     data.begin(),
     data.end(),
-    std::ostream_iterator<asafov::DataStruct>{std::cout, "\n"}
+    std::ostream_iterator<DataStruct>{std::cout, "\n"}
   );
 
   return 0;
