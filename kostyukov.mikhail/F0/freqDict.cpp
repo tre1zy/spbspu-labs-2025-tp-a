@@ -77,7 +77,7 @@ namespace kostyukov
     out_ << pair.word << " - " << std::fixed << std::setprecision(1) << pair.freq << "%\n";
   }
 
-  void getTopOrBottom(std::istream& in, std::ostream& out, FreqDictManager& dicts, bool isBottom)
+  void getTopOrBottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool isBottom)
   {
     std::string dictName;
     size_t n = 0;
@@ -114,12 +114,12 @@ namespace kostyukov
     std::for_each(tempVec.begin(), tempVec.begin() + limit, PairPrinter(out));
   }
 
-  void top(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  void top(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     getTopOrBottom(in, out, dicts, false);
   }
 
-  void bottom(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  void bottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     getTopOrBottom(in, out, dicts, true);
   }
@@ -177,7 +177,7 @@ namespace kostyukov
     out << "successfully loaded " << dictName;
   }
 
-  void getFreq(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  void getFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     std::string dictName;
     std::string word;
@@ -320,7 +320,7 @@ namespace kostyukov
     out << key << " (in " << name1 << ": " << dict1.counts.at(key) << ", in " << name2 << ": " << dict2.counts.at(key) << ")\n";
   }
 
-  void findUniq(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  void findUniq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     std::string name1, name2;
     in >> name1 >> name2;
@@ -351,7 +351,7 @@ namespace kostyukov
     std::copy(diff.begin(), diff.end(), std::ostream_iterator< std::string >(out, "\n"));
   }
 
-  void findSame(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  void findSame(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     std::string name1;
     std::string name2;
@@ -391,6 +391,14 @@ namespace kostyukov
   bool RangeFreqPredicate::operator()(const WordFreqPair& pair) const
   {
     return pair.freq >= minVal_ && pair.freq <= maxVal_;
+  }
+  OutOfRangeFreqPredicate::OutOfRangeFreqPredicate(double minVal, double maxVal):
+    minVal_(minVal),
+    maxVal_(maxVal)
+  {}
+  bool OutOfRangeFreqPredicate::operator()(const WordFreqPair& pair) const
+  {
+    return pair.freq < minVal_ || pair.freq > maxVal_;
   }
   void getRange(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool inRange)
   {
@@ -444,8 +452,7 @@ namespace kostyukov
     }
     else
     {
-      //Вот здесь исправить на другой предикат
-      std::copy_if(allPairs.begin(), allPairs.end(), std::back_inserter(filteredPairs), predicate);
+      std::copy_if(allPairs.begin(), allPairs.end(), std::back_inserter(filteredPairs), OutOfRangeFreqPredicate(leftBorder, rightBorder));
     }
     if (filteredPairs.empty())
     {

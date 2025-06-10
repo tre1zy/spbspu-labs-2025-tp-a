@@ -92,6 +92,15 @@ namespace kostyukov
     void operator()(const std::pair< const std::string, FrequencyDictionary >& dictPair) const;
   };
 
+  struct OutOfRangeFreqPredicate
+  {
+    OutOfRangeFreqPredicate(double minVal, double maxVal);
+    bool operator()(const WordFreqPair& pair) const;
+    private:
+      double minVal_;
+      double maxVal_;
+  };
+
   struct IsInvalidChar
   {
     bool operator()(char c) const;
@@ -109,14 +118,14 @@ namespace kostyukov
   };
 
   void createDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
-  void top(std::istream& in, std::ostream& out, FreqDictManager& dicts);
-  void bottom(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void top(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
+  void bottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
   void deleteDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void loadDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
-  void getFreq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void getFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
   void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts);
-  void findUniq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
-  void findSame(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void findUniq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
+  void findSame(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
   void clear(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void listDicts(std::ostream& out, const FreqDictManager& dicts);
   void rangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
