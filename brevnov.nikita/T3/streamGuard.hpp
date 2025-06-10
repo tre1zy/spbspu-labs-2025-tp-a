@@ -1,5 +1,6 @@
 #ifndef STREAMGUARD_HPP
 #define STREAMGUARD_HPP
+#include <iostream>
 namespace brevnov
 {
   struct StreamGuard
