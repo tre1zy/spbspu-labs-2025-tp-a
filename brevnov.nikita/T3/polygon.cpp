@@ -11,10 +11,13 @@
 
 namespace
 {
-  double calc_area_term(const brevnov::Point& p1, const brevnov::Point& p2)
+  struct Calc_area_term
   {
-    return p1.x * p2.y - p2.x * p1.y;
-  }
+    double operator()(const brevnov::Point& p1, const brevnov::Point& p2)
+    {
+      return p1.x * p2.y - p2.x * p1.y;
+    }
+  };
 
   brevnov::Point get_side(const brevnov::Point &p1, const brevnov::Point &p2)
   {
@@ -42,7 +45,7 @@ std::istream& brevnov::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  brevnov::streamGuard stream(in);
+  brevnov::StreamGuard stream(in);
   in >> DelimeterIO{ '(' } >> point.x >> DelimeterIO{ ';' } >> point.y >> DelimeterIO{ ')' };
   return in;
 }
@@ -77,7 +80,7 @@ double brevnov::get_area(const Polygon& polygon)
   const Point first = points.front();
   const Point last = points.back();
   double area = std::inner_product(
-    points.begin(), points.end() - 1, points.begin() + 1, calc_area_term(last, first), std::plus< double >(), calc_area_term());
+    points.begin(), points.end() - 1, points.begin() + 1, Calc_area_term()(last, first), std::plus< double >(), Calc_area_term());
   return std::abs(area) / 2.0;
 }
 
