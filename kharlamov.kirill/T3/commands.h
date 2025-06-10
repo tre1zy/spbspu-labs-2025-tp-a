@@ -8,6 +8,10 @@
 namespace kharlamov
 {
   using PolygonVec = std::vector<Polygon>;
+  void doAreaCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doMaxCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doMinCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
+  void doCountCommand(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void maxSeq(std::istream& in, std::ostream& out, const PolygonVec& polygons);
   void same(std::istream& in, std::ostream& out, const PolygonVec& polygons);
 }

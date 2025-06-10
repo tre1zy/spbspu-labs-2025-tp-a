@@ -4,6 +4,17 @@
 #include "scopeguard.h"
 #include "delimetr.h"
 
+namespace kharlamov
+{
+  struct CalcAreaTerm
+  {
+    double operator()(const kharlamov::Point& p1, const kharlamov::Point& p2)
+    {
+      return p1.x * p2.y - p2.x * p1.y;
+    }
+  };
+}
+
 std::istream& kharlamov::operator>>(std::istream& in, Polygon& polygon)
 {
   std::istream::sentry sentry(in);
