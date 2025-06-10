@@ -16,9 +16,22 @@ namespace
     return p1.x * p2.y - p2.x * p1.y;
   }
 
-  double distance(const brevnov::Point p1, const brevnov::Point& p2)
+  brevnov::Point get_side(const Point &p1, const Point &p2)
   {
-    return std::sqrt(std::pow((p1.x - p2.x), 2) + std::pow((p1.y - p2.y), 2));
+    Point newSide;
+    newSide.x = p1.x - p2.x;
+    newSide.y = p1.y - p2.y;
+    return newSide;
+  }
+
+  bool is_right_angle(const Point &side1, const Point &side2)
+  {
+    return (side1.x * side2.x + side1.y * side2.y) == 0;
+  }
+
+  bool is_true(bool a)
+  {
+    return a != 0;
   }
 }
 
@@ -64,6 +77,18 @@ double brevnov::get_area(const Polygon& polygon)
   const Point first = points.front();
   const Point last = points.back();
   double area = std::inner_product(
-    points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
+    points.begin(), points.end() - 1, points.begin() + 1, calc_area_term()(last, first), std::plus< double >(), calc_area_term());
   return std::abs(area) / 2.0;
+}
+
+bool brevnov::has_right_angle(const Polygon& polygon)
+{
+  std::vector<Point> sides(polygon.points.size());
+  auto polygon_begin = polygon.points.cbegin();
+  std::transform(polygon_begin + 1, shape.points.cend(), polygon_begin, sides.begin(), get_side);
+  sides[shape.points.size() - 1] = get_side(shape.points[0], shape.points[shape.points.size() - 1]);
+  std::vector<bool> has_right_angle_vector(shape.points.size());
+  std::transform(sides.cbegin() + 1, sides.cend(), sides.cbegin(), has_right_angle_vector.begin(), is_right_angle);
+  has_right_angle_vector[sides.size() - 1] = is_right_angle(sides[0], sides[sides.size() - 1]);
+  return std::any_of(has_right_angle_vector.cbegin(), has_right_angle_vector.cend(), is_true);
 }

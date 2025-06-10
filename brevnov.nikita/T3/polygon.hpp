@@ -20,6 +20,6 @@ namespace brevnov
   std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
   double get_area(const Polygon&);
-
+  bool has_right_angle(const Polygon&);
 }
 #endif
