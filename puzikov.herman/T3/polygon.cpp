@@ -14,7 +14,13 @@ std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
   {
     return in;
   }
-  in >> input::Character{'('} >> dest.x >> input::Character{';'} >> dest.y >> input::Character{')'};
+
+  Point temp{0, 0};
+  in >> delim{'('} >> temp.x >> delim{';'} >> temp.y >> delim{')'};
+  if (in)
+  {
+    dest = temp;
+  }
   return in;
 }
 
@@ -61,7 +67,7 @@ std::ostream &puzikov::operator<<(std::ostream &out, const puzikov::Polygon &src
   FormatGuard guard(out);
 
   out << src.points.size() << ' ';
-  std::copy(src.points.begin(), src.points.end(), std::ostream_iterator< Point >{out, " "});
+  std::copy(src.points.begin(), src.points.end(), output_it_t{out, " "});
   return out;
 }
 
@@ -120,10 +126,17 @@ void puzikov::readPolygons(std::istream &in, std::vector< Polygon > &polygons)
     try
     {
       std::copy(polygonInputIter{in}, polygonInputIter{}, std::back_inserter(polygons));
+      if (in.fail())
+      {
+        throw std::exception();
+      }
     }
     catch (...)
     {
-      in.clear();
+      if (in.fail())
+      {
+        in.clear(in.rdstate() ^ std::ios::failbit);
+      }
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
