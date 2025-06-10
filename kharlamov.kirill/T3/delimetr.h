@@ -1,8 +1,8 @@
-#ifndef DELIMETERS_HPP
-#define DELIMETERS_HPP
+#ifndef DELIMETRS_HPP
+#define DELIMETRS_HPP
 #include <string>
 
-namespace kiselev
+namespace kharlamov
 {
   struct DelimeterIO
   {
