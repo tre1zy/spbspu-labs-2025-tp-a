@@ -64,7 +64,8 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     if (valid) {
         std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
         temp.key2 = parseCmpLsp(key2_str);
-        if (temp.key2 == std::complex<double>{0.0, 0.0} && key2_str != "#c(0.0 0.0)" && key2_str != "#c(0 0)" && key2_str != "#c(0. 0.)") valid = false;
+        if (temp.key2 == std::complex<double>{0.0, 0.0} && key2_str != "#c(0.0 0.0)" &&
+            key2_str != "#c(0 0)" && key2_str != "#c(0. 0.)") valid = false;
     }
 
     // Parse key3 - modified to handle colons in the string
