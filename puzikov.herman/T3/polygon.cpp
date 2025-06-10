@@ -10,18 +10,11 @@
 std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
 {
   std::istream::sentry sentry(in);
-  using delim = puzikov::input::Character;
   if (!sentry)
   {
     return in;
   }
-
-  Point temp {0, 0};
-  in >> delim {'('} >> temp.x >> delim {';'} >> temp.y >> delim {')'};
-  if (in)
-  {
-    dest = temp;
-  }
+  in >> input::Character{'('} >> dest.x >> input::Character{';'} >> dest.y >> input::Character{')'};
   return in;
 }
 
@@ -43,23 +36,17 @@ std::istream &puzikov::operator>>(std::istream &in, Polygon &dest)
   {
     return in;
   }
-
-  size_t vertexCount;
-  in >> vertexCount;
-  if (!in || vertexCount < 3)
-  {
-    throw std::logic_error("Not enough vertices.");
-  }
-  std::vector< Point > points(vertexCount, Point{0, 0});
-  using inputIt = std::istream_iterator< Point >;
-  std::copy_n(inputIt{in}, vertexCount, points.begin());
-  if (in && points.size() == vertexCount)
-  {
-    dest.points = points;
-  }
-  else
+  size_t vertices = 0;
+  if (!(in >> vertices) || vertices < 3)
   {
     in.setstate(std::ios::failbit);
+    return in;
+  }
+  std::vector< Point > temp(vertices);
+  std::copy_n(std::istream_iterator< Point >(in), vertices, temp.begin());
+  if (in)
+  {
+    dest.points = std::move(temp);
   }
   return in;
 }
@@ -71,11 +58,10 @@ std::ostream &puzikov::operator<<(std::ostream &out, const puzikov::Polygon &src
   {
     return out;
   }
-  puzikov::FormatGuard guard(out);
-  using output_it_t = std::ostream_iterator< puzikov::Point >;
+  FormatGuard guard(out);
 
   out << src.points.size() << ' ';
-  std::copy(src.points.begin(), src.points.end(), output_it_t {out, " "});
+  std::copy(src.points.begin(), src.points.end(), std::ostream_iterator< Point >{out, " "});
   return out;
 }
 
@@ -133,7 +119,7 @@ void puzikov::readPolygons(std::istream &in, std::vector< Polygon > &polygons)
   {
     try
     {
-      std::copy(polygonInputIter {in}, polygonInputIter {}, std::back_inserter(polygons));
+      std::copy(polygonInputIter{in}, polygonInputIter{}, std::back_inserter(polygons));
     }
     catch (...)
     {

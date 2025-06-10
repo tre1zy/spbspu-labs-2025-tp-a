@@ -11,11 +11,6 @@ void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
     try
     {
       commands.at(cmd)(in, out);
-      if (!in)
-      {
-        restoreInputStream(in);
-        out << "<INVALID COMMAND>\n";
-      }
     }
     catch (...)
     {

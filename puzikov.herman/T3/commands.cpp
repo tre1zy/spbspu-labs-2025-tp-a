@@ -180,7 +180,6 @@ void puzikov::sameCommand(std::istream &in, std::ostream &out, const std::vector
   }
   catch (...)
   {
-    std::cout << "whoops\n";
     throw std::runtime_error("WHOOPS");
   }
   if (!in || in.peek() != '\n')

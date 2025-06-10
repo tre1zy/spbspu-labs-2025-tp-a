@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  std::ifstream inputFile {argv[1]};
+  std::ifstream inputFile{argv[1]};
   if (!inputFile)
   {
     std::cerr << "Couldn't open the file 😢\n";
@@ -22,7 +22,6 @@ int main(int argc, char **argv)
 
   std::vector< puzikov::Polygon > polygons;
   puzikov::readPolygons(inputFile, polygons);
-  puzikov::writePolygons(std::cout, polygons);
   inputFile.close();
 
   puzikov::CommandHandler cmdHandler(polygons);
