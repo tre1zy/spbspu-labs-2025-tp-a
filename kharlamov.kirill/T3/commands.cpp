@@ -11,9 +11,9 @@
 #include "polygon.h"
 #include "scopeguard.h"
 
-namespace kharlamov
+namespace
 {
-  double kharlamov::getArea(const Polygon& polygon)
+  double getArea(const Polygon& polygon)
   {
   const auto points = polygon.points;
   const Point first = points.front();
@@ -25,7 +25,7 @@ namespace kharlamov
 
   struct CalcAreaTerm
   {
-    double operator()(const kiselev::Point& p1, const kharlamov::Point& p2)
+    double operator()(const kharlamov::Point& p1, const kharlamov::Point& p2)
     {
       return p1.x * p2.y - p2.x * p1.y;
     }
