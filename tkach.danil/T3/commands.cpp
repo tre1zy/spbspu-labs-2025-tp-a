@@ -61,7 +61,6 @@ namespace
       {
         return true;
       }
-      std::vector< tkach::Point > temp = polygon.points;
       tkach::Point target_min = findMinXYPoint(poly);
       tkach::Point poly_min = findMinXYPoint(polygon);
       tkach::Point delta = {poly_min.x - target_min.x, poly_min.y - target_min.y};
@@ -80,9 +79,9 @@ namespace
     PolyAreaAccumulator accum{};
     auto begin_it = polygon.points.begin();
     auto end_it = polygon.points.end();
-    double sum = std::fabs(std::inner_product(begin_it, end_it - 1, begin_it + 1, 0.0, std::plus< double >(), accum));
+    double sum = std::inner_product(begin_it, end_it - 1, begin_it + 1, 0.0, std::plus< double >(), accum);
     sum += accum(polygon.points[polygon.points.size() - 1], polygon.points[0]);
-    return sum / 2.0;
+    return std::fabs(sum) / 2.0;
   }
 
   bool isEven(const tkach::Polygon& polygon)
@@ -102,10 +101,6 @@ namespace
 
   double sumPolyVector(const std::vector< tkach::Polygon >& poly)
   {
-    if (poly.empty())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
     std::vector< double > areas;
     std::transform(poly.begin(), poly.end(), std::back_inserter(areas), calculatePolygonArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -123,6 +118,10 @@ namespace
 
   double sumPolyVectorMean(const std::vector< tkach::Polygon >& poly)
   {
+    if (poly.empty())
+    {
+      throw std::logic_error("Error: zero polygons");
+    }
     return sumPolyVector(poly) / poly.size();
   }
 
