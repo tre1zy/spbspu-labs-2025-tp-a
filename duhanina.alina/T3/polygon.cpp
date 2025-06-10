@@ -49,7 +49,9 @@ std::istream& duhanina::operator>>(std::istream& in, duhanina::Polygon& polygon)
   if (polygon.points.size() != numPoints)
   {
     in.setstate(std::ios::failbit);
+    return in;
   }
+  polygon.points = std::move(points);
   return in;
 }
 

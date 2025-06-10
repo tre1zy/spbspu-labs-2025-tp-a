@@ -275,6 +275,10 @@ namespace
 
 void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("Error");
+  }
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
@@ -292,6 +296,10 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
 
 void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("Error");
+  }
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
@@ -303,6 +311,10 @@ void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plg
 
 void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("Error");
+  }
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
@@ -314,6 +326,10 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
 
 void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("Error");
+  }
   std::string param;
   in >> param;
   std::map<std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
@@ -330,6 +346,10 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
 
 void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
 {
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("Error");
+  }
   Polygon ref;
   in >> ref;
   double refArea = calculateArea(ref);
@@ -339,6 +359,10 @@ void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& pol
 
 void duhanina::printRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
 {
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("Error");
+  }
   Polygon ref;
   in >> ref;
   bool first_flag = true;
