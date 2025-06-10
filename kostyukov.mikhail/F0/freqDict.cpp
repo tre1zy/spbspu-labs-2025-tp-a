@@ -509,4 +509,120 @@ namespace kostyukov
     }
     std::for_each(dicts.begin(), dicts.end(), DictNamePrinter{ out });
   }
+
+  MergeFunctor::MergeFunctor(FrequencyDictionary& targetDict):
+    targetDict_(targetDict)
+  {}
+  void MergeFunctor::operator()(const std::pair< const std::string, size_t >& pair)
+  {
+    targetDict_.counts[pair.first] += pair.second;
+    targetDict_.totalWords += pair.second;
+  }
+  void merge(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  {
+    std::string newDictName;
+    std::string dict1Name;
+    std::string dict2Name;
+    in >> newDictName >> dict1Name >> dict2Name;
+    if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty())
+    {
+      out << "<MISSING ARGUMENTS>";
+      return;
+    }
+    if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    if (dicts.count(newDictName))
+    {
+      out << "<DICTIONARY EXIST>";
+      return;
+    }
+    auto iter1 = dicts.find(dict1Name);
+    auto iter2 = dicts.find(dict2Name);
+    if (iter1 == dicts.end() || iter2 == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    dicts.emplace(newDictName, iter1->second);
+    FrequencyDictionary& newDict = dicts.at(newDictName);
+    const FrequencyDictionary& dict2 = iter2->second;
+    std::for_each(dict2.counts.begin(), dict2.counts.end(), MergeFunctor(newDict));
+    out << "Dictionaries merged into " << newDictName;
+  }
+
+  IntersectFunctor::IntersectFunctor(FrequencyDictionary& targetDict, const FrequencyDictionary& otherDict, bool useMax):
+    targetDict_(targetDict),
+    otherDict_(otherDict),
+    useMax_(useMax)
+  {}
+  void IntersectFunctor::operator()(const std::pair< const std::string, size_t >& pair)
+  {
+    auto otherIt = otherDict_.counts.find(pair.first);
+    if (otherIt != otherDict_.counts.end())
+    {
+      size_t freq1 = pair.second;
+      size_t freq2 = otherIt->second;
+      size_t newFreq = useMax_ ? std::max(freq1, freq2) : std::min(freq1, freq2);
+      targetDict_.counts[pair.first] = newFreq;
+      targetDict_.totalWords += newFreq;
+    }
+  }
+  void intersect(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  {
+    std::string newDictName;
+    std::string dict1Name;
+    std::string dict2Name;
+    std::string param;
+    in >> newDictName >> dict1Name >> dict2Name >> param;
+    if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty() || param.empty())
+    {
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    if (param != "min" && param != "max")
+    {
+      out << "<INVALID ARGUMENT>";
+      return;
+    }
+    if (dicts.count(newDictName))
+    {
+      out << "<DICTIONARY EXISTS>";
+      return;
+    }
+    auto iter1 = dicts.find(dict1Name);
+    auto iter2 = dicts.find(dict2Name);
+    if (iter1 == dicts.end() || iter2 == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    dicts.emplace(newDictName, FrequencyDictionary{});
+    FrequencyDictionary& newDict = dicts.at(newDictName);
+    const FrequencyDictionary& dict1 = iter1->second;
+    const FrequencyDictionary& dict2 = iter2->second;
+    if (dict1.counts.size() < dict2.counts.size())
+    {
+      std::for_each(dict1.counts.begin(), dict1.counts.end(), IntersectFunctor(newDict, dict2, param == "max"));
+    }
+    else
+    {
+      std::for_each(dict2.counts.begin(), dict2.counts.end(), IntersectFunctor(newDict, dict1, param == "max"));
+    }
+    out << "Dictionaries intersected into " << newDictName;
+  }
+
+  void printHelp(std::ostream& out)
+  {
+    out << "create\ntop\nbottom\ndelete\nload\ngetfreq\nremovebatch\nfinduniq\nfindsame\n";
+    out << "clear\nlistdicts\nrangefreq\noutrangefreq\nmerge\nintersect";
+    return;
+  }
 }

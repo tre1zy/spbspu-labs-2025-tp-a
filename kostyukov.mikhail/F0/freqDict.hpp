@@ -101,6 +101,24 @@ namespace kostyukov
       double maxVal_;
   };
 
+  struct MergeFunctor
+  {
+    explicit MergeFunctor(FrequencyDictionary& targetDict);
+    void operator()(const std::pair< const std::string, size_t >& pair);
+    private:
+      FrequencyDictionary& targetDict_;
+  };
+
+  struct IntersectFunctor
+  {
+    IntersectFunctor(FrequencyDictionary& targetDict, const FrequencyDictionary& otherDict, bool useMax);
+    void operator()(const std::pair< const std::string, size_t >& pair);
+    private:
+      FrequencyDictionary& targetDict_;
+      const FrequencyDictionary& otherDict_;
+      bool useMax_;
+  };
+
   struct IsInvalidChar
   {
     bool operator()(char c) const;
@@ -117,6 +135,7 @@ namespace kostyukov
       FrequencyDictionary& dict_;
   };
 
+  void printHelp(std::ostream& out);
   void createDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void top(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
   void bottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
@@ -130,5 +149,7 @@ namespace kostyukov
   void listDicts(std::ostream& out, const FreqDictManager& dicts);
   void rangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
   void outRangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts);
+  void merge(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void intersect(std::istream& in, std::ostream& out, FreqDictManager& dicts);
 }
 #endif
