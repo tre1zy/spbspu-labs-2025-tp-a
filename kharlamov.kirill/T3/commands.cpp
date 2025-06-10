@@ -21,7 +21,7 @@ namespace
     }
   };
 
-  double getArea(const Polygon& polygon)
+  double getArea(const kharlamov::Polygon& polygon)
   {
     const auto points = polygon.points;
     const kharlamov::Point first = points.front();
@@ -232,7 +232,7 @@ void kharlamov::doCountCommand(std::istream& in, std::ostream& out, const std::v
   }
 }
 
-void kharlamov::domaxSeqCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
+void kharlamov::doMaxSeqCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
 {
   Polygon target;
   in >> target;
@@ -257,7 +257,7 @@ void kharlamov::domaxSeqCommand(std::istream& in, std::ostream& out, const Polyg
     out << maxCount << "\n";
 }
 
-void kharlamov::dosameCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
+void kharlamov::doSameCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
 {
   Polygon target;
   in >> target;
