@@ -1,6 +1,6 @@
 #include "iofmtguard.hpp"
 
-namespace DataIO
+namespace averenkov
 {
   iofmtguard::iofmtguard(std::basic_ios< char >& s):
     s_(s),

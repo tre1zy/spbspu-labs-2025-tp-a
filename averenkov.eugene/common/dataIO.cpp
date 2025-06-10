@@ -1,7 +1,7 @@
 #include "dataIO.hpp"
 #include <sstream>
 
-namespace DataIO
+namespace averenkov
 {
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {

@@ -6,7 +6,7 @@
 #include <utility>
 #include "iofmtguard.hpp"
 
-namespace DataIO
+namespace averenkov
 {
   struct DelimiterIO
   {

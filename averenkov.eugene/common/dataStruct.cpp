@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "iofmtguard.hpp"
 
-using namespace DataIO;
+using namespace averenkov;
 
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {

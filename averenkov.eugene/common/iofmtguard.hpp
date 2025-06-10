@@ -3,7 +3,7 @@
 
 #include <ios>
 
-namespace DataIO
+namespace averenkov
 {
   class iofmtguard
   {
