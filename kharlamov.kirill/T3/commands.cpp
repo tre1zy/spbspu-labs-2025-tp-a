@@ -141,6 +141,15 @@ namespace
   {
     out << countIf(polygons, VertexPred{ n }) << "\n";
   }
+  bool kharlamov::compareDouble(double d1, double d2, double epsilon)
+  {
+    return std::abs(d1 - d2) < epsilon;
+  }
+
+  double kharlamov::pointDeltaSum::operator()(const Point& a, const Point& b) const
+  {
+    return (a.x - b.x) + (a.y - b.y);
+  }
   struct isSame
   {
     kharlamov::Polygon& p;
