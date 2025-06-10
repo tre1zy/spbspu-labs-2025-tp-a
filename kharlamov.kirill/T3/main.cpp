@@ -9,6 +9,7 @@
 
 int main(int argc, char** argv)
 {
+  using istreamIt = std::istream_iterator< kharlamov::Polygon >;
   if (argc != 2)
   {
     std::cerr << "Usage: " << argv[0] << " <filename>\n";
