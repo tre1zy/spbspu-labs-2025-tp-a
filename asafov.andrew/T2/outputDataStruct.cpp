@@ -21,7 +21,7 @@ namespace
   {
     if (num == 0)
     {
-      return "0b0"
+      return "0b0";
     }
     std::string binary;
     for (int i = sizeof(num) * 8 - 1; i >= 0; --i)
