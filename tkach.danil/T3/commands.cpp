@@ -5,23 +5,19 @@
 #include <numeric>
 #include <iterator>
 #include <cmath>
-#include <streamguard.hpp>
 #include <iomanip>
+#include <streamguard.hpp>
 
 namespace
 {
   struct PolyAreaAccumulator
   {
-    const tkach::Polygon& poly;
-    size_t index;
-    double operator()(double area, const tkach::Point& polygon)
+    double operator()(const tkach::Point& p1, const tkach::Point& p2) const
     {
-      size_t next = (index + 1) % poly.points.size();
-      area += (polygon.x * poly.points[next].y) - (polygon.y * poly.points[next].x);
-      index++;
-      return area;
+      return static_cast< double >(p1.x) * p2.y - static_cast< double >(p1.y) * p2.x;
     }
   };
+
   bool pointCmp(const tkach::Point& lhs, const tkach::Point& rhs)
   {
     if (lhs.x != rhs.x)
@@ -33,28 +29,45 @@ namespace
       return lhs.y < rhs.y;
     }
   }
-  bool deltaCmp(const tkach::Point& lhs, const tkach::Point& rhs, double deltax, double deltay)
+
+  bool pointEqual(const tkach::Point& lhs, const tkach::Point& rhs)
   {
-    return std::fabs(lhs.x - rhs.x - deltax) < 1e-9 && std::fabs(lhs.y - rhs.y - deltay) < 1e-9;
+    return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+  }
+
+  tkach::Point findMinXYPoint(const tkach::Polygon& polygon)
+  {
+    return *std::min_element(polygon.points.cbegin(), polygon.points.cend(), pointCmp);
+  }
+  
+  bool hasPoint(const tkach::Point& delta, const tkach::Point& point, const tkach::Polygon& polygon)
+  {
+    tkach::Point res = {point.x + delta.x, point.y + delta.y};
+    using namespace std::placeholders;
+    auto accum_same = std::bind(pointEqual, res, _1);
+    return std::find_if(polygon.points.cbegin(), polygon.points.cend(), accum_same) != polygon.points.cend();
   }
 
   struct PolySame
   {
     const tkach::Polygon& poly;
-    double deltax;
-    double deltay;
     bool operator()(const tkach::Polygon& polygon)
     {
       if (poly.points.size() != polygon.points.size())
       {
         return false;
       }
+      if (polygon.points.empty())
+      {
+        return true;
+      }
       std::vector< tkach::Point > temp = polygon.points;
-      std::sort(temp.begin(), temp.end(), pointCmp);
-      deltax = temp[0].x - poly.points[0].x;
-      deltay = temp[0].y - poly.points[0].y;
-      auto cmp = std::bind(deltaCmp, std::placeholders::_1, std::placeholders::_2, deltax, deltay);
-      return std::equal(temp.begin(), temp.end(), poly.points.begin(), cmp);
+      tkach::Point target_min = findMinXYPoint(poly);
+      tkach::Point poly_min = findMinXYPoint(polygon);
+      tkach::Point delta = {poly_min.x - target_min.x, poly_min.y - target_min.y};
+      auto predicate = std::bind(hasPoint, delta, std::placeholders::_1, std::cref(polygon));
+      size_t count_matched_points = std::count_if(poly.points.cbegin(), poly.points.cend(), predicate);
+      return count_matched_points == poly.points.size();
     }
   };
 
@@ -64,8 +77,11 @@ namespace
     {
       return 0.0;
     }
-    PolyAreaAccumulator accum{polygon, 0};
-    double sum = std::fabs(std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, accum));
+    PolyAreaAccumulator accum{};
+    auto begin_it = polygon.points.begin();
+    auto end_it = polygon.points.end();
+    double sum = std::fabs(std::inner_product(begin_it, end_it - 1, begin_it + 1, 0.0, std::plus< double >(), accum));
+    sum += accum(polygon.points[polygon.points.size() - 1], polygon.points[0]);
     return sum / 2.0;
   }
 
@@ -84,6 +100,37 @@ namespace
     return polygon.points.size() == required_count;
   }
 
+  double sumPolyVector(const std::vector< tkach::Polygon >& poly)
+  {
+    if (poly.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    std::vector< double > areas;
+    std::transform(poly.begin(), poly.end(), std::back_inserter(areas), calculatePolygonArea);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
+
+  double sumPolyVectorEven(const std::vector< tkach::Polygon >& poly)
+  {
+    return sumPolyVector(poly);
+  }
+
+  double sumPolyVectorOdd(const std::vector< tkach::Polygon >& poly)
+  {
+    return sumPolyVector(poly);
+  }
+  
+  double sumPolyVectorMean(const std::vector< tkach::Polygon >& poly)
+  {
+    return sumPolyVector(poly) / poly.size();
+  }
+
+  double sumPolyVectorCount(const std::vector< tkach::Polygon >& poly)
+  {
+    return sumPolyVector(poly);
+  }
+  
   std::vector< tkach::Polygon > clearedEven(const std::vector< tkach::Polygon >& data)
   {
     std::vector< tkach::Polygon > result;
@@ -221,8 +268,7 @@ void tkach::printSame(std::istream& in, std::ostream& out, const std::vector< Po
   {
     throw std::logic_error("Error: not polygon");
   }
-  std::sort(target.points.begin(), target.points.end(), pointCmp);
-  PolySame cmp{target, 0, 0};
+  PolySame cmp{target};
   out << std::count_if(data.begin(), data.end(), cmp) << '\n';
 }
 
@@ -259,18 +305,18 @@ void tkach::printCount(std::istream& in, std::ostream& out, const std::vector< P
 
 void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& data)
 {
-  using sub_commands_map = std::map< std::string, std::function< std::vector< Polygon >() > >;
+  using sub_commands_map = std::map< std::string, std::function< double() > >;
   StreamGuard guard(out);
   sub_commands_map sub_cmds;
-  sub_cmds["EVEN"] = std::bind(clearedEven, std::cref(data));
-  sub_cmds["ODD"] = std::bind(clearedOdd, std::cref(data));
-  sub_cmds["MEAN"] = std::bind(clearedMean, std::cref(data));
+  sub_cmds["EVEN"] = std::bind(sumPolyVectorEven, std::bind(clearedEven, std::cref(data)));
+  sub_cmds["ODD"] = std::bind(sumPolyVectorOdd, std::bind(clearedOdd, std::cref(data)));
+  sub_cmds["MEAN"] = std::bind(sumPolyVectorMean, std::bind(clearedMean, std::cref(data)));
   std::string sub_cmd;
   in >> sub_cmd;
-  std::vector< tkach::Polygon > cleared;
+  double res = 0.0;
   try
   {
-    cleared = sub_cmds.at(sub_cmd)();
+    res = sub_cmds.at(sub_cmd)();
   }
   catch (...)
   {
@@ -279,24 +325,8 @@ void tkach::printArea(std::istream& in, std::ostream& out, const std::vector< Po
     {
       throw std::logic_error("Error: not polygon");
     }
-    cleared = clearedCount(data, count);
+    res = sumPolyVectorCount(clearedCount(data, count));
   }
-  std::vector< double > areas;
-  std::transform(cleared.begin(), cleared.end(), std::back_inserter(areas), calculatePolygonArea);
   out << std::fixed << std::setprecision(1);
-  if (sub_cmd == "MEAN")
-  {
-    if (!areas.empty())
-    {
-      out << std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size() << "\n";
-    }
-    else
-    {
-      throw std::logic_error("Error: zero polygons");
-    }
-  }
-  else
-  {
-    out << std::accumulate(areas.begin(), areas.end(), 0.0) << "\n";
-  }
+  out << res << "\n";
 }

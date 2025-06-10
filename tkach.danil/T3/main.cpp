@@ -30,7 +30,7 @@ int main(const int argc, const char* const* const argv)
     std::copy(istreamIT{in}, istreamIT{}, std::back_inserter(data));
     if (in.fail())
     {
-      in.clear();
+      in.clear(in.rdstate() ^ std::ios::failbit);
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
