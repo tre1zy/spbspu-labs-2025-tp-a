@@ -211,9 +211,9 @@ namespace
       [](const brevnov::Point& a, const brevnov::Point& b) { return a.x < b.x; });
     auto minmax_y2 = std::minmax_element(poly2.points.begin(), poly2.points.end(),
       [](const brevnov::Point& a, const brevnov::Point& b) { return a.y < b.y; });
-    return !(minmax_x1.second->x < minmax_x2.first->x || 
+    return !(minmax_x1.second->x < minmax_x2.first->x ||
             minmax_x2.second->x < minmax_x1.first->x ||
-            minmax_y1.second->y < minmax_y2.first->y || 
+            minmax_y1.second->y < minmax_y2.first->y ||
             minmax_y2.second->y < minmax_y1.first->y);
   }
 
