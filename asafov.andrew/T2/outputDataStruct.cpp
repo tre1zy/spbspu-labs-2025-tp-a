@@ -26,7 +26,7 @@ namespace
     if (firstOne != std::string::npos) {
         binary = binary.substr(firstOne);
     }
-    return "0b" + binary;
+    return "0b0" + binary;
 }
 }
 
