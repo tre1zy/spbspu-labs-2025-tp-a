@@ -1,5 +1,4 @@
 #include "datastruct.h"
-#include <sstream>
 #include <cctype>
 #include <algorithm>
 
@@ -27,10 +26,36 @@ namespace
     if (str.length() < 5 || str[0] != '#' || str[1] != 'c' || str[2] != '(')
       return {0.0, 0.0};
 
-    std::string content = str.substr(3, str.size() - 4);
-    std::istringstream iss(content);
-    double real, imag;
-    iss >> real >> imag;
+    size_t start = 3;
+    size_t end = str.find_first_of(" )", start);
+    double real = 0.0;
+    double imag = 0.0;
+
+    std::string real_str = str.substr(start, end - start);
+    try
+    {
+      real = std::stod(real_str);
+    }
+    catch (...)
+    {
+      return {0.0, 0.0};
+    }
+
+    if (end != std::string::npos && str[end] != ')')
+    {
+      start = end + 1;
+      end = str.find_first_of(" )", start);
+      std::string imag_str = str.substr(start, end - start);
+      try
+      {
+        imag = std::stod(imag_str);
+      }
+      catch (...)
+      {
+        return {0.0, 0.0};
+      }
+    }
+
     return {real, imag};
   }
 }
