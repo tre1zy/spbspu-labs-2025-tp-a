@@ -88,9 +88,9 @@ bool brevnov::has_right_angle(const Polygon& polygon)
 {
   std::vector<Point> sides(polygon.points.size());
   auto polygon_begin = polygon.points.cbegin();
-  std::transform(polygon_begin + 1, shape.points.cend(), polygon_begin, sides.begin(), get_side);
-  sides[shape.points.size() - 1] = get_side(shape.points[0], shape.points[shape.points.size() - 1]);
-  std::vector<bool> has_right_angle_vector(shape.points.size());
+  std::transform(polygon_begin + 1, polygon.points.cend(), polygon_begin, sides.begin(), get_side);
+  sides[polygon.points.size() - 1] = get_side(polygon.points[0], polygon.points[polygon.points.size() - 1]);
+  std::vector<bool> has_right_angle_vector(polygon.points.size());
   std::transform(sides.cbegin() + 1, sides.cend(), sides.cbegin(), has_right_angle_vector.begin(), is_right_angle);
   has_right_angle_vector[sides.size() - 1] = is_right_angle(sides[0], sides[sides.size() - 1]);
   return std::any_of(has_right_angle_vector.cbegin(), has_right_angle_vector.cend(), is_true);
