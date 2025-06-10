@@ -13,6 +13,24 @@
 
 namespace kharlamov
 {
+  double kharlamov::getArea(const Polygon& polygon)
+  {
+  const auto points = polygon.points;
+  const Point first = points.front();
+  const Point last = points.back();
+  double area = std::inner_product(
+    points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
+  return std::abs(area) / 2.0;
+  }
+
+  struct CalcAreaTerm
+  {
+    double operator()(const kiselev::Point& p1, const kharlamov::Point& p2)
+    {
+      return p1.x * p2.y - p2.x * p1.y;
+    }
+  };
+
   bool isEven(const kharlamov::Polygon& poly)
   {
     return poly.points.size() % 2 == 0;
@@ -190,16 +208,6 @@ void kharlamov::doMinCommand(std::istream& in, std::ostream& out, const std::vec
   {
     throw std::logic_error("Unknown command");
   }
-}
-
-double kharlamov::getArea(const Polygon& polygon)
-{
-  const auto points = polygon.points;
-  const Point first = points.front();
-  const Point last = points.back();
-  double area = std::inner_product(
-    points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
-  return std::abs(area) / 2.0;
 }
 
 void kharlamov::doCountCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
