@@ -3,78 +3,73 @@
 #include <bitset>
 #include "dataStruct.hpp"
 
+#include <iostream>
 
 namespace ivanova
 {
-  std::istream& operator>>(std::istream& in, dataStruct& ds)
+  inline std::string::size_type endKey(const std::string& line, std::string::size_type start)
   {
-    std::string line;
-    std::getline(in, line);
-
-    if (!line.empty() && line.front() == '(' && line.back() == ')')
+    bool in_raw = false;
+    for (std::string::size_type i = start; i < line.size(); ++i)
     {
-      line = line.substr(1, line.size() - 2);
-      std::istringstream iss(line);
-      std::string pair;
-
-      while (std::getline(iss, pair, ':'))
+      if (line[i] == ':' && !in_raw)
       {
-        if (pair.empty()) continue;
-
-        std::istringstream pairStream(pair);
-        std::string key;
-        pairStream >> key;
-
-        if (key == "key1")
-        {
-          std::string value;
-          pairStream >> value;
-          try
-          {
-            ds.key1 = std::stod(value, nullptr);
-          }
-          catch (...)
-          {
-            in.setstate(std::ios::failbit);
-          }
-        }
-        else if (key == "key2")
-        {
-          std::string value;
-          pairStream >> value;
-
-          if (value.size() > 2 && (value.substr(0, 2) == "0b" || value.substr(0, 2) == "0B"))
-          {
-            try
-            {
-              ds.key2 = std::stoull(value.substr(2), nullptr, 2);
-            }
-            catch (...)
-            {
-              in.setstate(std::ios::failbit);
-            }
-          }
-          else
-          {
-            in.setstate(std::ios::failbit);
-          }
-        }
-        else if (key == "key3")
-        {
-          pairStream >> std::ws;
-          std::getline(pairStream, ds.key3);
-          if (!ds.key3.empty() && ds.key3.front() == '\"')
-          {
-            ds.key3 = ds.key3.substr(1);
-          }
-          if (!ds.key3.empty() && ds.key3.back() == '\"')
-          {
-            ds.key3.pop_back();
-          }
-        }
+        return i;
+      }
+      if (line[i] == '"')
+      {
+        in_raw = !in_raw;
       }
     }
-    else
+    return line.size();
+  }
+
+  inline std::string getKey(const std::string& line, const std::string& key_preffix)
+  {
+    std::string::size_type key_pos = line.find(key_preffix);
+    if (key_pos == std::string::npos)
+    {
+      throw std::logic_error("");
+    }
+    std::string::size_type key_end = endKey(line, key_pos + key_preffix.size());
+    return line.substr(key_pos + key_preffix.size(), key_end - (key_pos + key_preffix.size()));
+  }
+
+  inline std::string::size_type countZeroes(const std::string& key) {
+    if (key.empty()) {
+      return 0;
+    }
+    std::string::size_type cnt = 0;
+    while (cnt < key.size() && key[cnt] == '0') {
+      ++cnt;
+    }
+    return cnt;
+  }
+
+  std::istream& operator>>(std::istream& in, dataStruct& ds)
+  {
+    try
+    {
+      std::string line;
+      std::getline(in, line);
+      if (line.empty() || line.front() != '(' || line.back() != ')')
+      {
+        throw std::logic_error("");
+      }
+      std::string key1 = getKey(line, ":key1 ");
+      std::string key2 = getKey(line, ":key2 ");
+      std::string key3 = getKey(line, ":key3 ");
+
+      if (key2.size() <= 2 || (key2.substr(0, 2) != "0b" && key2.substr(0, 2) != "0B") || key3.size() < 2)
+      {
+        throw std::logic_error("");
+      }
+      ds.key1 = std::stod(key1, nullptr);
+      ds.key2 = std::stoull(key2.substr(2), nullptr, 2);
+      ds.key2_zeroes = countZeroes(key2.substr(2));
+      ds.key3 = key3.substr(1, key3.size() - 2);
+    }
+    catch (...)
     {
       in.setstate(std::ios::failbit);
     }
@@ -100,11 +95,12 @@ namespace ivanova
     size_t firstOne = binaryStr.find('1');
     if (firstOne != std::string::npos)
     {
-        out << binaryStr.substr(firstOne);
+      std::string preffix(ds.key2_zeroes, '0');
+      out << preffix << binaryStr.substr(firstOne);
     }
     else
     {
-        out << "0";
+      out << "0";
     }
 
     out << ":key3 \"" << ds.key3 << "\":)";
