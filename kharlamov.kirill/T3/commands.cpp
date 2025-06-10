@@ -79,7 +79,6 @@ namespace kharlamov
   void maxArea(const std::vector< kharlamov::Polygon >& polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareArea));
-    detail::ScopeGuard scope(out);
     out << std::fixed << std::setprecision(1) << kharlamov::getArea(max) << "\n";
   }
 
@@ -92,7 +91,6 @@ namespace kharlamov
   void minArea(const std::vector< kharlamov::Polygon >& polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareArea));
-    detail::ScopeGuard scope(out);
     out << std::fixed << std::setprecision(1) << kharlamov::getArea(min) << "\n";
   }
 
@@ -226,56 +224,55 @@ void kharlamov::doCountCommand(std::istream& in, std::ostream& out, const std::v
   }
 }
 
-  void maxSeq(std::istream& in, std::ostream& out, const PolygonVec& polygons)
+void kharlamov::domaxSeqCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
+{
+  Polygon target;
+  in >> target;
+  if (!in || in.peek() != '\n')
   {
-    Polygon target;
-    in >> target;
-    if (!in || in.peek() != '\n')
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    size_t maxCount = 0;
-    size_t currentCount = 0;
-    for (const auto& poly : polygons)
-    {
-      if (poly == target)
-      {
-        currentCount++;
-        maxCount = std::max(maxCount, currentCount);
-      }
-      else
-      {
-        currentCount = 0;
-      }
-    }
-      out << maxCount << "\n";
+    throw std::logic_error("<INVALID COMMAND>");
   }
+  size_t maxCount = 0;
+  size_t currentCount = 0;
+  for (const auto& poly : polygons)
+  {
+    if (poly == target)
+    {
+      currentCount++;
+      maxCount = std::max(maxCount, currentCount);
+    }
+    else
+    {
+      currentCount = 0;
+    }
+  }
+    out << maxCount << "\n";
+}
 
-  void same(std::istream& in, std::ostream& out, const PolygonVec& polygons)
+void kharlamov::dosameCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
+{
+  Polygon target;
+  in >> target;
+  if (!in || in.peek() != '\n')
   {
-    Polygon target;
-    in >> target;
-    if (!in || in.peek() != '\n')
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    size_t count = 0;
-    for (const auto& poly : polygons)
-    {
-      if (poly.points.size() == target.points.size())
-      {
-        bool isSame = true;
-        for (size_t i = 0; i < poly.points.size(); ++i)
-        {
-          if (poly.points[i].x != target.points[i].x || poly.points[i].y != target.points[i].y)
-          {
-            isSame = false;
-            break;
-          }
-        }
-        if (isSame) count++;
-      }
-    }
-    out << count << "\n";
+    throw std::logic_error("<INVALID COMMAND>");
   }
+  size_t count = 0;
+  for (const auto& poly : polygons)
+  {
+    if (poly.points.size() == target.points.size())
+    {
+      bool isSame = true;
+      for (size_t i = 0; i < poly.points.size(); ++i)
+      {
+        if (poly.points[i].x != target.points[i].x || poly.points[i].y != target.points[i].y)
+        {
+          isSame = false;
+          break;
+        }
+      }
+      if (isSame) count++;
+    }
+  }
+  out << count << "\n";
 }
