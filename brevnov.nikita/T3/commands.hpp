@@ -10,6 +10,6 @@ namespace brevnov
   void min(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void count(std::istream&, std::ostream&, const std::vector< Polygon >&);
   void intersections(std::istream&, std::ostream&, const std::vector< Polygon >&);
-  void rightshapes(std::istream&, std::ostream&);
+  void rightshapes(std::istream&, std::ostream&, const std::vector< Polygon >&);
 }
 #endif

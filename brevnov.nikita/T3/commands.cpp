@@ -131,6 +131,15 @@ namespace
     out << count_if(polygons, VertexPred{ n }) << "\n";
   }
 
+  struct Check_intersect
+  {
+    bool operator()(const brevnov::Polygon & a)
+    {
+      return poly_intersect(a, p);
+    }
+    const brevnov::Polygon & p;
+  }
+
   int ccw(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C)
   {
     int cross = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
@@ -148,7 +157,7 @@ namespace
   bool on_segment(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& P)
   {
     if (P.x >= std::min(A.x, B.x) && P.x <= std::max(A.x, B.x) &&
-      P.y >= std::min(A.y, B.y) && P.y <= std::max(A.y, B.y)) 
+      P.y >= std::min(A.y, B.y) && P.y <= std::max(A.y, B.y))
     {
       int cross = (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x);
       return cross == 0;
@@ -156,7 +165,8 @@ namespace
     return false;
   }
 
-  bool segment_insert(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C, const brevnov::Point& D) {
+  bool segment_insert(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C, const brevnov::Point& D)
+  {
     int ccw1 = ccw(A, B, C);
     int ccw2 = ccw(A, B, D);
     int ccw3 = ccw(C, D, A);
@@ -165,7 +175,7 @@ namespace
     {
       return true;
     }
-    if (ccw1 == 0 && ccw2 == 0 && ccw3 == 0 && ccw4 == 0) 
+    if (ccw1 == 0 && ccw2 == 0 && ccw3 == 0 && ccw4 == 0)
     {
       if (std::max(A.x, B.x) < std::min(C.x, D.x) || std::max(C.x, D.x) < std::min(A.x, B.x))
       {
@@ -210,10 +220,10 @@ namespace
       [](const Point& a, const Point& b) { return a.x < b.x; });
     auto [min_y2, max_y2] = std::minmax_element(poly2.points.begin(), poly2.points.end(),
       [](const Point& a, const Point& b) { return a.y < b.y; });
-    return !(max_x1->x < min_x2->x || max_x2->x < min_x1->x || max_y1->y < min_y2->y || max_y2->y < min_y1->y); 
+    return !(max_x1->x < min_x2->x || max_x2->x < min_x1->x || max_y1->y < min_y2->y || max_y2->y < min_y1->y);
   }
 
-  bool point_in_poly(const brevnov::Point& point, const brevnov::Polygon& polygon) 
+  bool point_in_poly(const brevnov::Point& point, const brevnov::Polygon& polygon)
   {
     int n = polygon.points.size();
     if (n < 3)
@@ -221,7 +231,7 @@ namespace
       return false;
     }
     bool inside = false;
-    for (int i = 0, j = n - 1; i < n; j = i++) 
+    for (int i = 0, j = n - 1; i < n; j = i++)
     {
       const Point& p1 = polygon.points[i];
       const Point& p2 = polygon.points[j];
@@ -242,7 +252,6 @@ namespace
     }
     int n1 = poly1.points.size();
     int n2 = poly2.points.size();
-
     for (int i = 0; i < n1; i++)
     {
       const brevnov::Point& A = poly1.points[i];
@@ -257,16 +266,15 @@ namespace
         }
       }
     }
-  
-  if (!poly1.points.empty() && point_in_poly(poly1.points[0], poly2))
-  {
-    return true;
-  }
-  if (!poly2.points.empty() && point_in_poly(poly2.points[0], poly1))
-  {
-    return true;
-  }
-  return false;
+    if (!poly1.points.empty() && point_in_poly(poly1.points[0], poly2))
+    {
+      return true;
+    }
+    if (!poly2.points.empty() && point_in_poly(poly2.points[0], poly1))
+    {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -362,11 +370,21 @@ void brevnov::count(std::istream& in, std::ostream& out, const std::vector< Poly
 
 void brevnov::rightshapes(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  if (polygons.empty())
+  if (in.peek() != '\n')
   {
-    throw std::logic_error("No polygons");
+    throw std::logic_error("ERROR: Do not need any parameters");
   }
   out << std::count_if(polygons.cbegin(), polygons.cend(), has_right_angle);
 }
 
-void brevnov::intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& );
+void brevnov::intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& )
+{
+  Polygon p;
+  in >> p;
+  if (!in || !(in.peek() == '\n'))
+  {
+    throw std::logic_error("ERROR: Not correct parameters");
+  }
+  Check_intersect check{p};
+  out << std::count_if(data.begin(),data.end(), check) << '\n';
+}
