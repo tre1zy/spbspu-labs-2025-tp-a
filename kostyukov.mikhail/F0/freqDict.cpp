@@ -36,6 +36,7 @@ namespace kostyukov
   WordProcessor::WordProcessor(FrequencyDictionary& dict):
     dict_(dict)
   {}
+
   void WordProcessor::operator()(std::string word)
   {
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
@@ -63,11 +64,7 @@ namespace kostyukov
 
   bool FreqComparator::operator()(const WordFreqPair& first, const WordFreqPair& second) const
   {
-    if (ascending_)
-    {
-      return first.freq < second.freq;
-    }
-    return first.freq > second.freq;
+    return (ascending_) ? first.freq < second.freq : first.freq > second.freq;
   }
 
   PairPrinter::PairPrinter(std::ostream& out):
@@ -83,11 +80,16 @@ namespace kostyukov
   void getTopOrBottom(std::istream& in, std::ostream& out, FreqDictManager& dicts, bool isBottom)
   {
     std::string dictName;
-    size_t n;
+    size_t n = 0;
     in >> dictName >> n;
     if (!in || dictName.empty() || n == 0)
     {
-      out << "<INVALID ARGUMENT>";
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(dictName))
+    {
+      out << "<INVALID DICTIONARY NAME>";
       return;
     }
     auto dictIter = dicts.find(dictName);
@@ -232,5 +234,78 @@ namespace kostyukov
     }
     dicts.erase(iter);
     out << "successfully deleted " << dictName;
+  }
+
+  RemoveBatchPredicate::RemoveBatchPredicate(size_t total, bool less, double n):
+    totalWords_(total),
+    isLess_(less),
+    threshold_(n)
+  {}
+
+  bool RemoveBatchPredicate::operator()(const std::pair< const std::string, size_t >& pair) const
+  {
+    if (totalWords_ == 0)
+    {
+      return false;
+    }
+    double freq = (static_cast< double >(pair.second) / totalWords_) * 100.0;
+    return isLess_ ? (freq < threshold_) : (freq > threshold_);
+  }
+
+  DictDeleter::DictDeleter(FrequencyDictionary& dict):
+    dict_(dict)
+  {}
+
+  void DictDeleter::operator()(const std::pair< const std::string, size_t >& pairToRemove) const
+  {
+    dict_.totalWords -= pairToRemove.second;
+    dict_.counts.erase(pairToRemove.first);
+  }
+
+  void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  {
+    std::string dictName;
+    std::string param;
+    double n = 0;
+    in >> dictName >> param >> n;
+    if (!in || dictName.empty() || param.empty() || n == 0)
+    {
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(dictName))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    auto dictIter = dicts.find(dictName);
+    if (dictIter == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    if (n < 0 || (param != "freq_less" && param != "freq_more"))
+    {
+      out << "<INVALID ARGUMENT>";
+      return;
+    }
+    FrequencyDictionary& dict = dictIter->second;
+    if (dict.counts.empty())
+    {
+      out << "<EMPTY DICTIONARY>";
+      return;
+    }
+    std::vector< std::pair< const std::string, size_t > > pairsToRemove;
+    auto begin = dict.counts.begin();
+    auto end = dict.counts.end();
+    auto pred = RemoveBatchPredicate(dict.totalWords, param == "freq_less", n);
+    std::copy_if(begin, end, std::back_inserter(pairsToRemove),pred);
+    if (pairsToRemove.empty())
+    {
+      out << "no words to remove";
+      return;
+    }
+    std::for_each(pairsToRemove.begin(), pairsToRemove.end(), DictDeleter(dict));
+    out << "Removed " << pairsToRemove.size() << "words.";
   }
 }

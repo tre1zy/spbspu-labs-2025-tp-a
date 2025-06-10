@@ -7,6 +7,13 @@
 
 namespace kostyukov
 {
+  struct FrequencyDictionary
+  {
+    std::map< std::string, size_t > counts;
+    size_t totalWords = 0;
+  };
+  using FreqDictManager = std::map< std::string, FrequencyDictionary >;
+
   struct WordFreqPair
   {
     std::string word;
@@ -37,12 +44,28 @@ namespace kostyukov
       std::ostream& out_;
   };
 
-  struct FrequencyDictionary
+  struct KeyExtractor
   {
-    std::map< std::string, size_t > counts;
-    size_t totalWords = 0;
+    std::string operator()(const std::pair< const std::string, size_t >& mapPair) const;
   };
-  using FreqDictManager = std::map< std::string, FrequencyDictionary >;
+
+  struct RemoveBatchPredicate
+  {
+    RemoveBatchPredicate(size_t total, bool less, double n);
+    bool operator()(const std::pair< const std::string, size_t >& pair) const;
+    private:
+      size_t totalWords_;
+      bool isLess_;
+      double threshold_;
+  };
+
+  struct DictDeleter
+  {
+    explicit DictDeleter(FrequencyDictionary& dict);
+    void operator()(const std::pair< const std::string, size_t >& pairToRemove) const;
+    private:
+      FrequencyDictionary& dict_;
+  };
 
   struct IsInvalidChar
   {
@@ -66,6 +89,6 @@ namespace kostyukov
   void deleteDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void loadDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void getFreq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts);
 }
-
 #endif
