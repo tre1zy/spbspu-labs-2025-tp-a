@@ -131,15 +131,6 @@ namespace
     out << count_if(polygons, VertexPred{ n }) << "\n";
   }
 
-  struct Check_intersect
-  {
-    bool operator()(const brevnov::Polygon & a)
-    {
-      return poly_intersect(a, p);
-    }
-    const brevnov::Polygon & p;
-  }
-
   int ccw(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C)
   {
     int cross = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
@@ -276,6 +267,15 @@ namespace
     }
     return false;
   }
+
+    struct Check_intersect
+  {
+    bool operator()(const brevnov::Polygon & a)
+    {
+      return poly_intersect(a, p);
+    }
+    const brevnov::Polygon & p;
+  };
 }
 
 void brevnov::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
