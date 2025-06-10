@@ -13,16 +13,6 @@
 
 namespace
 {
-  double getArea(const Polygon& polygon)
-  {
-  const auto points = polygon.points;
-  const kharlamov::Point first = points.front();
-  const kharlamov::Point last = points.back();
-  double area = std::inner_product(
-    points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
-  return std::abs(area) / 2.0;
-  }
-
   struct CalcAreaTerm
   {
     double operator()(const kharlamov::Point& p1, const kharlamov::Point& p2)
@@ -30,6 +20,16 @@ namespace
       return p1.x * p2.y - p2.x * p1.y;
     }
   };
+
+  double getArea(const Polygon& polygon)
+  {
+    const auto points = polygon.points;
+    const kharlamov::Point first = points.front();
+    const kharlamov::Point last = points.back();
+    double area = std::inner_product(
+    points.begin(), points.end() - 1, points.begin() + 1, CalcAreaTerm()(last, first), std::plus< double >(), CalcAreaTerm());
+    return std::abs(area) / 2.0;
+  }
 
   bool isEven(const kharlamov::Polygon& poly)
   {
