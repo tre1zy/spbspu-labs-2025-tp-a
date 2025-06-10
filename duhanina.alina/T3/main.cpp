@@ -30,6 +30,8 @@ int main(int argc, char* argv[])
   cmds["MAX"] = std::bind(printMaxValue, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
   cmds["MIN"] = std::bind(printMinValue, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
   cmds["COUNT"] = std::bind(printCount, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
+  cmds["RMECHO"] = std::bind(printRmecho, std::ref(std::cin), std::ref(polygons), std::ref(std::cout));
+  cmds["LESSAREA"] = std::bind(printLessArea, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())
