@@ -203,15 +203,18 @@ namespace
     {
       return false;
     }
-    auto [min_x1, max_x1] = std::minmax_element(poly1.points.begin(), poly1.points.end(),
-      [](const Point& a, const Point& b) { return a.x < b.x; });
-    auto [min_y1, max_y1] = std::minmax_element(poly1.points.begin(), poly1.points.end(),
-      [](const Point& a, const Point& b) { return a.y < b.y; });
-    auto [min_x2, max_x2] = std::minmax_element(poly2.points.begin(), poly2.points.end(),
-      [](const Point& a, const Point& b) { return a.x < b.x; });
-    auto [min_y2, max_y2] = std::minmax_element(poly2.points.begin(), poly2.points.end(),
-      [](const Point& a, const Point& b) { return a.y < b.y; });
-    return !(max_x1->x < min_x2->x || max_x2->x < min_x1->x || max_y1->y < min_y2->y || max_y2->y < min_y1->y);
+    auto minmax_x1 = std::minmax_element(poly1.points.begin(), poly1.points.end(),
+      [](const brevnov::Point& a, const brevnov::Point& b) { return a.x < b.x; });
+    auto minmax_y1 = std::minmax_element(poly1.points.begin(), poly1.points.end(),
+      [](const brevnov::Point& a, const brevnov::Point& b) { return a.y < b.y; });
+    auto minmax_x2 = std::minmax_element(poly2.points.begin(), poly2.points.end(),
+      [](const brevnov::Point& a, const brevnov::Point& b) { return a.x < b.x; });
+    auto minmax_y2 = std::minmax_element(poly2.points.begin(), poly2.points.end(),
+      [](const brevnov::Point& a, const brevnov::Point& b) { return a.y < b.y; });
+    return !(minmax_x1.second->x < minmax_x2.first->x || 
+            minmax_x2.second->x < minmax_x1.first->x ||
+            minmax_y1.second->y < minmax_y2.first->y || 
+            minmax_y2.second->y < minmax_y1.first->y);
   }
 
   bool point_in_poly(const brevnov::Point& point, const brevnov::Polygon& polygon)
