@@ -5,6 +5,7 @@
 #include <map>
 #include <functional>
 #include <iomanip>
+#include <iterator>
 #include <vector>
 #include <numeric>
 #include <limits>
