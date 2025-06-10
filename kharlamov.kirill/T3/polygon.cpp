@@ -1,5 +1,7 @@
 #include "polygon.h"
 #include <algorithm>
+#include "scopeguard.h"
+#include "delimeter.h"
 
 namespace kharlamov
 {

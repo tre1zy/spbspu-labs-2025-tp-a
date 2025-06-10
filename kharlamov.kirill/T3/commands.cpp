@@ -1,5 +1,7 @@
 #include "commands.h"
 #include <algorithm>
+#include "polygon.h"
+#include "scopeguard.h"
 
 namespace kharlamov
 {
