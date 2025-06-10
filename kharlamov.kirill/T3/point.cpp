@@ -16,5 +16,6 @@ namespace kharlamov
       return in;
     }
     in >> DelimeterIO{ '(' } >> point.x >> DelimeterIO{ ';' } >> point.y >> DelimeterIO{ ')' };
-    return in;
+  }
+  return in;
 }

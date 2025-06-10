@@ -1,7 +1,7 @@
 #include "polygon.h"
 #include <algorithm>
 #include "scopeguard.h"
-#include "delimeter.h"
+#include "delimetr.h"
 
 namespace kharlamov
 {
@@ -12,7 +12,6 @@ namespace kharlamov
     {
       return in;
     }
-    detail::ScopeGuard scope(in);
     size_t count = 0;
     if (!(in >> count) || count < 3)
     {
