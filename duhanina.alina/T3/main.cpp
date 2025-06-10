@@ -1,10 +1,7 @@
-#include <iostream>
 #include <limits>
-#include <algorithm>
+#include <map>
 #include <iterator>
 #include <fstream>
-#include <map>
-#include <functional>
 #include "commands.hpp"
 
 int main(int argc, char* argv[])

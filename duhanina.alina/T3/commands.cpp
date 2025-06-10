@@ -1,16 +1,13 @@
 #include "commands.hpp"
-
 #include <algorithm>
 #include <functional>
 #include <iostream>
 #include <vector>
 #include <string>
-#include <sstream>
+#include <cmath>
 #include <iomanip>
 #include <numeric>
-#include <cmath>
 #include <map>
-#include <limits>
 #include <stdexcept>
 
 namespace
@@ -221,7 +218,6 @@ namespace
       return std::count_if(plgs.begin(), plgs.end(), OddVertexCounter());
     }
   };
-}
 
   struct CountIfAreaLess
   {
@@ -233,25 +229,6 @@ namespace
     bool operator()(const Polygon& p) const
     {
       return calculateArea(p) < threshold;
-    }
-  };
-
-  struct ConsecutiveEqual
-  {
-    const Polygon& ref;
-    bool operator()(const Polygon& a, const Polygon& b) const
-    {
-      return a == ref && b == ref;
-    }
-  };
-
-  struct EqualToRef
-  {
-    const Polygon& ref;
-
-    bool operator()(const Polygon& p) const
-    {
-      return p == ref;
     }
   };
 
@@ -272,6 +249,7 @@ namespace
       return false;
     }
   };
+}
 
 void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
