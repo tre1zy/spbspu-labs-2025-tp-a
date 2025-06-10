@@ -25,6 +25,7 @@ namespace kharlamov
       polygon.points = std::move(temp);
     }
     return in;
+  }
 
   bool Polygon::operator==(const Polygon& other) const
   {
