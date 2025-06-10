@@ -8,13 +8,14 @@ namespace kharlamov
   {
     return x == other.x && y == other.y;
   }
-  std::istream& operator>>(std::istream& in, Point& point)
+  std::istream& kiselev::operator>>(std::istream& in, Point& point)
   {
-    char sep;
-    if (!(in >> sep >> point.x >> sep >> point.y >> sep) || sep != ')')
+    std::istream::sentry sentry(in);
+    if (!sentry)
     {
-      in.setstate(std::ios::failbit);
+      return in;
     }
+    detail::ScopeGuard scope(in);
+    in >> DelimeterIO{ '(' } >> point.x >> DelimeterIO{ ';' } >> point.y >> DelimeterIO{ ')' };
     return in;
-  }
 }

@@ -2,6 +2,7 @@
 #define POLYGON_H
 
 #include <iostream>
+#include <ostream>
 #include <vector>
 #include "point.h"
 
