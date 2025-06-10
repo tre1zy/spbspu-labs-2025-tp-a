@@ -4,37 +4,29 @@
 
 namespace
 {
-  std::string cmpLspToStr(const std::complex<double> data)
-  {
-    std::string str;
-    str += '#';
-    str += 'c';
-    str += '(';
-    std::string temp = std::to_string(data.real());
-    temp.erase(temp.find_last_not_of('0') + 1, std::string::npos);
-    if (temp.back() == '.') temp.pop_back();
-    str += temp;
-    str += ' ';
-    temp = std::to_string(data.imag());
-    temp.erase(temp.find_last_not_of('0') + 1, std::string::npos);
-    if (temp.back() == '.') temp.pop_back();
-    str += temp;
-    str += ')';
-    return str;
-  }
+  std::string cmpLspToStr(const std::complex<double> data) {
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(1);
+    oss << data.real();
+    std::string re = oss.str();
+    oss.str("");
+    oss << data.imag();
+    std::string im = oss.str();
+    return "#c(" + re + " " + im + ")";
+}
 
-  std::string ullBinToStr(unsigned long long num)
-  {
+  std::string ullBinToStr(unsigned long long num) {
     if (num == 0) return "0b0";
     std::string binary;
-    while (num > 0)
-    {
-      binary += (num & 1) ? '1' : '0';
-      num >>= 1;
+    for (int i = sizeof(num) * 8 - 1; i >= 0; --i) {
+        binary += (num & (1ULL << i)) ? '1' : '0';
     }
-    std::reverse(binary.begin(), binary.end());
+    size_t firstOne = binary.find('1');
+    if (firstOne != std::string::npos) {
+        binary = binary.substr(firstOne);
+    }
     return "0b" + binary;
-  }
+}
 }
 
 std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data) {
