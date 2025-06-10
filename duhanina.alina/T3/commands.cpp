@@ -275,7 +275,7 @@ namespace
 
 void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (polygons.empty())
+  if (plgs.empty())
   {
     throw std::invalid_argument("Error");
   }
@@ -296,7 +296,7 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
 
 void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (polygons.empty())
+  if (plgs.empty())
   {
     throw std::invalid_argument("Error");
   }
@@ -311,7 +311,7 @@ void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plg
 
 void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (polygons.empty())
+  if (plgs.empty())
   {
     throw std::invalid_argument("Error");
   }
@@ -326,7 +326,7 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
 
 void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (polygons.empty())
+  if (plgs.empty())
   {
     throw std::invalid_argument("Error");
   }
