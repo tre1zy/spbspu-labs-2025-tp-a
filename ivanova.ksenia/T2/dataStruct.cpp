@@ -27,7 +27,17 @@ namespace ivanova
 
         if (key == "key1")
         {
-          pairStream >> ds.key1;
+          std::string value;
+          pairStream >> value;
+          try
+          {
+            ds.key1 = std::stod(value, nullptr);
+          }
+          catch (...)
+          {
+            in.setstate(std::ios::failbit);
+          }
+          // pairStream >> ds.key1;
         }
         else if (key == "key2")
         {
