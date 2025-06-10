@@ -37,7 +37,6 @@ namespace ivanova
           {
             in.setstate(std::ios::failbit);
           }
-          // pairStream >> ds.key1;
         }
         else if (key == "key2")
         {
@@ -84,7 +83,15 @@ namespace ivanova
 
   std::ostream& operator<<(std::ostream& out, const dataStruct& ds)
   {
-    out << "(:key1 " << std::scientific << std::setprecision(6) << ds.key1;
+    std::stringstream ss;
+    ss << std::scientific << std::setprecision(1) << ds.key1;
+    std::string key1;
+    ss >> key1;
+    if (*(key1.end() - 2) == '0') {
+      key1.erase(key1.end() - 2);
+    }
+
+    out << "(:key1 " << key1;
 
     out << ":key2 0b";
     std::bitset<64> bits(ds.key2);
