@@ -156,53 +156,53 @@ namespace
 
   struct MaxArea
   {
-    double operator()(const std::vector< Polygon >& plgs) const
+    void operator()(const std::vector< Polygon >& plgs, std::ostream& out) const
     {
       if (plgs.empty())
       {
         throw std::runtime_error("Error");
       }
       auto it = std::max_element(plgs.begin(), plgs.end(), AreaComparator());
-      return calculateArea(*it);
+      out << calculateArea(*it);
     }
   };
 
   struct MaxVertexCount
   {
-    size_t operator()(const std::vector< Polygon >& plgs) const
+    void operator()(const std::vector< Polygon >& plgs, std::ostream& out) const
     {
       if (plgs.empty())
       {
         throw std::runtime_error("Error");
       }
       auto it = std::max_element(plgs.begin(), plgs.end(), VertexCountComparator());
-      return it->points.size();
+      out << it->points.size();
     }
   };
 
   struct MinArea
   {
-    double operator()(const std::vector< Polygon >& plgs) const
+    void operator()(const std::vector< Polygon >& plgs, std::ostream& out) const
     {
       if (plgs.empty())
       {
         throw std::runtime_error("Error");
       }
       auto it = std::min_element(plgs.begin(), plgs.end(), AreaComparator());
-      return calculateArea(*it);
+      out << calculateArea(*it);
     }
   };
 
   struct MinVertexCount
   {
-    int operator()(const std::vector< Polygon >& plgs) const
+    void operator()(const std::vector< Polygon >& plgs, std::ostream& out) const
     {
       if (plgs.empty())
       {
         throw std::runtime_error("Error");
       }
       auto it = std::min_element(plgs.begin(), plgs.end(), VertexCountComparator());
-      return it->points.size();
+      out << it->points.size();
     }
   };
 
@@ -275,10 +275,6 @@ namespace
 
 void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (plgs.empty())
-  {
-    throw std::invalid_argument("Error");
-  }
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
@@ -303,10 +299,10 @@ void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  std::map<std::string, std::function< double(const std::vector< Polygon >&) > > commands;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
   commands["AREA"] = MaxArea();
   commands["VERTEXES"] = MaxVertexCount();
-  out << commands.at(param)(plgs);
+  out << commands.at(param)(plgs, out);
 }
 
 void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
@@ -318,21 +314,17 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  std::map<std::string, std::function< double(const std::vector< Polygon >&) > > commands;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
   commands["AREA"] = MinArea();
   commands["VERTEXES"] = MinVertexCount();
-  out << commands.at(param)(plgs);
+  out << commands.at(param)(plgs, out);
 }
 
 void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (plgs.empty())
-  {
-    throw std::invalid_argument("Error");
-  }
   std::string param;
   in >> param;
-  std::map<std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
+  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
   commands["EVEN"] = CountEven();
   commands["ODD"] = CountOdd();
   if (std::isdigit(param[0]))
