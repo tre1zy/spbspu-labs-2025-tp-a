@@ -308,4 +308,79 @@ namespace kostyukov
     std::for_each(pairsToRemove.begin(), pairsToRemove.end(), DictDeleter(dict));
     out << "Removed " << pairsToRemove.size() << "words.";
   }
+
+  std::string KeyExtractor::operator()(const std::pair< const std::string, size_t >& mapPair) const
+  {
+    return mapPair.first;
+  }
+
+  void SameWordPrinter::operator()(const std::string& key) const
+  {
+    ScopeGuard scopeGrd(out);
+    out << key << " (in " << name1 << ": " << dict1.counts.at(key) << ", in " << name2 << ": " << dict2.counts.at(key) << ")\n";
+  }
+
+  void findUniq(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  {
+    std::string name1, name2;
+    in >> name1 >> name2;
+    if (!in || name1.empty() || name2.empty())
+    {
+      out << "<MISSING ARGUMENTS>";
+      return;
+    }
+    auto iter1 = dicts.find(name1);
+    auto iter2 = dicts.find(name2);
+    if (iter1 == dicts.end() || iter2 == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    std::vector< std::string > keys1;
+    std::vector< std::string > keys2;
+    auto begin = iter1->second.counts.begin();
+    auto end = iter1->second.counts.end();
+    std::transform(begin, end, std::back_inserter(keys1), KeyExtractor{});
+    std::vector< std::string > diff;
+    std::set_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::back_inserter(diff));
+    out << "Words only in " << name1 << ":\n";
+    std::copy(diff.begin(), diff.end(), std::ostream_iterator< std::string >(out, "\n"));
+    diff.clear();
+    std::set_difference(keys2.begin(), keys2.end(), keys1.begin(), keys1.end(), std::back_inserter(diff));
+    out << "Words only in " << name2 << ":\n";
+    std::copy(diff.begin(), diff.end(), std::ostream_iterator< std::string >(out, "\n"));
+  }
+
+  void findSame(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  {
+    std::string name1;
+    std::string name2;
+    in >> name1 >> name2;
+    if (!in || name1.empty() || name2.empty())
+    {
+      out << "<MISSING ARGUMENTS>";
+      return;
+    }
+    auto iter1 = dicts.find(name1);
+    auto iter2 = dicts.find(name2);
+    if (iter1 == dicts.end() || iter2 == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    std::vector< std::string > keys1;
+    std::vector< std::string > keys2;
+    std::transform(iter1->second.counts.begin(), iter1->second.counts.end(), std::back_inserter(keys1), KeyExtractor{});
+    std::transform(iter2->second.counts.begin(), iter2->second.counts.end(), std::back_inserter(keys2), KeyExtractor{});
+    std::vector< std::string > commonKeys;
+    std::set_intersection(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::back_inserter(commonKeys));
+    out << "Common words:\n";
+    if (commonKeys.empty())
+    {
+      out << "No common words found.";
+      return;
+    }
+    SameWordPrinter printer = SameWordPrinter{ out, iter1->second, iter2->second, name1, name2 };
+    std::for_each(commonKeys.begin(), commonKeys.end(), printer);
+  }
 }

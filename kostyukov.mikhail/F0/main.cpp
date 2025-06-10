@@ -24,7 +24,8 @@ int main()
     commands["load"] = std::bind(loadDict, std::ref(std::cin), std::ref(std::cout), std::ref(dict_manager));
     commands["getfreq"] = std::bind(getFreq, std::ref(std::cin), std::ref(std::cout), std::ref(dict_manager));
     commands["removebatch"] = std::bind(removeBatch, std::ref(std::cin), std::ref(std::cout), std::ref(dict_manager));
-
+    commands["finduniq"] = std::bind(findUniq, std::ref(std::cin), std::ref(std::cout), std::ref(dict_manager));
+    commands["findsame"] = std::bind(findSame, std::ref(std::cin), std::ref(std::cout), std::ref(dict_manager));
   }
   std::string command;
   while(!(std::cin >> command).eof())

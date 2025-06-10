@@ -67,6 +67,16 @@ namespace kostyukov
       FrequencyDictionary& dict_;
   };
 
+  struct SameWordPrinter
+  {
+    std::ostream& out;
+    const FrequencyDictionary& dict1;
+    const FrequencyDictionary& dict2;
+    const std::string& name1;
+    const std::string& name2;
+    void operator()(const std::string& key) const;
+  };
+
   struct IsInvalidChar
   {
     bool operator()(char c) const;
@@ -90,5 +100,7 @@ namespace kostyukov
   void loadDict(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void getFreq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
   void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void findUniq(std::istream& in, std::ostream& out, FreqDictManager& dicts);
+  void findSame(std::istream& in, std::ostream& out, FreqDictManager& dicts);
 }
 #endif
