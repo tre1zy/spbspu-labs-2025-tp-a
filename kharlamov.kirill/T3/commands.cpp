@@ -140,21 +140,25 @@ namespace
   {
     out << countIf(polygons, VertexPred{ n }) << "\n";
   }
-  bool isSame(const Polygon& src) const
+  struct isSame
   {
-    if (src.points.size() != p.points.size())
+    Polygon& p;
+    bool operator()(const Polygon& src) const
     {
-      return false;
+      if (src.points.size() != p.points.size())
+      {
+        return false;
+      }
+      using namespace std::placeholders;
+      double deltaX = p.points[0].x - src.points[0].x;
+      double deltaY = p.points[0].y - src.points[0].y;
+      double absoluteDelta = deltaX + deltaY;
+      std::vector< double > sumOfDeltaCoords;
+      std::transform(p.points.begin(), p.points.end(), src.points.begin(), std::back_inserter(sumOfDeltaCoords), pointDeltaSum{});
+      size_t counterOfPoints = std::count_if(sumOfDeltaCoords.begin(), sumOfDeltaCoords.end(), std::bind(compareDouble, _1, absoluteDelta, 1e-9));
+      return counterOfPoints == sumOfDeltaCoords.size();
     }
-    using namespace std::placeholders;
-    double deltaX = p.points[0].x - src.points[0].x;
-    double deltaY = p.points[0].y - src.points[0].y;
-    double absoluteDelta = deltaX + deltaY;
-    std::vector< double > sumOfDeltaCoords;
-    std::transform(p.points.begin(), p.points.end(), src.points.begin(), std::back_inserter(sumOfDeltaCoords), pointDeltaSum{});
-    size_t counterOfPoints = std::count_if(sumOfDeltaCoords.begin(), sumOfDeltaCoords.end(), std::bind(compareDouble, _1, absoluteDelta, 1e-9));
-    return counterOfPoints == sumOfDeltaCoords.size();
-  }
+  };
 }
 
 void kharlamov::doAreaCommand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
