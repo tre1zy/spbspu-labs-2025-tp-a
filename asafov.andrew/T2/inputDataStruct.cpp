@@ -76,7 +76,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     if (closing_quote == std::string::npos) valid = false;
     size_t final_colon = line.find(':', closing_quote + 1);
     if (final_colon == std::string::npos) valid = false;
-    
+
     if (valid) {
         temp.key3 = line.substr(key3_pos + 7, closing_quote - (key3_pos + 7));
     }
