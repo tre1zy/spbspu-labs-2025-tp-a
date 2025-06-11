@@ -1,6 +1,6 @@
 #include "stream_guard.hpp"
 
-smirnov::Iofmtguard::Iofmtguard(std::basic_ios<char>& stream):
+smirnov::Iofmtguard::Iofmtguard(std::basic_ios< char >& stream):
   stream_(stream),
   precision_(stream.precision()),
   width_(stream.width()),
