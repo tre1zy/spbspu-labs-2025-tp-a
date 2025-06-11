@@ -2,6 +2,8 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <functional>
+#include <map>
 #include "shapes.hpp"
 
 
@@ -31,5 +33,8 @@ int main(int argc, char** argv)
     }
     std::copy(istr_iterator(file), istr_iterator(), std::back_inserter(polygons));
   }
+  std::map< std::string, std::function< void() > > cmds;
+  //cmds["AREA"] = std::bind(kas::show, std::cref(polygons), std::ref(std::cout));
+
 
 }

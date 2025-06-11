@@ -2,6 +2,12 @@
 #include <algorithm>
 #include <iterator>
 
+
+double karnauhova::CalcAreaPolygon::operator()(const karnauhova::Point& p1, const karnauhova::Point& p2)
+{
+  return p1.x * p2.y - p2.x * p1.y;
+}
+
 std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);

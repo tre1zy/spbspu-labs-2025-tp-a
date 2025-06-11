@@ -5,11 +5,16 @@
 
 namespace karnauhova
 {
+  struct CalcAreaPolygon
+  {
+  double operator()(const Point& p1, const Point& p2);
+  };
+
   struct Point
   {
     int x, y;
   };
-  
+
   struct Polygon
   {
     std::vector< Point > points;
