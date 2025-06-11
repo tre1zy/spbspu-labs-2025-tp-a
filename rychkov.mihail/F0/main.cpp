@@ -25,18 +25,18 @@ int main(int argc, char** argv)
   using namespace rychkov::typing;
   Type types[] = {
         {"int", Type::Int, nullptr, false, false, true, false, Type::SHORT},
-        {{}, Type::Combination, types + 0, true, true},
-        {{}, Type::Array, types + 1, true, true, false, false, Type::NO_LENGTH, true, 2},
-        {{}, Type::Function, types + 1, false, false, false, false, Type::NO_LENGTH, false, 0, {types[0], types[2]}},
-        {{}, Type::Pointer, types + 3, true, true},
-        {{}, Type::Pointer, types + 3, true},
-        {{}, Type::Pointer, types + 5},
-        {{}, Type::Array, types + 6, false, false, false, false, Type::NO_LENGTH, true, 2},
-        {{}, Type::Array, types + 7, false, false, false, false, Type::NO_LENGTH},
-        {{}, Type::Pointer, types + 8, false, true},
+        {{}, Type::Combination, types[0], true, true},
+        {{}, Type::Array, types[1], true, true, false, false, Type::NO_LENGTH, true, 2},
+        {{}, Type::Function, types[1], false, false, false, false, Type::NO_LENGTH, false, 0, {types[0], types[2]}},
+        {{}, Type::Pointer, types[3], true, true},
+        {{}, Type::Pointer, types[3], true},
+        {{}, Type::Pointer, types[5]},
+        {{}, Type::Array, types[6], false, false, false, false, Type::NO_LENGTH, true, 2},
+        {{}, Type::Array, types[7], false, false, false, false, Type::NO_LENGTH},
+        {{}, Type::Pointer, types[8], false, true},
         {"int", Type::Int, nullptr, false, false, false, true, Type::LONG_LONG},
         {"int", Type::Int, nullptr, false, false, false, false},
-        {{}, Type::Function, types + 11, false, false, false, false, Type::NO_LENGTH, false, 0, {}},
+        {{}, Type::Function, types[11], false, false, false, false, Type::NO_LENGTH, false, 0, {}},
       };
   for (const Type& i: types)
   {
@@ -61,6 +61,17 @@ int main(int argc, char** argv)
   {
     printer(i);
   }
+  std::cout << '\n';
+
+  rychkov::Tokenizer tokenizer;
+  tokenizer.append(std::cerr, "struct");
+  tokenizer.append(std::cerr, "A");
+  tokenizer.append(std::cerr, ';');
+  tokenizer.append(std::cerr, "struct");
+  tokenizer.append(std::cerr, "B");
+  tokenizer.append(std::cerr, '{');
+  tokenizer.append(std::cerr, ';');
+  tokenizer.print(std::cout);
   /*std::cout << std::fixed << std::setprecision(1);
   using processor = rychkov::MainProcessor;
   using parser_type = rychkov::Parser< processor >;

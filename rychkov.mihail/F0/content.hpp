@@ -9,6 +9,54 @@
 
 namespace rychkov
 {
+  template< class T >
+  struct DinMemWrapper: std::unique_ptr< T >
+  {
+    using value_type = T;
+    DinMemWrapper():
+      std::unique_ptr< T >(new T)
+    {}
+    DinMemWrapper(const DinMemWrapper& rhs):
+      std::unique_ptr< T >(rhs != nullptr ? new T{*rhs} : nullptr)
+    {}
+    DinMemWrapper(DinMemWrapper&&) = default;
+    DinMemWrapper(nullptr_t):
+      std::unique_ptr< T >(nullptr)
+    {}
+    DinMemWrapper(T* ptr):
+      std::unique_ptr< T >(ptr)
+    {}
+    template< class... Args >
+    DinMemWrapper(Args&&... args):
+      std::unique_ptr< T >(new T{std::forward< Args >(args)...})
+    {}
+    DinMemWrapper& operator=(const DinMemWrapper& rhs)
+    {
+      if (rhs != nullptr)
+      {
+        static_cast< std::unique_ptr< T >& >(*this) = new T{*rhs};
+      }
+      return *this;
+    }
+    DinMemWrapper& operator=(DinMemWrapper&&) = default;
+    template< class U = T >
+    DinMemWrapper& operator=(U&& rhs)
+    {
+      static_cast< std::unique_ptr< T >& >(*this) = std::unique_ptr< T >{new T{std::forward< U >(rhs)}};
+      return *this;
+    }
+    DinMemWrapper& operator=(nullptr_t)
+    {
+      static_cast< std::unique_ptr< T >& >(*this) = nullptr;
+      return *this;
+    }
+    DinMemWrapper& operator=(T* ptr)
+    {
+      static_cast< std::unique_ptr< T >& >(*this) = std::unique_ptr< T >{ptr};
+      return *this;
+    }
+  };
+
   namespace keywords
   {
     enum Keyword
@@ -33,9 +81,20 @@ namespace rychkov
       ternary = 3,
       multiple = -1
     };
+    enum Category
+    {
+      arithmetic, // +, -, *, ...
+      logic, // &&, || !
+      bit, // &, |, ~, ^, <<, ...
+      address, // ., ->, *, &
+      special, // (), [], ?:, sizeof, ','
+      assign // =
+    };
 
     Type type;
+    Category category;
     std::string token;
+    bool require_lvalue = false;
     bool right_align = false;
     int priority = 0;
   };
@@ -62,7 +121,7 @@ namespace rychkov
 
       std::string name;
       Category category = Combination;
-      Type* base = nullptr;
+      DinMemWrapper< Type > base = nullptr;
       bool is_const = false;
       bool is_volatile = false;
       bool is_signed = false;
@@ -73,38 +132,12 @@ namespace rychkov
       std::vector< Type > function_parameters;
     };
   }
-  template< class T >
-  struct DinMemWrapper: std::unique_ptr< T >
-  {
-    using value_type = T;
-    DinMemWrapper():
-      std::unique_ptr< T >(new T)
-    {}
-    DinMemWrapper(const DinMemWrapper& rhs):
-      std::unique_ptr< T >(new T{*rhs})
-    {}
-    template< class... Args >
-    DinMemWrapper(Args&&... args):
-      std::unique_ptr< T >(new T{std::forward< Args >(args)...})
-    {}
-    DinMemWrapper(DinMemWrapper&&) = default;
-    DinMemWrapper& operator=(const DinMemWrapper& rhs)
-    {
-      static_cast< std::unique_ptr< T >& >(*this) = new T{*rhs};
-    }
-    template< class U >
-    DinMemWrapper& operator=(U&& rhs)
-    {
-      static_cast< std::unique_ptr< T >& >(*this) = new T{std::forward< U >(rhs)};
-    }
-    DinMemWrapper& operator=(DinMemWrapper&&) = default;
-  };
   namespace entities
   {
     struct Expression;
     struct Body
     {
-      std::vector< Expression > data;
+      std::vector< Expression > data = {{}};
     };
     struct Variable
     {
@@ -173,16 +206,17 @@ namespace rychkov
     };
     struct Expression
     {
-      using operand = std::variant< DinMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation >;
+      using operand = std::variant< DinMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation, Body >;
 
-      Operator* operation;
+      Operator* operation = nullptr;
       typing::Type result_type;
       std::vector< operand > operands;
+      bool empty() const noexcept;
+      bool full() const noexcept;
     };
-    struct Name
-    {
-      std::string name;
-    };
+
+    bool is_body(const entities::Expression& expr);
+    bool is_decl(const entities::Expression& expr);
   }
 }
 

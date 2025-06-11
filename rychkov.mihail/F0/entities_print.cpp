@@ -131,7 +131,7 @@ void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
   indent_++;
   std::visit(*this, decl.data);
   indent_--;
-  if (std::holds_alternative< entities::Variable >(decl.data) && !decl.value->operands.empty())
+  if (!decl.value->empty())
   {
     print_indent();
     out << "with default:\n";
