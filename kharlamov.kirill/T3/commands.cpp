@@ -14,6 +14,19 @@
 
 namespace
 {
+  bool compareDouble(double d1, double d2, double epsilon)
+  {
+    return std::abs(d1 - d2) < epsilon;
+  }
+
+  struct pointDeltaSum
+  {
+    double operator()(const kharlamov::Point& a, const kharlamov::Point& b) const
+    {
+      return (a.x - b.x) + (a.y - b.y);
+    }
+  };
+
   struct CalcAreaTerm
   {
     double operator()(const kharlamov::Point& p1, const kharlamov::Point& p2)
