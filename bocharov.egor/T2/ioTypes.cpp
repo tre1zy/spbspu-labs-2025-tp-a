@@ -43,26 +43,22 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
   {
     return in;
   }
-
-  std::string doubleHold;
-  if (!std::getline(in, doubleHold, ':'))
+  std::string str;
+  if (!std::getline(in, str, ':'))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-
-  if (doubleHold.find('e') == doubleHold.find('E'))
+  if (str.find('e') == str.find('E'))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-
   try
   {
     size_t index = 0;
-    double number = std::stod(doubleHold, &index);
-
-    if (index != doubleHold.length())
+    double number = std::stod(str, & index);
+    if (index != str.length())
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -70,11 +66,10 @@ std::istream & bocharov::operator>>(std::istream & in, DoubleSciIO && dest)
     in.unget();
     dest.ref = number;
   }
-  catch (const std::exception& e)
+  catch (const std::exception & e)
   {
     in.setstate(std::ios::failbit);
   }
-
   return in;
 }
 
