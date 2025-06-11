@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <ostream>
 #include <string>
 #include <algorithm>
 #include <iterator>
@@ -9,6 +10,29 @@ namespace
   {
     return val.first;
   }
+  struct WordPrinter
+  {
+    std::ostream& out;
+    void operator()(const std::string& word)
+    {
+      out << " " << word;
+    }
+  };
+  struct DictPrinter
+  {
+    std::ostream& out;
+
+    void operator()(const kiselev::Dict::value_type& val) const
+    {
+      out << val.first;
+      if (!val.second.empty())
+      {
+        std::transform(val.second.begin(), val.second.end(), std::ostream_iterator<std::string>(out), WordPrinter{ out });
+      }
+      out << "\n";
+    }
+  };
+
 }
 void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
 {
@@ -89,4 +113,18 @@ void kiselev::doListDict(std::ostream& out, const Dicts& dicts)
     return;
   }
   std::transform(dicts.begin(), dicts.end(), std::ostream_iterator<std::string>(out, "\n"), extractDict);
+}
+
+void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string nameDict;
+  in >> nameDict;
+  auto dictIt = dicts.find(nameDict);
+  if (dictIt == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  out << nameDict << '\n';
+  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator<std::string>(out), DictPrinter{out});
 }
