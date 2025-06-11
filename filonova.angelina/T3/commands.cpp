@@ -11,13 +11,11 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
 
   if (subcmd == "EVEN")
   {
-    auto pred = std::bind(IsEven(), _1);
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), isEven);
   }
   else if (subcmd == "ODD")
   {
-    auto pred = std::bind(IsOdd(), _1);
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), isOdd);
   }
   else if (subcmd == "MEAN")
   {
@@ -27,7 +25,7 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
       return;
     }
 
-    double totalArea = ComputeTotalArea()(polygons);
+    double totalArea = computeTotalArea(polygons);
     out << std::fixed << std::setprecision(1) << totalArea / polygons.size();
     return;
   }
@@ -49,7 +47,7 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
     return;
   }
 
-  double totalArea = ComputeTotalArea()(filteredPolygons);
+  double totalArea = computeTotalArea(filteredPolygons);
   out << std::fixed << std::setprecision(1) << totalArea;
 }
 
@@ -120,13 +118,11 @@ void filonova::count(std::istream &in, std::ostream &out, const std::vector< Pol
 
   if (subcmd == "EVEN")
   {
-    auto pred = std::bind(IsEven(), _1);
-    count = std::count_if(polygons.begin(), polygons.end(), pred);
+    count = std::count_if(polygons.begin(), polygons.end(), isEven);
   }
   else if (subcmd == "ODD")
   {
-    auto pred = std::bind(IsOdd(), _1);
-    count = std::count_if(polygons.begin(), polygons.end(), pred);
+    count = std::count_if(polygons.begin(), polygons.end(), isOdd);
   }
   else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
   {
@@ -161,7 +157,6 @@ void filonova::intersections(std::istream &in, std::ostream &out, const std::vec
   }
 
   std::istringstream lineStream(line);
-
   Polygon inputPolygon;
   if (!(lineStream >> inputPolygon))
   {
@@ -190,6 +185,6 @@ void filonova::intersections(std::istream &in, std::ostream &out, const std::vec
 
 void filonova::rects(std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  size_t count = std::count_if(polygons.begin(), polygons.end(), filonova::IsRectangle{});
+  size_t count = std::count_if(polygons.begin(), polygons.end(), IsRectangle{});
   out << count;
 }

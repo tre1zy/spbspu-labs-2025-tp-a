@@ -3,28 +3,11 @@
 
 #include "polygon.hpp"
 
-#include <algorithm>
-#include <numeric>
-
 constexpr size_t RECTANGLE_SIDES = 4;
+static constexpr double EPS = 1e-9;
 
 namespace filonova
 {
-  struct IsOdd
-  {
-    bool operator()(const Polygon &p) const;
-  };
-
-  struct IsEven
-  {
-    bool operator()(const Polygon &p) const;
-  };
-
-  struct ComputeTotalArea
-  {
-    double operator()(const std::vector< Polygon > &polygons) const;
-  };
-
   struct TriangleAreaAccumulator
   {
     const Point &point;
@@ -62,6 +45,21 @@ namespace filonova
     static double dot(const Point &a, const Point &b, const Point &c);
     static double getDistanceSquared(const Point &a, const Point &b);
     bool operator()(const Polygon &polygon) const;
+  };
+
+  struct AngleCheckPoints
+  {
+    const Point &prev;
+    const Point &current;
+    const Point &next;
+  };
+
+  struct IsRightAngle
+  {
+    bool operator()(const AngleCheckPoints &angle) const
+    {
+      return IsRectangle::dot(angle.prev, angle.current, angle.next) <= EPS;
+    }
   };
 }
 

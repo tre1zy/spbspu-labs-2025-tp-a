@@ -1,36 +1,13 @@
 #include "functors.hpp"
 
-bool filonova::IsOdd::operator()(const Polygon &p) const
-{
-  return (p.points.size() % 2) == 1;
-}
-
-bool filonova::IsEven::operator()(const Polygon &p) const
-{
-  return (p.points.size() % 2) == 0;
-}
-
-double filonova::ComputeTotalArea::operator()(const std::vector< Polygon > &polygons) const
-{
-  std::vector< double > areas;
-  areas.reserve(polygons.size());
-
-  std::transform(
-      polygons.begin(), polygons.end(),
-      std::back_inserter(areas),
-      getArea);
-
-  return std::accumulate(areas.begin(), areas.end(), 0.0);
-}
-
-filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts): point(pts[0]), points(pts) {}
+filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts) : point(pts[0]), points(pts) {}
 
 double filonova::TriangleAreaAccumulator::operator()(double sum, size_t i) const
 {
   return sum + filonova::triangleArea(point, points[i], points[i + 1]);
 }
 
-filonova::HasVertexCount::HasVertexCount(size_t count): count_(count) {}
+filonova::HasVertexCount::HasVertexCount(size_t count) : count_(count) {}
 
 bool filonova::HasVertexCount::operator()(const Polygon &p) const
 {
@@ -47,7 +24,7 @@ bool filonova::CompareByVertexes::operator()(const Polygon &a, const Polygon &b)
   return a.points.size() < b.points.size();
 }
 
-filonova::IntersectsWith::IntersectsWith(const Polygon &polygon): polygon_(polygon) {}
+filonova::IntersectsWith::IntersectsWith(const Polygon &polygon) : polygon_(polygon) {}
 
 bool filonova::IntersectsWith::operator()(const Polygon &other) const
 {
@@ -81,21 +58,21 @@ bool filonova::IsRectangle::operator()(const Polygon &polygon) const
     return false;
   }
 
-  static constexpr double EPS = 1e-9;
   double diag1 = getDistanceSquared(points[0], points[2]);
   double diag2 = getDistanceSquared(points[1], points[3]);
+
   if (std::abs(diag1 - diag2) > EPS)
   {
     return false;
   }
 
-  for (size_t i = 0; i < RECTANGLE_SIDES; ++i)
-  {
-    if (dot(points[i], points[(i + 1) % RECTANGLE_SIDES], points[(i + 2) % RECTANGLE_SIDES]) > EPS)
-    {
-      return false;
-    }
-  }
+  std::vector< filonova::AngleCheckPoints > angles_to_check;
+  angles_to_check.reserve(RECTANGLE_SIDES);
 
-  return true;
+  angles_to_check.push_back(filonova::AngleCheckPoints{points[3], points[0], points[1]});
+  angles_to_check.push_back(filonova::AngleCheckPoints{points[0], points[1], points[2]});
+  angles_to_check.push_back(filonova::AngleCheckPoints{points[1], points[2], points[3]});
+  angles_to_check.push_back(filonova::AngleCheckPoints{points[2], points[3], points[0]});
+
+  return std::all_of(angles_to_check.begin(), angles_to_check.end(), filonova::IsRightAngle{});
 }
