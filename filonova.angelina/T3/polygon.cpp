@@ -1,6 +1,6 @@
 #include "polygon.hpp"
 #include "functors.hpp"
-#include "input_struct.hpp"
+#include <input_struct.hpp>
 
 std::istream &filonova::operator>>(std::istream &in, Point &point)
 {

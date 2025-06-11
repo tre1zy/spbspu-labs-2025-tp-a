@@ -23,7 +23,7 @@ double filonova::ComputeTotalArea::operator()(const std::vector< Polygon > &poly
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
-filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts) : point(pts[0]), points(pts) {}
+filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts): point(pts[0]), points(pts) {}
 
 double filonova::TriangleAreaAccumulator::operator()(double sum, size_t i) const
 {
