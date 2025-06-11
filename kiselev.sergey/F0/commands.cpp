@@ -88,10 +88,50 @@ namespace
       return res;
     }
   };
+
   kiselev::Dict unionTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
   {
     return std::accumulate(dict2.begin(), dict2.end(), dict1, DictMerger{});
   }
+
+  struct LetterSearcher {
+    const std::string& letters;
+    std::ostream& out;
+    bool operator()(bool found, const kiselev::Dict::value_type& val)
+    {
+      if (val.first.rfind(letters, 0) == 0)
+      {
+        DictPrinter{ out }(val);
+        return true;
+      }
+      return found;
+    }
+  };
+
+  struct TranslationMerger
+  {
+    kiselev::Dict& dict;
+    bool& allExist;
+    void operator()(const kiselev::Dict::value_type& val)
+    {
+      auto val2 = dict.find(val.first);
+      if (val2 == dict.end())
+      {
+        dict[val.first] = val.second;
+        allExist = false;
+      }
+      else
+      {
+        std::vector<std::string> newTranslations;
+        std::copy_if(val.second.begin(), val.second.end(), std::back_inserter(newTranslations), VectorChecker{ val2->second });
+        if (!newTranslations.empty())
+        {
+          val2->second.insert(val2->second.end(), newTranslations.begin(), newTranslations.end());
+          allExist = false;
+        }
+      }
+    }
+  };
 }
 void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
 {
@@ -292,4 +332,87 @@ void kiselev::doCountWord(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << it->second.size() << "\n";
+}
+
+void kiselev::doSearchLetter(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string dictName;
+  std::string letters;
+  in >> dictName >> letters;
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  Dict dict = dictIt->second;
+  bool found = std::accumulate(dict.begin(), dict.end(), false, LetterSearcher{ letters, out });
+  if (!found)
+  {
+    out << "<WORD NOT FOUND>\n";
+  }
+}
+
+void kiselev::doLoadDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string fileName;
+  in >> fileName;
+  std::ifstream file(fileName);
+  if (!file)
+  {
+    out << "<FILE ERROR>\n";
+    return;
+  }
+
+  std::string dictName;
+  while (file >> dictName)
+  {
+    Dict dict;
+    std::string eng;
+    while (file >> eng)
+    {
+      std::vector<std::string> ruswords;
+      std::copy(std::istream_iterator<std::string>(file), std::istream_iterator<std::string>(), std::back_inserter(ruswords));
+      if (!ruswords.empty() && ruswords.back().back() == '\n')
+      {
+        ruswords.back().pop_back();
+      }
+      dict[eng] = ruswords;
+      if (file.get() == '\n')
+      {
+        break;
+      }
+      else
+      {
+        file.unget();
+      }
+    }
+    auto it = dicts.find(dictName);
+    if (it != dicts.end())
+    {
+      bool allExist = true;
+      std::for_each(dict.begin(), dict.end(), TranslationMerger{ it->second, allExist });
+      if (allExist)
+      {
+        out << "<DICTIONARY ALREADY EXISTS>\n";
+      }
+    }
+    else
+    {
+      dicts[dictName] = dict;
+    }
+  }
+}
+
+void kiselev::doClearDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.end())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  it->second.clear();
 }
