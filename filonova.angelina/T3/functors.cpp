@@ -1,13 +1,13 @@
 #include "functors.hpp"
 
-filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts) : point(pts[0]), points(pts) {}
+filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts): point(pts[0]), points(pts) {}
 
 double filonova::TriangleAreaAccumulator::operator()(double sum, size_t i) const
 {
   return sum + filonova::triangleArea(point, points[i], points[i + 1]);
 }
 
-filonova::HasVertexCount::HasVertexCount(size_t count) : count_(count) {}
+filonova::HasVertexCount::HasVertexCount(size_t count): count_(count) {}
 
 bool filonova::HasVertexCount::operator()(const Polygon &p) const
 {
@@ -24,7 +24,7 @@ bool filonova::CompareByVertexes::operator()(const Polygon &a, const Polygon &b)
   return a.points.size() < b.points.size();
 }
 
-filonova::IntersectsWith::IntersectsWith(const Polygon &polygon) : polygon_(polygon) {}
+filonova::IntersectsWith::IntersectsWith(const Polygon &polygon): polygon_(polygon) {}
 
 bool filonova::IntersectsWith::operator()(const Polygon &other) const
 {
