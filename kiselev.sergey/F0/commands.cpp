@@ -132,6 +132,34 @@ namespace
       }
     }
   };
+
+  struct DictIntersector
+  {
+    const kiselev::Dict& dict;
+    kiselev::Dict res {};
+    void operator()(const kiselev::Dict::value_type& val)
+    {
+      auto it = dict.find(val.first);
+      if (it != dict.end())
+      {
+        res[val.first] = val.second;
+        std::vector<std::string> translations;
+        std::set_intersection(
+          val.second.begin(), val.second.end(), it->second.begin(), it->second.end(), std::back_inserter(translations));
+        if (!translations.empty())
+        {
+          res[val.first] = translations;
+        }
+      }
+    }
+  };
+
+  kiselev::Dict intersectTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
+  {
+    DictIntersector intersector{ dict2 };
+    std::for_each(dict1.begin(), dict1.end(), intersector);
+    return intersector.res;
+  }
 }
 void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
 {
@@ -415,4 +443,41 @@ void kiselev::doClearDict(std::istream& in, std::ostream& out, Dicts& dicts)
     return;
   }
   it->second.clear();
+}
+
+void kiselev::doIntersectDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string nameNewDict;
+  std::string firstDict;
+  std::string secondDict;
+  in >> nameNewDict >> firstDict >> secondDict;
+  if (dicts.find(nameNewDict) != dicts.end())
+  {
+    out << "<DICTIONARY ALREADY EXISTS>\n";
+    return;
+  }
+  auto first = dicts.find(firstDict);
+  auto second = dicts.find(secondDict);
+  if (first == dicts.end() || second == dicts.end())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  Dict res = intersectTwoDict(first->second, second->second);
+  std::string nextDict;
+  while (in >> nextDict)
+  {
+    auto it = dicts.find(nextDict);
+    if (it == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>\n";
+      return;
+    }
+    res = intersectTwoDict(res, it->second);
+    if (in.get() == '\n')
+    {
+      break;
+    }
+  }
+  dicts[nameNewDict] = res;
 }
