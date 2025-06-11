@@ -5,7 +5,7 @@
 #include <numeric>
 #include <iterator>
 #include <vector>
-#include <pthread.h>
+#include <fstream>
 
 namespace
 {
@@ -33,9 +33,22 @@ namespace
       out << val.first;
       if (!val.second.empty())
       {
-        std::transform(val.second.begin(), val.second.end(), osIt(out), WordPrinter{ out });
+        std::for_each(val.second.begin(), val.second.end(), WordPrinter{ out });
       }
       out << "\n";
+    }
+  };
+
+  struct TranslationFinder
+  {
+    const std::string& word;
+    std::vector<std::string>& translations;
+    void operator()(const kiselev::Dict::value_type& val) const
+    {
+      if (std::find(val.second.begin(), val.second.end(), word) != val.second.end())
+      {
+        translations.push_back(val.first);
+      }
     }
   };
 
@@ -44,7 +57,7 @@ namespace
     const std::string& str;
     bool operator()(const kiselev::Dict::value_type& val)
     {
-        return std::find(val.second.begin(), val.second.end(), str) == val.second.end();
+      return std::find(val.second.begin(), val.second.end(), str) == val.second.end();
     }
   };
 
@@ -172,7 +185,7 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << nameDict << '\n';
-  std::transform(dictIt->second.begin(), dictIt->second.end(), osIt(out), DictPrinter{out});
+  std::for_each(dictIt->second.begin(), dictIt->second.end(), DictPrinter{ out });
 }
 
 void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -191,17 +204,16 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   if (engIt != dict.cend())
   {
     out << *engIt->second.begin();
-    std::transform(std::next(engIt->second.begin()), engIt->second.end(), osIt(out), WordPrinter{ out });
+    std::for_each(std::next(engIt->second.begin()), engIt->second.end(), WordPrinter{ out });
     out << "\n";
     return;
   }
   std::vector< std::string > translations;
-  TranslationChecker check{ word };
-  std::copy_if(dict.begin(), dict.end(), std::back_inserter(translations), check);
+  std::for_each(dict.begin(), dict.end(), TranslationFinder{ word, translations });
   if (!translations.empty())
   {
     out << *translations.begin();
-    std::transform(std::next(engIt->second.begin()), engIt->second.end(), osIt(out), WordPrinter{ out });
+    std::for_each(std::next(engIt->second.begin()), engIt->second.end(), WordPrinter{ out });
     out << "\n";
     return;
   }
@@ -243,4 +255,41 @@ void kiselev::doUnionDict(std::istream& in, std::ostream& out, Dicts& dicts)
     }
   }
   dicts[nameNewDict] = res;
+}
+
+void kiselev::doSaveDict(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string fileName;
+  std::string dictName;
+  in >> dictName >> fileName;
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  std::ofstream file(fileName);
+  if (!file)
+  {
+    out << "<FILE ERROR>\n";
+    return;
+  }
+  file << dictName << "\n";
+  Dict dict = dictIt->second;
+  out << dictName << '\n';
+  std::for_each(dictIt->second.begin(), dictIt->second.end(), DictPrinter{ out });
+  file << "\n";
+}
+
+void kiselev::doCountWord(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  out << it->second.size() << "\n";
 }
