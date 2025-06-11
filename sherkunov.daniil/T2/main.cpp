@@ -8,8 +8,8 @@
 
 int main()
 {
-  using InputStreamIterator = std::istream_iterator< zholobov::DataStruct >;
-  using OutputStreamIterator = std::ostream_iterator< zholobov::DataStruct >;
+  using InputStreamIterator = std::istream_iterator< sherkunov::DataStruct >;
+  using OutputStreamIterator = std::ostream_iterator< sherkunov::DataStruct >;
 
   std::vector< sherkunov::DataStruct > data;
   while (!std::cin.eof()) {
