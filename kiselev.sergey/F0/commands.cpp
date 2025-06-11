@@ -136,7 +136,7 @@ namespace
   struct DictIntersector
   {
     const kiselev::Dict& dict;
-    kiselev::Dict res {};
+    kiselev::Dict res{};
     void operator()(const kiselev::Dict::value_type& val)
     {
       auto it = dict.find(val.first);
@@ -160,6 +160,15 @@ namespace
     std::for_each(dict1.begin(), dict1.end(), intersector);
     return intersector.res;
   }
+
+  struct DictComplementer
+  {
+    const kiselev::Dict& dict;
+    bool operator()(const kiselev::Dict::value_type& val) const
+    {
+      return dict.find(val.first) == dict.end();
+    }
+  };
 }
 void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
 {
@@ -479,5 +488,29 @@ void kiselev::doIntersectDict(std::istream& in, std::ostream& out, Dicts& dicts)
       break;
     }
   }
+  dicts[nameNewDict] = res;
+}
+
+void kiselev::doComplementDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string nameNewDict;
+  std::string firstDict;
+  std::string secondDict;
+  in >> nameNewDict >> firstDict >> secondDict;
+  if (dicts.find(nameNewDict) != dicts.end())
+  {
+    out << "<DICTIONARY ALREADY EXISTS>\n";
+    return;
+  }
+  auto first = dicts.find(firstDict);
+  auto second = dicts.find(secondDict);
+  if (first == dicts.end() || second == dicts.end())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+
+  Dict res;
+  std::copy_if(first->second.begin(), first->second.end(), std::inserter(res, res.end()), DictComplementer{ second->second });
   dicts[nameNewDict] = res;
 }
