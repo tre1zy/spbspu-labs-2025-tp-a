@@ -3,9 +3,11 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
 namespace
 {
+  using osIt = std::ostream_iterator< std::string >;
   const std::string& extractDict(const kiselev::Dicts::value_type& val)
   {
     return val.first;
@@ -27,9 +29,17 @@ namespace
       out << val.first;
       if (!val.second.empty())
       {
-        std::transform(val.second.begin(), val.second.end(), std::ostream_iterator<std::string>(out), WordPrinter{ out });
+        std::transform(val.second.begin(), val.second.end(), osIt(out), WordPrinter{ out });
       }
       out << "\n";
+    }
+  };
+  struct TranslationChecker
+  {
+    const std::string& str;
+    bool operator()(const kiselev::Dict::value_type& val)
+    {
+      return std::find(val.second.begin(), val.second.end(), str) != val.second.end();
     }
   };
 
@@ -112,7 +122,7 @@ void kiselev::doListDict(std::ostream& out, const Dicts& dicts)
     out << "<EMPTY>\n";
     return;
   }
-  std::transform(dicts.begin(), dicts.end(), std::ostream_iterator<std::string>(out, "\n"), extractDict);
+  std::transform(dicts.begin(), dicts.end(), osIt(out, "\n"), extractDict);
 }
 
 void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -126,5 +136,38 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << nameDict << '\n';
-  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator<std::string>(out), DictPrinter{out});
+  std::transform(dictIt->second.begin(), dictIt->second.end(), osIt(out), DictPrinter{out});
+}
+
+void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string nameDict;
+  std::string word;
+  in >> nameDict >> word;
+  auto dictIt = dicts.find(nameDict);
+  if (dictIt == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  const Dict dict = dictIt->second;
+  auto engIt = dict.find(word);
+  if (engIt != dict.cend())
+  {
+    out << *engIt->second.begin();
+    std::transform(std::next(engIt->second.begin()), engIt->second.end(), osIt(out), WordPrinter{ out });
+    out << "\n";
+    return;
+  }
+  std::vector< std::string > translations;
+  TranslationChecker check{ word };
+  std::copy_if(dict.begin(), dict.end(), std::back_inserter(translations), check);
+  if (!translations.empty())
+  {
+    out << *translations.begin();
+    std::transform(std::next(engIt->second.begin()), engIt->second.end(), osIt(out), WordPrinter{ out });
+    out << "\n";
+    return;
+  }
+  out << "<WORD NOT FOUND>\n";
 }
