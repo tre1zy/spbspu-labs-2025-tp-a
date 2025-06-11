@@ -93,7 +93,11 @@ double filonova::TriangleAreaFunctor::operator()(const Triangle &tri) const
 
 double filonova::triangleArea(const Point &a, const Point &b, const Point &c)
 {
-  return std::abs(static_cast< double >(a.x) * (b.y - c.y) + static_cast< double >(b.x) * (c.y - a.y) + static_cast< double >(c.x) * (a.y - b.y)) / 2.0;
+  double term1 = static_cast< double >(a.x) * (b.y - c.y);
+  double term2 = static_cast< double >(b.x) * (c.y - a.y);
+  double term3 = static_cast< double >(c.x) * (a.y - b.y);
+
+  return std::abs(term1 + term2 + term3) / 2.0;
 }
 
 double filonova::getArea(const Polygon &polygon)
