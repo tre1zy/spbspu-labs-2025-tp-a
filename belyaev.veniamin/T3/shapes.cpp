@@ -80,11 +80,20 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Polygon& src)
   belyaev::StreamGuard guard(out);
 
   using ostreamPnt = std::ostream_iterator<Point>;
-  std::copy(src.points.begin(), src.points.end(), ostreamPnt{out, "\n"});
+  std::copy(src.points.begin(), src.points.end(), ostreamPnt{out, " "});
   return out;
 }
 
 bool belyaev::operator==(const Point& lhs, const Point& rhs)
 {
   return (lhs.x == rhs.x && lhs.y == rhs.y);
+}
+
+bool belyaev::operator==(const Polygon& lhs, const Polygon& rhs)
+{
+  if (lhs.points.size() != rhs.points.size())
+  {
+    return false;
+  }
+  return std::equal(lhs.points.begin(), lhs.points.end(), rhs.points.begin());
 }
