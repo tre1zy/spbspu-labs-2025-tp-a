@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     try {
       cmds.at(command)();
       std::cout << '\n';
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
