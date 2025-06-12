@@ -40,6 +40,7 @@ namespace brevnov
   struct KeyIO
   {
     DataStruct& data;
+    std::array< int, 3 > keys;
   };
 
   struct StreamGuard

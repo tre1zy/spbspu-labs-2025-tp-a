@@ -7,7 +7,7 @@ int main()
 {
   using DaS = brevnov::DataStruct;
   using istreamIt = std::istream_iterator< DaS >;
-  using ostreamIt = ostream_iterator< DaS >;
+  using ostreamIt = std::ostream_iterator< DaS >;
 
   std::vector< DaS > data;
   while (!std::cin.eof())
@@ -24,7 +24,7 @@ int main()
   (
     std::begin(data),
     std::end(data),
-    std::ostreamIt(std::cout, "\n")
+    ostreamIt(std::cout, "\n")
   );
   return 0;
 }
