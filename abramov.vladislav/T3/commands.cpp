@@ -145,7 +145,10 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
   {
     commands["VERTEXES"]();
   }
-  commands.at(subcommand)();
+  else
+  {
+    commands.at(subcommand)();
+  }
 }
 
 void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in)
@@ -187,7 +190,10 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
   {
     commands["VERTEXES"]();
   }
-  commands.at(subcommand)();
+  else
+  {
+    commands.at(subcommand)();
+  }
 }
 
 void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
