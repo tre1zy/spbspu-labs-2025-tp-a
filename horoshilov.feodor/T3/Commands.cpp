@@ -93,7 +93,7 @@ namespace
   bool compareArea(const horoshilov::Polygon& poly1, const horoshilov::Polygon& poly2)
   {
     return getArea(poly1) < getArea(poly2);
-  } 
+  }
 
   void maxArea(const std::vector< horoshilov::Polygon >& polygons, std::ostream& out)
   {
@@ -183,7 +183,7 @@ void horoshilov::printPermsCount(std::istream& in, std::ostream& out, const std:
     throw std::invalid_argument("incorrect shape");
   }
   out << std::count_if(plgs.cbegin(), plgs.cend(), std::bind(cheackPerms, std::placeholders::_1, plg));
-} 
+}
 
 void horoshilov::printArea(std::istream& in, std::ostream& out, const std::vector< horoshilov::Polygon >& polygons)
 {
