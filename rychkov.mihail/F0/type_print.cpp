@@ -2,41 +2,43 @@
 
 #include <iostream>
 
-void rychkov::ContentPrinter::print_left_parenthesis(const typing::Type& parent)
+std::ostream& rychkov::details::print_left_parenthesis(std::ostream& out, const typing::Type& parent)
 {
   if (parent.base == nullptr)
   {
-    return;
+    return out;
   }
   if ((parent.category == typing::Type::Array) && (parent.base->category == typing::Type::Array))
   {
-    return;
+    return out;
   }
   if ((parent.base->category == typing::Type::Function) || (parent.base->category == typing::Type::Array))
   {
     out << '(';
   }
+  return out;
 }
-void rychkov::ContentPrinter::print_right_parenthesis(const typing::Type& parent)
+std::ostream& rychkov::details::print_right_parenthesis(std::ostream& out, const typing::Type& parent)
 {
   if (parent.base == nullptr)
   {
-    return;
+    return out;
   }
   if ((parent.category == typing::Type::Array) && (parent.base->category == typing::Type::Array))
   {
-    return;
+    return out;
   }
   if ((parent.base->category == typing::Type::Function) || (parent.base->category == typing::Type::Array))
   {
     out << ')';
   }
+  return out;
 }
-void rychkov::ContentPrinter::print_left(const typing::Type& type)
+std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
 {
   if (type.base != nullptr)
   {
-    print_left(*type.base);
+    print_left(out, *type.base);
   }
   switch (type.category)
   {
@@ -67,7 +69,7 @@ void rychkov::ContentPrinter::print_left(const typing::Type& type)
     out << type.name;
     break;
   case typing::Type::Pointer:
-    print_left_parenthesis(type);
+    details::print_left_parenthesis(out, type);
     out << '*';
     if (type.is_const)
     {
@@ -79,7 +81,7 @@ void rychkov::ContentPrinter::print_left(const typing::Type& type)
     }
     break;
   case typing::Type::Array:
-    print_left_parenthesis(type);
+    details::print_left_parenthesis(out, type);
     break;
   case typing::Type::Combination:
     if (type.is_const)
@@ -92,8 +94,9 @@ void rychkov::ContentPrinter::print_left(const typing::Type& type)
     }
     break;
   }
+  return out;
 }
-void rychkov::ContentPrinter::print_right(const typing::Type& type)
+std::ostream& rychkov::print_right(std::ostream& out, const typing::Type& type)
 {
   if (type.category == typing::Type::Function)
   {
@@ -101,17 +104,16 @@ void rychkov::ContentPrinter::print_right(const typing::Type& type)
     char comma[3] = "\0\0";
     for (const typing::Type& i: type.function_parameters)
     {
-      out << comma;
-      operator()(i);
+      out << comma << i;
       comma[0] = ',';
       comma[1] = ' ';
     }
     out << ')';
-    print_right_parenthesis(type);
+    details::print_right_parenthesis(out, type);
   }
   else if (type.category == typing::Type::Pointer)
   {
-    print_right_parenthesis(type);
+    details::print_right_parenthesis(out, type);
   }
   else if (type.category == typing::Type::Array)
   {
@@ -121,15 +123,17 @@ void rychkov::ContentPrinter::print_right(const typing::Type& type)
       out << type.array_length;
     }
     out << ']';
-    print_right_parenthesis(type);
+    details::print_right_parenthesis(out, type);
   }
   if (type.base != nullptr)
   {
-    print_right(*type.base);
+    print_right(out, *type.base);
   }
+  return out;
 }
-void rychkov::ContentPrinter::operator()(const typing::Type& type)
+std::ostream& rychkov::operator<<(std::ostream& out, const typing::Type& type)
 {
-  print_left(type);
-  print_right(type);
+  print_left(out, type);
+  print_right(out, type);
+  return out;
 }

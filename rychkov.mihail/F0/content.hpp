@@ -57,21 +57,6 @@ namespace rychkov
     }
   };
 
-  namespace keywords
-  {
-    enum Keyword
-    {
-      Const,
-      Volatile,
-      Unsigned,
-      Long,
-      True,
-      False,
-      Enum,
-      Struct,
-      Union
-    };
-  }
   struct Operator
   {
     enum Type
@@ -149,14 +134,11 @@ namespace rychkov
       typing::Type type;
       std::string name;
       std::vector< std::string > parameters;
-      bool inplace_defined = false;
-      Body body;
     };
     struct Struct
     {
       std::string name;
       std::vector< Variable > fields;
-      std::vector< Expression > defaults;
     };
     struct Enum
     {
@@ -167,26 +149,20 @@ namespace rychkov
     {
       std::string name;
       std::vector< Variable > fields;
-      DinMemWrapper< Expression > value;
-      size_t initialized_field = ~0ULL;
     };
     struct Alias
     {
       typing::Type type;
       std::string name;
     };
-    struct Cast
-    {
-      typing::Type from, to;
-    };
     struct Declaration
     {
-      std::variant< Variable, Struct, Enum, Union, Alias, Cast, Function > data;
+      std::variant< Variable, Struct, Enum, Union, Alias, Function > data;
       DinMemWrapper< Expression > value;
     };
     struct CastOperation
     {
-      Cast cast;
+      typing::Type from, to;
       bool is_explicit = false;
       DinMemWrapper< Expression > expr;
     };
@@ -196,8 +172,7 @@ namespace rychkov
       {
         Char,
         String,
-        Number,
-        Logic
+        Number
       };
 
       std::string literal;
@@ -208,9 +183,18 @@ namespace rychkov
     {
       using operand = std::variant< DinMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation, Body >;
 
-      Operator* operation = nullptr;
+      const Operator* operation;
       typing::Type result_type;
       std::vector< operand > operands;
+
+      Expression();
+      Expression(Variable var);
+      Expression(Declaration decl);
+      Expression(Literal lit);
+      Expression(CastOperation cast);
+      Expression(Body body);
+      Expression(const Operator* op, typing::Type result, std::vector< operand > opers);
+
       bool empty() const noexcept;
       bool full() const noexcept;
     };

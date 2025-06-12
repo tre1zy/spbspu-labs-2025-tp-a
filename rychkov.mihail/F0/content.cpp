@@ -1,5 +1,39 @@
 #include "content.hpp"
 
+rychkov::entities::Expression::Expression():
+  operation{nullptr}
+{}
+rychkov::entities::Expression::Expression(Variable var):
+  operation{nullptr},
+  result_type{var.type},
+  operands{std::move(var)}
+{}
+rychkov::entities::Expression::Expression(Declaration decl):
+  operation{nullptr},
+  result_type{},
+  operands{std::move(decl)}
+{}
+rychkov::entities::Expression::Expression(Literal lit):
+  operation{nullptr},
+  result_type{},
+  operands{std::move(lit)}
+{}
+rychkov::entities::Expression::Expression(CastOperation cast):
+  operation{nullptr},
+  result_type{cast.to},
+  operands{std::move(cast)}
+{}
+rychkov::entities::Expression::Expression(Body body):
+  operation{nullptr},
+  result_type{},
+  operands{std::move(body)}
+{}
+rychkov::entities::Expression::Expression(const Operator* op, typing::Type result, std::vector< operand > opers):
+  operation{op},
+  result_type{result},
+  operands(std::move(opers))
+{}
+
 bool rychkov::entities::Expression::empty() const noexcept
 {
   return (operation == nullptr) && operands.empty();

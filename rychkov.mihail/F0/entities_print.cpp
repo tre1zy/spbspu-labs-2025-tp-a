@@ -2,139 +2,135 @@
 
 #include <iostream>
 
-void rychkov::ContentPrinter::print_indent()
+std::ostream& rychkov::operator<<(std::ostream& out, const entities::Variable& var)
 {
-  for (size_t i = 0; i < indent_; i++)
-  {
-    out << '\t';
-  }
-}
-void rychkov::ContentPrinter::print_empty()
-{
-  print_indent();
-  out << "<EMPTY>\n";
-}
-void rychkov::ContentPrinter::operator()(const entities::Variable& var)
-{
-  print_indent();
-  out << "[variable] ";
-  print_left(var.type);
+  print_left(out, var.type);
   out << ' ' << var.name;
-  print_right(var.type);
-  out << '\n';
+  print_right(out, var.type);
+  return out;
 }
-void rychkov::ContentPrinter::operator()(const entities::Function& func)
+std::ostream& rychkov::operator<<(std::ostream& out, const entities::Function& func)
 {
-  print_indent();
-  out << "[function] ";
-  print_left(func.type);
+  print_left(out, func.type);
   out << ' ' << func.name;
   out << '(';
   char comma[3] = "\0 ";
   for (size_t i = 0; i < func.type.function_parameters.size(); i++)
   {
     out << comma;
-    print_left(func.type.function_parameters[i]);
+    print_left(out, func.type.function_parameters[i]);
     out << ' ' << func.parameters[i];
-    print_right(func.type.function_parameters[i]);
+    print_right(out, func.type.function_parameters[i]);
     comma[0] = ',';
   }
   out << ')';
-  print_right_parenthesis(func.type);
-  print_right(*func.type.base);
-  out << '\n';
-  if (func.inplace_defined)
+  details::print_right_parenthesis(out, func.type);
+  print_right(out, *func.type.base);
+  return out;
+}
+std::ostream& rychkov::operator<<(std::ostream& out, const entities::Literal& literal)
+{
+  switch (literal.type)
   {
-    operator()(func.body);
+  case entities::Literal::String:
+    out << '"' << literal.literal << '"';
+    break;
+  case entities::Literal::Char:
+    out << '\'' << literal.literal << '\'';
+    break;
+  case entities::Literal::Number:
+    out << literal.literal;
+    break;
   }
+  return out << literal.suffix;
+}
+
+std::ostream& rychkov::ContentPrinter::indent()
+{
+  for (size_t i = 0; i < indent_; i++)
+  {
+    out << '\t';
+  }
+  return out;
+}
+void rychkov::ContentPrinter::print_empty()
+{
+  indent() << "<EMPTY>\n";
+}
+void rychkov::ContentPrinter::operator()(const entities::Variable& var)
+{
+  indent() << "[variable] " << var << '\n';
+}
+void rychkov::ContentPrinter::operator()(const entities::Function& func)
+{
+  indent() << "[function] " << func << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::Body& body)
 {
   if (body.data.empty())
   {
-    print_indent();
-    out << "{}\n";
+    indent() << "{}\n";
   }
   else
   {
-    print_indent();
-    out << "{\n";
+    indent() << "{\n";
     indent_++;
     for (const entities::Expression& i: body.data)
     {
       operator()(i);
     }
     indent_--;
-    print_indent();
-    out << "}\n";
+    indent() << "}\n";
   }
 }
 void rychkov::ContentPrinter::operator()(const entities::Struct& structure)
 {
-  print_indent();
-  out << "[struct] " << structure.name << '\n';
+  indent() << "[struct] " << structure.name << '\n';
   indent_++;
   for (size_t i = 0; i < structure.fields.size(); i++)
   {
-    operator()(structure.fields[i]);
-    if (!structure.defaults[i].operands.empty())
-    {
-      indent_++;
-      operator()(structure.defaults[i]);
-      indent_--;
-    }
+    indent() << "[field] " << structure.fields[i] << '\n';
   }
   indent_--;
 }
 void rychkov::ContentPrinter::operator()(const entities::Enum& structure)
 {
-  print_indent();
-  out << "[enum] " << structure.name << '\n';
+  indent() << "[enum] " << structure.name << '\n';
   indent_++;
   for (const std::pair< std::string, int >& i: structure.fields)
   {
-    print_indent();
-    out << i.first << " = " << i.second << '\n';
+    indent() << i.first << " = " << i.second << '\n';
   }
   indent_--;
 }
 void rychkov::ContentPrinter::operator()(const entities::Union& structure)
 {
-  print_indent();
-  out << "[union] " << structure.name << '\n';
+  indent() << "[union] " << structure.name << '\n';
   indent_++;
   for (size_t i = 0; i < structure.fields.size(); i++)
   {
-    operator()(structure.fields[i]);
-    if (i == structure.initialized_field)
-    {
-      indent_++;
-      operator()(*structure.value);
-      indent_--;
-    }
+    indent() << "[variant] " << structure.fields[i] << '\n';
   }
   indent_--;
 }
 void rychkov::ContentPrinter::operator()(const entities::Alias& alias)
 {
-  print_indent();
-  out << "[typedef] ";
-  print_left(alias.type);
+  indent() << "[typedef] ";
+  print_left(out, alias.type);
   out << ' ' << alias.name;
-  print_right(alias.type);
+  print_right(out, alias.type);
   out << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
 {
-  print_indent();
-  out << "[declaration]\n";
+  indent() << "[declaration]\n";
+  indent() << "<object>:\n";
   indent_++;
   std::visit(*this, decl.data);
   indent_--;
   if (!decl.value->empty())
   {
-    print_indent();
-    out << "with default:\n";
+    indent() << "<definition>:\n";
     indent_++;
     operator()(*decl.value);
     indent_--;
@@ -142,45 +138,28 @@ void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
 }
 void rychkov::ContentPrinter::operator()(const entities::Literal& literal)
 {
-  print_indent();
+  indent();
   switch (literal.type)
   {
   case entities::Literal::String:
-    out << "[string] \"" << literal.literal << '"' << literal.suffix << '\n';
+    out << "[string] ";
     break;
   case entities::Literal::Char:
-    out << "[char] '" << literal.literal << '\'' << literal.suffix << '\n';
+    out << "[char] ";
     break;
   case entities::Literal::Number:
-    out << "[number] " << literal.literal << literal.suffix << '\n';
-    break;
-  case entities::Literal::Logic:
-    out << "[logic] " << literal.literal << '\n';
+    out << "[number] ";
     break;
   }
-}
-void rychkov::ContentPrinter::operator()(const entities::Cast& cast)
-{
-  print_indent();
-  out << "[cast]\n";
-  indent_++;
-  print_indent();
-  out << "<from> ";
-  operator()(cast.from);
-  out << '\n';
-
-  print_indent();
-  out << "<to> ";
-  operator()(cast.to);
-  out << '\n';
-  indent_--;
+  out << literal << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::CastOperation& cast)
 {
-  print_indent();
-  out << (cast.is_explicit ? "[explicit cast]\n" : "[implicit cast]\n");
+  indent() << (cast.is_explicit ? "[explicit cast]\n" : "[implicit cast]\n");
+  indent() << "<from> " << cast.from << '\n';
+  indent() << "<to>   " << cast.to << '\n';
+  indent() << "<object>:\n";
   indent_++;
-  operator()(cast.cast);
   operator()(cast.expr);
   indent_--;
 }

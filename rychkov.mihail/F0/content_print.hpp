@@ -15,10 +15,6 @@ namespace rychkov
       indent_(0)
     {}
 
-    void operator()(const typing::Type& type);
-    void print_left(const typing::Type& type);
-    void print_right(const typing::Type& type);
-
     void operator()(const entities::Variable& var);
     void operator()(const entities::Function& func);
     void operator()(const entities::Body& body);
@@ -29,20 +25,30 @@ namespace rychkov
     void operator()(const entities::Declaration& decl);
 
     void operator()(const entities::Literal& literal);
-    void operator()(const entities::Cast& cast);
     void operator()(const entities::CastOperation& cast);
 
     void operator()(const DinMemWrapper< entities::Expression >& root);
     void operator()(const entities::Expression& root);
     void operator()(const entities::Expression::operand& operand);
 
-    void print_indent();
+    std::ostream& indent();
     void print_empty();
   private:
     size_t indent_;
-    void print_left_parenthesis(const typing::Type& parent);
-    void print_right_parenthesis(const typing::Type& parent);
   };
+
+  namespace details
+  {
+    std::ostream& print_left_parenthesis(std::ostream& out, const typing::Type& parent);
+    std::ostream& print_right_parenthesis(std::ostream& out, const typing::Type& parent);
+  }
+  std::ostream& print_left(std::ostream& out, const typing::Type& type);
+  std::ostream& print_right(std::ostream& out, const typing::Type& type);
+  std::ostream& operator<<(std::ostream& out, const typing::Type& type);
+
+  std::ostream& operator<<(std::ostream& out, const entities::Variable& var);
+  std::ostream& operator<<(std::ostream& out, const entities::Function& func);
+  std::ostream& operator<<(std::ostream& out, const entities::Literal& literal);
 }
 
 #endif

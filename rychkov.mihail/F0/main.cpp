@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <parser.hpp>
 #include "processors.hpp"
-#include "tokenizer.hpp"
+#include "code_parsers.hpp"
 #include "content_print.hpp"
 
 int main(int argc, char** argv)
@@ -12,8 +12,7 @@ int main(int argc, char** argv)
   Literal literals[] = {
         {"abc", "u16", Literal::String},
         {"\\n", "u16", Literal::Char},
-        {"0x182", "ull", Literal::Number},
-        {"true", {}, Literal::Logic}
+        {"0x182", "ull", Literal::Number}
       };
   rychkov::ContentPrinter printer{std::cout};
   for (const Literal& i: literals)
@@ -42,19 +41,17 @@ int main(int argc, char** argv)
   {
     printer(Declaration{Variable{i, "var"}});
   }
-  Cast cast{types[10], types[0]};
-  printer(cast);
   printer(Declaration{Function{types[3], "foo", {"arg1", "arg2"}}});
-  printer(Declaration{Struct{"S", {{types[0], "field1"}, {types[1], "field2"}}, {{}, {}}}});
+  printer(Declaration{Struct{"S", {{types[0], "field1"}, {types[1], "field2"}}}});
   printer(Declaration{Enum{"E", {{"val1", 0}, {"val2", 1}}}});
   printer(Declaration{Union{"U", {{types[0], "field1"}, {types[1], "field2"}}}});
   printer(Declaration{Alias{types[0], "bool"}});
-  printer(Declaration{Function{types[3], "foo", {"arg1", "arg2"}, true, {}}});
+  printer(Declaration{Function{types[3], "foo", {"arg1", "arg2"}}});
   Expression pgm[] = {
-        {&rychkov::Tokenizer::operators[0], types[0], {literals[2]}},
-        {nullptr, cast.to, {CastOperation{cast, false, pgm[0]}}},
-        {nullptr, pgm[1].result_type, {Declaration{Variable{types[0], "var"}, pgm[1]}}},
-        {nullptr, types[12], {Declaration{Function{types[12], "main", {}, true, {{pgm[0], pgm[0]}}}}}},
+        {&rychkov::CParser::operators[0], types[0], {literals[2]}},
+        CastOperation{types[10], types[0], false, pgm[0]},
+        Declaration{Variable{types[0], "var"}, pgm[1]},
+        Declaration{Function{types[12], "main", {}}, Body{{pgm[0], pgm[0]}}},
       };
   std::cout << '\n';
   for (const Expression& i: pgm)
@@ -63,15 +60,21 @@ int main(int argc, char** argv)
   }
   std::cout << '\n';
 
-  rychkov::Tokenizer tokenizer;
-  tokenizer.append(std::cerr, "struct");
-  tokenizer.append(std::cerr, "A");
-  tokenizer.append(std::cerr, ';');
-  tokenizer.append(std::cerr, "struct");
-  tokenizer.append(std::cerr, "B");
-  tokenizer.append(std::cerr, '{');
-  tokenizer.append(std::cerr, ';');
-  tokenizer.print(std::cout);
+  rychkov::CParseContext context{std::cerr};
+  rychkov::Lexer lexer;
+  lexer.parse(context, "struct A\n{};\n A a = {};\nint b = 0x192'023ULL\n");
+  lexer.flush(context);
+  std::cout << '\n';
+
+  rychkov::CParser cparser;
+  cparser.append(context, "struct");
+  cparser.append(context, "A");
+  cparser.append(context, ';');
+  cparser.append(context, "struct");
+  cparser.append(context, "B");
+  cparser.append(context, '{');
+  cparser.append(context, ';');
+  cparser.print(std::cout);
   /*std::cout << std::fixed << std::setprecision(1);
   using processor = rychkov::MainProcessor;
   using parser_type = rychkov::Parser< processor >;
