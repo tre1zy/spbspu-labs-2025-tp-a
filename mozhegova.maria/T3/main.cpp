@@ -37,11 +37,11 @@ int main(int argc, char * argv[])
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["MAX"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["MIN"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["COUNT"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["ECHO"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["SAME"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAX"] = std::bind(mozhegova::printMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(mozhegova::printMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  // cmds["COUNT"] = std::bind(mozhegova::printCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  // cmds["ECHO"] = std::bind(mozhegova::printEcho, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  // cmds["SAME"] = std::bind(mozhegova::printSame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (!(std::cin >> command).eof())

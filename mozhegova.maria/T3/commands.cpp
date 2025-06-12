@@ -28,6 +28,11 @@ namespace
     return std::abs(sum) * 0.5;
   }
 
+  size_t getNum(const mozhegova::Polygon & poly)
+  {
+    return poly.points.size();
+  }
+
   bool isEven(size_t num)
   {
     return num % 2 == 0;
@@ -46,6 +51,11 @@ namespace
   bool isOddPoly(const mozhegova::Polygon & poly)
   {
     return isOdd(poly.points.size());
+  }
+
+  bool hasNumVert(const mozhegova::Polygon & poly, size_t num)
+  {
+    return poly.points.size() == num;
   }
 
   void getAreaEven(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
@@ -79,6 +89,54 @@ namespace
     mozhegova::iofmtguard fmtguard(out);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
+
+  void getAreaVertexes(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons, size_t n)
+  {
+    std::vector< mozhegova::Polygon > temp;
+    auto pred = std::bind(hasNumVert, std::placeholders::_1, n);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(temp), pred);
+    std::vector< double > areaPoly(temp.size());
+    std::transform(temp.begin(), temp.end(), areaPoly.begin(), getArea);
+    double result = std::accumulate(areaPoly.begin(), areaPoly.end(), 0.0);
+    mozhegova::iofmtguard fmtguard(out);
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
+
+  void getMaxArea(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
+  {
+    std::vector< double > areaPoly(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getArea);
+    mozhegova::iofmtguard fmtguard(out);
+    double result = *std::max_element(areaPoly.begin(), areaPoly.end());
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
+
+  void getMaxVertexes(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
+  {
+    std::vector< size_t > areaPoly(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getNum);
+    mozhegova::iofmtguard fmtguard(out);
+    size_t result = *std::max_element(areaPoly.begin(), areaPoly.end());
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
+
+  void getMinArea(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
+  {
+    std::vector< double > areaPoly(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getArea);
+    mozhegova::iofmtguard fmtguard(out);
+    double result = *std::min_element(areaPoly.begin(), areaPoly.end());
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
+
+  void getMinVertexes(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
+  {
+    std::vector< size_t > areaPoly(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getNum);
+    mozhegova::iofmtguard fmtguard(out);
+    size_t result = *std::min_element(areaPoly.begin(), areaPoly.end());
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
 }
 
 void mozhegova::printArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -99,12 +157,56 @@ void mozhegova::printArea(std::istream & in, std::ostream & out, const std::vect
   }
   catch (...)
   {
+    size_t count = std::stoull(subcommand);
+    if (count < 3)
+    {
+      throw std::logic_error("not that command");
+    }
+    getAreaVertexes(out, polygons, count);
+  }
+}
+
+void mozhegova::printMax(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("not polygons");
+  }
+  std::map< std::string, std::function< void() > > subcmds;
+  subcmds["AREA"] = std::bind(getMaxArea, std::ref(out), std::cref(polygons));
+  subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
+  std::string subcommand;
+  in >> subcommand;
+  try
+  {
+    subcmds.at(subcommand)();
+  }
+  catch (...)
+  {
     throw std::logic_error("not that command");
   }
 }
 
-void mozhegova::printMax(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
-void mozhegova::printMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
+void mozhegova::printMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("not polygons");
+  }
+  std::map< std::string, std::function< void() > > subcmds;
+  subcmds["AREA"] = std::bind(getMinArea, std::ref(out), std::cref(polygons));
+  subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
+  std::string subcommand;
+  in >> subcommand;
+  try
+  {
+    subcmds.at(subcommand)();
+  }
+  catch (...)
+  {
+    throw std::logic_error("not that command");
+  }
+}
 void mozhegova::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
 void mozhegova::printEcho(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
 void mozhegova::printSame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
