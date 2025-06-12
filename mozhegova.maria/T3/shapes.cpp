@@ -1,4 +1,6 @@
 #include "shapes.hpp"
+#include <iterator>
+#include <algorithm>
 #include <delimiter.hpp>
 
 std::istream & mozhegova::operator>>(std::istream & in, Point & dest)
