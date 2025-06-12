@@ -12,13 +12,15 @@ namespace
 
   void printAreaEven(const std::vector< Polygon > &polygons, std::ostream &out)
   {
-    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, abramov::areaEven);
+    AreaEvenAcc acc{};
+    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc);
     out << res;
   }
 
   void printAreaOdd(const std::vector< Polygon > &polygons, std::ostream &out)
   {
-    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, abramov::areaOdd);
+    AreaOddAcc acc{};
+    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc);
     out << res;
   }
 
@@ -41,8 +43,8 @@ namespace
     {
       throw std::logic_error("Too less vertexes\n");
     }
-    auto f = std::bind(areaVertexes, _1, _2, vert);
-    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, f);
+    AreaVertAcc acc{ vert };
+    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc);
     out << res;
   }
 

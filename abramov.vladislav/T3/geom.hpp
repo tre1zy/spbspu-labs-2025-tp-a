@@ -21,11 +21,38 @@ namespace abramov
   };
   std::istream &operator>>(std::istream &in, Polygon &polygon);
 
+  struct AreaOddAcc
+  {
+    double operator()(double s, const Polygon &polygon) const;
+  };
+
+  struct AreaEvenAcc
+  {
+    double operator()(double s, const Polygon &polygon) const;
+  };
+
+  struct AreaVertAcc
+  {
+    size_t k;
+
+    explicit AreaVertAcc(size_t vert):
+      k(vert)
+    {}
+    double operator()(double s, const Polygon &polygon) const;
+  };
+
+  struct VertexesCmp
+  {
+    size_t k;
+
+    explicit VertexesCmp(size_t vert):
+      k(vert)
+    {}
+    bool operator()(const Polygon &polygon) const;
+  };
+
   double getArea(const Polygon &polygon);
-  double areaEven(double s, const Polygon &polygon);
-  double areaOdd(double s, const Polygon &polygon);
   double areaMean(const std::vector< Polygon > &polygons);
-  double areaVertexes(double s, const Polygon &polygon, size_t vert);
   bool maxArea(const Polygon &p1, const Polygon& p2);
   bool maxVertexes(const Polygon &p1, const Polygon &p2);
   size_t countEven(const std::vector< Polygon > &polygons);

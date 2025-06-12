@@ -7,7 +7,7 @@
 
 namespace
 {
-  int pointsSum(const abramov::Point &p1, const abramov::Point &p2)
+  int diffGaussPoints(const abramov::Point &p1, const abramov::Point &p2)
   {
     return p1.x * p2.y - p1.y * p2.x;
   }
@@ -20,11 +20,6 @@ namespace
   bool isOdd(const abramov::Polygon &polygon)
   {
     return !isEven(polygon);
-  }
-
-  bool isEnoughVertexes(const abramov::Polygon &polygon, size_t k)
-  {
-    return polygon.points.size() == k;
   }
 }
 
@@ -82,15 +77,7 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
   return in;
 }
 
-double abramov::getArea(const Polygon &polygon)
-{
-  const std::vector< Point > &p = polygon.points;
-  double area = pointsSum(p.back(), p.front());
-  area += std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, pointsSum);
-  return std::abs(area) / 2.0;
-}
-
-double abramov::areaEven(double s, const Polygon &polygon)
+double abramov::AreaEvenAcc::operator()(double s, const Polygon &polygon) const
 {
   if (isEven(polygon))
   {
@@ -99,29 +86,45 @@ double abramov::areaEven(double s, const Polygon &polygon)
   return s;
 }
 
-double abramov::areaOdd(double s, const Polygon &polygon)
+double abramov::AreaOddAcc::operator()(double s, const Polygon &polygon) const
 {
-  if (!isEven(polygon))
+  if (isOdd(polygon))
   {
     return s + getArea(polygon);
   }
   return s;
+}
+
+double abramov::AreaVertAcc::operator()(double s, const Polygon &polygon) const
+{
+  VertexesCmp cmp{ k };
+  if (cmp(polygon))
+  {
+    return s + getArea(polygon);
+  }
+  return s;
+}
+
+bool abramov::VertexesCmp::operator()(const Polygon &polygon) const
+{
+  return polygon.points.size() == k;
+}
+
+double abramov::getArea(const Polygon &polygon)
+{
+  const std::vector< Point > &p = polygon.points;
+  double area = diffGaussPoints(p.back(), p.front());
+  area += std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, diffGaussPoints);
+  return std::abs(area) / 2.0;
 }
 
 double abramov::areaMean(const std::vector< Polygon > &polygons)
 {
-  double s1 = std::accumulate(polygons.begin(), polygons.end(), 0.0, areaEven);
-  double s2 = std::accumulate(polygons.begin(), polygons.end(), 0.0, areaOdd);
+  AreaEvenAcc acc_even{};
+  AreaOddAcc acc_odd{};
+  double s1 = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc_even);
+  double s2 = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc_odd);
   return (s1 + s2) / polygons.size();
-}
-
-double abramov::areaVertexes(double s, const Polygon &polygon, size_t vert)
-{
-  if (polygon.points.size() == vert)
-  {
-    return s + getArea(polygon);
-  }
-  return s;
 }
 
 bool abramov::maxArea(const Polygon &p1, const Polygon &p2)
@@ -148,8 +151,8 @@ size_t abramov::countVertexes(const std::vector< Polygon > &polygons, size_t ver
 {
   using namespace std::placeholders;
 
-  auto f = std::bind(isEnoughVertexes, _1, vert);
-  return std::count_if(polygons.begin(), polygons.end(), f);
+  VertexesCmp cmp{ vert };
+  return std::count_if(polygons.begin(), polygons.end(), cmp);
 }
 
 bool abramov::isPointsEqual(const Point &p1, const Point &p2)
