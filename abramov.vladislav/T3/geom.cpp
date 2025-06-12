@@ -28,6 +28,11 @@ namespace
   }
 }
 
+bool abramov::Point::operator<(const Point &p) const
+{
+  return std::tie(x, y) < std::tie(p.x, p.y);
+}
+
 std::istream &abramov::operator>>(std::istream &in, Point &p)
 {
   std::istream::sentry s(in);

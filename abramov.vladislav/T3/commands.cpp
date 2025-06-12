@@ -134,13 +134,13 @@ void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::i
 {
   using namespace std::placeholders;
 
-  Polygon example;
-  in >> example;
+  Polygon pattern;
+  in >> pattern;
   if (!in)
   {
     throw std::logic_error("Fail to read\n");
   }
-  auto f = std::bind(isPolygonsEqualToExample, _1, _2, example);
+  auto f = std::bind(isPolygonsEqualToExample, _1, _2, pattern);
   auto del = std::unique(polygons.begin(), polygons.end(), f);
   size_t diff = polygons.size();
   polygons.erase(del, polygons.end());
@@ -150,19 +150,12 @@ void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::i
 
 void abramov::perms(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
-  Polygon example;
-  in >> example;
+  Polygon pattern;
+  in >> pattern;
   if (!in)
   {
     throw std::logic_error("Fail to read\n");
   }
-  struct pointsComp
-  {
-    bool operator()(const Point &p1, const Point &p2) const
-    {
-      return std::tie(p1.x, p1.y) < std::tie(p2.x, p2.y);
-    }
-  };
 
   struct permutationsComp
   {
@@ -179,14 +172,13 @@ void abramov::perms(const std::vector< Polygon > &polygons, std::ostream &out, s
       }
       std::vector< Point > sortPolygon = polygon.points;
       std::vector< Point > sortEx = ex.points;
-      pointsComp cmp;
-      std::sort(sortPolygon.begin(), sortPolygon.end(), cmp);
-      std::sort(sortEx.begin(), sortEx.end(), cmp);
+      std::sort(sortPolygon.begin(), sortPolygon.end());
+      std::sort(sortEx.begin(), sortEx.end());
       return std::equal(sortPolygon.begin(), sortPolygon.end(), sortEx.begin(), isPointsEqual);
     }
   };
 
-  permutationsComp cmp(example);
+  permutationsComp cmp(pattern);
   size_t count = std::count_if(polygons.begin(), polygons.end(), cmp);
   out << count;
 }

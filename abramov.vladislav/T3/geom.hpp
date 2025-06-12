@@ -9,6 +9,8 @@ namespace abramov
   {
     int x;
     int y;
+
+    bool operator<(const Point &p) const;
   };
   std::istream &operator>>(std::istream &in, Point &p);
 
