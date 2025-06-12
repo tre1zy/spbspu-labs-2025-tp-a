@@ -143,7 +143,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
   out << std::fixed << std::setprecision(1);
   try
   {
-    if (stoull(subcommand))
+    if (stoull(subcommand) || subcommand == "0")
     {
       commands["VERTEXES"]();
     }
@@ -191,7 +191,7 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
   getCountCommands(commands, polygons, subcommand);
   try
   {
-    if (stoull(subcommand))
+    if (stoull(subcommand) || subcommand == "0")
     {
       commands["VERTEXES"]();
     }
