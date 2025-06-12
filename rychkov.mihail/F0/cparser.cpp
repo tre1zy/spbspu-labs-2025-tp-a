@@ -3,6 +3,8 @@
 #include <iostream>
 #include "content_print.hpp"
 
+using namespace std::literals::string_literals;
+
 const std::vector< rychkov::Operator > rychkov::CParser::operators = {
       {rychkov::Operator::unary, rychkov::Operator::arithmetic, "+", false, true, 2},
       {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, false, 1},
@@ -11,11 +13,22 @@ const std::vector< rychkov::Operator > rychkov::CParser::operators = {
       {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, true, 2}
     };
 
+void rychkov::log(CParseContext& context, std::string message)
+{
+  for (const CParseContext* file = &context; file != nullptr; file = file->base)
+  {
+    context.err << "In file \"" << file->file << "\" (" << context.line + 1 << ':' << context.symbol + 1 << ")\n";
+  }
+  context.err << "\tError: " << message << "\n\n  " << context.last_line << '\n';
+  context.err << "  " << std::string(context.symbol, '-') << "^\n";
+}
+
 rychkov::CParser::CParser():
   program_{{}}
 {
   stack_.push(&program_[0]);
 }
+
 void rychkov::CParser::print(std::ostream& out) const
 {
   ContentPrinter printer{out};
@@ -24,18 +37,11 @@ void rychkov::CParser::print(std::ostream& out) const
     printer(i);
   }
 }
-void rychkov::log(CParseContext& context, std::string message)
-{
-  for (const CParseContext* file = &context; file != nullptr; file = file->base)
-  {
-    context.err << "In file \"" << file->file << "\" (" << context.line + 1 << ':' << context.symbol + 1 << ")\n";
-  }
-  context.err << "\tError: " << message << '\n';
-}
 bool rychkov::CParser::global_scope() const noexcept
 {
   return (stack_.size() == 1) && (stack_.top()->empty());
 }
+
 bool rychkov::CParser::append(CParseContext& context, entities::Literal literal)
 {
   if (global_scope() || stack_.top()->full())
@@ -64,7 +70,7 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
   // name
   if (stack_.top()->empty())
   {
-    log(context, "unexpected name");
+    log(context, "unexpected name (" + name + ")");
     return false;
   }
   if (entities::is_decl(*stack_.top()))
@@ -78,7 +84,7 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
         data.name = std::move(name);
         return true;
       }
-      log(context, "struct name duplicating");
+      log(context, "struct name duplicating (" + name + ")");
       return false;
     }
   }
@@ -131,6 +137,6 @@ bool rychkov::CParser::append(CParseContext& context, char c)
   {
     //
   }
-  log(context, "unknown symbol");
+  log(context, "unknown symbol ('"s + c + "'; code = " + std::to_string(c) + ")");
   return false;
 }

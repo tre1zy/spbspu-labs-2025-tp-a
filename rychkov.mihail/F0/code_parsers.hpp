@@ -5,6 +5,7 @@
 #include <stack>
 #include <set>
 #include <string>
+#include <parser.hpp>
 #include "content.hpp"
 
 namespace rychkov
@@ -15,9 +16,42 @@ namespace rychkov
     std::string file;
     CParseContext* base = nullptr;
     size_t line = 0, symbol = 0;
+    std::string last_line;
   };
 
+  class Lexer;
   class CParser;
+  class Preprocessor
+  {
+  public:
+    Preprocessor();
+    Preprocessor(Lexer& next);
+
+    void parse(CParseContext& context, std::string line);
+
+  private:
+    struct CommandContext
+    {
+      std::istream& in;
+      std::ostream& err;
+      CParseContext& parse_context;
+
+      void parse_error();
+    };
+    static Parser::map_type< CommandContext, Preprocessor > call_map;
+
+    Lexer* next_;
+    bool singleline_comment = false;
+    bool multiline_comment = false;
+
+    void flush(CParseContext& context, char c);
+
+    bool include(CommandContext&);
+    bool define(CommandContext&);
+    bool pragma(CommandContext&);
+    bool undef(CommandContext&);
+  };
+
   class Lexer
   {
   public:

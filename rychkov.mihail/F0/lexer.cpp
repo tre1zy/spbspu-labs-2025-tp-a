@@ -51,7 +51,7 @@ bool rychkov::Lexer::flush(CParseContext& context)
     }
     else
     {
-      result = next_->append(context, std::get< std::string >(buf_));
+      result = next_->append(context, std::get< entities::Literal >(buf_));
     }
   }
   literal_full_ = false;
@@ -119,7 +119,7 @@ bool rychkov::Lexer::append_literal(CParseContext& context, char c)
     {
       if ((literal.literal == "0x") || (literal.literal == "0b"))
       {
-        log(context, "wrong numeric literal");
+        log(context, "wrong numeric literal prefix");
         return false;
       }
       if ((literal.literal != "0") || ((c != 'x') && (c != 'b')))
@@ -153,6 +153,11 @@ bool rychkov::Lexer::append_literal(CParseContext& context, char c)
     literal.literal += c;
     return true;
   case entities::Literal::Number:
+    if (c == '.')
+    {
+      literal.literal += c;
+      return true;
+    }
     return (c == '\'') || (flush(context) && append(context, c));
   }
   log(context, "unexpected symbol");

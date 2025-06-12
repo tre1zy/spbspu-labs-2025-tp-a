@@ -47,11 +47,7 @@ std::ostream& rychkov::operator<<(std::ostream& out, const entities::Literal& li
 
 std::ostream& rychkov::ContentPrinter::indent()
 {
-  for (size_t i = 0; i < indent_; i++)
-  {
-    out << '\t';
-  }
-  return out;
+  return out << std::string(indent_, '\t');
 }
 void rychkov::ContentPrinter::print_empty()
 {
