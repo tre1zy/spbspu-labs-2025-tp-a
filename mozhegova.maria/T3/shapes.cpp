@@ -39,3 +39,13 @@ std::istream & mozhegova::operator>>(std::istream & in, Polygon & dest)
   dest.points = temp;
   return in;
 }
+
+bool mozhegova::Point::operator==(const Point & rhs) const
+{
+  return x == rhs.x && y == rhs.y;
+}
+
+bool mozhegova::Polygon::operator==(const Polygon & rhs) const
+{
+  return points == rhs.points;
+}

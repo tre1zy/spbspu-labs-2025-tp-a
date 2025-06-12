@@ -58,6 +58,11 @@ namespace
     return poly.points.size() == num;
   }
 
+  bool sortPoints(const mozhegova::Point & p1, const mozhegova::Point & p1)
+  {
+    return p1.x < p2.x && p1.y < p2.y;
+  }
+
   void getAreaEven(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
   {
     std::vector< mozhegova::Polygon > temp;
@@ -137,6 +142,33 @@ namespace
     size_t result = *std::min_element(areaPoly.begin(), areaPoly.end());
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
+
+  void getCountEven(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
+  {
+    size_t result = std::count_if(polygons.begin(), polygons.end(), isEvenPoly);
+    out << result << '\n';
+  }
+
+  void getCountOdd(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
+  {
+    size_t result = std::count_if(polygons.begin(), polygons.end(), isOddPoly);
+    out << result << '\n';
+  }
+
+  void getCountVertexes(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons, size_t n)
+  {
+    auto pred = std::bind(hasNumVert, std::placeholders::_1, n);
+    size_t result = std::count_if(polygons.begin(), polygons.end(), pred);
+    mozhegova::iofmtguard fmtguard(out);
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
+
+  bool isSamePoly(mozhegova::Polygon poly1, mozhegova::Polygon poly2)
+  {
+    std::sort(poly1.points.begin(), poly1.points.end(), sortPoints);
+    std::sort(poly2.points.begin(), poly2.points.end(), sortPoints);
+
+  }
 }
 
 void mozhegova::printArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -207,6 +239,68 @@ void mozhegova::printMin(std::istream & in, std::ostream & out, const std::vecto
     throw std::logic_error("not that command");
   }
 }
-void mozhegova::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
-void mozhegova::printEcho(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
-void mozhegova::printSame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
+
+void mozhegova::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("not polygons");
+  }
+  std::map< std::string, std::function< void() > > subcmds;
+  subcmds["EVEN"] = std::bind(getCountEven, std::ref(out), std::cref(polygons));
+  subcmds["ODD"] = std::bind(getCountOdd, std::ref(out), std::cref(polygons));
+  std::string subcommand;
+  in >> subcommand;
+  try
+  {
+    subcmds.at(subcommand)();
+  }
+  catch (...)
+  {
+    size_t count = std::stoull(subcommand);
+    if (count < 3)
+    {
+      throw std::logic_error("not that command");
+    }
+    getCountVertexes(out, polygons, count);
+  }
+}
+
+void mozhegova::printEcho(std::istream & in, std::ostream & out, std::vector< Polygon > & polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("not polygons");
+  }
+  Polygon poly;
+  if (!(in >> poly))
+  {
+    throw std::logic_error("incorrect input");
+  }
+  std::vector< Polygon > tempPolygons = polygons;
+  size_t count = 0;
+  auto it = std::find(tempPolygons.begin(), tempPolygons.end(), poly);
+  while (it != tempPolygons.end())
+  {
+    ++count;
+    tempPolygons.insert(it + 1, poly);
+    it = std::find(it + 2, tempPolygons.end(), poly);
+  }
+  polygons = std::move(tempPolygons);
+  out << count << '\n';
+}
+
+void mozhegova::printSame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("not polygons");
+  }
+  Polygon poly;
+  if (!(in >> poly))
+  {
+    throw std::logic_error("incorrect input");
+  }
+  auto cmp = std::bind(isSamePoly, std::placeholders::_1, poly);
+  out << std::count_if(polygons.begin(), polygons.end(), cmp) << '\n';
+}
