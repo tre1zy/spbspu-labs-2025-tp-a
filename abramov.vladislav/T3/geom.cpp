@@ -3,30 +3,10 @@
 #include <iterator>
 #include <algorithm>
 #include <functional>
+#include <delimiterIO.hpp>
 
 namespace
 {
-  struct DelimiterIO
-  {
-    char delim;
-  };
-
-  std::istream &operator>>(std::istream &in, DelimiterIO &&dest)
-  {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    char c = '0';
-    in >> c;
-    if (in && (c != dest.delim))
-    {
-      throw std::logic_error("wrong symbol\n");
-    }
-    return in;
-  }
-
   int pointsSum(const abramov::Point &p1, const abramov::Point &p2)
   {
     return p1.x * p2.y - p1.y * p2.x;
@@ -65,10 +45,6 @@ std::istream &abramov::operator>>(std::istream &in, Point &p)
   {
     p = tmp;
   }
-  else
-  {
-    throw std::logic_error("Fail to read\n");
-  }
   return in;
 }
 
@@ -83,13 +59,14 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
   in >> k;
   if (k < 3)
   {
-    throw std::logic_error("Wrong size\n");
+    in.setstate(std::ios::failbit);
+    return in;
   }
   std::vector< Point > pts(k);
   std::copy_n(std::istream_iterator< Point >(in), k, pts.begin());
   if (!in)
   {
-    throw std::logic_error("Fail to read\n");
+    return in;
   }
   polygon.points = pts;
   return in;

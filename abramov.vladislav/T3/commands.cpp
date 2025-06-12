@@ -136,6 +136,10 @@ void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::i
 
   Polygon example;
   in >> example;
+  if (!in)
+  {
+    throw std::logic_error("Fail to read\n");
+  }
   auto f = std::bind(isPolygonsEqualToExample, _1, _2, example);
   auto del = std::unique(polygons.begin(), polygons.end(), f);
   size_t diff = polygons.size();
@@ -148,7 +152,10 @@ void abramov::perms(const std::vector< Polygon > &polygons, std::ostream &out, s
 {
   Polygon example;
   in >> example;
-
+  if (!in)
+  {
+    throw std::logic_error("Fail to read\n");
+  }
   struct pointsComp
   {
     bool operator()(const Point &p1, const Point &p2) const

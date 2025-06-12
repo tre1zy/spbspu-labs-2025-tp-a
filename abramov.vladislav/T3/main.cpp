@@ -25,11 +25,8 @@ int main(int argc, char **argv)
   std::vector< Polygon > polygons;
   while (!input.eof())
   {
-    try
-    {
-      std::copy(std::istream_iterator< Polygon >(input), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
-    }
-    catch (std::logic_error &)
+    std::copy(std::istream_iterator< Polygon >(input), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+    if (!input)
     {
       input.clear();
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
