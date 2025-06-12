@@ -65,8 +65,8 @@ bool averenkov::operator<(const DataStruct& a, const DataStruct& b)
   {
     return a.key1 < b.key1;
   }
-  double a_val = a.key2.first / a.key2.second;
-  double b_val = b.key2.first / b.key2.second;
+  double a_val = static_cast< double >(a.key2.first) / a.key2.second;
+  double b_val = static_cast< double >(b.key2.first) / b.key2.second;
   if (std::abs(a_val - b_val) > 1e-9)
   {
     return a_val < b_val;
