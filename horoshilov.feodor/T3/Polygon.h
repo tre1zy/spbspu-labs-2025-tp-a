@@ -8,12 +8,12 @@
 
 namespace horoshilov
 {
-    struct Polygon
-    {
-        std::vector<Point> points;
-        bool operator==(const Polygon& other) const;
-    };
-    std::istream& operator>>(std::istream& in, Polygon& poly);
+  struct Polygon
+  {
+    std::vector<Point> points;
+    bool operator==(const Polygon& other) const;
+  };
+  std::istream& operator>>(std::istream& in, Polygon& poly);
 }
 
 #endif
