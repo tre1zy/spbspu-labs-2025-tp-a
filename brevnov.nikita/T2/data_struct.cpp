@@ -2,7 +2,6 @@
 #include <exception>
 #include <vector>
 #include <iomanip>
-#include <sstream>
 #include <cmath>
 
 brevnov::StreamGuard::StreamGuard(std::basic_ios< char > & s):
@@ -39,6 +38,11 @@ std::istream& brevnov::operator>>(std::istream& input, DelimiterIO&& dest)
 
 std::istream& brevnov::operator>>(std::istream& input, DelimitersIO&& dest)
 {
+  std::istream::sentry sentry(input);
+  if (!sentry)
+  {
+    return input;
+  }
   for (char c: dest.exp)
   {
     input >> DelimiterIO{ c };
@@ -115,6 +119,18 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
   input >> DelimitersIO{ str };
   int key;
   input >> key;
+  if (std::find(dest.keys.begin(), dest.keys.end(), key) != dest.keys.end())
+  {
+    input.setstate(std::ios::failbit);
+    return input;
+  }
+  auto it = std::find(dest.keys.begin(), dest.keys.end(), 0);
+  if (it == dest.keys.end())
+  {
+    input.setstate(std::ios::failbit);
+    return input;
+  }
+  *it = key;
   switch (key)
   {
   case 1:
@@ -158,23 +174,7 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
 
 std::ostream& brevnov::operator<<(std::ostream& output, const UnLongLongIO&& dest)
 {
-  unsigned long long num = dest.ref;
-  if (dest.ref == 0)
-  {
-    return output << "00";
-  }
-  std::vector< unsigned > octal;
-  while (num > 0)
-  {
-    octal.push_back(num % 8);
-    num /= 8;
-  }
-  output << "0";
-  for (auto it = octal.rbegin(); it != octal.rend(); ++it)
-  {
-    output << *it;
-  }
-  return output;
+  return output << '0' << std::oct << dest.ref;
 }
 
 std::ostream& brevnov::operator<<(std::ostream& output, const ComplexIO&& dest)
@@ -197,7 +197,7 @@ std::ostream& brevnov::operator<<(std::ostream& output, const DataStruct& dest)
     return output;
   }
   unsigned long long ull = dest.key1;
-  std::complex<double> complex = dest.key2;
+  std::complex< double > complex = dest.key2;
   std::string string = dest.key3;
   StreamGuard scope(output);
   output << "(:key1 " << UnLongLongIO{ ull };

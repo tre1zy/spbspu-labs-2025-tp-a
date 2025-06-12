@@ -5,15 +5,14 @@
 #include "data_struct.hpp"
 int main()
 {
-  std::vector< brevnov::DataStruct > data;
-  while(!std::cin.eof())
+  using DaS = brevnov::DataStruct;
+  using istreamIt = std::istream_iterator< DaS >;
+  using ostreamIt = ostream_iterator< DaS >;
+
+  std::vector< DaS > data;
+  while (!std::cin.eof())
   {
-    std::copy
-    (
-      std::istream_iterator< brevnov::DataStruct >(std::cin),
-      std::istream_iterator< brevnov::DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(istreamIt(std::cin), istreamIt(), std::back_inserter(data));
     if (!std::cin)
     {
       std::cin.clear();
@@ -25,7 +24,7 @@ int main()
   (
     std::begin(data),
     std::end(data),
-    std::ostream_iterator< brevnov::DataStruct >(std::cout, "\n")
+    std::ostreamIt(std::cout, "\n")
   );
   return 0;
 }
