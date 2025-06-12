@@ -5,6 +5,7 @@
 #include <numeric>
 #include <functional>
 #include <vector>
+#include <stdexcept>
 
 namespace rychkov
 {
@@ -62,7 +63,11 @@ bool rychkov::AreaProcessor::count(ParserContext& context)
 }
 bool rychkov::AreaProcessor::mean(ParserContext& context)
 {
-  if ((polygons_.size() == 0) || !eol(context.in))
+  if (polygons_.size() == 0)
+  {
+    throw std::logic_error("arithmetic mean from 0 elements");
+  }
+  if (!eol(context.in))
   {
     return false;
   }
@@ -109,7 +114,11 @@ bool rychkov::CountProcessor::count(ParserContext& context)
 
 bool rychkov::MaxProcessor::area(ParserContext& context)
 {
-  if ((polygons_.size() == 0) || !eol(context.in))
+  if (polygons_.size() == 0)
+  {
+    throw std::logic_error("max from 0 elements");
+  }
+  if (!eol(context.in))
   {
     return false;
   }
@@ -120,7 +129,11 @@ bool rychkov::MaxProcessor::area(ParserContext& context)
 }
 bool rychkov::MaxProcessor::count(ParserContext& context)
 {
-  if ((polygons_.size() == 0) || !eol(context.in))
+  if (polygons_.size() == 0)
+  {
+    throw std::logic_error("max from 0 elements");
+  }
+  if (!eol(context.in))
   {
     return false;
   }
@@ -131,7 +144,11 @@ bool rychkov::MaxProcessor::count(ParserContext& context)
 }
 bool rychkov::MinProcessor::area(ParserContext& context)
 {
-  if ((polygons_.size() == 0) || !eol(context.in))
+  if (polygons_.size() == 0)
+  {
+    throw std::logic_error("min from 0 elements");
+  }
+  if (!eol(context.in))
   {
     return false;
   }
@@ -142,7 +159,11 @@ bool rychkov::MinProcessor::area(ParserContext& context)
 }
 bool rychkov::MinProcessor::count(ParserContext& context)
 {
-  if ((polygons_.size() == 0) || !eol(context.in))
+  if (polygons_.size() == 0)
+  {
+    throw std::logic_error("min from 0 elements");
+  }
+  if (!eol(context.in))
   {
     return false;
   }
