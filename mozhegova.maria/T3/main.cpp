@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include "shapes.hpp"
+#include "commands.hpp"
 
 int main(int argc, char * argv[])
 {
@@ -35,7 +36,12 @@ int main(int argc, char * argv[])
   }
 
   std::map< std::string, std::function< void() > > cmds;
-  // cmds["show"] = std::bind(kas::show, std::cref(points), std::ref(std::cout));
+  cmds["AREA"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAX"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COUNT"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["ECHO"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["SAME"] = std::bind(mozhegova::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (!(std::cin >> command).eof())
