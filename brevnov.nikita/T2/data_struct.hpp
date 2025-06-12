@@ -1,6 +1,7 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
 #include <array>
+#include <algorithm>
 #include <complex>
 #include <iostream>
 #include <string>
