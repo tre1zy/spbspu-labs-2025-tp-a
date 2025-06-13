@@ -16,3 +16,15 @@ bool rychkov::NameCompare::operator()(const std::string& lhs, const base_type_va
 {
   return lhs < rhs.first.name;
 }
+bool rychkov::NameCompare::operator()(const variable_value& lhs, const variable_value& rhs) const
+{
+  return (lhs.first.name < rhs.first.name) || ((lhs.first.name == rhs.first.name) && (lhs.second > rhs.second));
+}
+bool rychkov::NameCompare::operator()(const variable_value& lhs, const std::string& rhs) const
+{
+  return lhs.first.name < rhs;
+}
+bool rychkov::NameCompare::operator()(const std::string& lhs, const variable_value& rhs) const
+{
+  return lhs < rhs.first.name;
+}

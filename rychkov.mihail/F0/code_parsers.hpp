@@ -32,6 +32,7 @@ namespace rychkov
     typing::Type type() const;
     entities::Variable variable() const;
     entities::Function function() const;
+    void clear();
 
     bool append(CParseContext& context, char c);
     bool append(CParseContext& context, std::string name);
@@ -135,15 +136,16 @@ namespace rychkov
 
     void print(std::ostream& out) const;
   private:
-    std::vector< entities::Expression > program_ = {{}};
+    std::vector< entities::Expression > program_;
     std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_; // data and declare-depth
     std::set< entities::Alias > aliases_;
-    std::set< std::pair< entities::Variable, size_t > > variables_;
+    std::set< std::pair< entities::Variable, size_t >, NameCompare > variables_;
     std::set< entities::Variable > defined_functions_;
     std::set< std::pair< entities::Struct, size_t >, NameCompare > structs_;
     std::set< std::pair< entities::Union, size_t > > unions_;
     std::set< std::pair< entities::Enum, size_t > > enums_;
     std::stack< entities::Expression* > stack_;
+    TypeParser type_parser_;
 
     bool global_scope() const noexcept;
 

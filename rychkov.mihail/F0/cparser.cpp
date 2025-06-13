@@ -24,7 +24,11 @@ void rychkov::log(CParseContext& context, std::string message)
 }
 
 rychkov::CParser::CParser():
-  program_{{}}
+  program_{{}},
+  base_types_{
+        {{"int", typing::Type::Int}, 0},
+        {{"char", typing::Type::Int}, 0}
+      }
 {
   stack_.push(&program_[0]);
 }
@@ -44,6 +48,22 @@ bool rychkov::CParser::global_scope() const noexcept
 
 bool rychkov::CParser::append(CParseContext& context, entities::Literal literal)
 {
+  if (!type_parser_.empty())
+  {
+    if (literal.type != entities::Literal::Number)
+    {
+      log(context, "non-numeric literal cannot be a part of a type");
+      return false;
+    }
+    try
+    {
+      return type_parser_.append(context, std::stoull(literal.literal, nullptr, 0));
+    }
+    catch (...)
+    {
+      return false;
+    }
+  }
   if (global_scope() || stack_.top()->full())
   {
     log(context, "unexpected literal");
@@ -54,11 +74,22 @@ bool rychkov::CParser::append(CParseContext& context, entities::Literal literal)
 }
 bool rychkov::CParser::append(CParseContext& context, std::string name)
 {
-  if (name == "const")
+  decltype(base_types_)::const_iterator base_type_p = base_types_.find(name);
+  if (base_type_p != base_types_.cend())
   {
-    // type
+    return type_parser_.append(context, base_type_p->first);
   }
-  else if (name == "struct")
+  if (!type_parser_.empty())
+  {
+    return type_parser_.append(context, name);
+  }
+  static const std::set< std::string > type_keywords = {"const", "volatile", "signed", "unsigned"};
+  if (type_keywords.find(name) != type_keywords.end())
+  {
+    return type_parser_.append(context, name);
+  }
+
+  if (name == "struct")
   {
     if (global_scope() || stack_.top()->empty())
     {
@@ -67,8 +98,7 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
     }
     log(context, "struct can't be declared in this context");
   }
-  // if ()
-  // name
+
   if (stack_.top()->empty())
   {
     log(context, "unexpected name (" + name + ")");
@@ -93,6 +123,33 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
 }
 bool rychkov::CParser::append(CParseContext& context, char c)
 {
+  if (!type_parser_.empty())
+  {
+    if (!type_parser_.ready() || (c == '*') || (c == '(') || (c == '['))
+    {
+      return type_parser_.append(context, c);
+    }
+    // if typedef
+    if (type_parser_.is_function())
+    {
+      if (!global_scope())
+      {
+        log(context, "functions can be declared only in global scope");
+        return false;
+      }
+      *stack_.top() = entities::Declaration{type_parser_.function()};
+      type_parser_.clear();
+      return append(context, c);
+    }
+    if (!stack_.top()->empty())
+    {
+      log(context, "variable declaration cannot be placed here");
+      return false;
+    }
+    *stack_.top() = entities::Declaration{type_parser_.variable()};
+    type_parser_.clear();
+    return append(context, c);
+  }
   using append_signature = bool(CParser::*)(CParseContext&);
   using append_map = std::map< char, append_signature >;
   static const append_map dispatch_map = {
@@ -138,10 +195,28 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
         log(context, "struct must have name");
         return false;
       }
-      // add struct to dict
       stack_.pop();
       structs_.insert(std::make_pair(data, stack_.size()));
       base_types_.insert(std::make_pair(typing::Type{data.name, typing::Type::Struct}, stack_.size()));
+      return append_empty(context);
+    }
+    if (std::holds_alternative< entities::Variable >(decl.data))
+    {
+      entities::Variable& data = std::get< entities::Variable >(decl.data);
+      if (data.name.empty())
+      {
+        log(context, "variable must have name");
+        return false;
+      }
+      stack_.pop();
+      variables_.insert(std::make_pair(data, stack_.size()));
+      return append_empty(context);
+    }
+    if (std::holds_alternative< entities::Function >(decl.data))
+    {
+      entities::Function& data = std::get< entities::Function >(decl.data);
+      stack_.pop();
+      variables_.insert(std::make_pair(entities::Variable{data.type, data.name}, stack_.size()));
       return append_empty(context);
     }
   }

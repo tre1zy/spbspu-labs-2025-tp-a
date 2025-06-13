@@ -24,7 +24,16 @@ bool rychkov::CParser::parse_open_brace(CParseContext& context)
       stack_.push(&body.data[0]);
       return true;
     }
-    return true;
+    if (std::holds_alternative< entities::Function >(decl.data))
+    {
+      decl.value = entities::Body{};
+      stack_.push(&*decl.value);
+      entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
+      stack_.push(&body.data[0]);
+      return true;
+    }
+    log(context, "braced enclosed body cannot follow this declaration");
+    return false;
   }
   /*else if (entities::is_body(*stack_.top()))
   {

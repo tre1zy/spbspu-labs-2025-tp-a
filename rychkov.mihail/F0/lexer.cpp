@@ -107,8 +107,7 @@ bool rychkov::Lexer::append_name(CParseContext& context, char c)
     str += c;
     return true;
   }
-  flush(context);
-  return true;
+  return flush(context) && append(context, c);
 }
 bool rychkov::Lexer::append_literal(CParseContext& context, char c)
 {
@@ -132,7 +131,7 @@ bool rychkov::Lexer::append_literal(CParseContext& context, char c)
   }
   if (literal_full_)
   {
-    return flush(context);
+    return flush(context) && append(context, c);
   }
   switch (literal.type)
   {

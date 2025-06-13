@@ -36,6 +36,13 @@ rychkov::entities::Function rychkov::TypeParser::function() const
 {
   return {combined_, var_name_, parameters_};
 }
+void rychkov::TypeParser::clear()
+{
+  combined_ = {};
+  stack_ = {};
+  var_name_.clear();
+  parameters_.clear();
+}
 
 bool rychkov::TypeParser::append(CParseContext& context, size_t numeric_literal)
 {
