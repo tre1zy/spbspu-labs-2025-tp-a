@@ -36,6 +36,9 @@ int main(int argc, char* argv[])
   }
   std::map< std::string, std::function< void() > > commands;
   commands["AREA"] = std::bind(finaev::area, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
+  commands["COUNT"] = std::bind(finaev::count, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
+  commands["MAX"] = std::bind(finaev::max, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
+  commands["MIN"] = std::bind(finaev::min, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
   std::string cmd;
   while (std::cin >> cmd)
   {

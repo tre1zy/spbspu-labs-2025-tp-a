@@ -38,6 +38,10 @@ namespace
   {
     return !s.empty() && std::all_of(s.begin(), s.end(), isdigit);
   }
+  size_t getCountVertex(const finaev::Polygon& poly)
+  {
+    return poly.points.size();
+  }
 }
 
 void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
@@ -123,6 +127,62 @@ void finaev::area(std::istream& in, std::ostream& out, const std::vector< Polygo
       res += areaOnePoly(temp[i]);
     }
     out << res;
+  }
+  else
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+}
+
+void finaev::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
+{
+  if (shapes.empty())
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+  std::string substr;
+  in >> substr;
+  if (substr == "AREA")
+  {
+    std::vector< double > areas;
+    std::transform(shapes.begin(), shapes.end(), std::back_inserter(areas), areaOnePoly);
+    StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1);
+    out << *(std::max_element(areas.begin(), areas.end()));
+  }
+  else if (substr == "VERTEXES")
+  {
+    std::vector< size_t > countVertex;
+    std::transform(shapes.begin(), shapes.end(), std::back_inserter(countVertex), getCountVertex);
+    out << *(std::max_element(countVertex.begin(), countVertex.end()));
+  }
+  else
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+}
+
+void finaev::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
+{
+  if (shapes.empty())
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+  std::string substr;
+  in >> substr;
+  if (substr == "AREA")
+  {
+    std::vector< double > areas;
+    std::transform(shapes.begin(), shapes.end(), std::back_inserter(areas), areaOnePoly);
+    StreamGuard guard(out);
+    out << std::fixed << std::setprecision(1);
+    out << *(std::min_element(areas.begin(), areas.end()));
+  }
+  else if (substr == "VERTEXES")
+  {
+    std::vector< size_t > countVertex;
+    std::transform(shapes.begin(), shapes.end(), std::back_inserter(countVertex), getCountVertex);
+    out << *(std::min_element(countVertex.begin(), countVertex.end()));
   }
   else
   {
