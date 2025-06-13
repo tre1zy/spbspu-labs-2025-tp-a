@@ -19,7 +19,7 @@ double pilugina::updateMaxVertices(std::size_t currentMax, const Polygon &poly)
 void pilugina::printMaxArea(const std::vector< Polygon > &polys, std::ostream &out)
 {
   FormatGuard g(out);
-  out << std::setprecision(1) << std::accumulate(polys.begin(), polys.end(), 0.0, updateMaxArea);
+  out << std::fixed << std::setprecision(1) << std::accumulate(polys.begin(), polys.end(), 0.0, updateMaxArea);
 }
 
 void pilugina::printMaxVertices(const std::vector< Polygon > &polys, std::ostream &out)

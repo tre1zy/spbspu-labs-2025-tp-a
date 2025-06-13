@@ -54,7 +54,7 @@ bool pilugina::operator==(const Point &lhs, const Point &rhs)
 
 bool pilugina::operator<(const Point &lhs, const Point &rhs)
 {
-  return (lhs.x < rhs.x) && (lhs.y < rhs.y);
+  return (lhs.x < rhs.x) || (lhs.x == rhs.x && lhs.y < rhs.y);
 }
 
 bool pilugina::operator==(const Polygon &lhs, const Polygon &rhs)
