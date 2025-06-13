@@ -3,7 +3,7 @@
 #include <streamGuard.hpp>
 #include <algorithm>
 #include <functional>
-#include <iterator>commands["MIN"] = std::bind(finaev::min, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
+#include <iterator>
 
 namespace
 {
