@@ -20,14 +20,20 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
     counter = count_if(std::begin(polygons), std::end(polygons), isEven);
     currentPolygons.reserve(counter);
     polygonAreas.reserve(counter);
-    std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), isEven);
+    std::copy_if(std::begin(polygons),
+      std::end(polygons),
+      std::back_inserter(currentPolygons),
+      isEven);
   }
   else if (subcmd == "ODD")
   {
     counter = count_if(std::begin(polygons), std::end(polygons), isOdd);
     currentPolygons.reserve(counter);
     polygonAreas.reserve(counter);
-    std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), isOdd);
+    std::copy_if(std::begin(polygons),
+      std::end(polygons),
+      std::back_inserter(currentPolygons),
+      isOdd);
   }
   else if (subcmd == "MEAN")
   {
@@ -37,7 +43,9 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
       return;
     }
     std::transform(std::begin(polygons), std::end(polygons), std::back_inserter(polygonAreas), getArea);
-    out << std::fixed << std::setprecision(1) << (std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) / polygons.size()) << "\n";
+    out << std::fixed
+      << std::setprecision(1)
+      << (std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) / polygons.size()) << "\n";
     return;
   }
   else
@@ -54,11 +62,16 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
       counter = count_if(std::begin(polygons), std::end(polygons), std::bind(areEqualVertexes, vertexCount, _1));
       currentPolygons.reserve(counter);
       polygonAreas.reserve(counter);
-      std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), std::bind(areEqualVertexes, vertexCount, _1));
+      std::copy_if(std::begin(polygons),
+        std::end(polygons),
+        std::back_inserter(currentPolygons),
+        std::bind(areEqualVertexes, vertexCount, _1));
     }
   }
   std::transform(std::begin(currentPolygons), std::end(currentPolygons), std::back_inserter(polygonAreas), getArea);
-  out << std::fixed << std::setprecision(1) << std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) << "\n";
+  out << std::fixed
+    << std::setprecision(1)
+    << std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) << "\n";
 }
 
 void shak::cmdMax(const std::vector< Polygon > &polygon, std::istream &in, std::ostream &out)
