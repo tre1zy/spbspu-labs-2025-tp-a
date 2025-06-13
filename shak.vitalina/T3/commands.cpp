@@ -39,7 +39,7 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
   {
     if (polygons.size() == 0)
     {
-      out << "<INVALID COMMAND>";
+      out << "<INVALID COMMAND>\n";
       return;
     }
     std::transform(std::begin(polygons), std::end(polygons), std::back_inserter(polygonAreas), getArea);
@@ -53,7 +53,7 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
     vertexCount = std::stoull(subcmd);
     if (vertexCount < 3)
     {
-      out << "<INVALID COMMAND>";
+      out << "<INVALID COMMAND>\n";
       return;
     }
     else
@@ -78,7 +78,7 @@ void shak::cmdMax(const std::vector< Polygon > &polygon, std::istream &in, std::
 {
   if (polygon.size() == 0)
   {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
   }
   else
@@ -101,7 +101,7 @@ void shak::cmdMax(const std::vector< Polygon > &polygon, std::istream &in, std::
     }
     else
     {
-      out << "<INVALID COMMAND>";
+      out << "<INVALID COMMAND>\n";
       return;
     }
   }
@@ -111,7 +111,7 @@ void shak::cmdMin(const std::vector< Polygon > &polygon, std::istream &in, std::
 {
   if (polygon.size() == 0)
   {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
   }
   else
@@ -135,7 +135,7 @@ void shak::cmdMin(const std::vector< Polygon > &polygon, std::istream &in, std::
 }
     else
     {
-      out << "<INVALID COMMAND>";
+      out << "<INVALID COMMAND>\n";
       return;
     }
   }
@@ -159,7 +159,7 @@ void shak::cmdCount(const std::vector< Polygon > &polygon, std::istream &in, std
     vertexCount = std::stoull(subcmd);
     if (vertexCount < 3)
     {
-      out << "<INVALID COMMAND>";
+      out << "<INVALID COMMAND>\n";
       return;
     }
     else
@@ -180,14 +180,14 @@ void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, st
   in >> vertexCount;
   if (vertexCount < 3)
   {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
   }
   srcPoints.reserve(vertexCount);
   std::copy_n(inIter{in}, vertexCount, std::back_inserter(srcPoints));
   if (srcPoints.empty() || in.peek() != '\n')
   {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
   }
   matchCount.reserve(polygon.size());
