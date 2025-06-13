@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::vector<Polygon> data;
+
   using PolyIStream = std::istream_iterator<Polygon>;
-  
   while (!file.eof())
   {
     if (file.fail())
