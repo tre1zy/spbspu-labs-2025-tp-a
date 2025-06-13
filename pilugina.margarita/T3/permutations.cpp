@@ -6,5 +6,5 @@ pilugina::PermutationPredicate::PermutationPredicate(const Polygon &ref):
 
 bool pilugina::PermutationPredicate::operator()(const Polygon &other) const
 {
-  return std::is_permutation(other.points.begin(), other.points.end(), poly.points.begin());
+  return (poly.points.size() == other.points.size()) && (std::is_permutation(other.points.begin(), other.points.end(), poly.points.begin()));
 }
