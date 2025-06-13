@@ -26,5 +26,4 @@ namespace belyaev
   void inframe(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
 }
 
-
 #endif

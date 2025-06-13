@@ -46,7 +46,6 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
   {
     throw std::logic_error("Failed.");
   }
-  
 
   std::map<std::string, std::function<double(double, const Polygon&)>> subCmds;
   subCmds["ODD"] = std::bind(areaOdd, _1, _2);
