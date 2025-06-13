@@ -5,23 +5,20 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <istream>
 #include <iterator>
-#include <ostream>
 #include <string>
 #include <vector>
 
+#include "functors.hpp"
 #include "scopeGuard.hpp"
 
 namespace kostyukov
 {
-  bool IsInvalidChar::operator()(char c) const
+  void printHelp(std::ostream& out)
   {
-    return !std::isalnum(c) && c != '_';
-  }
-  bool IsPunct::operator()(char c) const
-  {
-    return std::ispunct(c);
+    out << "create\ntop\nbottom\ndelete\nload\ngetfreq\nremovebatch\nfinduniq\nfindsame\n";
+    out << "clear\nlistdicts\nrangefreq\noutrangefreq\nmerge\nintersect";
+    return;
   }
 
   bool isValidName(const std::string& name)
@@ -31,97 +28,6 @@ namespace kostyukov
       return false;
     }
     return std::find_if(name.begin(), name.end(), IsInvalidChar{}) == name.end();
-  }
-
-  WordProcessor::WordProcessor(FrequencyDictionary& dict):
-    dict_(dict)
-  {}
-
-  void WordProcessor::operator()(std::string word)
-  {
-    std::transform(word.begin(), word.end(), word.begin(), ::tolower);
-    word.erase(std::remove_if(word.begin(), word.end(), IsPunct{}), word.end());
-    if (!word.empty())
-    {
-      dict_.counts[word]++;
-      dict_.totalWords++;
-    }
-  }
-
-  MapToPairTransformer::MapToPairTransformer(size_t totalWords):
-    totalWords_(totalWords)
-  {}
-
-  WordFreqPair MapToPairTransformer::operator()(const std::pair< const std::string, size_t >& mapPair) const
-  {
-    double freq = (totalWords_ == 0) ? 0.0 : (static_cast< double >(mapPair.second) / totalWords_) * 100.0;
-    return WordFreqPair{ mapPair.first, freq };
-  }
-
-  FreqComparator::FreqComparator(bool ascending):
-    ascending_(ascending)
-  {}
-
-  bool FreqComparator::operator()(const WordFreqPair& first, const WordFreqPair& second) const
-  {
-    return (ascending_) ? first.freq < second.freq : first.freq > second.freq;
-  }
-
-  PairPrinter::PairPrinter(std::ostream& out):
-    out_(out)
-  {}
-
-  void PairPrinter::operator()(const WordFreqPair& pair) const
-  {
-    ScopeGuard scopeGrd(out_);
-    out_ << pair.word << " - " << std::fixed << std::setprecision(1) << pair.freq << "%\n";
-  }
-
-  void getTopOrBottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool isBottom)
-  {
-    std::string dictName;
-    size_t n = 0;
-    in >> dictName >> n;
-    if (!in || dictName.empty() || n == 0)
-    {
-      out << "<MISSING ARGUMENT>";
-      return;
-    }
-    if (!isValidName(dictName))
-    {
-      out << "<INVALID DICTIONARY NAME>";
-      return;
-    }
-    auto dictIter = dicts.find(dictName);
-    if (dictIter == dicts.end())
-    {
-      out << "<DICTIONARY NOT FOUND>";
-      return;
-    }
-    const FrequencyDictionary& dict = dictIter->second;
-    if (dict.counts.empty())
-    {
-      out << "<EMPTY DICTIONARY>";
-      return;
-    }
-    std::vector< WordFreqPair > tempVec;
-    tempVec.reserve(dict.counts.size());
-    auto begin = dict.counts.begin();
-    auto end = dict.counts.end();
-    std::transform(begin, end, std::back_inserter(tempVec), MapToPairTransformer(dict.totalWords));
-    size_t limit = std::min(n, tempVec.size());
-    std::partial_sort(tempVec.begin(), tempVec.begin() + limit, tempVec.end(), FreqComparator(isBottom));
-    std::for_each(tempVec.begin(), tempVec.begin() + limit, PairPrinter(out));
-  }
-
-  void top(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
-  {
-    getTopOrBottom(in, out, dicts, false);
-  }
-
-  void bottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
-  {
-    getTopOrBottom(in, out, dicts, true);
   }
 
   void createDict(std::istream& in, std::ostream& out, FreqDictManager& dicts)
@@ -212,6 +118,63 @@ namespace kostyukov
     out << std::fixed << std::setprecision(1) << freq << "%";
   }
 
+  void getTopOrBottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool isBottom)
+  {
+    std::string dictName;
+    size_t n = 0;
+    in >> dictName >> n;
+    if (!in || dictName.empty() || n == 0)
+    {
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(dictName))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    auto dictIter = dicts.find(dictName);
+    if (dictIter == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    const FrequencyDictionary& dict = dictIter->second;
+    if (dict.counts.empty())
+    {
+      out << "<EMPTY DICTIONARY>";
+      return;
+    }
+    std::vector< WordFreqPair > tempVec;
+    tempVec.reserve(dict.counts.size());
+    auto begin = dict.counts.begin();
+    auto end = dict.counts.end();
+    std::transform(begin, end, std::back_inserter(tempVec), MapToPairTransformer(dict.totalWords));
+    size_t limit = std::min(n, tempVec.size());
+    std::partial_sort(tempVec.begin(), tempVec.begin() + limit, tempVec.end(), FreqComparator(isBottom));
+    std::for_each(tempVec.begin(), tempVec.begin() + limit, PairPrinter(out));
+  }
+
+  void top(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
+  {
+    getTopOrBottom(in, out, dicts, false);
+  }
+
+  void bottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
+  {
+    getTopOrBottom(in, out, dicts, true);
+  }
+
+  void listDicts(std::ostream& out, const FreqDictManager& dicts)
+  {
+    if (dicts.empty())
+    {
+      out << "<NO DICTIONARIES>";
+      return;
+    }
+    std::for_each(dicts.begin(), dicts.end(), DictNamePrinter{ out });
+  }
+
   void deleteDict(std::istream& in, std::ostream& out, FreqDictManager& dicts)
   {
     std::string dictName;
@@ -236,39 +199,95 @@ namespace kostyukov
     out << "successfully deleted " << dictName;
   }
 
-  RemoveBatchPredicate::RemoveBatchPredicate(size_t total, bool less, double n):
-    totalWords_(total),
-    isLess_(less),
-    threshold_(n)
-  {}
-
-  bool RemoveBatchPredicate::operator()(const std::pair< const std::string, size_t >& pair) const
+  void merge(std::istream& in, std::ostream& out, FreqDictManager& dicts)
   {
-    if (totalWords_ == 0)
+    std::string newDictName;
+    std::string dict1Name;
+    std::string dict2Name;
+    in >> newDictName >> dict1Name >> dict2Name;
+    if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty())
     {
-      return false;
+      out << "<MISSING ARGUMENTS>";
+      return;
     }
-    double freq = (static_cast< double >(pair.second) / totalWords_) * 100.0;
-    return isLess_ ? (freq < threshold_) : (freq > threshold_);
+    if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    if (dicts.count(newDictName))
+    {
+      out << "<DICTIONARY EXIST>";
+      return;
+    }
+    auto iter1 = dicts.find(dict1Name);
+    auto iter2 = dicts.find(dict2Name);
+    if (iter1 == dicts.end() || iter2 == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    dicts.emplace(newDictName, iter1->second);
+    FrequencyDictionary& newDict = dicts.at(newDictName);
+    const FrequencyDictionary& dict2 = iter2->second;
+    std::for_each(dict2.counts.begin(), dict2.counts.end(), MergeFunctor(newDict));
+    out << "Dictionaries merged into " << newDictName;
   }
 
-  DictDeleter::DictDeleter(FrequencyDictionary& dict):
-    dict_(dict)
-  {}
-
-  void DictDeleter::operator()(const std::pair< const std::string, size_t >& pairToRemove) const
+  void intersect(std::istream& in, std::ostream& out, FreqDictManager& dicts)
   {
-    dict_.totalWords -= pairToRemove.second;
-    dict_.counts.erase(pairToRemove.first);
+    std::string newDictName;
+    std::string dict1Name;
+    std::string dict2Name;
+    std::string param;
+    in >> newDictName >> dict1Name >> dict2Name >> param;
+    if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty() || param.empty())
+    {
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    if (param != "min" && param != "max")
+    {
+      out << "<INVALID ARGUMENT>";
+      return;
+    }
+    if (dicts.count(newDictName))
+    {
+      out << "<DICTIONARY EXISTS>";
+      return;
+    }
+    auto iter1 = dicts.find(dict1Name);
+    auto iter2 = dicts.find(dict2Name);
+    if (iter1 == dicts.end() || iter2 == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    dicts.emplace(newDictName, FrequencyDictionary{});
+    FrequencyDictionary& newDict = dicts.at(newDictName);
+    const FrequencyDictionary& dict1 = iter1->second;
+    const FrequencyDictionary& dict2 = iter2->second;
+    if (dict1.counts.size() < dict2.counts.size())
+    {
+      std::for_each(dict1.counts.begin(), dict1.counts.end(), IntersectFunctor(newDict, dict2, param == "max"));
+    }
+    else
+    {
+      std::for_each(dict2.counts.begin(), dict2.counts.end(), IntersectFunctor(newDict, dict1, param == "max"));
+    }
+    out << "Dictionaries intersected into " << newDictName;
   }
 
-  void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts)
+  void clear(std::istream& in, std::ostream& out, FreqDictManager& dicts)
   {
     std::string dictName;
-    std::string param;
-    double n = 0;
-    in >> dictName >> param >> n;
-    if (!in || dictName.empty() || param.empty() || n == 0)
+    in >> dictName;
+    if (!in || dictName.empty())
     {
       out << "<MISSING ARGUMENT>";
       return;
@@ -284,40 +303,9 @@ namespace kostyukov
       out << "<DICTIONARY NOT FOUND>";
       return;
     }
-    if (n < 0 || (param != "freq_less" && param != "freq_more"))
-    {
-      out << "<INVALID ARGUMENT>";
-      return;
-    }
-    FrequencyDictionary& dict = dictIter->second;
-    if (dict.counts.empty())
-    {
-      out << "<EMPTY DICTIONARY>";
-      return;
-    }
-    std::vector< std::pair< const std::string, size_t > > pairsToRemove;
-    auto begin = dict.counts.begin();
-    auto end = dict.counts.end();
-    auto pred = RemoveBatchPredicate(dict.totalWords, param == "freq_less", n);
-    std::copy_if(begin, end, std::back_inserter(pairsToRemove),pred);
-    if (pairsToRemove.empty())
-    {
-      out << "no words to remove";
-      return;
-    }
-    std::for_each(pairsToRemove.begin(), pairsToRemove.end(), DictDeleter(dict));
-    out << "Removed " << pairsToRemove.size() << "words.";
-  }
-
-  std::string KeyExtractor::operator()(const std::pair< const std::string, size_t >& mapPair) const
-  {
-    return mapPair.first;
-  }
-
-  void SameWordPrinter::operator()(const std::string& key) const
-  {
-    ScopeGuard scopeGrd(out);
-    out << key << " (in " << name1 << ": " << dict1.counts.at(key) << ", in " << name2 << ": " << dict2.counts.at(key) << ")\n";
+    dictIter->second.counts.clear();
+    dictIter->second.totalWords = 0;
+    out << "Dictionary " << dictName << " has been cleared.";
   }
 
   void findUniq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
@@ -384,22 +372,53 @@ namespace kostyukov
     std::for_each(commonKeys.begin(), commonKeys.end(), printer);
   }
 
-  RangeFreqPredicate::RangeFreqPredicate(double minVal, double maxVal):
-    minVal_(minVal),
-    maxVal_(maxVal)
-  {}
-  bool RangeFreqPredicate::operator()(const WordFreqPair& pair) const
+  void removeBatch(std::istream& in, std::ostream& out, FreqDictManager& dicts)
   {
-    return pair.freq >= minVal_ && pair.freq <= maxVal_;
+    std::string dictName;
+    std::string param;
+    double n = 0;
+    in >> dictName >> param >> n;
+    if (!in || dictName.empty() || param.empty() || n == 0)
+    {
+      out << "<MISSING ARGUMENT>";
+      return;
+    }
+    if (!isValidName(dictName))
+    {
+      out << "<INVALID DICTIONARY NAME>";
+      return;
+    }
+    auto dictIter = dicts.find(dictName);
+    if (dictIter == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>";
+      return;
+    }
+    if (n < 0 || (param != "freq_less" && param != "freq_more"))
+    {
+      out << "<INVALID ARGUMENT>";
+      return;
+    }
+    FrequencyDictionary& dict = dictIter->second;
+    if (dict.counts.empty())
+    {
+      out << "<EMPTY DICTIONARY>";
+      return;
+    }
+    std::vector< std::pair< const std::string, size_t > > pairsToRemove;
+    auto begin = dict.counts.begin();
+    auto end = dict.counts.end();
+    auto pred = RemoveBatchPredicate(dict.totalWords, param == "freq_less", n);
+    std::copy_if(begin, end, std::back_inserter(pairsToRemove),pred);
+    if (pairsToRemove.empty())
+    {
+      out << "no words to remove";
+      return;
+    }
+    std::for_each(pairsToRemove.begin(), pairsToRemove.end(), DictDeleter(dict));
+    out << "Removed " << pairsToRemove.size() << "words.";
   }
-  OutOfRangeFreqPredicate::OutOfRangeFreqPredicate(double minVal, double maxVal):
-    minVal_(minVal),
-    maxVal_(maxVal)
-  {}
-  bool OutOfRangeFreqPredicate::operator()(const WordFreqPair& pair) const
-  {
-    return pair.freq < minVal_ || pair.freq > maxVal_;
-  }
+
   void getRange(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool inRange)
   {
     std::string dictName;
@@ -462,167 +481,14 @@ namespace kostyukov
     std::sort(filteredPairs.begin(), filteredPairs.end(), FreqComparator(false));
     std::for_each(filteredPairs.begin(), filteredPairs.end(), PairPrinter(out));
   }
+
   void rangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     getRange(in, out, dicts, true);
   }
+
   void outRangeFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
   {
     getRange(in, out, dicts, false);
-  }
-
-  void clear(std::istream& in, std::ostream& out, FreqDictManager& dicts)
-  {
-    std::string dictName;
-    in >> dictName;
-    if (!in || dictName.empty())
-    {
-      out << "<MISSING ARGUMENT>";
-      return;
-    }
-    if (!isValidName(dictName))
-    {
-      out << "<INVALID DICTIONARY NAME>";
-      return;
-    }
-    auto dictIter = dicts.find(dictName);
-    if (dictIter == dicts.end())
-    {
-      out << "<DICTIONARY NOT FOUND>";
-      return;
-    }
-    dictIter->second.counts.clear();
-    dictIter->second.totalWords = 0;
-    out << "Dictionary " << dictName << " has been cleared.";
-  }
-
-  void DictNamePrinter::operator()(const std::pair< const std::string, FrequencyDictionary >& dictPair) const
-  {
-    out << dictPair.first << '\n';
-  }
-  void listDicts(std::ostream& out, const FreqDictManager& dicts)
-  {
-    if (dicts.empty())
-    {
-      out << "<NO DICTIONARIES>";
-      return;
-    }
-    std::for_each(dicts.begin(), dicts.end(), DictNamePrinter{ out });
-  }
-
-  MergeFunctor::MergeFunctor(FrequencyDictionary& targetDict):
-    targetDict_(targetDict)
-  {}
-  void MergeFunctor::operator()(const std::pair< const std::string, size_t >& pair)
-  {
-    targetDict_.counts[pair.first] += pair.second;
-    targetDict_.totalWords += pair.second;
-  }
-  void merge(std::istream& in, std::ostream& out, FreqDictManager& dicts)
-  {
-    std::string newDictName;
-    std::string dict1Name;
-    std::string dict2Name;
-    in >> newDictName >> dict1Name >> dict2Name;
-    if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty())
-    {
-      out << "<MISSING ARGUMENTS>";
-      return;
-    }
-    if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
-    {
-      out << "<INVALID DICTIONARY NAME>";
-      return;
-    }
-    if (dicts.count(newDictName))
-    {
-      out << "<DICTIONARY EXIST>";
-      return;
-    }
-    auto iter1 = dicts.find(dict1Name);
-    auto iter2 = dicts.find(dict2Name);
-    if (iter1 == dicts.end() || iter2 == dicts.end())
-    {
-      out << "<DICTIONARY NOT FOUND>";
-      return;
-    }
-    dicts.emplace(newDictName, iter1->second);
-    FrequencyDictionary& newDict = dicts.at(newDictName);
-    const FrequencyDictionary& dict2 = iter2->second;
-    std::for_each(dict2.counts.begin(), dict2.counts.end(), MergeFunctor(newDict));
-    out << "Dictionaries merged into " << newDictName;
-  }
-
-  IntersectFunctor::IntersectFunctor(FrequencyDictionary& targetDict, const FrequencyDictionary& otherDict, bool useMax):
-    targetDict_(targetDict),
-    otherDict_(otherDict),
-    useMax_(useMax)
-  {}
-  void IntersectFunctor::operator()(const std::pair< const std::string, size_t >& pair)
-  {
-    auto otherIt = otherDict_.counts.find(pair.first);
-    if (otherIt != otherDict_.counts.end())
-    {
-      size_t freq1 = pair.second;
-      size_t freq2 = otherIt->second;
-      size_t newFreq = useMax_ ? std::max(freq1, freq2) : std::min(freq1, freq2);
-      targetDict_.counts[pair.first] = newFreq;
-      targetDict_.totalWords += newFreq;
-    }
-  }
-  void intersect(std::istream& in, std::ostream& out, FreqDictManager& dicts)
-  {
-    std::string newDictName;
-    std::string dict1Name;
-    std::string dict2Name;
-    std::string param;
-    in >> newDictName >> dict1Name >> dict2Name >> param;
-    if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty() || param.empty())
-    {
-      out << "<MISSING ARGUMENT>";
-      return;
-    }
-    if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
-    {
-      out << "<INVALID DICTIONARY NAME>";
-      return;
-    }
-    if (param != "min" && param != "max")
-    {
-      out << "<INVALID ARGUMENT>";
-      return;
-    }
-    if (dicts.count(newDictName))
-    {
-      out << "<DICTIONARY EXISTS>";
-      return;
-    }
-    auto iter1 = dicts.find(dict1Name);
-    auto iter2 = dicts.find(dict2Name);
-    if (iter1 == dicts.end() || iter2 == dicts.end())
-    {
-      out << "<DICTIONARY NOT FOUND>";
-      return;
-    }
-    dicts.emplace(newDictName, FrequencyDictionary{});
-    FrequencyDictionary& newDict = dicts.at(newDictName);
-    const FrequencyDictionary& dict1 = iter1->second;
-    const FrequencyDictionary& dict2 = iter2->second;
-    if (dict1.counts.size() < dict2.counts.size())
-    {
-      std::for_each(dict1.counts.begin(), dict1.counts.end(), IntersectFunctor(newDict, dict2, param == "max"));
-    }
-    else
-    {
-      std::for_each(dict2.counts.begin(), dict2.counts.end(), IntersectFunctor(newDict, dict1, param == "max"));
-    }
-    out << "Dictionaries intersected into " << newDictName;
-  }
-
-  void printHelp(std::ostream& out)
-  {
-    out << "create\ntop\nbottom\ndelete\nload\ngetfreq\nremovebatch\nfinduniq\nfindsame\n";
-    out << "clear\nlistdicts\nrangefreq\noutrangefreq\nmerge\nintersect";
-    return;
   }
 }
