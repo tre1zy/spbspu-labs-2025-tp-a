@@ -13,39 +13,35 @@ using namespace std::placeholders;
 
 void shapkov::areaEven(std::ostream& out, const VecOfPolygons& src)
 {
-  double area = 0.0;
   VecOfPolygons evenPolygons;
   std::copy_if(src.begin(), src.end(), std::back_inserter(evenPolygons), isEven);
   std::vector< double > areas(evenPolygons.size());
   std::transform(evenPolygons.begin(), evenPolygons.end(), areas.begin(), getArea);
-  area = std::accumulate(areas.begin(), areas.end(), 0.0);
+  double area = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
 void shapkov::areaOdd(std::ostream& out, const VecOfPolygons& src)
 {
-  double area = 0.0;
   VecOfPolygons oddPolygons;
   std::copy_if(src.begin(), src.end(), std::back_inserter(oddPolygons), isOdd);
   std::vector< double > areas(oddPolygons.size());
   std::transform(oddPolygons.begin(), oddPolygons.end(), areas.begin(), getArea);
-  area = std::accumulate(areas.begin(), areas.end(), 0.0);
+  double area = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
 void shapkov::areaMean(std::ostream& out, const VecOfPolygons& src)
 {
-  double area = 0.0;
   if (src.empty())
   {
     throw std::logic_error("no polygons");
   }
   std::vector< double > areas(src.size());
   std::transform(src.begin(), src.end(), areas.begin(), getArea);
-  area = std::accumulate(areas.begin(), areas.end(), 0.0) / src.size();
+  double area = std::accumulate(areas.begin(), areas.end(), 0.0) / src.size();
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
 void shapkov::areaVertexes(std::ostream& out, const VecOfPolygons& src, size_t vertexes)
 {
-  double area = 0.0;
   if (vertexes < 3)
   {
     throw std::logic_error("wrong number of vertexes");
@@ -54,7 +50,7 @@ void shapkov::areaVertexes(std::ostream& out, const VecOfPolygons& src, size_t v
   std::copy_if(src.begin(), src.end(), std::back_inserter(polygons), std::bind(isSize, _1, vertexes));
   std::vector< double > areas(polygons.size());
   std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
-  area = std::accumulate(areas.begin(), areas.end(), 0.0);
+  double area = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << std::fixed << std::setprecision(1) << area << '\n';
 }
 void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src)
