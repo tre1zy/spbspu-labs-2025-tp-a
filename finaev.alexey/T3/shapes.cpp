@@ -39,9 +39,13 @@ std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
   }
   std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >{ in }, count, temp.begin());
-  if (in)
+  if (in && temp.size() == count)
   {
     poly.points = std::move(temp);
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
