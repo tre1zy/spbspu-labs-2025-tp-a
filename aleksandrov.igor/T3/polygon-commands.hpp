@@ -8,6 +8,7 @@
 namespace aleksandrov
 {
   using FrameRect = std::pair< Point, Point >;
+  using Vector = std::pair< int, int >;
 
   namespace detail
   {
@@ -37,7 +38,9 @@ namespace aleksandrov
 
   void inframe(const std::vector< Polygon >&, std::istream&, std::ostream&);
   FrameRect findFrameRect(const Polygon&);
-  FrameRect findGlobalFrameRect(const std::vector< Polygon >&); 
+  FrameRect findGlobalFrameRect(const std::vector< Polygon >&);
+
+  void rightshapes(const std::vector< Polygon >&, std::ostream&);
 }
 
 #endif

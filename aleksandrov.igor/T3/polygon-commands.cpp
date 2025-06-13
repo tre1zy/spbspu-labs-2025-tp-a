@@ -356,5 +356,50 @@ namespace aleksandrov
       out << "FALSE";
     }
   }
+
+  struct VectorCoordsCalculator
+  {
+    Vector operator()(const Point& a, const Point& b) const
+    {
+      return Vector{ b.x - a.x, b.y - a.y };
+    }
+  };
+
+  struct EdgeVectorsCalculator
+  {
+    std::vector< Vector > operator()(const Polygon& polygon) const
+    {
+      std::vector< Vector > vectors;
+      const auto& pts = polygon.points;
+      VectorCoordsCalculator calculator;
+      std::transform(pts.begin(), pts.end() - 1, pts.begin() + 1, std::back_inserter(vectors), calculator);
+      vectors.emplace_back(calculator(pts.back(), pts.front()));
+      return vectors;
+    }
+  };
+
+  struct RightAngleChecker
+  {
+    bool operator()(const std::vector< Vector >& vectors) const
+    {
+      struct PerpendicularChecker
+      {
+        bool operator()(const Vector& a, const Vector& b) const
+        {
+          return !(a.first * b.first + a.second * b.second);
+        }
+      };
+      return std::adjacent_find(vectors.begin(), vectors.end(), PerpendicularChecker{}) != vectors.end();
+    }
+  };
+
+  void rightshapes(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    std::vector< std::vector< Vector > > allEdges;
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(allEdges), EdgeVectorsCalculator{});
+
+    size_t rightAngleCount = std::count_if(allEdges.begin(), allEdges.end(), RightAngleChecker{});
+    out << rightAngleCount;
+  }
 }
 
