@@ -10,6 +10,8 @@ namespace belyaev
 {
   double accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n);
   double calcArea(const Polygon& src);
+  bool compareAreas(const Polygon& lhs, const Polygon& rhs);
+  bool compareVertices(const Polygon& lhs, const Polygon& rhs);
   bool isPolygonEven(const Polygon& src);
   bool isPolygonOdd(const Polygon& src);
   bool isPolygonOfSize(const Polygon& src, const size_t& userSize);

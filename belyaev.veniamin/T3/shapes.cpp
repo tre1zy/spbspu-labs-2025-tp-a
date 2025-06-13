@@ -57,7 +57,7 @@ std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
 
   using istreamPnt = std::istream_iterator<Point>;
   std::vector<Point> newPoints;
-  std::copy_n(istreamPnt(in), pointsAmount, newPoints.begin()); // questionable implementation might change l8r
+  std::copy_n(istreamPnt(in), pointsAmount, std::back_inserter(newPoints)); // questionable implementation might change l8r
   if (in.peek() != '\n')
   {
     in.setstate(std::ios::failbit);
@@ -95,5 +95,5 @@ bool belyaev::operator==(const Polygon& lhs, const Polygon& rhs)
   {
     return false;
   }
-  return std::equal(lhs.points.begin(), lhs.points.end(), rhs.points.begin());
+  return std::is_permutation(lhs.points.begin(), lhs.points.end(), rhs.points.begin());
 }

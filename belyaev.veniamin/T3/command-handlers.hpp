@@ -3,7 +3,7 @@
 #include <iostream>
 #include <map>
 #include <iomanip>
-#include <limits.h>
+#include <limits>
 #include "shapes.hpp"
 #include "command-helpers.hpp"
 #include <stream-guard.hpp>
@@ -15,9 +15,9 @@ namespace belyaev
   double areaMean(double value, const Polygon& src, size_t size);
   double areaVertices(double value, const Polygon& src, size_t vertices);
   void area(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
-  void minMaxArea(const std::vector<Polygon>& data, std::ostream& out, std::string command);
-  void minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, std::string command);
-  void minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, std::string command);
+  void minMaxArea(const std::vector<Polygon>& data, std::ostream& out, const std::string& command);
+  void minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, const std::string& command);
+  void minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, const std::string& command);
   void countEven(const std::vector<Polygon>& data, size_t& result);
   void countOdd(const std::vector<Polygon>& data, size_t& result);
   void countVertices(const std::vector<Polygon>& data, size_t& result, size_t givenSize);

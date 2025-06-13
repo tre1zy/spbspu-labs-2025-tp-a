@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iterator>
-#include <limits>
 
 int main(int argc, char* argv[])
 {
@@ -24,6 +23,7 @@ int main(int argc, char* argv[])
   }
   std::vector<Polygon> data;
   using PolyIStream = std::istream_iterator<Polygon>;
+  
   while (!file.eof())
   {
     if (file.fail())
@@ -35,11 +35,13 @@ int main(int argc, char* argv[])
   }
 
   std::map<std::string, std::function<void(std::istream&, std::ostream&)>> cmds;
+  const std::string minCommand = "min";
+  const std::string maxCommand = "max";
   cmds["AREA"] = std::bind(area, std::cref(data), _1, _2);
-  cmds["MAX"] = std::bind(minMax, std::cref(data), _1, _2, "max");
-  cmds["MIN"] = std::bind(minMax, std::cref(data), _1, _2, "min");
+  cmds["MAX"] = std::bind(minMax, std::cref(data), _1, _2, std::cref(maxCommand));
+  cmds["MIN"] = std::bind(minMax, std::cref(data), _1, _2, std::cref(minCommand));
   cmds["COUNT"] = std::bind(count, std::cref(data), _1, _2);
-  cmds["RMECHO"] = std::bind(count, std::ref(data), _1, _2);
+  cmds["RMECHO"] = std::bind(rmecho, std::ref(data), _1, _2);
   cmds["INFRAME"] = std::bind(inframe, std::cref(data), _1, _2);
   std::string command;
   while (!(std::cin >> command).eof())

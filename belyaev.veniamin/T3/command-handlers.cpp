@@ -51,13 +51,15 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
   subCmds["ODD"] = std::bind(areaOdd, _1, _2);
   subCmds["EVEN"] = std::bind(areaEven, _1, _2);
   subCmds["MEAN"] = std::bind(areaMean, _1, _2, data.size());
-  double res;
+  double res = 0.0;
   try
   {
+    subCmds.at(subcommand);
     res = std::accumulate(data.begin(), data.end(), 0.0, subCmds[subcommand]);
   }
   catch (const std::out_of_range& e)
   {
+    std::cout << subcommand << '\n';
     if (isStringNumeric(subcommand))
     {
       auto areaVerticesBind = std::bind(areaVertices, _1, _2, std::stoull(subcommand));
@@ -70,52 +72,52 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
   }
 
   StreamGuard guard(out);
-  out << res << '\n';
+  out << std::fixed << std::setprecision(1) << res << '\n';
 }
 
-void belyaev::minMaxArea(const std::vector<Polygon>& data, std::ostream& out, std::string command)
+void belyaev::minMaxArea(const std::vector<Polygon>& data, std::ostream& out, const std::string& command)
 {
   using namespace std::placeholders;
-  auto calcAreaBind = std::bind(calcArea, _1);
+  auto compareAreasBind = std::bind(compareAreas, _1, _2);
   Polygon resultingPolygon;
   if (command == "min")
   {
-    resultingPolygon = *std::min_element(data.begin(), data.end(), calcAreaBind);
+    resultingPolygon = *std::min_element(data.begin(), data.end(), compareAreasBind);
   }
   else if (command == "max")
   {
-    resultingPolygon = *std::max_element(data.begin(), data.end(), calcAreaBind);
+    resultingPolygon = *std::max_element(data.begin(), data.end(), compareAreasBind);
   }
   else
   {
     throw std::logic_error("minMaxArea failed");
   }
   StreamGuard guard(out);
-  out << std::fixed << std::setprecision(1) << calcAreaBind(resultingPolygon) << '\n';
+  out << std::fixed << std::setprecision(1) << calcArea(resultingPolygon) << '\n';
 }
 
-void belyaev::minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, std::string command)
+void belyaev::minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, const std::string& command)
 {
   using namespace std::placeholders;
-  auto getVertsBind = std::bind(getVertices, _1);
+  auto compareVertsBind = std::bind(compareVertices, _1, _2);
   Polygon resultingPolygon;
   if (command == "min")
   {
-    resultingPolygon = *std::min_element(data.begin(), data.end(), getVertsBind);
+    resultingPolygon = *std::min_element(data.begin(), data.end(), compareVertsBind);
   }
   else if (command == "max")
   {
-    resultingPolygon = *std::max_element(data.begin(), data.end(), getVertsBind);
+    resultingPolygon = *std::max_element(data.begin(), data.end(), compareVertsBind);
   }
   else
   {
     throw std::logic_error("minMaxVertices failed");
   }
   StreamGuard guard(out);
-  out << getVertsBind(resultingPolygon) << '\n';
+  out << getVertices(resultingPolygon) << '\n';
 }
 
-void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, std::string command)
+void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, const std::string& command)
 {
   using namespace std::placeholders;
 
@@ -127,11 +129,11 @@ void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::os
   }
 
   std::map<std::string, std::function<void()>> subCmds;
-  subCmds["AREA"] = std::bind(minMaxArea, std::ref(data), std::ref(out), command);
-  subCmds["VERTICES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), command);
+  subCmds["AREA"] = std::bind(minMaxArea, std::ref(data), std::ref(out), std::cref(command));
+  subCmds["VERTICES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), std::cref(command));
   try
   {
-    subCmds.at(subcommand);
+    subCmds.at(subcommand)();
   }
   catch (const std::out_of_range& e)
   {
@@ -176,7 +178,7 @@ void belyaev::count(const std::vector<Polygon>& data, std::istream& in, std::ost
 
   try
   {
-    subCmds.at(subcommand);
+    subCmds.at(subcommand)();
   }
   catch (const std::out_of_range& e)
   {
@@ -200,12 +202,12 @@ void belyaev::rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream&
 
   Polygon rmPolygon;
   in >> rmPolygon;
-  if (data.empty() || in.fail())
+  if (in.fail())
   {
     throw std::logic_error("Failed.");
   }
-
-  size_t oldSize = rmPolygon.points.size();
+  data.size();
+  size_t oldSize = data.size();
   auto helperBind = std::bind(rmEchoHelper, rmPolygon, _1, _2);
   auto new_end = std::unique(data.begin(), data.end(), helperBind);
   data.erase(new_end, data.end());
@@ -227,10 +229,10 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   }
 
   int minX, minY, maxX, maxY;
-  minX = INT_MIN;
-  minY = INT_MIN;
-  maxX = INT_MAX;
-  maxY = INT_MAX;
+  minX = std::numeric_limits<int>::max();
+  minY = std::numeric_limits<int>::max();
+  maxX = std::numeric_limits<int>::min();
+  maxY = std::numeric_limits<int>::min();
   auto getMinCoordsBind = std::bind(getMinMaxCoordsInPoly, _1, std::ref(minX), std::ref(minY), "min");
   auto getMaxCoordsBind = std::bind(getMinMaxCoordsInPoly, _1, std::ref(maxX), std::ref(maxY), "max");
   std::for_each(data.begin(), data.end(), getMinCoordsBind);

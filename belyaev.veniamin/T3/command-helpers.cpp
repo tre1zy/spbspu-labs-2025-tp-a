@@ -18,6 +18,16 @@ double belyaev::calcArea(const Polygon& src)
   return std::abs(area) / 2.0;
 }
 
+bool belyaev::compareAreas(const Polygon& lhs, const Polygon& rhs)
+{
+  return calcArea(lhs) < calcArea(rhs);
+}
+
+bool belyaev::compareVertices(const Polygon& lhs, const Polygon& rhs)
+{
+  return lhs.points.size() < rhs.points.size();
+}
+
 bool belyaev::isPolygonEven(const Polygon& src)
 {
   return src.points.size() % 2 == 0;
