@@ -173,7 +173,7 @@ void shapkov::palindromes(std::istream& in, std::ostream& out, const FrequencyDi
   std::vector< std::string > txtWords;
   auto txt = text->second.dictionary;
   std::transform(txt.begin(), txt.end(), std::back_inserter(txtWords), ExtractFirst());
-  std::copy_if(txtWords.begin(), txtWords.end(), std::ostream_iterator< std::string >(out, "\n"), std::ref(PalindromeChecker));
+  std::copy_if(txtWords.begin(), txtWords.end(), std::ostream_iterator< std::string >{ out, "\n" }, std::ref(PalindromeChecker));
   if (PalindromeChecker.palindromesCnt == 0)
   {
     out << "<NO PALINDROMES>\n";
@@ -194,7 +194,7 @@ void shapkov::show_with_pattern(std::istream& in, std::ostream& out, const Frequ
   std::vector< std::string > txtWords;
   auto txt = text->second.dictionary;
   std::transform(txt.begin(), txt.end(), std::back_inserter(txtWords), ExtractFirst());
-  std::copy_if(txtWords.begin(), txtWords.end(), std::ostream_iterator< std::string >(out, "\n"), std::ref(PatternChecker));
+  std::copy_if(txtWords.begin(), txtWords.end(), std::ostream_iterator< std::string >{ out, "\n" }, std::ref(PatternChecker));
   if (PatternChecker.patternMatches == 0)
   {
     out << "<NO MATCHES>\n";
