@@ -7,8 +7,8 @@ namespace smirnov
 {
   struct DataStruct
   {
-    long long key1;
-    unsigned long long key2;
+    unsigned long long key1;
+    long long key2;
     std::string key3;
   };
   bool compare(const DataStruct & lhs, const DataStruct & rhs);
