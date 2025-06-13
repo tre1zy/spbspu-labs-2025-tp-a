@@ -9,11 +9,11 @@ namespace
 {
   bool isOdd(const finaev::Polygon& poly)
   {
-    return poly.points.size() % 2 == 0;
+    return poly.points.size() % 2 != 0;
   }
   bool isEven(const finaev::Polygon& poly)
   {
-    return poly.points.size() % 2 != 0;
+    return poly.points.size() % 2 == 0;
   }
   bool isNumOfVertex(const finaev::Polygon& poly, size_t s)
   {
@@ -33,6 +33,40 @@ namespace
       res += (poly.points[i].x * poly.points[j].y) - (poly.points[i].y * poly.points[j].x);
     }
     return std::abs(res) / 2.0;
+  }
+  bool isDigit(const std::string& s) 
+  {
+    return !s.empty() && std::all_of(s.begin(), s.end(), isdigit);
+  }
+}
+
+void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
+{
+  std::string substr;
+  in >> substr;
+  if (substr == "ODD")
+  {
+    std::vector< Polygon > odd;
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(odd), isOdd);
+    out << odd.size();
+  }
+  else if (substr == "EVEN")
+  {
+    std::vector< Polygon > even;
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(even), isEven);
+    out << even.size();
+  }
+  else if(isDigit(substr))
+  {
+    size_t s = std::stoul(substr);
+    std::vector< Polygon > temp;
+    auto compare = std::bind(isNumOfVertex, std::placeholders::_1, s);
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare);
+    out << temp.size();
+  }
+  else
+  {
+    std::invalid_argument("<INVALID COMMAND>");
   }
 }
 
@@ -77,10 +111,9 @@ void finaev::area(std::istream& in, std::ostream& out, const std::vector< Polygo
     }
     out << res / shapes.size();
   }
-  else if (substr == "num-of-vertexes")
+  else if (isDigit(substr))
   {
-    size_t s = 0;
-    in >> s;
+    size_t s = std::stoul(substr);
     std::vector< Polygon > temp;
     auto compare = std::bind(isNumOfVertex, std::placeholders::_1, s);
     std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare);
