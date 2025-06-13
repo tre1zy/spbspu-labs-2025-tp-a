@@ -16,8 +16,22 @@ namespace kostyukov
 {
   void printHelp(std::ostream& out)
   {
-    out << "create\ntop\nbottom\ndelete\nload\ngetfreq\nremovebatch\nfinduniq\nfindsame\n";
-    out << "clear\nlistdicts\nrangefreq\noutrangefreq\nmerge\nintersect";
+    out << "Available commands:\n";
+    out << "  create <dict_name>          - Creates a new empty dictionary.\n";
+    out << "  load <dict_name> <filename> - Loads text from file into a dictionary.\n";
+    out << "  getfreq <dict_name> <word>  - Shows relative frequency of a word.\n";
+    out << "  top <dict_name> <N>         - Shows N most frequent words.\n";
+    out << "  bottom <dict_name> <N>      - Shows N least frequent words.\n";
+    out << "  listdicts                   - Shows names of all created dictionaries.\n";
+    out << "  delete <dict_name>          - Deletes an existing dictionary.\n";
+    out << "  merge <new> <d1> <d2>       - Merges d1 and d2 into a new dictionary.\n";
+    out << "  intersect <new> <d1> <d2> <p> - Intersects d1 and d2, where p is 'min' or 'max' for counts.\n";
+    out << "  clear <dict_name>           - Clears all words from a dictionary.\n";
+    out << "  findsame <d1> <d2>          - Finds common words in two dictionaries.\n";
+    out << "  finduniq <d1> <d2>          - Finds unique words in two dictionaries.\n";
+    out << "  removebatch <d> <p> <N>   - Removes words where p is 'freq_less' or 'freq_more' than N%.\n";
+    out << "  rangefreq <d> <min> <max> - Shows words with frequency in [min, max] %.\n";
+    out << "  outrangefreq <d> <min> <max> - Shows words with frequency outside [min, max] %.\n";
     return;
   }
 
@@ -36,21 +50,21 @@ namespace kostyukov
     in >> dictName;
     if (!in || dictName.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     if(!isValidName(dictName))
     {
-      out << "INVALID DICTIONARY NAME>";
+      out << "INVALID DICTIONARY NAME>\n";
       return;
     }
     if (dicts.count(dictName))
     {
-      out << "<DICTIONARY EXISTS>";
+      out << "<DICTIONARY EXISTS>\n";
       return;
     }
     dicts.emplace(dictName, FrequencyDictionary{});
-    out << "successfully created " << dictName;
+    out << "successfully created " << dictName << '\n';
   }
 
   void loadDict(std::istream& in, std::ostream& out, FreqDictManager& dicts)
@@ -60,18 +74,18 @@ namespace kostyukov
     in >> dictName >> filename;
     if (!in || dictName.empty() || filename.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     std::fstream file(filename);
     if (!file)
     {
-      out << "<FILE ERROR>";
+      out << "<FILE ERROR>\n";
       return;
     }
     FrequencyDictionary& dict = dicts[dictName];
@@ -80,7 +94,7 @@ namespace kostyukov
     std::istream_iterator< std::string > start(file);
     std::istream_iterator< std::string > end;
     std::for_each(start, end, WordProcessor(dict));
-    out << "successfully loaded " << dictName;
+    out << "successfully loaded " << dictName << '\n';
   }
 
   void getFreq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
@@ -90,18 +104,18 @@ namespace kostyukov
     in >> dictName >> word;
     if (!in || dictName.empty() || word.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     auto dictIter = dicts.find(dictName);
     if (dictIter == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
@@ -110,12 +124,12 @@ namespace kostyukov
     auto wordIter = dict.counts.find(word);
     if (wordIter == dict.counts.end() || dict.totalWords == 0)
     {
-      out << "0.0%";
+      out << "0.0%\n";
       return;
     }
     double freq = (static_cast< double >(wordIter->second) / dict.totalWords) * 100.0;
     ScopeGuard scopeGrd(out);
-    out << std::fixed << std::setprecision(1) << freq << "%";
+    out << std::fixed << std::setprecision(1) << freq << "%\n";
   }
 
   void getTopOrBottom(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool isBottom)
@@ -125,24 +139,24 @@ namespace kostyukov
     in >> dictName >> n;
     if (!in || dictName.empty() || n == 0)
     {
-      out << "<MISSING ARGUMENT>";
+      out << "<MISSING ARGUMENT>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     auto dictIter = dicts.find(dictName);
     if (dictIter == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     const FrequencyDictionary& dict = dictIter->second;
     if (dict.counts.empty())
     {
-      out << "<EMPTY DICTIONARY>";
+      out << "<EMPTY DICTIONARY>\n";
       return;
     }
     std::vector< WordFreqPair > tempVec;
@@ -181,22 +195,22 @@ namespace kostyukov
     in >> dictName;
     if (!in || dictName.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     auto iter = dicts.find(dictName);
     if (iter == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     dicts.erase(iter);
-    out << "successfully deleted " << dictName;
+    out << "successfully deleted " << dictName << '\n';
   }
 
   void merge(std::istream& in, std::ostream& out, FreqDictManager& dicts)
@@ -207,31 +221,31 @@ namespace kostyukov
     in >> newDictName >> dict1Name >> dict2Name;
     if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     if (dicts.count(newDictName))
     {
-      out << "<DICTIONARY EXIST>";
+      out << "<DICTIONARY EXIST>\n";
       return;
     }
     auto iter1 = dicts.find(dict1Name);
     auto iter2 = dicts.find(dict2Name);
     if (iter1 == dicts.end() || iter2 == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     dicts.emplace(newDictName, iter1->second);
     FrequencyDictionary& newDict = dicts.at(newDictName);
     const FrequencyDictionary& dict2 = iter2->second;
     std::for_each(dict2.counts.begin(), dict2.counts.end(), MergeFunctor(newDict));
-    out << "Dictionaries merged into " << newDictName;
+    out << "Dictionaries merged into " << newDictName << '\n';
   }
 
   void intersect(std::istream& in, std::ostream& out, FreqDictManager& dicts)
@@ -243,29 +257,29 @@ namespace kostyukov
     in >> newDictName >> dict1Name >> dict2Name >> param;
     if (!in || newDictName.empty() || dict1Name.empty() || dict2Name.empty() || param.empty())
     {
-      out << "<MISSING ARGUMENT>";
+      out << "<MISSING ARGUMENT>\n";
       return;
     }
     if (!isValidName(newDictName) || !isValidName(dict1Name) || !isValidName(dict2Name))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     if (param != "min" && param != "max")
     {
-      out << "<INVALID ARGUMENT>";
+      out << "<INVALID ARGUMENT>\n";
       return;
     }
     if (dicts.count(newDictName))
     {
-      out << "<DICTIONARY EXISTS>";
+      out << "<DICTIONARY EXISTS>\n";
       return;
     }
     auto iter1 = dicts.find(dict1Name);
     auto iter2 = dicts.find(dict2Name);
     if (iter1 == dicts.end() || iter2 == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     dicts.emplace(newDictName, FrequencyDictionary{});
@@ -280,7 +294,7 @@ namespace kostyukov
     {
       std::for_each(dict2.counts.begin(), dict2.counts.end(), IntersectFunctor(newDict, dict1, param == "max"));
     }
-    out << "Dictionaries intersected into " << newDictName;
+    out << "Dictionaries intersected into " << newDictName << '\n';
   }
 
   void clear(std::istream& in, std::ostream& out, FreqDictManager& dicts)
@@ -289,23 +303,23 @@ namespace kostyukov
     in >> dictName;
     if (!in || dictName.empty())
     {
-      out << "<MISSING ARGUMENT>";
+      out << "<MISSING ARGUMENT>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     auto dictIter = dicts.find(dictName);
     if (dictIter == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     dictIter->second.counts.clear();
     dictIter->second.totalWords = 0;
-    out << "Dictionary " << dictName << " has been cleared.";
+    out << "Dictionary " << dictName << " has been cleared\n";
   }
 
   void findUniq(std::istream& in, std::ostream& out, const FreqDictManager& dicts)
@@ -314,25 +328,29 @@ namespace kostyukov
     in >> name1 >> name2;
     if (!in || name1.empty() || name2.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     auto iter1 = dicts.find(name1);
     auto iter2 = dicts.find(name2);
     if (iter1 == dicts.end() || iter2 == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     std::vector< std::string > keys1;
     std::vector< std::string > keys2;
-    auto begin = iter1->second.counts.begin();
-    auto end = iter1->second.counts.end();
-    std::transform(begin, end, std::back_inserter(keys1), KeyExtractor{});
+    auto begin1 = iter1->second.counts.begin();
+    auto end1 = iter1->second.counts.end();
+    auto begin2 = iter2->second.counts.begin();
+    auto end2 = iter2->second.counts.end();
+    std::transform(begin1, end1, std::back_inserter(keys1), KeyExtractor{});
+    std::transform(begin2, end2, std::back_inserter(keys2), KeyExtractor{});
     std::vector< std::string > diff;
     std::set_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::back_inserter(diff));
     out << "Words only in " << name1 << ":\n";
     std::copy(diff.begin(), diff.end(), std::ostream_iterator< std::string >(out, "\n"));
+    out << '\n';
     diff.clear();
     std::set_difference(keys2.begin(), keys2.end(), keys1.begin(), keys1.end(), std::back_inserter(diff));
     out << "Words only in " << name2 << ":\n";
@@ -346,14 +364,14 @@ namespace kostyukov
     in >> name1 >> name2;
     if (!in || name1.empty() || name2.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     auto iter1 = dicts.find(name1);
     auto iter2 = dicts.find(name2);
     if (iter1 == dicts.end() || iter2 == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     std::vector< std::string > keys1;
@@ -365,7 +383,7 @@ namespace kostyukov
     out << "Common words:\n";
     if (commonKeys.empty())
     {
-      out << "No common words found.";
+      out << "No common words found\n";
       return;
     }
     SameWordPrinter printer = SameWordPrinter{ out, iter1->second, iter2->second, name1, name2 };
@@ -380,29 +398,29 @@ namespace kostyukov
     in >> dictName >> param >> n;
     if (!in || dictName.empty() || param.empty() || n == 0)
     {
-      out << "<MISSING ARGUMENT>";
+      out << "<MISSING ARGUMENT>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     auto dictIter = dicts.find(dictName);
     if (dictIter == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     if (n < 0 || (param != "freq_less" && param != "freq_more"))
     {
-      out << "<INVALID ARGUMENT>";
+      out << "<INVALID ARGUMENT>\n";
       return;
     }
     FrequencyDictionary& dict = dictIter->second;
     if (dict.counts.empty())
     {
-      out << "<EMPTY DICTIONARY>";
+      out << "<EMPTY DICTIONARY>\n";
       return;
     }
     std::vector< std::pair< const std::string, size_t > > pairsToRemove;
@@ -412,11 +430,11 @@ namespace kostyukov
     std::copy_if(begin, end, std::back_inserter(pairsToRemove),pred);
     if (pairsToRemove.empty())
     {
-      out << "no words to remove";
+      out << "No words to remove\n";
       return;
     }
     std::for_each(pairsToRemove.begin(), pairsToRemove.end(), DictDeleter(dict));
-    out << "Removed " << pairsToRemove.size() << "words.";
+    out << "Removed " << pairsToRemove.size() << "words\n";
   }
 
   void getRange(std::istream& in, std::ostream& out, const FreqDictManager& dicts, bool inRange)
@@ -427,34 +445,34 @@ namespace kostyukov
     in >> dictName >> leftBorder >> rightBorder;
     if (!in || dictName.empty())
     {
-      out << "<MISSING ARGUMENTS>";
+      out << "<MISSING ARGUMENTS>\n";
       return;
     }
     if (!isValidName(dictName))
     {
-      out << "<INVALID DICTIONARY NAME>";
+      out << "<INVALID DICTIONARY NAME>\n";
       return;
     }
     if (leftBorder < 0.0 || leftBorder > 100.0 ||  rightBorder < 0 || rightBorder > 100.0)
     {
-      out << "<INVALID ARGUMENT>";
+      out << "<INVALID ARGUMENT>\n";
       return;
     }
     if (leftBorder > rightBorder)
     {
-      out << "<INVALID RANGE>";
+      out << "<INVALID RANGE>\n";
       return;
     }
     auto dictIter = dicts.find(dictName);
     if (dictIter == dicts.end())
     {
-      out << "<DICTIONARY NOT FOUND>";
+      out << "<DICTIONARY NOT FOUND>\n";
       return;
     }
     const FrequencyDictionary& dict = dictIter->second;
     if (dict.counts.empty())
     {
-      out << "<EMPTY DICTIONARY>";
+      out << "<EMPTY DICTIONARY>\n";
       return;
     }
     std::vector< WordFreqPair > allPairs;
@@ -475,7 +493,7 @@ namespace kostyukov
     }
     if (filteredPairs.empty())
     {
-      out << "No words found in this range.";
+      out << "No words found in this range\n";
       return;
     }
     std::sort(filteredPairs.begin(), filteredPairs.end(), FreqComparator(false));
