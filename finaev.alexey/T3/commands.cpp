@@ -34,7 +34,7 @@ namespace
     }
     return std::abs(res) / 2.0;
   }
-  bool isDigit(const std::string& s) 
+  bool isDigit(const std::string& s)
   {
     return !s.empty() && std::all_of(s.begin(), s.end(), isdigit);
   }
