@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
   if (argc != 2)
   {
     std::cerr << "<INVALID NUMBER OF ARGUMENTS>\n";
-    return 1; 
+    return 1;
   }
   std::ifstream file;
   file.open(argv[1]);
@@ -42,11 +42,16 @@ int main(int argc, char* argv[])
   cmds["RMECHO"] = std::bind(count, std::ref(data), _1, _2);
   cmds["INFRAME"] = std::bind(inframe, std::cref(data), _1, _2);
   std::string command;
-  while (!(std::cin >> command).eof()) {
-    try {
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
       cmds.at(command)(std::cin, std::cout);
-    } catch (...) {
-      if (std::cin.fail()) {
+    }
+    catch (...)
+    {
+      if (std::cin.fail())
+      {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

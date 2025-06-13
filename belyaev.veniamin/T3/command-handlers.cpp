@@ -241,7 +241,7 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   int currentMinY = minY;
   int currentMaxX = maxX;
   int currentMaxY = maxY;
-  getMinCoordsBind(inframePoly);  
+  getMinCoordsBind(inframePoly);
   getMaxCoordsBind(inframePoly);
   StreamGuard guard(out);
   if (currentMinX != minX || currentMinY != minY || currentMaxX != maxX || currentMaxY != maxY)
