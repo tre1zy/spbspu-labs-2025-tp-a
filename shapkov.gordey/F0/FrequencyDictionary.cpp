@@ -6,8 +6,8 @@
 #include <iterator>
 #include <numeric>
 #include <vector>
-#include "functors.hpp"
 #include <scopeGuard.hpp>
+#include "analyzeAndParseFunctors.hpp"
 
 void shapkov::analyze_text(std::istream& in, std::ostream& out, FrequencyDictionary& dict)
 {

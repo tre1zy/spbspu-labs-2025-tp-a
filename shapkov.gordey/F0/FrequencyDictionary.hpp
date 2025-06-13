@@ -1,6 +1,5 @@
 #ifndef FREQUENCY_DICTIONARY
 #define FREQUENCY_DICTIONARY
-
 #include <unordered_map>
 #include <string>
 #include <iostream>
