@@ -200,5 +200,5 @@ void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, st
 
 void shak::cmdRects(const std::vector< Polygon > &polygons, std::ostream &out)
 {
-  out << std::count_if(polygons.begin(), polygons.end(), checkRectangle);
+  out << std::count_if(polygons.begin(), polygons.end(), checkRectangle) << "\n";
 }
