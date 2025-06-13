@@ -1,4 +1,4 @@
-#include "guard.h"
+#include "Guard.h"
 horoshilov::Guard::Guard(std::basic_ios< char >& s):
   s_(s),
   fmt_(s.flags()),
