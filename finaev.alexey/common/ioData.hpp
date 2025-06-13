@@ -8,7 +8,7 @@ namespace finaev
   {
     char obj;
   };
-  
+
   std::istream& operator>>(std::istream& in, delimiterIO&& dest);
 }
 

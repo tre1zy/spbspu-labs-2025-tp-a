@@ -21,7 +21,7 @@ std::ostream& finaev::operator<<(std::ostream& out, const Point& point)
     return out;
   }
   out << "(" << point.x << ";" << point.y << ")";
-  return out; 
+  return out;
 }
 
 std::istream& finaev::operator>>(std::istream& in, Polygon& poly)

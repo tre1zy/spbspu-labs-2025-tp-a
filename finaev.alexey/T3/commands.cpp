@@ -75,15 +75,15 @@ void finaev::area(std::istream& in, std::ostream& out, const std::vector< Polygo
     {
       res += areaOnePoly(shapes[i]);
     }
-    out << res / shapes.size(); 
+    out << res / shapes.size();
   }
   else if (substr == "num-of-vertexes")
   {
-    size_t s = 0; 
+    size_t s = 0;
     in >> s;
     std::vector< Polygon > temp;
     auto compare = std::bind(isNumOfVertex, std::placeholders::_1, s);
-    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare); 
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare);
     double res = 0.0;
     for (size_t i = 0; i < temp.size(); ++i)
     {
