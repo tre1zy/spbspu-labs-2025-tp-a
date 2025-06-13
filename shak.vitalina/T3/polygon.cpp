@@ -93,12 +93,12 @@ bool shak::checkRectangle(const Polygon &polygon)
   }
   const auto &points = polygon.points;
   double polygonSides[4];
-  for (int i = 0; i < 4; i++) {
-      int next = (i + 1) % 4;
-      polygonSides[i] = getDistance(points[i], points[next]);
-  }
   const double epsilon = 1e-9;
-  bool isOpositeEqual = std::abs(polygonSides[0] - polygonSides[2]) < epsilon && std::abs(polygonSides[1] - polygonSides[3]) < epsilon;
+  double side1 = getDistance(points[0], points[1]);
+  double side2 = getDistance(points[1], points[2]);
+  double side3 = getDistance(points[2], points[3]);
+  double side4 = getDistance(points[3], points[0]);
+  bool isOppositeEqual = std::abs(side1 - side3) < epsilon && std::abs(side2 - side4) < epsilon;
   if (!isOpositeEqual) {
     return false;
   }
