@@ -227,7 +227,7 @@ void finaev::min(std::istream& in, std::ostream& out, const std::vector< Polygon
 void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& shapes)
 {
   Polygon poly;
-  if (!(in >> poly))
+  if (!(in >> poly) || in.fail())
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
@@ -249,7 +249,7 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
 void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
 {
   Polygon poly;
-  if (!(in >> poly))
+  if (!(in >> poly) || in.fail())
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
