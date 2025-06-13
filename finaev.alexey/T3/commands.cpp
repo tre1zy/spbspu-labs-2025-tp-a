@@ -3,7 +3,7 @@
 #include <streamGuard.hpp>
 #include <algorithm>
 #include <functional>
-#include <iterator>
+#include <iterator>commands["MIN"] = std::bind(finaev::min, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
 
 namespace
 {
@@ -52,22 +52,22 @@ namespace
     int dy = second.points[0].y - first.points[0].y;
     for (size_t i = 1; i < first.points.size(); ++i)
     {
-      if (second.points[i].x != first.points[i].x + dx || second.points[i].y != first.points[i].y + dy) 
+      if (second.points[i].x != first.points[i].x + dx || second.points[i].y != first.points[i].y + dy)
       {
         return false;
       }
     }
     return true;
   }
-  bool isExactSame(const finaev::Polygon& first, const finaev::Polygon& second) 
+  bool isExactSame(const finaev::Polygon& first, const finaev::Polygon& second)
   {
-    if (first.points.size() != second.points.size()) 
+    if (first.points.size() != second.points.size())
     {
       return false;
     }
-    for (size_t i = 0; i < first.points.size(); ++i) 
+    for (size_t i = 0; i < first.points.size(); ++i)
     {
-      if (first.points[i].x != second.points[i].x || first.points[i].y != second.points[i].y) 
+      if (first.points[i].x != second.points[i].x || first.points[i].y != second.points[i].y)
       {
         return false;
       }
@@ -235,14 +235,14 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
   }
   size_t countAdd = 0;
   std::vector< Polygon > res;
-  for (auto it = shapes.begin(); it != shapes.end(); ++it) 
+  for (auto it = shapes.begin(); it != shapes.end(); ++it)
   {
     res.push_back(*it);
-    if (isExactSame(*it, poly)) 
+    if (isExactSame(*it, poly))
     {
       res.push_back(*it);
       ++countAdd;
-    }     
+    }
     ++it;
   }
   shapes = std::move(res);
