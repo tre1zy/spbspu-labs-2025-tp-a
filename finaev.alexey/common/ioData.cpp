@@ -7,7 +7,7 @@ std::istream& finaev::operator>>(std::istream& in, delimiterIO&& rhs)
   {
     return in;
   }
-  char c = 0;
+  char c = '0';
   in >> c;
   if (in && (c != rhs.obj))
   {

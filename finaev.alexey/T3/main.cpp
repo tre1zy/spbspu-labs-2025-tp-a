@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
   }
   using finaev::Polygon;
   std::vector< Polygon > shapes;
-  while(!file.eof())
+  try
   {
     std::copy(std::istream_iterator< Polygon >{ file }, std::istream_iterator< Polygon >{}, std::back_inserter(shapes));
     if (file.fail() && !file.eof())
@@ -33,6 +33,11 @@ int main(int argc, char* argv[])
       file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+  }
+  catch(const std::exception& e)
+  {
+    std::cout << e.what() << "\n";
+    return 1;
   }
   std::map< std::string, std::function< void() > > commands;
   commands["AREA"] = std::bind(finaev::area, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));

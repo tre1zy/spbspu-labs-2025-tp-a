@@ -31,7 +31,7 @@ std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
   {
     return in;
   }
-  size_t count;
+  size_t count = 0;
   if (!(in >> count) || count < 3)
   {
     in.setstate(std::ios::failbit);

@@ -254,7 +254,5 @@ void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygo
     throw std::invalid_argument("<INVALID COMMAND>");
   }
   auto same = std::bind(isSame, poly, std::placeholders::_1);
-  std::vector< Polygon > temp;
-  std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), same);
-  out << temp.size();
+  out << std::count_if(shapes.begin(), shapes.end(), same);
 }
