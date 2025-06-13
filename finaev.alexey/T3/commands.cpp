@@ -42,6 +42,38 @@ namespace
   {
     return poly.points.size();
   }
+  bool isSame(const finaev::Polygon& first, const finaev::Polygon& second)
+  {
+    if (first.points.size() != second.points.size())
+    {
+      return false;
+    }
+    int dx = second.points[0].x - first.points[0].x;
+    int dy = second.points[0].y - first.points[0].y;
+    for (size_t i = 1; i < first.points.size(); ++i)
+    {
+      if (second.points[i].x != first.points[i].x + dx || second.points[i].y != first.points[i].y + dy) 
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  bool isExactSame(const finaev::Polygon& first, const finaev::Polygon& second) 
+  {
+    if (first.points.size() != second.points.size()) 
+    {
+      return false;
+    }
+    for (size_t i = 0; i < first.points.size(); ++i) 
+    {
+      if (first.points[i].x != second.points[i].x || first.points[i].y != second.points[i].y) 
+      {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
@@ -63,6 +95,10 @@ void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polyg
   else if(isDigit(substr))
   {
     size_t s = std::stoul(substr);
+    if (s < 3)
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
     std::vector< Polygon > temp;
     auto compare = std::bind(isNumOfVertex, std::placeholders::_1, s);
     std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare);
@@ -188,4 +224,40 @@ void finaev::min(std::istream& in, std::ostream& out, const std::vector< Polygon
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
+}
+
+void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& shapes)
+{
+  Polygon poly;
+  if (!(in >> poly) || poly.points.size() < 3)
+  {
+    throw std::logic_error("Not a polygon!");
+  }
+  size_t countAdd = 0;
+  std::vector< Polygon > res;
+  for (auto it = shapes.begin(); it != shapes.end(); ++it) 
+  {
+    res.push_back(*it);
+    if (isExactSame(*it, poly)) 
+    {
+      res.push_back(*it);
+      ++countAdd;
+    }     
+    ++it;
+  }
+  shapes = std::move(res);
+  out << countAdd;
+}
+
+void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygon >& shapes)
+{
+  Polygon poly;
+  if (!(in >> poly) || poly.points.size() < 3)
+  {
+    throw std::logic_error("Not a polygon!");
+  }
+  auto same = std::bind(isSame, poly, std::placeholders::_1);
+  std::vector< Polygon > temp;
+  std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), same);
+  out << temp.size();
 }

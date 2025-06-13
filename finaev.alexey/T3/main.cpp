@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
   commands["COUNT"] = std::bind(finaev::count, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
   commands["MAX"] = std::bind(finaev::max, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
   commands["MIN"] = std::bind(finaev::min, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
+  commands["SAME"] = std::bind(finaev::same, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
+  commands["ECHO"] = std::bind(finaev::echo, std::ref(std::cin), std::ref(std::cout), std::ref(shapes));
   std::string cmd;
   while (std::cin >> cmd)
   {

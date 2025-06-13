@@ -10,7 +10,7 @@ namespace finaev
   void area(std::istream& in, std::ostream& out, const std::vector< Polygon >&);
   void max(std::istream& in, std::ostream& out, const std::vector< Polygon >&);
   void min(std::istream& in, std::ostream& out, const std::vector< Polygon >&);
-  void echo(std::istream& in, std::ostream& out, const std::vector< Polygon >&);
+  void echo(std::istream& in, std::ostream& out, std::vector< Polygon >&);
   void same(std::istream& in, std::ostream& out, const std::vector< Polygon >&);
 }
 
