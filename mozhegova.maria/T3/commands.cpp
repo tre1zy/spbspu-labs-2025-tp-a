@@ -72,6 +72,10 @@ namespace
 
   void getAreaMean(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("not polygons");
+    }
     std::vector< mozhegova::Polygon > temp = polygons;
     std::vector< double > areaPoly(temp.size());
     std::transform(temp.begin(), temp.end(), areaPoly.begin(), getArea);
@@ -207,10 +211,6 @@ namespace
 
 void mozhegova::printArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::logic_error("not polygons");
-  }
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["EVEN"] = std::bind(getAreaEven, std::ref(out), std::cref(polygons));
   subcmds["ODD"] = std::bind(getAreaOdd, std::ref(out), std::cref(polygons));
@@ -276,10 +276,6 @@ void mozhegova::printMin(std::istream & in, std::ostream & out, const std::vecto
 
 void mozhegova::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::logic_error("not polygons");
-  }
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["EVEN"] = std::bind(getCountEven, std::ref(out), std::cref(polygons));
   subcmds["ODD"] = std::bind(getCountOdd, std::ref(out), std::cref(polygons));
@@ -313,12 +309,12 @@ void mozhegova::printEcho(std::istream & in, std::ostream & out, std::vector< Po
   }
   std::vector< Polygon > tempPolygons = polygons;
   size_t count = 0;
-  auto it = std::find(tempPolygons.begin(), tempPolygons.end(), poly);
-  while (it != tempPolygons.end())
+  auto it = std::find(polygons.begin(), polygons.end(), poly);
+  while (it != polygons.end())
   {
     ++count;
-    tempPolygons.insert(it + 1, poly);
-    it = std::find(it + 2, tempPolygons.end(), poly);
+    tempPolygons.insert(std::next(tempPolygons.begin(), std::distance(polygons.begin(), it) + count), poly);
+    it = std::find(std::next(it), polygons.end(), poly);
   }
   polygons = std::move(tempPolygons);
   out << count << '\n';
@@ -331,7 +327,7 @@ void mozhegova::printSame(std::istream & in, std::ostream & out, const std::vect
     throw std::logic_error("not polygons");
   }
   Polygon poly;
-  if (!(in >> poly))
+  if (!(in >> poly) || in.peek() != '\n')
   {
     throw std::logic_error("incorrect input");
   }
