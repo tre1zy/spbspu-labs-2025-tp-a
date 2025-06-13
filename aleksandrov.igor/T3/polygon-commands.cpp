@@ -347,14 +347,7 @@ namespace aleksandrov
 
     const bool isMinInside = globalRect.first.x <= inputRect.first.x && globalRect.first.y <= inputRect.first.y;
     const bool isMaxInside = globalRect.second.x >= inputRect.second.x && globalRect.second.y >= inputRect.second.y;
-    if (isMinInside && isMaxInside)
-    {
-      out << "TRUE";
-    }
-    else
-    {
-      out << "FALSE";
-    }
+    out << ((isMinInside && isMaxInside) ? "<TRUE>" : "<FALSE>");
   }
 
   struct VectorCoordsCalculator
@@ -389,7 +382,9 @@ namespace aleksandrov
           return !(a.first * b.first + a.second * b.second);
         }
       };
-      return std::adjacent_find(vectors.begin(), vectors.end(), PerpendicularChecker{}) != vectors.end();
+      std::vector< Vector > rotated(vectors);
+      std::rotate(rotated.begin(), rotated.begin() + 1, rotated.end());
+      return std::inner_product(vectors.begin(), vectors.end(), rotated.begin(), false, std::logical_or< bool >{}, PerpendicularChecker{});
     }
   };
 
@@ -397,9 +392,8 @@ namespace aleksandrov
   {
     std::vector< std::vector< Vector > > allEdges;
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(allEdges), EdgeVectorsCalculator{});
-
-    size_t rightAngleCount = std::count_if(allEdges.begin(), allEdges.end(), RightAngleChecker{});
-    out << rightAngleCount;
+    size_t count = std::count_if(allEdges.begin(), allEdges.end(), RightAngleChecker{});
+    out << count;
   }
 }
 
