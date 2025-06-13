@@ -235,7 +235,7 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   {
     throw std::logic_error("Invalid input.");
   }
-  
+
   Borders polygonBorders = std::accumulate(data.begin(), data.end(), Borders{}, getPolygonBorders);
   auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
   bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
