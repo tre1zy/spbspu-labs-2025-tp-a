@@ -291,5 +291,70 @@ namespace aleksandrov
       out << countN(polygons, numOfVertexes);
     }
   }
+
+  struct FrameRectFinder
+  {
+    FrameRect operator()(const FrameRect& rect, const Point& point) const
+    {
+      Point newMin{ std::min(rect.first.x, point.x), std::min(rect.first.y, point.y) };
+      Point newMax{ std::max(rect.second.x, point.x), std::max(rect.second.y, point.y) };
+      return { newMin, newMax };
+    }
+  };
+
+  FrameRect findFrameRect(const Polygon& polygon)
+  {
+    const auto& pts = polygon.points;
+    if (pts.empty())
+    {
+      return {{0, 0}, {0, 0}};
+    }
+    FrameRect init{ pts.front(), pts.front() };
+    return std::accumulate(pts.begin(), pts.end(), init, FrameRectFinder{});
+  }
+
+  struct FrameRectsMerger
+  {
+    FrameRect operator()(const FrameRect& a, const FrameRect& b) const
+    {
+      Point newMin{ std::min(a.first.x, b.first.x), std::min(a.first.y, b.first.y) };
+      Point newMax{ std::max(a.second.x, b.second.x), std::max(a.second.y, b.second.y) };
+      return { newMin, newMax };
+    }
+  };
+
+  FrameRect findGlobalFrameRect(const std::vector< Polygon >& polygons)
+  {
+    if (polygons.empty())
+    {
+      return {{0, 0}, {0, 0}};
+    }
+    std::vector< FrameRect > rects;
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(rects), findFrameRect);
+    return std::accumulate(rects.begin(), rects.end(), rects.front(), FrameRectsMerger{});
+  }
+
+  void inframe(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+  {
+    Polygon polygon;
+    if (!(in >> polygon))
+    {
+      throw std::logic_error("Incorrect polygon!");
+    }
+
+    FrameRect globalRect = findGlobalFrameRect(polygons);
+    FrameRect inputRect = findFrameRect(polygon);
+
+    const bool isMinInside = globalRect.first.x <= inputRect.first.x && globalRect.first.y <= inputRect.first.y;
+    const bool isMaxInside = globalRect.second.x >= inputRect.second.x && globalRect.second.y >= inputRect.second.y;
+    if (isMinInside && isMaxInside)
+    {
+      out << "TRUE";
+    }
+    else
+    {
+      out << "FALSE";
+    }
+  }
 }
 

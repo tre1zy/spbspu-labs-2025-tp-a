@@ -7,6 +7,8 @@
 
 namespace aleksandrov
 {
+  using FrameRect = std::pair< Point, Point >;
+
   namespace detail
   {
     double multPoints(const Point&, const Point&);
@@ -32,6 +34,10 @@ namespace aleksandrov
   size_t countOdd(const std::vector< Polygon >&);
   size_t countN(const std::vector< Polygon >&, size_t);
   void count(const std::vector< Polygon >&, std::istream&, std::ostream&);
+
+  void inframe(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  FrameRect findFrameRect(const Polygon&);
+  FrameRect findGlobalFrameRect(const std::vector< Polygon >&); 
 }
 
 #endif
