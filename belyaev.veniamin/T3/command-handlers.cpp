@@ -20,10 +20,6 @@ double belyaev::areaEven(double value, const Polygon& src)
 
 double belyaev::areaMean(double value, const Polygon& src, size_t size)
 {
-  if (size == 0)
-  {
-    throw std::logic_error("Size is 0.");
-  }
   return value + calcArea(src) / size;
 }
 
@@ -51,6 +47,10 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
   subCmds["ODD"] = std::bind(areaOdd, _1, _2);
   subCmds["EVEN"] = std::bind(areaEven, _1, _2);
   subCmds["MEAN"] = std::bind(areaMean, _1, _2, data.size());
+  if (subcommand == "MEAN" && data.size() == 0)
+  {
+    throw std::logic_error("Invalid query.");
+  }
   double res = 0.0;
   try
   {
@@ -236,29 +236,17 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
     throw std::logic_error("Invalid input.");
   }
 
-  int minX, minY, maxX, maxY;
-  minX = std::numeric_limits<int>::max();
-  minY = std::numeric_limits<int>::max();
-  maxX = std::numeric_limits<int>::min();
-  maxY = std::numeric_limits<int>::min();
-  auto getMinCoordsBind = std::bind(getMinMaxCoordsInPoly, _1, std::ref(minX), std::ref(minY), "min");
-  auto getMaxCoordsBind = std::bind(getMinMaxCoordsInPoly, _1, std::ref(maxX), std::ref(maxY), "max");
-  std::for_each(data.begin(), data.end(), getMinCoordsBind);
-  std::for_each(data.begin(), data.end(), getMaxCoordsBind);
+  Borders polygonBorders = std::accumulate(data.begin(), data.end(), Borders{}, getPolygonBorders);
+  auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
+  bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
 
-  int currentMinX = minX;
-  int currentMinY = minY;
-  int currentMaxX = maxX;
-  int currentMaxY = maxY;
-  getMinCoordsBind(inframePoly);
-  getMaxCoordsBind(inframePoly);
   StreamGuard guard(out);
-  if (currentMinX != minX || currentMinY != minY || currentMaxX != maxX || currentMaxY != maxY)
+  if (inside)
   {
-    out << "<FALSE>" << '\n';
+    out << "<TRUE>\n";
   }
   else
   {
-    out << "<TRUE>" << '\n';
+    out << "<FALSE>\n";
   }
 }

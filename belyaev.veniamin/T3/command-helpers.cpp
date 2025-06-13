@@ -60,45 +60,29 @@ size_t belyaev::getVertices(const Polygon& src)
   return src.points.size();
 }
 
-void belyaev::compareCoordsMin(const Point& pnt, int& minX, int& minY)
+belyaev::Borders belyaev::getPointBorders(Borders box, const Point& pnt)
 {
-  if (pnt.x < minX)
-  {
-    minX = pnt.x;
-  }
-  if (pnt.y < minY)
-  {
-    minY = pnt.y;
-  }
+  return Borders{
+    std::min(box.minX, pnt.x),
+    std::min(box.minY, pnt.y),
+    std::max(box.maxX, pnt.x),
+    std::max(box.maxY, pnt.y)
+  };
 }
 
-void belyaev::compareCoordsMax(const Point& pnt, int& maxX, int& maxY)
-{
-  if (pnt.x > maxX)
-  {
-    maxX = pnt.x;
-  }
-  if (pnt.y > maxY)
-  {
-    maxY = pnt.y;
-  }
-}
-
-void belyaev::getMinMaxCoordsInPoly(const Polygon& src, int& minMaxX, int& minMaxY, std::string subCommand)
+belyaev::Borders belyaev::getPolygonBorders(Borders box, const Polygon& src)
 {
   using namespace std::placeholders;
-  if (subCommand == "min")
-  {
-    auto compareCoordsBind = std::bind(compareCoordsMin, _1, std::ref(minMaxX), std::ref(minMaxY));
-    std::for_each(src.points.begin(), src.points.end(), compareCoordsBind);
-  }
-  else if (subCommand == "max")
-  {
-    auto compareCoordsBind = std::bind(compareCoordsMax, _1, std::ref(minMaxX), std::ref(minMaxY));
-    std::for_each(src.points.begin(), src.points.end(), compareCoordsBind);
-  }
-  else
-  {
-    throw std::logic_error("getMinMaxCoordsInPoly: INVALID SUBCOMMAND");
-  }
+  Borders polyBorders = std::accumulate(src.points.begin(), src.points.end(), Borders{}, getPointBorders);
+  return Borders{
+    std::min(box.minX, polyBorders.minX),
+    std::min(box.minY, polyBorders.minY),
+    std::max(box.maxX, polyBorders.maxX),
+    std::max(box.maxY, polyBorders.maxY)
+  };
+}
+
+bool belyaev::isPointInBorders(const belyaev::Point& pnt, const belyaev::Borders& box)
+{
+  return pnt.x >= box.minX && pnt.x <= box.maxX && pnt.y >= box.minY && pnt.y <= box.maxY;
 }

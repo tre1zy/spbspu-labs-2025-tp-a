@@ -56,16 +56,15 @@ std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
   }
 
   using istreamPnt = std::istream_iterator<Point>;
-  std::vector<Point> newPoints;
-  std::copy_n(istreamPnt(in), pointsAmount, std::back_inserter(newPoints)); // questionable implementation might change l8r
-  if (in.peek() != '\n')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  if (in)
+  std::vector<Point> newPoints(pointsAmount, Point{0, 0});
+  std::copy_n(istreamPnt(in), pointsAmount, newPoints.begin());
+  if (in && pointsAmount == newPoints.size())
   {
     dest.points = std::move(newPoints);
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }

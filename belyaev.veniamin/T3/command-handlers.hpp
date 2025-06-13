@@ -1,11 +1,10 @@
 #ifndef COMMAND_HANDLERS_HPP
 #define COMMAND_HANDLERS_HPP
+#include <iomanip>
 #include <iostream>
 #include <map>
-#include <iomanip>
-#include <limits>
-#include "shapes.hpp"
 #include "command-helpers.hpp"
+#include "shapes.hpp"
 #include <stream-guard.hpp>
 
 namespace belyaev
