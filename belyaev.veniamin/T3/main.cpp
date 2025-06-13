@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
       file.clear(file.rdstate() ^ std::ios_base::failbit);
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    std::copy(PolyIStream(file), PolyIStream(), std::back_inserter(data));
+    std::copy(PolyIStream{file}, PolyIStream{}, std::back_inserter(data));
   }
 
   std::map<std::string, std::function<void(std::istream&, std::ostream&)>> cmds;

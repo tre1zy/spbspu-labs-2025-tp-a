@@ -59,9 +59,13 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
   }
   catch (const std::out_of_range& e)
   {
-    std::cout << subcommand << '\n';
     if (isStringNumeric(subcommand))
     {
+      size_t vertices = std::stoull(subcommand);
+      if (vertices < 3)
+      {
+        throw std::logic_error("Invalid query.");
+      }
       auto areaVerticesBind = std::bind(areaVertices, _1, _2, std::stoull(subcommand));
       res = std::accumulate(data.begin(), data.end(), 0.0, areaVerticesBind);
     }
@@ -123,14 +127,14 @@ void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::os
 
   std::string subcommand;
   in >> subcommand;
-  if (in.fail())
+  if (in.fail() || data.size() == 0)
   {
     throw std::logic_error("Failed.");
   }
 
   std::map<std::string, std::function<void()>> subCmds;
   subCmds["AREA"] = std::bind(minMaxArea, std::ref(data), std::ref(out), std::cref(command));
-  subCmds["VERTICES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), std::cref(command));
+  subCmds["VERTIXES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), std::cref(command));
   try
   {
     subCmds.at(subcommand)();
@@ -184,6 +188,11 @@ void belyaev::count(const std::vector<Polygon>& data, std::istream& in, std::ost
   {
     if (isStringNumeric(subcommand))
     {
+      size_t vertices = std::stoull(subcommand);
+      if (vertices < 3)
+      {
+        throw std::logic_error("Invalid query.");
+      }
       countVertices(data, result, std::stoull(subcommand));
     }
     else
