@@ -82,15 +82,11 @@ void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polyg
   in >> substr;
   if (substr == "ODD")
   {
-    std::vector< Polygon > odd;
-    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(odd), isOdd);
-    out << odd.size();
+    out << std::count_if(shapes.begin(), shapes.end(), isOdd);
   }
   else if (substr == "EVEN")
   {
-    std::vector< Polygon > even;
-    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(even), isEven);
-    out << even.size();
+    out << std::count_if(shapes.begin(), shapes.end(), isEven);
   }
   else if(isDigit(substr))
   {
@@ -99,10 +95,8 @@ void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polyg
     {
       throw std::invalid_argument("<INVALID COMMAND>");
     }
-    std::vector< Polygon > temp;
     auto compare = std::bind(isNumOfVertex, std::placeholders::_1, s);
-    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare);
-    out << temp.size();
+    out << std::count_if(shapes.begin(), shapes.end(), compare);
   }
   else
   {
@@ -235,7 +229,7 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
   Polygon poly;
   if (!(in >> poly) || poly.points.size() < 3)
   {
-    throw std::logic_error("Not a polygon!");
+    throw std::invalid_argument("<INVALID COMMAND>");
   }
   size_t countAdd = 0;
   std::vector< Polygon > res;
@@ -246,7 +240,6 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
     {
       res.push_back(*it);
       ++countAdd;
-      ++it;
     }
   }
   shapes = std::move(res);
@@ -258,7 +251,7 @@ void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygo
   Polygon poly;
   if (!(in >> poly) || poly.points.size() < 3)
   {
-    throw std::logic_error("Not a polygon!");
+    throw std::invalid_argument("<INVALID COMMAND>");
   }
   auto same = std::bind(isSame, poly, std::placeholders::_1);
   std::vector< Polygon > temp;
