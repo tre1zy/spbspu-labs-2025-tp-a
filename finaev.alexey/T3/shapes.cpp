@@ -49,6 +49,12 @@ std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
       in.setstate(std::ios::failbit);
       return in;
     }
+    if (in.fail())
+    {
+      poly.points.clear();
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     poly.points.push_back(p);
   }
   return in;
@@ -64,4 +70,3 @@ std::ostream& finaev::operator<<(std::ostream& out, const Polygon& poly)
   std::copy(poly.points.begin(), poly.points.end(), std::ostream_iterator< Point >{ out, " " });
   return out;
 }
-
