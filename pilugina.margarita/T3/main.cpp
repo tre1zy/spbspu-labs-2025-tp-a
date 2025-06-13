@@ -33,16 +33,22 @@ int main(int argc, char **argv)
       inputFile.clear(inputFile.rdstate() ^ std::ios::failbit);
       inputFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::copy(std::istream_iterator< Polygon >(inputFile), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+    std::copy(std::istream_iterator< Polygon >(inputFile), std::istream_iterator< Polygon >(),
+              std::back_inserter(polygons));
   }
   inputFile.close();
 
-  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
   using namespace std::placeholders;
-  commands["AREA"] = std::bind(pilugina::areaCommand, _1, _2, std::cref(polygons));
-  commands["MAX"] = std::bind(pilugina::maxCommand, _1, _2, std::cref(polygons));
-  commands["MIN"] = std::bind(pilugina::minCommand, _1, _2, std::cref(polygons));
-  commands["COUNT"] = std::bind(pilugina::countCommand, _1, _2, std::cref(polygons));
+  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands
+  {
+      {"AREA", std::bind(pilugina::areaCommand, _1, _2, std::cref(polygons))},
+      {"MAX", std::bind(pilugina::maxCommand, _1, _2, std::cref(polygons))},
+      {"MIN", std::bind(pilugina::minCommand, _1, _2, std::cref(polygons))},
+      {"COUNT", std::bind(pilugina::countCommand, _1, _2, std::cref(polygons))},
+      {"ECHO", std::bind(pilugina::echoCommand, _1, _2, std::ref(polygons))},
+      {"INTERSECTIONS", std::bind(pilugina::intersectsCommand, _1, _2, std::cref(polygons))},
+      {"PERMS", std::bind(pilugina::permsCommand, _1, _2, std::cref(polygons))}
+  };
 
   std::string command;
   while (!(std::cin >> command).eof())

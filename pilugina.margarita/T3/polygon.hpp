@@ -11,16 +11,16 @@ namespace pilugina
   {
     int x, y;
   };
+  bool operator<(const Point &lhs, const Point &rhs);
+  bool operator==(const Point &lhs, const Point &rhs);
+  std::istream &operator>>(std::istream &in, Point &dest);
 
   struct Polygon
   {
     std::vector< Point > points;
   };
-
-  std::istream &operator>>(std::istream &in, Point &dest);
+  bool operator==(const Polygon &lhs, const Polygon &rhs);
   std::istream &operator>>(std::istream &in, Polygon &dest);
-
-  bool operator==(const Point &lhs, const Point &rhs);
 }
 
 #endif

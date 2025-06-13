@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <algorithm>
 #include <format_guard.hpp>
 #include <iomanip>
 #include "areaCommands.hpp"
@@ -6,6 +7,8 @@
 #include "echo.hpp"
 #include "maxCommands.hpp"
 #include "minCommands.hpp"
+#include "intersects.hpp"
+#include "permutations.hpp"
 
 void pilugina::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
 {
@@ -35,6 +38,34 @@ void pilugina::echoCommand(std::istream &in, std::ostream &out, std::vector< Pol
   if (in)
   {
     out << echo(polys, ref);
+  }
+  else
+  {
+    throw std::invalid_argument("wrong polygon");
+  }
+}
+
+void pilugina::intersectsCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
+{
+  Polygon ref;
+  in >> ref;
+  if (in)
+  {
+    out << std::count_if(polys.cbegin(), polys.cend(), IntersectsWith(ref));
+  }
+  else
+  {
+    throw std::invalid_argument("wrong polygon");
+  }
+}
+
+void pilugina::permsCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
+{
+  Polygon ref;
+  in >> ref;
+  if (in)
+  {
+    out << std::count_if(polys.cbegin(), polys.cend(), PermutationPredicate(ref));
   }
   else
   {

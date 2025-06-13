@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include "polygon.hpp"
-#include "utils.hpp"
+#include "polygonUtils.hpp"
 
 double pilugina::calcAreasSum(const std::vector< Polygon > &polys)
 {

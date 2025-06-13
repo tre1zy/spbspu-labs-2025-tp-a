@@ -4,7 +4,7 @@
 #include <map>
 #include <numeric>
 #include <iomanip>
-#include "utils.hpp"
+#include "polygonUtils.hpp"
 
 double pilugina::updateMinArea(double currentMin, const Polygon &poly)
 {

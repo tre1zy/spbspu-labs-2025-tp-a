@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <map>
-#include "utils.hpp"
+#include "polygonUtils.hpp"
 
 std::size_t pilugina::getCountOdd(const std::vector< Polygon > &polys)
 {

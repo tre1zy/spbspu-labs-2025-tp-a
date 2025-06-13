@@ -10,6 +10,8 @@ namespace pilugina
   void minCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void countCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void echoCommand(std::istream &, std::ostream &, std::vector< Polygon > &);
+  void intersectsCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
+  void permsCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
 }
 
 #endif
