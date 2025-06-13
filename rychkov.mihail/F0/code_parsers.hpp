@@ -5,8 +5,10 @@
 #include <stack>
 #include <set>
 #include <string>
+#include <utility>
 #include <parser.hpp>
 #include "content.hpp"
+#include "compare.hpp"
 
 namespace rychkov
 {
@@ -17,6 +19,54 @@ namespace rychkov
     CParseContext* base = nullptr;
     size_t line = 0, symbol = 0;
     std::string last_line;
+  };
+
+  class TypeParser
+  {
+  public:
+    bool empty() const noexcept;
+    bool ready() const noexcept;
+    bool is_function() const noexcept;
+
+    bool prepare();
+    typing::Type type() const;
+    entities::Variable variable() const;
+    entities::Function function() const;
+
+    bool append(CParseContext& context, char c);
+    bool append(CParseContext& context, std::string name);
+    bool append(CParseContext& context, size_t numeric_literal);
+    bool append(CParseContext& context, typing::Type base_type);
+
+  private:
+    struct ParseCell
+    {
+      typing::Type* data;
+      bool right_allign = false;
+      bool bracket_opened = false;
+      bool parenthesis_opened = false;
+      bool array_must_have_size = false;
+      bool is_function_paremeter = false;
+    };
+    typing::Type combined_;
+    std::stack< ParseCell > stack_;
+    std::string var_name_;
+    std::vector< std::string > parameters_;
+
+    bool append_const(CParseContext& context);
+    bool append_volatile(CParseContext& context);
+    bool append_signed(CParseContext& context);
+    bool append_unsigned(CParseContext& context);
+
+    bool append_asterisk(CParseContext& context);
+    bool append_open_bracket(CParseContext& context);
+    bool append_close_bracket(CParseContext& context);
+    bool append_open_parenthesis(CParseContext& context);
+    bool append_close_parenthesis(CParseContext& context);
+    bool append_comma(CParseContext& context);
+
+    typing::Type* move_up();
+    bool can_be_named_param(typing::Type* type_p);
   };
 
   class Lexer;
@@ -86,16 +136,22 @@ namespace rychkov
     void print(std::ostream& out) const;
   private:
     std::vector< entities::Expression > program_ = {{}};
-    std::set< std::pair< typing::Type, size_t > > base_types_; // data and declare-depth
+    std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_; // data and declare-depth
     std::set< entities::Alias > aliases_;
     std::set< std::pair< entities::Variable, size_t > > variables_;
     std::set< entities::Variable > defined_functions_;
-    std::set< std::pair< entities::Struct, size_t > > structs_;
+    std::set< std::pair< entities::Struct, size_t >, NameCompare > structs_;
     std::set< std::pair< entities::Union, size_t > > unions_;
     std::set< std::pair< entities::Enum, size_t > > enums_;
     std::stack< entities::Expression* > stack_;
 
     bool global_scope() const noexcept;
+
+    bool append_empty(CParseContext& context);
+
+    bool parse_semicolon(CParseContext& context);
+    bool parse_open_brace(CParseContext& context);
+    bool parse_close_brace(CParseContext& context);
   };
   void log(CParseContext& context, std::string message);
 }

@@ -67,6 +67,7 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
     }
     log(context, "struct can't be declared in this context");
   }
+  // if ()
   // name
   if (stack_.top()->empty())
   {
@@ -92,51 +93,74 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
 }
 bool rychkov::CParser::append(CParseContext& context, char c)
 {
-  if (c == ';')
+  using append_signature = bool(CParser::*)(CParseContext&);
+  using append_map = std::map< char, append_signature >;
+  static const append_map dispatch_map = {
+        {';', &CParser::parse_semicolon},
+        {'{', &CParser::parse_open_brace},
+        {'}', &CParser::parse_close_brace}
+      };
+
+  append_map::const_iterator found = dispatch_map.find(c);
+  if (found != dispatch_map.cend())
   {
-    // finish him...
-    for (; stack_.top()->operation != nullptr; stack_.pop())
-    {}
-    if (entities::is_body(*stack_.top()))
-    {
-      entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
-      stack_.top() = &body.data.emplace_back();
-      return true;
-    }
-    stack_.top() = &program_.emplace_back();
-    return true;
-  }
-  else if (c == '{')
-  {
-    if (global_scope())
-    {
-      log(context, "braced-enclosed body cannot be alone in global scope");
-      return false;
-    }
-    if (entities::is_decl(*stack_.top()))
-    {
-      entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-      if (std::holds_alternative< entities::Struct >(decl.data))
-      {
-        entities::Struct& data = std::get< entities::Struct >(decl.data);
-        if (data.name.empty())
-        {
-          log(context, "struct must have name");
-          return false;
-        }
-        decl.value = entities::Body{};
-        stack_.push(&*decl.value);
-        return true;
-      }
-      return true;
-    }
-    log(context, "unexpected braced-enclosed body");
-    return false;
-  }
-  else if (c == '}')
-  {
-    //
+    return (this->*(found->second))(context);
   }
   log(context, "unknown symbol ('"s + c + "'; code = " + std::to_string(c) + ")");
+  return false;
+}
+bool rychkov::CParser::parse_semicolon(CParseContext& context)
+{
+  for (; stack_.top()->operation != nullptr; stack_.pop()) // pop operators
+  {}
+  if (stack_.top()->empty())
+  {
+    stack_.pop();
+  }
+  if (stack_.empty())
+  {
+    return append_empty(context);
+  }
+  if (entities::is_body(*stack_.top())) //append new empty to body
+  {
+    entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
+    stack_.push(&body.data.emplace_back());
+    return true;
+  }
+  if (entities::is_decl(*stack_.top()))
+  {
+    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
+    if (std::holds_alternative< entities::Struct >(decl.data))
+    {
+      entities::Struct& data = std::get< entities::Struct >(decl.data);
+      if (data.name.empty())
+      {
+        log(context, "struct must have name");
+        return false;
+      }
+      // add struct to dict
+      stack_.pop();
+      structs_.insert(std::make_pair(data, stack_.size()));
+      base_types_.insert(std::make_pair(typing::Type{data.name, typing::Type::Struct}, stack_.size()));
+      return append_empty(context);
+    }
+  }
+  stack_.push(&program_.emplace_back()); //append new empty to program
+  return true;
+}
+bool rychkov::CParser::append_empty(CParseContext& context)
+{
+  if (stack_.empty())
+  {
+    stack_.push(&program_.emplace_back()); //append new empty to program
+    return true;
+  }
+  if (entities::is_body(*stack_.top())) //append new empty to body
+  {
+    entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
+    stack_.push(&body.data.emplace_back());
+    return true;
+  }
+  log(context, "cannot append any expr to this place");
   return false;
 }

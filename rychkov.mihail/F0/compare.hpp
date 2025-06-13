@@ -1,0 +1,24 @@
+#ifndef COMPARE_HPP
+#define COMPARE_HPP
+
+#include <string>
+#include <utility>
+#include "content.hpp"
+
+namespace rychkov
+{
+  struct NameCompare
+  {
+    using is_transparent = void;
+
+    using base_type_value = std::pair< typing::Type, size_t >;
+    using struct_value = std::pair< entities::Struct, size_t >;
+
+    bool operator()(const struct_value& lhs, const struct_value& rhs) const;
+    bool operator()(const base_type_value& lhs, const base_type_value& rhs) const;
+    bool operator()(const base_type_value& lhs, const std::string& rhs) const;
+    bool operator()(const std::string& lhs, const base_type_value& rhs) const;
+  };
+}
+
+#endif

@@ -1,5 +1,9 @@
 #include "content.hpp"
 
+bool rychkov::typing::Type::empty() const noexcept
+{
+  return (category == Combination) && !is_const && !is_volatile && !is_signed && !is_unsigned;
+}
 rychkov::entities::Expression::Expression():
   operation{nullptr}
 {}

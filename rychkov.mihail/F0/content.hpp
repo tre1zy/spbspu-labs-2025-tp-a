@@ -34,7 +34,7 @@ namespace rychkov
     {
       if (rhs != nullptr)
       {
-        static_cast< std::unique_ptr< T >& >(*this) = new T{*rhs};
+        static_cast< std::unique_ptr< T >& >(*this).reset(new T{*rhs});
       }
       return *this;
     }
@@ -42,7 +42,7 @@ namespace rychkov
     template< class U = T >
     DinMemWrapper& operator=(U&& rhs)
     {
-      static_cast< std::unique_ptr< T >& >(*this) = std::unique_ptr< T >{new T{std::forward< U >(rhs)}};
+      static_cast< std::unique_ptr< T >& >(*this).reset(new T{std::forward< U >(rhs)});
       return *this;
     }
     DinMemWrapper& operator=(nullptr_t)
@@ -52,7 +52,7 @@ namespace rychkov
     }
     DinMemWrapper& operator=(T* ptr)
     {
-      static_cast< std::unique_ptr< T >& >(*this) = std::unique_ptr< T >{ptr};
+      static_cast< std::unique_ptr< T >& >(*this).reset(ptr);
       return *this;
     }
   };
@@ -115,6 +115,8 @@ namespace rychkov
       bool array_has_length = false;
       size_t array_length = 0;
       std::vector< Type > function_parameters;
+
+      bool empty() const noexcept;
     };
   }
   namespace entities

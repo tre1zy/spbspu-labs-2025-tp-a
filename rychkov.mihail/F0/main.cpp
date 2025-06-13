@@ -12,7 +12,7 @@ static const char code[] = R"code(
 // # define a*/
 
 struct A
-{};
+{;};
 A a = {};
 int b = 0x192'023ULL;
 )code";
@@ -20,6 +20,47 @@ int b = 0x192'023ULL;
 int main(int argc, char** argv)
 {
   {
+    rychkov::CParseContext context{std::cerr, "main.c"};
+    rychkov::TypeParser tparser;
+    tparser.append(context, "const");
+    tparser.append(context, rychkov::typing::Type{"int", rychkov::typing::Type::Int});
+    tparser.append(context, '*');
+    tparser.append(context, "const");
+    tparser.append(context, '(');
+    tparser.append(context, '*');
+    tparser.append(context, '(');
+    tparser.append(context, "var");
+    tparser.append(context, ')');
+    tparser.append(context, '(');
+    tparser.append(context, rychkov::typing::Type{"char", rychkov::typing::Type::Int});
+    tparser.append(context, "arg1");
+    tparser.append(context, ',');
+    tparser.append(context, "const");
+    tparser.append(context, rychkov::typing::Type{"int", rychkov::typing::Type::Int});
+    tparser.append(context, '(');
+    tparser.append(context, '*');
+    tparser.append(context, ')');
+    tparser.append(context, '[');
+    tparser.append(context, ']');
+    tparser.append(context, ')');
+    tparser.append(context, ')');
+    tparser.append(context, '[');
+    tparser.append(context, 3ULL);
+    tparser.append(context, ']');
+    tparser.append(context, '[');
+    tparser.append(context, 4ULL);
+    tparser.append(context, ']');
+    if (tparser.is_function())
+    {
+      rychkov::operator<<(std::cout << "func: ", tparser.function()) << '\n';
+    }
+    else
+    {
+      rychkov::operator<<(std::cout << "var: ", tparser.variable()) << '\n';
+    }
+    std::cout << std::boolalpha << tparser.ready() << '\n';
+  }
+  /*{
     rychkov::CParseContext context{std::cerr, "main.c"};
     std::istringstream in(code);
     rychkov::Preprocessor preproc{};
@@ -59,5 +100,5 @@ int main(int argc, char** argv)
     }
     lexer.flush(context);
     cparser.print(std::cout);
-  }
+  }*/
 }
