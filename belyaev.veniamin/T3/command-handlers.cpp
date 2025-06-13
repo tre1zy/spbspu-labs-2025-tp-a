@@ -206,7 +206,6 @@ void belyaev::rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream&
   {
     throw std::logic_error("Failed.");
   }
-  data.size();
   size_t oldSize = data.size();
   auto helperBind = std::bind(rmEchoHelper, rmPolygon, _1, _2);
   auto new_end = std::unique(data.begin(), data.end(), helperBind);
