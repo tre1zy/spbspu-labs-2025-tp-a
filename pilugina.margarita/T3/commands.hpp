@@ -9,7 +9,7 @@ namespace pilugina
   void maxCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void minCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void countCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
-  void sameCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
+  void echoCommand(std::istream &, std::ostream &, std::vector< Polygon > &);
 }
 
 #endif
