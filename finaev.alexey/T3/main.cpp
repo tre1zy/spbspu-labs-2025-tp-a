@@ -46,22 +46,16 @@ int main(int argc, char* argv[])
   {
     try
     {
-      auto func = commands.find(cmd);
-      if (func != commands.end())
-      {
-        func->second();
-      }
-      else
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
+      commands.at(cmd)();
     }
     catch(const std::exception& e)
     {
-      std::cin.clear();
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << e.what();
+      std::cout << "<INVALID COMMAND>\n";
     }
-    std::cout << "\n";
   }
 }
