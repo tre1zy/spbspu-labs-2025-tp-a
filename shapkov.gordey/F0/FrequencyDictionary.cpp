@@ -387,8 +387,8 @@ void shapkov::intersect(std::istream& in, std::ostream& out, FrequencyDictionary
     return;
   }
   OneFreqDict temp;
-  std::unordered_map< std::string, size_t>* smallerDict = &text1->second.dictionary;
-  std::unordered_map< std::string, size_t>* largerDict = &text2->second.dictionary;
+  std::unordered_map< std::string, size_t >* smallerDict = &text1->second.dictionary;
+  std::unordered_map< std::string, size_t >* largerDict = &text2->second.dictionary;
   if (text2->second.dictionary.size() < text1->second.dictionary.size())
   {
     smallerDict = &text2->second.dictionary;
