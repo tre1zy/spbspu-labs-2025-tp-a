@@ -24,6 +24,7 @@ std::ostream& finaev::operator<<(std::ostream& out, const Point& point)
   return out;
 }
 
+
 std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
 {
   std::istream::sentry sentry(in);
@@ -37,15 +38,18 @@ std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > temp(count);
-  std::copy_n(std::istream_iterator< Point >{ in }, count, temp.begin());
-  if (in && temp.size() == count)
+  poly.points.clear();
+  poly.points.reserve(count);
+  for (size_t i = 0; i < count; ++i)
   {
-    poly.points = std::move(temp);
-  }
-  else
-  {
-    in.setstate(std::ios::failbit);
+    Point p;
+    if (!(in >> p))
+    {
+      poly.points.clear();
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    poly.points.push_back(p);
   }
   return in;
 }
@@ -60,3 +64,4 @@ std::ostream& finaev::operator<<(std::ostream& out, const Polygon& poly)
   std::copy(poly.points.begin(), poly.points.end(), std::ostream_iterator< Point >{ out, " " });
   return out;
 }
+
