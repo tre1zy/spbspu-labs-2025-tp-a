@@ -106,7 +106,7 @@ void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polyg
   }
   else
   {
-    std::invalid_argument("<INVALID COMMAND>");
+    throw std::invalid_argument("<INVALID COMMAND>");
   }
 }
 
@@ -154,6 +154,10 @@ void finaev::area(std::istream& in, std::ostream& out, const std::vector< Polygo
   else if (isDigit(substr))
   {
     size_t s = std::stoul(substr);
+    if (s < 3)
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
     std::vector< Polygon > temp;
     auto compare = std::bind(isNumOfVertex, std::placeholders::_1, s);
     std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(temp), compare);
@@ -242,8 +246,8 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
     {
       res.push_back(*it);
       ++countAdd;
+      ++it;
     }
-    ++it;
   }
   shapes = std::move(res);
   out << countAdd;
