@@ -33,34 +33,19 @@ namespace
     return poly.points.size();
   }
 
-  bool isEven(size_t num)
-  {
-    return num % 2 == 0;
-  }
-
-  bool isOdd(size_t num)
-  {
-    return num % 2 != 0;
-  }
-
   bool isEvenPoly(const mozhegova::Polygon & poly)
   {
-    return isEven(poly.points.size());
+    return poly.points.size() % 2 == 0;
   }
 
   bool isOddPoly(const mozhegova::Polygon & poly)
   {
-    return isOdd(poly.points.size());
+    return poly.points.size() % 2 != 0;
   }
 
   bool hasNumVert(const mozhegova::Polygon & poly, size_t num)
   {
     return poly.points.size() == num;
-  }
-
-  bool sortPoints(const mozhegova::Point & p1, const mozhegova::Point & p1)
-  {
-    return p1.x < p2.x && p1.y < p2.y;
   }
 
   void getAreaEven(std::ostream & out, const std::vector< mozhegova::Polygon > & polygons)
@@ -163,12 +148,61 @@ namespace
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
-  bool isSamePoly(mozhegova::Polygon poly1, mozhegova::Polygon poly2)
+  bool cmpPoint(const mozhegova::Point & p1, const mozhegova::Point & p2)
   {
-    std::sort(poly1.points.begin(), poly1.points.end(), sortPoints);
-    std::sort(poly2.points.begin(), poly2.points.end(), sortPoints);
-
+    if (p1.x != p2.x)
+    {
+      return p1.x < p2.x;
+    }
+    else
+    {
+      return p1.y < p2.y;
+    }
   }
+
+  double crossProduct(const mozhegova::Point & a, const mozhegova::Point & b, const mozhegova::Point & c)
+  {
+    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  }
+
+  bool isCounterClockwise(const mozhegova::Polygon & polygon)
+  {
+    return crossProduct(polygon.points[0], polygon.points[1], polygon.points[2]) > 0;
+  }
+
+  void sortPolygon(mozhegova::Polygon & poly)
+  {
+    auto itMin = std::min_element(poly.points.begin(), poly.points.end(), cmpPoint);
+    std::rotate(poly.points.begin(), itMin, poly.points.end());
+    if (isCounterClockwise(poly))
+    {
+      std::reverse(poly.points.begin() + 1, poly.points.end());
+    }
+  }
+
+  struct isSame
+  {
+    const mozhegova::Polygon & poly;
+    bool operator()(const mozhegova::Polygon & temp) const
+    {
+      if (temp.points.size() != poly.points.size())
+      {
+        return false;
+      }
+      mozhegova::Polygon sortTemp = temp;
+      sortPolygon(sortTemp);
+      std::vector< mozhegova::Point > diffsPoly;
+      std::vector< mozhegova::Point > diffsTemp;
+      std::adjacent_difference(poly.points.begin(), poly.points.end(), std::back_inserter(diffsPoly));
+      std::adjacent_difference(sortTemp.points.begin(), sortTemp.points.end(), std::back_inserter(diffsTemp));
+      diffsTemp[0] = diffsPoly[0];
+      if (diffsPoly == diffsTemp)
+      {
+        return true;
+      }
+      return false;
+    }
+  };
 }
 
 void mozhegova::printArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -301,6 +335,7 @@ void mozhegova::printSame(std::istream & in, std::ostream & out, const std::vect
   {
     throw std::logic_error("incorrect input");
   }
-  auto cmp = std::bind(isSamePoly, std::placeholders::_1, poly);
+  sortPolygon(poly);
+  isSame cmp{poly};
   out << std::count_if(polygons.begin(), polygons.end(), cmp) << '\n';
 }

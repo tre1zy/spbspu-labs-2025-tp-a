@@ -10,6 +10,7 @@ namespace mozhegova
   {
     int x, y;
     bool operator==(const Point & rhs) const;
+    Point operator-(const Point & rhs) const;
   };
 
   struct Polygon
