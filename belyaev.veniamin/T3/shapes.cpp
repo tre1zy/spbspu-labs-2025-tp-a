@@ -1,6 +1,7 @@
 #include "shapes.hpp"
-#include <iterator>
 #include <algorithm>
+#include <iterator>
+#include <functional>
 #include <stream-guard.hpp>
 #include "delimiter.hpp"
 
@@ -39,8 +40,20 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Point& src)
   return out;
 }
 
+belyaev::Point belyaev::checkNext(const Point& pnt, std::istream& in, bool& result)
+{
+  if (in.peek() == '\n')
+  {
+    result = true;
+    in.setstate(std::ios::eofbit);
+  }
+  return pnt;
+}
+
 std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
 {
+  using namespace std::placeholders;
+
   std::istream::sentry sentry(in);
   if (!sentry)
   {
@@ -56,14 +69,18 @@ std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
   }
 
   using istreamPnt = std::istream_iterator<Point>;
-  std::vector<Point> newPoints(pointsAmount, Point{0, 0});
-  std::copy_n(istreamPnt(in), pointsAmount, newPoints.begin());
-  if (in && pointsAmount == newPoints.size())
+  std::vector<Point> newPoints;
+  bool result = false;
+  auto checkNextBind = std::bind(checkNext, _1, std::ref(in), std::ref(result));
+  std::transform(istreamPnt{in}, istreamPnt{}, std::back_inserter(newPoints), checkNextBind);
+  if (newPoints.size() == pointsAmount && result)
   {
+    in.clear();
     dest.points = std::move(newPoints);
   }
   else
   {
+    in.clear();
     in.setstate(std::ios::failbit);
   }
   return in;

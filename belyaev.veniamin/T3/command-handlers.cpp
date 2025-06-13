@@ -134,7 +134,7 @@ void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::os
 
   std::map<std::string, std::function<void()>> subCmds;
   subCmds["AREA"] = std::bind(minMaxArea, std::ref(data), std::ref(out), std::cref(command));
-  subCmds["VERTIXES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), std::cref(command));
+  subCmds["VERTEXES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), std::cref(command));
   try
   {
     subCmds.at(subcommand)();
@@ -235,7 +235,7 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   {
     throw std::logic_error("Invalid input.");
   }
-
+  
   Borders polygonBorders = std::accumulate(data.begin(), data.end(), Borders{}, getPolygonBorders);
   auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
   bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
