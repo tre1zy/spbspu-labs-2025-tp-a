@@ -1,4 +1,4 @@
-#include "structures.hpp"
+#include "processing_structures.hpp"
 #include <iostream>
 #include <stack>
 #include "stream_guardian.hpp"
@@ -29,20 +29,26 @@ std::istream & zakirov::operator>>(std::istream & in, Data & data)
   in >> MinorSymbol{'('};
   in >> MinorSymbol{':'};
   std::string key;
+  bool key_flag1 = false;
+  bool key_flag2 = false;
+  bool key_flag3 = false;
   for (size_t i = 0; i < 3; ++i)
   {
     in >> key;
-    if (key == "key1")
+    if (key == "key1" && !key_flag1)
     {
       in >> UllOctIO{received.key1};
+      key_flag1 = true;
     }
-    else if (key == "key2")
+    else if (key == "key2" && !key_flag2)
     {
       in >> UllHexIO{received.key2};
+      key_flag2 = true;
     }
-    else if (key == "key3")
+    else if (key == "key3" && !key_flag3)
     {
       in >> StringIO{received.key3};
+      key_flag3 = true;
     }
     else
     {

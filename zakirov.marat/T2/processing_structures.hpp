@@ -1,5 +1,5 @@
-#ifndef STRUCTURES_HPP
-#define STRUCTURES_HPP
+#ifndef PROCESSING_STRUCTURES_HPP
+#define PROCESSING_STRUCTURES_HPP
 #include <string>
 
 namespace zakirov

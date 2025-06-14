@@ -3,13 +3,10 @@
 #include <iterator>
 #include <algorithm>
 #include "stream_guardian.hpp"
-#include "structures.hpp"
+#include "processing_structures.hpp"
 
 int main()
 {
-  zakirov::Guardian output_primary(std::cout);
-  zakirov::Guardian input_primary(std::cin);
-
   std::vector< zakirov::Data > array;
   while (!std::cin.eof())
   {
