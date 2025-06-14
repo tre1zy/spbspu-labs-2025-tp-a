@@ -7,7 +7,7 @@ namespace zakirov
   class Guardian
   {
   public:
-    explicit Guardian(std::basic_ios< char > & s);
+    Guardian(std::basic_ios< char > & s);
     ~Guardian();
   private:
     std::basic_ios< char > & s_;
