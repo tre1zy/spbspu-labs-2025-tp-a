@@ -38,24 +38,11 @@ std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
     in.setstate(std::ios::failbit);
     return in;
   }
-  poly.points.clear();
-  poly.points.reserve(count);
-  for (size_t i = 0; i < count; ++i)
+  std::vector< Point > temp(count);
+  std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
+  if (in)
   {
-    Point p;
-    if (!(in >> p))
-    {
-      poly.points.clear();
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    if (in.fail())
-    {
-      poly.points.clear();
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    poly.points.push_back(p);
+    poly.points = std::move(temp);
   }
   return in;
 }
