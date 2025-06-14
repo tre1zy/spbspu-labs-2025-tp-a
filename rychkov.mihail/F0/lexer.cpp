@@ -3,12 +3,8 @@
 #include <iostream>
 #include "content_print.hpp"
 
-rychkov::Lexer::Lexer():
-  next_(nullptr),
-  literal_full_(false)
-{}
-rychkov::Lexer::Lexer(CParser& next):
-  next_(&next),
+rychkov::Lexer::Lexer(CParser* next):
+  next_(next),
   literal_full_(false)
 {}
 
@@ -58,7 +54,7 @@ void rychkov::Lexer::flush(CParseContext& context)
   {
     if (next_ == nullptr)
     {
-      std::cout << "<name> " << std::get< std::string >(buf_) << '\n';
+      context.out << "<name> " << std::get< std::string >(buf_) << '\n';
     }
     else
     {
@@ -69,7 +65,7 @@ void rychkov::Lexer::flush(CParseContext& context)
   {
     if (next_ == nullptr)
     {
-      std::cout << "<lit>  " << std::get< entities::Literal >(buf_) << '\n';
+      context.out << "<lit>  " << std::get< entities::Literal >(buf_) << '\n';
     }
     else
     {
@@ -80,7 +76,7 @@ void rychkov::Lexer::flush(CParseContext& context)
   {
     if (next_ == nullptr)
     {
-      std::cout << "<oper> " << (*std::get< operator_value >(buf_))[0].token << '\n';
+      context.out << "<oper> " << (*std::get< operator_value >(buf_))[0].token << '\n';
     }
     else
     {
@@ -126,17 +122,17 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
   }
   else if (c == '\'')
   {
-    buf_ = entities::Literal{{c}, {}, entities::Literal::Char};
+    buf_ = entities::Literal{{}, {}, entities::Literal::Char};
   }
   else if (c == '"')
   {
-    buf_ = entities::Literal{{c}, {}, entities::Literal::String};
+    buf_ = entities::Literal{{}, {}, entities::Literal::String};
   }
   else if (!std::isspace(c))
   {
     if (next_ == nullptr)
     {
-      std::cout << "<spec> " << c << '\n';
+      context.out << "<spec> " << c << '\n';
       return;
     }
     next_->append(context, c);

@@ -14,6 +14,7 @@ namespace rychkov
 {
   struct CParseContext
   {
+    std::ostream& out;
     std::ostream& err;
     std::string file;
     CParseContext* base = nullptr;
@@ -76,9 +77,12 @@ namespace rychkov
   {
   public:
     Preprocessor();
-    Preprocessor(Lexer& next);
+    Preprocessor(Lexer* next, std::vector< std::string > search_dirs);
 
+    void parse(CParseContext& context, std::istream& in);
     void parse(CParseContext& context, std::string line);
+    void flush(CParseContext& context);
+    void flush(CParseContext& context, char c);
 
   private:
     struct CommandContext
@@ -92,10 +96,11 @@ namespace rychkov
     static Parser::map_type< CommandContext, Preprocessor > call_map;
 
     Lexer* next_;
-    bool singleline_comment = false;
     bool multiline_comment = false;
+    std::string last_line;
+    std::vector< std::string > include_dirs_;
 
-    void flush(CParseContext& context, char c);
+    void append(CParseContext& context, char c);
 
     bool include(CommandContext&);
     bool define(CommandContext&);
@@ -108,8 +113,7 @@ namespace rychkov
   public:
     static const std::set< std::vector< Operator >, NameCompare > cases;
 
-    Lexer();
-    Lexer(CParser& next);
+    Lexer(CParser* next = nullptr);
 
     void parse(CParseContext& context, std::string str);
     void append(CParseContext& context, char c);

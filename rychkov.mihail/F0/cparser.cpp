@@ -11,12 +11,14 @@ const std::vector< rychkov::Operator > rychkov::CParser::operators = {
 
 void rychkov::log(CParseContext& context, std::string message)
 {
-  for (const CParseContext* file = &context; file != nullptr; file = file->base)
+  context.err << "In file \"" << context.file << "\" (" << context.line + 1 << ':' << context.symbol + 1 << ")\n";
+  context.err << "\tError: " << message << "\n  ";
+  context.err << context.last_line << "\n  " << std::string(context.symbol, '-') << "^\n";
+  for (const CParseContext* file = context.base; file != nullptr; file = file->base)
   {
-    context.err << "In file \"" << file->file << "\" (" << context.line + 1 << ':' << context.symbol + 1 << ")\n";
+    context.err << "Included from \"" << file->file << "\" (" << file->line + 1 << ':' << file->symbol + 1 << ")\n  ";
+    context.err << file->last_line << "\n  " << std::string(file->symbol, '-') << "^\n";
   }
-  context.err << "\tError: " << message << "\n\n  " << context.last_line << '\n';
-  context.err << "  " << std::string(context.symbol, '-') << "^\n";
   context.nerrors++;
 }
 
