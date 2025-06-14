@@ -5,10 +5,10 @@
 #include <vector>
 #include <iomanip>
 #include <limits>
+#include <stream_guard.hpp>
 #include "functors.hpp"
 #include "polygon.hpp"
 #include "data_input.hpp"
-#include "stream_guard.hpp"
 
 void trukhanov::area(std::istream& in, std::ostream& out, const std::vector < Polygon >& src)
 {
