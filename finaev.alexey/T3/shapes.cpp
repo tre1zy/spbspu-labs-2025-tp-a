@@ -9,27 +9,7 @@ std::istream& finaev::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  in >> delimiterIO{'('};
-  if (!in)
-  {
-    return in;
-  }
-  in >> point.x;
-  if (!in)
-  {
-    return in;
-  }
-  in >> delimiterIO{';'};
-  if (!in)
-  {
-    return in;
-  }
-  in >> point.y;
-  if (!in)
-  {
-    return in;
-  }
-  in >> delimiterIO{')'};
+  in >> delimiterIO{'('} >> point.x >> delimiterIO{';'} >> point.y >> delimiterIO{')'};
   return in;
 }
 

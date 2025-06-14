@@ -232,6 +232,10 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
+  if (in.peek() != '\n' && in.peek() != EOF)
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
   size_t countAdd = 0;
   std::vector< Polygon > res;
   for (auto it = shapes.begin(); it != shapes.end(); ++it)
@@ -252,6 +256,10 @@ void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygo
   Polygon poly;
   in >> poly;
   if (in.fail() || !in)
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+  if (in.peek() != '\n' && in.peek() != EOF)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
