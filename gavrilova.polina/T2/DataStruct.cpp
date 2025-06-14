@@ -5,7 +5,7 @@
 
 namespace {
 
-  std::istream& input_value(std::istream& in, int (&ids)[3], int id, gavrilova::DataStruct& dest)
+  std::istream& input_value(std::istream& in, int* ids, int id, gavrilova::DataStruct& dest)
   {
     using namespace gavrilova;
     if (!in) {
