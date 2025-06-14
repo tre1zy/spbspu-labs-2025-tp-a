@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <stream-guard.hpp>
 
 namespace aleksandrov
 {
@@ -19,6 +20,7 @@ namespace aleksandrov
     }
     return in;
   }
+
   std::istream& operator>>(std::istream& in, Point& rhs)
   {
     std::istream::sentry sentry(in);
@@ -29,6 +31,7 @@ namespace aleksandrov
     using sep = DelimiterIO;
     return in >> sep{ '(' } >> rhs.x >> sep{ ';' } >> rhs.y >> sep{ ')' };
   }
+
   std::istream& operator>>(std::istream& in, Polygon& rhs)
   {
     std::istream::sentry sentry(in);
@@ -52,6 +55,7 @@ namespace aleksandrov
     rhs.points = points;
     return in;
   }
+
   std::ostream& operator<<(std::ostream& out, const Point& rhs)
   {
     std::ostream::sentry sentry(out);
@@ -59,8 +63,10 @@ namespace aleksandrov
     {
       return out;
     }
+    StreamGuard guard(out);
     return out << '(' << rhs.x << ';' << rhs.y << ')';
   }
+
   std::ostream& operator<<(std::ostream& out, const Polygon& rhs)
   {
     std::ostream::sentry sentry(out);
@@ -68,6 +74,7 @@ namespace aleksandrov
     {
       return out;
     }
+    StreamGuard guard(out);
     out << rhs.points.size();
     for (size_t i = 0; i < rhs.points.size(); ++i)
     {

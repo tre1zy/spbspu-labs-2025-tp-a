@@ -341,6 +341,14 @@ namespace aleksandrov
     {
       throw std::logic_error("Incorrect polygon!");
     }
+    while (in.peek() != '\n' && std::isspace(in.peek()))
+    {
+      in.ignore(1);
+    }
+    if (in.peek() != '\n' && in.peek() != EOF)
+    {
+      throw std::logic_error("Incorrect polygon!");
+    }
 
     FrameRect globalRect = findGlobalFrameRect(polygons);
     FrameRect inputRect = findFrameRect(polygon);
