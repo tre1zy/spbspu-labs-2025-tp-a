@@ -21,7 +21,7 @@ namespace zakirov
 
   std::istream & operator>>(std::istream & in, Point & point);
   std::istream & operator>>(std::istream & in, Polygon & polygon);
-  std::ostream & operator<<(std::ostream & out, Polygon & polygon);
+  std::ostream & operator<<(std::ostream & out, Point & point);
 }
 
 #endif
