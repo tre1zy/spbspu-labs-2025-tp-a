@@ -307,6 +307,10 @@ void mozhegova::printEcho(std::istream & in, std::ostream & out, std::vector< Po
   {
     throw std::logic_error("incorrect input");
   }
+  if (in.peek() != '\n')
+  {
+    throw std::logic_error("incorrect input");
+  }
   std::vector< Polygon > tempPolygons = polygons;
   size_t count = 0;
   auto it = std::find(polygons.begin(), polygons.end(), poly);

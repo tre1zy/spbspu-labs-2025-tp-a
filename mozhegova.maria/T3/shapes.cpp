@@ -31,7 +31,7 @@ std::istream & mozhegova::operator>>(std::istream & in, Polygon & dest)
   }
   std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
-  if (!in || in.peek() != '\n')
+  if (!in)
   {
     in.setstate(std::ios::failbit);
     return in;
