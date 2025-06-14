@@ -12,6 +12,33 @@ rychkov::Lexer::Lexer(CParser& next):
   literal_full_(false)
 {}
 
+const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases = {
+      {
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "+", false, true, 2},
+        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "+", false, false, 4}
+      },
+      {
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, false, 1},
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, true, 2},
+      },
+      {
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "-", false, true, 2},
+        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "-", false, false, 4}
+      },
+      {
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, false, 1},
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, true, 2},
+      },
+      {{rychkov::Operator::unary, rychkov::Operator::special, "!", false, true, 2}},
+      {
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "*", false, true, 2},
+        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "*", false, false, 3}
+      },
+      {{rychkov::Operator::binary, rychkov::Operator::arithmetic, "*=", true, true, 14}},
+      {{rychkov::Operator::binary, rychkov::Operator::assign, "=", true, true, 14}},
+      {{rychkov::Operator::binary, rychkov::Operator::logic, "==", false, false, 7}}
+    };
+
 void rychkov::Lexer::parse(CParseContext& context, std::string str)
 {
   for (char c: str)
@@ -25,13 +52,8 @@ void rychkov::Lexer::parse(CParseContext& context, std::string str)
     }
   }
 }
-bool rychkov::Lexer::flush(CParseContext& context)
+void rychkov::Lexer::flush(CParseContext& context)
 {
-  if (std::holds_alternative< std::monostate >(buf_))
-  {
-    return false;
-  }
-  bool result = true;
   if (std::holds_alternative< std::string >(buf_))
   {
     if (next_ == nullptr)
@@ -40,7 +62,7 @@ bool rychkov::Lexer::flush(CParseContext& context)
     }
     else
     {
-      result = next_->append(context, std::move(std::get< std::string >(buf_)));
+      next_->append(context, std::move(std::get< std::string >(buf_)));
     }
   }
   else if (std::holds_alternative< entities::Literal >(buf_))
@@ -51,28 +73,50 @@ bool rychkov::Lexer::flush(CParseContext& context)
     }
     else
     {
-      result = next_->append(context, std::get< entities::Literal >(buf_));
+      next_->append(context, std::get< entities::Literal >(buf_));
+    }
+  }
+  else if (std::holds_alternative< operator_value >(buf_))
+  {
+    if (next_ == nullptr)
+    {
+      std::cout << "<oper> " << (*std::get< operator_value >(buf_))[0].token << '\n';
+    }
+    else
+    {
+      next_->append(context, *std::get< operator_value >(buf_));
     }
   }
   literal_full_ = false;
   buf_.emplace< 0 >();
-  return result;
 }
-bool rychkov::Lexer::append(CParseContext& context, char c)
+void rychkov::Lexer::append(CParseContext& context, char c)
 {
   if (std::holds_alternative< entities::Literal >(buf_))
   {
-    return append_literal(context, c);
+    append_literal(context, c);
   }
-  if (std::holds_alternative< std::string >(buf_))
+  else if (std::holds_alternative< std::string >(buf_))
   {
-    return append_name(context, c);
+    append_name(context, c);
   }
-  return append_new(context, c);
+  else if (std::holds_alternative< operator_value >(buf_))
+  {
+    append_operator(context, c);
+  }
+  else
+  {
+    append_new(context, c);
+  }
 }
-bool rychkov::Lexer::append_new(CParseContext& context, char c)
+void rychkov::Lexer::append_new(CParseContext& context, char c)
 {
-  if (std::isalpha(c))
+  decltype(cases)::const_iterator oper_p = cases.find(std::string{c});
+  if (oper_p != cases.end())
+  {
+    buf_ = &*oper_p;
+  }
+  else if (std::isalpha(c))
   {
     buf_ = std::string{c};
   }
@@ -93,23 +137,23 @@ bool rychkov::Lexer::append_new(CParseContext& context, char c)
     if (next_ == nullptr)
     {
       std::cout << "<spec> " << c << '\n';
-      return true;
+      return;
     }
-    return next_->append(context, c);
+    next_->append(context, c);
   }
-  return true;
 }
-bool rychkov::Lexer::append_name(CParseContext& context, char c)
+void rychkov::Lexer::append_name(CParseContext& context, char c)
 {
   std::string& str = std::get< std::string >(buf_);
   if (std::isalnum(c))
   {
     str += c;
-    return true;
+    return;
   }
-  return flush(context) && append(context, c);
+  flush(context);
+  append(context, c);
 }
-bool rychkov::Lexer::append_literal(CParseContext& context, char c)
+void rychkov::Lexer::append_literal(CParseContext& context, char c)
 {
   entities::Literal& literal = std::get< entities::Literal >(buf_);
   if (std::isalnum(c))
@@ -119,7 +163,7 @@ bool rychkov::Lexer::append_literal(CParseContext& context, char c)
       if ((literal.literal == "0x") || (literal.literal == "0b"))
       {
         log(context, "wrong numeric literal prefix");
-        return false;
+        return;
       }
       if ((literal.literal != "0") || ((c != 'x') && (c != 'b')))
       {
@@ -127,11 +171,13 @@ bool rychkov::Lexer::append_literal(CParseContext& context, char c)
       }
     }
     (literal_full_ ? literal.suffix : literal.literal) += c;
-    return true;
+    return;
   }
   if (literal_full_)
   {
-    return flush(context) && append(context, c);
+    flush(context);
+    append(context, c);
+    return;
   }
   switch (literal.type)
   {
@@ -139,26 +185,42 @@ bool rychkov::Lexer::append_literal(CParseContext& context, char c)
     if (c == '"')
     {
       literal_full_ = true;
-      return true;
+      return;
     }
     literal.literal += c;
-    return true;
+    return;
   case entities::Literal::Char:
     if (c == '\'')
     {
       literal_full_ = true;
-      return true;
+      return;
     }
     literal.literal += c;
-    return true;
+    return;
   case entities::Literal::Number:
     if (c == '.')
     {
       literal.literal += c;
-      return true;
+      return;
     }
-    return (c == '\'') || (flush(context) && append(context, c));
+    if (c != '\'')
+    {
+      flush(context);
+      append(context, c);
+    }
+    return;
   }
   log(context, "unexpected symbol");
-  return false;
+}
+void rychkov::Lexer::append_operator(CParseContext& context, char c)
+{
+  operator_value& oper = std::get< operator_value >(buf_);
+  decltype(cases)::const_iterator oper_p = cases.find((*oper)[0].token + c);
+  if (oper_p != cases.cend())
+  {
+    buf_ = &*oper_p;
+    return;
+  }
+  flush(context);
+  append(context, c);
 }

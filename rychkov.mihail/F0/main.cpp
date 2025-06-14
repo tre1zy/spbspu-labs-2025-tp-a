@@ -5,19 +5,21 @@
 #include "content_print.hpp"
 
 static const char code[] = R"code(
-// #include <ios> \
-#define def number
-// #define macro(num, suf) #num##suf
+#include <ios>
+// #define def number \
+#define macro(num, suf) #num##suf
 /* #command
 // # define a*/
 
 struct A
 {;};
-A a = {};
-int b = 0x192'023ULL ;
+A a;
+int b = +0x192'023ULL * 2 + a * --++b++-- + 4;
 int main()
 {
-  //
+  int c = 1;
+  b *= +2 - 1;
+  int(*foo)() = main;
 }
 )code";
 

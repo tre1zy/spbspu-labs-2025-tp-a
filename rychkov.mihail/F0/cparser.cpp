@@ -6,10 +6,6 @@
 using namespace std::literals::string_literals;
 
 const std::vector< rychkov::Operator > rychkov::CParser::operators = {
-      {rychkov::Operator::unary, rychkov::Operator::arithmetic, "+", false, true, 2},
-      {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, false, 1},
-      {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, true, 2},
-      {rychkov::Operator::binary, rychkov::Operator::arithmetic, "+", false, false, 4},
       {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, true, 2}
     };
 
@@ -21,6 +17,7 @@ void rychkov::log(CParseContext& context, std::string message)
   }
   context.err << "\tError: " << message << "\n\n  " << context.last_line << '\n';
   context.err << "  " << std::string(context.symbol, '-') << "^\n";
+  context.nerrors++;
 }
 
 rychkov::CParser::CParser():
@@ -89,6 +86,18 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
     return type_parser_.append(context, name);
   }
 
+  decltype(variables_)::const_iterator var_p = variables_.find(name);
+  if (var_p != variables_.cend())
+  {
+    if (stack_.top()->full())
+    {
+      log(context, "unexpected variable");
+      return false;
+    }
+    stack_.top()->operands.push_back(var_p->first);
+    return true;
+  }
+
   if (name == "struct")
   {
     if (global_scope() || stack_.top()->empty())
@@ -97,6 +106,7 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
       return true;
     }
     log(context, "struct can't be declared in this context");
+    return false;
   }
 
   if (stack_.top()->empty())
@@ -129,26 +139,7 @@ bool rychkov::CParser::append(CParseContext& context, char c)
     {
       return type_parser_.append(context, c);
     }
-    // if typedef
-    if (type_parser_.is_function())
-    {
-      if (!global_scope())
-      {
-        log(context, "functions can be declared only in global scope");
-        return false;
-      }
-      *stack_.top() = entities::Declaration{type_parser_.function()};
-      type_parser_.clear();
-      return append(context, c);
-    }
-    if (!stack_.top()->empty())
-    {
-      log(context, "variable declaration cannot be placed here");
-      return false;
-    }
-    *stack_.top() = entities::Declaration{type_parser_.variable()};
-    type_parser_.clear();
-    return append(context, c);
+    return flush_type_parser(context) && append(context, c);
   }
   using append_signature = bool(CParser::*)(CParseContext&);
   using append_map = std::map< char, append_signature >;
@@ -166,61 +157,39 @@ bool rychkov::CParser::append(CParseContext& context, char c)
   log(context, "unknown symbol ('"s + c + "'; code = " + std::to_string(c) + ")");
   return false;
 }
-bool rychkov::CParser::parse_semicolon(CParseContext& context)
+bool rychkov::CParser::flush_type_parser(CParseContext& context)
 {
-  for (; stack_.top()->operation != nullptr; stack_.pop()) // pop operators
-  {}
-  if (stack_.top()->empty())
+  if (!type_parser_.empty())
   {
-    stack_.pop();
-  }
-  if (stack_.empty())
-  {
-    return append_empty(context);
-  }
-  if (entities::is_body(*stack_.top())) //append new empty to body
-  {
-    entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
-    stack_.push(&body.data.emplace_back());
-    return true;
-  }
-  if (entities::is_decl(*stack_.top()))
-  {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (std::holds_alternative< entities::Struct >(decl.data))
+    if (!type_parser_.ready())
     {
-      entities::Struct& data = std::get< entities::Struct >(decl.data);
-      if (data.name.empty())
+      log(context, "type cannot be finished here");
+      return false;
+    }
+    // if typedef
+    if (type_parser_.is_function())
+    {
+      if (!global_scope())
       {
-        log(context, "struct must have name");
+        log(context, "functions can be declared only in global scope");
         return false;
       }
-      stack_.pop();
-      structs_.insert(std::make_pair(data, stack_.size()));
-      base_types_.insert(std::make_pair(typing::Type{data.name, typing::Type::Struct}, stack_.size()));
-      return append_empty(context);
+      *stack_.top() = entities::Declaration{type_parser_.function()};
+      variables_.insert({type_parser_.variable(), stack_.size()});
+      defined_functions_.insert(type_parser_.variable());
     }
-    if (std::holds_alternative< entities::Variable >(decl.data))
+    else
     {
-      entities::Variable& data = std::get< entities::Variable >(decl.data);
-      if (data.name.empty())
+      if (!stack_.top()->empty())
       {
-        log(context, "variable must have name");
+        log(context, "variable declaration cannot be placed here");
         return false;
       }
-      stack_.pop();
-      variables_.insert(std::make_pair(data, stack_.size()));
-      return append_empty(context);
-    }
-    if (std::holds_alternative< entities::Function >(decl.data))
-    {
-      entities::Function& data = std::get< entities::Function >(decl.data);
-      stack_.pop();
-      variables_.insert(std::make_pair(entities::Variable{data.type, data.name}, stack_.size()));
-      return append_empty(context);
+      *stack_.top() = entities::Declaration{type_parser_.variable()};
+      variables_.insert({type_parser_.variable(), stack_.size()});
     }
   }
-  stack_.push(&program_.emplace_back()); //append new empty to program
+  type_parser_.clear();
   return true;
 }
 bool rychkov::CParser::append_empty(CParseContext& context)

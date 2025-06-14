@@ -19,6 +19,7 @@ namespace rychkov
     CParseContext* base = nullptr;
     size_t line = 0, symbol = 0;
     std::string last_line;
+    size_t nerrors = 0;
   };
 
   class TypeParser
@@ -28,7 +29,6 @@ namespace rychkov
     bool ready() const noexcept;
     bool is_function() const noexcept;
 
-    bool prepare();
     typing::Type type() const;
     entities::Variable variable() const;
     entities::Function function() const;
@@ -106,21 +106,25 @@ namespace rychkov
   class Lexer
   {
   public:
+    static const std::set< std::vector< Operator >, NameCompare > cases;
+
     Lexer();
     Lexer(CParser& next);
 
     void parse(CParseContext& context, std::string str);
-    bool append(CParseContext& context, char c);
-    bool flush(CParseContext& context);
+    void append(CParseContext& context, char c);
+    void flush(CParseContext& context);
 
   private:
+    using operator_value = const std::vector< Operator >*;
     CParser* next_;
     bool literal_full_;
-    std::variant< std::monostate, std::string, entities::Literal > buf_;
+    std::variant< std::monostate, operator_value, std::string, entities::Literal > buf_;
 
-    bool append_new(CParseContext& context, char c);
-    bool append_name(CParseContext& context, char c);
-    bool append_literal(CParseContext& context, char c);
+    void append_new(CParseContext& context, char c);
+    void append_name(CParseContext& context, char c);
+    void append_literal(CParseContext& context, char c);
+    void append_operator(CParseContext& context, char c);
   };
 
   class CParser
@@ -133,6 +137,7 @@ namespace rychkov
     bool append(CParseContext& context, char c);
     bool append(CParseContext& context, entities::Literal literal);
     bool append(CParseContext& context, std::string name);
+    bool append(CParseContext& context, const std::vector< rychkov::Operator >& cases);
 
     void print(std::ostream& out) const;
   private:
@@ -140,7 +145,7 @@ namespace rychkov
     std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_; // data and declare-depth
     std::set< entities::Alias > aliases_;
     std::set< std::pair< entities::Variable, size_t >, NameCompare > variables_;
-    std::set< entities::Variable > defined_functions_;
+    std::set< entities::Variable, NameCompare > defined_functions_;
     std::set< std::pair< entities::Struct, size_t >, NameCompare > structs_;
     std::set< std::pair< entities::Union, size_t > > unions_;
     std::set< std::pair< entities::Enum, size_t > > enums_;
@@ -149,11 +154,17 @@ namespace rychkov
 
     bool global_scope() const noexcept;
 
+    bool flush_type_parser(CParseContext& context);
     bool append_empty(CParseContext& context);
+    entities::Expression* move_up();
+    void move_down();
 
     bool parse_semicolon(CParseContext& context);
     bool parse_open_brace(CParseContext& context);
     bool parse_close_brace(CParseContext& context);
+
+    bool parse_unary(CParseContext& context, const Operator& oper);
+    bool parse_binary(CParseContext& context, const Operator& oper);
   };
   void log(CParseContext& context, std::string message);
 }

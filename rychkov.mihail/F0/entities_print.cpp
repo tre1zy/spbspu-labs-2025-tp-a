@@ -51,7 +51,7 @@ std::ostream& rychkov::ContentPrinter::indent()
 }
 void rychkov::ContentPrinter::print_empty()
 {
-  indent() << "<EMPTY>\n";
+  indent() << "[EMPTY]\n";
 }
 void rychkov::ContentPrinter::operator()(const entities::Variable& var)
 {

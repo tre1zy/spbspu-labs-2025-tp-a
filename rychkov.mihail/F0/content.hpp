@@ -69,7 +69,7 @@ namespace rychkov
     enum Category
     {
       arithmetic, // +, -, *, ...
-      logic, // &&, || !
+      logic, // &&, ||, !, <, >, >=, <=, ==
       bit, // &, |, ~, ^, <<, ...
       address, // ., ->, *, &
       special, // (), [], ?:, sizeof, ','
