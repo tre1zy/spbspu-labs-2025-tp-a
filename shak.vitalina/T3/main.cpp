@@ -1,9 +1,9 @@
-#include "commands.hpp"
 #include <fstream>
 #include <iterator>
 #include <functional>
 #include <map>
 #include <limits>
+#include "commands.hpp"
 
 int main(int argc, const char* argv[])
 {

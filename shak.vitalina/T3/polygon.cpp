@@ -1,9 +1,9 @@
 #include "polygon.hpp"
-#include <delimiter.hpp>
 #include <algorithm>
 #include <iterator>
 #include <numeric>
 #include <cmath>
+#include <delimiter.hpp>
 
 std::istream& shak::operator>>(std::istream &in, Point &dest)
 {

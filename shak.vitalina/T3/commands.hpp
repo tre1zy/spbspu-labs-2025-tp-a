@@ -1,8 +1,8 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
-#include "polygon.hpp"
 #include <iomanip>
 #include <string>
+#include "polygon.hpp"
 
 namespace shak
 {
@@ -13,5 +13,4 @@ namespace shak
   void cmdMaxSeq(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);
   void cmdRects(const std::vector< Polygon > &polygons, std::ostream &out);
 }
-
 #endif

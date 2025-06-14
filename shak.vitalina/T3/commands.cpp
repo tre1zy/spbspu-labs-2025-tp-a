@@ -1,11 +1,11 @@
 #include "commands.hpp"
-#include "polygon.hpp"
 #include <algorithm>
 #include <functional>
 #include <iterator>
 #include <numeric>
 #include <limits>
 #include <string>
+#include "polygon.hpp"
 
 void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
 {
@@ -20,20 +20,14 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
     counter = count_if(std::begin(polygons), std::end(polygons), isEven);
     currentPolygons.reserve(counter);
     polygonAreas.reserve(counter);
-    std::copy_if(std::begin(polygons),
-      std::end(polygons),
-      std::back_inserter(currentPolygons),
-      isEven);
+    std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), isEven);
   }
   else if (subcmd == "ODD")
   {
     counter = count_if(std::begin(polygons), std::end(polygons), isOdd);
     currentPolygons.reserve(counter);
     polygonAreas.reserve(counter);
-    std::copy_if(std::begin(polygons),
-      std::end(polygons),
-      std::back_inserter(currentPolygons),
-      isOdd);
+    std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), isOdd);
   }
   else if (subcmd == "MEAN")
   {
@@ -43,9 +37,9 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
       return;
     }
     std::transform(std::begin(polygons), std::end(polygons), std::back_inserter(polygonAreas), getArea);
-    out << std::fixed
-      << std::setprecision(1)
-      << (std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) / polygons.size()) << "\n";
+    out << std::fixed;
+    out.precision(1);
+    out << (std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) / polygons.size()) << "\n";
     return;
   }
   else
@@ -62,16 +56,14 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
       counter = count_if(std::begin(polygons), std::end(polygons), std::bind(areEqualVertexes, vertexCount, _1));
       currentPolygons.reserve(counter);
       polygonAreas.reserve(counter);
-      std::copy_if(std::begin(polygons),
-        std::end(polygons),
-        std::back_inserter(currentPolygons),
-        std::bind(areEqualVertexes, vertexCount, _1));
+      auto areEqualVertexCount = std::bind(areEqualVertexes, vertexCount, _1);
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(currentPolygons), areEqualVertexCount);
     }
   }
   std::transform(std::begin(currentPolygons), std::end(currentPolygons), std::back_inserter(polygonAreas), getArea);
-  out << std::fixed
-    << std::setprecision(1)
-    << std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) << "\n";
+  out << std::fixed;
+  out.precision(1);
+  out << std::accumulate(polygonAreas.begin(), polygonAreas.end(), 0.0, std::plus< double >{}) << "\n";
 }
 
 void shak::cmdMax(const std::vector< Polygon > &polygon, std::istream &in, std::ostream &out)
@@ -89,15 +81,15 @@ void shak::cmdMax(const std::vector< Polygon > &polygon, std::istream &in, std::
     {
       std::vector< double > currentPolygons(polygon.size());
       std::transform(std::begin(polygon), std::end(polygon), currentPolygons.begin(), getArea);
-      auto max_iter = std::max_element(currentPolygons.begin(), currentPolygons.end());
-      out << std::fixed << std::setprecision(1) << *max_iter << "\n";
+      auto maxIter = std::max_element(currentPolygons.begin(), currentPolygons.end());
+      out << std::fixed << std::setprecision(1) << *maxIter << "\n";
     }
     else if (subcmd == "VERTEXES")
     {
       std::vector< size_t > currentPolygons(polygon.size());
       std::transform(std::begin(polygon), std::end(polygon), currentPolygons.begin(), getVertexes);
-      auto max_iter = std::max_element(currentPolygons.begin(), currentPolygons.end());
-      out << *max_iter << "\n";
+      auto maxIter = std::max_element(currentPolygons.begin(), currentPolygons.end());
+      out << *maxIter << "\n";
     }
     else
     {
@@ -123,15 +115,15 @@ void shak::cmdMin(const std::vector< Polygon > &polygon, std::istream &in, std::
     {
       std::vector< double > currentPolygons(polygon.size());
       std::transform(std::begin(polygon), std::end(polygon), currentPolygons.begin(), getArea);
-      auto min_iter = std::min_element(currentPolygons.begin(), currentPolygons.end());
-      out << std::fixed << std::setprecision(1) << *min_iter << "\n";
+      auto minIter = std::min_element(currentPolygons.begin(), currentPolygons.end());
+      out << std::fixed << std::setprecision(1) << *minIter << "\n";
     }
     else if (subcmd == "VERTEXES")
     {
       std::vector< size_t > currentPolygons(polygon.size());
       std::transform(std::begin(polygon), std::end(polygon), currentPolygons.begin(), getVertexes);
-      auto min_iter = std::min_element(currentPolygons.begin(), currentPolygons.end());
-      out << *min_iter << "\n";
+      auto minIter = std::min_element(currentPolygons.begin(), currentPolygons.end());
+      out << *minIter << "\n";
 }
     else
     {
