@@ -2,7 +2,6 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
-#include "stream_guardian.hpp"
 #include "processing_structures.hpp"
 
 int main()
