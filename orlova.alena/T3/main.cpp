@@ -8,7 +8,7 @@
 #include "geom.h"
 #include "commands.h"
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
   using namespace orlova;
 
@@ -26,6 +26,8 @@ int main(int argc, char** argv)
     std::cerr << "<INCORRECT FILE>\n";
     return 1;
   }
+
+  getPolygons(file, polygons);
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["area"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
