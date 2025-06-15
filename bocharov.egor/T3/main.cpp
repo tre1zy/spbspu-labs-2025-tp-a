@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <functional>
-#include "polygon.hpp"
+#include "ioGeometry.hpp"
 #include "commands.hpp"
 
 int main(int argc, char ** argv)
