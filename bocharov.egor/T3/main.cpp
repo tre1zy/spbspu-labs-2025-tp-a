@@ -1,56 +1,53 @@
-#include <cstddef>
-#include <fstream>
-#include <iostream>
+#include <functional>
 #include <iterator>
+#include <iostream>
+#include <fstream>
 #include <limits>
 #include <map>
-#include <string>
-#include <functional>
-#include "ioGeometry.hpp"
 #include "commands.hpp"
 
-int main(int argc, char ** argv)
+int main(int argc, char * argv[])
 {
-  using namespace bocharov;
-  using istreamIt = std::istream_iterator< Polygon >;
-
   if (argc != 2)
   {
-    std::cerr << "Incorrect parameters\n";
+    std::cerr << "ERROR: wrong arguments\n";
     return 1;
   }
-
-  std::vector< Polygon > polygons;
   std::ifstream file(argv[1]);
+  if (!file.is_open())
+  {
+    std::cout << "ERROR: there is no such file\n";
+    return 1;
+  }
+  using bocharov::Polygon;
+  using iIterator = std::istream_iterator< Polygon >;
+  std::vector< Polygon > polygons;
   while (!file.eof())
   {
-    std::copy(istreamIt(file), istreamIt(), std::back_inserter(polygons));
-    if (!file)
+    if (file.fail())
     {
-      file.clear(file.rdstate() ^ std::ios::failbit);
+      file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+    std::copy(iIterator(file), iIterator(), std::back_inserter(polygons));
   }
 
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(getAreaCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MAX"] = std::bind(getMaxCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["MIN"] = std::bind(getMinCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["COUNT"] = std::bind(getCountCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["ECHO"] = std::bind(getEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
-  commands["RIGHTSHAPES"] = std::bind(getRightsCnt, std::cref(plgs), std::ref(std::cout));
-
-///  commands["LESSAREA"] = std::bind(doLessAreaCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-///  commands["RECTS"] = std::bind(doRectsCommand, std::ref(std::cout), std::cref(polygons));
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(bocharov::getArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAX"] = std::bind(bocharov::getMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(bocharov::getMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COUNT"] = std::bind(bocharov::getCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["ECHO"] = std::bind(bocharov::getEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
+  cmds["RIGHTSHAPES"] = std::bind(bocharov::getRightsCnt, std::cref(plgs), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())
   {
     try
     {
-      commands.at(command)();
+      cmds.at(command)();
     }
-    catch (...)
+    catch (const std::exception &)
     {
       if (std::cin.fail())
       {
@@ -61,3 +58,8 @@ int main(int argc, char ** argv)
     }
   }
 }
+
+
+
+//  commands["ECHO"] = std::bind(getEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
+//  commands["RIGHTSHAPES"] = std::bind(getRightsCnt, std::cref(plgs), std::ref(std::cout));
