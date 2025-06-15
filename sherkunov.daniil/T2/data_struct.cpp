@@ -131,37 +131,43 @@ namespace sherkunov {
     }
     DataStruct temp{};
     input >> io_helpers::DelimiterIO{'('} >> io_helpers::DelimiterIO{':'};
+
     for (int i = 0; i < 3; ++i) {
       std::string key;
-      if ((input >> key) && (key.size() == 4) && key.substr(0, 3) == "key") {
-        char k = key.back();
-        switch (k) {
-          case '1':
-            input >> io_helpers::LongLongIO{temp.key1};
-            break;
-          case '2':
-            input >> io_helpers::DelimiterIO{'('} >> io_helpers::DelimiterIO{':'};
-            input >> io_helpers::PairIO{temp.key2};
-            input >> io_helpers::DelimiterIO{':'} >> io_helpers::DelimiterIO{')'};
-            break;
-          case '3':
-            input >> io_helpers::StringIO{temp.key3};
-            break;
-          default:
-            input.setstate(std::ios::failbit);
-        }
-      } else {
+      input >> key;
+
+      if (key.size() != 4 || key.substr(0, 3) != "key") {
         input.setstate(std::ios::failbit);
+        return input;
       }
+
+      char k = key.back();
+      switch (k) {
+      case '1':
+        input >> io_helpers::LongLongIO{temp.key1};
+        break;
+      case '2':
+        input >> io_helpers::DelimiterIO{'('} >> io_helpers::DelimiterIO{':'}
+              >> io_helpers::PairIO{temp.key2} >> io_helpers::DelimiterIO{':'}
+              >> io_helpers::DelimiterIO{')'};
+        break;
+      case '3':
+        input >> io_helpers::StringIO{temp.key3};
+        break;
+      default:
+        input.setstate(std::ios::failbit);
+        return input;
+      }
+
       input >> io_helpers::DelimiterIO{':'};
     }
+
     input >> io_helpers::DelimiterIO{')'};
     if (input) {
       value = temp;
     }
     return input;
   }
-
   std::ostream& operator<<(std::ostream& output, const DataStruct& value) {
     std::ostream::sentry s(output);
     if (!s) {
@@ -180,10 +186,10 @@ namespace sherkunov {
     if (lhs.key1 != rhs.key1) {
       return lhs.key1 < rhs.key1;
     } else {
-      long long l = lhs.key2.first / rhs.key2.second;
-      long long r = rhs.key2.first / lhs.key2.second;
-      if (l != r) {
-        return l < r;
+      long long lhsCrossProduct = lhs.key2.first * rhs.key2.second;
+      long long rhsCrossProduct = rhs.key2.first * lhs.key2.second;
+      if (lhsCrossProduct != rhsCrossProduct) {
+        return lhsCrossProduct < rhsCrossProduct;
       } else {
         return lhs.key3.size() < rhs.key3.size();
       }
