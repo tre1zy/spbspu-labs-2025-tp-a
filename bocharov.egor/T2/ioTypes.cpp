@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <cmath>
 #include <ioDelimiter.hpp>
-#include "streamGuard.hpp"
+#include <streamGuard.hpp>
 
 std::ostream & bocharov::operator<<(std::ostream & out, const DataStruct & data)
 {
