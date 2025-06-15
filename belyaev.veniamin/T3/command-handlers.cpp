@@ -87,7 +87,7 @@ void belyaev::minMaxArea(const std::vector<Polygon>& data, std::ostream& out, co
   {
     throw std::logic_error("minMaxArea failed.");
   }
-  
+
   StreamGuard guard(out);
   out << std::fixed << std::setprecision(1) << calcArea(resultingPolygon) << '\n';
 }

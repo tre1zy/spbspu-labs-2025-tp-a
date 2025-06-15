@@ -10,7 +10,7 @@
 namespace belyaev
 {
   using comparatorFunction = std::function<bool(const Polygon&, const Polygon&)>;
-  
+
   double accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n);
   double calcArea(const Polygon& src);
   double areaOddAccumulate(double value, const Polygon& src);
