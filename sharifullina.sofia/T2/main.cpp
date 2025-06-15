@@ -36,7 +36,7 @@ int main()
   std::copy(
     data.begin(),
     data.end(),
-    OutputIt(std::cout, "\n")
+    std::ostream_iterator<DataStruct>(std::cout, "\n")
   );
 
   return 0;
