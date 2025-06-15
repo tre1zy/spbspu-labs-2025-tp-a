@@ -4,7 +4,6 @@
 
 int main(int argc, char** argv)
 {
-  constexpr const char filename[] = "test_code/main.c";
   try
   {
     rychkov::ParserContext context{std::cin, std::cout, std::cerr};

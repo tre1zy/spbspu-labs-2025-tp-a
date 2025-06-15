@@ -1,9 +1,11 @@
-#include "code_parsers.hpp"
+#include "preprocessor.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <utility>
+#include <algorithm>
+#include "lexer.hpp"
 
 rychkov::Parser::map_type< rychkov::Preprocessor::CommandContext, rychkov::Preprocessor >
     rychkov::Preprocessor::call_map = {

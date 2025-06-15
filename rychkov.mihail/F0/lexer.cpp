@@ -1,7 +1,9 @@
-#include "code_parsers.hpp"
+#include "lexer.hpp"
 
 #include <iostream>
-#include "content_print.hpp"
+#include <cctype>
+#include "cparser.hpp"
+#include "print_content.hpp"
 
 rychkov::Lexer::Lexer(CParser* next):
   next_(next),

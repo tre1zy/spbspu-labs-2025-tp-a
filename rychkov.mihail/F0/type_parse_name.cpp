@@ -80,11 +80,11 @@ bool rychkov::TypeParser::append_volatile(CParseContext& context)
   stack_.top().data->is_volatile = true;
   return true;
 }
-bool rychkov::TypeParser::append_signed(CParseContext& context)
+bool rychkov::TypeParser::append_signed(CParseContext&)
 {
   return true;
 }
-bool rychkov::TypeParser::append_unsigned(CParseContext& context)
+bool rychkov::TypeParser::append_unsigned(CParseContext&)
 {
   return true;
 }

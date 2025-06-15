@@ -37,6 +37,9 @@ rychkov::entities::Expression::Expression(const Operator* op, typing::Type resul
   result_type{result},
   operands(std::move(opers))
 {}
+rychkov::entities::Body::Body():
+  data{{}}
+{}
 
 bool rychkov::entities::Expression::empty() const noexcept
 {
@@ -52,7 +55,7 @@ bool rychkov::entities::Expression::full() const noexcept
   {
     return false;
   }
-  return operands.size() >= operation->type;
+  return static_cast< std::ptrdiff_t >(operands.size()) >= operation->type;
 }
 bool rychkov::entities::is_body(const entities::Expression& expr)
 {

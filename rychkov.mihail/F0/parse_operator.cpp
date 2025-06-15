@@ -1,4 +1,4 @@
-#include "code_parsers.hpp"
+#include "cparser.hpp"
 
 bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov::Operator >& cases)
 {
@@ -28,7 +28,6 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
       entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
       if (std::holds_alternative< entities::Variable >(decl.data))
       {
-        entities::Variable& data = std::get< entities::Variable >(decl.data);
         decl.value = entities::Expression{};
         stack_.push(&*decl.value);
         return true;
@@ -69,7 +68,7 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
   }
   return true;
 }
-bool rychkov::CParser::parse_binary(CParseContext& context, const rychkov::Operator& oper)
+bool rychkov::CParser::parse_binary(CParseContext&, const rychkov::Operator& oper)
 {
   if (stack_.top()->operation != nullptr)
   {
@@ -120,7 +119,7 @@ bool rychkov::CParser::parse_binary(CParseContext& context, const rychkov::Opera
   }
   return false;
 }
-bool rychkov::CParser::parse_unary(CParseContext& context, const rychkov::Operator& oper)
+bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper)
 {
   if (oper.right_align)
   {

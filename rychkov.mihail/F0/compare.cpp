@@ -1,4 +1,4 @@
-#include "code_parsers.hpp"
+#include "compare.hpp"
 
 bool rychkov::NameCompare::operator()(const struct_value& lhs, const struct_value& rhs) const
 {

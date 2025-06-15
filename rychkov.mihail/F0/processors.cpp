@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
 #include <cstring>
 #include <utility>
 #include <stdexcept>
@@ -31,7 +29,7 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
   bool sources = false;
   std::vector< std::string > files;
   std::ofstream out;
-  for (size_t i = 1; i < argc; i++)
+  for (int i = 1; i < argc; i++)
   {
     if (std::strcmp(argv[i], "--help") == 0)
     {

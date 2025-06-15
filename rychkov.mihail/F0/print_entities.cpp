@@ -1,6 +1,7 @@
-#include "content_print.hpp"
+#include "print_content.hpp"
 
 #include <iostream>
+#include <string>
 
 std::ostream& rychkov::operator<<(std::ostream& out, const entities::Variable& var)
 {

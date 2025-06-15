@@ -1,10 +1,11 @@
 #ifndef CONTENT_HPP
 #define CONTENT_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <variant>
-#include <memory>
+#include <cstddef>
 #include <utility>
 
 namespace rychkov
@@ -20,7 +21,7 @@ namespace rychkov
       std::unique_ptr< T >(rhs != nullptr ? new T{*rhs} : nullptr)
     {}
     DinMemWrapper(DinMemWrapper&&) = default;
-    DinMemWrapper(nullptr_t):
+    DinMemWrapper(std::nullptr_t):
       std::unique_ptr< T >(nullptr)
     {}
     DinMemWrapper(T* ptr):
@@ -45,7 +46,7 @@ namespace rychkov
       static_cast< std::unique_ptr< T >& >(*this).reset(new T{std::forward< U >(rhs)});
       return *this;
     }
-    DinMemWrapper& operator=(nullptr_t)
+    DinMemWrapper& operator=(std::nullptr_t)
     {
       static_cast< std::unique_ptr< T >& >(*this) = nullptr;
       return *this;
@@ -124,7 +125,8 @@ namespace rychkov
     struct Expression;
     struct Body
     {
-      std::vector< Expression > data = {{}};
+      Body();
+      std::vector< Expression > data;
     };
     struct Variable
     {

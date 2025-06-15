@@ -1,10 +1,16 @@
 #ifndef PROCESSORS_HPP
 #define PROCESSORS_HPP
 
+#include <iosfwd>
 #include <string>
 #include <vector>
+
 #include <parser.hpp>
-#include "code_parsers.hpp"
+
+#include "log.hpp"
+#include "preprocessor.hpp"
+#include "lexer.hpp"
+#include "cparser.hpp"
 
 namespace rychkov
 {

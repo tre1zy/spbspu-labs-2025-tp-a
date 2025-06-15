@@ -1,26 +1,14 @@
-#include "code_parsers.hpp"
+#include "cparser.hpp"
 
 #include <iostream>
-#include "content_print.hpp"
+#include <map>
+#include "print_content.hpp"
 
 using namespace std::literals::string_literals;
 
 const std::vector< rychkov::Operator > rychkov::CParser::operators = {
       {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, true, 2}
     };
-
-void rychkov::log(CParseContext& context, std::string message)
-{
-  context.err << "In file \"" << context.file << "\" (" << context.line + 1 << ':' << context.symbol + 1 << ")\n";
-  context.err << "\tError: " << message << "\n  ";
-  context.err << context.last_line << "\n  " << std::string(context.symbol, '-') << "^\n";
-  for (const CParseContext* file = context.base; file != nullptr; file = file->base)
-  {
-    context.err << "Included from \"" << file->file << "\" (" << file->line + 1 << ':' << file->symbol + 1 << ")\n  ";
-    context.err << file->last_line << "\n  " << std::string(file->symbol, '-') << "^\n";
-  }
-  context.nerrors++;
-}
 
 rychkov::CParser::CParser():
   program_{{}},
@@ -198,10 +186,10 @@ bool rychkov::CParser::append_empty(CParseContext& context)
 {
   if (stack_.empty())
   {
-    stack_.push(&program_.emplace_back()); //append new empty to program
+    stack_.push(&program_.emplace_back());
     return true;
   }
-  if (entities::is_body(*stack_.top())) //append new empty to body
+  if (entities::is_body(*stack_.top()))
   {
     entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
     stack_.push(&body.data.emplace_back());

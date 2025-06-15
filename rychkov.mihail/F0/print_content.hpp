@@ -1,5 +1,5 @@
-#ifndef CONTENT_PRINT_HPP
-#define CONTENT_PRINT_HPP
+#ifndef PRINT_CONTENT_HPP
+#define PRINT_CONTENT_HPP
 
 #include <iosfwd>
 #include "content.hpp"
