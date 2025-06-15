@@ -40,11 +40,10 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Point& src)
   return out;
 }
 
-belyaev::Point belyaev::checkNext(const Point& pnt, std::istream& in, bool& result)
+belyaev::Point belyaev::checkNext(const Point& pnt, std::istream& in)
 {
   if (in.peek() == '\n')
   {
-    result = true;
     in.setstate(std::ios::eofbit);
   }
   return pnt;
@@ -70,10 +69,9 @@ std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
 
   using istreamPnt = std::istream_iterator<Point>;
   std::vector<Point> newPoints;
-  bool result = false;
-  auto checkNextBind = std::bind(checkNext, _1, std::ref(in), std::ref(result));
+  auto checkNextBind = std::bind(checkNext, _1, std::ref(in));
   std::transform(istreamPnt{in}, istreamPnt{}, std::back_inserter(newPoints), checkNextBind);
-  if (newPoints.size() == pointsAmount && result)
+  if (newPoints.size() == pointsAmount && in.eof())
   {
     in.clear();
     dest.points = std::move(newPoints);
