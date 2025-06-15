@@ -109,6 +109,35 @@ namespace
     auto pred = std::bind(bocharov::hasNVertexes, std::placeholders::_1, num);
     out << std::count_if(polygons.cbegin(), polygons.cend(), pred) << '\n';
   }
+
+  struct RightAngleCheck
+  {
+    const bocharov::Polygon & plg;
+
+    bool operator()(size_t ind) const
+    {
+      size_t n  = plg.points.size();
+      auto prev = plg.points[(ind + n - 1) % n];
+      auto curr = plg.points[ind];
+      auto next = plg.points[(ind + 1) % n];
+
+      double dx1 = curr.x - prev.x;
+      double dy1 = curr.y - prev.y;
+      double dx2 = next.x - curr.x;
+      double dy2 = next.y - curr.y;
+
+      double scalar = dx1 * dx2 + dy1 * dy2;
+      return scalar == 0;
+    }
+  };
+
+  bool hasRights(const Polygon & plg)
+  {
+    std::vector< size_t > inds(plg.points.size());
+    std::iota(inds.begin(), inds.end(), 0);
+
+    return std::any_of(inds.begin(), inds.end(), RightAngleCheck{ plg });
+  }
 }
 
 void bocharov::getArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -213,7 +242,7 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std
     out << maxCount << "\n";
 }
 
-void bocharov::getRightsCnt(const std::vector< Polygon > & plgs, std::ostream & out)
+void bocharov::getRightsCnt(std::ostream & out, const std::vector< Polygon > & plgs)
 {
   out << count_if(plgs.cbegin(), plgs.cend(), hasRights);
 }
