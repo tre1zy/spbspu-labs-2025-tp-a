@@ -10,8 +10,6 @@
 int main()
 {
   using sharifullina::DataStruct;
-  using InputIt = std::istream_iterator<DataStruct>;
-  using OutputIt = std::ostream_iterator<DataStruct>;
 
   std::vector<DataStruct> data;
 
