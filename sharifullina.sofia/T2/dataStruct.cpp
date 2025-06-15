@@ -50,9 +50,19 @@ namespace
     {
       return in;
     }
+
+    char hash = 0;
+    char c = 0;
+    char paren = 0;
+    in >> hash >> c >> paren;
+    if (hash != '#' || c != 'c' || paren != '(')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
     double real = 0.0;
     double imag = 0.0;
-    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' } >> DelimiterIO{ '(' };
     in >> real >> imag >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
     if (in)
     {
@@ -68,6 +78,7 @@ namespace
     {
       return in;
     }
+
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' };
     in >> dest.ref.first;
     in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second;
