@@ -30,6 +30,6 @@ int main() {
 
   std::sort(data.begin(), data.end());
   std::copy(data.begin(), data.end(), OutputStreamIterator(std::cout, "\n"));
-  
+
   return 0;
 }
