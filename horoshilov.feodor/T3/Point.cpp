@@ -1,7 +1,7 @@
 #include "Point.h"
 #include <iomanip>
 #include <iostream>
-#include "Delimiter.h"
+#include <Delimiter.h>
 
 bool horoshilov::Point::operator==(const Point& other) const
 {

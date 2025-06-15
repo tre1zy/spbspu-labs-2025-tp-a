@@ -10,7 +10,7 @@
 #include <numeric>
 #include <limits>
 #include "Polygon.h"
-#include "Guard.h"
+#include <Guard.h>
 namespace
 {
   struct CalcGausTerm

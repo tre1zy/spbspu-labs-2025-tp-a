@@ -1,8 +1,8 @@
 #include "Polygon.h"
 #include <algorithm>
 #include <iterator>
-#include "Guard.h"
-#include "Delimiter.h"
+#include <Guard.h>
+#include <Delimiter.h>
 
 std::istream& horoshilov::operator>>(std::istream& in, Polygon& polygon)
 {
