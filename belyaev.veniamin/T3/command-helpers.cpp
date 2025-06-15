@@ -50,6 +50,12 @@ double belyaev::areaVerticesAccumulate(double value, const Polygon& src, size_t 
   return value;
 }
 
+void belyaev::areaOut(double result, std::ostream& out)
+{
+  StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1) << result << '\n';
+}
+
 bool belyaev::compareAreas(const Polygon& lhs, const Polygon& rhs)
 {
   return calcArea(lhs) < calcArea(rhs);

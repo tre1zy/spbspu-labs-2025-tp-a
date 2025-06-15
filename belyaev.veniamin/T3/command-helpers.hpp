@@ -4,8 +4,10 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <iomanip>
 #include <numeric>
 #include <limits>
+#include <stream-guard.hpp>
 
 namespace belyaev
 {
@@ -17,6 +19,7 @@ namespace belyaev
   double areaEvenAccumulate(double value, const Polygon& src);
   double areaMeanAccumulate(double value, const Polygon& src, size_t size);
   double areaVerticesAccumulate(double value, const Polygon& src, size_t vertices);
+  void areaOut(double result, std::ostream& out);
   bool compareAreas(const Polygon& lhs, const Polygon& rhs);
   bool compareVertices(const Polygon& lhs, const Polygon& rhs);
   Polygon minElement(const std::vector<Polygon>& data, comparatorFunction comparator);
