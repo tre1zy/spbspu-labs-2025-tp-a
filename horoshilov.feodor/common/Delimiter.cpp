@@ -20,3 +20,4 @@ std::istream& horoshilov::operator>>(std::istream& input, DelimiterIO&& dest)
   }
   return input;
 }
+

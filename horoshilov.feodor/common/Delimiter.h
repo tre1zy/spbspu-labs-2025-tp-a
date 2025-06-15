@@ -12,3 +12,4 @@ namespace horoshilov
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 #endif
+
