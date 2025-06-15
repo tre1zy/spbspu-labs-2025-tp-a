@@ -221,22 +221,22 @@ void ohantsev::PolygonCmdsHandler::operator()()
   iofmtguard fmt(out_);
   out_ << std::fixed << std::setprecision(1);
   try
+  {
+    CommandHandler::operator()();
+  }
+  catch (...)
+  {
+    if (in_.eof())
     {
-      CommandHandler::operator()();
+      return;
     }
-    catch (...)
+    out_ << "<INVALID COMMAND>\n";
+    if (in_.fail())
     {
-      if (in_.eof())
-      {
-        return;
-      }
-      out_ << "<INVALID COMMAND>\n";
-      if (in_.fail())
-      {
-        in_.clear(in_.rdstate() ^ std::ios::failbit);
-      }
-      in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      in_.clear(in_.rdstate() ^ std::ios::failbit);
     }
+    in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
 }
 
 void ohantsev::PolygonCmdsHandler::processUntilEOF()
