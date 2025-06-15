@@ -213,3 +213,7 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const Pol
     out << maxCount << "\n";
 }
 
+void bocharov::getRightsCnt(const std::vector< Polygon > & plgs, std::ostream & out)
+{
+  out << count_if(plgs.cbegin(), plgs.cend(), hasRights);
+}

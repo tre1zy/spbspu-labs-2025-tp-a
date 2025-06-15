@@ -10,6 +10,7 @@ namespace bocharov
   void getMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
   void getCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
   void getMaxSeqCommand(std::istream & in, std::ostream & out, const PolygonVec & polygons);
+  void getRightsCnt(const std::vector< Polygon > & plgs, std::ostream & out);
 }
 
 #endif
