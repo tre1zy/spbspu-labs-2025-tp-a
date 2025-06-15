@@ -37,8 +37,8 @@ int main(int argc, char * argv[])
   cmds["MAX"] = std::bind(bocharov::getMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MIN"] = std::bind(bocharov::getMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["COUNT"] = std::bind(bocharov::getCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["ECHO"] = std::bind(bocharov::getEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
-  cmds["RIGHTSHAPES"] = std::bind(bocharov::getRightsCnt, std::cref(plgs), std::ref(std::cout));
+  cmds["MAXSEQ"] = std::bind(bocharov::getMaxSeqCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["RIGHTSHAPES"] = std::bind(bocharov::getRightsCnt, std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (!(std::cin >> command).eof())

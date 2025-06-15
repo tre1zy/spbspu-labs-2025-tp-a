@@ -11,6 +11,8 @@
 
 namespace
 {
+  using bocharov::Polygon;
+
   void getAreaEven(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
   {
     bocharov::StreamGuard guard(out);
