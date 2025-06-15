@@ -9,20 +9,23 @@
 
 namespace belyaev
 {
-  double areaOdd(double value, const Polygon& src);
-  double areaEven(double value, const Polygon& src);
-  double areaMean(double value, const Polygon& src, size_t size);
-  double areaVertices(double value, const Polygon& src, size_t vertices);
+  double areaOdd(const std::vector<Polygon>& data);
+  double areaEven(const std::vector<Polygon>& data);
+  double areaMean(const std::vector<Polygon>& data);
+  double areaVertices(const std::vector<Polygon>& data, size_t vertices);
   void area(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
   void minMaxArea(const std::vector<Polygon>& data, std::ostream& out, const std::string& command);
   void minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, const std::string& command);
   void minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, const std::string& command);
-  void countEven(const std::vector<Polygon>& data, size_t& result);
-  void countOdd(const std::vector<Polygon>& data, size_t& result);
-  void countVertices(const std::vector<Polygon>& data, size_t& result, size_t givenSize);
+  size_t countEven(const std::vector<Polygon>& data);
+  size_t countOdd(const std::vector<Polygon>& data);
+  size_t countVertices(const std::vector<Polygon>& data, size_t givenSize);
   void count(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
   void rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream& out);
   void inframe(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
+
+  using commandMap = std::map<std::string, std::function<void(std::istream&, std::ostream&)>>;
+  commandMap mapCommandHandlers(std::vector<Polygon>& data);
 }
 
 #endif

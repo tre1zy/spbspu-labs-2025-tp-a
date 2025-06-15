@@ -34,15 +34,7 @@ int main(int argc, char* argv[])
     std::copy(PolyIStream{file}, PolyIStream{}, std::back_inserter(data));
   }
 
-  std::map<std::string, std::function<void(std::istream&, std::ostream&)>> cmds;
-  const std::string minCommand = "min";
-  const std::string maxCommand = "max";
-  cmds["AREA"] = std::bind(area, std::cref(data), _1, _2);
-  cmds["MAX"] = std::bind(minMax, std::cref(data), _1, _2, std::cref(maxCommand));
-  cmds["MIN"] = std::bind(minMax, std::cref(data), _1, _2, std::cref(minCommand));
-  cmds["COUNT"] = std::bind(count, std::cref(data), _1, _2);
-  cmds["RMECHO"] = std::bind(rmecho, std::ref(data), _1, _2);
-  cmds["INFRAME"] = std::bind(inframe, std::cref(data), _1, _2);
+  commandMap cmds = mapCommandHandlers(data);
   std::string command;
   while (!(std::cin >> command).eof())
   {

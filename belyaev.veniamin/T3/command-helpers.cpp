@@ -18,6 +18,38 @@ double belyaev::calcArea(const Polygon& src)
   return std::abs(area) / 2.0;
 }
 
+double belyaev::areaOddAccumulate(double value, const Polygon& src)
+{
+  if (isPolygonOdd(src))
+  {
+    return value + calcArea(src);
+  }
+  return value;
+}
+
+double belyaev::areaEvenAccumulate(double value, const Polygon& src)
+{
+  if (isPolygonEven(src))
+  {
+    return value + calcArea(src);
+  }
+  return value;
+}
+
+double belyaev::areaMeanAccumulate(double value, const Polygon& src, size_t size)
+{
+  return value + calcArea(src) / size;
+}
+
+double belyaev::areaVerticesAccumulate(double value, const Polygon& src, size_t vertices)
+{
+  if (src.points.size() == vertices)
+  {
+    return value + calcArea(src);
+  }
+  return value;
+}
+
 bool belyaev::compareAreas(const Polygon& lhs, const Polygon& rhs)
 {
   return calcArea(lhs) < calcArea(rhs);
@@ -26,6 +58,16 @@ bool belyaev::compareAreas(const Polygon& lhs, const Polygon& rhs)
 bool belyaev::compareVertices(const Polygon& lhs, const Polygon& rhs)
 {
   return lhs.points.size() < rhs.points.size();
+}
+
+belyaev::Polygon belyaev::minElement(const std::vector<Polygon>& data, comparatorFunction comparator)
+{
+  return *std::min_element(data.begin(), data.end(), comparator);
+}
+
+belyaev::Polygon belyaev::maxElement(const std::vector<Polygon>& data, comparatorFunction comparator)
+{
+  return *std::max_element(data.begin(), data.end(), comparator);
 }
 
 bool belyaev::isPolygonEven(const Polygon& src)
