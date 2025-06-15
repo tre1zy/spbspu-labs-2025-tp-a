@@ -1,5 +1,32 @@
 #include "command-helpers.hpp"
 
+size_t belyaev::getVertices(const Polygon& src)
+{
+  return src.points.size();
+}
+
+bool belyaev::isPolygonEven(const Polygon& src)
+{
+  return getVertices(src) % 2 == 0;
+}
+
+bool belyaev::isPolygonOdd(const Polygon& src)
+{
+  return getVertices(src) % 2 != 0;
+}
+
+bool belyaev::isPolygonOfSize(const Polygon& src, const size_t& userSize)
+{
+  return getVertices(src) == userSize;
+}
+
+bool belyaev::isStringNumeric(const std::string& str)
+{
+  using namespace std::placeholders;
+  auto isNumericBind = std::bind(isdigit, _1);
+  return std::all_of(str.begin(), str.end(), isNumericBind);
+}
+
 double belyaev::accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n)
 {
   const int next_i = (i + 1) % n;
@@ -8,7 +35,7 @@ double belyaev::accumulateTerm(double sum, int i, const std::vector<Point>& pnts
 
 double belyaev::calcArea(const Polygon& src)
 {
-  const int amount = src.points.size();
+  const int amount = getVertices(src);
   std::vector<int> indices(amount);
   std::iota(indices.begin(), indices.end(), 0);
 
@@ -43,7 +70,7 @@ double belyaev::areaMeanAccumulate(double value, const Polygon& src, size_t size
 
 double belyaev::areaVerticesAccumulate(double value, const Polygon& src, size_t vertices)
 {
-  if (src.points.size() == vertices)
+  if (getVertices(src) == vertices)
   {
     return value + calcArea(src);
   }
@@ -63,7 +90,7 @@ bool belyaev::compareAreas(const Polygon& lhs, const Polygon& rhs)
 
 bool belyaev::compareVertices(const Polygon& lhs, const Polygon& rhs)
 {
-  return lhs.points.size() < rhs.points.size();
+  return getVertices(lhs) < getVertices(rhs);
 }
 
 belyaev::Polygon belyaev::minElement(const std::vector<Polygon>& data, comparatorFunction comparator)
@@ -76,36 +103,9 @@ belyaev::Polygon belyaev::maxElement(const std::vector<Polygon>& data, comparato
   return *std::max_element(data.begin(), data.end(), comparator);
 }
 
-bool belyaev::isPolygonEven(const Polygon& src)
-{
-  return src.points.size() % 2 == 0;
-}
-
-bool belyaev::isPolygonOdd(const Polygon& src)
-{
-  return src.points.size() % 2 != 0;
-}
-
-bool belyaev::isPolygonOfSize(const Polygon& src, const size_t& userSize)
-{
-  return src.points.size() == userSize;
-}
-
 bool belyaev::rmEchoHelper(const Polygon& rmPolygon, const Polygon& lhs, const Polygon& rhs)
 {
   return (rmPolygon == lhs) && (rmPolygon == rhs);
-}
-
-bool belyaev::isStringNumeric(const std::string& str)
-{
-  using namespace std::placeholders;
-  auto isNumericBind = std::bind(isdigit, _1);
-  return std::all_of(str.begin(), str.end(), isNumericBind);
-}
-
-size_t belyaev::getVertices(const Polygon& src)
-{
-  return src.points.size();
 }
 
 belyaev::Borders belyaev::getPointBorders(Borders box, const Point& pnt)

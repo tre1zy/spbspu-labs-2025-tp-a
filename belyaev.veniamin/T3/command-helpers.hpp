@@ -11,7 +11,11 @@
 
 namespace belyaev
 {
-  using comparatorFunction = std::function<bool(const Polygon&, const Polygon&)>;
+  size_t getVertices(const Polygon& src);
+  bool isPolygonEven(const Polygon& src);
+  bool isPolygonOdd(const Polygon& src);
+  bool isPolygonOfSize(const Polygon& src, const size_t& userSize);
+  bool isStringNumeric(const std::string& str);
 
   double accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n);
   double calcArea(const Polygon& src);
@@ -20,17 +24,14 @@ namespace belyaev
   double areaMeanAccumulate(double value, const Polygon& src, size_t size);
   double areaVerticesAccumulate(double value, const Polygon& src, size_t vertices);
   void areaOut(double result, std::ostream& out);
+
+  using comparatorFunction = std::function<bool(const Polygon&, const Polygon&)>;
   bool compareAreas(const Polygon& lhs, const Polygon& rhs);
   bool compareVertices(const Polygon& lhs, const Polygon& rhs);
   Polygon minElement(const std::vector<Polygon>& data, comparatorFunction comparator);
   Polygon maxElement(const std::vector<Polygon>& data, comparatorFunction comparator);
-  bool isPolygonEven(const Polygon& src);
-  bool isPolygonOdd(const Polygon& src);
-  bool isPolygonOfSize(const Polygon& src, const size_t& userSize);
-  bool rmEchoHelper(const Polygon& rmPolygon, const Polygon& lhs, const Polygon& rhs);
-  bool isStringNumeric(const std::string& str);
-  size_t getVertices(const Polygon& src);
 
+  bool rmEchoHelper(const Polygon& rmPolygon, const Polygon& lhs, const Polygon& rhs);
   struct Borders
   {
     int minX = std::numeric_limits<int>::max();

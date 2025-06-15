@@ -20,6 +20,7 @@ void belyaev::areaMean(const std::vector<Polygon>& data, std::ostream& out)
   {
     throw std::logic_error("Invalid query in AREA MEAN.");
   }
+
   using namespace std::placeholders;
   auto areaMeanAccumBind = std::bind(areaMeanAccumulate, _1, _2, data.size());
   areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaMeanAccumBind), out);
@@ -196,6 +197,7 @@ void belyaev::rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream&
   {
     throw std::logic_error("Input failed in RMECHO.");
   }
+
   size_t oldSize = data.size();
   auto helperBind = std::bind(rmEchoHelper, rmPolygon, _1, _2);
   auto new_end = std::unique(data.begin(), data.end(), helperBind);

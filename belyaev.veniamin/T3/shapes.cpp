@@ -33,6 +33,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Point& src)
   {
     return out;
   }
+
   belyaev::StreamGuard guard(out);
   out << "(" << src.x << ";" << src.y << ")";
   return out;
@@ -89,6 +90,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Polygon& src)
   {
     return out;
   }
+
   belyaev::StreamGuard guard(out);
   using ostreamPnt = std::ostream_iterator<Point>;
   std::copy(src.points.begin(), src.points.end(), ostreamPnt{out, " "});

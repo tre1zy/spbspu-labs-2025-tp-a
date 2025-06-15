@@ -12,13 +12,16 @@ namespace belyaev
   void areaMean(const std::vector<Polygon>& data, std::ostream& out);
   void areaVertices(const std::vector<Polygon>& data, std::ostream& out, size_t vertices);
   void area(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
+
   void minMaxArea(const std::vector<Polygon>& data, std::ostream& out, const std::string& command);
   void minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, const std::string& command);
   void minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, const std::string& command);
+
   void countEven(const std::vector<Polygon>& data, std::ostream& out);
   void countOdd(const std::vector<Polygon>& data, std::ostream& out);
   void countVertices(const std::vector<Polygon>& data, std::ostream& out, size_t givenSize);
   void count(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
+
   void rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream& out);
   void inframe(const std::vector<Polygon>& data, std::istream& in, std::ostream& out);
 
