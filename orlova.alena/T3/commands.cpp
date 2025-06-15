@@ -1,5 +1,8 @@
 #include <iostream>
 #include <sstream>
+#include <iterator>
+#include <limits>
+#include <algorithm>
 #include <iomanip>
 #include <map>
 #include <functional>
@@ -7,7 +10,7 @@
 
 using namespace orlova;
 
-void getPolygons(std::istream&, std::vector< Polygon >&)
+void getPolygons(std::istream& in, std::vector< Polygon >& polygons)
 {
   while (!in.eof())
   {
