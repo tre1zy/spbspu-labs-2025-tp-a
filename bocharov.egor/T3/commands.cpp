@@ -188,7 +188,7 @@ void bocharov::getCount(std::istream & in, std::ostream & out, const std::vector
   }
 }
 
-void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const PolygonVec & polygons)
+void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   Polygon target;
   in >> target;
@@ -198,7 +198,7 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const Pol
   }
   size_t maxCount = 0;
   size_t currentCount = 0;
-  for (const auto& poly : polygons)
+  for (const auto & poly : polygons)
   {
     if (poly == target)
     {
