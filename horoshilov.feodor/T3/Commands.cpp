@@ -153,7 +153,9 @@ namespace
 void horoshilov::printIntersections(std::istream& in, std::ostream& out, const std::vector< horoshilov::Polygon >& polygons)
 {
   horoshilov::Polygon target;
-    in >> target;
+  in >> target;
+
+  while (std::isspace(in.peek())) in.get();
 
   if (!in || target.points.size() < 3 || (in.peek() != '\n' && !in.eof()))
   {
@@ -162,12 +164,12 @@ void horoshilov::printIntersections(std::istream& in, std::ostream& out, const s
 
   struct IntersectsWith
   {
-    horoshilov::Polygon polygon;
+    const horoshilov::Polygon& polygon;
     bool operator()(const horoshilov::Polygon& other) const
     {
       auto left = std::minmax_element(polygon.points.begin(), polygon.points.end());
       auto right = std::minmax_element(other.points.begin(), other.points.end());
-      return !((*left.second < *right.first) || (*right.second < *left.first));
+      return !(*left.second < *right.first || *right.second < *left.first);
     }
   };
 
