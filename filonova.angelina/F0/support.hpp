@@ -54,7 +54,7 @@ namespace filonova
   struct MergeDictEntry
   {
     Dictionary &destination;
-    explicit MergeDictEntry(Dictionary &d) : destination(d) {}
+    explicit MergeDictEntry(Dictionary &d): destination(d) {}
 
     void operator()(const std::pair< const std::string, size_t > &pair) const
     {
