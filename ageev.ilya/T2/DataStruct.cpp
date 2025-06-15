@@ -3,13 +3,12 @@
 #include <cmath>
 #include <string>
 #include <iomanip>
-
+#include <iostream>
 
 namespace ageev
 {
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
-    // все перегрузки операторов ввода/вывода должны начинаться с проверки экземпляра класса sentry
     std::istream::sentry sentry(in);
     if (!sentry)
     {
@@ -89,7 +88,6 @@ namespace ageev
     }
     return in;
   }
-  // { "key1": 1.0d, "key2": "Let madness release you" }
 
   std::istream& operator>>(std::istream& in, Data& dest)
   {
@@ -129,7 +127,9 @@ namespace ageev
     }
     iofmtguard fmtguard(out);
     out << "{ ";
-    out << "\"key1\": " << std::fixed << std::setprecision(1) << src.key1 << "d, ";
+    out << "\"key1\": ";
+    out << std::fixed;
+    out << std::fixed << std::setprecision(1) << src.key1 << "d, ";
     out << "\"key2\": " << src.key2;
     out << " }";
     return out;
