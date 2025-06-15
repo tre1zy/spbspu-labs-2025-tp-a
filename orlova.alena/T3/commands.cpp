@@ -9,7 +9,15 @@ using namespace orlova;
 
 void getPolygons(std::istream&, std::vector< Polygon >&)
 {
-
+  while (!in.eof())
+  {
+    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+    if (!in)
+    {
+      in.clear();
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 }
 
 void area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
