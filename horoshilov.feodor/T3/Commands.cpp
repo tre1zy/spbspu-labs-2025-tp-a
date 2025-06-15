@@ -184,7 +184,7 @@ void horoshilov::printPermsCount(std::istream& in, std::ostream& out, const std:
   {
     throw std::invalid_argument("incorrect shape");
   }
-  out << std::count_if(plgs.cbegin(), plgs.cend(), std::bind(cheackPerms, std::placeholders::_1, plg));
+  out << std::count_if(plgs.cbegin(), plgs.cend(), std::bind(cheackPerms, std::placeholders::_1, plg)) << "\n";
 }
 
 void horoshilov::printArea(std::istream& in, std::ostream& out, const std::vector< horoshilov::Polygon >& polygons)
