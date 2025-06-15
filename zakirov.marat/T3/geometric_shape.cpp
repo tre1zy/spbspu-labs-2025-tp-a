@@ -76,3 +76,16 @@ std::istream & zakirov::operator>>(std::istream & in, Polygon & polygon)
 
   return in;
 }
+
+std::ostream & zakirov::operator<<(std::ostream & out, Point & point)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+
+  out << '(' << point.x_ << ';' << point.y_ << ')';
+
+  return out;
+}
