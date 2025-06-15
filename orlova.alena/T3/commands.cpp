@@ -25,21 +25,16 @@ void area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream
   auto it = subcmds.find(subcommand);
   if (it != subcmds.end())
   {
-    std::cout << it->second(polygons);
+    out << it->second(polygons);
   }
   else
   {
     std::stringstream iss(subcommand);
     size_t numOfVertexes = 0;
 
-    if (!(iss >> numOfVertexes) || subcommand[0] == '-')
+    if (!(iss >> numOfVertexes) || numOfVertexes < 3)
     {
       throw std::logic_error("<WRONG SUBCOMMAND>");
-    }
-
-    if (numOfVertexes < 3
-    {
-      throw std::logic_error("<WRONG NUMBER OF VERTEXES>");
     }
 
     out << areaNum(polygons, numOfVertexes);

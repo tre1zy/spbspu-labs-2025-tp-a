@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <vector>
 #include <map>
-#include <exception>
 #include <fstream>
 #include "geom.h"
 #include "commands.h"
