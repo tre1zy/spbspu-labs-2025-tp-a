@@ -20,11 +20,6 @@ namespace horoshilov
     std::array< bool, 4 > usedKeys = { false };
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   struct DoubleSciI
   {
     double& ref;
@@ -55,7 +50,6 @@ namespace horoshilov
     const std::string& ref;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleSciI&& dest);
   std::istream& operator>>(std::istream& in, DoubleI&& dest);
   std::istream& operator>>(std::istream& in, StringI&& dest);

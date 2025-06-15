@@ -4,21 +4,7 @@
 #include <cmath>
 #include <iomanip>
 #include <Guard.h>
-
-std::istream& horoshilov::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char c = 0;
-  if (in >> c && std::tolower(c) != dest.exp)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
+#include <Delimiter.h>
 
 std::istream& horoshilov::operator>>(std::istream& in, DoubleI&& dest)
 {
