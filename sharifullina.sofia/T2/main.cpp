@@ -10,20 +10,23 @@
 int main()
 {
   using sharifullina::DataStruct;
-  using istreamIter = std::istream_iterator<DataStruct>;
-  using ostreamIter = std::ostream_iterator<DataStruct>;
+  using InputIt = std::istream_iterator<DataStruct>;
+  using OutputIt = std::ostream_iterator<DataStruct>;
 
   std::vector<DataStruct> data;
 
-  while (!std::cin.eof())
+  while (true)
   {
-    std::copy(
-      istreamIter(std::cin),
-      istreamIter(),
-      std::back_inserter(data)
-    );
-
-    if (std::cin.fail() && !std::cin.eof())
+    DataStruct ds;
+    if (std::cin >> ds)
+    {
+      data.push_back(ds);
+    }
+    else if (std::cin.eof())
+    {
+      break;
+    }
+    else
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -31,10 +34,11 @@ int main()
   }
 
   std::sort(data.begin(), data.end());
+
   std::copy(
-    std::begin(data),
-    std::end(data),
-    ostreamIter(std::cout, "\n")
+    data.begin(),
+    data.end(),
+    OutputIt(std::cout, "\n")
   );
 
   return 0;

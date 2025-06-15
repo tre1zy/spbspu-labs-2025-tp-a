@@ -18,4 +18,3 @@ namespace sharifullina
     s_.flags(fmt_);
   }
 }
-

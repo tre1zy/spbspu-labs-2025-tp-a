@@ -108,39 +108,66 @@ std::istream& sharifullina::operator>>(std::istream& in, DataStruct& dest)
   {
     return in;
   }
-  DataStruct input;
+
+  DataStruct temp;
+  bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+
+  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+  for (int i = 0; i < 3; ++i)
   {
-    std::vector<std::string> keys(3);
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-    for (size_t i = 0; i < 3; i++)
+    std::string key;
+    in >> key;
+
+    if (key == "key1")
     {
-      std::string key;
-      in >> key;
-      if (key == "key1")
-      {
-        in >> ComplexIO{ input.key1 };
-      }
-      else if (key == "key2")
-      {
-        in >> RationalIO{ input.key2 };
-      }
-      else if (key == "key3")
-      {
-        in >> StringIO{ input.key3 };
-      }
-      else
+      if (hasKey1)
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      in >> DelimiterIO{ ':' };
+      in >> ComplexIO{ temp.key1 };
+      hasKey1 = in.good();
     }
-    in >> DelimiterIO{ ')' };
+    else if (key == "key2")
+    {
+      if (hasKey2)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in >> RationalIO{ temp.key2 };
+      hasKey2 = in.good();
+    }
+    else if (key == "key3")
+    {
+      if (hasKey3)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in >> StringIO{ temp.key3 };
+      hasKey3 = in.good();
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    in >> DelimiterIO{ ':' };
   }
-  if (in)
+
+  in >> DelimiterIO{ ')' };
+
+  if (in && hasKey1 && hasKey2 && hasKey3)
   {
-    dest = input;
+    dest = temp;
   }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+
   return in;
 }
 
@@ -151,6 +178,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest
   {
     return out;
   }
+
   sharifullina::iofmtguard guard(out);
   out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")";
   out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
