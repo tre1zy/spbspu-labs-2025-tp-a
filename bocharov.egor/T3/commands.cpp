@@ -187,3 +187,29 @@ void bocharov::getCount(std::istream & in, std::ostream & out, const std::vector
     getCountVertexes(out, polygons, num);
   }
 }
+
+void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const PolygonVec & polygons)
+{
+  Polygon target;
+  in >> target;
+  if (!in || in.peek() != '\n')
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  size_t maxCount = 0;
+  size_t currentCount = 0;
+  for (const auto& poly : polygons)
+  {
+    if (poly == target)
+    {
+      currentCount++;
+      maxCount = std::max(maxCount, currentCount);
+    }
+    else
+    {
+      currentCount = 0;
+    }
+  }
+    out << maxCount << "\n";
+}
+
