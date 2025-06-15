@@ -10,7 +10,7 @@ int main() {
   using OutputStreamIterator = std::ostream_iterator<sherkunov::DataStruct>;
 
   std::vector<sherkunov::DataStruct> data;
-  
+
   InputStreamIterator it(std::cin);
   while (it != InputStreamIterator{}) {
     data.push_back(*it);
