@@ -120,3 +120,28 @@ void klimova::count(const std::vector< Polygon >& polygons, std::istream& is, st
         os << "<INVALID COMMAND>\n";
     }
 }
+
+void klimova::perms(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+    try {
+        Polygon target;
+        is >> target;
+        if (!is || target.points.empty()) {
+            throw std::invalid_argument("");
+        }
+
+        PermsTester tester{target};
+        size_t count = std::count_if(polygons.begin(), polygons.end(), tester);
+        os << count << "\n";
+    }
+    catch (const std::exception&) {
+        os << "<INVALID COMMAND>\n";
+        is.clear();
+        is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
+void klimova::rects(const std::vector< Polygon >& polygons, std::istream&, std::ostream& os) {
+    RectangleChecker checker;
+    size_t count = std::count_if(polygons.begin(), polygons.end(), checker);
+    os << count << "\n";
+}

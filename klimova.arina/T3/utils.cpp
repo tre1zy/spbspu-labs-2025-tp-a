@@ -74,7 +74,36 @@ bool klimova::hasVertexCount(const Polygon& polygon, size_t vertexes) {
     return polygon.points.size() == vertexes;
 }
 
-bool klimova::isValidVertexCount(size_t vertexes)
-{
+bool klimova::isValidVertexCount(size_t vertexes) {
     return vertexes >= 3;
+}
+
+namespace klimova {
+    bool PermsTester::operator()(const Polygon& p) const {
+        if (p.points.size() != target.points.size()) {
+            return false;
+        }
+        std::vector<Point> p_points = p.points;
+        std::vector<Point> target_points = target.points;
+        std::sort(p_points.begin(), p_points.end(), PointsComparator());
+        std::sort(target_points.begin(), target_points.end(), PointsComparator());
+        return std::equal(p_points.begin(), p_points.end(), target_points.begin());
+    }
+
+    bool RectangleChecker::is_right_angle(const Point& a, const Point& b, const Point& c) {
+        int dx1 = b.x - a.x;
+        int dy1 = b.y - a.y;
+        int dx2 = b.x - c.x;
+        int dy2 = b.y - c.y;
+        return (dx1 * dx2 + dy1 * dy2) == 0;
+    }
+
+    bool RectangleChecker::operator()(const Polygon& p) const {
+        if (p.points.size() != 4) return false;
+        bool angle1, angle2, angle3 = false;
+        bool angle1 = is_right_angle(p.points[0], p.points[1], p.points[3]);
+        bool angle2 = is_right_angle(p.points[1], p.points[2], p.points[0]);
+        bool angle3 = is_right_angle(p.points[2], p.points[3], p.points[1]);
+        return angle1 && angle2 && angle3;
+    }
 }

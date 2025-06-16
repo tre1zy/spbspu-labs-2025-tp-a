@@ -23,5 +23,16 @@ namespace klimova {
     bool hasVertexCount(const Polygon& polygon, size_t vertexes);
 
     bool isValidVertexCount(size_t vertexes);
+
+    struct PermsTester {
+        const Polygon& target;
+        bool operator()(const Polygon& p) const;
+    };
+
+    struct RectangleChecker {
+        bool operator()(const Polygon& p) const;
+    private:
+        static bool is_right_angle(const Point& a, const Point& b, const Point& c);
+    };
 }
 #endif

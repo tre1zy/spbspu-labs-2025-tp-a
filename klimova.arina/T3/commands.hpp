@@ -19,5 +19,7 @@ namespace klimova
     void max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
     void min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
     void count(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
+    void perms(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
+    void rects(const std::vector< Polygon >& polygons, std::istream&, std::ostream& os);
 }
 #endif
