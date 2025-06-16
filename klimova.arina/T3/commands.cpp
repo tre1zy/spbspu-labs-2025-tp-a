@@ -18,15 +18,18 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
     is >> subcommand;
     double result = 0.0;
     try {
-        subs.at(subcommand)(0.0, *polygons.begin());
-        result = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs[subcommand]);
+        if (subs.find(subcommand) != subs.end()) {
+            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs.at(subcommand));
+        } else {
+            size_t vertexes = getVertexes(subcommand);
+            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
+        }
+        Streamguard StreamGuard(os);
+        os << std::fixed << std::setprecision(1) << result << "\n";
     }
-    catch (const std::out_of_range& e) {
-        size_t vertexes = getVertexes(subcommand);
-        result = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
+    catch (const std::exception&) {
+        os << "<INVALID COMMAND>\n";
     }
-    Streamguard StreamGuard(os);
-    os << std::fixed << std::setprecision(1) << result << "\n";
 }
 
 void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
@@ -87,6 +90,10 @@ void klimova::count(const std::vector< Polygon >& polygons, std::istream& is, st
             result = std::count_if(polygons.begin(), polygons.end(), predicate);
         } else {
             size_t vertexes = getVertexes(subcommand);
+            if (!isValidVertexCount(vertexes)) {
+                os << "<INVALID COMMAND>\n";
+                return;
+            }
             auto predicate = std::bind(hasVertexCount, _1, vertexes);
             result = std::count_if(polygons.begin(), polygons.end(), predicate);
         }

@@ -21,5 +21,7 @@ namespace klimova {
     bool isVertexCountEven(const Polygon& polygon);
     bool isVertexCountOdd(const Polygon& polygon);
     bool hasVertexCount(const Polygon& polygon, size_t vertexes);
+
+    bool isValidVertexCount(size_t vertexes);
 }
 #endif

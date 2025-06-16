@@ -79,3 +79,8 @@ bool klimova::isVertexCountOdd(const Polygon& polygon) {
 bool klimova::hasVertexCount(const Polygon& polygon, size_t vertexes) {
     return polygon.points.size() == vertexes;
 }
+
+bool klimova::isValidVertexCount(size_t vertexes)
+{
+    return vertexes >= 3;
+}
