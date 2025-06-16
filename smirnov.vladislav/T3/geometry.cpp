@@ -2,7 +2,7 @@
 #include <numeric>
 #include <cmath>
 #include <iterator>
-#include "goemetry.hpp"
+#include "geometry.hpp"
 #include "delimiter.hpp"
 
 namespace

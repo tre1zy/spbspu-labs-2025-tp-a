@@ -2,8 +2,8 @@
 
 smirnov::Iofmtguard::Iofmtguard(std::basic_ios< char >& stream):
   stream_(stream),
-  precision_(stream.precision),
-  width_(stream.width),
+  precision_(stream.precision()),
+  width_(stream.width()),
   fill_(stream.fill()),
   flags_(stream.flags())
 {}
