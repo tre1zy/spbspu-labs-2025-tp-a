@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <iterator>
 #include "geom.h"
 #include "commands.h"
 
