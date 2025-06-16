@@ -24,6 +24,14 @@ namespace klimova {
 
     bool isValidVertexCount(size_t vertexes);
 
+    struct PointComparator {
+        bool operator()(const Point& a, const Point& b) const;
+    };
+
+    struct PointEqual {
+        bool operator()(const Point& a, const Point& b) const;
+    };
+
     struct PermsTester {
         const Polygon& target;
         bool operator()(const Polygon& p) const;

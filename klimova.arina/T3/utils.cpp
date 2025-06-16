@@ -79,6 +79,14 @@ bool klimova::isValidVertexCount(size_t vertexes) {
 }
 
 namespace klimova {
+    bool PointComparator::operator()(const Point& a, const Point& b) const {
+        return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+    }
+
+    bool  PointEqual::operator()(const Point& a, const Point& b) const {
+        return a.x == b.x && a.y == b.y;
+    }
+
     bool PermsTester::operator()(const Polygon& p) const {
         if (p.points.size() != target.points.size()) {
             return false;
@@ -87,7 +95,7 @@ namespace klimova {
         std::vector<Point> target_points = target.points;
         std::sort(p_points.begin(), p_points.end(), PointsComparator());
         std::sort(target_points.begin(), target_points.end(), PointsComparator());
-        return std::equal(p_points.begin(), p_points.end(), target_points.begin());
+        return std::equal(p_points.begin(), p_points.end(), target_points.begin(), PointEqual());
     }
 
     bool RectangleChecker::is_right_angle(const Point& a, const Point& b, const Point& c) {
