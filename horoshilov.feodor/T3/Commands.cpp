@@ -172,7 +172,7 @@ void horoshilov::printIntersections(std::istream& in, std::ostream& out, const s
     }
   };
 
-  out << std::count_if(polygons.begin(), polygons.end(), IntersectsWith{ target });
+  out << std::count_if(polygons.begin(), polygons.end(), IntersectsWith{ target }) << "\n";
 }
 
 void horoshilov::printPermsCount(std::istream& in, std::ostream& out, const std::vector< horoshilov::Polygon >& plgs)
