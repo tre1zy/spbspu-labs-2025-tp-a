@@ -1,5 +1,5 @@
-#ifndef STREAMGUARD_H
-#define COMMANDS_H
+#ifndef STREAMGUARD_HPP
+#define STREAMGUARD_HPP
 
 #include <iomanip>
 

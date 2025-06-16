@@ -1,5 +1,5 @@
-#include "commands.h"
-#include "streamguard.h"
+#include "commands.hpp"
+#include "streamguard.hpp"
 #include <algorithm>
 #include <functional>
 #include <numeric>

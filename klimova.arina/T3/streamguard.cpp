@@ -1,4 +1,4 @@
-#include "streamguard.h"
+#include "streamguard.hpp"
 
 klimova::Streamguard::Streamguard(std::basic_ios< char >& s):
     s_(s),

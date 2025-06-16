@@ -47,6 +47,14 @@ double klimova::areaPolygon(const Polygon& polygon) {
     return std::abs(result) / 2.0;
 }
 
+double klimova::multPoints(const Point& point1, const Point& point2) {
+  return point1.x * point2.y - point1.y * point2.x;
+}
+
+bool klimova::isPolygonEven(const Polygon& polygon) {
+  return polygon.points.size() % 2 == 0;
+}
+
 size_t klimova::getVertexes(const std::string& str) {
     size_t vertexes = std::stoull(str);
     return vertexes;

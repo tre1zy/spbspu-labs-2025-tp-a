@@ -1,4 +1,5 @@
-#include "polygon.h"
+#include "polygon.hpp"
+#include "commands.hpp"
 #include <functional>
 #include <iostream>
 #include <fstream>

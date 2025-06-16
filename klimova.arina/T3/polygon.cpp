@@ -1,6 +1,9 @@
 #include "polygon.hpp"
 #include "streamguard.hpp"
 #include <numeric>
+#include <algorithm>
+#include <functional>
+#include <iterator>
 
 std::istream& klimova::operator>>(std::istream& in, DelimiterIO&& dest) {
     std::istream::sentry sentry(in);

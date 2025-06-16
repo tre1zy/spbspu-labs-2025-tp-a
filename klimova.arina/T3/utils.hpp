@@ -10,6 +10,8 @@ namespace klimova {
     double areaMean(double value, const Polygon& polygon, size_t size);
     double areaNumber(double value, const Polygon& polygon, size_t vertexes);
     double areaPolygon(const Polygon& polygon);
+    double multPoints(const Point& point1, const Point& point2);
+    bool isPolygonEven(const Polygon& polygon);
     size_t getVertexes(const std::string& str);
 }
 #endif

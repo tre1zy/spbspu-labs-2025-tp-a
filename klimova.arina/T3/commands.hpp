@@ -1,7 +1,7 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include "polygon.h"
+#include "polygon.hpp"
 #include <iostream>
 #include <vector>
 
