@@ -37,7 +37,17 @@ void orlova::getPolygons(std::istream& in, std::vector< Polygon >& polygons)
 
 bool orlova::isEven(const Polygon& polygon)
 {
-  return polygon.points.size() & 2 == 0;
+  return polygon.points.size() % 2 == 0;
+}
+
+bool orlova::isOdd(const Polygon& polygon)
+{
+  return polygon.points.size() % 2 != 0;
+}
+
+double orlova::oddAreaAccumulator(double sum, const Polygon& polygon)
+{
+  return isOdd(polygon) ? sum + areaPolygon(polygon) : sum;
 }
 
 double orlova::evenAreaAccumulator(double sum, const Polygon& polygon)
@@ -45,10 +55,29 @@ double orlova::evenAreaAccumulator(double sum, const Polygon& polygon)
   return isEven(polygon) ? sum + areaPolygon(polygon) : sum;
 }
 
+double orlova::meanAreaAccumulator(double sum, const Polygon& polygon)
+{
+  return sum + areaPolygon(polygon);
+}
+
 double orlova::areaEven(const std::vector< Polygon >& polygons)
 {
   return std::accumulate(polygons.begin(), polygons.end(), 0.0, evenAreaAccumulator);
-};
+}
+
+double orlova::areaOdd(const std::vector< Polygon >& polygons)
+{
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, oddAreaAccumulator);
+}
+
+double orlova::areaMean(const std::vector< Polygon >& polygons)
+{
+  if (polygons.size() == 0)
+  {
+    throw std::logic_error("<THERE ARE NO POLYGONS>");
+  }
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, meanAreaAccumulator) / polygons.size();
+}
 
 void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
