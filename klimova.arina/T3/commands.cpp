@@ -39,15 +39,14 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
 }
 
 void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
-    if (polygons.empty()) {
-        os << "<INVALID COMMAND>\n";
-        return;
-    }
-    MaxSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
-
-    std::string subcommand;
-    is >> subcommand;
     try {
+        if (polygons.empty()) {
+            throw std::invalid_argument("");
+        }
+        MaxSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+
+        std::string subcommand;
+        is >> subcommand;
         auto func = subs.at(subcommand);
         auto compare = std::bind(std::less<double>(), std::bind(func, _1), std::bind(func, _2));
         auto it = std::max_element(polygons.begin(), polygons.end(), compare);
@@ -65,15 +64,14 @@ void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std:
 }
 
 void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
-    if (polygons.empty()) {
-        os << "<INVALID COMMAND>\n";
-        return;
-    }
-    MinSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
-
-    std::string subcommand;
-    is >> subcommand;
     try {
+        if (polygons.empty()) {
+            throw std::invalid_argument("");
+        }
+        MinSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+
+        std::string subcommand;
+        is >> subcommand;
         auto func = subs.at(subcommand);
         auto compare = std::bind(std::less<double>(), std::bind(func, _1), std::bind(func, _2));
         auto it = std::min_element(polygons.begin(), polygons.end(), compare);
