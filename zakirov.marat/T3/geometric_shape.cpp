@@ -1,4 +1,6 @@
 #include "geometric_shape.hpp"
+#include <cctype>
+#include <algorithm>
 
 namespace
 {
@@ -9,20 +11,21 @@ namespace
 
   std::istream & operator>>(std::istream & in, MinorSymbol && sym)
   {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+
+    char symbol;
+    if (!(in >> symbol) || symbol != sym.symbol)
+    {
+      in.setstate(std::ios::failbit);
+    }
+
     return in;
   }
 
-  char symbol;
-  if (!(in >> symbol) || symbol != sym.symbol)
-  {
-    in.setstate(std::ios::failbit);
-  }
-
-  return in;
-}
 }
 
 std::istream & zakirov::operator>>(std::istream & in, Point & point)
@@ -89,3 +92,5 @@ std::ostream & zakirov::operator<<(std::ostream & out, Point & point)
 
   return out;
 }
+
+

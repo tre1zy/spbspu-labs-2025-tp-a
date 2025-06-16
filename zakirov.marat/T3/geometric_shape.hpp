@@ -9,6 +9,7 @@ namespace zakirov
   class Polygon
   {
   public:
+    Polygon() = default;
     std::vector< Point > points_;
   };
 
