@@ -16,7 +16,7 @@ namespace geom
     std::vector< Point > points;
   };
 
-  bool operator==(const Point& p1. const Point& p2);
+  bool operator==(const Point& p1, const Point& p2);
   std::istream& operator>>(std::istream& in, Point& p);
   std::istream& operator>>(std::istream& in, Point& poly);
   double getPolygonArea(const Polygon& poly);

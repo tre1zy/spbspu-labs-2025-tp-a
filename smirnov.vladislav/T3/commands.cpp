@@ -33,16 +33,6 @@ namespace
     }
   };
 
-  bool compareByVertexCount(const Polygon& lhs, const Polygon& rhs)
-  {
-    return lhs.points.size() < rhs.points.size();
-  }
-
-  bool compareByArea(const Polygon& lhs, const Polygon& rhs)
-  {
-    return geom::getPolygonArea(lhs) < geom::getPolygonArea(rhs);
-  }
-
   size_t countEvenVertices(const std::vector< Polygon >& polygons)
   {
     return std::count_if(polygons.begin(), polygons.end(), hasEvenVertices);
@@ -56,6 +46,16 @@ namespace
   size_t countByVertexCount(const std::vector< Polygon >& polygons, size_t count)
   {
     return std::count_if(polygons.begin(), polygons.end(), VertexCountMatcher{ count });
+  }
+
+  bool compareByVertexCount(const Polygon& lhs, const Polygon& rhs)
+  {
+    return lhs.points.size() < rhs.points.size();
+  }
+
+  bool compareByArea(const Polygon& lhs, const Polygon& rhs)
+  {
+    return geom::getPolygonArea(lhs) < geom::getPolygonArea(rhs);
   }
 
   using PolygonPredicate = std::function< bool(const Polygon&) >;
