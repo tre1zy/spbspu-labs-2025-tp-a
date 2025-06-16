@@ -77,7 +77,8 @@ double orlova::areaMean(const std::vector< Polygon >& polygons)
 
 double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
 {
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, numAreaAccumulator{ numOfVertexes });
+  using namespace std::placeholders;
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(numAreaAccumulator, _1, _2, numOfVertexes));
 }
 
 void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
