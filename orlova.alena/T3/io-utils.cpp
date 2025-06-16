@@ -41,7 +41,7 @@ std::istream& orlova::operator>>(std::istream& in, Polygon& polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > points;
+  std::vector< Point > points(vertexesCount);
   std::copy_n(std::istream_iterator< Point >(in), vertexesCount, points.begin());
   if (!in)
   {
