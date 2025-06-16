@@ -107,7 +107,9 @@ namespace klimova {
     }
 
     bool RectangleChecker::operator()(const Polygon& p) const {
-        if (p.points.size() != 4) return false;
+        if (p.points.size() != 4) {
+             return false;
+        }
         bool angle1 = is_right_angle(p.points[0], p.points[1], p.points[3]);
         bool angle2 = is_right_angle(p.points[1], p.points[2], p.points[0]);
         bool angle3 = is_right_angle(p.points[2], p.points[3], p.points[1]);
