@@ -6,6 +6,7 @@
 #include <numeric>
 #include <iomanip>
 #include <string>
+#include <limits>
 
 void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os)
 {
@@ -60,6 +61,8 @@ void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std:
     }
     catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";
+        is.clear();
+        is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 }
 
@@ -85,6 +88,8 @@ void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std:
     }
     catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";
+        is.clear();
+        is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 }
 
