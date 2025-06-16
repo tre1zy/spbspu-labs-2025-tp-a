@@ -9,6 +9,7 @@ namespace orlova
   double subArea(const Point&, const Point&);
   double areaPolygon(const Polygon&);
   bool isEven(const Polygon&);
+  bool isOdd(const Polygon&);
   double evenAreaAccumulator(double, const Polygon&);
   double oddAreaAccumulator(double, const Polygon&);
   double meanAreaAccumulator(double, const Polygon&);
@@ -31,8 +32,6 @@ namespace orlova
   size_t countEven(const std::vector< Polygon >&);
   size_t countOdd(const std::vector< Polygon >&);
   size_t countNum(const std::vector< Polygon >&, size_t);
-
-  void getPolygons(std::istream&, std::vector< Polygon >&);
 }
 
 #endif

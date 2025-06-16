@@ -22,19 +22,6 @@ double orlova::areaPolygon(const Polygon& polygon)
   return std::abs(sum) / 2.0;
 }
 
-void orlova::getPolygons(std::istream& in, std::vector< Polygon >& polygons)
-{
-  while (!in.eof())
-  {
-    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
-    if (!in)
-    {
-      in.clear();
-      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
-  }
-}
-
 bool orlova::isEven(const Polygon& polygon)
 {
   return polygon.points.size() % 2 == 0;
