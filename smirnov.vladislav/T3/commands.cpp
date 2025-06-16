@@ -114,41 +114,40 @@ namespace
 
   void outputMaxVertices(std::ostream& os, const std::vector< Polygon >& polygons)
   {
-    const Polygon& max_poly = *std::max_element(polygons.begin(), polygons.end(), compareByVertexCount);
+    auto  max_poly = *std::max_element(polygons.begin(), polygons.end(), compareByVertexCount);
     os << max_poly.points.size();
   }
 
   void outputMaxArea(std::ostream& os, const std::vector< Polygon >& polygons)
   {
-    const Polygon& max_poly = *std::max_element(polygons.begin(), polygons.end(), compareByArea);
+    auto max_poly = *std::max_element(polygons.begin(), polygons.end(), compareByArea);
     os << std::fixed << std::setprecision(1) << geom::getPolygonArea(max_poly);
   }
 
   void outputMinVertices(std::ostream& os, const std::vector< Polygon >& polygons)
   {
-    const Polygon& min_poly = *std::min_element(polygons.begin(), polygons.end(), compareByVertexCount);
+    auto min_poly = *std::min_element(polygons.begin(), polygons.end(), compareByVertexCount);
     os << min_poly.points.size();
   }
 
   void outputMinArea(std::ostream& os, const std::vector< Polygon >& polygons)
   {
-    const Polygon& min_poly = *std::min_element(polygons.begin(), polygons.end(), compareByArea);
+    auto min_poly = *std::min_element(polygons.begin(), polygons.end(), compareByArea);
     os << std::fixed << std::setprecision(1) << geom::getPolygonArea(min_poly);
   }
 }
 
 void smirnov::printAreaSum(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
 {
-  std::unordered_map< std::string, std::function< double() > > handlers{
-    {"EVEN", std::bind(totalEvenArea, std::cref(polygons))},
-    {"ODD", std::bind(totalOddArea, std::cref(polygons))},
-    {"MEAN", std::bind(AverageAreaCalculator{}, std::cref(polygons))}
-  };
+  std::unordered_map< std::string, std::function< double() > > handlers;
+  handlers["EVEN"] = std::bind(totalEvenArea, std::cref(polygons));
+  handlers["ODD"] = std::bind(totalOddArea, std::cref(polygons));
+  handlers["MEAN"] = std::bind(AverageAreaCalculator{ }, std::cref(polygons));
 
   std::string param;
   input >> param;
 
-  double result{};
+  double result;
   try
   {
     result = handlers.at(param)();
@@ -174,10 +173,9 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
     throw std::invalid_argument("No polygons available");
   }
 
-  std::unordered_map< std::string, std::function< void() > > handlers{
-    {"AREA", std::bind(outputMaxArea, std::ref(output), std::cref(polygons))},
-    {"VERTEXES", std::bind(outputMaxVertices, std::ref(output), std::cref(polygons))}
-  };
+  std::unordered_map< std::string, std::function< void() > > handlers;
+  handlers["AREA"] = std::bind(outputMaxArea, std::ref(output), std::cref(polygons));
+  handlers["VERTEXES"] = std::bind(outputMaxVertices, std::ref(output), std::cref(polygons));
 
   std::string param;
   input >> param;
@@ -192,11 +190,9 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
     throw std::invalid_argument("No polygons available");
   }
 
-  std::unordered_map< std::string, std::function< void() > > handlers
-  {
-    {"AREA", std::bind(outputMinArea, std::ref(output), std::cref(polygons))},
-    {"VERTEXES", std::bind(outputMinVertices, std::ref(output), std::cref(polygons))}
-  };
+  std::unordered_map< std::string, std::function< void() > > handlers;
+  handlers["AREA"] = std::bind(outputMinArea, std::ref(output), std::cref(polygons))
+  handlers["VERTEXES"] = std::bind(outputMinVertices, std::ref(output), std::cref(polygons));
 
   std::string param;
   input >> param;
@@ -205,16 +201,14 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
 
 void smirnov::printCountOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
 {
-  std::unordered_map< std::string, std::function< size_t() > > handlers
-  {
-    {"EVEN", std::bind(countEvenVertices, std::cref(polygons))},
-    {"ODD", std::bind(countOddVertices, std::cref(polygons))}
-  };
+  std::unordered_map< std::string, std::function< size_t() > > handlers;
+  handlers["EVEN"] = std::bind(countEvenVertices, std::cref(polygons));
+  handlers["ODD"] = std::bind(countOddVertices, std::cref(polygons));
 
   std::string param;
   input >> param;
 
-  size_t count{};
+  size_t count;
   try
   {
     count = handlers.at(param)();
@@ -251,18 +245,18 @@ void smirnov::printLessAreaCnt(std::istream& input, const std::vector< Polygon >
 
 bool smirnov::polygonsIntersect(const Polygon& p1, const Polygon& p2)
 {
-  auto [minX1, maxX1] = std::minmax_element(p1.points.begin(), p1.points.end(),
+  auto minmaxX1 = std::minmax_element(p1.points.begin(), p1.points.end(),
     [](const geom::Point& a, const geom::Point& b) { return a.x < b.x; });
-  auto [minY1, maxY1] = std::minmax_element(p1.points.begin(), p1.points.end(),
+  auto minmaxY1 = std::minmax_element(p1.points.begin(), p1.points.end(),
     [](const geom::Point& a, const geom::Point& b) { return a.y < b.y; });
 
-  auto [minX2, maxX2] = std::minmax_element(p2.points.begin(), p2.points.end(),
+  auto minmaxX2 = std::minmax_element(p2.points.begin(), p2.points.end(),
     [](const geom::Point& a, const geom::Point& b) { return a.x < b.x; });
-  auto [minY2, maxY2] = std::minmax_element(p2.points.begin(), p2.points.end(),
+  auto minmaxY2 = std::minmax_element(p2.points.begin(), p2.points.end(),
     [](const geom::Point& a, const geom::Point& b) { return a.y < b.y; });
 
-  return !(maxX1->x < minX2->x || maxX2->x < minX1->x ||
-    maxY1->y < minY2->y || maxY2->y < minY1->y);
+  return !(minmaxX1.second->x < minmaxX2.first->x || minmaxX2.second->x < minmaxX1.first->x ||
+    minmaxY1.second->y < minmaxY2.first->y || minmaxY2.second->y < minmaxY1.first->y);
 }
 
 
