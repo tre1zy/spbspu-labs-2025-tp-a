@@ -19,6 +19,9 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
     double result = 0.0;
     try {
         if (subs.find(subcommand) != subs.end()) {
+            if (subcommand == "MEAN" && polygons.empty()) {
+                throw std::out_of_range("");
+            }
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs.at(subcommand));
         } else {
             size_t vertexes = getVertexes(subcommand);
@@ -36,6 +39,10 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
 }
 
 void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+    if (polygons.empty()) {
+        os << "<INVALID COMMAND>\n";
+        return;
+    }
     MaxSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
 
     std::string subcommand;
@@ -58,6 +65,10 @@ void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std:
 }
 
 void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+    if (polygons.empty()) {
+        os << "<INVALID COMMAND>\n";
+        return;
+    }
     MinSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
 
     std::string subcommand;
