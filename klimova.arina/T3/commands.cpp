@@ -28,3 +28,45 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
     Streamguard StreamGuard(os);
     os << std::fixed << std::setprecision(1) << result << "\n";
 }
+
+void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+    MaxSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+    std::string subcommand;
+    is >> subcommand;
+    try {
+        auto func = subs.at(subcommand);
+        auto compare = std::bind(std::less<double>(), std::bind(func, _1), std::bind(func, _2));
+        auto it = std::max_element(polygons.begin(), polygons.end(), compare);
+        Streamguard StreamGuard(os);
+        os << std::fixed << std::setprecision(1);
+        if (subcommand == "AREA") {
+            os << func(*it) << "\n";
+        } else {
+            os << static_cast<int>(func(*it)) << "\n";
+        }
+    }
+    catch (const std::out_of_range&) {
+        os << "<INVALID COMMAND>\n";
+    }
+}
+
+void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+    MinSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+    std::string subcommand;
+    is >> subcommand;
+    try {
+        auto func = subs.at(subcommand);
+        auto compare = std::bind(std::less<double>(), std::bind(func, _1), std::bind(func, _2));
+        auto it = std::min_element(polygons.begin(), polygons.end(), compare);
+        Streamguard StreamGuard(os);
+        os << std::fixed << std::setprecision(1);
+        if (subcommand == "AREA") {
+            os << func(*it) << "\n";
+        } else {
+            os << static_cast<int>(func(*it)) << "\n";
+        }
+    }
+    catch (const std::out_of_range&) {
+        os << "<INVALID COMMAND>\n";
+    }
+}

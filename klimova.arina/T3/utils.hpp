@@ -5,6 +5,7 @@
 
 namespace klimova {
     using namespace std::placeholders;
+
     double areaEven(double value, const Polygon& polygon, size_t size);
     double areaOdd(double value, const Polygon& polygon, size_t size);
     double areaMean(double value, const Polygon& polygon, size_t size);
@@ -13,5 +14,8 @@ namespace klimova {
     double multPoints(const Point& point1, const Point& point2);
     bool isPolygonEven(const Polygon& polygon);
     size_t getVertexes(const std::string& str);
+
+    double getArea(const Polygon& polygon);
+    double getVertexesCount(const Polygon& polygon);
 }
 #endif

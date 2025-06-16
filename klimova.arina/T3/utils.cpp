@@ -59,3 +59,11 @@ size_t klimova::getVertexes(const std::string& str) {
     size_t vertexes = std::stoull(str);
     return vertexes;
 }
+
+double klimova::getArea(const Polygon& polygon) {
+    return areaPolygon(polygon);
+}
+
+double klimova::getVertexesCount(const Polygon& polygon) {
+    return static_cast<double>(polygon.points.size());
+}

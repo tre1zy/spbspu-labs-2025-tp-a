@@ -28,6 +28,8 @@ int main(int argc, char* argv[])
     }
     std::map< std::string, std::function< void() > > cmds;
     cmds["area"] = std::bind(klimova::area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["MAX"] = std::bind(klimova::max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["MIN"] = std::bind(klimova::min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
     std::string command;
     while (!(std::cin >> command).eof()) {
         try {
