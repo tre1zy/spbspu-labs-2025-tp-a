@@ -155,10 +155,9 @@ void horoshilov::printIntersections(std::istream& in, std::ostream& out, const s
   horoshilov::Polygon target;
   in >> target;
 
-  while (std::isspace(in.peek())) in.get();
-
-  if (!in || target.points.size() < 3 || (in.peek() != '\n'))
+  if (!in || in.peek() != '\n')
   {
+    in.clear();
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
