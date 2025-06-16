@@ -17,5 +17,9 @@ namespace klimova {
 
     double getArea(const Polygon& polygon);
     double getVertexesCount(const Polygon& polygon);
+
+    bool isVertexCountEven(const Polygon& polygon);
+    bool isVertexCountOdd(const Polygon& polygon);
+    bool hasVertexCount(const Polygon& polygon, size_t vertexes);
 }
 #endif

@@ -31,6 +31,7 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
 
 void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
     MaxSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+
     std::string subcommand;
     is >> subcommand;
     try {
@@ -52,6 +53,7 @@ void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std:
 
 void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
     MinSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+
     std::string subcommand;
     is >> subcommand;
     try {
@@ -67,6 +69,30 @@ void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std:
         }
     }
     catch (const std::out_of_range&) {
+        os << "<INVALID COMMAND>\n";
+    }
+}
+
+void klimova::count(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+    auto bindEven = std::bind(isVertexCountEven, _1);
+    auto bindOdd = std::bind(isVertexCountOdd, _1);
+    CountSubcommands subs{{"EVEN", bindEven}, {"ODD", bindOdd}};
+
+    std::string subcommand;
+    is >> subcommand;
+    try {
+        size_t result = 0;
+        if (subs.find(subcommand) != subs.end()) {
+            auto predicate = subs.at(subcommand);
+            result = std::count_if(polygons.begin(), polygons.end(), predicate);
+        } else {
+            size_t vertexes = getVertexes(subcommand);
+            auto predicate = std::bind(hasVertexCount, _1, vertexes);
+            result = std::count_if(polygons.begin(), polygons.end(), predicate);
+        }
+        os << result << "\n";
+    }
+    catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";
     }
 }
