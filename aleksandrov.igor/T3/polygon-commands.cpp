@@ -272,12 +272,7 @@ namespace aleksandrov
     }
     else
     {
-      std::istringstream iss(subcommand);
-      size_t numOfVertexes = 0;
-      if (!(iss >> numOfVertexes) || subcommand[0] == '-')
-      {
-        throw std::logic_error("Unknown subcommand!");
-      }
+      size_t numOfVertexes = std::stoull(subcommand);
       if (numOfVertexes < 3)
       {
         throw std::logic_error("Incorrect number of vertexes!");
