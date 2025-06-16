@@ -157,7 +157,7 @@ void horoshilov::printIntersections(std::istream& in, std::ostream& out, const s
 
   while (std::isspace(in.peek())) in.get();
 
-  if (!in || target.points.size() < 3 || (in.peek() != '\n' && !in.eof()))
+  if (!in || target.points.size() < 3 || (in.peek() != '\n'))
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
