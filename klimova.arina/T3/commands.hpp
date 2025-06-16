@@ -4,6 +4,8 @@
 #include "polygon.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
+#include <functional>
 
 namespace klimova
 {

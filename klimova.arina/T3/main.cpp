@@ -2,9 +2,11 @@
 #include "commands.hpp"
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <vector>
 #include <string>
+#include <limits>
 #include <map>
 
 int main(int argc, char* argv[])
