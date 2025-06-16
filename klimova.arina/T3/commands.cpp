@@ -58,7 +58,7 @@ void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std:
             os << static_cast<int>(func(*it)) << "\n";
         }
     }
-    catch (const std::out_of_range&) {
+    catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";
     }
 }
@@ -83,7 +83,7 @@ void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std:
             os << static_cast<int>(func(*it)) << "\n";
         }
     }
-    catch (const std::out_of_range&) {
+    catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";
     }
 }
