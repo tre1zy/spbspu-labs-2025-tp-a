@@ -77,8 +77,7 @@ double orlova::areaMean(const std::vector< Polygon >& polygons)
 
 double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
 {
-  auto accumulator = std::bind(numAreaAccumulator, numOfVertexes);
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, numAreaAccumulator{numOfVertexes});
 }
 
 void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
@@ -232,5 +231,5 @@ size_t orlova::countOdd(const std::vector< Polygon >& polygons)
 
 size_t orlova::countNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
 {
-  return std::count_if(polygons.begin(), polygons.end(), isNum);
+  return std::count_if(polygons.begin(), polygons.end(), isNum{numOfVertexes});
 }
