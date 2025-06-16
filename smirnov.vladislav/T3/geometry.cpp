@@ -1,9 +1,9 @@
-#include "geometry.hpp"
-#include "delimiter.hpp"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
 #include <iterator>
+#include "goemetry.hpp"
+#include "delimiter.hpp"
 
 namespace
 {

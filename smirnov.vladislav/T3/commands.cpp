@@ -1,6 +1,3 @@
-#include "commands.h"
-#include "scope_guard.h"
-#include "geometry.h"
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
@@ -8,6 +5,9 @@
 #include <tuple>
 #include <unordered_map>
 #include <string>
+#include "commands.hpp"
+#include "geometry.hpp"
+#include "stream_guard.hpp"
 
 namespace
 {
@@ -200,7 +200,6 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
 
   std::string param;
   input >> param;
-
   handlers.at(param)();
 }
 
