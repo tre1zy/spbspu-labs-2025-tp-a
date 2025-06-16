@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <iterator>
 #include "io-utils.h"
 
 std::istream& orlova::operator>>(std::istream& in, DelimiterIO&& dest)
