@@ -10,9 +10,13 @@ namespace orlova
   double areaPolygon(const Polygon&);
   bool isEven(const Polygon&);
   bool isOdd(const Polygon&);
+  bool isNum(const Polygon&, size_t);
   double evenAreaAccumulator(double, const Polygon&);
   double oddAreaAccumulator(double, const Polygon&);
   double meanAreaAccumulator(double, const Polygon&);
+  double numAreaAccumulator(double, const Polygon&, size_t);
+  bool areaComparator(const Polygon&, const Polygon&);
+  bool vertexesComparator(const Polygon&, const Polygon&);
 
   void area(const std::vector< Polygon >&, std::istream&, std::ostream&);
   double areaEven(const std::vector< Polygon >&);

@@ -31,6 +31,11 @@ bool orlova::isOdd(const Polygon& polygon)
   return polygon.points.size() % 2 != 0;
 }
 
+bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
+{
+  return polygon.points.size() == numOfVertexes;
+}
+
 double orlova::oddAreaAccumulator(double sum, const Polygon& polygon)
 {
   return isOdd(polygon) ? sum + areaPolygon(polygon) : sum;
@@ -44,6 +49,11 @@ double orlova::evenAreaAccumulator(double sum, const Polygon& polygon)
 double orlova::meanAreaAccumulator(double sum, const Polygon& polygon)
 {
   return sum + areaPolygon(polygon);
+}
+
+double orlova::numAreaAccumulator(double sum, const Polygon& polygon, size_t numOfVertexes)
+{
+  return isNum(polygon, numOfVertexes) ? sum + areaPolygon(polygon) : sum;
 }
 
 double orlova::areaEven(const std::vector< Polygon >& polygons)
@@ -65,8 +75,18 @@ double orlova::areaMean(const std::vector< Polygon >& polygons)
   return std::accumulate(polygons.begin(), polygons.end(), 0.0, meanAreaAccumulator) / polygons.size();
 }
 
+double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
+{
+  auto accumulator = std::bind(numAreaAccumulator, numOfVertexes);
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+}
+
 void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
+  if (polygons.size() == 0)
+  {
+    throw std::logic_error("<THERE ARE NO POLYGONS>");
+  }
   std::string subcommand;
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
@@ -92,15 +112,125 @@ void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std:
   }
 }
 
-void orlova::max(const std::vector< Polygon >&, std::istream&, std::ostream&);
-double orlova::maxArea(const std::vector< Polygon >&);
-size_t orlova::maxVertexes(const std::vector< Polygon >&);
+void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  if (polygons.size() == 0)
+  {
+    throw std::logic_error("<THERE ARE NO POLYGONS>");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  out << std::fixed << std::setprecision(1);
 
-void orlova::min(const std::vector< Polygon >&, std::istream&, std::ostream&);
-double orlova::minArea(const std::vector< Polygon >&);
-size_t orlova::minVertexes(const std::vector< Polygon >&);
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
+  subcmds["AREA"] = maxArea;
+  subcmds["VERTEXES"] = maxVertexes;
+  auto it = subcmds.find(subcommand);
+  if (it != subcmds.end())
+  {
+    out << it->second(polygons);
+  }
+  else
+  {
+    throw std::logic_error("<WRONG SUBCOMMAND>");
+  }
+}
 
-void orlova::count(const std::vector< Polygon >&, std::istream&, std::ostream&);
-size_t orlova::countEven(const std::vector< Polygon >&);
-size_t orlova::countOdd(const std::vector< Polygon >&);
-size_t orlova::countNum(const std::vector< Polygon >&, size_t);
+bool orlova::areaComparator(const Polygon& a, const Polygon& b)
+{
+  return areaPolygon(a) < areaPolygon(b);
+}
+
+double orlova::maxArea(const std::vector< Polygon >& polygons)
+{
+  return areaPolygon(*std::max_element(polygons.begin(), polygons.end(), areaComparator));
+}
+
+bool orlova::vertexesComparator(const Polygon& a, const Polygon& b)
+{
+  return a.points.size() < b.points.size();
+}
+
+size_t orlova::maxVertexes(const std::vector< Polygon >& polygons)
+{
+  return (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator)).points.size();
+}
+
+void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  if (polygons.size() == 0)
+  {
+    throw std::logic_error("<THERE ARE NO POLYGONS>");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  out << std::fixed << std::setprecision(1);
+
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
+  subcmds["AREA"] = maxArea;
+  subcmds["VERTEXES"] = maxVertexes;
+  auto it = subcmds.find(subcommand);
+  if (it != subcmds.end())
+  {
+    out << it->second(polygons);
+  }
+  else
+  {
+    throw std::logic_error("<WRONG SUBCOMMAND>");
+  }
+}
+
+double orlova::minArea(const std::vector< Polygon >& polygons)
+{
+  return areaPolygon(*std::min_element(polygons.begin(), polygons.end(), areaComparator));
+}
+
+size_t orlova::minVertexes(const std::vector< Polygon >& polygons)
+{
+  return (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator)).points.size();
+}
+
+void orlova::count(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  if (polygons.size() == 0)
+  {
+    throw std::logic_error("<THERE ARE NO POLYGONS>");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  out << std::fixed << std::setprecision(1);
+
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
+  subcmds["EVEN"] = countEven;
+  subcmds["ODD"] = countOdd;
+  auto it = subcmds.find(subcommand);
+  if (it != subcmds.end())
+  {
+    out << it->second(polygons);
+  }
+  else
+  {
+    size_t numOfVertexes = std::stoull(subcommand);
+    if (numOfVertexes < 3)
+    {
+      throw std::logic_error("<WRONG SUBCOMMAND>");
+    }
+
+    out << countNum(polygons, numOfVertexes);
+  }
+}
+
+size_t orlova::countEven(const std::vector< Polygon >& polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isEven);
+}
+
+size_t orlova::countOdd(const std::vector< Polygon >& polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isOdd);
+}
+
+size_t orlova::countNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isNum);
+}
