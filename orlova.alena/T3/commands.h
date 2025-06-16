@@ -6,6 +6,11 @@
 
 namespace orlova
 {
+  double subArea(const Point&, const Point&);
+  double areaPolygon(const Polygon&);
+  bool isEven(const Polygon&);
+  double evenAreaAccumulator(double, const Polygon&);
+
   void area(const std::vector< Polygon >&, std::istream&, std::ostream&);
   double areaEven(const std::vector< Polygon >&);
   double areaOdd(const std::vector< Polygon >&);
