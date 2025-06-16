@@ -1,9 +1,9 @@
-#include "data.hpp"
 #include <iostream>
 #include <iterator>
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include "data.hpp"
 
 int main()
 {

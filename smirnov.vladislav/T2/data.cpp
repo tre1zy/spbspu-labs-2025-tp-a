@@ -1,7 +1,7 @@
-#include "data.hpp"
-#include "stream_guard.hpp"
 #include <iomanip>
 #include <cmath>
+#include "data.hpp"
+#include "stream_guard.hpp"
 
 namespace smirnov
 {
