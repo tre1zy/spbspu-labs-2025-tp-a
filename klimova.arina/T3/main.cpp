@@ -17,15 +17,14 @@ int main(int argc, char* argv[])
     std::ifstream file(argv[1]);
     std::vector< Polygon > polygons;
     while (!file.eof()) {
-        if (!file)
-        {
+        if (!file) {
             file.clear();
             file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         }
         std::copy(inputIterator(file), inputIterator(), std::back_inserter(polygons));
     }
     std::map< std::string, std::function< void() > > cmds;
-    //cmds["area"] = std::bind(klimova::area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["area"] = std::bind(klimova::area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
     std::string command;
     while (!(std::cin >> command).eof()) {
         try {
