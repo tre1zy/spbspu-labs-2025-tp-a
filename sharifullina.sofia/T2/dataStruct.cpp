@@ -63,7 +63,7 @@ namespace
 
     double real = 0.0;
     double imag = 0.0;
-    in >> real >> imag >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
+    in >> real >> imag >> DelimiterIO{ ')' };
     if (in)
     {
       dest.ref = std::complex<double>(real, imag);
@@ -82,7 +82,7 @@ namespace
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' };
     in >> dest.ref.first;
     in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second;
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
     return in;
   }
 
@@ -99,16 +99,21 @@ namespace
 
 bool sharifullina::DataStruct::operator<(const DataStruct& other) const
 {
-  if (std::abs(key1) != std::abs(other.key1))
+  if (std::abs(key1.real()) != std::abs(other.key1.real()) || 
+      std::abs(key1.imag()) != std::abs(other.key1.imag()))
   {
-    return std::abs(key1) < std::abs(other.key1);
+    return std::abs(key1.real()) < std::abs(other.key1.real()) ||
+           (std::abs(key1.real()) == std::abs(other.key1.real()) && 
+            std::abs(key1.imag()) < std::abs(other.key1.imag()));
   }
+  
   const double lhsRatio = static_cast<double>(key2.first) / key2.second;
   const double rhsRatio = static_cast<double>(other.key2.first) / other.key2.second;
-  if (lhsRatio != rhsRatio)
+  if (std::abs(lhsRatio - rhsRatio) > 1e-6)
   {
     return lhsRatio < rhsRatio;
   }
+  
   return key3.length() < other.key3.length();
 }
 

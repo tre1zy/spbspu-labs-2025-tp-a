@@ -13,18 +13,14 @@ int main()
 
   std::vector<DataStruct> data;
 
-  while (true)
+  while (!std::cin.eof())
   {
     DataStruct ds;
     if (std::cin >> ds)
     {
       data.push_back(ds);
     }
-    else if (std::cin.eof())
-    {
-      break;
-    }
-    else
+    else if (!std::cin.eof())
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
