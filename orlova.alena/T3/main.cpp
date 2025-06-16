@@ -31,12 +31,12 @@ int main(int argc, char** argv)
 
   while (!file.eof())
   {
-    std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
     if (!file)
     {
       file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+    std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
 
   std::map< std::string, std::function< void() > > cmds;
