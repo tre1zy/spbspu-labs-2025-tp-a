@@ -4,20 +4,14 @@
 #include <exception>
 #include <algorithm>
 
-double klimova::areaEven(double value, const Polygon& polygon, size_t size) {
-    if (size == 0) {
-        return value;
-    }
+double klimova::areaEven(double value, const Polygon& polygon) {
     if (isPolygonEven(polygon)) {
         return value + areaPolygon(polygon);
     }
     return value;
 }
 
-double klimova::areaOdd(double value, const Polygon& polygon, size_t size) {
-    if (size == 0) {
-        return value;
-    }
+double klimova::areaOdd(double value, const Polygon& polygon) {
     if (!isPolygonEven(polygon)) {
         return value + areaPolygon(polygon);
     }
