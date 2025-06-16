@@ -67,6 +67,14 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
       break;
     }
     out << type.name;
+    if (type.is_const)
+    {
+      out << " const";
+    }
+    if (type.is_volatile)
+    {
+      out << " volatile";
+    }
     break;
   case typing::Type::Pointer:
     details::print_left_parenthesis(out, type);

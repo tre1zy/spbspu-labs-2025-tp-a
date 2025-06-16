@@ -56,3 +56,16 @@ bool rychkov::NameCompare::operator()(const std::string& lhs, const operator_val
 {
   return lhs < rhs[0].token;
 }
+
+bool rychkov::NameCompare::operator()(const Macro& lhs, const Macro& rhs) const
+{
+  return lhs.name < rhs.name;
+}
+bool rychkov::NameCompare::operator()(const Macro& lhs, const std::string& rhs) const
+{
+  return lhs.name < rhs;
+}
+bool rychkov::NameCompare::operator()(const std::string& lhs, const Macro& rhs) const
+{
+  return lhs < rhs.name;
+}

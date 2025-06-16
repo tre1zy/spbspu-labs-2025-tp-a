@@ -33,6 +33,10 @@ namespace rychkov
     bool operator()(const operator_value& lhs, const operator_value& rhs) const;
     bool operator()(const operator_value& lhs, const std::string& rhs) const;
     bool operator()(const std::string& lhs, const operator_value& rhs) const;
+
+    bool operator()(const Macro& lhs, const Macro& rhs) const;
+    bool operator()(const Macro& lhs, const std::string& rhs) const;
+    bool operator()(const std::string& lhs, const Macro& rhs) const;
   };
 }
 

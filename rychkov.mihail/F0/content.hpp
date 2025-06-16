@@ -58,6 +58,13 @@ namespace rychkov
     }
   };
 
+  struct Macro
+  {
+    std::string name;
+    std::string body;
+    bool func_style = false;
+    std::vector< std::string > parameters;
+  };
   struct Operator
   {
     enum Type
@@ -182,6 +189,7 @@ namespace rychkov
       std::string literal;
       std::string suffix;
       Type type;
+      typing::Type result_type;
     };
     struct Expression
     {

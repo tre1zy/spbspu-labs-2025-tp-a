@@ -1,4 +1,4 @@
-#include "code_parsers.hpp"
+#include "type_parser.hpp"
 
 rychkov::typing::Type* rychkov::TypeParser::move_up()
 {
@@ -63,7 +63,7 @@ bool rychkov::TypeParser::append(CParseContext& context, typing::Type base_type)
     stack_.push({&combined_});
     return true;
   }
-  if (stack_.top().data->base != nullptr)
+  if (!stack_.top().data->name.empty() || stack_.top().data->base != nullptr)
   {
     log(context, "types cannot be merged here");
     return false;

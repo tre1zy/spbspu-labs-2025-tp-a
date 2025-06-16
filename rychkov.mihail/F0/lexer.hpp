@@ -28,6 +28,7 @@ namespace rychkov
     using operator_value = const std::vector< Operator >*;
     CParser* next_;
     bool literal_full_;
+    bool screened_;
     std::variant< std::monostate, operator_value, std::string, entities::Literal > buf_;
 
     void append_new(CParseContext& context, char c);

@@ -19,7 +19,7 @@ rychkov::entities::Expression::Expression(Declaration decl):
 {}
 rychkov::entities::Expression::Expression(Literal lit):
   operation{nullptr},
-  result_type{},
+  result_type{lit.result_type},
   operands{std::move(lit)}
 {}
 rychkov::entities::Expression::Expression(CastOperation cast):

@@ -135,20 +135,9 @@ void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
 }
 void rychkov::ContentPrinter::operator()(const entities::Literal& literal)
 {
-  indent();
-  switch (literal.type)
-  {
-  case entities::Literal::String:
-    out << "[string] ";
-    break;
-  case entities::Literal::Char:
-    out << "[char] ";
-    break;
-  case entities::Literal::Number:
-    out << "[number] ";
-    break;
-  }
-  out << literal << '\n';
+  indent() << "[literal]\n";
+  indent() << "<object> " << literal << '\n';
+  indent() << "<type>   " << literal.result_type << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::CastOperation& cast)
 {

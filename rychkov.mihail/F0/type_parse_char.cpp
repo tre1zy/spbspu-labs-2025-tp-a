@@ -1,4 +1,6 @@
-#include "code_parsers.hpp"
+#include "type_parser.hpp"
+
+#include <map>
 
 bool rychkov::TypeParser::append(CParseContext& context, char c)
 {

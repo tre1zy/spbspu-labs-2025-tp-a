@@ -46,6 +46,8 @@ void rychkov::ContentPrinter::operator()(const entities::Expression& expr)
     }
     return;
   }
+  indent() << "<type> " << expr.result_type << '\n';
+  indent() << "<operands>:\n";
   indent_++;
   for (size_t i = 0; i < oper_size; i++)
   {

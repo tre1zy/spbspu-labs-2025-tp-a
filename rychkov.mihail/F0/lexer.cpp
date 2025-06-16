@@ -2,12 +2,14 @@
 
 #include <iostream>
 #include <cctype>
+#include <utility>
 #include "cparser.hpp"
 #include "print_content.hpp"
 
 rychkov::Lexer::Lexer(CParser* next):
-  next_(next),
-  literal_full_(false)
+  next_{next},
+  literal_full_{false},
+  screened_{false}
 {}
 
 const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases = {
@@ -65,13 +67,46 @@ void rychkov::Lexer::flush(CParseContext& context)
   }
   else if (std::holds_alternative< entities::Literal >(buf_))
   {
+    entities::Literal& lit = std::get< entities::Literal >(buf_);
+    if (lit.type == entities::Literal::Number)
+    {
+      if ((lit.suffix == "l") || (lit.suffix == "L"))
+      {
+        lit.result_type.length_category = typing::Type::LONG;
+      }
+      else if ((lit.suffix == "ul") || (lit.suffix == "UL"))
+      {
+        lit.result_type.length_category = typing::Type::LONG;
+        lit.result_type.is_unsigned = true;
+      }
+      else if ((lit.suffix == "ll") || (lit.suffix == "LL"))
+      {
+        lit.result_type.length_category = typing::Type::LONG_LONG;
+      }
+      else if ((lit.suffix == "ull") || (lit.suffix == "ULL"))
+      {
+        lit.result_type.length_category = typing::Type::LONG_LONG;
+        lit.result_type.is_unsigned = true;
+      }
+      else if (!lit.suffix.empty())
+      {
+        log(context, "unknown numeric suffix - " + lit.suffix);
+        lit.suffix.clear();
+      }
+    }
+    else if (!lit.suffix.empty())
+    {
+      log(context, "unknown literal suffix - " + lit.suffix);
+      lit.suffix.clear();
+    }
+
     if (next_ == nullptr)
     {
-      context.out << "<lit>  " << std::get< entities::Literal >(buf_) << '\n';
+      context.out << "<lit>  " << lit << '\n';
     }
     else
     {
-      next_->append(context, std::get< entities::Literal >(buf_));
+      next_->append(context, lit);
     }
   }
   else if (std::holds_alternative< operator_value >(buf_))
@@ -120,15 +155,16 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
   }
   else if (std::isdigit(c))
   {
-    buf_ = entities::Literal{{c}, {}, entities::Literal::Number};
+    buf_ = entities::Literal{{c}, {}, entities::Literal::Number, {"int", typing::Type::Int}};
   }
   else if (c == '\'')
   {
-    buf_ = entities::Literal{{}, {}, entities::Literal::Char};
+    buf_ = entities::Literal{{}, {}, entities::Literal::Char, {"char", typing::Type::Int}};
   }
   else if (c == '"')
   {
-    buf_ = entities::Literal{{}, {}, entities::Literal::String};
+    typing::Type type = {{}, typing::Type::Array, {"char", typing::Type::Int, nullptr, true}};
+    buf_ = entities::Literal{{}, {}, entities::Literal::String, std::move(type)};
   }
   else if (!std::isspace(c))
   {
