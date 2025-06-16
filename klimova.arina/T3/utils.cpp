@@ -93,8 +93,8 @@ namespace klimova {
         }
         std::vector<Point> p_points = p.points;
         std::vector<Point> target_points = target.points;
-        std::sort(p_points.begin(), p_points.end(), PointsComparator());
-        std::sort(target_points.begin(), target_points.end(), PointsComparator());
+        std::sort(p_points.begin(), p_points.end(), PointComparator());
+        std::sort(target_points.begin(), target_points.end(), PointComparator());
         return std::equal(p_points.begin(), p_points.end(), target_points.begin(), PointEqual());
     }
 
@@ -108,7 +108,6 @@ namespace klimova {
 
     bool RectangleChecker::operator()(const Polygon& p) const {
         if (p.points.size() != 4) return false;
-        bool angle1, angle2, angle3 = false;
         bool angle1 = is_right_angle(p.points[0], p.points[1], p.points[3]);
         bool angle2 = is_right_angle(p.points[1], p.points[2], p.points[0]);
         bool angle3 = is_right_angle(p.points[2], p.points[3], p.points[1]);
