@@ -28,10 +28,10 @@ int main(int argc, char* argv[])
 
   std::vector< geom::Polygon > polyList;
   using it = std::istream_iterator< Polygon >;
-  std::copy(it(file), it(), std::back_inserter(polyList));
+  std::copy(it(inFile), it(), std::back_inserter(polyList));
   std::string line;
 
-  std::map< std::string, std::function< void() > > commandMap;
+  std::map< std::string, std::function< void(std::istream&) > > commandMap;
   commandMap["AREA"] = [&](std::istream& args) {
     smirnov::printAreaSum(args, std::cref(polyList), std::ref(std::cout));
     };
@@ -51,8 +51,7 @@ int main(int argc, char* argv[])
     smirnov::printIntersectionsCnt(args, std::cref(polyList), std::ref(std::cout));
     };
 
-  std::string line;
-  while (std::getline(std::cin, line)))
+  while (std::getline(std::cin, line))
   {
     std::istringstream iss(line);
     std::string cmd;

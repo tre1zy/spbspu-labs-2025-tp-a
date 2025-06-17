@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iterator>
 #include <limits>
+#include <ios>
 #include "delimiter.hpp"
 
 namespace geom
@@ -46,12 +47,11 @@ namespace geom
     }
 
     std::vector< Point > tmp;
-    tmp.reverse(count);
+    tmp.reserve(count);
 
     try
     {
-      std::generate_n(std::back_inserter(tmp), count, [&]
-      {
+      std::generate_n(std::back_inserter(tmp), count, [&] {
         Point p,
         if (!(in >> p))
         {
@@ -74,7 +74,7 @@ namespace geom
       in.setstate(std::ios::failbit);
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    else if (in.peek == '\n')
+    else if (in.peek() == '\n')
     {
       in.get();
     }
