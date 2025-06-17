@@ -1,3 +1,11 @@
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <limits>
+#include <algorithm>
+
+#include "dataStruct.hpp"
+
 int main()
 {
   using sharifullina::DataStruct;
