@@ -2,6 +2,7 @@
 #include <numeric>
 #include <cmath>
 #include <iterator>
+#include <limits>
 #include "geometry.hpp"
 #include "delimiter.hpp"
 
@@ -55,6 +56,16 @@ std::istream& geom::operator>>(std::istream& in, Polygon& poly)
     in.setstate(std::ios::failbit);
     return in;
   }
+  in >> std::ws;
+  char temp;
+
+  if (in.get(temp))
+  {
+    if (temp != '\n')
+    {
+      in.setstate(std::ios::failbit);
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   poly.points = std::move(pts);
   return in;
 }

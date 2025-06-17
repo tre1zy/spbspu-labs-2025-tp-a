@@ -180,6 +180,8 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
   handlers["AREA"] = std::bind(outputMaxArea, std::ref(output), std::cref(polygons));
   handlers["VERTEXES"] = std::bind(outputMaxVertices, std::ref(output), std::cref(polygons));
 
+  smirnov::Iofmtguard guard(output);
+
   try
   {
     handlers.at(param);
@@ -203,6 +205,8 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
   std::unordered_map< std::string, std::function< void() > > handlers;
   handlers["AREA"] = std::bind(outputMinArea, std::ref(output), std::cref(polygons));
   handlers["VERTEXES"] = std::bind(outputMinVertices, std::ref(output), std::cref(polygons));
+
+  smirnov::Iofmtguard guard(output);
 
   try
   {
