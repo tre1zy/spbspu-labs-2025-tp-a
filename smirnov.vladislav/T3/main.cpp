@@ -28,9 +28,18 @@ int main(int argc, char* argv[])
 
   std::vector< geom::Polygon > polyList;
   Polygon temp;
-  while (inFile >> temp)
+  std::string line;
+  while (std::getline(inFile, line)))
   {
-    polyList.push_back(std::move(temp));
+    if (line.empty())
+    {
+      continue;
+    }
+    std::istringstream lineStream(line);
+    if (lineStream >> temp)
+    {
+      polyList.push_back(std::move(temp));
+    }
   }
 
   std::map<std::string, std::function<void()>> commandMap;
