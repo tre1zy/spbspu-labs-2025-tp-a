@@ -45,7 +45,7 @@ namespace
     return teamPair.first == name;
   }
 
-  void addT(std::istream& in, brevnov::League& league, const std::string& teamName) 
+  void addT(std::istream& in, brevnov::League& league, const std::string& teamName)
   {
     size_t budget = 0;
     in >> budget;
@@ -293,7 +293,8 @@ void brevnov::endCareer(std::istream& in, League& league)
   }
 }
 
-void brevnov::updateRating(std::istream& in, League& league) {
+void brevnov::updateRating(std::istream& in, League& league)
+{
   std::string teamName, playerName;
   int raiting;
   in >> teamName >> playerName >> raiting;
@@ -334,7 +335,7 @@ void brevnov::transfer(std::istream& in, std::ostream& out, League& league)
   auto soldTeamIt = league.teams_.find(soldTeamName);
   auto playerIt = (soldTeamIt != league.teams_.end()) ? soldTeamIt->second.players_.find(playerSold)
     : league.fa_.find(playerSold);
-  if (playerIt == ((soldTeamIt != league.teams_.end()) ? soldTeamIt->second.players_.end() 
+  if (playerIt == ((soldTeamIt != league.teams_.end()) ? soldTeamIt->second.players_.end()
     : league.fa_.end()))
   {
     std::cerr << "Player not found!\n";
@@ -372,7 +373,8 @@ void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
     std::cerr << "Not correct position!\n";
     return;
   }
-  if (bud == 0) {
+  if (bud == 0)
+  {
     std::cerr << "Not correct budget!\n";
     return;
   }
@@ -503,7 +505,8 @@ void brevnov::viewTeam(std::istream& in, std::ostream& out, League& league)
   }
 }
 
-void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league) {
+void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league)
+{
   Position sPos = Position::CF;
   try
   {
