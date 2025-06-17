@@ -36,7 +36,7 @@ std::istream & mozhegova::operator>>(std::istream & in, Polygon & dest)
     in.setstate(std::ios::failbit);
     return in;
   }
-  dest.points = temp;
+  dest.points = std::move(temp);
   return in;
 }
 

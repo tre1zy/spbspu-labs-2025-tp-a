@@ -8,7 +8,8 @@ namespace mozhegova
 {
   struct Point
   {
-    int x, y;
+    int x{};
+    int y{};
     bool operator==(const Point & rhs) const;
     Point operator-(const Point & rhs) const;
   };
