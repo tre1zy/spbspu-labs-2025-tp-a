@@ -150,7 +150,7 @@ void smirnov::printAreaSum(std::istream& input, const std::vector< Polygon >& po
   double result{};
   try
   {
-    result = handlers.at(param);
+    result = handlers.at(param)();
   }
   catch (...)
   {
@@ -226,7 +226,7 @@ void smirnov::printCountOf(std::istream& input, const std::vector< Polygon >& po
   size_t count{};
   try
   {
-    count = handlers.at(param);
+    count = handlers.at(param)();
   }
   catch (...)
   {
