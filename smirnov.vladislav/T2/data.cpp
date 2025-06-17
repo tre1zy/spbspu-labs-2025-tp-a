@@ -75,7 +75,7 @@ std::istream& smirnov::operator>>(std::istream& in, StringIO&& dest)
   return in;
 }
 
-std::istream& smirnov::operator>>(std::istream& in, KeyNumIO& dest)
+std::istream& smirnov::operator>>(std::istream& in, KeyNumIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -214,7 +214,7 @@ std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& src)
     return out;
   }
   double dbval = src.key1;
-  unsigned long long = src.key2;
+  unsigned long long ullval = src.key2;
   Iofmtguard guard(out);
   out << "(:key1 " << smirnov::DoubleIO{ dbval };
   out << ":key2 " << smirnov::UllIO{ ullval };
