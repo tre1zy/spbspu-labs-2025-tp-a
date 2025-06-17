@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
   std::ifstream inFile(argv[1]);
   if (!inFile.is_open())
   {
-    std::cer << "Could not open file" << argv[1] << "\n";
+    std::cerr << "Could not open file" << argv[1] << "\n";
     return 1;
   }
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    catch (const std::invalid_argument)
+    catch (const std::invalid_argument& e)
     {
       std::cout << "<INVALID COMMAND>\n";
       if (std::cin.fail())
@@ -72,6 +72,7 @@ int main(int argc, char* argv[])
         std::cin.clear();
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 
   return 0;
