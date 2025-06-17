@@ -1,10 +1,5 @@
 #include "delimiter.hpp"
 
-namespace
-{
-  using namespace io;
-}
-
 std::istream& io::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
@@ -13,9 +8,9 @@ std::istream& io::operator>>(std::istream& in, DelimiterIO&& dest)
     return in;
   }
 
-  char c = '0';
+  char c;
   in >> c;
-  if (in && (std::tolower(c) != dest.exp))
+  if (!in || c != dest.exp)
   {
     in.setstate(std::ios::failbit);
   }

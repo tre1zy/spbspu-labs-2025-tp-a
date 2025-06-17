@@ -1,3 +1,4 @@
+#include "commands.hpp"
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
@@ -5,7 +6,6 @@
 #include <tuple>
 #include <unordered_map>
 #include <string>
-#include "commands.hpp"
 #include "geometry.hpp"
 #include "stream_guard.hpp"
 

@@ -1,9 +1,9 @@
+#include "geometry.hpp"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
 #include <iterator>
 #include <limits>
-#include "geometry.hpp"
 #include "delimiter.hpp"
 
 namespace geom
@@ -45,26 +45,39 @@ namespace geom
       return in;
     }
 
-    std::vector< Point > pts(count);
-    auto it = std::istream_iterator< Point >(in);
-    std::copy_n(it, count, pts.begin());
-    if (!in)
+    std::vector< Point > tmp;
+    tmp.reverse(count);
+
+    try
+    {
+      std::generate_n(std::back_inserter(tmp), count, [&]
+      {
+        Point p,
+        if (!(in >> p))
+        {
+          throw std::ios_base::failure{ "" };
+        }
+        return p;
+        });
+    }
+    catch (const std::ios_base::failure&)
     {
       in.setstate(std::ios::failbit);
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       return in;
     }
-    in >> std::ws;
-    char temp;
+    poly.points = std::move(tmp);
 
-    if (in.get(temp))
+    in >> std::ws;
+    if (in.peek() != EOF && in.peek() != '\n')
     {
-      if (temp != '\n')
-      {
-        in.setstate(std::ios::failbit);
-        in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      }
+      in.setstate(std::ios::failbit);
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    poly.points = std::move(pts);
+    else if (in.peek == '\n')
+    {
+      in.get();
+    }
     return in;
   }
 
