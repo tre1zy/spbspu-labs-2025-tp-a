@@ -5,8 +5,8 @@
 
 namespace zakirov
 {
-    void process_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out);
-    void process_less_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out);
+  void process_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out);
+  void process_less_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out);
 }
 
 #endif

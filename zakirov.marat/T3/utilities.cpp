@@ -2,32 +2,32 @@
 #include <string>
 #include <algorithm>
 
-bool odd_polygon_pred(const zakirov::Polygon & polygon)
+  bool zakirov::odd_polygon_pred(const zakirov::Polygon & polygon)
   {
     return polygon.points_.size() % 2 == 0;
   }
 
-  bool even_polygon_pred(const zakirov::Polygon & polygon)
+  bool zakirov::even_polygon_pred(const zakirov::Polygon & polygon)
   {
     return polygon.points_.size() % 2 == 1;
   }
 
-  bool less_area_pred(double area_base, double area_other)
+  bool zakirov::less_area_pred(double area_base, double area_other)
   {
     return area_other < area_base;
   }
 
-  bool equal_vertexes_pred(double vertex_base, double vertex_other)
+  bool zakirov::equal_vertexes_pred(double vertex_base, double vertex_other)
   {
     return vertex_base == vertex_other;
   }
 
-  size_t get_vertex(const zakirov::Polygon & polygon)
+  size_t zakirov::get_vertex(const zakirov::Polygon & polygon)
   {
     return polygon.points_.size();
   }
 
-  double count_area(const zakirov::Polygon & plgn)
+  double zakirov::count_area(const zakirov::Polygon & plgn)
   {
     double result = 0;
     for (size_t i = 1; i < plgn.points_.size(); ++i)
@@ -41,7 +41,7 @@ bool odd_polygon_pred(const zakirov::Polygon & polygon)
   }
 
   template <class P>
-  double count_sum_area(const std::list< zakirov::Polygon > & points, P pred)
+  double zakirov::count_sum_area(const std::list< zakirov::Polygon > & points, P pred)
   {
     std::vector< Polygon > polygons;
     std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), even_polygon_pred);
@@ -50,7 +50,7 @@ bool odd_polygon_pred(const zakirov::Polygon & polygon)
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  int extract_num_until(const std::string & str, size_t start_pos, char el)
+  int zakirov::extract_num_until(const std::string & str, size_t start_pos, char el)
   {
     auto it = std::find(str.begin() + start_pos, str.end(), el);
     std::string substr(str.begin() + start_pos, it);
@@ -62,7 +62,7 @@ bool odd_polygon_pred(const zakirov::Polygon & polygon)
     return std::stoi(substr);
   }
 
-  zakirov::Point parce_point (const std::string & str)
+  zakirov::Point zakirov::parce_point (const std::string & str)
   {
     zakirov::Point result{0, 0};
     size_t pos = 0;
