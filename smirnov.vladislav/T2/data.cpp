@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <cmath>
 #include "stream_guard.hpp"
+#include "delimiter.hpp"
 
 std::istream& smirnov::io::operator>>(std::istream& in, DoubleIO&& dest)
 {
