@@ -5,7 +5,8 @@
 #include <functional>
 #include <iterator>
 
-std::istream& klimova::operator>>(std::istream& in, DelimiterIO&& dest) {
+std::istream& klimova::operator>>(std::istream& in, DelimiterIO&& dest)
+{
     std::istream::sentry sentry(in);
     if (!sentry) {
         return in;
@@ -17,7 +18,8 @@ std::istream& klimova::operator>>(std::istream& in, DelimiterIO&& dest) {
     }
     return in;
 }
-std::istream& klimova::operator>>(std::istream& in, Point& point) {
+std::istream& klimova::operator>>(std::istream& in, Point& point)
+{
     using sep = DelimiterIO;
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -35,7 +37,8 @@ std::istream& klimova::operator>>(std::istream& in, Point& point) {
     point.y = y;
     return in;
 }
-std::ostream& klimova::operator<<(std::ostream& out, const Point& point) {
+std::ostream& klimova::operator<<(std::ostream& out, const Point& point)
+{
     std::ostream::sentry sentry(out);
     if (!sentry) {
         return out;
@@ -44,7 +47,8 @@ std::ostream& klimova::operator<<(std::ostream& out, const Point& point) {
     out << "(" << point.x << ';' << point.y << ")";
     return out;
 }
-std::istream& klimova::operator>>(std::istream& in, Polygon& polygon) {
+std::istream& klimova::operator>>(std::istream& in, Polygon& polygon)
+{
     std::istream::sentry sentry(in);
     if (!sentry) {
         return in;
@@ -60,7 +64,8 @@ std::istream& klimova::operator>>(std::istream& in, Polygon& polygon) {
     polygon.points = points;
     return in;
 }
-std::ostream& klimova::operator<<(std::ostream& out, const Polygon& polygon) {
+std::ostream& klimova::operator<<(std::ostream& out, const Polygon& polygon)
+{
     std::ostream::sentry s(out);
     if (!s) {
         return out;

@@ -4,91 +4,108 @@
 #include <exception>
 #include <algorithm>
 
-double klimova::areaEven(double value, const Polygon& polygon) {
-    if (isPolygonEven(polygon)) {
+double klimova::areaEven(double value, const Polygon& polygon)
+{
+   if (isPolygonEven(polygon)) {
         return value + areaPolygon(polygon);
     }
     return value;
 }
 
-double klimova::areaOdd(double value, const Polygon& polygon) {
+double klimova::areaOdd(double value, const Polygon& polygon)
+{
     if (!isPolygonEven(polygon)) {
         return value + areaPolygon(polygon);
     }
     return value;
 }
 
-double klimova::areaMean(double value, const Polygon& polygon, size_t size) {
+double klimova::areaMean(double value, const Polygon& polygon, size_t size)
+{
     if (size == 0) {
         throw std::overflow_error("");
     }
     return value + areaPolygon(polygon) / size;
 }
 
-double klimova::areaNum(double value, const Polygon& polygon, size_t vertexes) {
+double klimova::areaNum(double value, const Polygon& polygon, size_t vertexes)
+{
     if (polygon.points.size() == vertexes) {
         return value + areaPolygon(polygon);
     }
     return value;
 }
 
-double klimova::areaPolygon(const Polygon& polygon) {
+double klimova::areaPolygon(const Polygon& polygon)
+{
     Polygon rotated = polygon;
     std::rotate(rotated.points.begin(), rotated.points.begin() + 1, rotated.points.end());
     auto beginPoly = polygon.points.begin();
-    auto  endPoly = polygon.points.end();
-    auto beginRotated = rotated.points.begin()
-    double sum = std::inner_product(beginPoly, endPoly, beginRotated(), 0, std::plus< double >{}, multiplier);
+    auto endPoly = polygon.points.end();
+    auto beginRotated = rotated.points.begin();
+    double sum = std::inner_product(beginPoly, endPoly, beginRotated(), 0.0, std::plus< double >{}, multiplier);
     return std::abs(sum) / 2.0;
 }
 
-double klimova::multiplier(const Point& p1, const Point& p2) {
-  return p1.x * p2.y - p1.y * p2.x;
+double klimova::multiplier(const Point& p1, const Point& p2)
+{
+    return p1.x * p2.y - p1.y * p2.x;
 }
 
-bool klimova::isPolygonEven(const Polygon& polygon) {
-  return polygon.points.size() % 2 == 0;
+bool klimova::isPolygonEven(const Polygon& polygon)
+{
+    return polygon.points.size() % 2 == 0;
 }
 
-size_t klimova::getVertexes(const std::string& str) {
+size_t klimova::getVertexes(const std::string& str)
+{
     size_t vertexes = std::stoull(str);
     return vertexes;
 }
 
-double klimova::getArea(const Polygon& polygon) {
+double klimova::getArea(const Polygon& polygon)
+{
     return areaPolygon(polygon);
 }
 
-double klimova::getVertexesCount(const Polygon& polygon) {
+double klimova::getVertexesCount(const Polygon& polygon)
+{
     return static_cast<double>(polygon.points.size());
 }
 
-bool klimova::isVertexCountEven(const Polygon& polygon) {
+bool klimova::isVertexCountEven(const Polygon& polygon)
+{
     return polygon.points.size() % 2 == 0;
 }
 
-bool klimova::isVertexCountOdd(const Polygon& polygon) {
+bool klimova::isVertexCountOdd(const Polygon& polygon)
+{
     return !isVertexCountEven(polygon);
 }
 
-bool klimova::hasVertexCount(const Polygon& polygon, size_t vertexes) {
+bool klimova::hasVertexCount(const Polygon& polygon, size_t vertexes)
+{
     return polygon.points.size() == vertexes;
 }
 
-bool klimova::isValidVertexCount(size_t vertexes) {
+bool klimova::isValidVertexCount(size_t vertexes)
+{
     return vertexes >= 3;
 }
 
 namespace klimova {
-    bool PointComparator::operator()(const Point& a, const Point& b) const {
+    bool PointComparator::operator()(const Point& a, const Point& b) const 
+    {
         return std::tie(a.x, a.y) < std::tie(b.x, b.y);
     }
 
-    bool  PointEqual::operator()(const Point& a, const Point& b) const {
+    bool  PointEqual::operator()(const Point& a, const Point& b) const 
+    {
         return a.x == b.x && a.y == b.y;
     }
 
-    bool PermsTester::operator()(const Polygon& p) const {
+    bool PermsTester::operator()(const Polygon& p) const 
+    {
         if (p.points.size() != target.points.size()) {
             return false;
         }
@@ -99,7 +116,8 @@ namespace klimova {
         return std::equal(p_points.begin(), p_points.end(), target_points.begin(), PointEqual());
     }
 
-    bool RectangleChecker::is_right_angle(const Point& a, const Point& b, const Point& c) {
+    bool RectangleChecker::is_right_angle(const Point& a, const Point& b, const Point& c)
+    {
         int dx1 = b.x - a.x;
         int dy1 = b.y - a.y;
         int dx2 = b.x - c.x;
@@ -107,7 +125,8 @@ namespace klimova {
         return (dx1 * dx2 + dy1 * dy2) == 0;
     }
 
-    bool RectangleChecker::operator()(const Polygon& p) const {
+    bool RectangleChecker::operator()(const Polygon& p) const 
+    {
         if (p.points.size() != 4) {
              return false;
         }

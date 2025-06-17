@@ -41,7 +41,8 @@ void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& o
     }
 }
 
-void klimova::max(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
+void klimova::max(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+{
     try {
         if (polygons.empty()) {
             throw std::invalid_argument("");
@@ -99,7 +100,8 @@ void klimova::min(const VecPolygon& polygons, std::istream& is, std::ostream& os
     }
 }
 
-void klimova::count(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
+void klimova::count(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+{
     auto bindEven = std::bind(isVertexCountEven, _1);
     auto bindOdd = std::bind(isVertexCountOdd, _1);
     CountSubs subs{{"EVEN", bindEven}, {"ODD", bindOdd}};
@@ -127,7 +129,8 @@ void klimova::count(const VecPolygon& polygons, std::istream& is, std::ostream& 
     }
 }
 
-void klimova::perms(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
+void klimova::perms(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+{
     try {
         Polygon target;
         is >> target;
@@ -146,7 +149,8 @@ void klimova::perms(const VecPolygon& polygons, std::istream& is, std::ostream& 
     }
 }
 
-void klimova::rects(const VecPolygon& polygons, std::ostream& os) {
+void klimova::rects(const VecPolygon& polygons, std::ostream& os)
+{
     RectangleChecker checker;
     size_t count = std::count_if(polygons.begin(), polygons.end(), checker);
     os << count << "\n";
