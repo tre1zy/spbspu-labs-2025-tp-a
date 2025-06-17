@@ -210,7 +210,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest
   out << std::fixed << std::setprecision(1) << std::showpoint;
 
   out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")"
-      << ":key2 (:N" << dest.key2.first << ":D" << dest.key2.second << ":)"
+      << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)"
       << ":key3 ";
   out << std::quoted(dest.key3);
   out << ":)";
