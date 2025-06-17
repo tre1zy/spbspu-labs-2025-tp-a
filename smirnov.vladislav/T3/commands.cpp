@@ -85,6 +85,11 @@ namespace
     return sumAreasByPredicate(polygons, hasOddVertices);
   }
 
+  double totalAreaByVertexCount(const std::vector< Polygon >& polygons, size_t count)
+  {
+    return sumAreasByPredicate(polygons, VertexCountMatcher{ count });
+  }
+
   bool acceptAll(const Polygon&)
   {
     return true;
@@ -93,11 +98,6 @@ namespace
   double totalAreaAll(const std::vector< Polygon >& polygons)
   {
     return sumAreasByPredicate(polygons, acceptAll);
-  }
-
-  double totalAreaByVertexCount(const std::vector< Polygon >& polygons, size_t count)
-  {
-    return sumAreasByPredicate(polygons, VertexCountMatcher{ count });
   }
 
   struct AverageAreaCalculator
@@ -168,6 +168,9 @@ void smirnov::printAreaSum(std::istream& input, const std::vector< Polygon >& po
 
 void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
 {
+  std::string param;
+  input >> param;
+
   if (polygons.empty())
   {
     throw std::invalid_argument("No polygons available");
@@ -177,14 +180,21 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
   handlers["AREA"] = std::bind(outputMaxArea, std::ref(output), std::cref(polygons));
   handlers["VERTEXES"] = std::bind(outputMaxVertices, std::ref(output), std::cref(polygons));
 
-  std::string param;
-  input >> param;
-
-  handlers.at(param)();
+  try
+  {
+    handlers.at(param());
+  }
+  catch (...)
+  {
+    throw std::invalid_argument("Unknown command");
+  }
 }
 
 void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
 {
+  std::string param;
+  input >> param;
+
   if (polygons.empty())
   {
     throw std::invalid_argument("No polygons available");
@@ -194,9 +204,14 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
   handlers["AREA"] = std::bind(outputMinArea, std::ref(output), std::cref(polygons))
   handlers["VERTEXES"] = std::bind(outputMinVertices, std::ref(output), std::cref(polygons));
 
-  std::string param;
-  input >> param;
-  handlers.at(param)();
+  try
+  {
+    handlers.at(param());
+  }
+  catch (...)
+  {
+    throw std::invalid_argument("Unknown command");
+  }
 }
 
 void smirnov::printCountOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
