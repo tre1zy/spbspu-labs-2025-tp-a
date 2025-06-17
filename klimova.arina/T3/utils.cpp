@@ -43,7 +43,7 @@ double klimova::areaPolygon(const Polygon& polygon)
     auto beginPoly = polygon.points.begin();
     auto endPoly = polygon.points.end();
     auto beginRotated = rotated.points.begin();
-    double sum = std::inner_product(beginPoly, endPoly, beginRotated(), 0.0, std::plus< double >{}, multiplier);
+    double sum = std::inner_product(beginPoly, endPoly, beginRotated, 0.0, std::plus< double >{}, multiplier);
     return std::abs(sum) / 2.0;
 }
 
