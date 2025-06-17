@@ -25,7 +25,7 @@ double klimova::areaMean(double value, const Polygon& polygon, size_t size) {
     return value + areaPolygon(polygon) / size;
 }
 
-double klimova::areaNumber(double value, const Polygon& polygon, size_t vertexes) {
+double klimova::areaNum(double value, const Polygon& polygon, size_t vertexes) {
     if (polygon.points.size() == vertexes) {
         return value + areaPolygon(polygon);
     }
@@ -33,16 +33,17 @@ double klimova::areaNumber(double value, const Polygon& polygon, size_t vertexes
 }
 
 double klimova::areaPolygon(const Polygon& polygon) {
-    Polygon polygon_rotate(polygon);
-    std::rotate(polygon_rotate.points.begin(), polygon_rotate.points.begin() + 1, polygon_rotate.points.end());
-    auto begin = polygon.points.begin();
-    auto  end = polygon.points.end();
-    double result = std::inner_product(begin, end, polygon_rotate.points.begin(), 0, std::plus< double >{}, multPoints);
-    return std::abs(result) / 2.0;
+    Polygon rotated = polygon;
+    std::rotate(rotated.points.begin(), rotated.points.begin() + 1, rotated.points.end());
+    auto beginPoly = polygon.points.begin();
+    auto  endPoly = polygon.points.end();
+    auto beginRotated = rotated.points.begin()
+    double sum = std::inner_product(beginPoly, endPoly, beginRotated(), 0, std::plus< double >{}, multiplier);
+    return std::abs(sum) / 2.0;
 }
 
-double klimova::multPoints(const Point& point1, const Point& point2) {
-  return point1.x * point2.y - point1.y * point2.x;
+double klimova::multiplier(const Point& p1, const Point& p2) {
+  return p1.x * p2.y - p1.y * p2.x;
 }
 
 bool klimova::isPolygonEven(const Polygon& polygon) {

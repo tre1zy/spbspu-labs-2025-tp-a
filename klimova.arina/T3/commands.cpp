@@ -8,28 +8,30 @@
 #include <string>
 #include <limits>
 
-void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os)
+void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& os)
 {
-    auto bindEven = std::bind(areaEven, _1, _2);
-    auto bindOdd = std::bind(areaOdd, _1, _2);
-    auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
-    AreaSubcommands subs{{"EVEN", bindEven}, {"ODD", bindOdd}, {"MEAN", bindMean}};
-
-    std::string subcommand;
-    is >> subcommand;
-    double result = 0.0;
     try {
+        if (polygons.empty()) {
+            throw std::invalid_argument("");
+        }
+
+        auto bindEven = std::bind(areaEven, _1, _2);
+        auto bindOdd = std::bind(areaOdd, _1, _2);
+        auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
+        AreaSubs subs{{"EVEN", bindEven}, {"ODD", bindOdd}, {"MEAN", bindMean}};
+
+        std::string subcommand;
+        is >> subcommand;
+        double result = 0.0;
         if (subs.find(subcommand) != subs.end()) {
-            if (subcommand == "MEAN" && polygons.empty()) {
-                throw std::out_of_range("");
-            }
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs.at(subcommand));
         } else {
             size_t vertexes = getVertexes(subcommand);
             if (!isValidVertexCount(vertexes)) {
                 throw std::out_of_range("");
             }
-            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
+            auto bindNum = std::bind(areaNum, _1, _2, vertexes);
+            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindNum);
         }
         Streamguard StreamGuard(os);
         os << std::fixed << std::setprecision(1) << result << "\n";
@@ -39,17 +41,19 @@ void klimova::area(const std::vector< Polygon >& polygons, std::istream& is, std
     }
 }
 
-void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+void klimova::max(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
     try {
         if (polygons.empty()) {
             throw std::invalid_argument("");
         }
-        MaxSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+        MaxSubs subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
 
         std::string subcommand;
         is >> subcommand;
         auto func = subs.at(subcommand);
-        auto compare = std::bind(std::less<double>(), std::bind(func, _1), std::bind(func, _2));
+        auto bindFunc1 = std::bind(func, _1);
+        auto bindFunc2 = std::bind(func, _2);
+        auto compare = std::bind(std::less<double>(), bindFunc1, bindFunc2);
         auto it = std::max_element(polygons.begin(), polygons.end(), compare);
         Streamguard StreamGuard(os);
         os << std::fixed << std::setprecision(1);
@@ -66,17 +70,19 @@ void klimova::max(const std::vector< Polygon >& polygons, std::istream& is, std:
     }
 }
 
-void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+void klimova::min(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
     try {
         if (polygons.empty()) {
             throw std::invalid_argument("");
         }
-        MinSubcommands subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
+        MinSubs subs{{"AREA", getArea}, {"VERTEXES", getVertexesCount}};
 
         std::string subcommand;
         is >> subcommand;
         auto func = subs.at(subcommand);
-        auto compare = std::bind(std::less<double>(), std::bind(func, _1), std::bind(func, _2));
+        auto bindFunc1 = std::bind(func, _1);
+        auto bindFunc2 = std::bind(func, _2);
+        auto compare = std::bind(std::less<double>(), bindFunc1, bindFunc2);
         auto it = std::min_element(polygons.begin(), polygons.end(), compare);
         Streamguard StreamGuard(os);
         os << std::fixed << std::setprecision(1);
@@ -93,10 +99,10 @@ void klimova::min(const std::vector< Polygon >& polygons, std::istream& is, std:
     }
 }
 
-void klimova::count(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+void klimova::count(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
     auto bindEven = std::bind(isVertexCountEven, _1);
     auto bindOdd = std::bind(isVertexCountOdd, _1);
-    CountSubcommands subs{{"EVEN", bindEven}, {"ODD", bindOdd}};
+    CountSubs subs{{"EVEN", bindEven}, {"ODD", bindOdd}};
 
     std::string subcommand;
     is >> subcommand;
@@ -121,11 +127,11 @@ void klimova::count(const std::vector< Polygon >& polygons, std::istream& is, st
     }
 }
 
-void klimova::perms(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os) {
+void klimova::perms(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
     try {
         Polygon target;
         is >> target;
-        if (!is || target.points.empty()) {
+        if (target.points.empty()) {
             throw std::invalid_argument("");
         }
 
@@ -140,7 +146,7 @@ void klimova::perms(const std::vector< Polygon >& polygons, std::istream& is, st
     }
 }
 
-void klimova::rects(const std::vector< Polygon >& polygons, std::istream&, std::ostream& os) {
+void klimova::rects(const VecPolygon& polygons, std::ostream& os) {
     RectangleChecker checker;
     size_t count = std::count_if(polygons.begin(), polygons.end(), checker);
     os << count << "\n";

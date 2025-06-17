@@ -10,16 +10,17 @@
 namespace klimova
 {
     using namespace std::placeholders;
-    using AreaSubcommands = std::map< std::string, std::function< double(double, const Polygon&) > >;
-    using MaxSubcommands = std::map< std::string, std::function< double(const Polygon&) > >;
-    using MinSubcommands = std::map< std::string, std::function< double(const Polygon&) > >;
-    using CountSubcommands = std::map< std::string, std::function< bool(const Polygon&) > >;
+    using VecPolygon = std::vector< Polygon >;
+    using AreaSubs = std::map< std::string, std::function< double(double, const Polygon&) > >;
+    using MaxSubs = std::map< std::string, std::function< double(const Polygon&) > >;
+    using MinSubs = std::map< std::string, std::function< double(const Polygon&) > >;
+    using CountSubs = std::map< std::string, std::function< bool(const Polygon&) > >;
 
-    void area(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
-    void max(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
-    void min(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
-    void count(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
-    void perms(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os);
-    void rects(const std::vector< Polygon >& polygons, std::istream&, std::ostream& os);
+    void area(const VecPolygon& polygons, std::istream& is, std::ostream& os);
+    void max(const VecPolygon& polygons, std::istream& is, std::ostream& os);
+    void min(const VecPolygon& polygons, std::istream& is, std::ostream& os);
+    void count(const VecPolygon& polygons, std::istream& is, std::ostream& os);
+    void perms(const VecPolygon& polygons, std::istream& is, std::ostream& os);
+    void rects(const VecPolygon& polygons, std::ostream& os);
 }
 #endif
