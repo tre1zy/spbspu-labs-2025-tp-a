@@ -136,10 +136,9 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest
   if (!sentry) return out;
 
   sharifullina::iofmtguard guard(out);
-  out << std::fixed << std::setprecision(1);
+  out << std::fixed << std::setprecision(1) << std::showpoint;
   out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")";
   out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
   out << ":key3 \"" << dest.key3 << "\":)";
   return out;
 }
-
