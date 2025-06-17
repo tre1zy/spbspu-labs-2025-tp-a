@@ -94,17 +94,17 @@ bool klimova::isValidVertexCount(size_t vertexes)
 }
 
 namespace klimova {
-    bool PointComparator::operator()(const Point& a, const Point& b) const 
+    bool PointComparator::operator()(const Point& a, const Point& b) const
     {
         return std::tie(a.x, a.y) < std::tie(b.x, b.y);
     }
 
-    bool  PointEqual::operator()(const Point& a, const Point& b) const 
+    bool  PointEqual::operator()(const Point& a, const Point& b) const
     {
         return a.x == b.x && a.y == b.y;
     }
 
-    bool PermsTester::operator()(const Polygon& p) const 
+    bool PermsTester::operator()(const Polygon& p) const
     {
         if (p.points.size() != target.points.size()) {
             return false;
@@ -125,7 +125,7 @@ namespace klimova {
         return (dx1 * dx2 + dy1 * dy2) == 0;
     }
 
-    bool RectangleChecker::operator()(const Polygon& p) const 
+    bool RectangleChecker::operator()(const Polygon& p) const
     {
         if (p.points.size() != 4) {
              return false;
