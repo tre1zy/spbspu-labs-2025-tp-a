@@ -2,9 +2,9 @@
 #include "scopeGuard.hpp"
 
 #include <complex>
-#include <vector>
-#include <algorithm>
+#include <string>
 #include <iomanip>
+#include <sstream>
 
 namespace
 {
@@ -49,11 +49,16 @@ namespace
 
     double real = 0.0;
     double imag = 0.0;
-    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' } >> DelimiterIO{ '(' };
-    in >> real >> imag >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
-    if (in)
+    char hash = 0, c = 0, lparen = 0, rparen = 0, colon = 0;
+    in >> hash >> c >> lparen >> real >> imag >> rparen >> colon;
+
+    if (in && hash == '#' && c == 'c' && lparen == '(' && rparen == ')' && colon == ':')
     {
       dest.ref = std::complex<double>(real, imag);
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -63,10 +68,23 @@ namespace
     std::istream::sentry sentry(in);
     if (!sentry) return in;
 
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' };
-    in >> dest.ref.first;
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second;
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
+    char lparen = 0, colon1 = 0, nchar = 0, colon2 = 0, dchar = 0, colon3 = 0, rparen = 0, colon4 = 0;
+    long long num = 0;
+    unsigned long long den = 0;
+
+    in >> lparen >> colon1 >> nchar >> num >> colon2 >> dchar >> den >> colon3 >> rparen >> colon4;
+
+    if (in &&
+        lparen == '(' && colon1 == ':' && nchar == 'N' &&
+        colon2 == ':' && dchar == 'D' && colon3 == ':' &&
+        rparen == ')' && colon4 == ':')
+    {
+      dest.ref = std::make_pair(num, den);
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+    }
     return in;
   }
 
@@ -75,7 +93,15 @@ namespace
     std::istream::sentry sentry(in);
     if (!sentry) return in;
 
-    return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+    char quote = 0;
+    in >> quote;
+    if (quote != '"')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    std::getline(in, dest.ref, '"');
+    return in;
   }
 }
 
@@ -85,12 +111,14 @@ bool sharifullina::DataStruct::operator<(const DataStruct& other) const
   {
     return std::abs(key1) < std::abs(other.key1);
   }
+
   const double lhsRatio = static_cast<double>(key2.first) / key2.second;
   const double rhsRatio = static_cast<double>(other.key2.first) / other.key2.second;
   if (lhsRatio != rhsRatio)
   {
     return lhsRatio < rhsRatio;
   }
+
   return key3.length() < other.key3.length();
 }
 
@@ -99,35 +127,30 @@ std::istream& sharifullina::operator>>(std::istream& in, DataStruct& dest)
   std::istream::sentry sentry(in);
   if (!sentry) return in;
 
-  DataStruct input;
+  DataStruct result;
+  std::string key;
   bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
 
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
 
-  for (size_t i = 0; i < 3; ++i)
+  for (int i = 0; i < 3 && in; ++i)
   {
-    std::string key;
     in >> key;
-
-    if (key == ":key1" && !hasKey1)
+    if (key == "key1")
     {
-      in >> ComplexIO{ input.key1 };
-      hasKey1 = true;
+      hasKey1 = static_cast<bool>(in >> ComplexIO{ result.key1 });
     }
-    else if (key == ":key2" && !hasKey2)
+    else if (key == "key2")
     {
-      in >> RationalIO{ input.key2 };
-      hasKey2 = true;
+      hasKey2 = static_cast<bool>(in >> RationalIO{ result.key2 });
     }
-    else if (key == ":key3" && !hasKey3)
+    else if (key == "key3")
     {
-      in >> StringIO{ input.key3 };
-      hasKey3 = true;
+      hasKey3 = static_cast<bool>(in >> StringIO{ result.key3 });
     }
     else
     {
       in.setstate(std::ios::failbit);
-      return in;
     }
 
     in >> DelimiterIO{ ':' };
@@ -135,13 +158,15 @@ std::istream& sharifullina::operator>>(std::istream& in, DataStruct& dest)
 
   in >> DelimiterIO{ ')' };
 
-  if (!(hasKey1 && hasKey2 && hasKey3))
+  if (in && hasKey1 && hasKey2 && hasKey3)
+  {
+    dest = result;
+  }
+  else
   {
     in.setstate(std::ios::failbit);
-    return in;
   }
 
-  dest = input;
   return in;
 }
 
