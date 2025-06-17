@@ -83,10 +83,6 @@ double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVerte
 
 void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (polygons.size() == 0)
-  {
-    throw std::logic_error("<THERE ARE NO POLYGONS>");
-  }
   std::string subcommand;
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
@@ -122,17 +118,25 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
 
-  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
-  subcmds["AREA"] = maxArea;
-  subcmds["VERTEXES"] = maxVertexes;
-  auto it = subcmds.find(subcommand);
-  if (it != subcmds.end())
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds1;
+  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds2;
+  subcmds1["AREA"] = maxArea;
+  subcmds2["VERTEXES"] = maxVertexes;
+  if (it1 != subcmds1.end())
   {
-    out << it->second(polygons);
+    out << it1->second(polygons);
   }
   else
   {
-    throw std::logic_error("<WRONG SUBCOMMAND>");
+    auto it2 = subcmds2.find(subcommand);
+    if (it2 != subcmds2.end())
+    {
+      out << it2->second(polygons);
+    }
+    else
+    {
+      throw std::logic_error("<WRONG SUBCOMMAND>");
+    }
   }
 }
 
