@@ -71,7 +71,7 @@ std::istream& smirnov::io::operator>>(std::istream& in, StringIO&& dest)
   {
     return in;
   }
-  std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+  std::getline(in >> io::DelimiterIO{ '"' }, dest.ref, '"');
   return in;
 }
 
@@ -103,10 +103,10 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
   bool hasKey1 = false;
   bool hasKey2 = false;
   bool hasKey3 = false;
-  using sep = DelimiterIO;
-  using dbl = DoubleIO;
-  using ull = UllIO;
-  using str = StringIO;
+  using sep = io::DelimiterIO;
+  using dbl = smirnov::io::DoubleIO;
+  using ull = smirnov::io::UllIO;
+  using str = smirnov::io::StringIO;
   in >> sep{ '(' };
   for (int i = 0; i < 3; ++i)
   {
@@ -213,11 +213,9 @@ std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& src)
   {
     return out;
   }
-  double dbval = src.key1;
-  unsigned long long ullval = src.key2;
   Iofmtguard guard(out);
-  out << "(:key1 " << DoubleIO{ dbval };
-  out << ":key2 " << UllIO{ ullval };
+  out << "(:key1 " << smirnov::io::DoubleIO{ src.key1 };
+  out << ":key2 " << smirnov::io::UllIO{ src.key2 };
   out << ":key3 \"" << src.key3 << "\":)";
 
   return out;
