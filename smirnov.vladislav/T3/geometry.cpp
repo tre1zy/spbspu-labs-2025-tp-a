@@ -68,15 +68,36 @@ namespace geom
     }
     poly.points = std::move(tmp);
 
-    in >> std::ws;
-    if (in.peek() != EOF && in.peek() != '\n')
+    int next_char_int = in.peek();
+    if (next_char_int == '\n')
     {
-      in.setstate(std::ios::failbit);
-      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
-    else if (in.peek() == '\n')
-    {
-      in.get();
+      char next_char = static_cast< char >(next_char_int);
+      if (next_char == '\n')
+      {
+        in.get(next_char);
+      }
+      else if (std::isspace(next_char))
+      {
+        in >> std::ws;
+        if (in.peek() != EOF && static_cast< char >(in.peek()) != '\n')
+        {
+          next_char = static_cast< char >(next_char_int);
+          if (next_char != '\n')
+          {
+            in.setstate(std::ios::failbit);
+            in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+          }
+          else
+          {
+            in.get(next_char);
+          }
+        }
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
     return in;
   }
