@@ -4,7 +4,7 @@
 #include "stream_guard.hpp"
 #include "delimiter.hpp"
 
-std::istream& smirnov::io::operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& smirnov::operator>>(std::istream& in, DoubleIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -39,7 +39,7 @@ std::istream& smirnov::io::operator>>(std::istream& in, DoubleIO&& dest)
   return in;
 }
 
-std::istream& smirnov::io::operator>>(std::istream& in, UllIO&& dest)
+std::istream& smirnov::operator>>(std::istream& in, UllIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -64,7 +64,7 @@ std::istream& smirnov::io::operator>>(std::istream& in, UllIO&& dest)
   return in;
 }
 
-std::istream& smirnov::io::operator>>(std::istream& in, StringIO&& dest)
+std::istream& smirnov::operator>>(std::istream& in, StringIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -75,7 +75,7 @@ std::istream& smirnov::io::operator>>(std::istream& in, StringIO&& dest)
   return in;
 }
 
-std::istream& smirnov::io::operator>>(std::istream& in, KeyNumIO& dest)
+std::istream& smirnov::operator>>(std::istream& in, KeyNumIO& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -104,9 +104,9 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
   bool hasKey2 = false;
   bool hasKey3 = false;
   using sep = io::DelimiterIO;
-  using dbl = smirnov::io::DoubleIO;
-  using ull = smirnov::io::UllIO;
-  using str = smirnov::io::StringIO;
+  using dbl = smirnov::DoubleIO;
+  using ull = smirnov::UllIO;
+  using str = smirnov::StringIO;
   in >> sep{ '(' };
   for (int i = 0; i < 3; ++i)
   {
@@ -161,7 +161,7 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& smirnov::io::operator<<(std::ostream& out, const DoubleIO& dest)
+std::ostream& smirnov::operator<<(std::ostream& out, const DoubleIO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -196,7 +196,7 @@ std::ostream& smirnov::io::operator<<(std::ostream& out, const DoubleIO& dest)
   return out;
 }
 
-std::ostream& smirnov::io::operator<<(std::ostream& out, const UllIO& dest)
+std::ostream& smirnov::operator<<(std::ostream& out, const UllIO& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -213,9 +213,11 @@ std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& src)
   {
     return out;
   }
+  double dbval = src.key1;
+  unsigned long long = src.key2;
   Iofmtguard guard(out);
-  out << "(:key1 " << smirnov::io::DoubleIO{ src.key1 };
-  out << ":key2 " << smirnov::io::UllIO{ src.key2 };
+  out << "(:key1 " << smirnov::DoubleIO{ dbval };
+  out << ":key2 " << smirnov::UllIO{ ullval };
   out << ":key3 \"" << src.key3 << "\":)";
 
   return out;
