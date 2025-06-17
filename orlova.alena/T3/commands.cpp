@@ -200,7 +200,7 @@ void orlova::count(const std::vector< Polygon >& polygons, std::istream& in, std
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
 
-  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
+  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds;
   subcmds["EVEN"] = countEven;
   subcmds["ODD"] = countOdd;
   auto it = subcmds.find(subcommand);
