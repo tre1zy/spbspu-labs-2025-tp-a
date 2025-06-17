@@ -1,12 +1,3 @@
-#include <iostream>
-#include <iterator>
-#include <vector>
-#include <algorithm>
-#include <limits>
-
-#include "dataStruct.hpp"
-#include "scopeGuard.hpp"
-
 int main()
 {
   using sharifullina::DataStruct;
@@ -25,6 +16,12 @@ int main()
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
+  }
+
+  if (data.empty())
+  {
+    std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+    return 0;
   }
 
   std::sort(data.begin(), data.end());
