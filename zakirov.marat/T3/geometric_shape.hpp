@@ -23,6 +23,7 @@ namespace zakirov
   std::istream & operator>>(std::istream & in, Point & point);
   std::istream & operator>>(std::istream & in, Polygon & polygon);
   std::ostream & operator<<(std::ostream & out, Point & point);
+  bool operator==(const Point & point_base, const Point & point_other);
 }
 
 #endif

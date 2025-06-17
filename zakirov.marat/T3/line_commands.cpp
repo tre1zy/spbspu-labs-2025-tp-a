@@ -23,6 +23,11 @@ namespace
     return area_other < area_base;
   }
 
+  bool equal_vertexes_pred(double vertex_base, double vertex_other)
+  {
+    return vertex_base == vertex_other;
+  }
+
   size_t get_vertex(const zakirov::Polygon & polygon)
   {
     return polygon.points_.size();
@@ -108,7 +113,9 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
   }
   else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
-    
+    int a = std::stoi(subcommand);
+    std::vector< Polygon > polygons;
+    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), std::bind(equal_vertexes_pred, get_vertex, a));
   }
 }
 
@@ -129,7 +136,8 @@ void zakirov::process_less_area(const std::list< Polygon > & points, std::istrea
   if (!in)
   {
     in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    throw std::logic_error("<INVALID COMMAND>");
+    in.clear();
+    return;
   }
 
   double base_area = count_area(plgn);
@@ -181,10 +189,45 @@ void zakirov::find_extremum_min(const std::list< Polygon > & points, std::istrea
 
 void zakirov::count(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
-
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "EVEN")
+  {
+    out << count_sum_area(points, even_polygon_pred);
+  }
+  else if (subcommand == "ODD")
+  {
+    out << count_sum_area(points, odd_polygon_pred);
+  }
+  else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
+  {
+    size_t i = std::stoi(subcommand);
+    std::vector< double > vertexes;
+    std::transform(points.begin(), points.end(), std::back_inserter(vertexes), get_vertex);
+    size_t size = vertexes.size();
+    out << std::accumulate(vertexes.begin(), vertexes.end(), 0.0);
+  }
 }
 
 void zakirov::echo(std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
+  std::string subcommand;
+  in >> subcommand;
+  if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
+  {
+    Point pnt;
+    Polygon plgn;
+    while (in >> pnt)
+    {
+      plgn.points_.push_back(pnt);
+    }
 
+    for (auto it = points.begin(); it != points.end(); ++it)
+    {
+      if (std::equal((*it).points_.begin(), (*it).points_.end(), plgn.points_.begin()))
+      {
+        points.insert(it, plgn);
+      }
+    }
+  }
 }

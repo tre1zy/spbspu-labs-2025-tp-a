@@ -93,4 +93,7 @@ std::ostream & zakirov::operator<<(std::ostream & out, Point & point)
   return out;
 }
 
-
+bool zakirov::operator==(const Point & point_base, const Point & point_other)
+{
+  return (point_base.x_ == point_other.x_) && (point_base.y_ == point_other.y_);
+}
