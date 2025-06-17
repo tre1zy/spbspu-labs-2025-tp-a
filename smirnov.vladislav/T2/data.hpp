@@ -18,11 +18,6 @@ namespace smirnov
 
   namespace io
   {
-    struct DelimiterIO
-    {
-      char expected;
-    };
-
     struct DoubleIO
     {
       double& ref;
@@ -45,7 +40,6 @@ namespace smirnov
 
     std::istream& operator>>(std::istream& in, DoubleIO&& dest);
     std::istream& operator>>(std::istream& in, UllIO&& dest);
-    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
     std::istream& operator>>(std::istream& in, StringIO&& dest);
     std::istream& operator>>(std::istream& in, KeyNumIO& dest);
     std::ostream& operator<<(std::ostream& out, const DoubleIO& dest);
