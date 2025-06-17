@@ -1,7 +1,7 @@
 #include "extremum_processing.hpp"
 #include <algorithm>
 #include <iomanip>
-#include "zakirov.marat/T2/stream_guardian.hpp"
+#include "stream_guardian.hpp"
 #include "utilities.hpp"
 
 void zakirov::find_max_extremum(const std::list< Polygon > & points, std::istream & in, std::ostream & out)

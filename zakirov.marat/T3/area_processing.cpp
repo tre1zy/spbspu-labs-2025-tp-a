@@ -4,7 +4,7 @@
 #include <numeric>
 #include <functional>
 #include <limits>
-#include "zakirov.marat/T2/stream_guardian.hpp"
+#include "stream_guardian.hpp"
 #include "utilities.hpp"
 
 void zakirov::process_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
