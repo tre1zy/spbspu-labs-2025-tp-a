@@ -113,8 +113,10 @@ bool sharifullina::DataStruct::operator<(const DataStruct& other) const
     return std::abs(key1) < std::abs(other.key1);
   }
 
-  long double lhsRatio = key2.second ? static_cast<long double>(key2.first) / key2.second : std::numeric_limits<long double>::max();
-  long double rhsRatio = other.key2.second ? static_cast<long double>(other.key2.first) / other.key2.second : std::numeric_limits<long double>::max();
+  const double lhsRatio =
+      static_cast<double>(key2.first) / key2.second;
+  const double rhsRatio =
+      static_cast<double>(other.key2.first) / other.key2.second;
 
   if (lhsRatio != rhsRatio)
   {
