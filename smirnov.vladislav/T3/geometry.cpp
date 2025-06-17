@@ -52,7 +52,7 @@ namespace geom
     try
     {
       std::generate_n(std::back_inserter(tmp), count, [&] {
-        Point p,
+        Point p;
         if (!(in >> p))
         {
           throw std::ios_base::failure{ "" };
