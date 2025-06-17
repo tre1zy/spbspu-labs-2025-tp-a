@@ -16,34 +16,32 @@ namespace smirnov
 
   bool compare(const DataStruct& a, const DataStruct& b);
 
-  namespace io
+  struct DoubleIO
   {
-    struct DoubleIO
-    {
-      double& ref;
-    };
+    double& ref;
+  };
 
-    struct UllIO
-    {
-      unsigned long long& ref;
-    };
+  struct UllIO
+  {
+    unsigned long long& ref;
+  };
 
-    struct StringIO
-    {
-      std::string& ref;
-    };
+  struct StringIO
+  {
+    std::string& ref;
+  };
 
-    struct KeyNumIO
-    {
-      const std::string exp;
-    };
+  struct KeyNumIO
+  {
+    const std::string exp;
+  };
 
-    std::istream& operator>>(std::istream& in, DoubleIO&& dest);
-    std::istream& operator>>(std::istream& in, UllIO&& dest);
-    std::istream& operator>>(std::istream& in, StringIO&& dest);
-    std::istream& operator>>(std::istream& in, KeyNumIO& dest);
-    std::ostream& operator<<(std::ostream& out, const DoubleIO& dest);
-    std::ostream& operator<<(std::ostream& out, const UllIO& dest);
-  }
+  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
+  std::istream& operator>>(std::istream& in, UllIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, KeyNumIO&& dest);
+  std::ostream& operator<<(std::ostream& out, const DoubleIO& dest);
+  std::ostream& operator<<(std::ostream& out, const UllIO& dest);
+
 }
 #endif
