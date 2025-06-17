@@ -1,8 +1,8 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
-#include "geometry.hpp"
 #include <iostream>
 #include <vector>
+#include "geometry.hpp"
 
 namespace smirnov
 {

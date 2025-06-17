@@ -147,10 +147,10 @@ void smirnov::printAreaSum(std::istream& input, const std::vector< Polygon >& po
   std::string param;
   input >> param;
 
-  double result;
+  double result{};
   try
   {
-    result = handlers.at(param)();
+    result = handlers.at(param);
   }
   catch (...)
   {
@@ -182,7 +182,7 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
 
   try
   {
-    handlers.at(param());
+    handlers.at(param);
   }
   catch (...)
   {
@@ -201,12 +201,12 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
   }
 
   std::unordered_map< std::string, std::function< void() > > handlers;
-  handlers["AREA"] = std::bind(outputMinArea, std::ref(output), std::cref(polygons))
+  handlers["AREA"] = std::bind(outputMinArea, std::ref(output), std::cref(polygons));
   handlers["VERTEXES"] = std::bind(outputMinVertices, std::ref(output), std::cref(polygons));
 
   try
   {
-    handlers.at(param());
+    handlers.at(param);
   }
   catch (...)
   {
@@ -223,10 +223,10 @@ void smirnov::printCountOf(std::istream& input, const std::vector< Polygon >& po
   std::string param;
   input >> param;
 
-  size_t count;
+  size_t count{};
   try
   {
-    count = handlers.at(param)();
+    count = handlers.at(param);
   }
   catch (...)
   {
