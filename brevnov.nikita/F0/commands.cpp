@@ -3,14 +3,20 @@
 #include <array>
 #include <iterator>
 #include <functional>
+#include <vector>
 #include <utility>
 
 namespace
 {
-  bool playerExists(const std::map<std::string, brevnov::Player>& players, const std::string& name)
+
+  struct PlayerNameComparator
   {
-    return players.find(name) == players.end();
-  }
+    bool operator()(const std::pair<std::string, brevnov::Player>& p) const
+    {
+      return p.first == name;
+    }
+    const std::string& name;
+  };
 
   void addPlayer(std::istream& in, brevnov::League& league, std::string teamName)
   {
@@ -21,7 +27,9 @@ namespace
     {
       auto teamIt = league.teams_.find(teamName);
       auto& targetMap = (teamIt != league.teams_.end()) ? teamIt->second.players_ : league.fa_;
-      if (std::none_of(targetMap.begin(), targetMap.end(), playerExists(teamIt->second.players_, playerName)))
+      PlayerNameComparator comp{playerName};
+      bool exists = std::find_if(targetMap.begin(), targetMap.end(), comp) != targetMap.end();
+      if (!exists)
       {
         targetMap.emplace(playerName, brevnov::Player(position, raiting, price));
       }
@@ -70,6 +78,15 @@ namespace
       return playerPair.second.position_ == targetPos;
     }
     brevnov::Position targetPos;
+  };
+
+  struct PositionNotMatcher
+  {
+    bool operator()(const std::pair<std::string, brevnov::Player>& player) const
+    {
+      return !matcher(player);
+    }
+    PositionMatcher matcher;
   };
 
   brevnov::Position viewM(std::istream& in, std::ostream& out, brevnov::League& league)
@@ -142,14 +159,14 @@ namespace
       return teamPair.first == teamName;
     }
     const std::string& teamName;
-  }
+  };
 
   struct TeamPlayerPrinter
   {
-    std::ostream& operator()(const std::pair<const std::string, Player>& pair) const
+    std::ostream& operator()(const std::pair<const std::string, brevnov::Player>& pair) const
     {
       out << teamName << " " << pair.first << " " << pair.second;
-      return oss.str();
+      return out;
     }
     std::string& teamName;
     std::ostream& out;
@@ -157,36 +174,48 @@ namespace
 
   struct PlayerComparator
   {
-    bool operator()(const std::pair<const std::string, Player>& a, const std::pair<const std::string, Player>& b) const
+    bool operator()(const std::pair<const std::string, brevnov::Player>& a, const std::pair<const std::string, brevnov::Player>& b) const
     {
-        bool a_affordable = (a.second.price_ <= budget);
-        bool b_affordable = (b.second.price_ <= budget);
-        
-        if (a_affordable && !b_affordable) return true;
-        if (!a_affordable && b_affordable) return false;
-        
-        return a.second.raiting_ > b.second.raiting_;
+      bool a_affordable = (a.second.price_ <= budget);
+      bool b_affordable = (b.second.price_ <= budget);
+      if (a_affordable && !b_affordable)
+      {
+        return true;
+      }
+      if (!a_affordable && b_affordable)
+      {
+        return false;
+      }
+      return a.second.raiting_ > b.second.raiting_;
     }
     size_t budget;
   };
 
-  struct PlayerNameComparator
+  struct PositionRaitingComparator
   {
-    bool operator()(const std::pair<std::string, Player>& p) const
+    bool operator()(const std::pair<std::string, brevnov::Player>& a, const std::pair<std::string, brevnov::Player>& b) const
     {
-      return p.first == name;
+      if (a.second.position_ != required_pos && b.second.position_ == required_pos)
+      {
+        return false;
+      }
+      if (a.second.position_ == required_pos && b.second.position_ != required_pos)
+      {
+        return true;
+      }
+      return a.second.raiting_ < b.second.raiting_;
     }
-    const std::string& name;
+    brevnov::Position required_pos;
   };
 
   struct FreeAgentPrinter
   {
-    void operator()(const std::pair<std::string, Player>& player) const
+    void operator()(const std::pair<std::string, brevnov::Player>& player) const
     {
       out << "FA " << player.first << " " << player.second << "\n";
     }
     std::ostream& out;
-  }
+  };
 }
 
 bool brevnov::checkPosition(std::string pos)
@@ -460,8 +489,13 @@ void brevnov::viewTeam(std::istream& in, std::ostream& out, League& league)
   if (findTeam != league.teams_.end())
   {
     TeamPlayerPrinter printer{teamName, out};
-    std::transform(findTeam->second.players_.begin(), findTeam->second.players_.end(),
-      std::ostream_iterator<std::string>(out, "\n"), printer);
+    auto it = findTeam->second.players_.begin();
+    while (it != findTeam->second.players_.end())
+    {
+      printer(*it);
+      out << "\n";
+      ++it;
+    }
   }
   else
   {
@@ -608,12 +642,17 @@ void brevnov::viewTeamPosition(std::istream& in, std::ostream& out, League& leag
   auto findTeam = league.teams_.find(teamName);
   if (findTeam != league.teams_.end())
   {
-    std::vector<std::pair<std::string, Player>> matchedPlayers;
     PositionMatcher matcher{sPos};
-    std::remove_copy_if(findTeam->second.players_.begin(), findTeam->second.players_.end(),
-      std::back_inserter(matchedPlayers), !matcher);
-    TeamPlayerPrinter printer{out, teamName};
-    std::transform(matchedPlayers.begin(), matchedPlayers.end(), std::ostream_iterator<void>(out), printer);
+    TeamPlayerPrinter printer{teamName, out};
+    auto it = findTeam->second.players_.begin();
+    while (it != findTeam->second.players_.end())
+    {
+      if (matcher(*it))
+      {
+        printer(*it);
+      }
+      ++it;
+    }
   }
   else
   {
@@ -624,7 +663,12 @@ void brevnov::viewTeamPosition(std::istream& in, std::ostream& out, League& leag
 void brevnov::viewMarket(std::ostream& out, League& league)
 {
   FreeAgentPrinter printer{out};
-  std::transform(league.fa_.begin(), league.fa_.end(), std::ostream_iterator<void>(out), printer);
+  auto it = league.fa_.begin();
+  while (it != league.fa_.end())
+  {
+    printer(*it);
+    ++it;
+  }
 }
 
 void brevnov::viewMarketPosition(std::istream& in, std::ostream& out, League& league)
