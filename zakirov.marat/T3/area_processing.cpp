@@ -4,7 +4,7 @@
 #include <numeric>
 #include <functional>
 #include <limits>
-#include "stream_guardian.hpp"
+#include <stream_guardian.hpp>
 #include "utilities.hpp"
 
 void zakirov::process_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
@@ -31,7 +31,10 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
   {
     int a = std::stoi(subcommand);
     std::vector< Polygon > polygons;
-    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), std::bind(equal_vertexes_pred, get_vertex, a));
+    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), std::bind(equal_vertexes_pred, std::placeholders::_1, a));
+    std::vector< double > areas;
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), count_area);
+    out << std::fixed << std::setprecision(1) << std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 }
 

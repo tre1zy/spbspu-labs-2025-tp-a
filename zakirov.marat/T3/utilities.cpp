@@ -1,5 +1,6 @@
 #include "utilities.hpp"
 #include <string>
+#include <numeric>
 #include <algorithm>
 
   bool zakirov::odd_polygon_pred(const zakirov::Polygon & polygon)
@@ -17,9 +18,9 @@
     return area_other < area_base;
   }
 
-  bool zakirov::equal_vertexes_pred(double vertex_base, double vertex_other)
+  bool zakirov::equal_vertexes_pred(const zakirov::Polygon & polygon, double vertex_base)
   {
-    return vertex_base == vertex_other;
+    return polygon.points_.size() == vertex_base;
   }
 
   size_t zakirov::get_vertex(const zakirov::Polygon & polygon)

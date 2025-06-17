@@ -6,18 +6,18 @@
 
 namespace zakirov
 {
-  class Polygon
-  {
-  public:
-    Polygon() = default;
-    std::vector< Point > points_;
-  };
-
   class Point
   {
   public:
     int x_;
     int y_;
+  };
+
+  class Polygon
+  {
+  public:
+    Polygon() = default;
+    std::vector< Point > points_;
   };
 
   std::istream & operator>>(std::istream & in, Point & point);
