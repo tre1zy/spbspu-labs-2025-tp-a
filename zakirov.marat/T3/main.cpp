@@ -19,6 +19,6 @@ int main(int argc, char ** argv)
   std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
   commands["AREA"] = std::bind(zakirov::process_area, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);
   commands["LESSAREA"] = std::bind(zakirov::process_less_area, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);
-  commands["count"] = std::bind(zakirov::process_area, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);
-  commands["echo"] = std::bind(zakirov::process_area, std::ref(shapes), std::placeholders::_1, std::placeholders::_2);
+  commands["MAX"] = std::bind(zakirov::find_extremum_max, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);
+  commands["MIN"] = std::bind(zakirov::find_extremum_min, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);
 }

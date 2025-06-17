@@ -3,15 +3,17 @@
 #include <numeric>
 #include <limits>
 #include <functional>
+#include <iomanip>
+#include "stream_guardian.hpp"
 
 namespace
 {
-  bool odd_polygon_pred(zakirov::Polygon polygon)
+  bool odd_polygon_pred(const zakirov::Polygon & polygon)
   {
     return polygon.points_.size() % 2 == 0;
   }
 
-  bool even_polygon_pred(zakirov::Polygon polygon)
+  bool even_polygon_pred(const zakirov::Polygon & polygon)
   {
     return polygon.points_.size() % 2 == 1;
   }
@@ -19,6 +21,11 @@ namespace
   bool less_area_pred(double area_base, double area_other)
   {
     return area_other < area_base;
+  }
+
+  size_t get_vertex(const zakirov::Polygon & polygon)
+  {
+    return polygon.points_.size();
   }
 
   double count_area(const zakirov::Polygon & plgn)
@@ -86,11 +93,11 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
   in >> subcommand;
   if (subcommand == "EVEN")
   {
-    std::cout << count_sum_area(points, even_polygon_pred);
+    out << count_sum_area(points, even_polygon_pred);
   }
   else if (subcommand == "ODD")
   {
-    std::cout << count_sum_area(points, odd_polygon_pred);
+    out << count_sum_area(points, odd_polygon_pred);
   }
   else if (subcommand == "MEAN")
   {
@@ -98,6 +105,10 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
     std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
     size_t size = areas.size();
     out << std::accumulate(areas.begin(), areas.end(), 0.0) / size;
+  }
+  else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
+  {
+    
   }
 }
 
@@ -126,12 +137,46 @@ void zakirov::process_less_area(const std::list< Polygon > & points, std::istrea
   std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
   std::vector< double > less_areas;
   std::copy_if(areas.begin(), areas.end(),  std::back_inserter(less_areas), std::bind(less_area_pred, base_area, std::placeholders::_1));
-  out << std::accumulate(less_areas.begin(), less_areas.end(), 0.0);
+  Guardian guard(out);
+  out << std::fixed << std::setprecision(1) << std::accumulate(less_areas.begin(), less_areas.end(), 0.0);
 }
 
-void zakirov::find_extremum(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
+void zakirov::find_extremum_max(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    std::vector< double > areas;
+    std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
+    Guardian guard(out);
+    out << std::fixed << std::setprecision(1) << *std::max_element(areas.begin(), areas.end());
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    std::vector< size_t > vertexes;
+    std::transform(points.begin(), points.end(), std::back_inserter(vertexes), get_vertex);
+    out << *std::max_element(vertexes.begin(), vertexes.end());
+  }
+}
 
+void zakirov::find_extremum_min(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
+{
+  std::string subcommand;
+  in >> subcommand;
+  if (subcommand == "AREA")
+  {
+    std::vector< double > areas;
+    std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
+    Guardian guard(out);
+    out << std::fixed << std::setprecision(1) << *std::min_element(areas.begin(), areas.end());
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    std::vector< size_t > vertexes;
+    std::transform(points.begin(), points.end(), std::back_inserter(vertexes), get_vertex);
+    out << *std::min_element(vertexes.begin(), vertexes.end());
+  }
 }
 
 void zakirov::count(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
