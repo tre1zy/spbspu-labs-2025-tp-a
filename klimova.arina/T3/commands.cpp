@@ -11,9 +11,6 @@
 void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& os)
 {
     try {
-        if (polygons.empty()) {
-            throw std::invalid_argument("");
-        }
 
         auto bindEven = std::bind(areaEven, _1, _2);
         auto bindOdd = std::bind(areaOdd, _1, _2);
@@ -24,6 +21,9 @@ void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& o
         is >> subcommand;
         double result = 0.0;
         if (subs.find(subcommand) != subs.end()) {
+            if (subcommand == "MEAN" && polygons.empty()) {
+                throw std::out_of_range("");
+            }
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs.at(subcommand));
         } else {
             size_t vertexes = getVertexes(subcommand);
