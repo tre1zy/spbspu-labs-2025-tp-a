@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     input(file, league);
     file.close();
   }
-  AVLTree< std::string, std::function< void() > > commands;
+  std::map< std::string, std::function< void() > > commands;
   using namespace std::placeholders;
   commands.insert(std::make_pair("NewPlayer", std::bind(addNewPlayer, std::ref(std::cin), std::ref(league))));
   commands.insert(std::make_pair("AddTeam", std::bind(addTeam, std::ref(std::cin), std::ref(league))));
