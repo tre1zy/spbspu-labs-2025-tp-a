@@ -100,33 +100,48 @@ std::istream& sharifullina::operator>>(std::istream& in, DataStruct& dest)
   if (!sentry) return in;
 
   DataStruct input;
+  bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+
   for (size_t i = 0; i < 3; ++i)
   {
     std::string key;
     in >> key;
-    if (key == "key1")
+
+    if (key == ":key1" && !hasKey1)
     {
       in >> ComplexIO{ input.key1 };
+      hasKey1 = true;
     }
-    else if (key == "key2")
+    else if (key == ":key2" && !hasKey2)
     {
       in >> RationalIO{ input.key2 };
+      hasKey2 = true;
     }
-    else if (key == "key3")
+    else if (key == ":key3" && !hasKey3)
     {
       in >> StringIO{ input.key3 };
+      hasKey3 = true;
     }
     else
     {
       in.setstate(std::ios::failbit);
       return in;
     }
+
     in >> DelimiterIO{ ':' };
   }
+
   in >> DelimiterIO{ ')' };
 
-  if (in) dest = input;
+  if (!(hasKey1 && hasKey2 && hasKey3))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  dest = input;
   return in;
 }
 
@@ -137,8 +152,8 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest
 
   sharifullina::iofmtguard guard(out);
   out << std::fixed << std::setprecision(1) << std::showpoint;
-  out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")";
-  out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
-  out << ":key3 \"" << dest.key3 << "\":)";
+  out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")"
+      << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)"
+      << ":key3 \"" << dest.key3 << "\":)";
   return out;
 }
