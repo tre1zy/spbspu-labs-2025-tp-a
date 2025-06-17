@@ -14,7 +14,7 @@ namespace rychkov
     using base_type_value = std::pair< typing::Type, size_t >;
     using struct_value = std::pair< entities::Struct, size_t >;
     using variable_value = std::pair< entities::Variable, size_t >;
-    using operator_value = std::vector< rychkov::Operator >;
+    using operator_value = std::vector< Operator >;
 
     bool operator()(const struct_value& lhs, const struct_value& rhs) const;
 
@@ -33,6 +33,10 @@ namespace rychkov
     bool operator()(const operator_value& lhs, const operator_value& rhs) const;
     bool operator()(const operator_value& lhs, const std::string& rhs) const;
     bool operator()(const std::string& lhs, const operator_value& rhs) const;
+
+    bool operator()(const Operator& lhs, const Operator& rhs) const;
+    bool operator()(const Operator& lhs, const std::string& rhs) const;
+    bool operator()(const std::string& lhs, const Operator& rhs) const;
 
     bool operator()(const Macro& lhs, const Macro& rhs) const;
     bool operator()(const Macro& lhs, const std::string& rhs) const;

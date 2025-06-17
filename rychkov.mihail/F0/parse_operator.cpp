@@ -68,43 +68,30 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
   }
   return true;
 }
-bool rychkov::CParser::parse_binary(CParseContext&, const rychkov::Operator& oper)
+bool rychkov::CParser::parse_binary(CParseContext& context, const rychkov::Operator& oper)
 {
   if (stack_.top()->operation != nullptr)
   {
+    if (!stack_.top()->full())
+    {
+      return false;
+    }
     entities::Expression* last = stack_.top();
-    while (stack_.top()->operation != nullptr)
+    while (entities::is_operator(*stack_.top()))
     {
       if (!stack_.top()->full())
       {
-        return false;
+        log(context, "found not full operator during priority folding");
       }
-      if (stack_.top()->operation->type == Operator::binary)
+      if ((stack_.top()->operation->priority > oper.priority)
+          || ((stack_.top()->operation->priority == oper.priority) && oper.right_align))
       {
-        if ((stack_.top()->operation->priority < oper.priority)
-            || ((stack_.top()->operation->priority == oper.priority) && !oper.right_align))
-        {
-          last = stack_.top();
-          stack_.pop();
-          continue;
-        }
         move_down();
         stack_.top()->operation = &oper;
         return true;
       }
-      else if (stack_.top()->operation->type == Operator::unary)
-      {
-        if ((stack_.top()->operation->priority < oper.priority)
-            || ((stack_.top()->operation->priority == oper.priority) && !oper.right_align))
-        {
-          last = stack_.top();
-          stack_.pop();
-          continue;
-        }
-        move_down();
-        stack_.top()->operation = &oper;
-        return true;
-      }
+      last = stack_.top();
+      stack_.pop();
     }
     stack_.push(last);
     move_up();
@@ -113,7 +100,7 @@ bool rychkov::CParser::parse_binary(CParseContext&, const rychkov::Operator& ope
   }
   if (!stack_.top()->empty() && !entities::is_decl(*stack_.top()) && !entities::is_body(*stack_.top()))
   {
-    move_up();
+    stack_.push(move_up());
     stack_.top()->operation = &oper;
     return true;
   }
@@ -147,7 +134,9 @@ bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper
 rychkov::entities::Expression* rychkov::CParser::move_up()
 {
   entities::Expression* old = new entities::Expression{std::move(*stack_.top())};
-  *stack_.top() = {nullptr, {}, {old}};
+  stack_.top()->operation = nullptr;
+  stack_.top()->result_type = {};
+  stack_.top()->operands.push_back(old);
   return old;
 }
 void rychkov::CParser::move_down()

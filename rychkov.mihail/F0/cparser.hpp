@@ -18,7 +18,7 @@ namespace rychkov
   class CParser
   {
   public:
-    static const std::vector< Operator > operators;
+    static const std::set< Operator, rychkov::NameCompare > operators;
 
     CParser();
 
@@ -50,6 +50,8 @@ namespace rychkov
     bool parse_semicolon(CParseContext& context);
     bool parse_open_brace(CParseContext& context);
     bool parse_close_brace(CParseContext& context);
+    bool parse_open_parenthesis(CParseContext& context);
+    bool parse_close_parenthesis(CParseContext& context);
 
     bool parse_unary(CParseContext& context, const Operator& oper);
     bool parse_binary(CParseContext& context, const Operator& oper);

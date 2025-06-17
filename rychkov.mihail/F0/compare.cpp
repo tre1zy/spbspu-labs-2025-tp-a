@@ -46,15 +46,28 @@ bool rychkov::NameCompare::operator()(const std::string& lhs, const entities::Va
 
 bool rychkov::NameCompare::operator()(const operator_value& lhs, const operator_value& rhs) const
 {
-  return lhs[0].token < rhs[0].token;
+  return operator()(lhs[0], rhs[0]);
 }
 bool rychkov::NameCompare::operator()(const operator_value& lhs, const std::string& rhs) const
 {
-  return lhs[0].token < rhs;
+  return operator()(lhs[0], rhs);
 }
 bool rychkov::NameCompare::operator()(const std::string& lhs, const operator_value& rhs) const
 {
-  return lhs < rhs[0].token;
+  return operator()(lhs, rhs[0]);
+}
+
+bool rychkov::NameCompare::operator()(const Operator& lhs, const Operator& rhs) const
+{
+  return lhs.token < rhs.token;
+}
+bool rychkov::NameCompare::operator()(const Operator& lhs, const std::string& rhs) const
+{
+  return lhs.token < rhs;
+}
+bool rychkov::NameCompare::operator()(const std::string& lhs, const Operator& rhs) const
+{
+  return lhs < rhs.token;
 }
 
 bool rychkov::NameCompare::operator()(const Macro& lhs, const Macro& rhs) const

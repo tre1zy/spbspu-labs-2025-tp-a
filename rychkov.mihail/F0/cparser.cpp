@@ -6,8 +6,9 @@
 
 using namespace std::literals::string_literals;
 
-const std::vector< rychkov::Operator > rychkov::CParser::operators = {
-      {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, true, 2}
+const std::set< rychkov::Operator, rychkov::NameCompare > rychkov::CParser::operators = {
+      {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, false, false, 0},
+      {rychkov::Operator::multiple, rychkov::Operator::special, "()", false, false, false, 0}
     };
 
 rychkov::CParser::CParser():
@@ -136,7 +137,9 @@ bool rychkov::CParser::append(CParseContext& context, char c)
   static const append_map dispatch_map = {
         {';', &CParser::parse_semicolon},
         {'{', &CParser::parse_open_brace},
-        {'}', &CParser::parse_close_brace}
+        {'}', &CParser::parse_close_brace},
+        {'(', &CParser::parse_open_parenthesis},
+        {')', &CParser::parse_close_parenthesis}
       };
 
   append_map::const_iterator found = dispatch_map.find(c);

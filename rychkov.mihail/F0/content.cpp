@@ -67,3 +67,11 @@ bool rychkov::entities::is_decl(const entities::Expression& expr)
   return (expr.operation == nullptr) && !expr.operands.empty()
       && std::holds_alternative< entities::Declaration >(expr.operands[0]);
 }
+bool rychkov::entities::is_operator(const entities::Expression& expr)
+{
+  return expr.operation != nullptr;
+}
+bool rychkov::entities::is_bridge(const entities::Expression& expr)
+{
+  return expr.operation == nullptr;
+}

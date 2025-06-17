@@ -2,14 +2,21 @@
 
 bool rychkov::CParser::parse_semicolon(CParseContext& context)
 {
-  bool last_empty = false;
+  bool last_empty = false, last_bridge = false;
+  entities::Expression* last = stack_.top();
   for (; !stack_.empty() && !entities::is_body(*stack_.top()) && !entities::is_decl(*stack_.top()); stack_.pop())
   {
+    if (last_bridge)
+    {
+      log(context, "found not closed () or [] pair");
+    }
     if (!stack_.top()->empty() && !stack_.top()->full())
     {
       log(context, "found not full expression during semicolon folding");
     }
     last_empty = stack_.top()->empty();
+    last_bridge = entities::is_bridge(*stack_.top());
+    last = stack_.top();
   }
   if (stack_.empty())
   {

@@ -14,29 +14,29 @@ rychkov::Lexer::Lexer(CParser* next):
 
 const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases = {
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "+", false, true, 2},
-        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "+", false, false, 4}
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "+", false, true, false, 2},
+        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "+", false, false, false, 4}
       },
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, false, 1},
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, true, 2},
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, false, false, 1},
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, true, true, 2},
       },
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "-", false, true, 2},
-        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "-", false, false, 4}
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "-", false, true, false, 2},
+        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "-", false, false, false, 4}
       },
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, false, 1},
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, true, 2},
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, false, false, 1},
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, true, true, 2},
       },
-      {{rychkov::Operator::unary, rychkov::Operator::special, "!", false, true, 2}},
+      {{rychkov::Operator::unary, rychkov::Operator::special, "!", false, true, false, 2}},
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "*", false, true, 2},
-        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "*", false, false, 3}
+        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "*", false, true, false, 2},
+        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "*", false, false, false, 3}
       },
-      {{rychkov::Operator::binary, rychkov::Operator::arithmetic, "*=", true, true, 14}},
-      {{rychkov::Operator::binary, rychkov::Operator::assign, "=", true, true, 14}},
-      {{rychkov::Operator::binary, rychkov::Operator::logic, "==", false, false, 7}}
+      {{rychkov::Operator::binary, rychkov::Operator::arithmetic, "*=", true, true, true, 14}},
+      {{rychkov::Operator::binary, rychkov::Operator::assign, "=", true, true, true, 14}},
+      {{rychkov::Operator::binary, rychkov::Operator::logic, "==", false, false, false, 7}}
     };
 
 void rychkov::Lexer::parse(CParseContext& context, std::string str)

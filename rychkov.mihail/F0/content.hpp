@@ -89,6 +89,7 @@ namespace rychkov
     std::string token;
     bool require_lvalue = false;
     bool right_align = false;
+    bool produce_lvalue = false;
     int priority = 0;
   };
   namespace typing
@@ -213,6 +214,8 @@ namespace rychkov
 
     bool is_body(const entities::Expression& expr);
     bool is_decl(const entities::Expression& expr);
+    bool is_operator(const entities::Expression& expr);
+    bool is_bridge(const entities::Expression& expr);
   }
 }
 
