@@ -184,7 +184,7 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
 
   try
   {
-    handlers.at(param);
+    handlers.at(param)();
   }
   catch (...)
   {
@@ -210,7 +210,7 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
 
   try
   {
-    handlers.at(param);
+    handlers.at(param)();
   }
   catch (...)
   {

@@ -7,6 +7,7 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <stdexcept>
 
 int main(int argc, char* argv[])
 {
@@ -20,16 +21,17 @@ int main(int argc, char* argv[])
   }
 
   std::ifstream inFile(argv[1]);
-  std::vector< geom::Polygon > polyList;
-
-  while (!inFile.eof())
+  if (!inFile.is_open())
   {
-    std::copy(inputIt(inFile), inputIt(), std::back_inserter(polyList));
-    if (!inFile)
-    {
-      inFile.clear();
-      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
+    std::cer << "Could not open file" << argv[1] << "\n";
+    return 1;
+  }
+
+  std::vector< geom::Polygon > polyList;
+  Polygon temp;
+  while (inFile >> temp)
+  {
+    polyList.push_back(std::move(temp));
   }
 
   std::map<std::string, std::function<void()>> commandMap;
@@ -41,22 +43,36 @@ int main(int argc, char* argv[])
   commandMap["INTERSECTIONS"] = std::bind(smirnov::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
 
   std::string cmd;
-  while (!(std::cin >> cmd).eof())
+  while (std::cin >> cmd)
   {
     try
     {
       commandMap.at(cmd)();
       std::cout << '\n';
     }
-    catch (...)
+    catch (const std::out_of_range& e)
     {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+    catch (const std::invalid_argument)
+    {
+      std::cout << "<INVALID COMMAND>\n";
       if (std::cin.fail())
       {
-        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+        std::cin.clear();
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>\n";
     }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      if (std::cin.fail())
+      {
+        std::cin.clear();
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
+
   return 0;
 }
