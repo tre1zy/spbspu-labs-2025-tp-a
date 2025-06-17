@@ -197,10 +197,6 @@ size_t orlova::minVertexes(const std::vector< Polygon >& polygons)
 
 void orlova::count(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (polygons.size() == 0)
-  {
-    throw std::logic_error("<THERE ARE NO POLYGONS>");
-  }
   std::string subcommand;
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
