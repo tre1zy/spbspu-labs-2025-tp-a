@@ -1,12 +1,7 @@
+#include "data.hpp"
 #include <iomanip>
 #include <cmath>
-#include "data.hpp"
 #include "stream_guard.hpp"
-
-namespace smirnov
-{
-  using namespace smirnov::io;
-}
 
 std::istream& smirnov::io::operator>>(std::istream& in, DelimiterIO&& dest)
 {
