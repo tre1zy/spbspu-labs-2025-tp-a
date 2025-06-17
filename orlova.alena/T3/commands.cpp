@@ -122,6 +122,7 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds2;
   subcmds1["AREA"] = maxArea;
   subcmds2["VERTEXES"] = maxVertexes;
+  auto it1 = subcmds1.find(subcommand);
   if (it1 != subcmds1.end())
   {
     out << it1->second(polygons);
