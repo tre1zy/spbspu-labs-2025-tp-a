@@ -36,12 +36,16 @@ void zakirov::echo(std::list< Polygon > & plgns, std::istream & in, std::ostream
       plgn.points_.push_back(pnt);
     }
 
+    size_t counter = 0;
     for (auto it = plgns.begin(); it != plgns.end(); ++it)
     {
       if (std::equal((*it).points_.begin(), (*it).points_.end(), plgn.points_.begin()))
       {
         plgns.insert(it, plgn);
+        ++counter;
       }
     }
+
+    out << counter;
   }
 }
