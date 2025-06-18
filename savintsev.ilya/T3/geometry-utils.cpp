@@ -1,20 +1,40 @@
 #include "geometry-utils.h"
+#include <numeric>
+
+namespace
+{
+  struct PointProduct
+  {
+    double operator()(const savintsev::Point & p1, const savintsev::Point & p2) const
+    {
+      return (p1.x * p2.y) - (p2.x * p1.y);
+    }
+  };
+
+  struct LastTermAdder
+  {
+    double operator()(double sum, const savintsev::Polygon & poly) const
+    {
+      return sum + (poly.points.back().x * poly.points.front().y) - (poly.points.front().x * poly.points.back().y);
+    }
+  };
+}
 
 double savintsev::calc_polygon_area(const Polygon a)
 {
-  size_t n = a.points.size();
-  if (n < 3)
+  if (a.points.size() < 3)
   {
     return 0.0;
   }
 
-  double area = 0.0;
-  for (size_t i = 0; i < n; ++i)
-  {
-    size_t j = (i + 1) % n;
-    area += (a.points[i].x * a.points[j].y) - (a.points[j].x * a.points[i].y);
-  }
-  return 0.5 * abs(area);
+  auto next_it = a.points.begin();
+  std::advance(next_it, 1);
+
+  double area = std::inner_product(a.points.begin(), a.points.end() - 1, next_it, 0.0, std::plus< double >(), PointProduct{});
+
+  area = LastTermAdder{}(area, a);
+
+  return 0.5 * std::abs(area);
 }
 
 bool savintsev::is_lines_int(const Point m1, const Point m2, const Point n1, const Point n2)

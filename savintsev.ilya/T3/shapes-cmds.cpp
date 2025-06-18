@@ -49,9 +49,9 @@ namespace
   {
     bool operator()(const savintsev::Point & point) const
     {
-      return shiftedPoints.find(point) != shiftedPoints.end();
+      return shifted.find(point) != shifted.end();
     }
-    const std::set< savintsev::Point > & shiftedPoints;
+    const std::set< savintsev::Point > & shifted;
   };
 
   struct PointMatchChecker
@@ -72,23 +72,23 @@ namespace
     {
       int dx = pa.x - pb.x;
       int dy = pa.y - pb.y;
-      PointShifter shifter{setP};
+      PointShifter shifter{set_p};
       return std::all_of(a.points.begin(), a.points.end(), PointMatchChecker{dx, dy, shifter});
     }
     const savintsev::Point & pa;
     const savintsev::Polygon & a;
-    const std::set< savintsev::Point > & setP;
+    const std::set< savintsev::Point > & set_p;
   };
 
   struct PointPairProcessor
   {
     bool operator()(const savintsev::Point & pa) const
     {
-      InnerPointProcessor processor{pa, a, setP};
+      InnerPointProcessor processor{pa, a, set_p};
       return std::any_of(a.points.begin(), a.points.end(), processor);
     }
     const savintsev::Polygon & a;
-    const std::set< savintsev::Point > & setP;
+    const std::set< savintsev::Point > & set_p;
   };
 
   struct SegmentIntersectionChecker
@@ -134,8 +134,8 @@ namespace
         return false;
       }
 
-      std::set< savintsev::Point > setP(p.points.begin(), p.points.end());
-      PointPairProcessor processor{a, setP};
+      std::set< savintsev::Point > set_p(p.points.begin(), p.points.end());
+      PointPairProcessor processor{a, set_p};
       return std::any_of(p.points.begin(), p.points.end(), processor);
     }
     const savintsev::Polygon & p;
@@ -145,13 +145,19 @@ namespace
   {
     bool operator()(const savintsev::Polygon & a) const
     {
+      struct SegmentChecker
+      {
+        bool operator()(const savintsev::Point & p1, const savintsev::Point & p2) const
+        {
+          return checker(p1, p2);
+        }
+        const SegmentIntersectionChecker & checker;
+      };
+
       SegmentIntersectionChecker checker{p};
-      SegmentCheckProcessor processor{a, checker};
-      
-      std::vector< size_t > indices(a.points.size());
-      std::iota(indices.begin(), indices.end(), 0);
-      
-      return std::any_of(indices.begin(), indices.end(), processor);
+      SegmentChecker segment_checker{checker};
+      auto result = std::adjacent_find(a.points.begin(), a.points.end(), segment_checker);
+      return result != a.points.end() || segment_checker(a.points.back(), a.points.front());
     }
     const savintsev::Polygon & p;
   };
