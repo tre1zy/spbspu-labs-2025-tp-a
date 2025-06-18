@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <string>
 #include "geometry.hpp"
-#include "stream_guard.hpp"
+#include <stream_guard.hpp>
 
 namespace
 {
