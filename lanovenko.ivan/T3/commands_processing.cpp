@@ -284,5 +284,5 @@ void lanovenko::printRmecho(std::istream& in, std::ostream& out, std::vector< Po
 
 void lanovenko::printRightShapes(std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  out << std::count_if(polygons.begin(), polygons.end(), haveRightAngles);
+  out << std::count_if(polygons.begin(), polygons.end(), haveRightAngles) << '\n';
 }
