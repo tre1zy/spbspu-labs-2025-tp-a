@@ -11,13 +11,14 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
 {
   std::string subcommand;
   in >> subcommand;
+  Guardian guard(out);
   if (subcommand == "EVEN")
   {
-    out << count_sum_area(points, even_polygon_pred);
+    out << std::fixed << std::setprecision(1) << count_sum_area(points, even_polygon_pred);
   }
   else if (subcommand == "ODD")
   {
-    out << count_sum_area(points, odd_polygon_pred);
+    out << std::fixed << std::setprecision(1) << count_sum_area(points, odd_polygon_pred);
   }
   else if (subcommand == "MEAN")
   {
@@ -40,22 +41,23 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
 
 void zakirov::process_less_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
+  Guardian guard(out);
   std::string subcommand;
   in >> subcommand;
-  zakirov::Polygon plgn;
+  Polygon plgn;
   if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
-    zakirov::Point pnt;
-    while (in >> pnt)
+    size_t vertexes = std::stoi(subcommand);
+    Point pnt;
+    for (size_t i = 0; i < vertexes; ++i)
     {
+      in >> pnt;
       plgn.points_.push_back(pnt);
     }
   }
 
   if (!in)
   {
-    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    in.clear();
     return;
   }
 
@@ -64,6 +66,5 @@ void zakirov::process_less_area(const std::list< Polygon > & points, std::istrea
   std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
   std::vector< double > less_areas;
   std::copy_if(areas.begin(), areas.end(),  std::back_inserter(less_areas), std::bind(less_area_pred, base_area, std::placeholders::_1));
-  Guardian guard(out);
   out << std::fixed << std::setprecision(1) << std::accumulate(less_areas.begin(), less_areas.end(), 0.0);
 }

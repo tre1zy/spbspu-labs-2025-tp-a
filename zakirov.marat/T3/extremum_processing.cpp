@@ -10,9 +10,9 @@ void zakirov::find_max_extremum(const std::list< Polygon > & points, std::istrea
   in >> subcommand;
   if (subcommand == "AREA")
   {
+    Guardian guard(out);
     std::vector< double > areas;
     std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
-    Guardian guard(out);
     out << std::fixed << std::setprecision(1) << *std::max_element(areas.begin(), areas.end());
   }
   else if (subcommand == "VERTEXES")
@@ -29,9 +29,9 @@ void zakirov::find_min_extremum(const std::list< Polygon > & points, std::istrea
   in >> subcommand;
   if (subcommand == "AREA")
   {
+    Guardian guard(out);
     std::vector< double > areas;
     std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
-    Guardian guard(out);
     out << std::fixed << std::setprecision(1) << *std::min_element(areas.begin(), areas.end());
   }
   else if (subcommand == "VERTEXES")
