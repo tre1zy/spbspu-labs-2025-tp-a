@@ -43,6 +43,7 @@ namespace geom
     if (!(in >> count) || count < 3)
     {
       in.setstate(std::ios::failbit);
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       return in;
     }
 
@@ -55,7 +56,7 @@ namespace geom
         Point p;
         if (!(in >> p))
         {
-          throw std::ios_base::failure{ "" };
+          throw std::ios_base::failure{ "Error" };
         }
         return p;
         });
@@ -66,39 +67,37 @@ namespace geom
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       return in;
     }
-    poly.points = std::move(tmp);
 
-    int next_char_int = in.peek();
-    if (next_char_int == '\n')
+    char next_char = in.peek();
+    if (next_char != EOF)
     {
-      char next_char = static_cast< char >(next_char_int);
-      if (next_char == '\n')
-      {
-        in.get(next_char);
-      }
-      else if (std::isspace(next_char))
-      {
-        in >> std::ws;
-        if (in.peek() != EOF && static_cast< char >(in.peek()) != '\n')
-        {
-          next_char = static_cast< char >(next_char_int);
-          if (next_char != '\n')
-          {
-            in.setstate(std::ios::failbit);
-            in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-          }
-          else
-          {
-            in.get(next_char);
-          }
-        }
-      }
-      else
+      if (!std::isspace(next_char) && next_char != '\n')
       {
         in.setstate(std::ios::failbit);
         in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        return in;
+      }
+      else if (next_char == '\n')
+      {
+        in.get();
+      }
+      else
+      {
+        in >> std::ws;
+        next_char = in.peek();
+        if (next_char != EOF && next_char != '\n')
+        {
+          in.setstate(std::ios::failbit);
+          in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+          return in;
+        }
+        else if (next_char == '\n')
+        {
+          in.get();
+        }
       }
     }
+    poly.points = std::move(pts);
     return in;
   }
 

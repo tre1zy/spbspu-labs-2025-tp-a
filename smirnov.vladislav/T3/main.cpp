@@ -27,9 +27,20 @@ int main(int argc, char* argv[])
   }
 
   std::vector< geom::Polygon > polyList;
-  using it = std::istream_iterator< Polygon >;
-  std::copy(it(inFile), it(), std::back_inserter(polyList));
   std::string line;
+  while (std::getline(inFile, line))
+  {
+    if (line.empty())
+    {
+      continue;
+    }
+    std::istringstream iss(line);
+    Polygon temp;
+    if (iss >> temp)
+    {
+      polyList.push_back(std::move(temp));
+    }
+  }
 
   std::map< std::string, std::function< void(std::istream&) > > commandMap;
   commandMap["AREA"] = [&](std::istream& args) {
@@ -56,22 +67,14 @@ int main(int argc, char* argv[])
     std::istringstream iss(line);
     std::string cmd;
 
-    if (!(iss >> cmd))
+    if (!(iss >> cmd) || !commandMap.count(cmd)))
     {
       std::cout << "<INVALID COMMAND>\n";
       continue;
     }
-
-    auto it = commandMap.find(cmd);
-    if (it == commandMap.end())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      continue;
-    }
-
     try
     {
-      it->second(iss);
+      commandMap[cmd](iss);
       std::cout << "\n";
     }
     catch (...)
