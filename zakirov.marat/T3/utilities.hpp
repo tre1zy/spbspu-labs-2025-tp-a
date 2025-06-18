@@ -22,7 +22,7 @@ namespace zakirov
   double zakirov::count_sum_area(const std::list< zakirov::Polygon > & points, P pred)
   {
     std::vector< Polygon > polygons;
-    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), even_polygon_pred);
+    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), pred);
     std::vector< double > areas;
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), count_area);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
