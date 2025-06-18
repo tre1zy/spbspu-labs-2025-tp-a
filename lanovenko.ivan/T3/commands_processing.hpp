@@ -18,7 +18,7 @@ namespace lanovenko
   void printMin(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
   void printCount(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
   void printRmecho(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons);
-  void printRightShapes(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
+  void printRightShapes(std::ostream& out, const std::vector< Polygon >& polygons);
 }
 
 #endif
