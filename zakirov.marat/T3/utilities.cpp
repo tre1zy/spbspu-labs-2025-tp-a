@@ -1,7 +1,5 @@
 #include "utilities.hpp"
 #include <string>
-#include <numeric>
-#include <algorithm>
 
   bool zakirov::odd_polygon_pred(const zakirov::Polygon & polygon)
   {
@@ -39,16 +37,6 @@
     result += plgn.points_[plgn.points_.size() - 1].x_ * plgn.points_[0].y_ - plgn.points_[plgn.points_.size() - 1].y_ * plgn.points_[0].x_;
     result *= 0.5;
     return std::abs(result);
-  }
-
-  template <class P>
-  double zakirov::count_sum_area(const std::list< zakirov::Polygon > & points, P pred)
-  {
-    std::vector< Polygon > polygons;
-    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), even_polygon_pred);
-    std::vector< double > areas;
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), count_area);
-    return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
   int zakirov::extract_num_until(const std::string & str, size_t start_pos, char el)

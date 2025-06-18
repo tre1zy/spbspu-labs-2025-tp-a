@@ -2,6 +2,8 @@
 #define UTILITES_HPP
 #include "geometric_shape.hpp"
 #include <list>
+#include <numeric>
+#include <algorithm>
 
 namespace zakirov
 {
@@ -15,6 +17,16 @@ namespace zakirov
   Point parce_point (const std::string & str);
   template <class P>
   double count_sum_area(const std::list< Polygon > & points, P pred);
+
+  template <class P>
+  double zakirov::count_sum_area(const std::list< zakirov::Polygon > & points, P pred)
+  {
+    std::vector< Polygon > polygons;
+    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), even_polygon_pred);
+    std::vector< double > areas;
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), count_area);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
 }
 
 #endif
