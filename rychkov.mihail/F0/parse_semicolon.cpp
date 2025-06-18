@@ -2,21 +2,16 @@
 
 bool rychkov::CParser::parse_semicolon(CParseContext& context)
 {
-  bool last_empty = false, last_bridge = false;
-  entities::Expression* last = stack_.top();
-  for (; !stack_.empty() && !entities::is_body(*stack_.top()) && !entities::is_decl(*stack_.top()); stack_.pop())
+  bool not_first = false;
+  while (!stack_.empty() && !entities::is_body(*stack_.top()) && !entities::is_decl(*stack_.top()))
   {
-    if (last_bridge)
+    if (not_first)
     {
-      log(context, "found not closed () or [] pair");
+      log(context, "found not paired closed [] or () pair");
+      not_first = true;
     }
-    if (!stack_.top()->empty() && !stack_.top()->full())
-    {
-      log(context, "found not full expression during semicolon folding");
-    }
-    last_empty = stack_.top()->empty();
-    last_bridge = entities::is_bridge(*stack_.top());
-    last = stack_.top();
+    fold(context, nullptr);
+    stack_.pop();
   }
   if (stack_.empty())
   {
@@ -52,10 +47,10 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
         log(context, "variable must have name");
         return false;
       }
-      if (last_empty)
-      {
-        log(context, "variable definition wasn't finished");
-      }
+      //if (last_empty)
+      //{
+        //log(context, "variable definition wasn't finished");
+      //}
       stack_.pop();
       variables_.insert(std::make_pair(data, stack_.size()));
       return append_empty(context);

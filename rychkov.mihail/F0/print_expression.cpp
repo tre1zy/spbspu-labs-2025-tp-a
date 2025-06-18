@@ -25,20 +25,20 @@ void rychkov::ContentPrinter::operator()(const entities::Expression& expr)
   size_t oper_size = expr.operation->type;
   if (expr.operation->type == Operator::unary)
   {
-    indent() << "[unary] operator" << expr.operation->token;
+    indent() << "* [unary] operator" << expr.operation->token;
     out << (expr.operation->right_align ? " <prefix form>\n" : " <suffix form>\n");
   }
   else if (expr.operation->type == Operator::binary)
   {
-    indent() << "[binary] operator" << expr.operation->token << '\n';
+    indent() << "* [binary] operator" << expr.operation->token << '\n';
   }
   else if (expr.operation->type == Operator::ternary)
   {
-    indent() << "[ternary] operator" << expr.operation->token << '\n';
+    indent() << "* [ternary] operator" << expr.operation->token << '\n';
   }
   else
   {
-    indent() << "[multi] operator" << expr.operation->token << " - size=" << expr.operands.size() << '\n';
+    indent() << "* [multi] operator" << expr.operation->token << " - size=" << expr.operands.size() << '\n';
     indent_++;
     for (const entities::Expression::operand& i: expr.operands)
     {

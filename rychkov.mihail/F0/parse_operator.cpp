@@ -70,54 +70,24 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
 }
 bool rychkov::CParser::parse_binary(CParseContext& context, const rychkov::Operator& oper)
 {
-  if (stack_.top()->operation != nullptr)
+  if (!stack_.top()->full())
   {
-    if (!stack_.top()->full())
-    {
-      return false;
-    }
-    entities::Expression* last = stack_.top();
-    while (entities::is_operator(*stack_.top()))
-    {
-      if (!stack_.top()->full())
-      {
-        log(context, "found not full operator during priority folding");
-      }
-      if ((stack_.top()->operation->priority > oper.priority)
-          || ((stack_.top()->operation->priority == oper.priority) && oper.right_align))
-      {
-        move_down();
-        stack_.top()->operation = &oper;
-        return true;
-      }
-      last = stack_.top();
-      stack_.pop();
-    }
-    stack_.push(last);
-    move_up();
-    stack_.top()->operation = &oper;
-    return true;
+    return false;
   }
-  if (!stack_.top()->empty() && !entities::is_decl(*stack_.top()) && !entities::is_body(*stack_.top()))
-  {
-    stack_.push(move_up());
-    stack_.top()->operation = &oper;
-    return true;
-  }
-  return false;
+  fold(context, &oper);
+  return true;
 }
 bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper)
 {
   if (oper.right_align)
   {
-    if ((!stack_.top()->empty() && (stack_.top()->operation == nullptr)) || stack_.top()->full())
+    if ((!stack_.top()->empty() && entities::is_bridge(*stack_.top())) || stack_.top()->full())
     {
       return false;
     }
     entities::Expression* temp = new entities::Expression{&oper, {}, {}};
     stack_.top()->operands.push_back(temp);
     stack_.push(temp);
-    return true;
   }
   else
   {
@@ -127,16 +97,15 @@ bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper
     }
     entities::Expression* temp = new entities::Expression{&oper, {}, {std::move(stack_.top()->operands.back())}};
     stack_.top()->operands.back() = temp;
-    temp->operation = &oper;
-    return true;
   }
+  return true;
 }
 rychkov::entities::Expression* rychkov::CParser::move_up()
 {
   entities::Expression* old = new entities::Expression{std::move(*stack_.top())};
   stack_.top()->operation = nullptr;
   stack_.top()->result_type = {};
-  stack_.top()->operands.push_back(old);
+  stack_.top()->operands.push_back(old); // creates unique_ptr and then pushes (no leak)
   return old;
 }
 void rychkov::CParser::move_down()

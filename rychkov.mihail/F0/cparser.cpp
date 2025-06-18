@@ -10,6 +10,12 @@ const std::set< rychkov::Operator, rychkov::NameCompare > rychkov::CParser::oper
       {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, false, false, 0},
       {rychkov::Operator::multiple, rychkov::Operator::special, "()", false, false, false, 0}
     };
+const rychkov::Operator rychkov::CParser::parentheses = {rychkov::Operator::multiple,
+      rychkov::Operator::special, "()", false, false, false, 0};
+const rychkov::Operator rychkov::CParser::brackets = {rychkov::Operator::binary,
+      rychkov::Operator::special, "[]", false, false, false, 0};
+const rychkov::Operator rychkov::CParser::comma = {rychkov::Operator::binary,
+      rychkov::Operator::special, ",", false, false, false, 0};
 
 rychkov::CParser::CParser():
   program_{{}},
@@ -139,7 +145,10 @@ bool rychkov::CParser::append(CParseContext& context, char c)
         {'{', &CParser::parse_open_brace},
         {'}', &CParser::parse_close_brace},
         {'(', &CParser::parse_open_parenthesis},
-        {')', &CParser::parse_close_parenthesis}
+        {')', &CParser::parse_close_parenthesis},
+        {'[', &CParser::parse_open_bracket},
+        {']', &CParser::parse_close_bracket},
+        {',', &CParser::parse_comma}
       };
 
   append_map::const_iterator found = dispatch_map.find(c);

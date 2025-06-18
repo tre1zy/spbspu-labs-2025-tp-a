@@ -130,6 +130,12 @@ namespace rychkov
   }
   namespace entities
   {
+    enum ScopeType
+    {
+      EXTERN,
+      STATIC,
+      UNSPECIFIED
+    };
     struct Expression;
     struct Body
     {
@@ -171,6 +177,7 @@ namespace rychkov
     {
       std::variant< Variable, Struct, Enum, Union, Alias, Function > data;
       DinMemWrapper< Expression > value;
+      ScopeType scope = UNSPECIFIED;
     };
     struct CastOperation
     {

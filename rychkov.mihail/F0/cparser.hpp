@@ -29,6 +29,11 @@ namespace rychkov
 
     void print(std::ostream& out) const;
   private:
+    static constexpr int min_priority = -1;
+    static const Operator parentheses;
+    static const Operator brackets;
+    static const Operator comma;
+
     std::vector< entities::Expression > program_;
     std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_;
     std::set< entities::Alias > aliases_;
@@ -46,12 +51,16 @@ namespace rychkov
     bool append_empty(CParseContext& context);
     entities::Expression* move_up();
     void move_down();
+    void fold(CParseContext& context, const Operator* reference = nullptr);
 
     bool parse_semicolon(CParseContext& context);
     bool parse_open_brace(CParseContext& context);
     bool parse_close_brace(CParseContext& context);
     bool parse_open_parenthesis(CParseContext& context);
     bool parse_close_parenthesis(CParseContext& context);
+    bool parse_open_bracket(CParseContext& context);
+    bool parse_close_bracket(CParseContext& context);
+    bool parse_comma(CParseContext& context);
 
     bool parse_unary(CParseContext& context, const Operator& oper);
     bool parse_binary(CParseContext& context, const Operator& oper);

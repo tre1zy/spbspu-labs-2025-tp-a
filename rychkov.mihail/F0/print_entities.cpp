@@ -52,15 +52,15 @@ std::ostream& rychkov::ContentPrinter::indent()
 }
 void rychkov::ContentPrinter::print_empty()
 {
-  indent() << "[EMPTY]\n";
+  indent() << "* [EMPTY]\n";
 }
 void rychkov::ContentPrinter::operator()(const entities::Variable& var)
 {
-  indent() << "[variable] " << var << '\n';
+  indent() << "* [variable] " << var << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::Function& func)
 {
-  indent() << "[function] " << func << '\n';
+  indent() << "* [function] " << func << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::Body& body)
 {
@@ -82,17 +82,17 @@ void rychkov::ContentPrinter::operator()(const entities::Body& body)
 }
 void rychkov::ContentPrinter::operator()(const entities::Struct& structure)
 {
-  indent() << "[struct] " << structure.name << '\n';
+  indent() << "* [struct] " << structure.name << '\n';
   indent_++;
   for (size_t i = 0; i < structure.fields.size(); i++)
   {
-    indent() << "[field] " << structure.fields[i] << '\n';
+    indent() << "* [field] " << structure.fields[i] << '\n';
   }
   indent_--;
 }
 void rychkov::ContentPrinter::operator()(const entities::Enum& structure)
 {
-  indent() << "[enum] " << structure.name << '\n';
+  indent() << "* [enum] " << structure.name << '\n';
   indent_++;
   for (const std::pair< std::string, int >& i: structure.fields)
   {
@@ -102,17 +102,17 @@ void rychkov::ContentPrinter::operator()(const entities::Enum& structure)
 }
 void rychkov::ContentPrinter::operator()(const entities::Union& structure)
 {
-  indent() << "[union] " << structure.name << '\n';
+  indent() << "* [union] " << structure.name << '\n';
   indent_++;
   for (size_t i = 0; i < structure.fields.size(); i++)
   {
-    indent() << "[variant] " << structure.fields[i] << '\n';
+    indent() << "* [variant] " << structure.fields[i] << '\n';
   }
   indent_--;
 }
 void rychkov::ContentPrinter::operator()(const entities::Alias& alias)
 {
-  indent() << "[typedef] ";
+  indent() << "* [typedef] ";
   print_left(out, alias.type);
   out << ' ' << alias.name;
   print_right(out, alias.type);
@@ -120,7 +120,18 @@ void rychkov::ContentPrinter::operator()(const entities::Alias& alias)
 }
 void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
 {
-  indent() << "[declaration]\n";
+  if (decl.scope == entities::EXTERN)
+  {
+    indent() << "* [extern declaration]\n";
+  }
+  else if (decl.scope == entities::STATIC)
+  {
+    indent() << "* [static declaration]\n";
+  }
+  else
+  {
+    indent() << "* [declaration]\n";
+  }
   indent() << "<object>:\n";
   indent_++;
   std::visit(*this, decl.data);
@@ -135,7 +146,7 @@ void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
 }
 void rychkov::ContentPrinter::operator()(const entities::Literal& literal)
 {
-  indent() << "[literal]\n";
+  indent() << "* [literal]\n";
   indent() << "<object> " << literal << '\n';
   indent() << "<type>   " << literal.result_type << '\n';
 }
