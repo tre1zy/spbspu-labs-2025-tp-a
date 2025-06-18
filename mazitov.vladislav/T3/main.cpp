@@ -43,6 +43,7 @@ int main(int argc, char **argv)
       {"MAX", std::bind(maxCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
       {"MIN", std::bind(minCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
       {"COUNT", std::bind(countCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"INTERSECTIONS", std::bind(intersectsCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
   };
 
   std::string command;

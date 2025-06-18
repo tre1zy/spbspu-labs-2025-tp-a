@@ -9,6 +9,7 @@ namespace mazitov
   void maxCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void minCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void countCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
+  void intersectsCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
 }
 
 #endif

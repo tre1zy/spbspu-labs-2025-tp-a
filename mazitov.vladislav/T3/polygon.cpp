@@ -40,11 +40,6 @@ std::istream &mazitov::operator>>(std::istream &in, Polygon &dest)
   dest.points.clear();
   std::copy_n(pointInputIter{in}, vertex_num, std::back_inserter(dest.points));
 
-  // if (in.peek() != '\n')
-  // {
-  //   std::copy_n(pointInputIter{in}, 1, std::back_inserter(dest.points));
-  // }
-
   if (!in || dest.points.size() != vertex_num || in.peek() != '\n')
   {
     dest.points.clear();

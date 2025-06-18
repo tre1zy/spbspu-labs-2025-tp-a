@@ -5,6 +5,7 @@
 #include "max_commands.hpp"
 #include "min_commands.hpp"
 #include "count_commands.hpp"
+#include "intersections_command.hpp"
 
 void mazitov::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
@@ -25,4 +26,18 @@ void mazitov::minCommand(std::istream &in, std::ostream &out, const std::vector<
 void mazitov::countCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   out << getCount(polygons, in);
+}
+
+void mazitov::intersectsCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  Polygon ref;
+  in >> ref;
+  if (in)
+  {
+    out << getIntersections(polygons, ref);
+  }
+  else
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
 }
