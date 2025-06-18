@@ -44,6 +44,7 @@ int main(int argc, char **argv)
       {"MIN", std::bind(minCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
       {"COUNT", std::bind(countCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
       {"INTERSECTIONS", std::bind(intersectsCommand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons))},
+      {"RMECHO", std::bind(rmEchoCommand, std::ref(std::cin), std::ref(std::cout), std::ref(polygons))},
   };
 
   std::string command;
