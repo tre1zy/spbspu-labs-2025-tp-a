@@ -69,7 +69,7 @@ void shapkov::area(std::istream& in, std::ostream& out, const VecOfPolygons& src
   catch (...)
   {
     size_t vertexes = std::stoi(subcommand);
-    shapkov::areaVertexes(out, src, vertexes);
+    areaVertexes(out, src, vertexes);
   }
 }
 void shapkov::maxArea(std::ostream& out, const VecOfPolygons& src)
@@ -151,7 +151,7 @@ void shapkov::count(std::istream& in, std::ostream& out, const VecOfPolygons& sr
   catch (...)
   {
     size_t vertexes = std::stoi(subcommand);
-    shapkov::countVertexes(out, src, vertexes);
+    countVertexes(out, src, vertexes);
   }
 }
 void shapkov::rects(std::ostream& out, const VecOfPolygons& src)
