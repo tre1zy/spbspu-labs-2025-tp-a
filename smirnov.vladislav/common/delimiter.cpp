@@ -1,6 +1,6 @@
 #include "delimiter.hpp"
 
-std::istream& io::operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream& io::operator>>(std::istream& in, const DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
