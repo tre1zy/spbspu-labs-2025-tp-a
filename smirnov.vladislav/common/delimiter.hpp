@@ -9,6 +9,6 @@ namespace io
     char exp;
   };
 
-  std::istream& operator>>(std::istream& in, const DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 #endif
