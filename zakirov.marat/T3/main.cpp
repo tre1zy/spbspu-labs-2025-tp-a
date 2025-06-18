@@ -7,6 +7,7 @@
 #include "vertex_processing.hpp"
 #include "extremum_processing.hpp"
 #include "utilities.hpp"
+#include <limits>
 
 int main(int argc, char ** argv)
 {
@@ -17,8 +18,26 @@ int main(int argc, char ** argv)
   }
 
   std::ifstream fin(argv[1]);
-
+  if (!fin)
+  {
+    std::cerr << "<INVALID FILE STREAM>" << '\n';
+    return 1;
+  }
   std::list< zakirov::Polygon > shapes;
+  zakirov::Polygon inserter;
+  while (!fin.eof())
+  {
+    fin >> inserter;
+    if (fin.fail())
+    {
+      fin.clear(fin.rdstate() ^ std::ios::failbit);
+      fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      continue;
+    }
+
+    shapes.push_back(inserter);
+  }
+
   std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
   commands["AREA"] = std::bind(zakirov::process_area, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);
   commands["LESSAREA"] = std::bind(zakirov::process_less_area, std::cref(shapes), std::placeholders::_1, std::placeholders::_2);

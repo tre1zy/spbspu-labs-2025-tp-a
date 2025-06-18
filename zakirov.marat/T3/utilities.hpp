@@ -10,7 +10,7 @@ namespace zakirov
   bool odd_polygon_pred(const Polygon & polygon);
   bool even_polygon_pred(const Polygon & polygon);
   bool less_area_pred(double area_base, double area_other);
-  bool equal_vertexes_pred(const zakirov::Polygon & polygon, double vertex_base);
+  bool equal_vertexes_pred(const zakirov::Polygon & polygon, size_t vertex_base);
   size_t get_vertex(const Polygon & polygon);
   double count_area(const Polygon & plgn);
   int extract_num_until(const std::string & str, size_t start_pos, char el);

@@ -60,16 +60,12 @@ std::istream & zakirov::operator>>(std::istream & in, Polygon & polygon)
 
   Polygon polygon_temp;
   size_t point_quantity = 0;
-  while (!in.eof())
+  in >> point_quantity;
+  Point inserting_point{0, 0};
+  for (size_t i = 0; i < point_quantity; ++i)
   {
-    in >> point_quantity;
-    auto it = polygon.points_.begin();
-    Point inserting_point{0, 0};
-    for (size_t i = 0; i < point_quantity; ++i, ++it)
-    {
-      in >> inserting_point;
-      polygon_temp.points_.insert(it, inserting_point);
-    }
+    in >> inserting_point;
+    polygon_temp.points_.push_back(inserting_point);
   }
 
   if (in)

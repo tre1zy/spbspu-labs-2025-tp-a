@@ -16,7 +16,7 @@
     return area_other < area_base;
   }
 
-  bool zakirov::equal_vertexes_pred(const zakirov::Polygon & polygon, double vertex_base)
+  bool zakirov::equal_vertexes_pred(const zakirov::Polygon & polygon, size_t vertex_base)
   {
     return polygon.points_.size() == vertex_base;
   }
