@@ -97,7 +97,7 @@ namespace geom
         }
       }
     }
-    poly.points = std::move(pts);
+    poly.points = std::move(tmp);
     return in;
   }
 

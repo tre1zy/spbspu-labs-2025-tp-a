@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     std::istringstream iss(line);
     std::string cmd;
 
-    if (!(iss >> cmd) || !commandMap.count(cmd)))
+    if (!(iss >> cmd) || !commandMap.count(cmd))
     {
       std::cout << "<INVALID COMMAND>\n";
       continue;
