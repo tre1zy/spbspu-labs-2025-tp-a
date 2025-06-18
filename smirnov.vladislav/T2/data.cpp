@@ -1,8 +1,8 @@
 #include "data.hpp"
 #include <iomanip>
 #include <cmath>
-#include "stream_guard.hpp"
-#include "delimiter.hpp"
+#include <stream_guard.hpp>
+#include <delimiter.hpp>
 
 std::istream& smirnov::operator>>(std::istream& in, DoubleIO&& dest)
 {
