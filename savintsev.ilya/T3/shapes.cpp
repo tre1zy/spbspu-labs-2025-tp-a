@@ -8,7 +8,7 @@ bool savintsev::operator<(const Point & a, const Point & b)
   return (a.x != b.x) ? a.x < b.x : a.y < b.y;
 }
 
-std::istream &savintsev::operator>>(std::istream &in, Point &dest)
+std::istream & savintsev::operator>>(std::istream & in, Point & dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)

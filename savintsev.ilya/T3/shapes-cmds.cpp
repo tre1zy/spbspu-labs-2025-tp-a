@@ -91,40 +91,6 @@ namespace
     const std::set< savintsev::Point > & set_p;
   };
 
-  struct SegmentIntersectionChecker
-  {
-    bool operator()(const savintsev::Point & p1, const savintsev::Point & p2) const
-    {
-      struct SegmentChecker
-      {
-        bool operator()(const savintsev::Point & q1) const
-        {
-          const savintsev::Point & q2 = polygon.points[(std::addressof(q1) - std::addressof(polygon.points[0]) + 1) % polygon.points.size()];
-          return savintsev::is_lines_int(p1, p2, q1, q2);
-        }
-        const savintsev::Polygon & polygon;
-        const savintsev::Point & p1;
-        const savintsev::Point & p2;
-      };
-
-      SegmentChecker checker{p, p1, p2};
-      return std::any_of(p.points.begin(), p.points.end(), checker);
-    }
-    const savintsev::Polygon & p;
-  };
-
-  struct SegmentCheckProcessor
-  {
-    bool operator()(size_t i) const
-    {
-      const savintsev::Point & p1 = polygon.points[i];
-      const savintsev::Point & p2 = polygon.points[(i + 1) % polygon.points.size()];
-      return checker(p1, p2);
-    }
-    const savintsev::Polygon & polygon;
-    const SegmentIntersectionChecker & checker;
-  };
-
   struct CheckSame
   {
     bool operator()(const savintsev::Polygon & a) const
@@ -143,21 +109,24 @@ namespace
 
   struct CheckIntersect
   {
-    bool operator()(const savintsev::Polygon & a) const
+    bool operator()(const savintsev::Polygon & a)
     {
-      struct SegmentChecker
+      size_t n = a.points.size();
+      for (size_t i = 0; i < n; ++i)
       {
-        bool operator()(const savintsev::Point & p1, const savintsev::Point & p2) const
+        size_t m = p.points.size();
+        for (size_t j = 0; j < m; ++j)
         {
-          return checker(p1, p2);
+          const savintsev::Point & a1 = a.points[((i + 1) == n) ? 0 : i + 1];
+          const savintsev::Point & p1 = p.points[((j + 1) == m) ? 0 : j + 1];
+          bool is_intersect = savintsev::is_lines_int(p.points[j], p1, a.points[j], a1);
+          if (is_intersect)
+          {
+            return true;
+          }
         }
-        const SegmentIntersectionChecker & checker;
-      };
-
-      SegmentIntersectionChecker checker{p};
-      SegmentChecker segment_checker{checker};
-      auto result = std::adjacent_find(a.points.begin(), a.points.end(), segment_checker);
-      return result != a.points.end() || segment_checker(a.points.back(), a.points.front());
+      }
+      return false;
     }
     const savintsev::Polygon & p;
   };
