@@ -5,7 +5,7 @@
 #include <istream>
 #include <iterator>
 #include <algorithm>
-#include "delimiter.hpp"
+#include <delimiter.hpp>
 
 namespace lanovenko
 {

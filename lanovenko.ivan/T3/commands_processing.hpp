@@ -8,7 +8,7 @@
 #include <functional>
 #include <map>
 #include <string>
-#include "scope_guard.hpp"
+#include <scope_guard.hpp>
 #include "shapes.hpp"
 
 namespace lanovenko
