@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 
+namespace amine {
+
 struct Point {
     int x, y;
     bool operator==(const Point& other) const;
@@ -15,7 +17,13 @@ struct Polygon {
     size_t vertexCount() const;
 };
 
+double compute_area(const Polygon& poly);
+bool parse_polygon(const std::string& str, Polygon& poly);
+bool polygons_intersect(const Polygon& a, const Polygon& b);
+
 std::istream& operator>>(std::istream& in, Point& p);
 std::istream& operator>>(std::istream& in, Polygon& poly);
+
+}
 
 #endif
