@@ -1,13 +1,7 @@
 #include "data_struct.hpp"
-#include "scope_guard.hpp"
 
 namespace
 {
-  struct DelimetrIO
-  {
-    char exp;
-  };
-
   struct CharIO
   {
     char& ref;
@@ -23,22 +17,6 @@ namespace
     std::string& ref;
   };
 
-  std::istream& operator>>(std::istream& in, DelimetrIO&& dest)
-  {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    char c = 0;
-    in >> c;
-    if (in && (c != dest.exp))
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
-
   std::istream& operator>>(std::istream& in, CharIO&& dest)
   {
     std::istream::sentry s(in);
@@ -46,7 +24,7 @@ namespace
     {
       return in;
     }
-    in >> DelimetrIO{ '\'' } >> dest.ref >> DelimetrIO{ '\'' } >> DelimetrIO{ ':' };
+    in >> io::DelimiterIO{ '\'' } >> dest.ref >> io::DelimiterIO{ '\'' } >> io::DelimiterIO{':'};
     return in;
   }
 
@@ -57,9 +35,9 @@ namespace
     {
       return in;
     }
-    in >> DelimetrIO{ '(' } >> DelimetrIO{ ':' } >> DelimetrIO{ 'N' } >> dest.ref.first;
-    in >> DelimetrIO{ ':' } >> DelimetrIO{ 'D' } >> dest.ref.second >> DelimetrIO{ ':' };
-    in >> DelimetrIO{ ')' } >> DelimetrIO{ ':' };
+    in >> io::DelimiterIO{ '(' } >> io::DelimiterIO{ ':' } >> io::DelimiterIO{ 'N' } >> dest.ref.first;
+    in >> io::DelimiterIO{ ':' } >> io::DelimiterIO{ 'D' } >> dest.ref.second >> io::DelimiterIO{ ':' };
+    in >> io::DelimiterIO{ ')' } >> io::DelimiterIO{ ':' };
     return in;
   }
 
@@ -70,8 +48,9 @@ namespace
     {
       return in;
     }
-    return std::getline(in >> DelimetrIO{ '"' }, dest.ref, '"');
+    return std::getline(in >> io::DelimiterIO{ '"' }, dest.ref, '"');
   }
+
 }
 
 std::istream& lanovenko::operator>>(std::istream& in, DataStruct& dest)
@@ -83,7 +62,7 @@ std::istream& lanovenko::operator>>(std::istream& in, DataStruct& dest)
   }
   DataStruct input{};
   {
-    using sep = DelimetrIO;
+    using sep = io::DelimiterIO;
     using chr = CharIO;
     using rtn = RationalIO;
     using str = StringIO;
