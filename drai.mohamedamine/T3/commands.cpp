@@ -80,7 +80,7 @@ namespace amine
 
     auto next_cmd = std::find_if(it, end,
       [](const std::string& s) {
-        return s == "AREA" || s == "MAX" || s == "MIN" || s == "COUNT" || 
+        return s == "AREA" || s == "MAX" || s == "MIN" || s == "COUNT" ||
                s == "INTERSECTIONS" || s == "RMECHO";
       });
 
