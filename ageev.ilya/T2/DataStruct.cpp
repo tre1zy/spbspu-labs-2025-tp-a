@@ -83,7 +83,6 @@ namespace ageev
     }
       std::string data;
     in >> data;
-
     if (data != dest.exp) {
     in.setstate(std::ios::failbit);
     }
@@ -105,12 +104,12 @@ namespace ageev
       using dbl = DoubleIO;
       using dblsci = DoubleSciIO;
       using str = StringIO;
-      
+
       bool hasKey1 = false;
       bool hasKey2 = false;
       bool hasKey3 = false;
       in >> sep{ '(' };
-      
+
       while (fields < 3) {
         std::string key;
         in >> sep{ ':' } >> key;
