@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
   if (argc != 2)
   {
-    std::cerr << "<WRONG NUMBER OF ARGUMENTS>";
+    std::cerr << "<WRONG NUMBER OF ARGUMENTS>\n";
     return 1;
   }
 
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 }

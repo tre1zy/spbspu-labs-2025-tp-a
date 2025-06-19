@@ -34,7 +34,8 @@ std::istream& kushekbaev::operator>>(std::istream& in, Polygon& polygon)
     return in;
   }
   std::vector< Point > tmp;
-  std::copy_n(std::istream_iterator< Point >(in), num_of_inputed_vertices, tmp.begin());
+  tmp.reserve();
+  std::copy_n(std::istream_iterator< Point >(in), num_of_inputed_vertices, std::back_inserter(tmp));
   if (in)
   {
     polygon.points = std::move(tmp);
