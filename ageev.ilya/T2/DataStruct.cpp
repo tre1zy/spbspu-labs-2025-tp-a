@@ -100,7 +100,6 @@ namespace ageev
     DataStruct input;
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
     int fields = 0;
-    char c;
 
     using sep = DelimiterIO;
     using dbl = DoubleIO;
