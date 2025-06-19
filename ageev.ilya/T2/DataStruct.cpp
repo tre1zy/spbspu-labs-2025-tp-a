@@ -109,7 +109,7 @@ namespace ageev
       in >> label{ "key2" } >> dblsci{ input.key2 };
       in >> sep{ ':' };
       in >> label{ "key3" } >> str{ input.key3 };
-      in >> sep{ ')' };
+      in >> sep{ ':' } >> sep{ ')' };
     }
     if (in)
     {
