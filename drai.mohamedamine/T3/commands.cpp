@@ -69,6 +69,27 @@ namespace amine
     }
   }
 
+  void process_command_group(std::vector<std::string>::iterator& it,
+                           std::vector<std::string>::iterator end,
+                           std::vector<Polygon>& polygons)
+  {
+    if (it == end) return;
+
+    std::string command = *it++;
+    std::vector<std::string> args;
+
+    auto next_cmd = std::find_if(it, end,
+      [](const std::string& s) {
+        return s == "AREA" || s == "MAX" || s == "MIN" || s == "COUNT" || 
+               s == "INTERSECTIONS" || s == "RMECHO";
+      });
+
+    std::copy(it, next_cmd, std::back_inserter(args));
+    it = next_cmd;
+
+    execute_command(command, args, polygons);
+  }
+
   void process_commands(std::vector<Polygon>& polygons)
   {
     std::vector<std::string> commands;
@@ -77,19 +98,13 @@ namespace amine
               std::back_inserter(commands));
 
     auto it = commands.begin();
-    while (it != commands.end()) {
-      std::string command = *it++;
-      std::vector<std::string> args;
+    std::function<void()> process = [&]() {
+      if (it != commands.end()) {
+        process_command_group(it, commands.end(), polygons);
+        process();
+      }
+    };
 
-      auto next_cmd = std::find_if(it, commands.end(),
-        [](const std::string& s) {
-          return s == "AREA" || s == "MAX" || s == "MIN" || s == "COUNT" ||
-                 s == "INTERSECTIONS" || s == "RMECHO";
-        });
-      std::copy(it, next_cmd, std::back_inserter(args));
-      it = next_cmd;
-
-      execute_command(command, args, polygons);
-    }
+    process();
   }
 }

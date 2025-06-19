@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     return 2;
   }
 
-  std::vector<Polygon> polygons;
+  std::vector<amine::Polygon> polygons;
   std::vector<std::string> lines;
   std::copy(std::istream_iterator<std::string>(file),
             std::istream_iterator<std::string>(),
@@ -28,12 +28,12 @@ int main(int argc, char** argv)
 
   std::for_each(lines.begin(), lines.end(),
     [&polygons](const std::string& line) {
-      Polygon poly;
-      if (parse_polygon(line, poly)) {
+      amine::Polygon poly;
+      if (amine::parse_polygon(line, poly)) {
         polygons.push_back(poly);
       }
     });
 
-  process_commands(polygons);
+  amine::process_commands(polygons);
   return 0;
 }
