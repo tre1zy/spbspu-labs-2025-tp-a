@@ -1,14 +1,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <iterator>
 #include <algorithm>
 #include <numeric>
-#include <functional>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-
 #include "polygon.hpp"
 #include "commands.hpp"
 
@@ -46,6 +43,7 @@ namespace amine
                 }
                 else {
                     size_t num = std::stoul(args[0]);
+                    if (num < 3) throw std::invalid_argument("Invalid command");
                     double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                         [num](double acc, const Polygon& p) {
                             return acc + (p.vertexCount() == num ? compute_area(p) : 0.0);
@@ -68,6 +66,7 @@ namespace amine
                 }
                 else {
                     size_t num = std::stoul(args[0]);
+                    if (num < 3) throw std::invalid_argument("Invalid command");
                     size_t count = std::count_if(polygons.begin(), polygons.end(),
                         [num](const Polygon& p) { return p.vertexCount() == num; });
                     std::cout << count << '\n';
@@ -116,7 +115,7 @@ namespace amine
                 }
             }
             else if (command == "INTERSECTIONS") {
-                if (args.empty() || polygons.empty()) throw std::invalid_argument("Invalid command");
+                if (args.empty()) throw std::invalid_argument("Invalid command");
 
                 Polygon param;
                 std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
@@ -136,7 +135,7 @@ namespace amine
                 std::cout << count << '\n';
             }
             else if (command == "RMECHO") {
-                if (args.empty() || polygons.empty()) throw std::invalid_argument("Invalid command");
+                if (args.empty()) throw std::invalid_argument("Invalid command");
 
                 Polygon param;
                 std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
@@ -165,44 +164,24 @@ namespace amine
         }
     }
 
-    void process_command_group(std::vector<std::string>::iterator& it,
-                             std::vector<std::string>::iterator end,
-                             std::vector<Polygon>& polygons)
-    {
-        if (it == end) return;
-
-        std::string command = *it++;
-        std::vector<std::string> args;
-
-        auto next_cmd = std::find_if(it, end,
-            [](const std::string& s) {
-                return s == "AREA" || s == "MAX" || s == "MIN" || s == "COUNT" ||
-                       s == "INTERSECTIONS" || s == "RMECHO";
-            });
-
-        std::copy(it, next_cmd, std::back_inserter(args));
-        it = next_cmd;
-
-        execute_command(command, args, polygons);
-    }
-
     void process_commands(std::vector<Polygon>& polygons)
     {
-        std::vector<std::string> commands;
-        std::copy(std::istream_iterator<std::string>(std::cin),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(commands));
+        std::string line;
+        while (std::getline(std::cin, line)) {
+            if (line.empty()) continue;
 
-        auto it = commands.begin();
+            std::istringstream iss(line);
+            std::vector<std::string> tokens;
+            std::copy(std::istream_iterator<std::string>(iss),
+                     std::istream_iterator<std::string>(),
+                     std::back_inserter(tokens));
 
-        std::function<void(std::vector<std::string>::iterator&)> process_all =
-            [&](std::vector<std::string>::iterator& iter)
-        {
-            if (iter == commands.end()) return;
-            process_command_group(iter, commands.end(), polygons);
-            process_all(iter);
-        };
+            if (tokens.empty()) continue;
 
-        process_all(it);
+            std::string command = tokens[0];
+            std::vector<std::string> args(tokens.begin() + 1, tokens.end());
+
+            execute_command(command, args, polygons);
+        }
     }
 }
