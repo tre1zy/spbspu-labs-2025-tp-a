@@ -129,10 +129,10 @@ void execute_command(const std::string& command, const std::vector<std::string>&
             }
 
             try {
-                std::string poly_str;
-                for (const auto& arg : args) {
-                    poly_str += arg + " ";
-                }
+                std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
+                    [](const std::string& a, const std::string& b) {
+                        return a + (a.empty() ? "" : " ") + b;
+                    });
 
                 Polygon param;
                 if (!parse_polygon(poly_str, param)) {
@@ -155,10 +155,10 @@ void execute_command(const std::string& command, const std::vector<std::string>&
             }
 
             try {
-                std::string poly_str;
-                for (const auto& arg : args) {
-                    poly_str += arg + " ";
-                }
+                std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
+                    [](const std::string& a, const std::string& b) {
+                        return a + (a.empty() ? "" : " ") + b;
+                    });
 
                 Polygon param;
                 if (!parse_polygon(poly_str, param)) {
@@ -213,6 +213,11 @@ void process_commands(std::vector<Polygon>& polygons)
     std::copy(std::istream_iterator<std::string>(std::cin),
               std::istream_iterator<std::string>(),
               std::back_inserter(commands));
+
+    if (commands.empty()) {
+        std::cout << "Atleast 2 optional supported commands\n";
+        return;
+    }
 
     auto it = commands.begin();
     std::function<void(std::vector<std::string>::iterator&)> process_all =
