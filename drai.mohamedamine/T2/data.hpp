@@ -1,8 +1,9 @@
-#ifndef DATA_HPP
+ifndef DATA_HPP
 #define DATA_HPP
 
-#include <string>
 #include <complex>
+#include <iostream>
+#include <string>
 #include <utility>
 
 namespace amine
@@ -14,9 +15,9 @@ namespace amine
     std::string key3;
   };
 
-  std::istream &operator>>(std::istream &in, DataStruct &dest);
-  std::ostream &operator<<(std::ostream &out, const DataStruct &dest);
-  bool operator<(const DataStruct &lhs, const DataStruct &rhs);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs);
 }
 
 #endif
