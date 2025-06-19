@@ -91,9 +91,32 @@ namespace klimova {
         Streamguard guard(os);
         os << getVertexesCount(*it) << "\n";
     }
+
+    void countEvenCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+    {
+        auto bindPredicate = std::bind(isVertexCountEven, _1);
+        size_t result = std::count_if(polygons.begin(), polygons.end(), bindPredicate);
+        os << result << "\n";
+    }
+
+    void countOddCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+    {
+        auto bindPredicate = std::bind(isVertexCountOdd, _1);
+        size_t result = std::count_if(polygons.begin(), polygons.end(), bindPredicate);
+        os << result << "\n";
+    }
+
+    void countNumCmd(const VecPolygon& polygons, const std::string& numStr, std::ostream& os)
+    {
+        size_t vertexes = getVertexes(numStr);
+        if (!isValidVertexCount(vertexes)) {
+            throw std::out_of_range("");
+        }
+        auto bindPredicate = std::bind(hasVertexCount, _1, vertexes);
+        size_t result = std::count_if(polygons.begin(), polygons.end(), bindPredicate);
+        os << result << "\n";
+    }
 }
-
-
 
 klimova::AreaSubs klimova::createAreaSubs()
 {
@@ -108,6 +131,11 @@ klimova::MaxSubs klimova::createMaxSubs()
 klimova::MinSubs klimova::createMinSubs()
 {
     return {{"AREA", minAreaCmd}, {"VERTEXES", minVertexesCmd}};
+}
+
+klimova::CountSubs klimova::createCountSubs()
+{
+    return {{"EVEN", countEvenCmd}, {"ODD", countOddCmd}};
 }
 
 void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& os)
@@ -175,27 +203,16 @@ void klimova::min(const VecPolygon& polygons, std::istream& is, std::ostream& os
 
 void klimova::count(const VecPolygon& polygons, std::istream& is, std::ostream& os)
 {
-    auto bindEven = std::bind(isVertexCountEven, _1);
-    auto bindOdd = std::bind(isVertexCountOdd, _1);
-    CountSubs subs{{"EVEN", bindEven}, {"ODD", bindOdd}};
-
-    std::string subcommand;
-    is >> subcommand;
     try {
-        size_t result = 0;
-        if (subs.find(subcommand) != subs.end()) {
-            auto predicate = subs.at(subcommand);
-            result = std::count_if(polygons.begin(), polygons.end(), predicate);
+        CountSubs subs = createCountSubs();
+        std::string subcommand;
+        is >> subcommand;
+        auto it = subs.find(subcommand);
+        if (it != subs.end()) {
+            it->second(polygons, is, os);
         } else {
-            size_t vertexes = getVertexes(subcommand);
-            if (!isValidVertexCount(vertexes)) {
-                os << "<INVALID COMMAND>\n";
-                return;
-            }
-            auto predicate = std::bind(hasVertexCount, _1, vertexes);
-            result = std::count_if(polygons.begin(), polygons.end(), predicate);
+            countNumCmd(polygons, subcommand, os);
         }
-        os << result << "\n";
     }
     catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";

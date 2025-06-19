@@ -18,14 +18,16 @@ namespace klimova
     using MaxSubs = std::map< std::string, MaxCommand >;
     using MinCommand = std::function< void(const VecPolygon&, std::istream&, std::ostream&) >;
     using MinSubs = std::map< std::string, MinCommand >;
+    using CountCommand = std::function< void(const VecPolygon&, std::istream&, std::ostream&) >;
+    using CountSubs = std::map< std::string, CountCommand >;
 
-    using CountSubs = std::map< std::string, std::function< bool(const Polygon&) > >;
     using CommandHandler = std::map< std::string, std::function< void() > >;
 
     CommandHandler createCommandHandler(const VecPolygon& polygons);
     AreaSubs createAreaSubs();
     MaxSubs createMaxSubs();
     MinSubs createMinSubs();
+    CountSubs createCountSubs();
 
     void area(const VecPolygon& polygons, std::istream& is, std::ostream& os);
     void max(const VecPolygon& polygons, std::istream& is, std::ostream& os);
