@@ -1,11 +1,26 @@
 #include "shapes.hpp"
 #include <algorithm>
 #include <iterator>
+#include <numeric>
+#include <functional>
 
-
-double karnauhova::CalcAreaPolygon::operator()(const karnauhova::Point& p1, const karnauhova::Point& p2)
+double karnauhova::CalcAreaPoint::operator()(const karnauhova::Point& p1, const karnauhova::Point& p2)
 {
   return p1.x * p2.y - p2.x * p1.y;
+}
+
+namespace
+{
+  struct AreaCalculator {
+    karnauhova::Point& last_point;
+    karnauhova::CalcAreaPoint& calculator;
+    double operator()(double sum, const karnauhova::Point& current)
+    {
+      double term = calculator(last_point, current);
+      last_point = current;
+      return sum + term;
+    }
+  };
 }
 
 std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
@@ -58,4 +73,17 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
     pol.points = temp;
   }
   return in;
+}
+
+double karnauhova::getArea(const Polygon& polygon)
+{
+  if (polygon.points.size() < 3)
+  {
+    return 0.0;
+  }
+  CalcAreaPoint calc;
+  Point last = polygon.points.back();
+  AreaCalculator acc{last, calc};
+  double area = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, std::ref(acc));
+  return std::abs(area) / 2.0;
 }

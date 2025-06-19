@@ -5,7 +5,7 @@
 
 namespace karnauhova
 {
-  struct CalcAreaPolygon
+  struct CalcAreaPoint
   {
   double operator()(const Point& p1, const Point& p2);
   };
@@ -28,5 +28,6 @@ namespace karnauhova
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, Point&& point);
   std::istream& operator>>(std::istream& in, Polygon& pol);
+  double getArea(const Polygon& polygon);
 }
 #endif

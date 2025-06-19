@@ -4,7 +4,9 @@
 #include <iterator>
 #include <functional>
 #include <map>
+#include <limits>
 #include "shapes.hpp"
+#include "comands.hpp"
 
 
 int main(int argc, char** argv)
@@ -34,7 +36,23 @@ int main(int argc, char** argv)
     std::copy(istr_iterator(file), istr_iterator(), std::back_inserter(polygons));
   }
   std::map< std::string, std::function< void() > > cmds;
-  //cmds["AREA"] = std::bind(kas::show, std::cref(polygons), std::ref(std::cout));
+  cmds["AREA"] = std::bind(areaComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
-
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      cmds.at(command)();
+    }
+    catch (...)
+    {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
 }
