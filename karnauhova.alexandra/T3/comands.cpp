@@ -42,6 +42,14 @@ namespace
     std::transform(it.begin(), it.end(), std::back_inserter(areas), karnauhova::getArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
+  bool isMaxArea(const karnauhova::Polygon& poll, const karnauhova::Polygon& polr)
+  {
+    return karnauhova::getArea(poll) < karnauhova::getArea(polr);
+  }
+  bool isMaxVert(const karnauhova::Polygon& poll, const karnauhova::Polygon& polr)
+  {
+    return poll.points.size() < polr.points.size();
+  }
 }
 
 void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -94,5 +102,39 @@ double karnauhova::countArea(const std::vector< Polygon >& polygons, size_t coun
   return sumAreas(polygons, CountCompare{ count });
 }
 
+void karnauhova::maxComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("Not enough polygons");
+  }
+  std::map< std::string, std::function< void() > > commands;
+  commands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(std::cout));
+  commands["VERTEXES"] = std::bind(maxVert, std::cref(polygons), std::ref(std::cout));
+  std::string command;
+  in >> command;
+  try
+  {
+    commands.at(command)();
+  }
+  catch(...)
+  {
+    throw std::logic_error("Error in command");
+  }
+}
+
+void karnauhova::maxArea(const std::vector< Polygon >& polygons, std::ostream& out)
+{
+  auto max = (*std::max_element(polygons.begin(), polygons.end(), isMaxArea));
+  //karnauhova::iofmtguard scope(out);
+  out << std::fixed << std::setprecision(1) << karnauhova::getArea(max) << "\n";
+}
+
+void karnauhova::maxVert(const std::vector< Polygon >& polygons, std::ostream& out)
+{
+  auto max = (*std::max_element(polygons.begin(), polygons.end(), isMaxVert));
+  //karnauhova::iofmtguard scope(out);
+  out << std::fixed << std::setprecision(1) << max.points.size() << "\n";
+}
 
 
