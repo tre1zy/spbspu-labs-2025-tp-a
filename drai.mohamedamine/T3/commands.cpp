@@ -68,6 +68,9 @@ namespace amine
                 }
                 else {
                     size_t num = std::stoul(args[0]);
+                    if (num < 3) {
+                        throw std::invalid_argument("Invalid command");
+                        }
                     size_t count = std::count_if(polygons.begin(), polygons.end(),
                         [num](const Polygon& p) { return p.vertexCount() == num; });
                     std::cout << count << '\n';
@@ -191,6 +194,10 @@ namespace amine
 
     void process_commands(std::vector<Polygon>& polygons)
     {
+        if (std::cin.peek() == EOF) {
+        std::cout << "Atleast 2 optional supported commands\n";
+        return;
+    }
         std::vector<std::string> commands;
         std::copy(std::istream_iterator<std::string>(std::cin),
                   std::istream_iterator<std::string>(),
