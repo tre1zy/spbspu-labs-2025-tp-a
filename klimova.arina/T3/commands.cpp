@@ -8,33 +8,58 @@
 #include "streamguard.hpp"
 #include "utils.hpp"
 
-void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+static void areaEvenCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
 {
+    auto bindEven = std::bind(areaEven, _1, _2);
+    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindEven);
+    Streamguard guard(os);
+    os << std::fixed << std::setprecision(1) << result << "\n";
+}
+
+static void areaOddCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+{
+    auto bindOdd = std::bind(areaOdd, _1, _2);
+    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindOdd);
+    Streamguard guard(os);
+    os << std::fixed << std::setprecision(1) << result << "\n";
+}
+
+static void areaMeanCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+{
+    if (polygons.empty()) throw std::out_of_range("");
+    auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
+    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindMean);
+    Streamguard guard(os);
+    os << std::fixed << std::setprecision(1) << result << "\n";
+}
+
+static void areaNumCmd(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+{
+    std::string numStr;
+    is >> numStr;
+    size_t vertexes = getVertexes(numStr);
+    if (!isValidVertexCount(vertexes)) throw std::out_of_range("");
+    auto bindMean = std::bind(areaNum, _1, _2, vertexes);
+    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindMean);
+    Streamguard guard(os);
+    os << std::fixed << std::setprecision(1) << result << "\n";
+}
+
+AreaSubs createAreaSubs() {
+    return {{"EVEN", areaEvenCmd}, {"ODD", areaOddCmd}, {"MEAN", areaMeanCmd}};
+}
+
+void area(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
     try {
-
-        auto bindEven = std::bind(areaEven, _1, _2);
-        auto bindOdd = std::bind(areaOdd, _1, _2);
-        auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
-        AreaSubs subs{{"EVEN", bindEven}, {"ODD", bindOdd}, {"MEAN", bindMean}};
-
+        AreaSubs subs = createAreaSubs();
         std::string subcommand;
         is >> subcommand;
-        double result = 0.0;
-        if (subs.find(subcommand) != subs.end()) {
-            if (subcommand == "MEAN" && polygons.empty()) {
-                throw std::out_of_range("");
-            }
-            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs.at(subcommand));
+        auto it = subs.find(subcommand);
+        if (it != subs.end()) {
+            it->second(polygons, is, os);
         } else {
-            size_t vertexes = getVertexes(subcommand);
-            if (!isValidVertexCount(vertexes)) {
-                throw std::out_of_range("");
-            }
-            auto bindNum = std::bind(areaNum, _1, _2, vertexes);
-            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindNum);
+            areaNumCmd(polygons, is, os);
         }
-        Streamguard StreamGuard(os);
-        os << std::fixed << std::setprecision(1) << result << "\n";
     }
     catch (const std::exception&) {
         os << "<INVALID COMMAND>\n";
