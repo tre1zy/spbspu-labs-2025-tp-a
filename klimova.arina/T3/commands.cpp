@@ -1,12 +1,12 @@
 #include "commands.hpp"
-#include "streamguard.hpp"
-#include "utils.hpp"
 #include <algorithm>
 #include <functional>
 #include <numeric>
 #include <iomanip>
 #include <string>
 #include <limits>
+#include "streamguard.hpp"
+#include "utils.hpp"
 
 void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& os)
 {
@@ -154,4 +154,16 @@ void klimova::rects(const VecPolygon& polygons, std::ostream& os)
     RectangleChecker checker;
     size_t count = std::count_if(polygons.begin(), polygons.end(), checker);
     os << count << "\n";
+}
+
+klimova::CommandHandler klimova::createCommandHandler(const std::vector<Polygon>& polygons)
+{
+    CommandHandler cmds;
+    cmds["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["PERMS"] = std::bind(perms, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+    cmds["RECTS"] = std::bind(rects, std::cref(polygons), std::ref(std::cout));
+    return cmds;
 }

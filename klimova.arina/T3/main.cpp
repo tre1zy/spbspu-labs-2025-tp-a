@@ -1,5 +1,3 @@
-#include "polygon.hpp"
-#include "commands.hpp"
 #include <functional>
 #include <iostream>
 #include <iterator>
@@ -7,7 +5,8 @@
 #include <vector>
 #include <string>
 #include <limits>
-#include <map>
+#include "polygon.hpp"
+#include "commands.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -26,20 +25,13 @@ int main(int argc, char* argv[])
         }
         std::copy(inputIterator(file), inputIterator(), std::back_inserter(polygons));
     }
-    std::map< std::string, std::function< void() > > cmds;
-    cmds["AREA"] = std::bind(klimova::area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-    cmds["MAX"] = std::bind(klimova::max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-    cmds["MIN"] = std::bind(klimova::min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-    cmds["COUNT"] = std::bind(klimova::count, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-    cmds["PERMS"] = std::bind(klimova::perms, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-    cmds["RECTS"] = std::bind(klimova::rects, std::cref(polygons), std::ref(std::cout));
-
+    auto cmds = create_command_handler(polygons);
     std::string command;
     while (!(std::cin >> command).eof()) {
         try {
             cmds.at(command)();
         }
-        catch (...) {
+        catch (const std::exception&) {
             if (std::cin.fail()) {
                 std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
             }
