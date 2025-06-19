@@ -100,7 +100,6 @@ namespace ageev
     DataStruct input;
     {
       using sep = DelimiterIO;
-      using label = LabelIO;
       using dbl = DoubleIO;
       using dblsci = DoubleSciIO;
       using str = StringIO;
@@ -131,7 +130,6 @@ namespace ageev
           break;
         }
       }
-
     }
     if (in && fields == 3)
     {
