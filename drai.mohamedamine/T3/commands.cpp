@@ -1,278 +1,221 @@
 #include "commands.hpp"
 #include "polygon.hpp"
-
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
-#include <iterator>
-#include <algorithm>
 #include <numeric>
-#include <functional>
-#include <iomanip>
-#include <sstream>
+#include <algorithm>
 #include <stdexcept>
 #include <optional>
-#include <cmath>
+#include <sstream>
 
 namespace amine
 {
   namespace
   {
-    double compute_area(const Polygon& polygon)
-    {
-      const auto& pts = polygon.points;
-      if (pts.size() < 3)
-      {
-        return 0.0;
-      }
+    using std::string;
+    using std::vector;
 
-      double area = std::inner_product(
-        pts.begin(), pts.end() - 1, pts.begin() + 1, 0.0,
-        std::plus<>(),
-        [](const Point& a, const Point& b) {
-          return static_cast<double>(a.x) * b.y - static_cast<double>(b.x) * a.y;
-        }
-      );
+    std::optional<Polygon> parse_polygon(const std::vector<std::string>& args);
 
-      area += static_cast<double>(pts.back().x) * pts.front().y - static_cast<double>(pts.front().x) * pts.back().y;
-      return std::abs(area) / 2.0;
-    }
-
-    std::optional<Polygon> parse_polygon(const std::vector<std::string>& args)
-    {
-      std::istringstream iss(std::accumulate(args.begin(), args.end(), std::string{},
-        [](const std::string& acc, const std::string& s) {
-          return acc + (acc.empty() ? "" : " ") + s;
-        }
-      ));
-
-      Polygon p;
-      if (!(iss >> p))
-      {
-        return std::nullopt;
-      }
-
-      return p;
-    }
-
-    void echo(const std::vector<std::string>& args, std::vector<Polygon>& polygons)
-    {
-      auto polygon = parse_polygon(args);
-      if (!polygon)
-      {
-        std::cout << "<INVALID POLYGON>" << std::endl;
-        return;
-      }
-
-      polygons.push_back(*polygon);
-    }
-
-    void count_cmd(const std::vector<std::string>& args, const std::vector<Polygon>& polygons)
+    void count_cmd(const vector<string>& args, const vector<Polygon>& polys)
     {
       if (args.empty())
       {
-        std::cout << polygons.size() << std::endl;
+        std::cout << "<INVALID COMMAND>\n";
         return;
       }
 
       if (args[0] == "EVEN")
       {
-        std::cout << std::count_if(polygons.begin(), polygons.end(),
-          [](const Polygon& p) {
-            return p.vertexCount() % 2 == 0;
-          }
-        ) << std::endl;
+        size_t count = std::count_if(polys.begin(), polys.end(), [](const Polygon& p)
+        {
+          return p.vertexCount() % 2 == 0;
+        });
+        std::cout << count << '\n';
       }
       else if (args[0] == "ODD")
       {
-        std::cout << std::count_if(polygons.begin(), polygons.end(),
-          [](const Polygon& p) {
-            return p.vertexCount() % 2 != 0;
-          }
-        ) << std::endl;
+        size_t count = std::count_if(polys.begin(), polys.end(), [](const Polygon& p)
+        {
+          return p.vertexCount() % 2 == 1;
+        });
+        std::cout << count << '\n';
       }
       else
       {
-        std::cout << "<INVALID COMMAND>" << std::endl;
+        try
+        {
+          size_t target = std::stoull(args[0]);
+          if (target < 3)
+          {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+          }
+          size_t count = std::count_if(polys.begin(), polys.end(), [target](const Polygon& p)
+          {
+            return p.vertexCount() == target;
+          });
+          std::cout << count << '\n';
+        }
+        catch (...)
+        {
+          std::cout << "<INVALID COMMAND>\n";
+        }
       }
     }
 
-    void area_cmd(const std::vector<std::string>& args, const std::vector<Polygon>& polygons)
+    void area_cmd(const vector<string>& args, const vector<Polygon>& polys)
     {
       if (args.empty())
       {
-        std::cout << "<INVALID COMMAND>" << std::endl;
+        std::cout << "<INVALID COMMAND>\n";
         return;
       }
 
       if (args[0] == "EVEN")
       {
-        double result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-          [](double acc, const Polygon& p) {
-            return acc + (p.vertexCount() % 2 == 0 ? compute_area(p) : 0.0);
-          }
-        );
-        std::cout << std::fixed << std::setprecision(1) << result << std::endl;
+        double sum = std::accumulate(polys.begin(), polys.end(), 0.0, [](double acc, const Polygon& p)
+        {
+          return acc + (p.vertexCount() % 2 == 0 ? compute_area(p) : 0.0);
+        });
+        std::cout << sum << '\n';
       }
       else if (args[0] == "ODD")
       {
-        double result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-          [](double acc, const Polygon& p) {
-            return acc + (p.vertexCount() % 2 != 0 ? compute_area(p) : 0.0);
+        double sum = std::accumulate(polys.begin(), polys.end(), 0.0, [](double acc, const Polygon& p)
+        {
+          return acc + (p.vertexCount() % 2 == 1 ? compute_area(p) : 0.0);
+        });
+        std::cout << sum << '\n';
+      }
+      else if (args[0] == "MEAN")
+      {
+        if (polys.empty())
+        {
+          std::cout << "<INVALID COMMAND>\n";
+          return;
+        }
+        double sum = std::accumulate(polys.begin(), polys.end(), 0.0, [](double acc, const Polygon& p)
+        {
+          return acc + compute_area(p);
+        });
+        std::cout << sum / polys.size() << '\n';
+      }
+      else
+      {
+        try
+        {
+          size_t target = std::stoull(args[0]);
+          if (target < 3)
+          {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
           }
-        );
-        std::cout << std::fixed << std::setprecision(1) << result << std::endl;
+          double sum = std::accumulate(polys.begin(), polys.end(), 0.0, [target](double acc, const Polygon& p)
+          {
+            return acc + (p.vertexCount() == target ? compute_area(p) : 0.0);
+          });
+          std::cout << sum << '\n';
+        }
+        catch (...)
+        {
+          std::cout << "<INVALID COMMAND>\n";
+        }
+      }
+    }
+
+    void max_cmd(const vector<string>& args, const vector<Polygon>& polys)
+    {
+      if (args.empty())
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      if (args[0] == "AREA")
+      {
+        if (polys.empty())
+        {
+          std::cout << "<INVALID COMMAND>\n";
+          return;
+        }
+        auto max_it = std::max_element(polys.begin(), polys.end(), [](const Polygon& a, const Polygon& b)
+        {
+          return compute_area(a) < compute_area(b);
+        });
+        std::cout << compute_area(*max_it) << '\n';
+      }
+      else if (args[0] == "VERTEXES")
+      {
+        if (polys.empty())
+        {
+          std::cout << "<INVALID COMMAND>\n";
+          return;
+        }
+        auto max_it = std::max_element(polys.begin(), polys.end(), [](const Polygon& a, const Polygon& b)
+        {
+          return a.vertexCount() < b.vertexCount();
+        });
+        std::cout << max_it->vertexCount() << '\n';
       }
       else
       {
-        std::cout << "<INVALID COMMAND>" << std::endl;
+        std::cout << "<INVALID COMMAND>\n";
       }
     }
 
-    void extreme_area(const std::vector<Polygon>& polygons, bool max)
+    void echo(const std::vector<std::string>& args, std::vector<Polygon>& polys)
     {
-      if (polygons.empty())
+      auto p = parse_polygon(args);
+      if (p)
       {
+        polys.push_back(*p);
+      }
+    }
+
+    void same_cmd(const std::vector<std::string>& args, const std::vector<Polygon>& polys)
+    {
+      auto p = parse_polygon(args);
+      if (!p)
+      {
+        std::cout << "<INVALID COMMAND>\n";
         return;
       }
 
-      auto comparator = [](const Polygon& a, const Polygon& b)
-      {
-        return compute_area(a) < compute_area(b);
-      };
-
-      auto it = max ? std::max_element(polygons.begin(), polygons.end(), comparator)
-                    : std::min_element(polygons.begin(), polygons.end(), comparator);
-
-      std::cout << *it << std::endl;
-    }
-
-    void extreme_vertices(const std::vector<Polygon>& polygons, bool max)
-    {
-      if (polygons.empty())
-      {
-        return;
-      }
-
-      auto comparator = [](const Polygon& a, const Polygon& b)
-      {
-        return a.vertexCount() < b.vertexCount();
-      };
-
-      auto it = max ? std::max_element(polygons.begin(), polygons.end(), comparator)
-                    : std::min_element(polygons.begin(), polygons.end(), comparator);
-
-      std::cout << *it << std::endl;
-    }
-
-    void same_cmd(const std::vector<std::string>& args, const std::vector<Polygon>& polygons)
-    {
-      auto polygon = parse_polygon(args);
-      if (!polygon)
-      {
-        std::cout << "<INVALID POLYGON>" << std::endl;
-        return;
-      }
-
-      std::cout << std::count(polygons.begin(), polygons.end(), *polygon) << std::endl;
-    }
-
-    std::vector<std::string> tokenize_line(const std::string& line)
-    {
-      std::istringstream iss(line);
-      return std::vector<std::string>(
-        std::istream_iterator<std::string>(iss),
-        std::istream_iterator<std::string>()
-      );
-    }
-
-    void dispatch_command(const std::vector<std::string>& tokens, std::vector<Polygon>& polygons)
-    {
-      if (tokens.empty())
-      {
-        return;
-      }
-
-      const std::string& command = tokens[0];
-      const std::vector<std::string> args(tokens.begin() + 1, tokens.end());
-
-      if (command == "ECHO")
-      {
-        echo(args, polygons);
-      }
-      else if (command == "COUNT")
-      {
-        count_cmd(args, polygons);
-      }
-      else if (command == "AREA")
-      {
-        area_cmd(args, polygons);
-      }
-      else if (command == "MAX")
-      {
-        if (args.empty())
-        {
-          std::cout << "<INVALID COMMAND>" << std::endl;
-        }
-        else if (args[0] == "AREA")
-        {
-          extreme_area(polygons, true);
-        }
-        else if (args[0] == "VERTEXES")
-        {
-          extreme_vertices(polygons, true);
-        }
-        else
-        {
-          std::cout << "<INVALID COMMAND>" << std::endl;
-        }
-      }
-      else if (command == "MIN")
-      {
-        if (args.empty())
-        {
-          std::cout << "<INVALID COMMAND>" << std::endl;
-        }
-        else if (args[0] == "AREA")
-        {
-          extreme_area(polygons, false);
-        }
-        else if (args[0] == "VERTEXES")
-        {
-          extreme_vertices(polygons, false);
-        }
-        else
-        {
-          std::cout << "<INVALID COMMAND>" << std::endl;
-        }
-      }
-      else if (command == "SAME")
-      {
-        same_cmd(args, polygons);
-      }
-      else
-      {
-        std::cout << "<INVALID COMMAND>" << std::endl;
-      }
+      size_t count = std::count(polys.begin(), polys.end(), *p);
+      std::cout << count << '\n';
     }
   }
-  void process_commands(std::vector<Polygon>& polygons)
-  {
-    std::istreambuf_iterator<char> begin(std::cin), end;
-    std::string input(begin, end);
-    std::istringstream stream(input);
 
-    std::for_each(
-      std::istream_iterator<std::string>(stream),
-      std::istream_iterator<std::string>(),
-      [&](const std::string&) {
-        static std::istringstream line_stream(input);
-        static std::string line;
-        if (std::getline(line_stream, line))
-        {
-          dispatch_command(tokenize_line(line), polygons);
-        }
-      }
-    );
+  void execute_command(const std::string& command, const std::vector<std::string>& args, std::vector<Polygon>& polygons)
+  {
+    std::cout << std::fixed << std::setprecision(1);
+
+    if (command == "COUNT")
+    {
+      count_cmd(args, polygons);
+    }
+    else if (command == "AREA")
+    {
+      area_cmd(args, polygons);
+    }
+    else if (command == "MAX")
+    {
+      max_cmd(args, polygons);
+    }
+    else if (command == "ECHO")
+    {
+      echo(args, polygons);
+    }
+    else if (command == "SAME")
+    {
+      same_cmd(args, polygons);
+    }
+    else
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
   }
 }
