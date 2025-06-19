@@ -81,9 +81,9 @@ namespace ageev
     {
       return in;
     }
-      std::string data;
+    std::string data;
     in >> data;
-    if (data != dest.exp) {
+    if (in && data != dest.exp) {
     in.setstate(std::ios::failbit);
     }
     return in;
@@ -92,14 +92,10 @@ namespace ageev
   std::istream& operator>>(std::istream& in, DataStruct& dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
+    if (!sentry) return in;
 
     DataStruct input;
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-    int fields = 0;
 
     using sep = DelimiterIO;
     using dbl = DoubleIO;
@@ -107,42 +103,38 @@ namespace ageev
     using str = StringIO;
 
     in >> sep{'('};
-    while (fields < 3 && in)
-    {
-      std::string key;
-      in >> sep{':'} >> key;
-      if (key == "key1" && !hasKey1)
-      {
-        if (in >> dbl{input.key1}) hasKey1 = true;
-        else break;
-      }
-      else if (key == "key2" && !hasKey2)
-      {
-        if (in >> dblsci{input.key2}) hasKey2 = true;
-        else break;
-      }
-      else if (key == "key3" && !hasKey3)
-      {
-        if (in >> str{input.key3}) hasKey3 = true;
-        else break;
-      }
-      else
-      {
-        in.setstate(std::ios::failbit);
+
+    std::string key;
+    while (true) {
+      in >> sep{':'};
+
+      if (in.peek() == ')') {
+        in.get();
         break;
       }
 
-      fields++;
+      in >> key;
+
+      if (key == "key1" && !hasKey1) {
+        if (in >> dbl{input.key1}) hasKey1 = true;
+      }
+      else if (key == "key2" && !hasKey2) {
+        if (in >> dblsci{input.key2}) hasKey2 = true;
+      }
+      else if (key == "key3" && !hasKey3) {
+        if (in >> str{input.key3}) hasKey3 = true;
+      }
+      else {
+        in.setstate(std::ios::failbit);
+      }
     }
-    in >> sep{':'} >> sep{')'};
-    if (hasKey1 && hasKey2 && hasKey3)
-    {
+
+    if (hasKey1 && hasKey2 && hasKey3) {
       dest = input;
-    }
-    else
-    {
+    } else {
       in.setstate(std::ios::failbit);
     }
+
     return in;
   }
 
