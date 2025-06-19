@@ -152,10 +152,10 @@ namespace ageev
       return out;
     }
     iofmtguard fmtguard(out);
-    out << "(:key1 " << std::fixed << std::setprecision(1) 
-        << src.key1 << "d:" << "key2 " << std::defaultfloat 
+    out << "(:key1 " << std::fixed << std::setprecision(1)
+        << src.key1 << "d:" << "key2 " << std::defaultfloat
         << src.key2 << ":" << "key3 \"" << src.key3 << "\":)";
-    return out; 
+    return out;
   }
 
   iofmtguard::iofmtguard(std::basic_ios< char >& s) :
