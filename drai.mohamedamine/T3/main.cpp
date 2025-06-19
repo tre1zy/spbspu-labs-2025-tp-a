@@ -2,35 +2,24 @@
 #include <string>
 #include <vector>
 #include <iterator>
-#include <algorithm>
-
-#include "polygon.hpp"
 #include "commands.hpp"
+#include "polygon.hpp"
 
-namespace amine
+int main(int argc, char** argv)
 {
-  int main(int, char**)
+  using namespace amine;
+
+  std::vector<Polygon> polygons;
+
+  std::istream_iterator<std::string> it(std::cin);
+  std::istream_iterator<std::string> end;
+
+  std::vector<std::string> args(it, end);
+
+  if (!args.empty())
   {
-    std::istream_iterator<std::string> it(std::cin);
-    std::istream_iterator<std::string> end;
-
-    std::string buffer;
-    std::vector<Polygon> polygons;
-
-    std::for_each(it, end, [&](const std::string& token) {
-      buffer += token + " ";
-      if (std::count(buffer.begin(), buffer.end(), ' ') % 2 == 0)
-      {
-        Polygon poly;
-        if (parse_polygon(buffer, poly))
-        {
-          polygons.push_back(std::move(poly));
-        }
-        buffer.clear();
-      }
-    });
-
-    process_commands(polygons);
-    return 0;
+    execute_command(args.front(), std::vector<std::string>(args.begin() + 1, args.end()), polygons);
   }
+
+  return 0;
 }
