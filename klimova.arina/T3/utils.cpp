@@ -68,9 +68,9 @@ double klimova::getArea(const Polygon& polygon)
     return areaPolygon(polygon);
 }
 
-double klimova::getVertexesCount(const Polygon& polygon)
+size_t klimova::getVertexesCount(const Polygon& polygon)
 {
-    return static_cast<double>(polygon.points.size());
+    return polygon.points.size();
 }
 
 bool klimova::isVertexCountEven(const Polygon& polygon)

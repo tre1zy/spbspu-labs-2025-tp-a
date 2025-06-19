@@ -11,16 +11,21 @@ namespace klimova
 {
     using namespace std::placeholders;
     using VecPolygon = std::vector< Polygon >;
-    using AreaCommand = std::function<void(const VecPolygon&, std::istream&, std::ostream&)>;
-    using AreaSubs = std::map<std::string, AreaCommand>;
 
-    using MaxSubs = std::map< std::string, std::function< double(const Polygon&) > >;
-    using MinSubs = std::map< std::string, std::function< double(const Polygon&) > >;
+    using AreaCommand = std::function< void(const VecPolygon&, std::istream&, std::ostream&) >;
+    using AreaSubs = std::map< std::string, AreaCommand >;
+    using MaxCommand = std::function< void(const VecPolygon&, std::istream&, std::ostream&) >;
+    using MaxSubs = std::map< std::string, MaxCommand >;
+    using MinCommand = std::function< void(const VecPolygon&, std::istream&, std::ostream&) >;
+    using MinSubs = std::map< std::string, MinCommand >;
+
     using CountSubs = std::map< std::string, std::function< bool(const Polygon&) > >;
     using CommandHandler = std::map< std::string, std::function< void() > >;
 
     CommandHandler createCommandHandler(const VecPolygon& polygons);
     AreaSubs createAreaSubs();
+    MaxSubs createMaxSubs();
+    MinSubs createMinSubs();
 
     void area(const VecPolygon& polygons, std::istream& is, std::ostream& os);
     void max(const VecPolygon& polygons, std::istream& is, std::ostream& os);
