@@ -13,14 +13,14 @@
 int main(int argc, char** argv)
 {
   using namespace khokhryakova;
-  using istreamIt = std::istream_iterator<Polygon>;
+  using istreamIt = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
     std::cerr << "Incorrect parameters\n";
     return 1;
   }
-  std::vector<Polygon> polygon;
+  std::vector< Polygon > polygon;
   std::ifstream file(argv[1]);
   while (!file.eof())
   {
@@ -28,10 +28,10 @@ int main(int argc, char** argv)
     if (!file)
     {
       file.clear();
-      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::map<std::string, std::function<void()>> commands;
+  std::map< std::string, std::function<void() > > commands;
   const std::string filename = argv[1];
   commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
   commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
       {
         std::cin.clear();
       }
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
   }

@@ -10,6 +10,7 @@ namespace khokhryakova
   {
     return points == other.points;
   }
+
   double getArea(const Polygon& poly)
   {
     double area = 0.0;
@@ -21,6 +22,7 @@ namespace khokhryakova
     }
     return std::abs(area) / 2.0;
   }
+
   std::istream& operator>>(std::istream& in, Polygon& poly)
   {
     std::istream::sentry sentry(in);
@@ -29,21 +31,22 @@ namespace khokhryakova
       return in;
     }
     StreamGuard guard(in);
-    size_t len=0;
+    size_t len = 0;
     if (!(in >> len) || len < 3)
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-    std::vector<Point> temp(len);
+    std::vector< Point > temp(len);
     temp.reserve(len);
-    std::copy_n(std::istream_iterator<Point>(in), len, temp.begin());
-    if (in )
+    std::copy_n(std::istream_iterator< Point >(in), len, temp.begin());
+    if (in)
     {
       poly.points = std::move(temp);
     }
     return in;
   }
+
   std::ostream& operator<<(std::ostream& out, const Polygon& poly)
   {
     std::ostream::sentry sentry(out);
@@ -55,7 +58,8 @@ namespace khokhryakova
     out << poly.points.size();
     for (const auto& p : poly.points)
     {
-      out << " " << p;
+      out << " ";
+      out << p;
     }
     return out;
   }

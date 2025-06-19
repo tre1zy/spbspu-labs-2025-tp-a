@@ -23,7 +23,7 @@ namespace
     return !isEven(poly);
   }
 
-  double areaEven(const std::vector<khokhryakova::Polygon>& polygons)
+  double areaEven(const std::vector< khokhryakova::Polygon >& polygons)
   {
     double sum = 0.0;
     for (const auto& poly : polygons)
@@ -36,7 +36,7 @@ namespace
     return sum;
   }
 
-  double areaOdd(const std::vector<khokhryakova::Polygon>& polygons)
+  double areaOdd(const std::vector< khokhryakova::Polygon >& polygons)
   {
     double sum = 0.0;
     for (const auto& poly : polygons)
@@ -49,7 +49,7 @@ namespace
     return sum;
   }
 
-  double areaMedian(const std::vector<khokhryakova::Polygon>& polygons)
+  double areaMedian(const std::vector< khokhryakova::Polygon >& polygons)
   {
     if (polygons.empty())
     {
@@ -63,7 +63,7 @@ namespace
     return sum / polygons.size();
   }
 
-  double areaNum(const std::vector<khokhryakova::Polygon>& polygons, size_t angles)
+  double areaNum(const std::vector< khokhryakova::Polygon >& polygons, size_t angles)
   {
     double sum = 0.0;
     for (const auto& poly : polygons)
@@ -86,7 +86,7 @@ namespace
     return khokhryakova::getArea(polygon1) < khokhryakova::getArea(polygon2);
   }
 
-  void countEven(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out)
+  void countEven(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     size_t count = 0;
     for (const auto& poly : polygons)
@@ -99,7 +99,7 @@ namespace
     out << count << "\n";
   }
 
-  void countOdd(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out)
+  void countOdd(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     size_t count = 0;
     for (const auto& poly : polygons)
@@ -112,7 +112,7 @@ namespace
     out << count << "\n";
   }
 
-  void countNum(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out, size_t n)
+  void countNum(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out, size_t n)
   {
     size_t count = 0;
     for (const auto& poly : polygons)
@@ -125,36 +125,36 @@ namespace
     out << count << "\n";
   }
 
-  void areaMax(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out)
+  void areaMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto max = *std::max_element(polygons.begin(), polygons.end(), areaCompare);
     out << std::fixed << std::setprecision(1) << khokhryakova::getArea(max) << "\n";
   }
 
-  void vertexMax(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out)
+  void vertexMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto max = *std::max_element(polygons.begin(), polygons.end(), vertexCompare);
     out << max.points.size() << "\n";
   }
 
-  void areaMin(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out)
+  void areaMin(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto min = *std::min_element(polygons.begin(), polygons.end(), areaCompare);
     out << std::fixed << std::setprecision(1) << khokhryakova::getArea(min) << "\n";
   }
 
-  void vertexMin(const std::vector<khokhryakova::Polygon>& polygons, std::ostream& out)
+  void vertexMin(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto min = *std::min_element(polygons.begin(), polygons.end(), vertexCompare);
     out << min.points.size() << "\n";
   }
 }
 
-void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   in >> command;
-  std::map<std::string, std::function<double()>> subcommands;
+  std::map< std::string, std::function< double() > > subcommands;
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
   subcommands["ODD"] = std::bind(areaOdd, std::cref(polygons));
   subcommands["MEAN"] = std::bind(areaMedian, std::cref(polygons));
@@ -177,7 +177,7 @@ void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector<P
   }
 }
 
-void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   in >> command;
@@ -185,7 +185,7 @@ void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector<Po
   {
     throw std::logic_error("Error: not found polygons");
   }
-  std::map<std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function<void() > > subcommands;
   subcommands["AREA"] = std::bind(areaMax, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(vertexMax, std::cref(polygons), std::ref(out));
   try
@@ -198,7 +198,7 @@ void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector<Po
   }
 }
 
-void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   in >> command;
@@ -206,7 +206,7 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector<Po
   {
     throw std::logic_error("Error: not found polygons");
   }
-  std::map<std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function<void() > > subcommands;
   subcommands["AREA"] = std::bind(areaMin, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(vertexMin, std::cref(polygons), std::ref(out));
   try
@@ -219,11 +219,11 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector<Po
   }
 }
 
-void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   in >> command;
-  std::map<std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function<void() > > subcommands;
   subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
   subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
   try
@@ -248,7 +248,7 @@ void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector<
   }
 }
 
-void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector<Polygon>& polygons, const std::string& filename)
+void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons, const std::string& filename)
 {
   Polygon poly;
   in >> poly;
@@ -258,7 +258,7 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector<Polygon
     throw std::logic_error("<INVALID COMMAND>");
   }
   size_t count = 0;
-  std::vector<Polygon> newPolygons;
+  std::vector< Polygon > newPolygons;
   for (const auto& p : polygons)
   {
     newPolygons.push_back(p);
@@ -286,7 +286,7 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector<Polygon
   out << count << "\n";
 }
 
-void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   Polygon poly;
   in >> poly;

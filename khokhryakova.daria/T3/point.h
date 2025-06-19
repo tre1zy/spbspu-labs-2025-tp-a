@@ -8,11 +8,8 @@ namespace khokhryakova
   class StreamGuard
   {
   public:
-    explicit StreamGuard(std::ios& stream) : stream_(stream), flags_(stream.flags()) {}
-    ~StreamGuard()
-    {
-      stream_.flags(flags_);
-    }
+    explicit StreamGuard(std::ios& stream);
+    ~StreamGuard();
   private:
     std::ios& stream_;
     std::ios::fmtflags flags_;
