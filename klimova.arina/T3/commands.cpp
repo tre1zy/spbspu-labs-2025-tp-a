@@ -8,7 +8,7 @@
 #include "streamguard.hpp"
 #include "utils.hpp"
 
-static void areaEvenCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+static void klimova::areaEvenCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
 {
     auto bindEven = std::bind(areaEven, _1, _2);
     double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindEven);
@@ -16,7 +16,7 @@ static void areaEvenCmd(const VecPolygon& polygons, std::istream&, std::ostream&
     os << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-static void areaOddCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+static void klimova::areaOddCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
 {
     auto bindOdd = std::bind(areaOdd, _1, _2);
     double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, bindOdd);
@@ -24,7 +24,7 @@ static void areaOddCmd(const VecPolygon& polygons, std::istream&, std::ostream& 
     os << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-static void areaMeanCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
+static void klimova::areaMeanCmd(const VecPolygon& polygons, std::istream&, std::ostream& os)
 {
     if (polygons.empty()) throw std::out_of_range("");
     auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
@@ -33,7 +33,7 @@ static void areaMeanCmd(const VecPolygon& polygons, std::istream&, std::ostream&
     os << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-static void areaNumCmd(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+static void klimova::areaNumCmd(const VecPolygon& polygons, std::istream& is, std::ostream& os)
 {
     std::string numStr;
     is >> numStr;
@@ -45,11 +45,11 @@ static void areaNumCmd(const VecPolygon& polygons, std::istream& is, std::ostrea
     os << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-AreaSubs createAreaSubs() {
+klimova::AreaSubs klimova::createAreaSubs() {
     return {{"EVEN", areaEvenCmd}, {"ODD", areaOddCmd}, {"MEAN", areaMeanCmd}};
 }
 
-void area(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
+void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& os) {
     try {
         AreaSubs subs = createAreaSubs();
         std::string subcommand;
