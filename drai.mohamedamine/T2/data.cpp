@@ -27,11 +27,15 @@ bool amine::operator<(const DataStruct& lhs, const DataStruct& rhs)
 std::ostream& amine::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
-  if (!sentry) {
+  if (!sentry)
+  {
     return out;
   }
+
   StreamGuard fg(out);
-  out << "(:key1 #c(" << std::scientific << std::setprecision(1) << src.key1.real() << " " << src.key1.imag() << ")" << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)" << ":key3 \"" << src.key3 << "\":)";
+  out << "(:key1 #c(" << std::fixed << std::setprecision(1) << src.key1.real() << " " << src.key1.imag() << ")"
+      << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)"
+      << ":key3 \"" << src.key3 << "\":)";
   return out;
 }
 
