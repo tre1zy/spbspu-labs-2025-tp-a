@@ -81,10 +81,11 @@ namespace ageev
     {
       return in;
     }
-    std::string data = "";
-    if ((in >> StringIO{ data }) && (data != dest.exp))
-    {
-      in.setstate(std::ios::failbit);
+      std::string data;
+    in >> data;
+
+    if (data != dest.exp) {
+    in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -96,6 +97,7 @@ namespace ageev
     {
       return in;
     }
+    int fields = 0;
     DataStruct input;
     {
       using sep = DelimiterIO;
@@ -103,17 +105,45 @@ namespace ageev
       using dbl = DoubleIO;
       using dblsci = DoubleSciIO;
       using str = StringIO;
-      in >> sep{ '(' } >> sep { ':' };
-      in >> label{ "key1" } >> dbl{ input.key1 };
-      in >> sep{ ':' };
-      in >> label{ "key2" } >> dblsci{ input.key2 };
-      in >> sep{ ':' };
-      in >> label{ "key3" } >> str{ input.key3 };
-      in >> sep{ ':' } >> sep{ ')' };
+      
+      bool hasKey1 = false;
+      bool hasKey2 = false;
+      bool hasKey3 = false;
+      in >> sep{ '(' };
+      
+      while (fields < 3) {
+        std::string key;
+        in >> sep{ ':' } >> key;
+        
+        if (key == "key1" && !hasKey1) {
+          in >> dbl{ input.key1 };
+          hasKey1 = true;
+          fields++;
+        }
+        else if (key == "key2" && !hasKey2) {
+          in >> dblsci{ input.key2 };
+          hasKey2 = true;
+          fields++;
+        }
+        else if (key == "key3" && !hasKey3) {
+          in >> str{ input.key3 };
+          hasKey3 = true;
+          fields++;
+        }
+        else {
+          in.setstate(std::ios::failbit);
+          break;
+        }
+      }
+
     }
-    if (in)
+    if (in && fields == 3)
     {
       dest = input;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -126,14 +156,10 @@ namespace ageev
       return out;
     }
     iofmtguard fmtguard(out);
-    out << "{ ";
-    out << "\"key1\": ";
-    out << std::fixed << std::setprecision(1) << src.key1 << "d, ";
-    out << "\"key2\": " << src.key2;
-    out << " }";
-    out << "\"key3\": \"" << src.key3 << "\"";
-    out << " }";
-    return out;
+    out << "(:key1 " << std::fixed << std::setprecision(1) 
+        << src.key1 << "d:" << "key2 " << std::defaultfloat 
+        << src.key2 << ":" << "key3 \"" << src.key3 << "\":)";
+    return out; 
   }
 
   iofmtguard::iofmtguard(std::basic_ios< char >& s) :
