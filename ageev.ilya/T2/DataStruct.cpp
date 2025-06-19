@@ -104,16 +104,13 @@ namespace ageev
       using dbl = DoubleIO;
       using dblsci = DoubleSciIO;
       using str = StringIO;
-
       bool hasKey1 = false;
       bool hasKey2 = false;
       bool hasKey3 = false;
       in >> sep{ '(' };
-
       while (fields < 3) {
         std::string key;
         in >> sep{ ':' } >> key;
-        
         if (key == "key1" && !hasKey1) {
           in >> dbl{ input.key1 };
           hasKey1 = true;
