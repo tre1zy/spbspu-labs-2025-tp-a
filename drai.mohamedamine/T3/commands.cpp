@@ -186,23 +186,23 @@ namespace amine
         execute_command(command, args, polygons);
     }
 
-void process_commands(std::vector<Polygon>& polygons)
-{
-    std::vector<std::string> commands;
-    std::copy(std::istream_iterator<std::string>(std::cin),
-              std::istream_iterator<std::string>(),
-              std::back_inserter(commands));
-
-    auto it = commands.begin();
-
-    std::function<void(std::vector<std::string>::iterator&)> process_all =
-        [&](std::vector<std::string>::iterator& iter)
+    void process_commands(std::vector<Polygon>& polygons)
     {
-        if (iter == commands.end()) return;
-        process_command_group(iter, commands.end(), polygons);
-        process_all(iter);
-    };
+        std::vector<std::string> commands;
+        std::copy(std::istream_iterator<std::string>(std::cin),
+                  std::istream_iterator<std::string>(),
+                  std::back_inserter(commands));
 
-    process_all(it);
-}
+        auto it = commands.begin();
+
+        std::function<void(std::vector<std::string>::iterator&)> process_all =
+            [&](std::vector<std::string>::iterator& iter)
+        {
+            if (iter == commands.end()) return;
+            process_command_group(iter, commands.end(), polygons);
+            process_all(iter);
+        };
+
+        process_all(it);
+    }
 }
