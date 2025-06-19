@@ -192,7 +192,7 @@ namespace amine
 
     size_t line_count = count(input.begin(), input.end(), '\n') + 1;
 
-    lines.reserve(line_count); 
+    lines.reserve(line_count);
 
     generate_n(back_inserter(lines), line_count, [&iss]() {
         string line;
