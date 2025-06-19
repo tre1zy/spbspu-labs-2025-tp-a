@@ -88,7 +88,7 @@ namespace amine
         });
       std::copy(it, next_cmd, std::back_inserter(args));
       it = next_cmd;
-      
+
       execute_command(command, args, polygons);
     }
   }
