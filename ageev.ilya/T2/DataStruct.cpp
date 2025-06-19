@@ -96,42 +96,47 @@ namespace ageev
     {
       return in;
     }
-    int fields = 0;
+
     DataStruct input;
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+    int fields = 0;
+    char c;
+
+    using sep = DelimiterIO;
+    using dbl = DoubleIO;
+    using dblsci = DoubleSciIO;
+    using str = StringIO;
+
+    in >> sep{'('};
+    while (fields < 3 && in)
     {
-      using sep = DelimiterIO;
-      using dbl = DoubleIO;
-      using dblsci = DoubleSciIO;
-      using str = StringIO;
-      bool hasKey1 = false;
-      bool hasKey2 = false;
-      bool hasKey3 = false;
-      in >> sep{ '(' };
-      while (fields < 3) {
-        std::string key;
-        in >> sep{ ':' } >> key;
-        if (key == "key1" && !hasKey1) {
-          in >> dbl{ input.key1 };
-          hasKey1 = true;
-          fields++;
-        }
-        else if (key == "key2" && !hasKey2) {
-          in >> dblsci{ input.key2 };
-          hasKey2 = true;
-          fields++;
-        }
-        else if (key == "key3" && !hasKey3) {
-          in >> str{ input.key3 };
-          hasKey3 = true;
-          fields++;
-        }
-        else {
-          in.setstate(std::ios::failbit);
-          break;
-        }
+      std::string key;
+      in >> sep{':'} >> key;
+      if (key == "key1" && !hasKey1)
+      {
+        if (in >> dbl{input.key1}) hasKey1 = true;
+        else break;
       }
+      else if (key == "key2" && !hasKey2)
+      {
+        if (in >> dblsci{input.key2}) hasKey2 = true;
+        else break;
+      }
+      else if (key == "key3" && !hasKey3)
+      {
+        if (in >> str{input.key3}) hasKey3 = true;
+        else break;
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        break;
+      }
+
+      fields++;
     }
-    if (in && fields == 3)
+    in >> sep{':'} >> sep{')'};
+    if (hasKey1 && hasKey2 && hasKey3)
     {
       dest = input;
     }
@@ -151,8 +156,8 @@ namespace ageev
     }
     iofmtguard fmtguard(out);
     out << "(:key1 " << std::fixed << std::setprecision(1)
-        << src.key1 << "d:" << "key2 " << std::defaultfloat
-        << src.key2 << ":" << "key3 \"" << src.key3 << "\":)";
+        << src.key1 << "d:key2 " << std::defaultfloat
+        << src.key2 << ":key3 \"" << src.key3 << "\":)";
     return out;
   }
 
