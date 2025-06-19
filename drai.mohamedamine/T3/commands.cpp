@@ -9,6 +9,7 @@
 #include <iterator>
 #include <numeric>
 #include <functional>
+#include <optional>
 
 namespace amine
 {
@@ -29,31 +30,6 @@ namespace amine
     void print_polygon_error()
     {
       cerr << "Invalid polygon format" << '\n';
-    }
-
-    optional<Polygon> parse_polygon(const vector<string>& args)
-    {
-      if (args.size() < 2 || !is_number(args[1])) {
-        return nullopt;
-      }
-      size_t n = stoi(args[1]);
-      if (args.size() != 2 + n) {
-        return nullopt;
-      }
-
-      try {
-        vector<Point> pts(n);
-        transform(args.begin() + 2, args.end(), pts.begin(), [](const string& s) {
-          auto l = s.find('('), m = s.find(';'), r = s.find(')');
-          if (l == string::npos || m == string::npos || r == string::npos) throw invalid_argument("invalid");
-          double x = stod(s.substr(l + 1, m - l - 1));
-          double y = stod(s.substr(m + 1, r - m - 1));
-          return Point{x, y};
-        });
-        return Polygon{pts};
-      } catch (...) {
-        return nullopt;
-      }
     }
 
     void echo(const vector<string>& args, vector<Polygon>& polys)
@@ -164,12 +140,6 @@ namespace amine
       cout << same << '\n';
     }
 
-    vector<string> split_lines(const string& full)
-    {
-      istringstream ss(full);
-      return vector<string>{istream_iterator<string>{ss}, istream_iterator<string>{}};
-    }
-
     void process_line(const string& line, vector<Polygon>& polys)
     {
       istringstream ss(line);
@@ -187,21 +157,54 @@ namespace amine
     }
   }
 
-  void process_commands(vector<Polygon>& polygons)
+  optional<Polygon> parse_polygon(const vector<string>& args)
   {
-    istreambuf_iterator<char> begin(std::cin), end;
+    if (args.size() < 2 || !is_number(args[1])) {
+      return nullopt;
+    }
+    size_t n = stoi(args[1]);
+    if (args.size() != 2 + n) {
+      return nullopt;
+    }
+
+    try {
+      vector<Point> pts(n);
+      transform(args.begin() + 2, args.end(), pts.begin(), [](const string& s) {
+        auto l = s.find('('), m = s.find(';'), r = s.find(')');
+        if (l == string::npos || m == string::npos || r == string::npos) throw invalid_argument("invalid");
+        double x = stod(s.substr(l + 1, m - l - 1));
+        double y = stod(s.substr(m + 1, r - m - 1));
+        return Point{x, y};
+      });
+      return Polygon{pts};
+    } catch (...) {
+      return nullopt;
+    }
+  }
+
+ void process_commands(vector<Polygon>& polygons)
+{
+    istreambuf_iterator<char> begin(cin), end;
     string input(begin, end);
 
     vector<string> lines;
     istringstream iss(input);
-    generate_n(back_inserter(lines), count(input.begin(), input.end(), '\n') + 1, [&iss]() {
-      string line;
-      getline(iss, line);
-      return line;
+
+    size_t line_count = count(input.begin(), input.end(), '\n') + 1;
+
+
+    lines.reserve(line_count);    
+
+    generate_n(back_inserter(lines), line_count, [&iss]() {
+        string line;
+        getline(iss, line);
+        return line;
     });
 
-    for_each(lines.begin(), lines.end(), [&](const string& l) {
-      if (!l.empty()) process_line(l, polygons);
+    for_each(lines.begin(), lines.end(), [&polygons](const string& line) {
+        if (!line.empty()) {
+            process_line(line, polygons);
+        }
     });
-  }
+}
 }
