@@ -36,7 +36,7 @@ namespace khokhryakova
 
   struct RationalIO
   {
-    std::pair<long long, unsigned long long>& ref;
+    std::pair< long long, unsigned long long >& ref;
   };
 
   struct StringIO

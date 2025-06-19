@@ -7,8 +7,8 @@
 int main()
 {
   using dataStruct = khokhryakova::DataStruct;
-  using istreamIterator = std::istream_iterator<dataSt>;
-  using ostreamIterator = std::ostream_iterator<dataSt>;
+  using istreamIterator = std::istream_iterator<dataStruct>;
+  using ostreamIterator = std::ostream_iterator<dataStruct>;
 
   std::vector<dataStruct> data;
   while (!std::cin.eof())
