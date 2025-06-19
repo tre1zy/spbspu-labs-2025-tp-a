@@ -11,8 +11,6 @@
 
 size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
 
-using ull = unsigned long long;
-
 namespace
 {
   struct PredicateForVertices
@@ -118,10 +116,10 @@ namespace
     auto first1 = points.begin();
     auto last1 = std::prev(points.end());
     auto first2 = std::next(points.begin());
-    std::transform(first1, last1, first2, std::back_inserter(partial_areas), AreaCalculator()
-    );
-    double last_segment = (points.back().x + points.front().x) * (points.back().y - points.front().y);
-    double total = std::accumulate(partial_areas.begin(), partial_areas.end(), last_segment);
+    std::transform(first1, last1, first2, std::back_inserter(partial_areas), AreaCalculator());
+    double last_segment = AreaCalculator()(points.back(), points.front());
+    partial_areas.push_back(last_segment);
+    double total = std::accumulate(partial_areas.begin(), partial_areas.end(), 0.0);
     return std::abs(total) / 2.0;
   }
 
@@ -156,22 +154,22 @@ namespace
     return !isEven(polygon);
   }
 
-  ull totalArea(const std::vector<kushekbaev::Polygon>& polygons)
+  double totalArea(const std::vector<kushekbaev::Polygon>& polygons)
   {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0, PolygonAreaAccumulator());
   }
 
-  ull countWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, PredicateForVertices predicate)
+  double countWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, PredicateForVertices predicate)
   {
     return std::count_if(polygons.begin(), polygons.end(), predicate);
   }
 
   template< typename Predicate >
-  ull totalAreaWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, Predicate predicate)
+  double totalAreaWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, Predicate predicate)
   {
     std::vector< kushekbaev::Polygon > predicated;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(predicated), predicate);
-    std::vector< ull > areas;
+    std::vector< double > areas;
     std::transform(predicated.begin(), predicated.end(), std::back_inserter(areas), getArea);
     return std::accumulate(areas.begin(), areas.end(), 0);
   }
@@ -186,17 +184,17 @@ namespace
     return polygon1.points.size() < polygon2.points.size();
   }
 
-  ull areaEven(const std::vector< kushekbaev::Polygon >& polygons)
+  double areaEven(const std::vector< kushekbaev::Polygon >& polygons)
   {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0, PredicatePolygonAreaAccumulator(isEven));
   }
 
-  ull areaOdd(const std::vector< kushekbaev::Polygon >& polygons)
+  double areaOdd(const std::vector< kushekbaev::Polygon >& polygons)
   {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0, PredicatePolygonAreaAccumulator(isOdd));
   }
 
-  ull areaMean(const std::vector< kushekbaev::Polygon >& polygons)
+  double areaMean(const std::vector< kushekbaev::Polygon >& polygons)
   {
     if (polygons.empty())
     {
@@ -205,7 +203,7 @@ namespace
     return totalArea(polygons) / polygons.size();
   }
 
-  ull areaNum(const std::vector< kushekbaev::Polygon >& polygons, size_t num_of_vertices)
+  double areaNum(const std::vector< kushekbaev::Polygon >& polygons, size_t num_of_vertices)
   {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num_of_vertices));
   }
@@ -223,6 +221,10 @@ namespace
 
   void maxVertices(const std::vector< kushekbaev::Polygon >& polygons, std::ostream& out)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("No polygons to process");
+    }
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareNumOfVertices));
     out << max.points.size() << "\n";
   }
@@ -240,6 +242,10 @@ namespace
 
   void minVertices(const std::vector< kushekbaev::Polygon >& polygons, std::ostream& out)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("No polygons to process");
+    }
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareNumOfVertices));
     out << min.points.size() << "\n";
   }
@@ -265,7 +271,7 @@ void kushekbaev::area(std::istream& in, std::ostream& out, const std::vector< Po
   double result = 0;
   std::string subcommand;
   in >> subcommand;
-  std::map< std::string, std::function< ull() > > subcommands;
+  std::map< std::string, std::function< double() > > subcommands;
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
   subcommands["ODD"] = std::bind(areaOdd, std::cref(polygons));
   subcommands["MEAN"] = std::bind(areaMean, std::cref(polygons));
