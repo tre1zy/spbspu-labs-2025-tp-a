@@ -1,6 +1,7 @@
 #include "structs.hpp"
 #include <iostream>
 #include <functional>
+#include <algorithm>
 #include <iterator>
 #include "streamguard.hpp"
 #include "delimiter.hpp"
@@ -41,12 +42,12 @@ std::istream& kushekbaev::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
-std::ostream& kushekbaev::operator<<(std::ostream& out, Point& point)
+std::ostream& kushekbaev::operator<<(std::ostream& out, const Point& point)
 {
   return out << "(" << point.x << ";" << point.y << ")";
 }
 
-std::ostream& kushekbaev::operator<<(std::ostream& out, Polygon& polygon)
+std::ostream& kushekbaev::operator<<(std::ostream& out, const Polygon& polygon)
 {
   out << polygon.points[0];
   for (size_t i = 1; i < polygon.points.size(); ++i)

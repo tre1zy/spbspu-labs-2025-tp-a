@@ -2,6 +2,7 @@
 #define STRUCTS_HPP
 
 #include <vector>
+#include <iosfwd>
 
 namespace kushekbaev
 {
