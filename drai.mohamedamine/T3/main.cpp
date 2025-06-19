@@ -1,44 +1,36 @@
-#include <fstream>
 #include <iostream>
-#include <iterator>
 #include <string>
 #include <vector>
+#include <iterator>
 #include <algorithm>
-#include <sstream>
 
 #include "polygon.hpp"
+#include "commands.hpp"
 
-namespace amine {
-
-int main(int argc, char* argv[])
+namespace amine
 {
-  if (argc < 2) {
-    std::cerr << "Error: missing filename argument\n";
-    return 1;
+  int main(int, char**)
+  {
+    std::istream_iterator<std::string> it(std::cin);
+    std::istream_iterator<std::string> end;
+
+    std::string buffer;
+    std::vector<Polygon> polygons;
+
+    std::for_each(it, end, [&](const std::string& token) {
+      buffer += token + " ";
+      if (std::count(buffer.begin(), buffer.end(), ' ') % 2 == 0)
+      {
+        Polygon poly;
+        if (parse_polygon(buffer, poly))
+        {
+          polygons.push_back(std::move(poly));
+        }
+        buffer.clear();
+      }
+    });
+
+    process_commands(polygons);
+    return 0;
   }
-
-  std::ifstream infile(argv[1]);
-  if (!infile) {
-    std::cerr << "Error: could not open file\n";
-    return 1;
-  }
-
-  std::vector<std::string> lines;
-  std::string line;
-  while (std::getline(infile, line)) {
-    lines.push_back(line);
-  }
-
-  std::vector<Polygon> polygons;
-  std::for_each(lines.begin(), lines.end(), [&](const std::string& line) {
-    Polygon poly;
-    if (!line.empty() && parse_polygon(line, poly) && poly.points.size() >= 3) {
-      polygons.emplace_back(std::move(poly));
-    }
-  });
-
-  process_commands(polygons);
-  return 0;
-}
-
 }

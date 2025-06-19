@@ -1,64 +1,54 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <iterator>
-#include <sstream>
-#include <iomanip>
+#include <algorithm>
+#include <numeric>
+#include <functional>
 
 #include "polygon.hpp"
+#include "commands.hpp"
 
-namespace amine {
-
-void process_commands(std::vector<Polygon>& polygons)
+namespace amine
 {
-  std::vector<std::string> lines;
-  std::string line;
-  while (std::getline(std::cin, line)) {
-    lines.push_back(line);
-  }
+  void process_commands(std::vector<Polygon>& polygons)
+  {
+    std::istream_iterator<std::string> it(std::cin);
+    std::istream_iterator<std::string> end;
 
-  std::for_each(lines.begin(), lines.end(), [&](const std::string& line) {
-    std::istringstream iss(line);
-    std::string command;
-    iss >> command;
+    std::vector<std::string> commands(it, end);
 
-    if (command == "INTERSECTIONS") {
-      std::string rest;
-      std::getline(iss, rest);
-      Polygon query;
-      if (!parse_polygon(rest, query)) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-      int count = std::count_if(
-        polygons.begin(), polygons.end(),
-        [&](const Polygon& p) {
-          return polygons_intersect(p, query);
+    std::for_each(commands.begin(), commands.end(), [&](const std::string& command) {
+      if (command == "AREA") {
+        std::for_each(polygons.begin(), polygons.end(), [](const Polygon& p) {
+          std::cout << compute_area(p) << "\n";
         });
-      std::cout << count << "\n";
-    } else if (command == "RMECHO") {
-      std::string rest;
-      std::getline(iss, rest);
-      Polygon query;
-      if (!parse_polygon(rest, query)) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
       }
 
-      std::size_t old_size = polygons.size();
-      polygons.erase(
-        std::unique(polygons.begin(), polygons.end(),
-                    [&](const Polygon& a, const Polygon& b) {
-                      return a.points == b.points && a.points == query.points;
-                    }),
-        polygons.end());
-      std::size_t new_size = polygons.size();
-      std::cout << (old_size - new_size) << "\n";
-    } else {
-      std::cout << "<INVALID COMMAND>\n";
-    }
-  });
-}
+      if (command == "RECT") {
+        std::for_each(polygons.begin(), polygons.end(), [](const Polygon& p) {
+          std::cout << (is_rectangle(p) ? "<TRUE>\n" : "<FALSE>\n");
+        });
+      }
 
+      if (command == "RMECHO") {
+        polygons.erase(
+          std::unique(polygons.begin(), polygons.end(), [](const Polygon& a, const Polygon& b) {
+            return a.points == b.points;
+          }),
+          polygons.end()
+        );
+      }
+
+      if (command == "INTERSECTIONS") {
+        std::for_each(polygons.begin(), polygons.end(), [&](const Polygon& a) {
+          std::for_each(polygons.begin(), polygons.end(), [&](const Polygon& b) {
+            if (&a != &b && polygons_intersect(a, b)) {
+              std::cout << "<TRUE>\n";
+            }
+          });
+        });
+      }
+    });
+  }
 }
