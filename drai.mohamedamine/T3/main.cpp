@@ -1,25 +1,39 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <iterator>
+#include <algorithm>
 #include "commands.hpp"
 #include "polygon.hpp"
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+int main(int argc, char** argv)
 {
-  using namespace amine;
-
-  std::vector<Polygon> polygons;
-
-  std::istream_iterator<std::string> it(std::cin);
-  std::istream_iterator<std::string> end;
-
-  std::vector<std::string> args(it, end);
-
-  if (!args.empty())
-  {
-    execute_command(args.front(), std::vector<std::string>(args.begin() + 1, args.end()), polygons);
+  if (argc != 2) {
+    std::cerr << "Error: filename parameter missing" << std::endl;
+    return 1;
   }
 
+  std::ifstream file(argv[1]);
+  if (!file) {
+    std::cerr << "Error: cannot open file" << std::endl;
+    return 2;
+  }
+
+  std::vector<Polygon> polygons;
+  std::vector<std::string> lines;
+  std::copy(std::istream_iterator<std::string>(file),
+            std::istream_iterator<std::string>(),
+            std::back_inserter(lines));
+
+  std::for_each(lines.begin(), lines.end(),
+    [&polygons](const std::string& line) {
+      Polygon poly;
+      if (parse_polygon(line, poly)) {
+        polygons.push_back(poly);
+      }
+    });
+
+  process_commands(polygons);
   return 0;
 }

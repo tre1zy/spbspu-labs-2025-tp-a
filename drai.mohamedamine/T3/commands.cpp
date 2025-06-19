@@ -5,50 +5,91 @@
 #include <algorithm>
 #include <numeric>
 #include <functional>
+#include <iomanip>
+#include <sstream>
 
 #include "polygon.hpp"
 #include "commands.hpp"
 
 namespace amine
 {
+  void execute_command(const std::string& command, const std::vector<std::string>& args, std::vector<Polygon>& polygons)
+  {
+    if (command == "INTERSECTIONS") {
+      if (args.empty() || polygons.empty()) {
+        std::cout << "<INVALID COMMAND>" << std::endl;
+        return;
+      }
+
+      Polygon param;
+      std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
+        [](const std::string& a, const std::string& b) {
+          return a + (a.empty() ? "" : " ") + b;
+        });
+
+      if (!parse_polygon(poly_str, param)) {
+        std::cout << "<INVALID COMMAND>" << std::endl;
+        return;
+      }
+
+      int count = std::count_if(polygons.begin(), polygons.end(),
+        [&param](const Polygon& p) {
+          return polygons_intersect(p, param);
+        });
+
+      std::cout << count << std::endl;
+    }
+    else if (command == "RMECHO") {
+      if (args.empty() || polygons.empty()) {
+        std::cout << "<INVALID COMMAND>" << std::endl;
+        return;
+      }
+
+      Polygon param;
+      std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
+        [](const std::string& a, const std::string& b) {
+          return a + (a.empty() ? "" : " ") + b;
+        });
+
+      if (!parse_polygon(poly_str, param)) {
+        std::cout << "<INVALID COMMAND>" << std::endl;
+        return;
+      }
+
+      auto new_end = std::unique(polygons.begin(), polygons.end(),
+        [&param](const Polygon& a, const Polygon& b) {
+          return a.points == param.points && b.points == param.points;
+        });
+      int removed = std::distance(new_end, polygons.end());
+      polygons.erase(new_end, polygons.end());
+      std::cout << removed << std::endl;
+    }
+    else {
+      std::cout << "<INVALID COMMAND>" << std::endl;
+    }
+  }
+
   void process_commands(std::vector<Polygon>& polygons)
   {
-    std::istream_iterator<std::string> it(std::cin);
-    std::istream_iterator<std::string> end;
+    std::vector<std::string> commands;
+    std::copy(std::istream_iterator<std::string>(std::cin),
+              std::istream_iterator<std::string>(),
+              std::back_inserter(commands));
 
-    std::vector<std::string> commands(it, end);
+    auto it = commands.begin();
+    while (it != commands.end()) {
+      std::string command = *it++;
+      std::vector<std::string> args;
 
-    std::for_each(commands.begin(), commands.end(), [&](const std::string& command) {
-      if (command == "AREA") {
-        std::for_each(polygons.begin(), polygons.end(), [](const Polygon& p) {
-          std::cout << compute_area(p) << "\n";
+      auto next_cmd = std::find_if(it, commands.end(),
+        [](const std::string& s) {
+          return s == "AREA" || s == "MAX" || s == "MIN" || s == "COUNT" || 
+                 s == "INTERSECTIONS" || s == "RMECHO";
         });
-      }
-
-      if (command == "RECT") {
-        std::for_each(polygons.begin(), polygons.end(), [](const Polygon& p) {
-          std::cout << (is_rectangle(p) ? "<TRUE>\n" : "<FALSE>\n");
-        });
-      }
-
-      if (command == "RMECHO") {
-        polygons.erase(
-          std::unique(polygons.begin(), polygons.end(), [](const Polygon& a, const Polygon& b) {
-            return a.points == b.points;
-          }),
-          polygons.end()
-        );
-      }
-
-      if (command == "INTERSECTIONS") {
-        std::for_each(polygons.begin(), polygons.end(), [&](const Polygon& a) {
-          std::for_each(polygons.begin(), polygons.end(), [&](const Polygon& b) {
-            if (&a != &b && polygons_intersect(a, b)) {
-              std::cout << "<TRUE>\n";
-            }
-          });
-        });
-      }
-    });
+      std::copy(it, next_cmd, std::back_inserter(args));
+      it = next_cmd;
+      
+      execute_command(command, args, polygons);
+    }
   }
 }
