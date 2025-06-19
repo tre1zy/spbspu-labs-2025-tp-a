@@ -7,7 +7,7 @@
 #include <string>
 #include <cmath>
 #include <map>
-#include "../common/streamguard.hpp"
+#include "streamguard.hpp"
 
 size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
 
