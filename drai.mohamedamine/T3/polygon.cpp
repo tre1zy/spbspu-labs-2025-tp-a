@@ -1,47 +1,69 @@
-#include "polygon.hpp"
-
 #include <cmath>
+#include <sstream>
 #include <numeric>
 #include <algorithm>
+#include <stdexcept>
+#include "polygon.hpp"
 
-namespace amine
+namespace amine {
+
+double compute_area(const Polygon& poly)
 {
-  bool Point::operator==(const Point& other) const
-  {
-    return x == other.x && y == other.y;
-  }
+    const auto& pts = poly.points;
+    if (pts.size() < 3) return 0.0;
 
-  Polygon::Polygon(const std::vector<Point>& points) : points_(points)
-  {}
+    return 0.5 * std::abs(std::inner_product(
+        pts.begin(), pts.end() - 1, 
+        pts.begin() + 1, 0.0,
+        std::plus<>(),
+        [](const Point& a, const Point& b) {
+            return a.x * b.y - b.x * a.y;
+        }) + 
+        (pts.back().x * pts.front().y - pts.front().x * pts.back().y));
+}
 
-  double Polygon::area() const
-  {
-    if (points_.size() < 3)
-    {
-      return 0.0;
+bool parse_polygon(const std::string& str, Polygon& poly)
+{
+    std::istringstream iss(str);
+    size_t num_points;
+    iss >> num_points;
+
+    if (iss.fail() || num_points < 3) {
+        return false;
     }
 
-    double result = std::inner_product(
-      points_.begin(), points_.end() - 1, points_.begin() + 1, 0.0,
-      std::plus<>(),
-      [](const Point& a, const Point& b)
-      {
-        return a.x * b.y - b.x * a.y;
-      }
-    );
+    poly.points.clear();
+    poly.points.reserve(num_points);
 
-    result += points_.back().x * points_.front().y - points_.front().x * points_.back().y;
+    for (size_t i = 0; i < num_points; ++i) {
+        Point p;
+        char ch1, ch2, ch3;
+        
+        if (!(iss >> ch1 >> p.x >> ch2 >> p.y >> ch3) || 
+            ch1 != '(' || ch2 != ';' || ch3 != ')') {
+            return false;
+        }
+        
+        poly.points.push_back(p);
+    }
 
-    return std::abs(result) * 0.5;
-  }
+    return true;
+}
 
-  std::size_t Polygon::vertexCount() const
-  {
-    return points_.size();
-  }
+bool operator==(const Point& a, const Point& b)
+{
+    return a.x == b.x && a.y == b.y;
+}
 
-  bool Polygon::operator==(const Polygon& other) const
-  {
-    return points_ == other.points_;
-  }
+bool operator==(const Polygon& a, const Polygon& b)
+{
+    if (a.points.size() != b.points.size()) return false;
+    return std::equal(a.points.begin(), a.points.end(), b.points.begin());
+}
+
+size_t Polygon::vertexCount() const
+{
+    return points.size();
+}
+
 }

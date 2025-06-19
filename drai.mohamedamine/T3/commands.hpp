@@ -1,17 +1,14 @@
-#ifndef AMINE_COMMANDS_HPP
-#define AMINE_COMMANDS_HPP
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
 
-#include "polygon.hpp"
-#include <string>
 #include <vector>
+#include <string>
+#include "polygon.hpp"
 
 namespace amine
 {
-  void process_command(
-    const std::string& name,
-    const std::vector<std::string>& args,
-    std::vector<Polygon>& polygons
-  );
+    void execute_command(const std::string& command, const std::vector<std::string>& args, std::vector<Polygon>& polygons);
+    void process_commands(std::vector<Polygon>& polygons);
 }
 
 #endif

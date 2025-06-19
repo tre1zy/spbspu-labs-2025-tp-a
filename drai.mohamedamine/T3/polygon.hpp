@@ -1,29 +1,29 @@
-#ifndef AMINE_POLYGON_HPP
-#define AMINE_POLYGON_HPP
+#ifndef POLYGON_HPP
+#define POLYGON_HPP
 
 #include <vector>
+#include <iostream>
 
-namespace amine
-{
-  struct Point
-  {
-    double x;
-    double y;
+namespace amine {
 
-    bool operator==(const Point& other) const;
-  };
+struct Point {
+    int x, y;
+};
 
-  class Polygon
-  {
-  public:
-    explicit Polygon(const std::vector<Point>& points);
-    double area() const;
-    std::size_t vertexCount() const;
-    bool operator==(const Polygon& other) const;
+struct Polygon {
+    std::vector<Point> points;
+    size_t vertexCount() const;
+};
 
-  private:
-    std::vector<Point> points_;
-  };
+double compute_area(const Polygon& poly);
+bool parse_polygon(const std::string& str, Polygon& poly);
+bool polygons_intersect(const Polygon& a, const Polygon& b);
+bool operator==(const Point& a, const Point& b);
+bool operator==(const Polygon& a, const Polygon& b);
+
+std::istream& operator>>(std::istream& in, Point& p);
+std::istream& operator>>(std::istream& in, Polygon& poly);
+
 }
 
 #endif

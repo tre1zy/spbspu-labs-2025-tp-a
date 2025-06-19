@@ -1,57 +1,43 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <iterator>
+#include <algorithm>
 #include "commands.hpp"
 #include "polygon.hpp"
 
-#include <iterator>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <iostream>
-#include <algorithm>
-
-int main()
+int main(int argc, char** argv)
 {
-  std::vector<amine::Polygon> polygons;
-
-  std::string all_input(
-    std::istreambuf_iterator<char>(std::cin),
-    std::istreambuf_iterator<char>()
-  );
-
-  std::istringstream input_stream(all_input);
-  std::vector<std::string> lines{
-    std::istream_iterator<std::string>(input_stream),
-    std::istream_iterator<std::string>()
-  };
-
-  std::vector<std::vector<std::string>> command_blocks;
-  std::vector<std::string> current;
-
-  std::for_each(lines.begin(), lines.end(), [&](const std::string& token) {
-    if (token == ";")
-    {
-      if (!current.empty())
-      {
-        command_blocks.push_back(current);
-        current.clear();
-      }
+    if (argc != 2) {
+        std::cerr << "Error: filename parameter missing" << std::endl;
+        return 1;
     }
-    else
-    {
-      current.push_back(token);
+
+    std::ifstream file(argv[1]);
+    if (!file) {
+        std::cerr << "Error: cannot open file" << std::endl;
+        return 2;
     }
-  });
 
-  if (!current.empty())
-  {
-    command_blocks.push_back(current);
-  }
+    std::vector<amine::Polygon> polygons;
+    std::vector<std::string> lines;
+    std::copy(std::istream_iterator<std::string>(file),
+              std::istream_iterator<std::string>(),
+              std::back_inserter(lines));
 
-  std::for_each(command_blocks.begin(), command_blocks.end(), [&](const std::vector<std::string>& tokens) {
-    if (!tokens.empty())
-    {
-      amine::process_command(tokens[0], std::vector<std::string>(tokens.begin() + 1, tokens.end()), polygons);
-    }
-  });
+    std::transform(lines.begin(), lines.end(), std::back_inserter(polygons),
+        [](const std::string& line) {
+            amine::Polygon poly;
+            amine::parse_polygon(line, poly);
+            return poly;
+        });
 
-  return 0;
+    polygons.erase(
+        std::remove_if(polygons.begin(), polygons.end(),
+            [](const amine::Polygon& p) { return p.points.empty(); }),
+        polygons.end());
+
+    amine::process_commands(polygons);
+    return 0;
 }
