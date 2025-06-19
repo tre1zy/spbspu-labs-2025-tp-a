@@ -3,7 +3,7 @@
 #include <functional>
 #include <algorithm>
 #include <iterator>
-#include "streamguard.hpp"
+#include "../common/streamguard.hpp"
 #include "delimiter.hpp"
 
 std::istream& kushekbaev::operator>>(std::istream& in, Point& point)
@@ -44,7 +44,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, Polygon& polygon)
 
 std::ostream& kushekbaev::operator<<(std::ostream& out, const Point& point)
 {
-  return out << "(" << point.x << ";" << point.y << ")";
+  return out << "(" << point.x << ";" << point.y << ")" << '\n';
 }
 
 std::ostream& kushekbaev::operator<<(std::ostream& out, const Polygon& polygon)
