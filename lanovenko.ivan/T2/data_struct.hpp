@@ -6,7 +6,6 @@
 #include <delimiter.hpp>
 #include <scope_guard.hpp>
 
-
 namespace lanovenko
 {
   struct DataStruct
