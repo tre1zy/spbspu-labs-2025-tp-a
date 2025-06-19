@@ -90,30 +90,25 @@ bool polygons_intersect(const Polygon& a, const Polygon& b)
 
 bool parse_polygon(const std::string& str, Polygon& poly)
 {
-    std::istringstream iss(str);
-    size_t num_points;
-    iss >> num_points;
+  std::istringstream iss(str);
+  size_t num_points;
+  iss >> num_points;
 
-    if (iss.fail() || num_points < 3) return false;
+  if (!iss || num_points < 3) return false;
 
-    poly.points.clear();
+  poly.points.clear();
+  poly.points.resize(num_points);
 
-    for (size_t i = 0; i < num_points; ++i) {
-        Point p;
-        char ch;
-        iss >> ch;
-        if (ch != '(') return false;
-        iss >> p.x;
-        iss >> ch;
-        if (ch != ';') return false;
-        iss >> p.y;
-        iss >> ch;
-        if (ch != ')') return false;
+  bool ok = std::all_of(poly.points.begin(), poly.points.end(), [&](Point& p) {
+    char ch1, ch2, ch3;
+    if (!(iss >> ch1 >> p.x >> ch2 >> p.y >> ch3)) return false;
+    return ch1 == '(' && ch2 == ';' && ch3 == ')';
+  });
 
-        poly.points.push_back(p);
-    }
+  char extra;
+  if (!ok || iss >> extra) return false;
 
-    return poly.points.size() == num_points && iss.eof();
+  return true;
 }
 
 bool operator==(const Point& a, const Point& b)

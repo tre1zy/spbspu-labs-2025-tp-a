@@ -20,7 +20,7 @@ namespace amine
 
         try {
             if (command == "AREA") {
-                if (args.empty()) throw std::invalid_argument("Invalid command");
+                if (args.empty()) {throw std::invalid_argument("Invalid command");}
 
                 if (args[0] == "EVEN") {
                     double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
@@ -37,7 +37,7 @@ namespace amine
                     std::cout << sum << '\n';
                 }
                 else if (args[0] == "MEAN") {
-                    if (polygons.empty()) throw std::invalid_argument("Invalid command");
+                    if (polygons.empty()) {throw std::invalid_argument("Invalid command");}
                     double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                         [](double acc, const Polygon& p) {
                             return acc + compute_area(p);
@@ -54,7 +54,7 @@ namespace amine
                 }
             }
             else if (command == "COUNT") {
-                if (args.empty()) throw std::invalid_argument("Invalid command");
+                if (args.empty()) {throw std::invalid_argument("Invalid command");}
 
                 if (args[0] == "EVEN") {
                     size_t count = std::count_if(polygons.begin(), polygons.end(),
@@ -77,6 +77,7 @@ namespace amine
                 if (args.empty() || polygons.empty()) throw std::invalid_argument("Invalid command");
 
                 if (args[0] == "AREA") {
+                    if (polygons.empty()) throw std::invalid_argument("Invalid command");
                     auto max_it = std::max_element(polygons.begin(), polygons.end(),
                         [](const Polygon& a, const Polygon& b) {
                             return compute_area(a) < compute_area(b);
@@ -84,6 +85,7 @@ namespace amine
                     std::cout << compute_area(*max_it) << '\n';
                 }
                 else if (args[0] == "VERTEXES") {
+                     if (polygons.empty()) throw std::invalid_argument("Invalid command");
                     auto max_it = std::max_element(polygons.begin(), polygons.end(),
                         [](const Polygon& a, const Polygon& b) {
                             return a.vertexCount() < b.vertexCount();
@@ -105,6 +107,7 @@ namespace amine
                     std::cout << compute_area(*min_it) << '\n';
                 }
                 else if (args[0] == "VERTEXES") {
+                    if (polygons.empty()) {throw std::invalid_argument("Invalid command");}
                     auto min_it = std::min_element(polygons.begin(), polygons.end(),
                         [](const Polygon& a, const Polygon& b) {
                             return a.vertexCount() < b.vertexCount();
