@@ -74,8 +74,13 @@ bool polygons_intersect(const Polygon& a, const Polygon& b)
 {
     auto edges = [](const Polygon& p) {
         std::vector<std::pair<Point, Point>> result;
-        std::transform(p.points.begin(), std::prev(p.points.end()), std::next(p.points.begin()), std::back_inserter(result),
-            [](const Point& p1, const Point& p2) { return std::make_pair(p1, p2); });
+        result.reserve(p.points.size());
+        std::transform(p.points.begin(), std::prev(p.points.end()),
+                      std::next(p.points.begin()),
+                      std::back_inserter(result),
+                      [](const Point& p1, const Point& p2) {
+                          return std::make_pair(p1, p2);
+                      });
         result.emplace_back(p.points.back(), p.points.front());
         return result;
     };
