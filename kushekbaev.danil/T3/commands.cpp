@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <numeric>
 #include <string>
+#include <cmath>
 #include <map>
 #include "streamguard.hpp"
 
@@ -38,9 +39,9 @@ namespace
     const kushekbaev::Polygon& other;
     bool operator()(const kushekbaev::Point& beforeShift)
     {
-      int dx = beforeShift.x - target[0].x;
-      int dy = beforeShift.y - target[0].y;
-      return std::equal(target.begin(), target.end(), other.begin(), PointComparator{ dx, dy });
+      int dx = beforeShift.x - target.points[0].x;
+      int dy = beforeShift.y - target.points[0].y;
+      return std::equal(target.points.begin(), target.points.end(), other.points.begin(), PointComparator{ dx, dy });
     }
   };
 
@@ -51,18 +52,18 @@ namespace
     return std::sqrt(width * width + length * length);
   }
 
-  kushekbaev::Polygon makeTriangle(size_t index, const std::vector< Point >& points)
+  kushekbaev::Polygon makeTriangle(size_t index, const std::vector< kushekbaev::Point >& points)
   {
-    return kushekbaev::Polygon{ std::vector< Point >{ points[0], points[index+1], points[index+2] }};
+    return kushekbaev::Polygon{ std::vector< kushekbaev::Point >{ points[0], points[index+1], points[index+2] }};
   }
 
   void convertPolygonIntoTriangles(const kushekbaev::Polygon& polygon, std::vector< kushekbaev::Polygon >& triangles)
   {
-    size_t size = p.points.size() - 2;
+    size_t size = polygon.points.size() - 2;
     std::vector< size_t > indices(size);
     std::iota(indices.begin(), indices.end(), 0);
-    auto tmp =  std::bind(makeTriangle, std::placeholders::_1, std::cref(p.points);
-    std::transform(indices.begin(), indices.end(), std::back_inserter(triangles), tmp));
+    auto tmp =  std::bind(makeTriangle, std::placeholders::_1, std::cref(polygon.points));
+    std::transform(indices.begin(), indices.end(), std::back_inserter(triangles), tmp);
   }
 
   double getAreaOfTriangle(const kushekbaev::Polygon& polygon)
@@ -92,7 +93,7 @@ namespace
     int amount_of_vertices = polygon.size();
     for (int i = 0; i < amount_of_vertices; ++i)
     {
-      const kushekbaev::Point& a = polygon[(i - 1 + n) % 2];
+      const kushekbaev::Point& a = polygon[(i - 1 + amount_of_vertices) % 2];
       const kushekbaev::Point& b = polygon[i];
       const kushekbaev::Point& c = polygon[(i + 1) % 2];
       const double abx = a.x - b.x;
@@ -110,12 +111,12 @@ namespace
 
   bool isCompabitebleByOverlay(const kushekbaev::Polygon collectedPolygon, const kushekbaev::Polygon inputedPolygon)
   {
-    if (collectedPolygon.size() != inputedPolygon.size())
+    if (collectedPolygon.points.size() != inputedPolygon.points.size())
     {
       return false;
     }
     PolygonMatcher matcher{ collectedPolygon, inputedPolygon };
-    return std::any_of(inputedPolygon.begin(), inputedPolygon.end(), matcher);
+    return std::any_of(inputedPolygon.points.begin(), inputedPolygon.points.end(), matcher);
   }
 
   bool isEven(const kushekbaev::Polygon& polygon)
@@ -129,11 +130,11 @@ namespace
   }
 
   template< typename Predicate >
-  double totalAreaWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, Predicate predicate)
+  ull totalAreaWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, Predicate predicate)
   {
     std::vector< kushekbaev::Polygon > predicated;
     std::copy_if(polygons.begin(), polygon.end(), std::back_inserter(predicated), predicate);
-    std::vector< double > areas;
+    std::vector< ull > areas;
     std::transform(predicated.begin(), predicated.end(), std::back_inserter(areas), getArea);
     return std::accumulate(areas.begin(), areas.end(), 0);
   }
@@ -172,52 +173,67 @@ namespace
     return totalAreaWithPredicate(polygons, PredicateForVertices{ num_of_vertices });
   }
 
-  ull maxArea(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
+  void maxArea(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareArea));
     StreamGuard s(in);
-    out << std::fixed << std::setprecision(1) << getArea(max) << "\n"
+    out << std::fixed << std::setprecision(1) << getArea(max) << "\n";
   }
 
-  ull maxVertices(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
+  void maxVertices(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareNumOfVertices));
     out << max.points.size() << "\n";
   }
 
-  ull minArea(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
+  void minArea(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareArea));
     StreamGuard s(in);
-    out << std::fixed << std::setprecision(1) << getArea(min) << "\n"
+    out << std::fixed << std::setprecision(1) << getArea(min) << "\n";
   }
 
-  ull maxVertices(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
+  void minVertices(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareNumOfVertices));
     out << min.points.size() << "\n";
   }
 
-  ull countEven(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
+  void countEven(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
   {
-    out << countWithPredicate(polygons, isEven);
+    out << std::count_if(polygons.begin(), polygons.end(), isEven);
   }
 
-  ull countOdd(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
+  void countOdd(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out)
   {
-    out << countWithPredicate(polygons, isOdd);
+    out << std::count_if(polygons.begin(), polygons.end(), isOdd);
   }
 
-  ull countNum(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out, size_t num_of_vertices)
+  void countNum(const std::vector< kushekbaev::Polygon > polygons, std::ostream& out, size_t num_of_vertices)
   {
-    out << countWithPredicate(polygons, PredicateForVertices{ num_of_vertices })
+    out << countWithPredicate(polygons, PredicateForVertices{ num_of_vertices });
+  }
+
+  ull countWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, PredicateForVertices predicate)
+  {
+      return std::count_if(polygons.begin(), polygons.end(), predicate);
+  }
+
+  ull totalArea(const std::vector<kushekbaev::Polygon>& polygons)
+  {
+    std::vector< ull > areas;
+    areas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 }
 
-void kushekbaev::area(std::istream& in, std::ostream out, const std::vector< Polygon >& polygons)
+void kushekbaev::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   double result = 0;
-  std::map< std::string, std::fucntion< void() > > subcommands;
+  std::string subcommand;
+  in >> subcommand;
+  std::map< std::string, std::function< ull() > > subcommands;
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
   subcommands["ODD"] = std::bind(areaOdd, std::cref(polygons));
   subcommands["MEAN"] = std::bind(areaMean, std::cref(polygons));
@@ -235,18 +251,20 @@ void kushekbaev::area(std::istream& in, std::ostream out, const std::vector< Pol
     result = areaNum(polygons, num_of_vertices);
   }
   StreamGuard s(out);
-  out << std::fixed << std::setpresicion(1) << result << "\n";
+  out << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-void kushekbaev::max(std::istream& in, std::ostream out, const std::vector< Polygon >& polygons)
+void kushekbaev::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   double result = 0;
+  std::string subcommand;
+  in >> subcommand;
   std::map< std::string, std::function< void() > > subcommands;
-  subcommands["AREA"] = std::bind(maxArea, std::ref(out), std::cref(polygons));
-  subcommands["VERTEXES"] = std::bind(maxVertexes, std::ref(out), std::cref(polygons));
+  subcommands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(out));
+  subcommands["VERTEXES"] = std::bind(maxVertices, std::cref(polygons), std::ref(out));
   try
   {
-    result = subcommands.at(subcommand)();
+    subcommands.at(subcommand)();
   }
   catch (...)
   {
@@ -254,15 +272,17 @@ void kushekbaev::max(std::istream& in, std::ostream out, const std::vector< Poly
   }
 }
 
-void kushekbaev::min(std::istream& in, std::ostream out, const std::vector< Polygon >& polygons)
+void kushekbaev::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   double result = 0;
+  std::string subcommand;
+  in >> subcommand;
   std::map< std::string, std::function< void() > > subcommands;
-  subcommands["AREA"] = std::bind(minArea, std::ref(out), std::cref(polygons));
-  subcommands["VERTEXES"] = std::bind(minVertexes, std::ref(out), std::cref(polygons));
+  subcommands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(out));
+  subcommands["VERTEXES"] = std::bind(minVertices, std::cref(polygons), std::ref(out));
   try
   {
-    result = subcommands.at(subcommand)();
+    subcommands.at(subcommand)();
   }
   catch (...)
   {
@@ -270,15 +290,17 @@ void kushekbaev::min(std::istream& in, std::ostream out, const std::vector< Poly
   }
 }
 
-void kushekbaev::count(std::istream& in, std::ostream out, const std::vector< Polygon >& polygons)
+void kushekbaev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   double result = 0;
-  std::map< std::string, std::fucntion< void() > > subcommands;
-  subcommands["EVEN"] = std::bind(countEven, std::ref(out), std::cref(polygons));
-  subcommands["ODD"] = std::bind(countOdd, std::ref(out), std::cref(polygons));
+  std::string subcommand;
+  in >> subcommand;
+  std::map< std::string, std::function< void() > > subcommands;
+  subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
+  subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
   try
   {
-    result = subcommands.at(subcommand)();
+    subcommands.at(subcommand)();
   }
   catch (...)
   {
@@ -287,11 +309,11 @@ void kushekbaev::count(std::istream& in, std::ostream out, const std::vector< Po
     {
       throw std::logic_error("Too few vertices!");
     }
-    result = countNum(polygons, out, num_of_vertices);
+    countNum(polygons, out, num_of_vertices);
   }
 }
 
-void kushekbaev::rightshapes(std::ostream out, const std::vector< Polygon >& polygons)
+void kushekbaev::rightshapes(std::ostream& out, const std::vector< Polygon >& polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), hasRightAngle) << "\n";
 }
