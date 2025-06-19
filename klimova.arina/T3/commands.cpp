@@ -156,7 +156,7 @@ void klimova::rects(const VecPolygon& polygons, std::ostream& os)
     os << count << "\n";
 }
 
-klimova::CommandHandler klimova::createCommandHandler(const std::vector<Polygon>& polygons)
+klimova::CommandHandler klimova::createCommandHandler(const VecPolygon& polygons)
 {
     CommandHandler cmds;
     cmds["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));

@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         }
         std::copy(inputIterator(file), inputIterator(), std::back_inserter(polygons));
     }
-    auto cmds = create_command_handler(polygons);
+    auto cmds = createCommandHandler(polygons);
     std::string command;
     while (!(std::cin >> command).eof()) {
         try {
