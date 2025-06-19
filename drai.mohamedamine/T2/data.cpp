@@ -1,8 +1,7 @@
+#include "data.hpp"
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-
-#include "data.hpp"
 #include "io.hpp"
 #include "stream_guard.hpp"
 
