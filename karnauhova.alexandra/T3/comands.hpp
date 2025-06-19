@@ -14,5 +14,8 @@ namespace karnauhova
   void maxComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
   void maxArea(const std::vector< Polygon >& polygons, std::ostream& out);
   void maxVert(const std::vector< Polygon >& polygons, std::ostream& out);
+  void minComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
+  void minArea(const std::vector< Polygon >& polygons, std::ostream& out);
+  void minVert(const std::vector< Polygon >& polygons, std::ostream& out);
 }
 #endif

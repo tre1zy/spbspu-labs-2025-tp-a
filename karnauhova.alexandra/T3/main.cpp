@@ -38,6 +38,7 @@ int main(int argc, char** argv)
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(areaComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MAX"] = std::bind(maxComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(minComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string command;
   while (!(std::cin >> command).eof())
   {
