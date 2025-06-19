@@ -20,7 +20,7 @@ void execute_command(const std::string& command, const std::vector<std::string>&
 
     try {
         if (command == "AREA") {
-            if (args.empty()) {throw std::invalid_argument("Invalid command");}
+            if (args.empty()) throw std::invalid_argument("Invalid command");
 
             if (args[0] == "EVEN") {
                 double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
@@ -37,7 +37,7 @@ void execute_command(const std::string& command, const std::vector<std::string>&
                 std::cout << sum << '\n';
             }
             else if (args[0] == "MEAN") {
-                if (polygons.empty()) {throw std::invalid_argument("Invalid command");}
+                if (polygons.empty()) throw std::invalid_argument("Invalid command");
                 double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                     [](double acc, const Polygon& p) {
                         return acc + compute_area(p);
@@ -55,7 +55,7 @@ void execute_command(const std::string& command, const std::vector<std::string>&
             }
         }
         else if (command == "COUNT") {
-            if (args.empty()) {throw std::invalid_argument("Invalid command");}
+            if (args.empty()) throw std::invalid_argument("Invalid command");
 
             if (args[0] == "EVEN") {
                 size_t count = std::count_if(polygons.begin(), polygons.end(),
@@ -81,8 +81,7 @@ void execute_command(const std::string& command, const std::vector<std::string>&
             }
 
             if (polygons.empty()) {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
+                throw std::invalid_argument("Invalid command");
             }
 
             if (args[0] == "AREA") {
@@ -101,10 +100,12 @@ void execute_command(const std::string& command, const std::vector<std::string>&
             }
         }
         else if (command == "MIN") {
-            if (args.empty()) throw std::invalid_argument("Invalid command");
+            if (args.empty() || (args[0] != "AREA" && args[0] != "VERTEXES")) {
+                throw std::invalid_argument("Invalid command");
+            }
+
             if (polygons.empty()) {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
+                throw std::invalid_argument("Invalid command");
             }
 
             if (args[0] == "AREA") {
@@ -114,38 +115,28 @@ void execute_command(const std::string& command, const std::vector<std::string>&
                     });
                 std::cout << compute_area(*min_it) << '\n';
             }
-            else if (args[0] == "VERTEXES") {
+            else {
                 auto min_it = std::min_element(polygons.begin(), polygons.end(),
                     [](const Polygon& a, const Polygon& b) {
                         return a.vertexCount() < b.vertexCount();
                     });
                 std::cout << min_it->vertexCount() << '\n';
             }
-            else {
-                throw std::invalid_argument("Invalid command");
-            }
         }
         else if (command == "INTERSECTIONS") {
             if (args.empty()) {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
+                throw std::invalid_argument("Invalid command");
             }
 
             try {
-                std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
-                    [](const std::string& a, const std::string& b) {
-                        return a + (a.empty() ? "" : " ") + b;
-                    });
+                std::string poly_str;
+                for (const auto& arg : args) {
+                    poly_str += arg + " ";
+                }
 
                 Polygon param;
                 if (!parse_polygon(poly_str, param)) {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
-
-                if (polygons.empty()) {
-                    std::cout << "0\n";
-                    return;
+                    throw std::invalid_argument("Invalid command");
                 }
 
                 int count = std::count_if(polygons.begin(), polygons.end(),
@@ -155,22 +146,21 @@ void execute_command(const std::string& command, const std::vector<std::string>&
                 std::cout << count << '\n';
             }
             catch (...) {
-                std::cout << "<INVALID COMMAND>\n";
+                throw std::invalid_argument("Invalid command");
             }
         }
         else if (command == "RMECHO") {
-            if (args.empty() || polygons.empty()) {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
+            if (args.empty()) {
+                throw std::invalid_argument("Invalid command");
             }
 
             try {
-                Polygon param;
-                std::string poly_str = std::accumulate(args.begin(), args.end(), std::string(),
-                    [](const std::string& a, const std::string& b) {
-                        return a + (a.empty() ? "" : " ") + b;
-                    });
+                std::string poly_str;
+                for (const auto& arg : args) {
+                    poly_str += arg + " ";
+                }
 
+                Polygon param;
                 if (!parse_polygon(poly_str, param)) {
                     throw std::invalid_argument("Invalid command");
                 }
@@ -184,11 +174,11 @@ void execute_command(const std::string& command, const std::vector<std::string>&
                 std::cout << removed << '\n';
             }
             catch (...) {
-                std::cout << "<INVALID COMMAND>\n";
+                throw std::invalid_argument("Invalid command");
             }
         }
         else {
-            std::cout << "<INVALID COMMAND>\n";
+            throw std::invalid_argument("Invalid command");
         }
     }
     catch (...) {
@@ -219,8 +209,6 @@ void process_command_group(std::vector<std::string>::iterator& it,
 
 void process_commands(std::vector<Polygon>& polygons)
 {
-    std::cout << "Atleast 2 optional supported commands\n";
-
     std::vector<std::string> commands;
     std::copy(std::istream_iterator<std::string>(std::cin),
               std::istream_iterator<std::string>(),
