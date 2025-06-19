@@ -35,10 +35,8 @@ namespace klimova {
         os << std::fixed << std::setprecision(1) << result << "\n";
     }
 
-    void areaNumCmd(const VecPolygon& polygons, std::istream& is, std::ostream& os)
+    void areaNumCmd(const VecPolygon& polygons, const std::string& numStr, std::ostream& os)
     {
-        std::string numStr;
-        is >> numStr;
         size_t vertexes = getVertexes(numStr);
         if (!isValidVertexCount(vertexes)) throw std::out_of_range("");
         auto bindMean = std::bind(areaNum, _1, _2, vertexes);
@@ -61,7 +59,7 @@ void klimova::area(const VecPolygon& polygons, std::istream& is, std::ostream& o
         if (it != subs.end()) {
             it->second(polygons, is, os);
         } else {
-            areaNumCmd(polygons, is, os);
+            areaNumCmd(polygons, subcommand, os);
         }
     }
     catch (const std::exception&) {
