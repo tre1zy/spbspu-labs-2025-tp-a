@@ -4,23 +4,23 @@
 #include <iostream>
 
 namespace klimova {
-    struct Point {
-        int x, y;
-    };
+  struct Point {
+    int x, y;
+  };
 
-    struct DelimiterIO {
-        char exp;
-    };
+  struct DelimiterIO {
+    char exp;
+  };
 
-    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-    std::istream& operator>>(std::istream& in, Point& point);
-    std::ostream& operator<<(std::ostream& out, const Point& point);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, Point& point);
+  std::ostream& operator<<(std::ostream& out, const Point& point);
 
-    struct Polygon {
-        std::vector< Point > points;
-    };
+  struct Polygon {
+    std::vector< Point > points;
+  };
 
-    std::istream& operator>>(std::istream& in, Polygon& polygon);
-    std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 }
 #endif
