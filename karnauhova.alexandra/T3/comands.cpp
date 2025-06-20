@@ -232,3 +232,32 @@ void karnauhova::lessareaComand(std::istream& in, std::ostream& out, const std::
   size_t count = std::count_if(polygons.begin(), polygons.end(), std::bind(compArea, std::placeholders::_1, it));
   out << count << "\n";
 }
+
+void karnauhova::echoComand(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("Empty polygons");
+  }
+  Polygon pol;
+  in >> pol;
+  if (!in)
+  {
+    in.clear();
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  std::vector< Polygon > new_polygons;
+  new_polygons.reserve(polygons.size());
+  new_polygons = polygons;
+  size_t count = 0;
+  for (auto it = polygons.begin(); it != polygons.end(); it++)
+  {
+    if (*it == pol)
+    {
+      new_polygons.insert(std::find(new_polygons.begin(), new_polygons.end(), *it) + 1, *it);
+      count++;
+    }
+  }
+  polygons = std::move(new_polygons);
+  out << count << '\n';
+}

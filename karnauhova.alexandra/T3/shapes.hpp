@@ -18,6 +18,7 @@ namespace karnauhova
   struct Polygon
   {
     std::vector< Point > points;
+    bool operator==(const Polygon & rhs) const;
   };
 
   struct DelimiterIO

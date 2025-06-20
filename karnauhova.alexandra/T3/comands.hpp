@@ -22,5 +22,6 @@ namespace karnauhova
   size_t oddCount(const std::vector< Polygon >& polygons);
   double countPol(const std::vector< Polygon >& polygons, size_t count);
   void lessareaComand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
+  void echoComand(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons);
 }
 #endif

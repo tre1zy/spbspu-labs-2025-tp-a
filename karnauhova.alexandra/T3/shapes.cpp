@@ -87,3 +87,8 @@ double karnauhova::getArea(const Polygon& polygon)
   double area = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, std::ref(acc));
   return std::abs(area) / 2.0;
 }
+
+bool karnauhova::Polygon::operator==(const Polygon & rhs) const
+{
+  points == rhs.points;
+}

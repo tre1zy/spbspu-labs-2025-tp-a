@@ -41,6 +41,7 @@ int main(int argc, char** argv)
   cmds["MIN"] = std::bind(minComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["COUNT"] = std::bind(countComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["LESSAREA"] = std::bind(lessareaComand, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["ECHO"] = std::bind(echoComand, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
   std::string command;
   while (!(std::cin >> command).eof())
   {
