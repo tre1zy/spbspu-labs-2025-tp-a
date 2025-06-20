@@ -1,126 +1,202 @@
-#include <iomanip>
-#include <bitset>
 #include "dataStruct.hpp"
 
-#include <iostream>
+#include <bitset>
+#include <iomanip>
 
-namespace ivanova
+#include "streamGuard.hpp"
+
+
+bool ivanova::dataStruct::operator<(const dataStruct& other)
 {
-  inline std::string::size_type endKey(const std::string& line, std::string::size_type start)
+  if (key1 != other.key1)
   {
-    bool in_raw = false;
-    for (std::string::size_type i = start; i < line.size(); ++i)
-    {
-      if (line[i] == ':' && !in_raw)
-      {
-        return i;
-      }
-      if (line[i] == '"')
-      {
-        in_raw = !in_raw;
-      }
-    }
-    return line.size();
+    return key1 < other.key1;
   }
-
-  inline std::string getKey(const std::string& line, const std::string& key_preffix)
+  if (key2 != other.key2)
   {
-    std::string::size_type key_pos = line.find(key_preffix);
-    if (key_pos == std::string::npos)
-    {
-      throw std::logic_error("");
-    }
-    std::string::size_type key_end = endKey(line, key_pos + key_preffix.size());
-    return line.substr(key_pos + key_preffix.size(), key_end - (key_pos + key_preffix.size()));
+    return key2 < other.key2;
   }
+  return key3.size() < other.key3.size();
+}
 
-  inline std::string::size_type countZeroes(const std::string& key) {
-    if (key.empty()) {
-      return 0;
-    }
-    std::string::size_type cnt = 0;
-    while (cnt < key.size() && key[cnt] == '0') {
-      ++cnt;
-    }
-    return cnt;
-  }
-
-  std::istream& operator>>(std::istream& in, dataStruct& ds)
+std::ostream& ivanova::operator<<(std::ostream& out, const DoubleScienceT& x)
+{
+  char keyStr[32];
+  std::snprintf(keyStr, sizeof(keyStr), "%.1e", x.key);
+  std::string key(keyStr);
+  size_t exp_pos = key.find('e');
+  if (exp_pos != std::string::npos && (key[exp_pos + 2] == '0'))
   {
-    try
-    {
-      std::string line;
-      std::getline(in, line);
-      if (line.empty() || line.front() != '(' || line.back() != ')')
-      {
-        throw std::logic_error("");
-      }
-      std::string key1 = getKey(line, ":key1 ");
-      std::string key2 = getKey(line, ":key2 ");
-      std::string key3 = getKey(line, ":key3 ");
+    key.erase(exp_pos + 2, 1);
+  }
+  out << key;
+  return out;
+}
 
-      if (key2.size() <= 2 || (key2.substr(0, 2) != "0b" && key2.substr(0, 2) != "0B") || key3.size() < 2)
-      {
-        throw std::logic_error("");
-      }
-      ds.key1 = std::stod(key1, nullptr);
-      ds.key2 = std::stoull(key2.substr(2), nullptr, 2);
-      ds.key2_zeroes = countZeroes(key2.substr(2));
-      ds.key3 = key3.substr(1, key3.size() - 2);
+std::ostream& ivanova::operator<<(std::ostream& out, const UllBinT& x)
+{
+  out << "0b";
+  std::bitset<64> bits(x.key);
+  std::string binaryStr = bits.to_string();
+  std::size_t firstOne = binaryStr.find('1');
+  if (firstOne != std::string::npos)
+  {
+    std::string preffix(x.prefix_zeroes, '0');
+    out << preffix << binaryStr.substr(firstOne);
+  }
+  else
+  {
+    out << "0";
+  }
+  return out;
+}
+
+std::ostream& ivanova::operator<<(std::ostream& out, const StringT& x)
+{
+  out << "\"" << x.key << "\"";
+  return out;
+}
+
+std::ostream& ivanova::operator<<(std::ostream& out, const dataStruct& ds)
+{
+  DoubleScienceT x { ds.key1 };
+  UllBinT y { ds.key2, ds.key2_zeroes };
+  StringT z { ds.key3 };
+
+  StreamGuard guard(out);
+  out << "(";
+  out << ":key1 " << x;
+  out << ":key2 " << y;
+  out << ":key3 " << z;
+  out << ":)";
+  return out;
+}
+
+std::istream& ivanova::operator>>(std::istream& in, ExpectCharT&& x)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  char ch;
+  if (!(in >> ch) || ch != x.ch)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream& ivanova::operator>>(std::istream& in, DoubleScienceT& x)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> x.key;
+  return in;
+}
+
+std::istream& ivanova::operator>>(std::istream& in, UllBinT& x)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  StreamGuard guard(in);
+  in >> ExpectCharT{'0'} >> ExpectCharT{'b'};
+  std::string bits;
+  char ch;
+  x.prefix_zeroes = 0;
+  bool first = true;
+  while (in.get(ch) && (ch == '0' || ch == '1')) {
+    bits += ch;
+    if (first && ch == '0') {
+      ++x.prefix_zeroes;
+    } else {
+      first = false;
     }
-    catch (...)
+  }
+  if (!bits.empty()) {
+    x.key = std::stoull(bits, nullptr, 2);
+    if (in) in.unget();
+  } else {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream& ivanova::operator>>(std::istream& in, StringT& x)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  StreamGuard guard(in);
+  in >> std::noskipws;
+  in >> ExpectCharT{'"'};
+  char next;
+  while (in >> next && next != '"')
+  {
+    if (next == '\n')
+    {
+      in.setstate(std::ios_base::failbit);
+      break;
+    }
+    x.key.push_back(next);
+  }
+  return in;
+}
+
+std::istream& ivanova::operator>>(std::istream& in, dataStruct& ds)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> ExpectCharT{'('};
+  dataStruct result;
+  bool is_key1 = false, is_key2 = false, is_key3 = false;
+  while ((!is_key1 || !is_key2 || !is_key3) && in)
+  {
+    in >> ExpectCharT{':'};
+    std::string keyName;
+    in >> keyName;
+    if (keyName == "key1" && !is_key1)
+    {
+      DoubleScienceT x;
+      is_key1 = true;
+      in >> x;
+      result.key1 = x.key;
+    }
+    else if (keyName == "key2" && !is_key2)
+    {
+      UllBinT x;
+      is_key2 = true;
+      in >> x;
+      result.key2 = x.key;
+      result.key2_zeroes = x.prefix_zeroes;
+    }
+    else if (keyName == "key3" && !is_key3)
+    {
+      StringT x;
+      is_key3 = true;
+      in >> x;
+      result.key3 = x.key;
+    }
+    else
     {
       in.setstate(std::ios::failbit);
     }
-    return in;
   }
-
-  std::ostream& operator<<(std::ostream& out, const dataStruct& ds)
+  in >> ExpectCharT{':'} >> ExpectCharT{')'};
+  if (in)
   {
-    char key1Str[32];
-    snprintf(key1Str, sizeof(key1Str), "%.1e", ds.key1);
-    std::string key1(key1Str);
-
-    if (*(key1.end() - 2) == '0')
-    {
-      key1.erase(key1.end() - 2);
-    }
-    out << "(:key1 " << key1;
-
-    out << ":key2 0b";
-    std::bitset<64> bits(ds.key2);
-    std::string binaryStr = bits.to_string();
-
-    size_t firstOne = binaryStr.find('1');
-    if (firstOne != std::string::npos)
-    {
-      std::string preffix(ds.key2_zeroes, '0');
-      out << preffix << binaryStr.substr(firstOne);
-    }
-    else
-    {
-      out << "0";
-    }
-
-    out << ":key3 \"" << ds.key3 << "\":)";
-
-    out << std::defaultfloat;
-    return out;
+    ds = result;
   }
-
-  bool compareDataStructs(const ivanova::dataStruct& a, const ivanova::dataStruct& b)
-  {
-    if (a.key1 != b.key1)
-    {
-      return a.key1 < b.key1;
-    }
-    else if (a.key2 != b.key2)
-    {
-      return a.key2 < b.key2;
-    }
-    else
-    {
-      return a.key3.length() < b.key3.length();
-    }
-  }
+  return in;
 }

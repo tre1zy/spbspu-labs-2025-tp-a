@@ -24,7 +24,7 @@ int main()
       std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
     }
 
-    std::sort(data.begin(), data.end(), compareDataStructs);
+    std::sort(data.begin(), data.end());
     std::copy(data.begin(), data.end(), oIterator(std::cout, "\n"));
   }
   catch (const std::exception& e)
