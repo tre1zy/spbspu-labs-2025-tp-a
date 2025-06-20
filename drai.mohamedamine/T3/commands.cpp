@@ -6,6 +6,16 @@
 #include <iomanip>
 #include <numeric>
 #include <functional>
+#include <vector>
+
+struct Line {
+    std::string content;
+};
+
+std::istream& operator>>(std::istream& is, Line& line) {
+    std::getline(is, line.content);
+    return is;
+}
 
 void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
     auto equal_to_query = [&query](const Polygon& p) {
@@ -17,35 +27,22 @@ void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
                          });
     };
 
-    auto is_consecutive_query_duplicate = [&](const Polygon& a, const Polygon& b) {
-        return equal_to_query(a) && equal_to_query(b);
-    };
-
-    std::vector<bool> to_remove(polygons.size(), false);
-    std::adjacent_difference(
-        polygons.begin(), polygons.end(),
-        to_remove.begin(),
+    size_t initial_size = polygons.size();
+    auto new_end = std::unique(polygons.begin(), polygons.end(),
         [&](const Polygon& a, const Polygon& b) {
             return equal_to_query(a) && equal_to_query(b);
-        }
-    );
-    to_remove[0] = false;
-
-    size_t removed = std::count(to_remove.begin(), to_remove.end(), true);
-    auto new_end = std::remove_if(
-        polygons.begin(), polygons.end(),
-        [&, i = 0](const Polygon&) mutable { return to_remove[i++]; }
-    );
+        });
     polygons.erase(new_end, polygons.end());
-
-    std::cout << removed << "\n";
+    std::cout << (initial_size - polygons.size()) << "\n";
 }
+
 void process_commands(std::vector<Polygon>& polygons) {
     std::for_each(
         std::istream_iterator<Line>(std::cin),
         std::istream_iterator<Line>(),
         [&polygons](const Line& line) {
             if (line.content.empty()) return;
+
             std::istringstream iss(line.content);
             std::string cmd;
             iss >> cmd;
@@ -242,13 +239,14 @@ void process_commands(std::vector<Polygon>& polygons) {
             }
         }
         if (invalid) {
-            std::cout << "<INVALID COMMAND>\n";
-        }
-        else if (printDouble) {
-            std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
-        }
-        else {
-            std::cout << intResult << "\n";
+                std::cout << "<INVALID COMMAND>\n";
+            }
+            else if (printDouble) {
+                std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
+            }
+            else {
+                std::cout << intResult << "\n";
+            }
         }
     );
 }

@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-
+#include <algorithm>
 #include "polygon.hpp"
 
 int main(int argc, char* argv[]) {
@@ -16,15 +16,23 @@ int main(int argc, char* argv[]) {
     }
     std::vector<Polygon> polygons;
 
-    std::copy_if(
+    std::transform(
         std::istream_iterator<std::string>(infile),
         std::istream_iterator<std::string>(),
         std::back_inserter(polygons),
         [](const std::string& line) {
-            if (line.empty()) return false;
             Polygon poly;
-            return parse_polygon(line, poly) && poly.points.size() >= 3;
+            if (!line.empty() && parse_polygon(line, poly) && poly.points.size() >= 3) {
+                return poly;
+            }
+            return Polygon{};
         }
+    );
+
+    polygons.erase(
+        std::remove_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) { return p.points.empty(); }),
+        polygons.end()
     );
 
     process_commands(polygons);
