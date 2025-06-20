@@ -48,6 +48,10 @@ namespace ageev
       {
         str += c;
       }
+      if (str.empty()) {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       double number = std::stod(str);
       str.clear();
       while (in >> c && c != ':')
@@ -88,6 +92,49 @@ namespace ageev
     in.setstate(std::ios::failbit);
     }
     return in;
+  }
+
+  std::ostream & operator<<(std::ostream & out, const DoubleToSciForm & dest)
+  {
+    std::ios::fmtflags oldFlags = out.flags();
+    std::streamsize oldPrecision = out.precision();
+    if (dest.ref == 0.0)
+    {
+      out << "0.0e+0";
+      return out;
+    }
+
+    int exponent = 0;
+    double mantissa = dest.ref;
+
+    while (std::abs(mantissa) >= 10.0)
+    {
+      mantissa /= 10.0;
+      ++exponent;
+    }
+    while (std::abs(mantissa) < 1.0)
+    {
+      mantissa *= 10.0;
+      --exponent;
+    }
+
+    out.setf(std::ios::fixed);
+    out.precision(1);
+    out << mantissa;
+
+    out << 'e';
+    if (exponent >= 0)
+    {
+      out << '+' << exponent;
+    }
+    else
+    {
+      out << '-' << -exponent;
+    }
+
+    out.flags(oldFlags);
+    out.precision(oldPrecision);
+    return out;
   }
 
   std::istream& operator>>(std::istream& in, DataStruct& dest)
@@ -161,9 +208,9 @@ namespace ageev
       return out;
     }
     iofmtguard fmtguard(out);
-    out << "(:key1 " << std::fixed << std::setprecision(1)
-        << src.key1 << "d:" << "key2 " << std::defaultfloat
-        << src.key2 << ":" << "key3 \"" << src.key3 << "\":)";
+    out << "(:key1 " << std::fixed << std::setprecision(1);
+    out << src.key1 << "d:" << "key2 ";
+    out << DoubleToSciForm{src.key2} << ":" << "key3 \"" << src.key3 << "\":)";
     return out;
   }
 
