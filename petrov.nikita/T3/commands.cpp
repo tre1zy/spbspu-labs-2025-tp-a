@@ -68,6 +68,7 @@ void petrov::addIfOdd(const std::vector< Polygon > & polygons, std::ostream & ou
   }
   out << result;
 }
+
 void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
 {
   if (polygons.empty())
@@ -296,3 +297,42 @@ void petrov::count(const std::vector< Polygon > & polygons, std::istream & in, s
     }
   }
 }
+
+void petrov::maxseq(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+{
+  size_t current_count = 0;
+  size_t max_count = 0;
+  Polygon polygon;
+  if (in >> polygon)
+  {
+    for (size_t i = 0; i < polygons.size(); i++)
+    {
+      bool isEqual = true;
+      for (size_t j = 0; j < polygons[i].points.size() && isEqual; j++)
+      {
+        if (!(polygon.points[j].x == polygons[i].points[j].x && polygon.points[j].y == polygons[i].points[j].y))
+        {
+          isEqual = false;
+        }
+      }
+      if (isEqual == true)
+      {
+        current_count++;
+      }
+      else
+      {
+        if (max_count < current_count)
+        {
+          max_count = current_count;
+        }
+        current_count = 0;
+      }
+    }
+  }
+  else
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+  out << max_count;
+}
+

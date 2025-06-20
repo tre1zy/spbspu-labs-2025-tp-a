@@ -35,6 +35,12 @@ namespace petrov
   void countIfThisNumber(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out);
 
   void count(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
+
+
+  void rmecho(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
+
+  
+  void maxseq(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 }
 
 #endif
