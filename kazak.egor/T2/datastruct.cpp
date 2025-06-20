@@ -137,12 +137,16 @@ std::istream& kazak::operator>>(std::istream& in, DataStruct& dest)
     else
     {
       in.setstate(std::ios::failbit);
+      break;
     }
   }
 
-  in >> DelimiterIO{')'};
+  if (in)
+  {
+    in >> DelimiterIO{')'};
+  }
 
-  if (hasKey1 && hasKey2 && hasKey3)
+  if (hasKey1 && hasKey2 && hasKey3 && in)
   {
     dest = std::move(input);
   }
