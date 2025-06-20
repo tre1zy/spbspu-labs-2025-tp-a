@@ -1,4 +1,3 @@
-#include "commands.hpp"
 #include "polygon.hpp"
 
 #include <iterator>
