@@ -1,6 +1,7 @@
+#include "data_struct.hpp"
+
 #include <iomanip>
 
-#include "data_struct.hpp"
 #include "delimiter.hpp"
 #include "input_parsers.hpp"
 #include "format_guard.hpp"
@@ -46,33 +47,60 @@ std::istream &fedorov::operator>>(std::istream &in, DataStruct &value)
   }
 
   using del = DelimiterI;
-  size_t count = 0;
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
   std::string numKey = " ";
 
-  in >> del {'('};
-  while (in && (count < 3))
+  in >> del{'('};
+  while (in && !(hasKey1 && hasKey2 && hasKey3))
   {
-    in >> del {':'} >> numKey;
+    in >> del{':'} >> numKey;
     if (numKey == "key1")
     {
-      in >> DoubleKey {value.key1};
-      ++count;
+      if (hasKey1)
+      {
+        in.setstate(std::ios::failbit);
+        break;
+      }
+      in >> DoubleKey{value.key1};
+      hasKey1 = true;
     }
     else if (numKey == "key2")
     {
-      in >> ComplexKey {value.key2};
-      ++count;
+      if (hasKey2)
+      {
+        in.setstate(std::ios::failbit);
+        break;
+      }
+      in >> ComplexKey{value.key2};
+      hasKey2 = true;
     }
     else if (numKey == "key3")
     {
-      in >> StringKey {value.key3};
-      ++count;
+      if (hasKey3)
+      {
+        in.setstate(std::ios::failbit);
+        break;
+      }
+      in >> StringKey{value.key3};
+      hasKey3 = true;
     }
     else
     {
       in.setstate(std::ios::failbit);
+      break;
     }
   }
-  in >> del {':'} >> del {')'};
+
+  if (!hasKey1 || !hasKey2 || !hasKey3)
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  if (in)
+  {
+    in >> del{':'} >> del{')'};
+  }
   return in;
 }

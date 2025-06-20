@@ -9,7 +9,7 @@ std::istream &fedorov::operator>>(std::istream &in, DelimiterStr &&exp)
   }
   for (size_t i = 0; exp.expected[i] != '\0'; ++i)
   {
-    in >> DelimiterI {exp.expected[i]};
+    in >> DelimiterI{exp.expected[i]};
   }
   return in;
 }

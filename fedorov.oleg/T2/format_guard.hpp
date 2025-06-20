@@ -1,5 +1,5 @@
-#ifndef FORMAT_GUARD
-#define FORMAT_GUARD
+#ifndef FORMAT_GUARD_HPP
+#define FORMAT_GUARD_HPP
 
 #include <ios>
 #include <iomanip>
@@ -20,17 +20,5 @@ namespace fedorov
     std::ios_base::fmtflags flags_;
     std::streamsize precision_;
   };
-
-  IOFormatGuard::IOFormatGuard(std::ostream &s):
-    s_(s),
-    flags_(s.flags()),
-    precision_(s.precision())
-  {}
-
-  IOFormatGuard::~IOFormatGuard()
-  {
-    s_.precision(precision_);
-    s_.flags(flags_);
-  }
 }
 #endif

@@ -12,7 +12,7 @@ std::istream &fedorov::operator>>(std::istream &input, DoubleKey &&key)
   using del = DelimiterI;
   double num = 0;
 
-  input >> num >> del {'d'};
+  input >> num >> del{'d'};
   if (input)
   {
     key.num = num;
@@ -33,7 +33,7 @@ std::istream &fedorov::operator>>(std::istream &input, ComplexKey &&key)
   double real = 0;
   double imag = 0;
 
-  input >> delStr {"#c("} >> real >> imag >> del {')'};
+  input >> delStr{"#c("} >> real >> imag >> del{')'};
 
   if (input)
   {
@@ -52,7 +52,7 @@ std::istream &fedorov::operator>>(std::istream &input, StringKey &&key)
 
   using del = DelimiterI;
 
-  input >> del {'"'};
+  input >> del{'"'};
   std::getline(input, key.string, '\"');
   return input;
 }
