@@ -5,7 +5,62 @@
 #include <numeric>
 #include <sstream>
 
+namespace {
+  double calcArea(const Polygon& polygon)
+  {
+    return polygon.area();
+  }
 
+  double calcAreaOdd(const Polygon& polygon)
+  {
+    return polygon.isOdd() ? calcArea(polygon) : 0.0;
+  }
+
+  double calcAreaEven(const Polygon& polygon)
+  {
+    return polygon.isEven() ? calcArea(polygon) : 0.0;
+  }
+
+  double calcAreaNum(const Polygon& polygon, size_t num)
+  {
+    return (polygon.points.size() == num) ? calcArea(polygon) : 0.0;
+  }
+
+  bool minAreaComp(const Polygon& polygon_1, const Polygon& polygon_2)
+  {
+    return polygon_1.area() < polygon_2.area();
+  }
+
+  bool minVertexesComp(const Polygon& polygon_1, const Polygon& polygon_2)
+  {
+    return polygon_1.points.size() < polygon_2.points.size();
+  }
+
+  const Polygon& findMinPolygon(const std::vector< Polygon >& polygons,
+      const std::function< bool(const Polygon&, const Polygon&) >& comp)
+  {
+    return *std::min_element(polygons.begin(), polygons.end(), comp);
+  }
+
+  const Polygon& findMaxPolygon(const std::vector< Polygon >& polygons,
+      const std::function< bool(const Polygon&, const Polygon&) >& comp)
+  {
+    return *std::max_element(polygons.begin(), polygons.end(), comp);
+  }
+
+  size_t calcCountOdd(const Polygon& polygon)
+  {
+    return polygon.isOdd() ? 1 : 0;
+  }
+  size_t calcCountEven(const Polygon& polygon)
+  {
+    return polygon.isEven() ? 1 : 0;
+  }
+  double calcCountNum(const Polygon& polygon, size_t num)
+  {
+    return (polygon.points.size() == num) ? 1 : 0.0;
+  }
+}
 
 void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands)
 {
