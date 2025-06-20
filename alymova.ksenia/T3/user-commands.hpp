@@ -12,8 +12,6 @@
 namespace alymova
 {
   using namespace std::placeholders;
-  using AreaSubcommands = std::map< std::string, std::function< double(double, const Polygon&) > >;
-  using CountSubcommands = std::map< std::string, std::function< bool(const Polygon&) > >;
   using CmpArea = std::function< double(double, const Polygon&) >;
   using CmpVertexes = std::function< size_t(size_t, const Polygon&) >;
 

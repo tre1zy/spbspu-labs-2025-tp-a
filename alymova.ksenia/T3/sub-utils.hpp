@@ -7,10 +7,6 @@ namespace alymova
 {
   using namespace std::placeholders;
 
-  //double areaEven(double value, const Polygon& polygon, size_t size);
-  //double areaOdd(double value, const Polygon& polygon, size_t size);
-  //double areaMean(double value, const Polygon& polygon, size_t size);
-  //double areaNumber(double value, const Polygon& polygon, size_t vertexes);
   double areaEven(const std::vector< Polygon >& polygons);
   double areaOdd(const std::vector< Polygon >& polygons);
   double areaMean(const std::vector< Polygon >& polygons);

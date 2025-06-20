@@ -28,60 +28,14 @@ namespace
   }
 }
 
-/*double alymova::areaEven(const std::vector< Polygon >& polygons)
-{
-  if (size == 0)
-  {
-    return value;
-  }
-  if (isPolygonEven(polygon))
-  {
-    return value + areaPolygon(polygon);
-  }
-  return value;
-}
-
-double alymova::areaOdd(double value, const Polygon& polygon, size_t size)
-{
-  if (size == 0)
-  {
-    return value;
-  }
-  if (!isPolygonEven(polygon))
-  {
-    return value + areaPolygon(polygon);
-  }
-  return value;
-}
-
-double alymova::areaMean(double value, const Polygon& polygon, size_t size)
-{
-  if (size == 0)
-  {
-    throw std::overflow_error("");
-  }
-  return value + areaPolygon(polygon) / size;
-}
-
-double alymova::areaNumber(double value, const Polygon& polygon, size_t vertexes)
-{
-  if (isEqualSize(vertexes, polygon))
-  {
-    return value + areaPolygon(polygon);
-  }
-  return value;
-}*/
-
 double alymova::areaEven(const std::vector< Polygon >& polygons)
 {
-  double res = getAreasIf(polygons, isPolygonEven);
-  return res;
+  return getAreasIf(polygons, isPolygonEven);
 }
 
 double alymova::areaOdd(const std::vector< Polygon >& polygons)
 {
-  double res = getAreasIf(polygons, isPolygonOdd);
-  return res;
+  return getAreasIf(polygons, isPolygonOdd);
 }
 
 double alymova::areaMean(const std::vector< Polygon >& polygons)
@@ -97,8 +51,7 @@ double alymova::areaMean(const std::vector< Polygon >& polygons)
 double alymova::areaNumber(size_t vertexes, const std::vector< Polygon >& polygons)
 {
   auto bindEqualSize = std::bind(isEqualSize, vertexes, _1);
-  double res = getAreasIf(polygons, bindEqualSize);
-  return res;
+  return getAreasIf(polygons, bindEqualSize);
 }
 
 double alymova::areaPolygon(const Polygon& polygon)
@@ -226,7 +179,7 @@ bool alymova::noConditional(const Polygon&)
 
 bool alymova::isEqualSize(size_t size, const Polygon& polygon)
 {
-  return size == polygon.points.size();
+  return polygon.points.size() == size;
 }
 
 bool alymova::isPolygonEven(const Polygon& polygon)

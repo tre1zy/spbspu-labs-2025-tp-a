@@ -3,32 +3,6 @@
 #include <exception>
 #include <string>
 
-/*void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
-{
-  auto bindEven = std::bind(areaEven, _1, _2, polygons.size());
-  auto bindOdd = std::bind(areaOdd, _1, _2, polygons.size());
-  auto bindMean = std::bind(areaMean, _1, _2, polygons.size());
-  AreaSubcommands subs{{"EVEN", bindEven}, {"ODD", bindOdd}, {"MEAN", bindMean}};
-
-  using Predicate = std::function< bool(const Polygon&) >;
-
-  double res;
-  std::string command;
-  in >> command;
-  try
-  {
-    subs.at(command)(0.0, *polygons.begin());
-    res = std::accumulate(polygons.begin(), polygons.end(), 0.0, subs[command]);
-  }
-  catch (const std::out_of_range& e)
-  {
-    size_t vertexes = getVertexes(command);
-    res = std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(areaNumber, _1, _2, vertexes));
-  }
-  StreamGuard guard(out);
-  out << std::fixed << std::setprecision(1) << res;
-}*/
-
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   using AreaSubcommands = std::map< std::string, std::function< double(const std::vector< Polygon >&) > >;
@@ -52,7 +26,7 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
 
 void alymova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  //auto bindOdd = std::not1(std::function< bool(const Polygon&) >(isPolygonEven));
+  using CountSubcommands = std::map< std::string, std::function< bool(const Polygon&) > >;
   CountSubcommands subs{{"EVEN", isPolygonEven}, {"ODD", isPolygonOdd}};
 
   std::string command;
