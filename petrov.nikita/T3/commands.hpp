@@ -37,9 +37,9 @@ namespace petrov
   void count(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 
 
-  void rmecho(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
+  void rmecho(std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 
-  
+
   void maxseq(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 }
 

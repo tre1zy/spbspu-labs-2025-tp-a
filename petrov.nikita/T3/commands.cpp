@@ -298,6 +298,45 @@ void petrov::count(const std::vector< Polygon > & polygons, std::istream & in, s
   }
 }
 
+void petrov::rmecho(std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+{
+  size_t current_count = 0;
+  size_t deleted_count = 0;
+  Polygon polygon;
+  if (in >> polygon)
+  {
+    for (size_t i = 0; i < polygons.size(); i++)
+    {
+      bool isEqual = true;
+      for (size_t j = 0; j < polygons[i].points.size() && isEqual; j++)
+      {
+        if (!(polygon.points[j].x == polygons[i].points[j].x && polygon.points[j].y == polygons[i].points[j].y))
+        {
+          isEqual = false;
+        }
+      }
+      if (isEqual == true)
+      {
+        current_count++;
+        if (current_count > 1)
+        {
+          polygons.erase(polygons.begin() + i);
+          deleted_count++;
+        }
+      }
+      else
+      {
+        current_count = 0;
+      }
+    }
+  }
+  else
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+  out << deleted_count;
+}
+
 void petrov::maxseq(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
 {
   size_t current_count = 0;

@@ -53,6 +53,7 @@ int main(int argc, const char * const * argv)
   cmds["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   cmds["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   cmds["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["RMECHO"] = std::bind(rmecho, std::ref(polygons), std::ref(std::cin), std::ref(std::cout));
   cmds["MAXSEQ"] = std::bind(maxseq, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   std::string command;
   while (!(std::cin >> command).eof())
