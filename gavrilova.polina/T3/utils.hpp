@@ -19,7 +19,7 @@ namespace gavrilova {
   template < typename Container, typename Init, typename Func, typename Op >
   auto applyCommand(const Container& cont, Init init, Func func, Op op)
   {
-    auto compose = [func, op](auto acc, const auto& elem) 
+    auto compose = [func, op](auto acc, const auto& elem)
     {
       return op(acc, func(elem));
     };
