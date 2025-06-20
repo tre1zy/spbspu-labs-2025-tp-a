@@ -1,5 +1,7 @@
 #include "datastruct.hpp"
 #include "stream_guard.hpp"
+#include <string>
+#include <algorithm>
 
 bool kazak::operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
@@ -21,15 +23,12 @@ std::istream& kazak::operator>>(std::istream& in, DelimiterIO&& dest)
   {
     return in;
   }
-
   char c = '0';
   in >> c;
-
-  if (in && (c != dest.exp))
+  if (in && c != dest.exp)
   {
     in.setstate(std::ios::failbit);
   }
-
   return in;
 }
 
@@ -41,8 +40,20 @@ std::istream& kazak::operator>>(std::istream& in, ULLHexIO&& dest)
     return in;
   }
 
-  in >> std::hex >> dest.ref;
-  if (!in)
+  in >> std::ws;
+  char c1 = in.get();
+  char c2 = in.peek();
+
+  if (c1 == '0' && (c2 == 'x' || c2 == 'X'))
+  {
+    in.get();
+    in >> std::hex >> dest.ref;
+    if (!in)
+    {
+      in.setstate(std::ios::failbit);
+    }
+  }
+  else
   {
     in.setstate(std::ios::failbit);
   }
@@ -61,9 +72,7 @@ std::istream& kazak::operator>>(std::istream& in, RationalIO&& dest)
   long long numerator = 0;
   unsigned long long denominator = 0;
 
-  in >> DelimiterIO{'('} >> LabelIO{":N"} >> numerator;
-  in >> LabelIO{":D"} >> denominator;
-  in >> DelimiterIO{':'} >> DelimiterIO{')'};
+  in >> DelimiterIO{'('} >> LabelIO{":N"} >> numerator >> LabelIO{":D"} >> denominator >> DelimiterIO{':'} >> DelimiterIO{')'};
 
   if (in)
   {
@@ -81,7 +90,8 @@ std::istream& kazak::operator>>(std::istream& in, StringIO&& dest)
     return in;
   }
 
-  return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
+  in >> DelimiterIO{'"'};
+  return std::getline(in, dest.ref, '"');
 }
 
 std::istream& kazak::operator>>(std::istream& in, LabelIO&& dest)
@@ -92,8 +102,9 @@ std::istream& kazak::operator>>(std::istream& in, LabelIO&& dest)
     return in;
   }
 
-  std::string data;
-  if ((in >> data) && (data != dest.exp))
+  std::string label;
+  in >> label;
+  if (in && label != dest.exp)
   {
     in.setstate(std::ios::failbit);
   }
@@ -110,49 +121,41 @@ std::istream& kazak::operator>>(std::istream& in, DataStruct& dest)
   }
 
   DataStruct input;
-  bool hasKey1 = false;
-  bool hasKey2 = false;
-  bool hasKey3 = false;
+  size_t keyCount = 0;
 
-  in >> DelimiterIO{'('};
+  in >> DelimiterIO{'('} >> DelimiterIO{':'};
 
-  std::string key;
-  while (in >> DelimiterIO{':'} && in >> key)
+  while (keyCount < 3 && in)
   {
+    std::string key;
+    in >> key;
+
     if (key == "key1")
     {
-      in >> ULLHexIO{input.key1};
-      hasKey1 = true;
+      in >> ULLHexIO{input.key1} >> DelimiterIO{':'};
+      ++keyCount;
     }
     else if (key == "key2")
     {
-      in >> RationalIO{input.key2};
-      hasKey2 = true;
+      in >> RationalIO{input.key2} >> DelimiterIO{':'};
+      ++keyCount;
     }
     else if (key == "key3")
     {
-      in >> StringIO{input.key3};
-      hasKey3 = true;
+      in >> StringIO{input.key3} >> DelimiterIO{':'};
+      ++keyCount;
     }
     else
     {
       in.setstate(std::ios::failbit);
-      break;
     }
   }
 
+  in >> DelimiterIO{')'};
+
   if (in)
   {
-    in >> DelimiterIO{')'};
-  }
-
-  if (hasKey1 && hasKey2 && hasKey3 && in)
-  {
     dest = std::move(input);
-  }
-  else
-  {
-    in.setstate(std::ios::failbit);
   }
 
   return in;
@@ -167,10 +170,9 @@ std::ostream& kazak::operator<<(std::ostream& out, const DataStruct& src)
   }
 
   StreamGuard guard(out);
-  out << "(:key1 0x" << std::hex << std::uppercase << src.key1;
-  out << ":key2 (:N " << std::dec << src.key2.first << ":D ";
-  out << src.key2.second << ":)";
-  out << ":key3 \"" << src.key3 << "\":)";
+  out << "(:key1 0x" << std::hex << std::uppercase << src.key1
+      << ":key2 (:N " << std::dec << src.key2.first << ":D " << src.key2.second << ":)"
+      << ":key3 \"" << src.key3 << "\":)";
 
   return out;
 }
