@@ -1,5 +1,7 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
+#include <array>
+#include <algorithm>
 #include <complex>
 #include <iostream>
 #include <string>
@@ -40,6 +42,7 @@ namespace brevnov
   struct KeyIO
   {
     DataStruct& data;
+    std::array< int, 3 > keys;
   };
 
   struct StreamGuard
