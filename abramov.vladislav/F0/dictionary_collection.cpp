@@ -29,6 +29,25 @@ void abramov::DictionaryCollection::addDict(const std::string &name)
       throw std::runtime_error("Fail to add dictionary\n");
     }
   }
+  else
+  {
+    throw std::logic_error("There is dictionary with such name\n");
+  }
+}
+
+void abramov::DictionaryCollection::addCompleteDict(const std::string &name, const Dictionary &dict)
+{
+  if (collection_.find(name) == collection_.end())
+  {
+    if (!collection_.insert({ name, dict }).second)
+    {
+      throw std::runtime_error("Fail to add dictionary\n");
+    }
+  }
+  else
+  {
+    throw std::logic_error("There is dictionary with such name\n");
+  }
 }
 
 void abramov::DictionaryCollection::deleteDict(const std::string &name)

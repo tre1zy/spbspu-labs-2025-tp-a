@@ -67,9 +67,11 @@ void abramov::deleteFromDict(DictionaryCollection &collect, std::istream &in)
 
 void abramov::setDicts(DictionaryCollection &collect, std::istream &in)
 {
+  std::string new_name;
+  in >> new_name;
   std::string name;
   in >> name;
-  if (name.empty())
+  if (name.empty() || new_name.empty())
   {
     throw std::logic_error("There is no enough arguments\n");
   }
@@ -86,13 +88,16 @@ void abramov::setDicts(DictionaryCollection &collect, std::istream &in)
     }
     res = res.setWithDict(collect.cfindDict(name));
   }
+  collect.addCompleteDict(new_name, res);
 }
 
 void abramov::intersectDicts(DictionaryCollection &collect, std::istream &in)
 {
+  std::string new_name;
+  in >> new_name;
   std::string name;
   in >> name;
-  if (name.empty())
+  if (name.empty() || new_name.empty())
   {
     throw std::logic_error("There is no enough arguments\n");
   }
@@ -109,13 +114,16 @@ void abramov::intersectDicts(DictionaryCollection &collect, std::istream &in)
     }
     res = res.intersectWithDict(collect.cfindDict(name));
   }
+  collect.addCompleteDict(new_name, res);
 }
 
 void abramov::unionDicts(DictionaryCollection &collect, std::istream &in)
 {
+  std::string new_name;
+  in >> new_name;
   std::string name;
   in >> name;
-  if (name.empty())
+  if (name.empty() || new_name.empty())
   {
     throw std::logic_error("There is no enough arguments\n");
   }
@@ -132,6 +140,7 @@ void abramov::unionDicts(DictionaryCollection &collect, std::istream &in)
     }
     res = res.unionWithDict(collect.cfindDict(name));
   }
+  collect.addCompleteDict(new_name, res);
 }
 
 void abramov::diffDicts(DictionaryCollection &collect, std::istream &in)
