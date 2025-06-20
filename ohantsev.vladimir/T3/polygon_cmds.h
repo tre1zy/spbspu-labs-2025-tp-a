@@ -3,8 +3,8 @@
 #include <vector>
 #include <iosfwd>
 #include <functional>
-#include "polygon.h"
 #include <command_handler.h>
+#include "polygon.h"
 
 namespace ohantsev
 {
