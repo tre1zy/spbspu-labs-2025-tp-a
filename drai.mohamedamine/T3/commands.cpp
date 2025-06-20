@@ -1,4 +1,3 @@
-#include "commands.hpp"
 #include "polygon.hpp"
 #include <iostream>
 #include <iomanip>
@@ -201,7 +200,7 @@ namespace amine
         return *p == q;
       }) << '\n';
     }
-  } // namespace
+  }
 
   void process_commands(std::vector<Polygon>& polygons)
   {
