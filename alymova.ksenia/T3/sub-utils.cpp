@@ -81,7 +81,7 @@ double alymova::areaEven(const std::vector< Polygon >& polygons)
 double alymova::areaOdd(const std::vector< Polygon >& polygons)
 {
   double res = getAreasIf(polygons, isPolygonOdd);
-  return res; 
+  return res;
 }
 
 double alymova::areaMean(const std::vector< Polygon >& polygons)
