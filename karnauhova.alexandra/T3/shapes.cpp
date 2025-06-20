@@ -72,6 +72,10 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
   {
     pol.points = std::move(temp);
   }
+  if (!in || in.peek() != '\n' || temp.size() != count)
+  {
+    in.setstate(std::ios::failbit);
+  }
   return in;
 }
 
