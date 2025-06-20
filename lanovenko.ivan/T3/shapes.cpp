@@ -7,9 +7,9 @@ std::istream& lanovenko::operator>>(std::istream& in, Point& dest)
   {
     return in;
   }
-  in >> io::DelimiterIO{ '(' };
-  in >> dest.x >> io::DelimiterIO{ ';' };
-  in >> dest.y >> io::DelimiterIO{ ')' };
+  in >> DelimiterIO{ '(' };
+  in >> dest.x >> DelimiterIO{ ';' };
+  in >> dest.y >> DelimiterIO{ ')' };
   return in;
 }
 
