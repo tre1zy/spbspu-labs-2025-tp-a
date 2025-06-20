@@ -8,10 +8,6 @@
 #include <functional>
 #include <vector>
 
-struct Line {
-    std::string content;
-};
-
 std::istream& operator>>(std::istream& is, Line& line) {
     std::getline(is, line.content);
     return is;
