@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "graph.h"
+#include "graph.hpp"
 
 namespace klimova {
   using GraphType = Graph< std::string >;

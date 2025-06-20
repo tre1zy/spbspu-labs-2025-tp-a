@@ -1,8 +1,9 @@
 #include <iostream>
 #include <unordered_map>
 #include <functional>
+#include <limits>
 #include "graph.hpp"
-#include "graph_options.hpp"
+#include "graph_operations.hpp"
 
 int main() {
   using namespace std::placeholders;

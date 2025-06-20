@@ -1,6 +1,6 @@
 #include "graph_operations.hpp"
 
-void klimova::createGraph(GraphManager& graphs, std::istream& in, std::ostream& out) 
+void klimova::createGraph(GraphManager& graphs, std::istream& in, std::ostream& out)
 {
   std::string name;
   in >> name;
@@ -12,7 +12,7 @@ void klimova::createGraph(GraphManager& graphs, std::istream& in, std::ostream& 
   std::cout << "graph created\n";
 }
 
-void klimova::addVertex(GraphManager& graphs, std::istream& in, std::ostream& out) 
+void klimova::addVertex(GraphManager& graphs, std::istream& in, std::ostream& out)
 {
   std::string graphName, vertex;
   in >> graphName >> vertex;
@@ -30,7 +30,7 @@ void klimova::addVertex(GraphManager& graphs, std::istream& in, std::ostream& ou
   }
 }
 
-void klimova::addEdge(GraphManager& graphs, std::istream& in, std::ostream& out) 
+void klimova::addEdge(GraphManager& graphs, std::istream& in, std::ostream& out)
 {
   std::string graphName, v1, v2;
   in >> graphName >> v1 >> v2;
@@ -48,7 +48,7 @@ void klimova::addEdge(GraphManager& graphs, std::istream& in, std::ostream& out)
   }
 }
 
-void klimova::printGraph(const GraphManager& graphs, std::istream& in, std::ostream& out) 
+void klimova::printGraph(const GraphManager& graphs, std::istream& in, std::ostream& out)
 {
   std::string name;
   in >> name;

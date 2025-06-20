@@ -306,5 +306,5 @@ namespace klimova {
       std::cout << "One of the vertices not found." << std::endl;
     }
   }
-
+}
 #endif
