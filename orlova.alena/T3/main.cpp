@@ -8,7 +8,6 @@
 #include <iterator>
 #include "geom.h"
 #include "commands.h"
-#include "io-utils.h"
 
 int main(int argc, char** argv)
 {
