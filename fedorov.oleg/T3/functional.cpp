@@ -1,10 +1,12 @@
+#include "functional.hpp"
+
 #include <numeric>
 #include <sstream>
 #include <iterator>
 #include <stdexcept>
 #include <cctype>
 #include <algorithm>
-#include "functional.hpp"
+
 #include "polygon.hpp"
 
 namespace fedorov

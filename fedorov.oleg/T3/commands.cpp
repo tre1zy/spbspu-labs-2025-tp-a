@@ -1,7 +1,9 @@
+#include "commands.hpp"
+
 #include <iomanip>
 #include <numeric>
 #include <algorithm>
-#include "commands.hpp"
+
 #include "functional.hpp"
 
 namespace fedorov

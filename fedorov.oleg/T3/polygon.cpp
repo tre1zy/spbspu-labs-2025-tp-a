@@ -14,23 +14,25 @@ namespace fedorov
 
   std::istream &operator>>(std::istream &in, Point &dest)
   {
-    char open, sep = '\0', close = '\0';
-    in >> open;
-    if (open != '(')
+    char open = '\0';
+    char sep = '\0';
+    char close = '\0';
+    int x = 0;
+    int y = 0;
+
+    if (!(in >> open >> x >> sep >> y >> close))
     {
-      in.setstate(std::ios::failbit);
       return in;
     }
 
-    if (!(in >> dest.x >> sep >> dest.y >> close))
+    if (open != '(' || sep != ';' || close != ')')
     {
       in.setstate(std::ios::failbit);
-      return in;
     }
-
-    if (sep != ';' || close != ')')
+    else
     {
-      in.setstate(std::ios::failbit);
+      dest.x = x;
+      dest.y = y;
     }
     return in;
   }
@@ -58,7 +60,7 @@ namespace fedorov
     {}
     Point operator()() const
     {
-      Point p;
+      Point p{0, 0};
       if (!(in >> p))
       {
         in.setstate(std::ios::failbit);
@@ -79,6 +81,13 @@ namespace fedorov
 
     dest.points.clear();
     std::generate_n(std::back_inserter(dest.points), n, PointGenerator(in));
+
+    if (in.fail())
+    {
+      dest.points.clear();
+      in.setstate(std::ios::failbit);
+      return in;
+    }
 
     if (in.fail() || dest.points.size() != static_cast< size_t >(n))
     {
