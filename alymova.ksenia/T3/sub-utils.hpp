@@ -1,5 +1,5 @@
-#ifndef SUB_COMMANDS_HPP
-#define SUB_COMMANDS_HPP
+#ifndef SUB_UTILS_HPP
+#define SUB_UTILS_HPP
 #include <functional>
 #include "shapes.hpp"
 
