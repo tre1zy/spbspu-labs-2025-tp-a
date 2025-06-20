@@ -2,6 +2,7 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
+#include <limits>
 #include "DataStruct.hpp"
 #include <sstream>
 
@@ -10,20 +11,24 @@ int main()
   using ageev::DataStruct;
 
   std::vector< DataStruct > data;
-  std::istringstream iss("(:key1 0.0d:key2 1234.0e-2:key3 \"Data\":)");
 
+  using InputDataIt = std::istream_iterator< DataStruct >;
+  using OutputDataIt = std::ostream_iterator< DataStruct >;
 
-  std::copy(
-    std::istream_iterator< DataStruct >(std::cin),
-    std::istream_iterator< DataStruct >(),
-    std::back_inserter(data)
-  );
+  while (!std::cin.eof())
+  {
+    std::copy(InputDataIt(std::cin), InputDataIt(), std::back_inserter(data));
+    if (!std::cin)
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 
   std::copy(
     std::begin(data),
     std::end(data),
     std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
-
   return 0;
 }
