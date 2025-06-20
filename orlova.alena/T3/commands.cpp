@@ -270,7 +270,8 @@ void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, st
   }
   int current = 0, max = 0;
   countSequence(polygons, polygon, 0, current, max);
-  out << max << std::endl;
+  out << max;
+  return;
 }
 
 void orlova::countSequence(const std::vector< Polygon >& polygons, const Polygon& polygon, size_t index, int& current, int& max)
