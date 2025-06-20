@@ -10,6 +10,16 @@ abramov::Dictionary::Dictionary(const Dictionary &dict):
   dict_(std::unordered_map< std::string, std::string >(dict.dict_))
 {}
 
+abramov::Dictionary &abramov::Dictionary::operator=(const Dictionary &dict)
+{
+  if (this != std::addressof(dict))
+  {
+    Dictionary tmp(dict);
+    swap(tmp);
+  }
+  return *this;
+}
+
 void abramov::Dictionary::addWord(const std::string &word, const std::string &trans)
 {
   if (!dict_.insert({ word, trans }).second)
@@ -121,4 +131,9 @@ void abramov::Dictionary::mergeDict(const Dictionary &dict)
 bool abramov::Dictionary::empty() const noexcept
 {
   return dict_.empty();
+}
+
+void abramov::Dictionary::swap(Dictionary &dict) noexcept
+{
+  std::swap(dict_, dict.dict_);
 }

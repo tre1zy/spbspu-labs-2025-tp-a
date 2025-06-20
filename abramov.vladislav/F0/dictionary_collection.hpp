@@ -7,6 +7,8 @@ namespace abramov
   struct DictionaryCollection
   {
     DictionaryCollection();
+    Dictionary &findDict(const std::string &name);
+    const Dictionary &cfindDict(const std::string &name) const;
     void addDict(const std::string &name);
     void deleteDict(const std::string &name);
   private:

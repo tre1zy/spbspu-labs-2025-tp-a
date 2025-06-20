@@ -9,6 +9,7 @@ namespace abramov
   {
     Dictionary();
     Dictionary(const Dictionary &dict);
+    Dictionary &operator=(const Dictionary &dict);
     void addWord(const std::string &word, const std::string &trans);
     void mergeDict(const Dictionary &dict);
     void deleteWord(const std::string &word);
@@ -20,6 +21,8 @@ namespace abramov
     bool empty() const noexcept;
   private:
     std::unordered_map< std::string, std::string > dict_;
+
+    void swap(Dictionary &dict) noexcept;
   };
 }
 #endif
