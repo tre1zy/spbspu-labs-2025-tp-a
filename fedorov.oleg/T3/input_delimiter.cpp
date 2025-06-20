@@ -1,4 +1,5 @@
 #include "input_delimiter.hpp"
+
 #include <cctype>
 
 std::istream &fedorov::operator>>(std::istream &in, Line &line)

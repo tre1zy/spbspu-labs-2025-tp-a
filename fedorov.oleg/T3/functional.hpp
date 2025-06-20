@@ -1,11 +1,12 @@
 #ifndef FUNCTIONAL_HPP
 #define FUNCTIONAL_HPP
 
-#include "polygon.hpp"
-#include "input_delimiter.hpp"
 #include <algorithm>
 #include <functional>
 #include <string>
+
+#include "polygon.hpp"
+#include "input_delimiter.hpp"
 
 namespace fedorov
 {
