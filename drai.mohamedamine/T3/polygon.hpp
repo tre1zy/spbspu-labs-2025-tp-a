@@ -14,6 +14,12 @@ struct Polygon {
     std::vector<Point> points;
 };
 
+struct Line {
+    std::string content;
+};
+
+std::istream& operator>>(std::istream& is, Line& line);
+
 Point operator-(const Point& a, const Point& b);
 int dot(const Point& a, const Point& b);
 int cross(const Point& a, const Point& b);

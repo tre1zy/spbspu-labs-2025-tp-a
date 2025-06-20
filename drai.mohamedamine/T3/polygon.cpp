@@ -124,9 +124,8 @@ bool polygons_intersect(const Polygon& a, const Polygon& b) {
 bool parse_polygon(const std::string& str, Polygon& poly) {
     std::istringstream iss(str);
     int n;
-    if (!(iss >> n) || n <= 0) {
-        return false;
-    }
+    if (!(iss >> n) || n <= 0) return false;
+    
     poly.points.clear();
     poly.points.reserve(n);
 
@@ -136,12 +135,11 @@ bool parse_polygon(const std::string& str, Polygon& poly) {
         [&iss]() {
             Point pt;
             char c;
-            if (!(iss >> c) || c != '(') throw false;
-            if (!(iss >> pt.x)) throw false;
-            if (!(iss >> c) || c != ';') throw false;
-            if (!(iss >> pt.y)) throw false;
-            if (!(iss >> c) || c != ')') throw false;
-            if (iss.fail()) throw false;
+            if (!(iss >> c) || c != '(') return Point{};
+            if (!(iss >> pt.x)) return Point{};
+            if (!(iss >> c) || c != ';') return Point{};
+            if (!(iss >> pt.y)) return Point{};
+            if (!(iss >> c) || c != ')') return Point{};
             return pt;
         }
     );

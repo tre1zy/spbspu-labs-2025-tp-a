@@ -4,6 +4,11 @@
 #include <algorithm>
 #include "polygon.hpp"
 
+std::istream& operator>>(std::istream& is, Line& line) {
+    std::getline(is, line.content);
+    return is;
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Error: missing filename argument\n";
@@ -14,15 +19,23 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: could not open file\n";
         return 1;
     }
+
     std::vector<Polygon> polygons;
+    std::vector<Line> lines;
+
+    std::copy(
+        std::istream_iterator<Line>(infile),
+        std::istream_iterator<Line>(),
+        std::back_inserter(lines)
+    );
 
     std::transform(
-        std::istream_iterator<std::string>(infile),
-        std::istream_iterator<std::string>(),
+        lines.begin(),
+        lines.end(),
         std::back_inserter(polygons),
-        [](const std::string& line) {
+        [](const Line& line) {
             Polygon poly;
-            if (!line.empty() && parse_polygon(line, poly) && poly.points.size() >= 3) {
+            if (!line.content.empty() && parse_polygon(line.content, poly) && poly.points.size() >= 3) {
                 return poly;
             }
             return Polygon{};

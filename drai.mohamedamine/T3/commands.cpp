@@ -189,27 +189,24 @@ void process_commands(std::vector<Polygon>& polygons) {
             }
         }
         else if (cmd == "INTERSECTIONS") {
-            std::string rest;
-            std::getline(iss, rest);
-            if (rest.empty()) {
-                invalid = true;
-            } else {
-                size_t pos = rest.find_first_not_of(' ');
-                if (pos != std::string::npos) {
-                    rest = rest.substr(pos);
-                }
-                Polygon query;
-                if (!parse_polygon(rest, query) || query.points.size() < 3) {
+                std::string rest;
+                std::getline(iss, rest);
+                if (rest.empty()) {
                     invalid = true;
                 } else {
-                    intResult = std::count_if(
-                        polygons.begin(), polygons.end(),
-                        [&query](const Polygon& p) {
-                            return polygons_intersect(p, query);
-                        });
+                    rest.erase(0, rest.find_first_not_of(' '));
+                    Polygon query;
+                    if (!parse_polygon(rest, query) || query.points.size() < 3) {
+                        invalid = true;
+                    } else {
+                        intResult = polygons.empty() ? 0 : std::count_if(
+                            polygons.begin(), polygons.end(),
+                            [&query](const Polygon& p) {
+                                return polygons_intersect(p, query);
+                            });
+                    }
                 }
             }
-        }
         else if (cmd == "RMECHO") {
             std::string rest;
             std::getline(iss, rest);
