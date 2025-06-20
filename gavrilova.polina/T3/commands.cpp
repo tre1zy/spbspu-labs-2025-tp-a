@@ -52,10 +52,12 @@ namespace {
   {
     return polygon.isOdd() ? 1 : 0;
   }
+
   size_t calcCountEven(const Polygon& polygon)
   {
     return polygon.isEven() ? 1 : 0;
   }
+
   double calcCountNum(const Polygon& polygon, size_t num)
   {
     return (polygon.points.size() == num) ? 1 : 0.0;
@@ -65,7 +67,7 @@ namespace {
 void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands)
 {
   if (polygons.empty()) {
-    std::cout << "No polygons detected." << std::endl;
+    std::cout << "No polygons detected." << "\n";
     return;
   }
 
@@ -97,17 +99,17 @@ void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::v
               std::placeholders::_1,
               num));
     } catch (...) {
-      std::cout << "Invalid subcommand." << std::endl;
+      std::cout << "Invalid subcommand." << "\n";
       return;
     }
   }
-  std::cout << std::fixed << std::setprecision(1) << area << std::endl;
+  std::cout << std::fixed << std::setprecision(1) << area << "\n";
 }
 
 void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands)
 {
   if (polygons.empty()) {
-    std::cout << "No polygons detected." << std::endl;
+    std::cout << "No polygons detected." << "\n";
     return;
   }
 
@@ -123,19 +125,19 @@ void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std:
 
   if (subcommand == "AREA") {
     auto val = min_max_map.at(command)(polygons, minAreaComp);
-    std::cout << std::fixed << std::setprecision(1) << val.area() << std::endl;
+    std::cout << std::fixed << std::setprecision(1) << val.area() << "\n";
   } else if (subcommand == "VERTEXES") {
     auto val = min_max_map.at(command)(polygons, minVertexesComp);
-    std::cout << val.points.size() << std::endl;
+    std::cout << val.points.size() << "\n";
   } else {
-    std::cout << "Invalid subcommand." << std::endl;
+    std::cout << "Invalid subcommand." << "\n";
   }
 }
 
 void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands)
 {
   if (polygons.empty()) {
-    std::cout << "No polygons detected." << std::endl;
+    std::cout << "No polygons detected." << "\n";
     return;
   }
 
@@ -164,12 +166,12 @@ void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::
               std::placeholders::_1,
               num));
     } catch (...) {
-      std::cout << "Invalid subcommand." << std::endl;
+      std::cout << "Invalid subcommand." << "\n";
       return;
     }
   }
 
-  std::cout << count << std::endl;
+  std::cout << count << "\n";
 }
 
 void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands)
@@ -178,7 +180,8 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
       commands.begin() + 1,
       commands.end(),
       std::string(""),
-      [](const std::string& str_1, const std::string& str_2) {
+      [](const std::string& str_1, const std::string& str_2)
+      {
         return str_1 + " " + str_2;
       });
 
@@ -186,7 +189,7 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
-    std::cout << "Error while parsing Polygon" << std::endl;
+    std::cout << "Error while parsing Polygon" << "\n";
     return;
   }
 
@@ -195,13 +198,14 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
   size_t count = std::count_if(
       polygons.begin(),
       polygons.end(),
-      [&ref_polygon](const Polygon& polygon) {
+      [&ref_polygon](const Polygon& polygon)
+      {
         auto points = polygon.points;
         std::sort(points.begin(), points.end());
         return points == ref_polygon.points;
       });
 
-  std::cout << count << std::endl;
+  std::cout << count << "\n";
 }
 
 void gavrilova::processLessArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands)
@@ -210,7 +214,8 @@ void gavrilova::processLessArea(const std::vector< Polygon >& polygons, const st
       commands.begin() + 1,
       commands.end(),
       std::string(""),
-      [](const std::string& str_1, const std::string& str_2) {
+      [](const std::string& str_1, const std::string& str_2)
+      {
         return str_1 + " " + str_2;
       });
 
@@ -218,16 +223,17 @@ void gavrilova::processLessArea(const std::vector< Polygon >& polygons, const st
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
-    std::cout << "Error while parsing Polygon" << std::endl;
+    std::cout << "Error while parsing Polygon" << "\n";
     return;
   }
 
   size_t count = std::count_if(
       polygons.begin(),
       polygons.end(),
-      [&ref_polygon](const Polygon& polygon) {
+      [&ref_polygon](const Polygon& polygon)
+      {
         return polygon.area() < ref_polygon.area();
       });
 
-  std::cout << count << std::endl;
+  std::cout << count << "\n";
 }
