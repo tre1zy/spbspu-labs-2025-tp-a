@@ -4,11 +4,6 @@
 #include <algorithm>
 #include "polygon.hpp"
 
-std::istream& operator>>(std::istream& is, Line& line) {
-    std::getline(is, line.content);
-    return is;
-}
-
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Error: missing filename argument\n";
