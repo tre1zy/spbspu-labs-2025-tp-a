@@ -104,15 +104,3 @@ void alymova::rightShapes(std::ostream& out, const std::vector< Polygon >& polyg
 {
   out << std::count_if(polygons.begin(), polygons.end(), haveRightAngles);
 }
-
-alymova::CommandDataset alymova::complectCommands(std::istream& in, std::ostream& out)
-{
-  return {
-    {"AREA", std::bind(area, std::ref(in), std::ref(out), _1)},
-    {"MAX", std::bind(maxAndMin< CmpArea, CmpVertexes >, maxArea, maxVertexes, std::ref(in), std::ref(out), _1)},
-    {"MIN", std::bind(maxAndMin< CmpArea, CmpVertexes >, minArea, minVertexes, std::ref(in), std::ref(out), _1)},
-    {"COUNT", std::bind(count, std::ref(in), std::ref(out), _1)},
-    {"INFRAME", std::bind(inFrame, std::ref(in), std::ref(out), _1)},
-    {"RIGHTSHAPES", std::bind(rightShapes, std::ref(out), _1)}
-  };
-}
