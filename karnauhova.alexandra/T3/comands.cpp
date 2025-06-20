@@ -219,3 +219,16 @@ double karnauhova::countPol(const std::vector< Polygon >& polygons, size_t count
 {
   return sumPol(polygons, CountCompare{ count });
 }
+
+void karnauhova::lessareaComand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  Polygon it;
+  in >> it;
+  if (!in)
+  {
+    in.clear();
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  size_t count = std::count_if(polygons.begin(), polygons.end(), std::bind(compArea, std::placeholders::_1, it));
+  out << count << "\n";
+}
