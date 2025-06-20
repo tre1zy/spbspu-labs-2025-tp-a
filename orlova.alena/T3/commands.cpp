@@ -236,3 +236,25 @@ size_t orlova::countNum(const std::vector< Polygon >& polygons, size_t numOfVert
   using namespace std::placeholders;
   return std::count_if(polygons.begin(), polygons.end(), std::bind(isNum, _1, numOfVertexes));
 }
+
+void orlova::perms(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (polygon.points.size() < 3)
+  {
+    throw std::logic_error("WRONG POLYGON SIZE");
+  }
+  using namespace std::placeholders;
+  out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, _1, polygon);
+  return;
+}
+
+bool orlova::isPermutation(const Polygon& polygon1, const Polygon& polygon2)
+{
+  if (polygon1.points.size() != polygon2.points.size())
+  {
+    return false;
+  }
+  return std::is_permutaion(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
+}

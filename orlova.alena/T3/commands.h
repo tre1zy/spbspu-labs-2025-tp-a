@@ -36,6 +36,9 @@ namespace orlova
   size_t countEven(const std::vector< Polygon >&);
   size_t countOdd(const std::vector< Polygon >&);
   size_t countNum(const std::vector< Polygon >&, size_t);
+
+  void perms(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  bool isPermutation(const Polygon&, const Polygon&);
 }
 
 #endif
