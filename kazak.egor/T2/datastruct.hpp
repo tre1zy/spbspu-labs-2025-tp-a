@@ -1,4 +1,4 @@
-#ifndef DATASTRUCT_HPP
+k#ifndef DATASTRUCT_HPP
 #define DATASTRUCT_HPP
 #include <iostream>
 #include <string>
@@ -47,5 +47,4 @@ namespace kazak
   std::istream& operator>>(std::istream& in, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 }
-
 #endif
