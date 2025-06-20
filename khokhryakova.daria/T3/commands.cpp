@@ -15,7 +15,7 @@ namespace
 {
   bool isEven(const khokhryakova::Polygon& poly)
   {
-    return poly.points.size() % 2;
+    return poly.points.size() % 2 == 0;
   }
 
   bool isOdd(const khokhryakova::Polygon& poly)
