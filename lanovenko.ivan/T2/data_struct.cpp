@@ -1,56 +1,37 @@
 #include "data_struct.hpp"
 
-namespace
+std::istream& lanovenko::operator>>(std::istream& in, CharIO&& dest)
 {
-  struct CharIO
+  std::istream::sentry s(in);
+  if (!s)
   {
-    char& ref;
-  };
-
-  struct RationalIO
-  {
-    std::pair< long long, unsigned long long >& ref;
-  };
-
-  struct StringIO
-  {
-    std::string& ref;
-  };
-
-  std::istream& operator>>(std::istream& in, CharIO&& dest)
-  {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    in >> io::DelimiterIO{ '\'' } >> dest.ref >> io::DelimiterIO{ '\'' } >> io::DelimiterIO{':'};
     return in;
   }
+  in >> DelimiterIO{ '\'' } >> dest.ref >> DelimiterIO{ '\'' } >> DelimiterIO{':'};
+  return in;
+}
 
-  std::istream& operator>>(std::istream& in, RationalIO&& dest)
+std::istream& lanovenko::operator>>(std::istream& in, RationalIO&& dest)
+{
+  std::istream::sentry s(in);
+  if (!s)
   {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    in >> io::DelimiterIO{ '(' } >> io::DelimiterIO{ ':' } >> io::DelimiterIO{ 'N' } >> dest.ref.first;
-    in >> io::DelimiterIO{ ':' } >> io::DelimiterIO{ 'D' } >> dest.ref.second >> io::DelimiterIO{ ':' };
-    in >> io::DelimiterIO{ ')' } >> io::DelimiterIO{ ':' };
     return in;
   }
+  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' } >> dest.ref.first;
+  in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second >> DelimiterIO{ ':' };
+  in >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
+  return in;
+}
 
-  std::istream& operator>>(std::istream& in, StringIO&& dest)
+std::istream& lanovenko::operator>>(std::istream& in, StringIO&& dest)
+{
+  std::istream::sentry s(in);
+  if (!s)
   {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    return std::getline(in >> io::DelimiterIO{ '"' }, dest.ref, '"');
+    return in;
   }
-
+  return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
 
 std::istream& lanovenko::operator>>(std::istream& in, DataStruct& dest)
@@ -62,7 +43,7 @@ std::istream& lanovenko::operator>>(std::istream& in, DataStruct& dest)
   }
   DataStruct input{};
   {
-    using sep = io::DelimiterIO;
+    using sep = DelimiterIO;
     using chr = CharIO;
     using rtn = RationalIO;
     using str = StringIO;

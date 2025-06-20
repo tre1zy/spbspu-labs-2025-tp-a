@@ -1,9 +1,8 @@
 #ifndef DELIMITER_HPP
 #define DELIMITER_HPP
+#include <iostream>
 
-#include <istream>
-
-namespace lanovenko
+namespace io
 {
   struct DelimiterIO
   {
@@ -12,5 +11,4 @@ namespace lanovenko
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
-
 #endif

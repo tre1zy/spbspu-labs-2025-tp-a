@@ -1,15 +1,15 @@
-#ifndef DELIMITER_HPP
-#define DELIMITER_HPP
+#ifndef COMMON_IO_ACTIONS
+#define COMMON_IO_ACTIONS
 
-#include <istream>
+#include <cstddef>
+#include <iostream>
 
-namespace lanovenko
+namespace tkach
 {
   struct DelimiterIO
   {
     char exp;
   };
-
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 

@@ -1,6 +1,6 @@
 #include "delimiter.hpp"
 
-std::istream& io::operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream& lanovenko::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry s(in);
   if (!s)
