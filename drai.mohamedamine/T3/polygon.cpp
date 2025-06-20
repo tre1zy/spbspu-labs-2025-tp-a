@@ -125,7 +125,7 @@ bool parse_polygon(const std::string& str, Polygon& poly) {
     std::istringstream iss(str);
     int n;
     if (!(iss >> n) || n <= 0) return false;
-    
+
     poly.points.clear();
     poly.points.reserve(n);
 
