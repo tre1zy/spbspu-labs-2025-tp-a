@@ -16,6 +16,6 @@ namespace abramov
   void unionDicts(DictionaryCollection &collect, std::istream &in);
   void diffDicts(DictionaryCollection &collect, std::istream &in);
   void mergeDicts(DictionaryCollection &collect, std::istream &in);
-  void printDicts(DictionaryCollection &collect, std::istream &in, std::ostream &out);
+  void printDict(const DictionaryCollection &collect, std::istream &in, std::ostream &out);
 }
 #endif
