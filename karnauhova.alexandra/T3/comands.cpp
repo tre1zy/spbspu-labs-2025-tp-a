@@ -28,7 +28,7 @@ namespace
   struct CountCompare
   {
     size_t count;
-    bool operator()(const karnauhova::Polygon& pol)
+    bool operator()(const karnauhova::Polygon& pol) const
     {
       return count == pol.points.size();
     }
