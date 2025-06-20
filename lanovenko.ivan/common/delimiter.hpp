@@ -3,7 +3,7 @@
 
 #include <istream>
 
-namespace io
+namespace lanovenko
 {
   struct DelimiterIO
   {
