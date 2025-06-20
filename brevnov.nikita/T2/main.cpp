@@ -8,7 +8,6 @@ int main()
   using DaS = brevnov::DataStruct;
   using istreamIt = std::istream_iterator< DaS >;
   using ostreamIt = std::ostream_iterator< DaS >;
-
   std::vector< DaS > data;
   while (!std::cin.eof())
   {
@@ -20,11 +19,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), brevnov::compare);
-  std::copy
-  (
-    std::begin(data),
-    std::end(data),
-    ostreamIt(std::cout, "\n")
-  );
+  std::copy(std::begin(data), std::end(data), ostreamIt(std::cout, "\n"));
   return 0;
 }
