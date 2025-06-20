@@ -63,12 +63,12 @@ namespace
     return sum / polygons.size();
   }
 
-  double areaNum(const std::vector< khokhryakova::Polygon >& polygons, size_t angles)
+  double areaNum(const std::vector< khokhryakova::Polygon >& polygons, size_t angle)
   {
     double sum = 0.0;
     for (const auto& poly : polygons)
     {
-      if (poly.points.size() == angles)
+      if (poly.points.size() == angle)
       {
         sum += khokhryakova::getArea(poly);
       }
