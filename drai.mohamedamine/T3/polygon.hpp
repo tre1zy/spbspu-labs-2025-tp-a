@@ -1,22 +1,28 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-#include <vector>
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 
-struct Point {
-    int x;
-    int y;
-    Point(int x_val = 0, int y_val = 0) : x(x_val), y(y_val) {}
+struct Point
+{
+  int x;
+  int y;
+  Point(int x_val = 0, int y_val = 0):
+    x(x_val),
+    y(y_val)
+  {}
 };
 
-struct Polygon {
-    std::vector<Point> points;
+struct Polygon
+{
+  std::vector< Point > points;
 };
 
-struct Line {
-    std::string content;
+struct Line
+{
+  std::string content;
 };
 
 std::istream& operator>>(std::istream& is, Line& line);
@@ -34,6 +40,6 @@ bool point_in_polygon(const Point& pt, const Polygon& poly);
 bool polygons_intersect(const Polygon& a, const Polygon& b);
 bool parse_polygon(const std::string& str, Polygon& poly);
 
-void process_commands(std::vector<Polygon>& polygons);
+void process_commands(std::vector< Polygon >& polygons);
 
 #endif
