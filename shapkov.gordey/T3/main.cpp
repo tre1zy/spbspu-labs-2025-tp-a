@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   using inputIt = std::istream_iterator< Polygon >;
   while (!file.eof())
   {
-    std::copy(inputIt{file}, inputIt{}, std::back_inserter(data));
+    std::copy(inputIt{ file }, inputIt{}, std::back_inserter(data));
     if (!file)
     {
       file.clear();

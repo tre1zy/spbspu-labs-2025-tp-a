@@ -1,14 +1,10 @@
-#ifndef FUNCTORS_HPP
-#define FUNCTORS_HPP
+#ifndef POLYGON_FUNCTORS_HPP
+#define POLYGON_FUNCTORS_HPP
 #include "GeometricalTypes.hpp"
 
 namespace shapkov
 {
-  struct isSize
-  {
-    size_t size;
-    bool operator()(const Polygon& p) const;
-  };
+  bool isSize(const Polygon& p, size_t size);
   bool compareDouble(double d1, double d2, double epsilon = 1e-9);
   struct isSame
   {
