@@ -50,24 +50,32 @@ namespace
   {
     return poll.points.size() < polr.points.size();
   }
+  
+  template< typename Compare >
+  size_t sumPol(const std::vector< karnauhova::Polygon >& polygons, Compare C)
+  {
+    std::vector< karnauhova::Polygon > it;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(it), C);
+    return it.size();
+  }
 }
 
 void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  std::map< std::string, std::function< double() > > commands;
-  commands["EVEN"] = std::bind(evenArea, std::cref(polygons));
-  commands["ODD"] = std::bind(oddArea, std::cref(polygons));
-  commands["MEAN"] = std::bind(meanArea, std::cref(polygons));
-  std::string command;
-  in >> command;
+  std::map< std::string, std::function< double() > > comands;
+  comands["EVEN"] = std::bind(evenArea, std::cref(polygons));
+  comands["ODD"] = std::bind(oddArea, std::cref(polygons));
+  comands["MEAN"] = std::bind(meanArea, std::cref(polygons));
+  std::string comand;
+  in >> comand;
   double sum = 0;
   try
   {
-    sum = commands.at(command)();
+    sum = comands.at(comand)();
   }
   catch(...)
   {
-    size_t count = std::stoull(command);
+    size_t count = std::stoull(comand);
     if (count < 3)
     {
       throw std::logic_error("Error: few vertices");
@@ -108,18 +116,18 @@ void karnauhova::maxComands(std::istream& in, std::ostream& out, const std::vect
   {
     throw std::logic_error("Not enough polygons");
   }
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(out));
-  commands["VERTEXES"] = std::bind(maxVert, std::cref(polygons), std::ref(out));
-  std::string command;
-  in >> command;
+  std::map< std::string, std::function< void() > > comands;
+  comands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(out));
+  comands["VERTEXES"] = std::bind(maxVert, std::cref(polygons), std::ref(out));
+  std::string comand;
+  in >> comand;
   try
   {
-    commands.at(command)();
+    comands.at(comand)();
   }
   catch(...)
   {
-    throw std::logic_error("Error in command");
+    throw std::logic_error("Error in comand");
   }
 }
 
@@ -143,18 +151,18 @@ void karnauhova::minComands(std::istream& in, std::ostream& out, const std::vect
   {
     throw std::logic_error("Not enough polygons");
   }
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(std::cout));
-  commands["VERTEXES"] = std::bind(minVert, std::cref(polygons), std::ref(std::cout));
-  std::string command;
-  in >> command;
+  std::map< std::string, std::function< void() > > comands;
+  comands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(std::cout));
+  comands["VERTEXES"] = std::bind(minVert, std::cref(polygons), std::ref(std::cout));
+  std::string comand;
+  in >> comand;
   try
   {
-    commands.at(command)();
+    comands.at(comand)();
   }
   catch(...)
   {
-    throw std::logic_error("Error in command");
+    throw std::logic_error("Error in comand");
   }
 }
 
@@ -172,4 +180,42 @@ void karnauhova::minVert(const std::vector< Polygon >& polygons, std::ostream& o
   out << std::fixed << std::setprecision(1) << min.points.size() << "\n";
 }
 
+void karnauhova::countComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  std::map< std::string, std::function< size_t() > > comands;
+  comands["EVEN"] = std::bind(evenCount, std::cref(polygons));
+  comands["ODD"] = std::bind(oddCount, std::cref(polygons));
+  std::string comand;
+  in >> comand;
+  size_t size = 0;
+  try
+  {
+    size = comands.at(comand)();
+  }
+  catch(...)
+  {
+    size_t count = std::stoull(comand);
+    if (count < 3)
+    {
+      throw std::logic_error("Error: few vertices");
+    }
+    size = countPol(polygons, count);
+  }
+  //karnauhova::iofmtguard scope(out);
+  out << std::fixed << std::setprecision(1) << size << "\n";
+}
 
+size_t karnauhova::evenCount(const std::vector< Polygon >& polygons)
+{
+  return sumPol(polygons, isEven);
+}
+
+size_t karnauhova::oddCount(const std::vector< Polygon >& polygons)
+{
+  return sumPol(polygons, isOdd);
+}
+
+double karnauhova::countPol(const std::vector< Polygon >& polygons, size_t count)
+{
+  return sumPol(polygons, CountCompare{ count });
+}
