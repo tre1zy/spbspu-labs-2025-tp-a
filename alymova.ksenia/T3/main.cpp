@@ -7,6 +7,7 @@
 #include <limits>
 #include <iomanip>
 #include "user-commands.hpp"
+#include "sub-utils.hpp"
 #include "shapes.hpp"
 
 int main(int argc, char** argv)
@@ -37,7 +38,14 @@ int main(int argc, char** argv)
     std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
 
-  CommandDataset commands = complectCommands(std::cin, std::cout);
+  //CommandDataset commands = complectCommands(std::cin, std::cout);
+  CommandDataset commands;
+  commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["MAX"] = std::bind(maxAndMin< CmpArea, CmpVertexes >, maxArea, maxVertexes, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["MIN"] = std::bind(maxAndMin< CmpArea, CmpVertexes >, minArea, minVertexes, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["INFRAME"] = std::bind(inFrame, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["RIGHTSHAPES"] = std::bind(rightShapes, std::ref(std::cout), _1);
   std::string command;
   while (!(std::cin >> command).eof())
   {

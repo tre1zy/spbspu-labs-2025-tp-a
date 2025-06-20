@@ -34,7 +34,6 @@ namespace alymova
   bool isRightAngle(const Point& point1, const Point& point2);
   Point getSide(const Point& point1, const Point& point2);
 
-  bool isDigit(char c);
   bool isEqualSize(size_t size, const Polygon& polygon);
   bool isPolygonEven(const Polygon& polygon);
   size_t getVertexes(const std::string& str);

@@ -179,11 +179,6 @@ alymova::Point alymova::getSide(const Point& point1, const Point& point2)
   return {point1.x - point2.x, point1.y - point2.y};
 }
 
-bool alymova::isDigit(char c)
-{
-  return std::isdigit(c);
-}
-
 bool alymova::isEqualSize(size_t size, const Polygon& polygon)
 {
   return size == polygon.points.size();

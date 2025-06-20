@@ -72,11 +72,7 @@ std::ostream& alymova::operator<<(std::ostream& out, const Polygon& polygon)
   {
     return out;
   }
-  std::copy_n(
-    polygon.points.begin(),
-    polygon.points.size() - 1,
-    std::ostream_iterator< Point >(out, " ")
-  );
+  std::copy_n(polygon.points.begin(), polygon.points.size() - 1, std::ostream_iterator< Point >(out, " "));
   out << polygon.points[polygon.points.size() - 1];
   return out;
 }
