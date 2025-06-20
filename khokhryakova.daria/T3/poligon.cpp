@@ -2,6 +2,7 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip>
+#include <iterator>
 #include "poligon.h"
 
 namespace khokhryakova
