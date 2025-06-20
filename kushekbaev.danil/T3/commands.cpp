@@ -93,15 +93,15 @@ namespace
     const kushekbaev::Polygon& polygon;
     bool operator()(const kushekbaev::Point& b)
     {
-        size_t i = &b - &polygon.points[0];
-        size_t n = polygon.points.size();
-        const auto& a = polygon.points[(i + n - 1) % n];
-        const auto& c = polygon.points[(i + 1) % n];
-        double abx = a.x - b.x;
-        double aby = a.y - b.y;
-        double cbx = c.x - b.x;
-        double cby = c.y - b.y;
-        return (abx * cbx + aby * cby) == 0;
+      size_t i = &b - &polygon.points[0];
+      size_t n = polygon.points.size();
+      const auto& a = polygon.points[(i + n - 1) % n];
+      const auto& c = polygon.points[(i + 1) % n];
+      double abx = a.x - b.x;
+      double aby = a.y - b.y;
+      double cbx = c.x - b.x;
+      double cby = c.y - b.y;
+      return (abx * cbx + aby * cby) == 0;
     }
   };
 
