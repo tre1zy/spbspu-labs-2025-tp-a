@@ -147,8 +147,8 @@ namespace ageev
     }
     iofmtguard fmtguard(out);
     out << "(:key1 " << std::fixed << std::setprecision(1)
-        << src.key1 << "d:key2 " << std::defaultfloat
-        << src.key2 << ":key3 \"" << src.key3 << "\":)";
+        << src.key1 << "d:" << "key2 " << std::defaultfloat
+        << src.key2 << ":" << "key3 \"" << src.key3 << "\":)";
     return out;
   }
 
