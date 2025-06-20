@@ -1,4 +1,5 @@
-#include <iostream>
+void orlova::countSequence(const std::vector< Polygon >& polygons, const Polygon& target,
+    size_t index, int& current, int& max)#include <iostream>
 #include <sstream>
 #include <limits>
 #include <algorithm>
@@ -258,4 +259,35 @@ bool orlova::isPermutation(const Polygon& polygon1, const Polygon& polygon2)
     return false;
   }
   return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
+}
+
+void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (polygon.points.size() < 3)
+  {
+    throw std::logic_error("<WRONG POLYGON SIZE>");
+  }
+  int current = 0, max = 0;
+  countSequence(polygons, polygon, 0, current, max);
+  out << max << std::endl;
+}
+
+void orlova::countSequence(const std::vector< Polygon >& polygons, const Polygon& polygon, size_t index, int& current, int& max)
+{
+  if (index >= polygons.size())
+  {
+    return;
+  }
+  if (polygons[index] == polygon)
+  {
+    current++;
+    max = std::max(max, current);
+  }
+  else
+  {
+    current = 0;
+  }
+  countSequence(polygons, polygon, index + 1, current, max);
 }

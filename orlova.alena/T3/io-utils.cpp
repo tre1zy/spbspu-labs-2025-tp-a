@@ -84,6 +84,11 @@ bool orlova::operator==(const Point& point1, const Point& point2)
   return (point1.x == point2.x && point1.y == point2.y) || (point1.x == point2.y && point1.y == point2.x);
 }
 
+bool orlova::operator==(const Polygon& polygon1, const Polygon& polygon2)
+{
+  return polygon1.points == polygon2.points;
+}
+
 orlova::IoGuard::IoGuard(std::basic_ios< char >& s) :
   s_(s),
   width_(s.width()),

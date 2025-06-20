@@ -39,6 +39,9 @@ namespace orlova
 
   void perms(const std::vector< Polygon >&, std::istream&, std::ostream&);
   bool isPermutation(const Polygon&, const Polygon&);
+
+  void maxseq(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void countSequence(const std::vector< Polygon >&, const Polygon&, size_t, int&, int&);
 }
 
 #endif
