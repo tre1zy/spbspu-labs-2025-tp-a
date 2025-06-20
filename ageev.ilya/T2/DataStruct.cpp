@@ -55,6 +55,7 @@ namespace ageev
         str += c;
       }
       int degree = std::stoi(str);
+      in.unget();
       dest.ref = number * std::pow(10, degree);
     }
     catch (const std::exception& e)
@@ -113,17 +114,23 @@ namespace ageev
       in >> sep{':'} >> key;
       if (key == "key1" && !hasKey1)
       {
-        if (in >> dbl{input.key1}) hasKey1 = true;
+        if (in >> dbl{input.key1}){
+          hasKey1 = true;
+        }
         else break;
       }
       else if (key == "key2" && !hasKey2)
       {
-        if (in >> dblsci{input.key2}) hasKey2 = true;
+        if (in >> dblsci{input.key2}) {
+          hasKey2 = true;
+        }
         else break;
       }
       else if (key == "key3" && !hasKey3)
       {
-        if (in >> str{input.key3}) hasKey3 = true;
+        if (in >> str{input.key3}) {
+          hasKey3 = true;
+        }
         else break;
       }
       else

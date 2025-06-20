@@ -3,12 +3,15 @@
 #include <iterator>
 #include <algorithm>
 #include "DataStruct.hpp"
+#include <sstream>
 
 int main()
 {
   using ageev::DataStruct;
 
   std::vector< DataStruct > data;
+  std::istringstream iss("(:key1 0.0d:key2 1234.0e-2:key3 \"Data\":)");
+
 
   std::copy(
     std::istream_iterator< DataStruct >(std::cin),
@@ -16,7 +19,6 @@ int main()
     std::back_inserter(data)
   );
 
-  std::cout << "Data:\n";
   std::copy(
     std::begin(data),
     std::end(data),
