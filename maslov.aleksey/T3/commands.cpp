@@ -44,7 +44,7 @@ namespace
     maslov::StreamGuard guard(out);
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
+    double result = std::accumulate(areas.begin(), areas.end(), 0.0) / polygons.size();
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
