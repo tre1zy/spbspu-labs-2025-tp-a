@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv)
 {
-  using namespace karnauhova; 
+  using namespace karnauhova;
   if (argc != 2)
   {
     std::cerr << "<INVALID ARGUMENTS>\n";
@@ -26,7 +26,6 @@ int main(int argc, char** argv)
   }
   std::vector< Polygon > polygons;
   using istr_iterator = std::istream_iterator< Polygon >;
-  using ostr_iter = std::ostream_iterator< Polygon >;
   while(!file.eof())
   {
     if (file.fail())

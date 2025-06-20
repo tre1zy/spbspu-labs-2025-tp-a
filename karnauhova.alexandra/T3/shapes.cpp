@@ -39,7 +39,7 @@ std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& karnauhova::operator>>(std::istream& in, Point&& point)
+std::istream& karnauhova::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -58,7 +58,6 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
   {
     return in;
   }
-  using point = Point;
   size_t count = 0;
   in >> count;
   if (!in || count < 3)
@@ -67,7 +66,7 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
     return in;
   }
   std::vector< Point > temp(count);
-  std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
+  std::copy_n(std::istream_iterator< Point >(in), count, std::back_inserter(temp));
   if (in)
   {
     pol.points = temp;
@@ -88,7 +87,12 @@ double karnauhova::getArea(const Polygon& polygon)
   return std::abs(area) / 2.0;
 }
 
-bool karnauhova::Polygon::operator==(const Polygon & rhs) const
+bool karnauhova::Point::operator==(const Point& rhs) const
 {
-  points == rhs.points;
+  return x == rhs.x && y == rhs.y;
+}
+
+bool karnauhova::Polygon::operator==(const Polygon& rhs) const
+{
+  return points == rhs.points;
 }

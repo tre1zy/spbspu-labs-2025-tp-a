@@ -6,6 +6,7 @@
 #include <functional>
 #include <stdexcept>
 #include <iomanip>
+#include <scope_guard.hpp>
 
 namespace
 {
@@ -19,7 +20,7 @@ namespace
     return !isEven(pol);
   }
 
-  bool allAreas(const karnauhova::Polygon& pol)
+  bool allAreas(const karnauhova::Polygon&)
   {
     return true;
   }
@@ -50,7 +51,7 @@ namespace
   {
     return poll.points.size() < polr.points.size();
   }
-  
+
   template< typename Compare >
   size_t sumPol(const std::vector< karnauhova::Polygon >& polygons, Compare C)
   {
@@ -82,7 +83,7 @@ void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vec
     }
     sum = countArea(polygons, count);
   }
-  //karnauhova::iofmtguard scope(out);
+  iofmtguard scope(out);
   out << std::fixed << std::setprecision(1) << sum << "\n";
 }
 
@@ -134,14 +135,14 @@ void karnauhova::maxComands(std::istream& in, std::ostream& out, const std::vect
 void karnauhova::maxArea(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   auto max = (*std::max_element(polygons.begin(), polygons.end(), compArea));
-  //karnauhova::iofmtguard scope(out);
+  iofmtguard scope(out);
   out << std::fixed << std::setprecision(1) << karnauhova::getArea(max) << "\n";
 }
 
 void karnauhova::maxVert(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   auto max = (*std::max_element(polygons.begin(), polygons.end(), compVert));
-  //karnauhova::iofmtguard scope(out);
+  iofmtguard scope(out);
   out << std::fixed << std::setprecision(1) << max.points.size() << "\n";
 }
 
@@ -152,8 +153,8 @@ void karnauhova::minComands(std::istream& in, std::ostream& out, const std::vect
     throw std::logic_error("Not enough polygons");
   }
   std::map< std::string, std::function< void() > > comands;
-  comands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(std::cout));
-  comands["VERTEXES"] = std::bind(minVert, std::cref(polygons), std::ref(std::cout));
+  comands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(out));
+  comands["VERTEXES"] = std::bind(minVert, std::cref(polygons), std::ref(out));
   std::string comand;
   in >> comand;
   try
@@ -169,14 +170,14 @@ void karnauhova::minComands(std::istream& in, std::ostream& out, const std::vect
 void karnauhova::minArea(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   auto min = (*std::min_element(polygons.begin(), polygons.end(), compArea));
-  //karnauhova::iofmtguard scope(out);
+  iofmtguard scope(out);
   out << std::fixed << std::setprecision(1) << karnauhova::getArea(min) << "\n";
 }
 
 void karnauhova::minVert(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   auto min = (*std::min_element(polygons.begin(), polygons.end(), compVert));
-  //karnauhova::iofmtguard scope(out);
+  iofmtguard scope(out);
   out << std::fixed << std::setprecision(1) << min.points.size() << "\n";
 }
 
@@ -201,7 +202,7 @@ void karnauhova::countComands(std::istream& in, std::ostream& out, const std::ve
     }
     size = countPol(polygons, count);
   }
-  //karnauhova::iofmtguard scope(out);
+  iofmtguard scope(out);
   out << std::fixed << std::setprecision(1) << size << "\n";
 }
 
