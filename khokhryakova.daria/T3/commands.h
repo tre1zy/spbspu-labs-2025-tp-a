@@ -4,7 +4,7 @@
 #include <iosfwd>
 #include <vector>
 #include <string>
-#include "polygon.h"
+#include "poligon.h"
 
 namespace khokhryakova
 {

@@ -2,7 +2,7 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip>
-#include "polygon.h"
+#include "poligon.h"
 
 namespace khokhryakova
 {

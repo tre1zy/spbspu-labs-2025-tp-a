@@ -7,7 +7,7 @@
 #include <string>
 #include <functional>
 #include "point.h"
-#include "polygon.h"
+#include "poligon.h"
 #include "commands.h"
 
 int main(int argc, char** argv)
