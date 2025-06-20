@@ -5,40 +5,44 @@
 
 namespace
 {
-  std::string cmpLspToStr(const std::complex<double> data)
+  void outputCmpLsp(std::ostream& os, const std::complex<double>& data)
   {
-    std::ostringstream oss;
-    oss << std::fixed << std::setprecision(1);
-    oss << data.real();
-    std::string re = oss.str();
-    oss.str("");
-    oss << data.imag();
-    std::string im = oss.str();
-    return "#c(" + re + " " + im + ")";
+    os << std::fixed << std::setprecision(1);
+    os << "#c(" << data.real() << " " << data.imag() << ")";
   }
 
-  std::string ullBinToStr(unsigned long long num)
+  void outputULLBin(std::ostream& os, unsigned long long num)
   {
     if (num == 0)
     {
-      return "0b0";
+      os << "0b0";
+      return;
     }
-    std::string binary;
+    
+    os << "0b0";
+    bool leadingZero = true;
     for (int i = sizeof(num) * 8 - 1; i >= 0; --i)
     {
-      binary += (num & (1ULL << i)) ? '1' : '0';
+      bool bit = num & (1ULL << i);
+      if (!leadingZero || bit)
+      {
+        os << (bit ? '1' : '0');
+        leadingZero = false;
+      }
     }
-    size_t firstOne = binary.find('1');
-    if (firstOne != std::string::npos)
+    if (leadingZero)
     {
-      binary = binary.substr(firstOne);
+      os << '0';
     }
-    return "0b0" + binary;
   }
 }
 
 std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
 {
-  os << "(:key1 " << ullBinToStr(data.key1) << ":key2 " << cmpLspToStr(data.key2)<< ":key3 \"" << data.key3 << "\":)";
+  os << "(:key1 ";
+  outputULLBin(os, data.key1);
+  os << ":key2 ";
+  outputCmpLsp(os, data.key2);
+  os << ":key3 \"" << data.key3 << "\":)";
   return os;
 }

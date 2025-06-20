@@ -8,7 +8,7 @@ namespace asafov
   struct DataStruct
   {
     unsigned long long key1 = 0;            //[ULL BIN]
-    std::complex<double> key2 = {0.0, 0.0}; //[CMP LSP]
+    std::complex< double > key2 = {0.0, 0.0}; //[CMP LSP]
     std::string key3;
   };
 
