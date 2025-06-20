@@ -23,7 +23,7 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-
+  std::sort(data.begin(), data.end());
   std::copy(
     std::begin(data),
     std::end(data),

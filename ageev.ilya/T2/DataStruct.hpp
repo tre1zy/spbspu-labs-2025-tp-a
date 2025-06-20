@@ -10,6 +10,8 @@ namespace ageev
     double key1;
     double key2;
     std::string key3;
+
+    bool operator<(const DataStruct&) const;
   };
 
   struct DelimiterIO

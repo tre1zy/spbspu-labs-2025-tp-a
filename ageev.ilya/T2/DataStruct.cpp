@@ -7,6 +7,16 @@
 
 namespace ageev
 {
+  bool DataStruct::operator<(const DataStruct& var) const{
+    if(key1 == var.key1){
+      if(key2 == var.key2){
+        return key3.size() < var.key3.size();
+      }
+      return key2 < var.key2;
+    }
+    return key1 < var.key1;
+  }
+
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
     std::istream::sentry sentry(in);
