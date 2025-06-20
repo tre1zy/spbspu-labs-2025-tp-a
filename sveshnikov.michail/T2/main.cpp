@@ -7,27 +7,19 @@
 int main()
 {
   using namespace sveshnikov;
-  std::vector< DataStruct > data;
+  using in_iter = std::istream_iterator< DataStruct >;
+  using out_iter = std::ostream_iterator< DataStruct >;
 
+  std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
     if (std::cin.fail())
     {
       std::cin.clear();
     }
-    std::copy(
-      std::istream_iterator< DataStruct >(std::cin),
-      std::istream_iterator< DataStruct >(),
-      std::back_inserter(data)
-    );
+    std::copy(in_iter(std::cin), in_iter(), std::back_inserter(data));
   }
-
   std::sort(data.begin(), data.end());
-
-  std::copy(
-    data.begin(),
-    data.end(),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
+  std::copy(data.begin(), data.end(), out_iter(std::cout, "\n"));
   return 0;
 }

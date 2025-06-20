@@ -36,8 +36,8 @@ namespace
   std::istream &operator>>(std::istream &in, SllIO &&dest);
   std::istream &operator>>(std::istream &in, UllIO &&dest);
 
-  template < class T >
-  std::istream &ll_io_impl(std::istream &in, T &ref, std::string str1, std::string str2)
+  template< class T >
+  std::istream &ll_io_impl(std::istream &in, T &ref, std::string &str1, std::string &str2)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -77,7 +77,7 @@ namespace
     {
       return in;
     }
-    return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+    return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
   }
 
   std::istream &operator>>(std::istream &in, LabelIO &&dest)
@@ -92,12 +92,16 @@ namespace
 
   std::istream &operator>>(std::istream &in, SllIO &&dest)
   {
-    return ll_io_impl(in, dest.ref, "ll", "LL");
+    std::string small_ll = "ll";
+    std::string big_ll = "LL";
+    return ll_io_impl(in, dest.ref, small_ll, big_ll);
   }
 
   std::istream &operator>>(std::istream &in, UllIO &&dest)
   {
-    return ll_io_impl(in, dest.ref, "ull", "ULL");
+    std::string small_ull = "ull";
+    std::string big_ull = "ULL";
+    return ll_io_impl(in, dest.ref, small_ull, big_ull);
   }
 }
 
@@ -115,34 +119,34 @@ std::istream &sveshnikov::operator>>(std::istream &in, DataStruct &dest)
   using ull = UllIO;
   using str = StringIO;
 
-  in >> std::noskipws >> sep{ '(' } >> sep{ ':' };
+  in >> std::noskipws >> sep{'('} >> sep{':'};
   int keys[3] = {};
   for (size_t i = 0; i < 3; i++)
   {
     std::string key;
-    in >> label{ key };
+    in >> label{key};
     if (key == "key1" && keys[0] == 0)
     {
-      in >> sll{ input.key1 };
+      in >> sll{input.key1};
       keys[0] = 1;
     }
     else if (key == "key2" && keys[1] == 0)
     {
-      in >> ull{ input.key2 };
+      in >> ull{input.key2};
       keys[1] = 1;
     }
     else if (key == "key3" && keys[2] == 0)
     {
-      in >> str{ input.key3 };
+      in >> str{input.key3};
       keys[2] = 1;
     }
     else
     {
       in.setstate(std::ios::failbit);
     }
-    in >> sep{ ':' };
+    in >> sep{':'};
   }
-  in >> sep{ ')' } >> std::skipws;
+  in >> sep{')'} >> std::skipws;
 
   if (in)
   {
@@ -170,17 +174,13 @@ std::ostream &sveshnikov::operator<<(std::ostream &out, const DataStruct &src)
 
 bool sveshnikov::DataStruct::operator<(const DataStruct &src) const
 {
-  if (key1 < src.key1)
+  if (key1 != src.key1)
   {
-    return true;
+    return key1 < src.key1;
   }
-  else if (key1 == src.key1 && key2 < src.key2)
+  else if (key2 != src.key2)
   {
-    return true;
+    return key2 < src.key2;
   }
-  else if (key1 == src.key1 && key2 == src.key2 && key3.size() < src.key3.size())
-  {
-    return true;
-  }
-  return false;
+  return key3.size() < src.key3.size();
 }
