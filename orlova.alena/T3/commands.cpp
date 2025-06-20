@@ -247,7 +247,7 @@ void orlova::perms(const std::vector< Polygon >& polygons, std::istream& in, std
     throw std::logic_error("WRONG POLYGON SIZE");
   }
   using namespace std::placeholders;
-  out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, _1, polygon);
+  out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, _1, polygon));
   return;
 }
 
@@ -257,5 +257,5 @@ bool orlova::isPermutation(const Polygon& polygon1, const Polygon& polygon2)
   {
     return false;
   }
-  return std::is_permutaion(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
+  return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
 }
