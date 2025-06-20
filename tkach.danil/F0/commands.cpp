@@ -323,7 +323,7 @@ namespace
   };
 }
 
-void tkach::import(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::import(std::istream& in, tree_of_dict& avltree)
 {
   tree_of_dict temp(avltree);
   std::string file_name = "";
@@ -404,7 +404,7 @@ void tkach::import(std::istream& in, std::map< std::string, std::map< std::strin
   }
 }
 
-void tkach::addWord(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::addWord(std::istream& in, tree_of_dict& avltree)
 {
   std::string dict_name;
   std::string eng_word;
@@ -431,7 +431,7 @@ void tkach::addWord(std::istream& in, std::map< std::string, std::map< std::stri
   avltree[dict_name][eng_word] = mergeTranslations(translations, avltree[dict_name][eng_word]);
 }
 
-void tkach::mergeWords(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::mergeWords(std::istream& in, tree_of_dict& avltree)
 {
   std::string dict_name;
   std::string eng_word1;
@@ -519,17 +519,17 @@ void tkach::printCommonTranslations(std::istream& in, std::ostream& out, const t
   }
 }
 
-void tkach::doExportOverwrite(std::istream& in, const std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::doExportOverwrite(std::istream& in, const tree_of_dict& avltree)
 {
   exportDictionaries(in, avltree, std::ios_base::out);
 }
 
-void tkach::doExportInEnd(std::istream& in, const std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::doExportInEnd(std::istream& in, const tree_of_dict& avltree)
 {
   exportDictionaries(in, avltree, std::ios_base::app);
 }
 
-void tkach::printAll(std::ostream& out, const std::map< std::string, std::map< std::string, std::list< std::string > > >& data)
+void tkach::printAll(std::ostream& out, const tree_of_dict& data)
 {
   if (data.empty())
   {
@@ -538,7 +538,7 @@ void tkach::printAll(std::ostream& out, const std::map< std::string, std::map< s
   std::for_each(data.cbegin(), data.cend(), PrintDictEntry{out});
 }
 
-void tkach::removeWord(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::removeWord(std::istream& in, tree_of_dict& avltree)
 {
   std::string dict_name;
   std::string eng_word;
@@ -562,7 +562,7 @@ void tkach::removeWord(std::istream& in, std::map< std::string, std::map< std::s
   }
 }
 
-void tkach::addTranslation(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::addTranslation(std::istream& in, tree_of_dict& avltree)
 {
   std::string dict_name = "";
   std::string eng_word;
@@ -610,7 +610,7 @@ void tkach::addTranslation(std::istream& in, std::map< std::string, std::map< st
   }
 }
 
-void tkach::removeTranslation(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::removeTranslation(std::istream& in, tree_of_dict& avltree)
 {
   std::string dict_name = "";
   std::string eng_word;
@@ -662,7 +662,7 @@ void tkach::removeTranslation(std::istream& in, std::map< std::string, std::map<
   }
 }
 
-void tkach::clear(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::clear(std::istream& in, tree_of_dict& avltree)
 {
   std::string dict_name;
   if (!(in >> dict_name) || dict_name.empty())
@@ -677,7 +677,7 @@ void tkach::clear(std::istream& in, std::map< std::string, std::map< std::string
   it->second.clear();
 }
 
-void tkach::printCount(std::istream& in, std::ostream& out, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::printCount(std::istream& in, std::ostream& out, tree_of_dict& avltree)
 {
   std::string dict_name;
   if (!(in >> dict_name) || dict_name.empty())
@@ -692,7 +692,7 @@ void tkach::printCount(std::istream& in, std::ostream& out, std::map< std::strin
   out << it->second.size() << "\n";
 }
 
-void tkach::substructDicts(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::substructDicts(std::istream& in, tree_of_dict& avltree)
 {
   std::string new_dict_name;
   int number_of_dictionaries = 0;
@@ -727,7 +727,7 @@ void tkach::substructDicts(std::istream& in, std::map< std::string, std::map< st
   avltree[new_dict_name] = result_dict;
 }
 
-void tkach::mergeNumberDicts(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::mergeNumberDicts(std::istream& in, tree_of_dict& avltree)
 {
   std::string new_dict_name;
   int number_of_dictionaries = 0;
@@ -758,7 +758,7 @@ void tkach::mergeNumberDicts(std::istream& in, std::map< std::string, std::map< 
   avltree[new_dict_name] = result_dict;
 }
 
-void tkach::doCommonPartDicts(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::doCommonPartDicts(std::istream& in, tree_of_dict& avltree)
 {
   std::string new_dict_name;
   int number_of_dictionaries = 0;
@@ -803,7 +803,7 @@ void tkach::doCommonPartDicts(std::istream& in, std::map< std::string, std::map<
   avltree[new_dict_name] = result_dict;
 }
 
-void tkach::copyTranslations(std::istream& in, std::map< std::string, std::map< std::string, std::list< std::string > > >& avltree)
+void tkach::copyTranslations(std::istream& in, tree_of_dict& avltree)
 {
   std::string source_dict_name;
   std::string eng_word;
