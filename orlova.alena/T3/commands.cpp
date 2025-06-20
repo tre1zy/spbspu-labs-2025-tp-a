@@ -1,5 +1,4 @@
-void orlova::countSequence(const std::vector< Polygon >& polygons, const Polygon& target,
-    size_t index, int& current, int& max)#include <iostream>
+#include <iostream>
 #include <sstream>
 #include <limits>
 #include <algorithm>
