@@ -2,10 +2,11 @@
 #define UTILS_HPP
 
 #include <functional>
+#include <numeric>
 #include <map>
 #include <string>
 #include <vector>
-#include "Polygon/Polygon.hpp"
+#include "Polygon.hpp"
 
 namespace gavrilova {
   template < typename Container, typename Init, typename Func, typename Op >
@@ -13,8 +14,8 @@ namespace gavrilova {
 
   std::vector< std::string > tokenize(std::vector< std::string >& tokens, const std::string& str);
   void readFile(const std::string& filename, std::vector< Polygon >& polygons);
-  void loadPolygons(const std::string& filename, std::vector< Polygon >& polygons);
-  void startCommandInterface(const std::string& filename, std::istream& is);
+  void loadPolygons(const std::string& filename, std::vector< Polygon >& polygons, std::ostream& out);
+  void startCommandInterface(const std::string& filename, std::istream& is, std::ostream& out);
 
   template < typename Container, typename Init, typename Func, typename Op >
   auto applyCommand(const Container& cont, Init init, Func func, Op op)

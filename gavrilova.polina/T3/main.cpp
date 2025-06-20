@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Polygon/Polygon.hpp"
-#include "Utils/Utils.hpp"
+#include "Polygon.hpp"
+#include "utils.hpp"
 
 int main(int argc, char* argv[]) {
     std::string filename = "";
@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     }
 
     try {
-        gavrilova::startCommandInterface(filename, std::cin);
+        gavrilova::startCommandInterface(filename, std::cin, std::cout);
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";
         return 1;
