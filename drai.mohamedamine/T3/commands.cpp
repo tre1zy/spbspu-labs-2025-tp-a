@@ -225,9 +225,9 @@ void process_commands(std::vector<Polygon>& polygons) {
                     invalid = true;
                 } else {
                     process_rmecho(polygons, query);
+                    return;
                 }
             }
-            continue;
         }
         else {
             invalid = true;
