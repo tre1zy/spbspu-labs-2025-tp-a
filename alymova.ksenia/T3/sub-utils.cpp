@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 #include <exception>
+#include <stream-guard.hpp>
 
 namespace
 {
@@ -27,7 +28,7 @@ namespace
   }
 }
 
-double alymova::areaEven(double value, const Polygon& polygon, size_t size)
+/*double alymova::areaEven(const std::vector< Polygon >& polygons)
 {
   if (size == 0)
   {
@@ -64,11 +65,40 @@ double alymova::areaMean(double value, const Polygon& polygon, size_t size)
 
 double alymova::areaNumber(double value, const Polygon& polygon, size_t vertexes)
 {
-  if (polygon.points.size() == vertexes)
+  if (isEqualSize(vertexes, polygon))
   {
     return value + areaPolygon(polygon);
   }
   return value;
+}*/
+
+double alymova::areaEven(const std::vector< Polygon >& polygons)
+{
+  double res = getAreasIf(polygons, isPolygonEven);
+  return res;
+}
+
+double alymova::areaOdd(const std::vector< Polygon >& polygons)
+{
+  double res = getAreasIf(polygons, isPolygonOdd);
+  return res; 
+}
+
+double alymova::areaMean(const std::vector< Polygon >& polygons)
+{
+  if (polygons.size() == 0)
+  {
+    throw std::overflow_error("");
+  }
+  double res = getAreasIf(polygons, noConditional);
+  return res / polygons.size();
+}
+
+double alymova::areaNumber(size_t vertexes, const std::vector< Polygon >& polygons)
+{
+  auto bindEqualSize = std::bind(isEqualSize, vertexes, _1);
+  double res = getAreasIf(polygons, bindEqualSize);
+  return res;
 }
 
 double alymova::areaPolygon(const Polygon& polygon)
@@ -84,6 +114,16 @@ double alymova::areaPolygon(const Polygon& polygon)
 double alymova::multPoints(const Point& point1, const Point& point2)
 {
   return point1.x * point2.y - point1.y * point2.x;
+}
+
+template< class Predicate >
+double alymova::getAreasIf(const std::vector< Polygon >& polygons, Predicate pred)
+{
+  std::vector< Polygon > suitable;
+  std::vector< double > areas;
+  std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(suitable), pred);
+  std::transform(suitable.begin(), suitable.end(), std::back_inserter(areas), areaPolygon);
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
 double alymova::maxArea(double value, const Polygon& polygon)
@@ -179,6 +219,11 @@ alymova::Point alymova::getSide(const Point& point1, const Point& point2)
   return {point1.x - point2.x, point1.y - point2.y};
 }
 
+bool alymova::noConditional(const Polygon&)
+{
+  return true;
+}
+
 bool alymova::isEqualSize(size_t size, const Polygon& polygon)
 {
   return size == polygon.points.size();
@@ -187,6 +232,11 @@ bool alymova::isEqualSize(size_t size, const Polygon& polygon)
 bool alymova::isPolygonEven(const Polygon& polygon)
 {
   return polygon.points.size() % 2 == 0;
+}
+
+bool alymova::isPolygonOdd(const Polygon& polygon)
+{
+  return !isPolygonEven(polygon);
 }
 
 size_t alymova::getVertexes(const std::string& str)

@@ -7,12 +7,18 @@ namespace alymova
 {
   using namespace std::placeholders;
 
-  double areaEven(double value, const Polygon& polygon, size_t size);
-  double areaOdd(double value, const Polygon& polygon, size_t size);
-  double areaMean(double value, const Polygon& polygon, size_t size);
-  double areaNumber(double value, const Polygon& polygon, size_t vertexes);
+  //double areaEven(double value, const Polygon& polygon, size_t size);
+  //double areaOdd(double value, const Polygon& polygon, size_t size);
+  //double areaMean(double value, const Polygon& polygon, size_t size);
+  //double areaNumber(double value, const Polygon& polygon, size_t vertexes);
+  double areaEven(const std::vector< Polygon >& polygons);
+  double areaOdd(const std::vector< Polygon >& polygons);
+  double areaMean(const std::vector< Polygon >& polygons);
+  double areaNumber(size_t vertexes, const std::vector< Polygon >& polygons);
   double areaPolygon(const Polygon& polygon);
   double multPoints(const Point& point1, const Point& point2);
+  template< class Predicate >
+  double getAreasIf(const std::vector< Polygon >& polygons, Predicate pred);
 
   double maxArea(double value, const Polygon& polygon);
   double minArea(double value, const Polygon& polygon);
@@ -34,8 +40,10 @@ namespace alymova
   bool isRightAngle(const Point& point1, const Point& point2);
   Point getSide(const Point& point1, const Point& point2);
 
+  bool noConditional(const Polygon&);
   bool isEqualSize(size_t size, const Polygon& polygon);
   bool isPolygonEven(const Polygon& polygon);
+  bool isPolygonOdd(const Polygon& polygon);
   size_t getVertexes(const std::string& str);
 }
 #endif
