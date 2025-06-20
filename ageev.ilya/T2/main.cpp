@@ -13,7 +13,6 @@ int main()
   std::vector< DataStruct > data;
 
   using InputDataIt = std::istream_iterator< DataStruct >;
-  using OutputDataIt = std::ostream_iterator< DataStruct >;
 
   while (!std::cin.eof())
   {
