@@ -79,6 +79,11 @@ std::ostream& orlova::operator<<(std::ostream& out, const Polygon& polygon)
   return out;
 }
 
+bool orlova::operator==(const Point& point1, const Point& point2)
+{
+  return (point1.x == point2.x && point1.y == point2.y) || (point1.x == point2.y && point1.y == point2.x);
+}
+
 orlova::IoGuard::IoGuard(std::basic_ios< char >& s) :
   s_(s),
   width_(s.width()),

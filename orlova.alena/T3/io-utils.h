@@ -29,6 +29,7 @@ namespace orlova
   std::istream& operator>>(std::istream&, Polygon&);
   std::ostream& operator<<(std::ostream&, const Point&);
   std::ostream& operator<<(std::ostream&, const Polygon&);
+  bool operator==(const Point&, const Point&);
 }
 
 #endif
