@@ -14,7 +14,7 @@ namespace fedorov
 
   std::istream &operator>>(std::istream &in, Point &dest)
   {
-    char open, sep, close;
+    char open, sep = '\0', close = '\0';
     in >> open;
     if (open != '(')
     {
@@ -22,7 +22,12 @@ namespace fedorov
       return in;
     }
 
-    in >> dest.x >> sep >> dest.y >> close;
+    if (!(in >> dest.x >> sep >> dest.y >> close))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
     if (sep != ';' || close != ')')
     {
       in.setstate(std::ios::failbit);
@@ -54,7 +59,10 @@ namespace fedorov
     Point operator()() const
     {
       Point p;
-      in >> p;
+      if (!(in >> p))
+      {
+        in.setstate(std::ios::failbit);
+      }
       return p;
     }
     std::istream &in;
