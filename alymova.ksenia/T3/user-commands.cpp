@@ -5,8 +5,8 @@
 
 void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
-  using AreaSubcommands = std::map< std::string, std::function< double(const std::vector< Polygon >&) > >;
-  AreaSubcommands subs{{"EVEN", areaEven}, {"ODD", areaOdd}, {"MEAN", areaMean}};
+  using Subcommands = std::map< std::string, std::function< double(const std::vector< Polygon >&) > >;
+  Subcommands subs{{"EVEN", areaEven}, {"ODD", areaOdd}, {"MEAN", areaMean}};
 
   double res;
   std::string command;
@@ -22,6 +22,38 @@ void alymova::area(std::istream& in, std::ostream& out, const std::vector< Polyg
   }
   StreamGuard guard(out);
   out << std::fixed << std::setprecision(1) << res;
+}
+
+void alymova::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  using CompareCommands = std::map< std::string, std::function< bool(const Polygon&, const Polygon&) > >;
+  using PrintCommands = std::map< std::string, std::function< void(std::ostream&, const Polygon&) > >;
+  CompareCommands cmp_subs{{"AREA", compareArea}, {"VERTEXES", compareVertexes}};
+  PrintCommands print_subs{{"AREA", printArea}, {"VERTEXES", printVertexes}};
+  if (polygons.empty())
+  {
+    throw std::logic_error("");
+  }
+  std::string command;
+  in >> command;
+  auto res = std::max_element(polygons.begin(), polygons.end(), cmp_subs.at(command));
+  print_subs[command](out, *res);
+}
+
+void alymova::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+{
+  using CompareCommands = std::map< std::string, std::function< bool(const Polygon&, const Polygon&) > >;
+  using PrintCommands = std::map< std::string, std::function< void(std::ostream&, const Polygon&) > >;
+  CompareCommands cmp_subs{{"AREA", compareArea}, {"VERTEXES", compareVertexes}};
+  PrintCommands print_subs{{"AREA", printArea}, {"VERTEXES", printVertexes}};
+  if (polygons.empty())
+  {
+    throw std::logic_error("");
+  }
+  std::string command;
+  in >> command;
+  auto res = std::min_element(polygons.begin(), polygons.end(), cmp_subs.at(command));
+  print_subs[command](out, *res);
 }
 
 void alymova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)

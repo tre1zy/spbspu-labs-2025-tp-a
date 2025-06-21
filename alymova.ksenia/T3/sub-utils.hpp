@@ -16,10 +16,10 @@ namespace alymova
   template< class Predicate >
   double getAreasIf(const std::vector< Polygon >& polygons, Predicate pred);
 
-  double maxArea(double value, const Polygon& polygon);
-  double minArea(double value, const Polygon& polygon);
-  size_t maxVertexes(size_t value, const Polygon& polygon);
-  size_t minVertexes(size_t value, const Polygon& polygon);
+  bool compareArea(const Polygon& polygon1, const Polygon& polygon2);
+  bool compareVertexes(const Polygon& polygon1, const Polygon& polygon2);
+  void printArea(std::ostream& out, const Polygon& polygon);
+  void printVertexes(std::ostream& out, const Polygon& polygon);
 
   int findMaxXPolygon(const Polygon& polygon);
   int findMaxYPolygon(const Polygon& polygon);

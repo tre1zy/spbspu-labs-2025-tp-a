@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 #include <exception>
+#include <iomanip>
 #include <stream-guard.hpp>
 
 namespace
@@ -89,24 +90,25 @@ double alymova::getAreasIf(const std::vector< Polygon >& polygons, Predicate pre
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
-double alymova::maxArea(double value, const Polygon& polygon)
+bool alymova::compareArea(const Polygon& polygon1, const Polygon& polygon2)
 {
-  return std::max(value, areaPolygon(polygon));
+  return areaPolygon(polygon1) < areaPolygon(polygon2);
 }
 
-double alymova::minArea(double value, const Polygon& polygon)
+bool alymova::compareVertexes(const Polygon& polygon1, const Polygon& polygon2)
 {
-  return std::min(value, areaPolygon(polygon));
+  return polygon1.points.size() < polygon2.points.size();
 }
 
-size_t alymova::maxVertexes(size_t value, const Polygon& polygon)
+void alymova::printArea(std::ostream& out, const Polygon& polygon)
 {
-  return std::max(value, polygon.points.size());
+  StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1) << areaPolygon(polygon);
 }
 
-size_t alymova::minVertexes(size_t value, const Polygon& polygon)
+void alymova::printVertexes(std::ostream& out, const Polygon& polygon)
 {
-  return std::min(value, polygon.points.size());
+  out << polygon.points.size();
 }
 
 int alymova::findMaxXPolygon(const Polygon& polygon)
