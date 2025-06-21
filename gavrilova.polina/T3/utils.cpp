@@ -54,6 +54,7 @@ void gavrilova::loadPolygons(const std::string& filename, std::vector< Polygon >
   //     polygons.begin(),
   //     polygons.end(),
   //     std::ostream_iterator< Polygon >(out, "\n"));
+  out << "";
 }
 
 void gavrilova::startCommandInterface(const std::string& filename, std::istream& is, std::ostream& out)
