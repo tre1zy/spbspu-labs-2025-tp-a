@@ -14,12 +14,12 @@ namespace
 {
   bool isOdd(const petrov::Polygon & polygon)
   {
-    return polygon.points.size() % 2 == 1; 
+    return polygon.points.size() % 2 == 1;
   }
 
   bool isEven(const petrov::Polygon & polygon)
   {
-    return polygon.points.size() % 2 == 0; 
+    return polygon.points.size() % 2 == 0;
   }
 
   bool isDigit(std::string & string)
