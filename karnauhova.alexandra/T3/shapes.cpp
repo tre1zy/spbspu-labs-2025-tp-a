@@ -65,15 +65,14 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > temp;
-  temp.reserve(count);
+  std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
   if (!in || temp.size() != count || (in.peek() != '\n' && in.peek() != EOF))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  pol.points = std::move(temp);
+  pol.points = temp;
   return in;
 }
 
