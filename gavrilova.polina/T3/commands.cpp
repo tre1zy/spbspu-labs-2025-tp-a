@@ -91,9 +91,8 @@ const std::vector< std::string >& commands, std::ostream& out)
     std::plus<>());
 
   if (subcommand == "MEAN") {
-    if (polygons.empty()) {
-      throw std::runtime_error("No polygons for MEAN calculation");
-    }
+    out << "<INVALID COMMAND>\n";
+    return;
     area = apply_command(polygons, calcArea);
     area = area / static_cast< double >(polygons.size());
   } else if (subcommand == "ODD") {
@@ -201,7 +200,7 @@ const std::vector< std::string >& commands, std::ostream& out)
 void gavrilova::processPerms(const std::vector< Polygon >& polygons,
 const std::vector< std::string >& commands, std::ostream& out)
 {
-  if (commands.size() < 3) {
+  if (commands.size() < 2) {
     out << "<INVALID COMMAND>\n";
     return;
   }
