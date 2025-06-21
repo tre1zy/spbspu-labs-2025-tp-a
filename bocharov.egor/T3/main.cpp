@@ -60,6 +60,3 @@ int main(int argc, char * argv[])
 }
 
 
-
-//  commands["ECHO"] = std::bind(getEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
-//  commands["RIGHTSHAPES"] = std::bind(getRightsCnt, std::cref(plgs), std::ref(std::cout));
