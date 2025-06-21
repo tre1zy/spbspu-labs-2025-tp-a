@@ -18,6 +18,9 @@ namespace kazak
     char exp;
   };
 
+  struct HexPrefixIO
+  {};
+
   struct ULLHexIO
   {
     unsigned long long& ref;

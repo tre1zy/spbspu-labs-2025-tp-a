@@ -32,6 +32,26 @@ std::istream& kazak::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
+std::istream& kazak::operator>>(std::istream& in, HexPrefixIO&&)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  char c1 = in.get();
+  char c2 = in.get();
+
+  if (c1 != '0' || (c2 != 'x' && c2 != 'X'))
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
+}
+
+
 std::istream& kazak::operator>>(std::istream& in, ULLHexIO&& dest)
 {
   std::istream::sentry sentry(in);
@@ -40,20 +60,10 @@ std::istream& kazak::operator>>(std::istream& in, ULLHexIO&& dest)
     return in;
   }
 
-  in >> std::ws;
-  char c1 = in.get();
-  char c2 = in.peek();
+  in >> std::ws >> HexPrefixIO{};
+  in >> std::hex >> dest.ref;
 
-  if (c1 == '0' && (c2 == 'x' || c2 == 'X'))
-  {
-    in.get();
-    in >> std::hex >> dest.ref;
-    if (!in)
-    {
-      in.setstate(std::ios::failbit);
-    }
-  }
-  else
+  if (!in)
   {
     in.setstate(std::ios::failbit);
   }
