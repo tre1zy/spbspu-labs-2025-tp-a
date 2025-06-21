@@ -1,0 +1,3 @@
+rectangle my_rectangle 0 0 5 5
+circle my_circle 5 6 3
+triangle my_triangle 3 3 0 3 0 0
