@@ -48,7 +48,7 @@ void ohantsev::Area::operator()()
   {
     run(subcmd);
   }
-  catch(const std::out_of_range&)
+  catch (const std::out_of_range&)
   {
     static constexpr std::size_t TRIANGLE_VERTEXES_COUNT = 3;
     std::size_t symbolsProcessed;
@@ -63,9 +63,8 @@ void ohantsev::Area::operator()()
 
 double ohantsev::Area::accumulateArea(const std::vector< Polygon >& polygons)
 {
-  std::vector< double > areas;
-  areas.reserve(polygons.size());
-  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), getArea);
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), areas.begin(), getArea);
   return std::accumulate(areas.cbegin(), areas.cend(), 0.0);
 }
 
@@ -116,9 +115,8 @@ void ohantsev::Max::area(const std::vector< Polygon >& polygons, std::ostream& o
   {
     throw std::invalid_argument("there are no polygons");
   }
-  std::vector< double > areas;
-  areas.reserve(polygons.size());
-  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), getArea);
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), areas.begin(), getArea);
   out << *std::max_element(areas.cbegin(), areas.cend()) << '\n';
 }
 
@@ -145,9 +143,8 @@ void ohantsev::Min::area(const std::vector< Polygon >& polygons, std::ostream& o
   {
     throw std::invalid_argument("there are no polygons");
   }
-  std::vector< double > areas;
-  areas.reserve(polygons.size());
-  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), getArea);
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), areas.begin(), getArea);
   out << *std::min_element(areas.cbegin(), areas.cend()) << '\n';
 }
 
@@ -176,7 +173,7 @@ void ohantsev::Count::operator()()
   {
     run(subcmd);
   }
-  catch(const std::out_of_range&)
+  catch (const std::out_of_range&)
   {
     static constexpr std::size_t TRIANGLE_VERTEXES_COUNT = 3;
     std::size_t processedCount;
@@ -221,22 +218,22 @@ void ohantsev::PolygonCmdsHandler::operator()()
   iofmtguard fmt(out_);
   out_ << std::fixed << std::setprecision(1);
   try
+  {
+    CommandHandler::operator()();
+  }
+  catch (...)
+  {
+    if (in_.eof())
     {
-      CommandHandler::operator()();
+      return;
     }
-    catch (...)
+    out_ << "<INVALID COMMAND>\n";
+    if (in_.fail())
     {
-      if (in_.eof())
-      {
-        return;
-      }
-      out_ << "<INVALID COMMAND>\n";
-      if (in_.fail())
-      {
-        in_.clear(in_.rdstate() ^ std::ios::failbit);
-      }
-      in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      in_.clear(in_.rdstate() ^ std::ios::failbit);
     }
+    in_.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
 }
 
 void ohantsev::PolygonCmdsHandler::processUntilEOF()
@@ -293,23 +290,16 @@ bool ohantsev::isRect(const Polygon& polygon)
     return false;
   }
   std::array< Point, RECT_VERTEX_COUNT > geomVects;
-  std::transform
-  (
-    polygon.points.cbegin(),
-    polygon.points.cend() - 1,
-    polygon.points.cbegin() + 1,
-    geomVects.begin(),
-    getVec
-  );
+  auto vecFromBegin = polygon.points.cbegin();
+  auto vecFromEnd = polygon.points.cend() - 1;
+  auto vecToBegin = vecFromBegin + 1;
+  std::transform(vecFromBegin, vecFromEnd, vecToBegin, geomVects.begin(), getVec);
   geomVects.back() = getVec(polygon.points.back(), polygon.points.front());
   std::array< bool, RECT_VERTEX_COUNT - 1 > orthogonal;
-  std::transform
-  (
-    geomVects.cbegin(),
-    geomVects.cend() - 1,
-    geomVects.cbegin() + 1,
-    orthogonal.begin(),
-    isOrthogonal
-  );
+  auto firstVecBegin = geomVects.cbegin();
+  auto firstVecEnd = geomVects.cend() - 1;
+  auto secondVecBegin = firstVecBegin + 1;
+  auto resBegin = orthogonal.begin();
+  std::transform(firstVecBegin, firstVecEnd, secondVecBegin, resBegin, isOrthogonal);
   return std::find(orthogonal.cbegin(), orthogonal.cend(), true) != orthogonal.cend();
 }

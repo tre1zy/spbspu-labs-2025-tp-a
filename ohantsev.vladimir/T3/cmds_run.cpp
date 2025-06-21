@@ -13,7 +13,7 @@ void ohantsev::fillPolygons(std::vector< Polygon >& polygons, std::ifstream& in)
   using inIter = std::istream_iterator< Polygon >;
   while (!in.eof())
   {
-    std::copy(inIter(in), inIter(), std::back_inserter(polygons));
+    std::copy(inIter{ in }, inIter{}, std::back_inserter(polygons));
     if (in.fail())
     {
       in.clear(in.rdstate() ^ std::ios::failbit);
