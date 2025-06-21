@@ -79,12 +79,17 @@ namespace gavrilova {
     std::stringstream curr_line_string_stream(line);
     int num_of_points = 0;
 
-    if (!((curr_line_string_stream >> num_of_points) && (num_of_points > 0))) {
+    if (!((curr_line_string_stream >> num_of_points) && (num_of_points >= 0))) {
       is.setstate(std::ios_base::failbit);
       return is;
     }
 
     polygon.points.clear();
+
+    if (num_of_points == 0) {
+      return is;
+    }
+    
     polygon.points.reserve(num_of_points);
 
     std::copy_n(std::istream_iterator< Point >(curr_line_string_stream),

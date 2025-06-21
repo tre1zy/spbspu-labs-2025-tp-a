@@ -91,8 +91,6 @@ const std::vector< std::string >& commands, std::ostream& out)
     std::plus<>());
 
   if (subcommand == "MEAN") {
-    out << "<INVALID COMMAND>\n";
-    return;
     area = apply_command(polygons, calcArea);
     area = area / static_cast< double >(polygons.size());
   } else if (subcommand == "ODD") {
@@ -200,7 +198,7 @@ const std::vector< std::string >& commands, std::ostream& out)
 void gavrilova::processPerms(const std::vector< Polygon >& polygons,
 const std::vector< std::string >& commands, std::ostream& out)
 {
-  if (commands.size() < 2) {
+  if (commands.size() < 3) {
     out << "<INVALID COMMAND>\n";
     return;
   }
@@ -258,6 +256,11 @@ const std::vector< std::string >& commands, std::ostream& out)
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  if (ref_polygon.area() == 0.0) {
     out << "<INVALID COMMAND>\n";
     return;
   }
