@@ -128,7 +128,7 @@ void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std:
     return;
   }
 
-  static std::map< std::string, std::function< const Polygon&(const std::vector< Polygon >&, 
+  static std::map< std::string, std::function< const Polygon&(const std::vector< Polygon >&,
   const std::function< bool(const Polygon&, const Polygon&) >&) > > min_max_map = {
     {"MIN", findMinPolygon},
     {"MAX", findMaxPolygon}
@@ -238,7 +238,7 @@ const std::vector< std::string >& commands, std::ostream& out)
   out << count << "\n";
 }
 
-void gavrilova::processLessArea(const std::vector< Polygon >& polygons, 
+void gavrilova::processLessArea(const std::vector< Polygon >& polygons,
 const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {

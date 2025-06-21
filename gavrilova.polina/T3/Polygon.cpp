@@ -87,7 +87,7 @@ namespace gavrilova {
     polygon.points.clear();
     polygon.points.reserve(num_of_points);
 
-    std::copy_n(std::istream_iterator< Point >(curr_line_string_stream), 
+    std::copy_n(std::istream_iterator< Point >(curr_line_string_stream),
       num_of_points,
       std::back_inserter(polygon.points));
 
