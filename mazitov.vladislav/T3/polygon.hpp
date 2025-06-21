@@ -13,6 +13,7 @@ namespace mazitov
   bool operator<(const Point &lhs, const Point &rhs);
   bool operator==(const Point &lhs, const Point &rhs);
   std::istream &operator>>(std::istream &in, Point &dest);
+  std::ostream& operator<<(std::ostream& out, const Point& src);
 
   struct Polygon
   {
@@ -20,6 +21,7 @@ namespace mazitov
   };
   bool operator==(const Polygon &lhs, const Polygon &rhs);
   std::istream &operator>>(std::istream &in, Polygon &dest);
+  std::ostream& operator<<(std::ostream& out, const Polygon& src);
 
   struct PolygonAreaAccumulator
   {

@@ -20,17 +20,28 @@ std::istream &mazitov::operator>>(std::istream &in, Point &dest)
   return in;
 }
 
+std::ostream &mazitov::operator<<(std::ostream &out, const Point &src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  out << '(' << src.x << ';' << src.y << ')';
+  return out;
+}
+
 std::istream &mazitov::operator>>(std::istream &in, Polygon &dest)
 {
-  using pointInputIter = std::istream_iterator< Point >;
+  using pointIt = std::istream_iterator< Point >;
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
+
   std::size_t vertex_num = 0;
   in >> vertex_num;
-
   if (!in || vertex_num < 3)
   {
     in.setstate(std::ios::failbit);
@@ -38,7 +49,11 @@ std::istream &mazitov::operator>>(std::istream &in, Polygon &dest)
   }
 
   dest.points.clear();
-  std::copy_n(pointInputIter{in}, vertex_num, std::back_inserter(dest.points));
+  std::copy_n(pointIt{in}, vertex_num - 1, std::back_inserter(dest.points));
+  if (in.peek() != '\n')
+  {
+    std::copy_n(pointIt{in}, 1, std::back_inserter(dest.points));
+  }
 
   if (!in || dest.points.size() != vertex_num || in.peek() != '\n')
   {
@@ -46,6 +61,25 @@ std::istream &mazitov::operator>>(std::istream &in, Polygon &dest)
     in.setstate(std::ios::failbit);
   }
   return in;
+}
+
+std::ostream &mazitov::operator<<(std::ostream &out, const Polygon &src)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+
+  out << src.points.size();
+
+  if (!src.points.empty())
+  {
+    out << ' ';
+    std::copy(src.points.begin(), src.points.end(), std::ostream_iterator< Point >(out, " "));
+  }
+
+  return out;
 }
 
 bool mazitov::operator==(const Point &lhs, const Point &rhs)
