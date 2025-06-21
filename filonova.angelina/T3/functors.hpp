@@ -33,6 +33,16 @@ namespace filonova
     bool operator()(const Polygon &a, const Polygon &b) const;
   };
 
+  struct ComparePointByX
+  {
+    bool operator()(const Point &a, const Point &b) const;
+  };
+
+  struct ComparePointByY
+  {
+    bool operator()(const Point &a, const Point &b) const;
+  };
+
   struct IntersectsWith
   {
     Polygon polygon_;
@@ -56,11 +66,9 @@ namespace filonova
 
   struct IsRightAngle
   {
-    bool operator()(const AngleCheckPoints &angle) const
-    {
-      return IsRectangle::dot(angle.prev, angle.current, angle.next) <= EPS;
-    }
+    bool operator()(const AngleCheckPoints &angle) const;
   };
+
 }
 
 #endif

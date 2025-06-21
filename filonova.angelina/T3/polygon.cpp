@@ -36,23 +36,23 @@ std::istream &filonova::operator>>(std::istream &in, Polygon &polygon)
     return in;
   }
 
-  size_t vertexCount;
-  in >> vertexCount;
-  if (!in || vertexCount < MIN_VERTEX_COUNT)
+  size_t count = 0;
+  in >> count;
+  if (count < MIN_VERTEX_COUNT)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  std::vector< Point > points(vertexCount);
-  std::copy_n(std::istream_iterator< Point >(in), vertexCount, points.begin());
-  if (!in)
+  std::vector< Point > temp;
+  using input_it_t = std::istream_iterator< Point >;
+  std::copy_n(input_it_t{in}, count, std::back_inserter(temp));
+
+  if (in)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    polygon.points = temp;
   }
 
-  polygon.points = std::move(points);
   return in;
 }
 

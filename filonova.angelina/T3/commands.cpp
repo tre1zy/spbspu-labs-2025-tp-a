@@ -1,7 +1,5 @@
 #include "commands.hpp"
 
-using namespace std::placeholders;
-
 void filonova::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   std::string subcmd;
@@ -38,7 +36,7 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
       return;
     }
 
-    auto pred = std::bind(HasVertexCount(vertexCount), _1);
+    auto pred = std::bind(HasVertexCount(vertexCount), std::placeholders::_1);
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
   }
   else
@@ -133,7 +131,7 @@ void filonova::count(std::istream &in, std::ostream &out, const std::vector< Pol
       return;
     }
 
-    auto pred = std::bind(HasVertexCount(vertexCount), _1);
+    auto pred = std::bind(HasVertexCount(vertexCount), std::placeholders::_1);
     count = std::count_if(polygons.begin(), polygons.end(), pred);
   }
   else
@@ -147,38 +145,17 @@ void filonova::count(std::istream &in, std::ostream &out, const std::vector< Pol
 
 void filonova::intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  std::string line;
-  std::getline(in, line);
-
-  if (line.empty())
-  {
-    out << "<INVALID COMMAND>";
-    return;
-  }
-
-  std::istringstream lineStream(line);
   Polygon inputPolygon;
-  if (!(lineStream >> inputPolygon))
-  {
-    out << "<INVALID COMMAND>";
-    return;
-  }
 
-  std::string extra;
-  if (lineStream >> extra)
-  {
-    out << "<INVALID COMMAND>";
-    return;
-  }
-
-  if (inputPolygon.points.size() < MIN_VERTEX_COUNT)
+  if (!(in >> inputPolygon))
   {
     out << "<INVALID COMMAND>";
     return;
   }
 
   IntersectsWith intersects(inputPolygon);
-  auto pred = std::bind(intersects, _1);
+  auto pred = std::bind(intersects, std::placeholders::_1);
+
   size_t count = std::count_if(polygons.begin(), polygons.end(), pred);
   out << count;
 }
