@@ -28,11 +28,12 @@ int main(int argc, char** argv)
   using istr_iterator = std::istream_iterator< Polygon >;
   while(!file.eof())
   {
-    if (file.fail())
-    {
-        file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
     std::copy(istr_iterator(file), istr_iterator(), std::back_inserter(polygons));
+    if (!file)
+    {
+      file.clear();
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(areaComands, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));

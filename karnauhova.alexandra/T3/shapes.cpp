@@ -3,7 +3,6 @@
 #include <iterator>
 #include <numeric>
 #include <functional>
-#include <scope_guard.hpp>
 
 double karnauhova::CalcAreaPoint::operator()(const karnauhova::Point& p1, const karnauhova::Point& p2)
 {
@@ -59,7 +58,6 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
   {
     return in;
   }
-  iofmtguard scope(in);
   size_t count = 0;
   in >> count;
   if (!in || count < 3)
@@ -69,7 +67,7 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
   }
   std::vector< Point > temp;
   temp.reserve(count);
-  std::copy_n(std::istream_iterator< Point >(in), count, std::back_inserter(temp));
+  std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
   if (!in || temp.size() != count || (in.peek() != '\n' && in.peek() != EOF))
   {
     in.setstate(std::ios::failbit);
