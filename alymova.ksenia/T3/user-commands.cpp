@@ -30,6 +30,7 @@ void alymova::max(std::istream& in, std::ostream& out, const std::vector< Polygo
   using PrintCommands = std::map< std::string, std::function< void(std::ostream&, const Polygon&) > >;
   CompareCommands cmp_subs{{"AREA", compareArea}, {"VERTEXES", compareVertexes}};
   PrintCommands print_subs{{"AREA", printArea}, {"VERTEXES", printVertexes}};
+
   if (polygons.empty())
   {
     throw std::logic_error("");
@@ -46,6 +47,7 @@ void alymova::min(std::istream& in, std::ostream& out, const std::vector< Polygo
   using PrintCommands = std::map< std::string, std::function< void(std::ostream&, const Polygon&) > >;
   CompareCommands cmp_subs{{"AREA", compareArea}, {"VERTEXES", compareVertexes}};
   PrintCommands print_subs{{"AREA", printArea}, {"VERTEXES", printVertexes}};
+
   if (polygons.empty())
   {
     throw std::logic_error("");
