@@ -28,21 +28,21 @@ namespace
   {
     std::ostream& out;
 
-    void operator()(const kiselev::Dict::value_type& val) const
+    std::ostream& operator()(const kiselev::Dict::value_type& val) const
     {
       out << val.first;
       if (!val.second.empty())
       {
-        std::for_each(val.second.begin(), val.second.end(), WordPrinter{ out });
+        std::copy(val.second.begin(), val.second.end(), std::ostream_iterator< std::string >(out, " "));
       }
-      out << "\n";
+      return out << "\n";
     }
   };
 
   struct TranslationFinder
   {
     const std::string& word;
-    std::vector<std::string>& translations;
+    std::vector< std::string >& translations;
     void operator()(const kiselev::Dict::value_type& val) const
     {
       if (std::find(val.second.begin(), val.second.end(), word) != val.second.end())
@@ -112,7 +112,7 @@ namespace
   {
     kiselev::Dict& dict;
     bool& allExist;
-    void operator()(const kiselev::Dict::value_type& val)
+    void operator()(const kiselev::Dict::value_type& val) const
     {
       auto val2 = dict.find(val.first);
       if (val2 == dict.end())
@@ -154,10 +154,20 @@ namespace
     }
   };
 
+  struct DictIntersectAccumulator
+  {
+    DictIntersector& intersector;
+    kiselev::Dict operator()(kiselev::Dict, const kiselev::Dict::value_type& val) const
+    {
+      intersector(val);
+      return kiselev::Dict{};
+    }
+  };
+
   kiselev::Dict intersectTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
   {
     DictIntersector intersector{ dict2 };
-    std::for_each(dict1.begin(), dict1.end(), intersector);
+    std::accumulate(dict1.begin(), dict1.end(), kiselev::Dict{}, DictIntersectAccumulator{ intersector });
     return intersector.res;
   }
 
@@ -167,6 +177,18 @@ namespace
     bool operator()(const kiselev::Dict::value_type& val) const
     {
       return dict.find(val.first) == dict.end();
+    }
+  };
+
+  template <typename Func>
+  struct AccumulateAdapter
+  {
+    Func func;
+    template <typename T>
+    T operator()(T, const kiselev::Dict::value_type& val) const
+    {
+      func(val);
+      return T();
     }
   };
 }
@@ -262,7 +284,7 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << nameDict << '\n';
-  std::for_each(dictIt->second.begin(), dictIt->second.end(), DictPrinter{ out });
+  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator< std::string >(out), DictPrinter{ out });
 }
 
 void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -281,16 +303,17 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   if (engIt != dict.cend())
   {
     out << *engIt->second.begin();
-    std::for_each(std::next(engIt->second.begin()), engIt->second.end(), WordPrinter{ out });
+    std::copy(std::next(engIt->second.begin()), engIt->second.end(), std::ostream_iterator< std::string >(out, " "));
     out << "\n";
     return;
   }
   std::vector< std::string > translations;
-  std::for_each(dict.begin(), dict.end(), TranslationFinder{ word, translations });
+  TranslationFinder finder{ word, translations };
+  std::accumulate(dict.begin(), dict.end(), 0, AccumulateAdapter< TranslationFinder >{ finder });
   if (!translations.empty())
   {
     out << *translations.begin();
-    std::for_each(std::next(engIt->second.begin()), engIt->second.end(), WordPrinter{ out });
+    std::copy(std::next(translations.begin()), translations.end(), std::ostream_iterator< std::string >(out, " "));
     out << "\n";
     return;
   }
@@ -428,7 +451,8 @@ void kiselev::doLoadDict(std::istream& in, std::ostream& out, Dicts& dicts)
     if (it != dicts.end())
     {
       bool allExist = true;
-      std::for_each(dict.begin(), dict.end(), TranslationMerger{ it->second, allExist });
+      TranslationMerger checker{ it->second, allExist };
+      std::accumulate(dict.begin(), dict.end(), 0, AccumulateAdapter< TranslationMerger >{ checker });
       if (allExist)
       {
         out << "<DICTIONARY ALREADY EXISTS>\n";
