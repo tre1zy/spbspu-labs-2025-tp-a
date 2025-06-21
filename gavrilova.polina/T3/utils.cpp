@@ -82,7 +82,7 @@ void gavrilova::startCommandInterface(const std::string& filename, std::istream&
       {"MAX", std::bind(callCommand, processMinMax)},
       {"COUNT", std::bind(callCommand, processCount)},
       {"PERMS", std::bind(callCommand, processPerms)},
-      {"LESSAREA", std::bind(callCommand, processArea)}};
+      {"LESSAREA", std::bind(callCommand, processLessArea)}};
 
   std::string input_command;
   while (std::getline(is, input_command)) {
