@@ -44,7 +44,7 @@ namespace gavrilova {
     int new_x = 0;
     int new_y = 0;
 
-    if (!((is >> l_div) && (is >> new_x) && is >> separator_char) && (is >> new_y) && (is >> r_div)) {
+    if (!((is >> l_div) && (is >> new_x) && (is >> separator_char) && (is >> new_y) && (is >> r_div))) {
       is.setstate(std::ios::failbit);
       return is;
     }
