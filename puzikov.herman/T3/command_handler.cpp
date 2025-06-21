@@ -1,41 +1,35 @@
 #include "command_handler.hpp"
+#include <iostream>
 #include <limits>
-#include "commands.hpp"
+#include <functional>
 
 using namespace std::placeholders;
 
-void puzikov::CommandHandler::readCommands(std::istream &in, std::ostream &out)
+namespace puzikov
 {
-  while (!(in >> cmd).eof())
+  void readCommands(std::istream &in, std::ostream &out, CommandMap &commands)
   {
-    try
+    std::string cmd;
+    while (!(in >> cmd).eof())
     {
-      commands.at(cmd)(in, out);
-    }
-    catch (...)
-    {
-      restoreInputStream(in);
-      out << "<INVALID COMMAND>\n";
+      try
+      {
+        commands.at(cmd)(in, out);
+      }
+      catch (...)
+      {
+        restoreInputStream(in);
+        out << "<INVALID COMMAND>\n";
+      }
     }
   }
-}
 
-void puzikov::CommandHandler::restoreInputStream(std::istream &in)
-{
-  if (in.fail())
+  void restoreInputStream(std::istream &in)
   {
-    in.clear(in.rdstate() ^ std::ios::failbit);
-  }
-  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-}
-
-puzikov::CommandHandler::CommandHandler(std::vector< Polygon > &refPolys):
-  commands{
-        {"AREA", std::bind(puzikov::areaCommand, _1, _2, std::cref(refPolys))},
-        {"MAX", std::bind(puzikov::maxCommand, _1, _2, std::cref(refPolys))},
-        {"MIN", std::bind(puzikov::minCommand, _1, _2, std::cref(refPolys))},
-        {"COUNT", std::bind(puzikov::countCommand, _1, _2, std::cref(refPolys))},
-        {"RMECHO", std::bind(puzikov::rmEchoCommand, _1, _2, std::ref(refPolys))},
-        {"SAME", std::bind(puzikov::sameCommand, _1, _2, std::cref(refPolys))}
+    if (in.fail())
+    {
+      in.clear(in.rdstate() ^ std::ios::failbit);
     }
-{};
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
+}

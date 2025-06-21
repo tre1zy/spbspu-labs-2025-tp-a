@@ -2,6 +2,7 @@
 #include <fstream>
 #include "polygon.hpp"
 #include "command_handler.hpp"
+#include "commands.hpp"
 
 int main(int argc, char **argv)
 {
@@ -24,6 +25,18 @@ int main(int argc, char **argv)
   readPolygons(inputFile, polygons);
   inputFile.close();
 
-  CommandHandler cmdHandler(polygons);
-  cmdHandler.readCommands(std::cin, std::cout);
+  using std::placeholders::_1;
+  using std::placeholders::_2;
+
+  CommandMap commands
+  {
+      {"AREA", std::bind(areaCommand, _1, _2, std::cref(polygons))},
+      {"MAX", std::bind(maxCommand, _1, _2, std::cref(polygons))},
+      {"MIN", std::bind(minCommand, _1, _2, std::cref(polygons))},
+      {"COUNT", std::bind(countCommand, _1, _2, std::cref(polygons))},
+      {"RMECHO", std::bind(rmEchoCommand, _1, _2, std::ref(polygons))},
+      {"SAME", std::bind(sameCommand, _1, _2, std::cref(polygons))}
+  };
+
+  readCommands(std::cin, std::cout, commands);
 }
