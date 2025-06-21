@@ -12,17 +12,17 @@ namespace
     char obj;
   };
 
-  struct signedLongLongIo
+  struct SignedLongLongIo
   {
     long long& obj;
   };
 
-  struct complexIO
+  struct ComplexIO
   {
     std::complex< double >& obj;
   };
 
-  struct stringIO
+  struct StringIO
   {
     std::string& obj;
   };
@@ -43,7 +43,7 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, signedLongLongIo&& rhs)
+  std::istream& operator>>(std::istream& in, SignedLongLongIo&& rhs)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -54,7 +54,7 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, complexIO&& rhs)
+  std::istream& operator>>(std::istream& in, ComplexIO&& rhs)
   {
     std::istream::sentry s(in);
     if (!s)
@@ -71,7 +71,7 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, stringIO&& rhs)
+  std::istream& operator>>(std::istream& in, StringIO&& rhs)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -92,9 +92,9 @@ std::istream& finaev::operator>>(std::istream& in, DataStruct& rhs)
   DataStruct input;
   {
     using sep = DelimiterIO;
-    using ll = signedLongLongIo;
-    using cmpLsp = complexIO;
-    using str = stringIO;
+    using ll = SignedLongLongIo;
+    using cmpLsp = ComplexIO;
+    using str = StringIO;
     in >> sep{ '(' } >> sep{ ':' };
     std::vector< std::string > usedKeys;
     std::string key = "";
