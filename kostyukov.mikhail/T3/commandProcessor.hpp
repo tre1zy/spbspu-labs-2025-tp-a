@@ -11,10 +11,11 @@
 
 namespace kostyukov
 {
+  using cVecPoly = const std::vector< Polygon >;
   class CommandProcessor
   {
     public:
-      CommandProcessor(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+      CommandProcessor(cVecPoly& polygons, std::istream& in, std::ostream& out);
       const std::map< std::string, std::function< void() > >& getCommands() const;
     private:
       std::map< std::string, std::function< void() > > commands_;
