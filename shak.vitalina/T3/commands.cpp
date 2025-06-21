@@ -177,7 +177,7 @@ void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, st
   }
   srcPoints.reserve(vertexCount);
   std::copy_n(inIter{in}, vertexCount, std::back_inserter(srcPoints));
-  if (srcPoints.empty() || in.peek() != '\n')
+  if (srcPoints.empty())
   {
     out << "<INVALID COMMAND>\n";
     return;
