@@ -223,6 +223,11 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
   bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
 
+  if (in.peek() != '\n')
+  {
+    in.setstate(std::ios::failbit);
+    return;
+  }
   StreamGuard guard(out);
   if (inside)
   {
