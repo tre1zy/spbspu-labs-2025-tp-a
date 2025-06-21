@@ -242,7 +242,7 @@ void karnauhova::echoComand(std::istream& in, std::ostream& out, std::vector< Po
   }
   Polygon pol;
   in >> pol;
-  if (!in)
+  if (!in || in.peek() != '\n')
   {
     in.clear();
     throw std::logic_error("<INVALID COMMAND>");
