@@ -1,4 +1,4 @@
-#include "ioData.hpp"
+#include "delimiter.hpp"
 
 std::istream& finaev::operator>>(std::istream& in, delimiterIO&& rhs)
 {
