@@ -254,7 +254,7 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons,
 void gavrilova::processLessArea(const std::vector< Polygon >& polygons,
     const std::vector< std::string >& commands, std::ostream& out)
 {
-  if (commands[.size()] < 3) {
+  if (commands.size() < 3) {
     out << "<INVALID COMMAND>\n";
     return;
   }
