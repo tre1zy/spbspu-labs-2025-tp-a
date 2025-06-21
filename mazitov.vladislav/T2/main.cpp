@@ -8,11 +8,12 @@
 int main()
 {
   using mazitov::DataStruct;
+  using istream_it = std::istream_iterator< DataStruct >;
   std::vector< DataStruct > data;
 
   while (!std::cin.eof())
   {
-    std::copy(std::istream_iterator< DataStruct >(std::cin), std::istream_iterator< DataStruct >(), std::back_inserter(data));
+    std::copy(istream_it{std::cin}, istream_it{}, std::back_inserter(data));
     if (std::cin.fail())
     {
       std::cin.clear();

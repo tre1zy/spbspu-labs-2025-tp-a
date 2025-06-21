@@ -1,38 +1,10 @@
 #include "data_struct.hpp"
-#include <algorithm>
 #include <iomanip>
 #include "stream_guard.hpp"
 #include "input_struct.hpp"
+#include "output_struct.hpp"
 
-
-void writeBin(std::ostream& out, unsigned long long n)
-{
-  if (n == 0)
-  {
-    out << "0";
-    return;
-  }
-
-  unsigned long long tmp = n;
-  int bits = 0;
-  while (tmp != 0)
-  {
-    tmp >>= 1;
-    bits++;
-  }
-
-  if (bits == 1)
-  {
-    out << "0";
-  }
-
-  for (int i = bits - 1; i >= 0; --i)
-  {
-    out << ((n >> i) & 1);
-  }
-}
-
-bool mazitov::operator<(const DataStruct& lhs, const DataStruct& rhs)
+bool mazitov::operator<(const DataStruct &lhs, const DataStruct &rhs)
 {
   if (lhs.key1 != rhs.key1)
   {
@@ -45,7 +17,7 @@ bool mazitov::operator<(const DataStruct& lhs, const DataStruct& rhs)
   return lhs.key3.size() < rhs.key3.size();
 }
 
-std::ostream& mazitov::operator<<(std::ostream& out, const DataStruct& dest)
+std::ostream &mazitov::operator<<(std::ostream &out, const DataStruct &dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -55,12 +27,12 @@ std::ostream& mazitov::operator<<(std::ostream& out, const DataStruct& dest)
   StreamGuard guard(out);
   out << "(:key1 " << std::fixed << std::setprecision(1) << dest.key1 << "d";
   out << ":key2 0b";
-  writeBin(out, dest.key2);
+  out << UnsignedLongLongBinOutput{dest.key2};
   out << ":key3 \"" << dest.key3 << "\":)";
   return out;
 }
 
-std::istream& mazitov::operator>>(std::istream& in, DataStruct& dest)
+std::istream &mazitov::operator>>(std::istream &in, DataStruct &dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -70,12 +42,12 @@ std::istream& mazitov::operator>>(std::istream& in, DataStruct& dest)
 
   DataStruct data;
   {
-    using sep = DelimiterIO;
-    using ull = UnsignedLongLongBinIO;
-    using dbl = DoubleIO;
-    using str = StringIO;
+    using sep = DelimiterInput;
+    using ull = UnsignedLongLongBinInput;
+    using dbl = DoubleInput;
+    using str = StringInput;
 
-    in >> sep{ '(' } >> sep{ ':' };
+    in >> sep{'('} >> sep{':'};
     for (int i = 0; i < 3; i++)
     {
       std::string key;
@@ -83,15 +55,15 @@ std::istream& mazitov::operator>>(std::istream& in, DataStruct& dest)
 
       if (key == "key1")
       {
-        in >> dbl{ data.key1 } >> sep{ ':' };
+        in >> dbl{data.key1} >> sep{':'};
       }
       else if (key == "key2")
       {
-        in >> ull{ data.key2 };
+        in >> ull{data.key2};
       }
       else if (key == "key3")
       {
-        in >> str{ data.key3 } >> sep{ ':' };
+        in >> str{data.key3} >> sep{':'};
       }
       else
       {
@@ -99,7 +71,7 @@ std::istream& mazitov::operator>>(std::istream& in, DataStruct& dest)
         return in;
       }
     }
-    in >> sep{ ')' };
+    in >> sep{')'};
   }
   if (in)
   {

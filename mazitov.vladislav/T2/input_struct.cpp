@@ -1,7 +1,7 @@
 #include "input_struct.hpp"
 #include "stream_guard.hpp"
 
-std::istream& mazitov::operator>>(std::istream& in, DelimiterIO&& dest)
+std::istream &mazitov::operator>>(std::istream &in, DelimiterInput &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -17,17 +17,17 @@ std::istream& mazitov::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
-std::istream& mazitov::operator>>(std::istream& in, StringIO&& dest)
+std::istream &mazitov::operator>>(std::istream &in, StringInput &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
-  return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+  return std::getline(in >> DelimiterInput{'"'}, dest.ref, '"');
 }
 
-std::istream& mazitov::operator>>(std::istream& in, DoubleIO&& dest)
+std::istream &mazitov::operator>>(std::istream &in, DoubleInput &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -49,7 +49,7 @@ std::istream& mazitov::operator>>(std::istream& in, DoubleIO&& dest)
   return in;
 }
 
-std::istream& mazitov::operator>>(std::istream& in, UnsignedLongLongBinIO&& dest)
+std::istream &mazitov::operator>>(std::istream &in, UnsignedLongLongBinInput &&dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -57,7 +57,7 @@ std::istream& mazitov::operator>>(std::istream& in, UnsignedLongLongBinIO&& dest
     return in;
   }
 
-  in >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' };
+  in >> DelimiterInput{'0'} >> DelimiterInput{'b'};
 
   char c = 0;
   bool flag = false;
@@ -83,4 +83,3 @@ std::istream& mazitov::operator>>(std::istream& in, UnsignedLongLongBinIO&& dest
   dest.ref = binaryValue;
   return in;
 }
-

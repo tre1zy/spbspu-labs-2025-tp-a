@@ -5,29 +5,29 @@
 
 namespace mazitov
 {
-  struct DelimiterIO
+  struct DelimiterInput
   {
     char exp;
   };
 
-  struct UnsignedLongLongBinIO
+  struct UnsignedLongLongBinInput
   {
-    unsigned long long& ref;
+    unsigned long long &ref;
   };
 
-  struct DoubleIO
+  struct DoubleInput
   {
-    double& ref;
+    double &ref;
   };
 
-  struct StringIO
+  struct StringInput
   {
-    std::string& ref;
+    std::string &ref;
   };
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
-  std::istream& operator>>(std::istream& in, UnsignedLongLongBinIO&& dest);
-  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream &operator>>(std::istream &in, DelimiterInput &&dest);
+  std::istream &operator>>(std::istream &in, DoubleInput &&dest);
+  std::istream &operator>>(std::istream &in, UnsignedLongLongBinInput &&dest);
+  std::istream &operator>>(std::istream &in, StringInput &&dest);
 }
 
 #endif
