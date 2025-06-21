@@ -9,7 +9,7 @@
 #include <map>
 #include "streamguard.hpp"
 
-size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
+constexpr size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
 
 namespace
 {
@@ -26,7 +26,7 @@ namespace
   {
     int dx = 0;
     int dy = 0;
-    bool operator()(const kushekbaev::Point& a, const kushekbaev::Point b)
+    bool operator()(const kushekbaev::Point& a, const kushekbaev::Point& b)
     {
       return (a.x + dx) == b.x && (a.y + dy) == b.y;
     }
@@ -154,7 +154,7 @@ namespace
     return !isEven(polygon);
   }
 
-  double totalArea(const std::vector<kushekbaev::Polygon>& polygons)
+  double totalArea(const std::vector< kushekbaev::Polygon >& polygons)
   {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0, PolygonAreaAccumulator());
   }
