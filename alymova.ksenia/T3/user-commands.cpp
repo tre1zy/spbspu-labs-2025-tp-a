@@ -50,19 +50,15 @@ void alymova::inFrame(std::istream& in, std::ostream& out, const std::vector< Po
   {
     throw std::logic_error("");
   }
-  int start_frame_x = framed.points[0].x;
-  int start_frame_y = framed.points[0].y;
-  int max_framed_x = findMaxXPolygon(start_frame_x, framed);
-  int max_framed_y = findMaxXPolygon(start_frame_y, framed);
-  int min_framed_x = findMinXPolygon(start_frame_x, framed);
-  int min_framed_y = findMinXPolygon(start_frame_y, framed);
+  int max_framed_x = findMaxXPolygon(framed);
+  int max_framed_y = findMaxYPolygon(framed);
+  int min_framed_x = findMinXPolygon(framed);
+  int min_framed_y = findMinYPolygon(framed);
 
-  int start_x = polygons[0].points[0].x;
-  int start_y = polygons[0].points[0].y;
-  int max_x = findMaxXVector(start_x, polygons);
-  int max_y = findMaxYVector(start_y, polygons);
-  int min_x = findMinXVector(start_x, polygons);
-  int min_y = findMinYVector(start_y, polygons);
+  int max_x = findMaxXVector(polygons);
+  int max_y = findMaxYVector(polygons);
+  int min_x = findMinXVector(polygons);
+  int min_y = findMinYVector(polygons);
 
   bool res = max_framed_x <= max_x && max_framed_y <= max_y && min_framed_x >= min_x && min_framed_y >= min_y;
   inFrameOutput(out, res);

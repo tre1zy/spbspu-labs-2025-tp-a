@@ -21,15 +21,15 @@ namespace alymova
   size_t maxVertexes(size_t value, const Polygon& polygon);
   size_t minVertexes(size_t value, const Polygon& polygon);
 
-  int findMaxXPolygon(int start, const Polygon& polygon);
-  int findMaxYPolygon(int start, const Polygon& polygon);
-  int findMinXPolygon(int start, const Polygon& polygon);
-  int findMinYPolygon(int start, const Polygon& polygon);
+  int findMaxXPolygon(const Polygon& polygon);
+  int findMaxYPolygon(const Polygon& polygon);
+  int findMinXPolygon(const Polygon& polygon);
+  int findMinYPolygon(const Polygon& polygon);
 
-  int findMaxXVector(int start, const std::vector< Polygon >& polygons);
-  int findMaxYVector(int start, const std::vector< Polygon >& polygons);
-  int findMinXVector(int start, const std::vector< Polygon >& polygons);
-  int findMinYVector(int start, const std::vector< Polygon >& polygons);
+  int findMaxXVector(const std::vector< Polygon >& polygons);
+  int findMaxYVector(const std::vector< Polygon >& polygons);
+  int findMinXVector(const std::vector< Polygon >& polygons);
+  int findMinYVector(const std::vector< Polygon >& polygons);
   void inFrameOutput(std::ostream& out, bool res);
 
   bool haveRightAngles(const Polygon& polygon);
