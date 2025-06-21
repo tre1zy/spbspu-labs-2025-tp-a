@@ -38,20 +38,19 @@ std::istream& duhanina::operator>>(std::istream& in, duhanina::Polygon& polygon)
   }
   size_t numPoints = 0;
   in >> numPoints;
-  if (numPoints < 3)
+  if (!in || numPoints < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
   std::vector< Point > points(numPoints);
-  polygon.points.reserve(numPoints);
   std::copy_n(std::istream_iterator< Point >(in), numPoints, points.begin());
-  if (polygon.points.size() != numPoints)
+  if (!in || points.size() != numPoints)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  polygon.points = std::move(points);
+  polygon.points = points;
   return in;
 }
 
