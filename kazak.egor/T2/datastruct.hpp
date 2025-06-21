@@ -43,6 +43,7 @@ namespace kazak
 
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, HexPrefixIO&& dest);
   std::istream& operator>>(std::istream& in, ULLHexIO&& dest);
   std::istream& operator>>(std::istream& in, RationalIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
