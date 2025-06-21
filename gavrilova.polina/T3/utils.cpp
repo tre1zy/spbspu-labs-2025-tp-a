@@ -6,6 +6,15 @@
 #include <sstream>
 #include "commands.hpp"
 
+namespace {
+  void processCommand(const std::function< void(const std::vector< gavrilova::Polygon >&,
+                          const std::vector< std::string >&, std::ostream&) >& func,
+      const std::vector< gavrilova::Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& os)
+  {
+    return func(polygons, commands, os);
+  }
+}
+
 std::vector< std::string > gavrilova::tokenize(std::vector< std::string >& tokens, const std::string& str)
 {
   std::istringstream iss(str);
@@ -44,11 +53,14 @@ void gavrilova::readFile(const std::string& filename, std::vector< Polygon >& po
       std::istream_iterator< Polygon >(),
       std::back_inserter(polygons));
 
-  polygons.erase(std::remove_if(polygons.begin(), polygons.end(), [](const Polygon& p)
-                  {
-                    return p.points.empty();
-                  }),
-                  polygons.end());
+  struct Empty {
+    bool operator()(const Polygon& p) const
+    {
+      return p.empty();
+    }
+  };
+
+  polygons.erase(std::remove_if(polygons.begin(), polygons.end(), Empty()), polygons.end());
 }
 
 void gavrilova::startCommandInterface(const std::string& filename, std::istream& is, std::ostream& out)
@@ -61,25 +73,16 @@ void gavrilova::startCommandInterface(const std::string& filename, std::istream&
   }
 
   std::vector< std::string > command_tokens;
-  static std::map< std::string, std::function< void(std::ostream&) > > command_map = {
-      {"AREA", [&polygons, &command_tokens](std::ostream& out) {
-         processArea(polygons, command_tokens, out);
-       }},
-      {"MIN", [&polygons, &command_tokens](std::ostream& out) {
-         processMinMax(polygons, command_tokens, out);
-       }},
-      {"MAX", [&polygons, &command_tokens](std::ostream& out) {
-         processMinMax(polygons, command_tokens, out);
-       }},
-      {"COUNT", [&polygons, &command_tokens](std::ostream& out) {
-         processCount(polygons, command_tokens, out);
-       }},
-      {"PERMS", [&polygons, &command_tokens](std::ostream& out) {
-         processPerms(polygons, command_tokens, out);
-       }},
-      {"LESSAREA", [&polygons, &command_tokens](std::ostream& out) {
-         processLessArea(polygons, command_tokens, out);
-       }}};
+
+  auto callCommand = std::bind(processCommand, std::placeholders::_1, std::cref(polygons), std::ref(command_tokens), std::ref(out));
+
+  static std::map< std::string, std::function< void() > > command_map = {
+      {"AREA", std::bind(callCommand, processArea)},
+      {"MIN", std::bind(callCommand, processMinMax)},
+      {"MAX", std::bind(callCommand, processMinMax)},
+      {"COUNT", std::bind(callCommand, processCount)},
+      {"PERMS", std::bind(callCommand, processPerms)},
+      {"LESSAREA", std::bind(callCommand, processArea)}};
 
   std::string input_command;
   while (std::getline(is, input_command)) {
@@ -93,7 +96,7 @@ void gavrilova::startCommandInterface(const std::string& filename, std::istream&
         out << "<INVALID COMMAND>\n";
         continue;
       }
-      it->second(out);
+      it->second();
     } catch (const std::exception&) {
       throw;
     }
