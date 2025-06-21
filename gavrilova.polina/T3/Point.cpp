@@ -1,5 +1,4 @@
 #include "Point.hpp"
-#include <fstream>
 #include <tuple>
 
 namespace {
@@ -8,7 +7,7 @@ namespace {
   constexpr char lhs_divider = '(';
   constexpr char rhs_divider = ')';
 
-}  // anonymous namespace
+}
 
 namespace gavrilova {
 
@@ -40,21 +39,17 @@ namespace gavrilova {
       return is;
     }
 
-    char separator_char, l_div, r_div;
-    int new_x, new_y;
+    char separator_char = ' ';
+    char l_div, r_div = ' ';
+    int new_x = 0;
+    int new_y = 0;
 
-    if (!((is >> l_div) &&
-            (is >> new_x) &&
-            (is >> separator_char) &&
-            (is >> new_y) &&
-            (is >> r_div))) {
+    if (!((is >> l_div) && (is >> new_x) && is >> separator_char) && (is >> new_y) && (is >> r_div)) {
       is.setstate(std::ios::failbit);
       return is;
     }
 
-    if (!(l_div == lhs_divider &&
-            separator_char == separator &&
-            r_div == rhs_divider)) {
+    if (!(l_div == lhs_divider && separator_char == separator && r_div == rhs_divider)) {
       is.setstate(std::ios::failbit);
       return is;
     }
@@ -64,5 +59,4 @@ namespace gavrilova {
 
     return is;
   }
-
 }

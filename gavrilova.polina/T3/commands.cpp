@@ -39,19 +39,19 @@ namespace {
   }
 
   const gavrilova::Polygon& findMinPolygon(const std::vector< gavrilova::Polygon >& polygons,
-      const std::function< bool(const gavrilova::Polygon&, const gavrilova::Polygon&) >& comp)
+  const std::function< bool(const gavrilova::Polygon&, const gavrilova::Polygon&) >& comp)
   {
     if (polygons.empty()) {
-      throw std::runtime_error("No polygons to compare");
+      throw std::runtime_error("");
     }
     return *std::min_element(polygons.begin(), polygons.end(), comp);
   }
 
   const gavrilova::Polygon& findMaxPolygon(const std::vector< gavrilova::Polygon >& polygons,
-      const std::function< bool(const gavrilova::Polygon&, const gavrilova::Polygon&) >& comp)
+  const std::function< bool(const gavrilova::Polygon&, const gavrilova::Polygon&) >& comp)
   {
     if (polygons.empty()) {
-      throw std::runtime_error("No polygons to compare");
+      throw std::runtime_error("");
     }
     return *std::max_element(polygons.begin(), polygons.end(), comp);
   }
@@ -72,23 +72,23 @@ namespace {
   }
 }
 
-void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::processArea(const std::vector< Polygon >& polygons,
+const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
-    // throw std::runtime_error("Not enough arguments for AREA command");
   }
 
   auto& subcommand = commands.at(1);
   double area = 0.0;
 
   static auto apply_command = std::bind(
-      gavrilova::applyCommand< std::vector< Polygon >, double, std::function< double(const Polygon&) >, std::plus<> >,
-      std::placeholders::_1,
-      0.0,
-      std::placeholders::_2,
-      std::plus<>());
+    gavrilova::applyCommand< std::vector< Polygon >, double, std::function< double(const Polygon&) >, std::plus<> >,
+    std::placeholders::_1,
+    0.0,
+    std::placeholders::_2,
+    std::plus<>());
 
   if (subcommand == "MEAN") {
     if (polygons.empty()) {
@@ -105,16 +105,15 @@ void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::v
     try {
       num = std::stoll(subcommand);
       if (num < 3) {
-        out << "<INVALID COMMAND>";
+        out << "<INVALID COMMAND>\n";
         return;
-        // throw std::runtime_error("Invalid number of vertices");
       }
       area = apply_command(
-          polygons,
-          std::bind(
-              calcAreaNum,
-              std::placeholders::_1,
-              num));
+        polygons,
+        std::bind(
+          calcAreaNum,
+          std::placeholders::_1,
+          num));
     } catch (const std::exception&) {
       throw std::runtime_error("Invalid subcommand for AREA");
     }
@@ -125,17 +124,15 @@ void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::v
 void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
-    // throw std::runtime_error("Not enough arguments for MIN/MAX command");
   }
 
-  static std::map< std::string, std::function< const Polygon&(
-                                    const std::vector< Polygon >&,
-                                    const std::function< bool(const Polygon&, const Polygon&) >&) > >
-      min_max_map = {
-          {"MIN", findMinPolygon},
-          {"MAX", findMaxPolygon}};
+  static std::map< std::string, std::function< const Polygon&(const std::vector< Polygon >&, 
+  const std::function< bool(const Polygon&, const Polygon&) >&) > > min_max_map = {
+    {"MIN", findMinPolygon},
+    {"MAX", findMaxPolygon}
+  };
 
   auto& command = commands.at(0);
   auto& subcommand = commands.at(1);
@@ -148,30 +145,30 @@ void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std:
       auto val = min_max_map.at(command)(polygons, minVertexesComp);
       out << val.points.size() << "\n";
     } else {
-      out << "<INVALID COMMAND>";
+      out << "<INVALID COMMAND>\n";
       return;
-      // throw std::runtime_error("Invalid subcommand for MIN/MAX");
     }
   } catch (const std::exception&) {
-    throw;
+    out << "<INVALID COMMAND>\n";
+    return;
   }
 }
 
-void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::processCount(const std::vector< Polygon >& polygons,
+const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
-    // throw std::runtime_error("Not enough arguments for COUNT command");
   }
 
   auto& subcommand = commands.at(1);
   static auto apply_command = std::bind(
-      gavrilova::applyCommand< std::vector< Polygon >, size_t, std::function< size_t(const Polygon&) >, std::plus<> >,
-      std::placeholders::_1,
-      static_cast< size_t >(0),
-      std::placeholders::_2,
-      std::plus<>());
+    gavrilova::applyCommand< std::vector< Polygon >, size_t, std::function< size_t(const Polygon&) >, std::plus<> >,
+    std::placeholders::_1,
+    static_cast< size_t >(0),
+    std::placeholders::_2,
+    std::plus<>());
 
   size_t count = 0;
 
@@ -184,16 +181,15 @@ void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::
     try {
       num = std::stoll(subcommand);
       if (num < 3) {
-        // throw std::runtime_error("Invalid number of vertices");
-        out << "<INVALID COMMAND>";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       count = apply_command(
-          polygons,
-          std::bind(
-              calcCountNum,
-              std::placeholders::_1,
-              num));
+        polygons,
+        std::bind(
+          calcCountNum,
+          std::placeholders::_1,
+          num));
     } catch (const std::exception&) {
       throw std::runtime_error("Invalid subcommand for COUNT");
     }
@@ -202,74 +198,78 @@ void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::
   out << count << "\n";
 }
 
-void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::processPerms(const std::vector< Polygon >& polygons,
+const std::vector< std::string >& commands, std::ostream& out)
 {
-  if (commands.size() < 2) {
-    out << "<INVALID COMMAND>";
+  if (commands.size() < 3) {
+    out << "<INVALID COMMAND>\n";
     return;
-    // throw std::runtime_error("Not enough arguments for PERMS command");
   }
 
   auto polygon_str = std::accumulate(
-      commands.begin() + 1,
-      commands.end(),
-      std::string(""),
-      [](const std::string& str_1, const std::string& str_2) {
-        return str_1 + " " + str_2;
-      });
+    commands.begin() + 1,
+    commands.end(),
+    std::string(""),
+    [](const std::string& str_1, const std::string& str_2)
+    {
+      return str_1 + " " + str_2;
+    });
 
   std::istringstream iss(polygon_str);
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
   }
 
   std::sort(ref_polygon.points.begin(), ref_polygon.points.end());
 
   size_t count = std::count_if(
-      polygons.begin(),
-      polygons.end(),
-      [&ref_polygon](const Polygon& polygon) {
-        auto points = polygon.points;
-        std::sort(points.begin(), points.end());
-        return points == ref_polygon.points;
-      });
+    polygons.begin(),
+    polygons.end(),
+    [&ref_polygon](const Polygon& polygon)
+    {
+      auto points = polygon.points;
+      std::sort(points.begin(), points.end());
+      return points == ref_polygon.points;
+    });
 
   out << count << "\n";
 }
 
-void gavrilova::processLessArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::processLessArea(const std::vector< Polygon >& polygons, 
+const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
-    // throw std::runtime_error("Not enough arguments for LESSAREA command");
   }
 
   auto polygon_str = std::accumulate(
-      commands.begin() + 1,
-      commands.end(),
-      std::string(""),
-      [](const std::string& str_1, const std::string& str_2) {
-        return str_1 + " " + str_2;
-      });
+    commands.begin() + 1,
+    commands.end(),
+    std::string(""),
+    [](const std::string& str_1, const std::string& str_2)
+    {
+      return str_1 + " " + str_2;
+    });
 
   std::istringstream iss(polygon_str);
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
-    out << "<INVALID COMMAND>";
+    out << "<INVALID COMMAND>\n";
     return;
   }
 
   size_t count = std::count_if(
-      polygons.begin(),
-      polygons.end(),
-      [&ref_polygon](const Polygon& polygon) {
-        return polygon.area() < ref_polygon.area();
-      });
+    polygons.begin(),
+    polygons.end(),
+    [&ref_polygon](const Polygon& polygon)
+    {
+      return polygon.area() < ref_polygon.area();
+    });
 
   out << count << "\n";
 }

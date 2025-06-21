@@ -14,7 +14,6 @@ namespace gavrilova {
 
   std::vector< std::string > tokenize(std::vector< std::string >& tokens, const std::string& str);
   void readFile(const std::string& filename, std::vector< Polygon >& polygons);
-  void loadPolygons(const std::string& filename, std::vector< Polygon >& polygons, std::ostream& out);
   void startCommandInterface(const std::string& filename, std::istream& is, std::ostream& out);
 
   template < typename Container, typename Init, typename Func, typename Op >
@@ -24,11 +23,7 @@ namespace gavrilova {
     {
       return op(acc, func(elem));
     };
-    return std::accumulate(
-        cont.begin(),
-        cont.end(),
-        init,
-        compose);
+    return std::accumulate(cont.begin(), cont.end(), init, compose);
   }
 }
 

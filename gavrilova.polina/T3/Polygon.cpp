@@ -15,18 +15,19 @@ namespace gavrilova {
       return 0;
     }
 
-    auto det2 = [](const Point& a, const Point& b) {
+    auto det2 = [](const Point& a, const Point& b)
+    {
       return a.x * b.y - b.x * a.y;
     };
 
     auto area = static_cast< double >(
-        std::inner_product(
-            points.cbegin(),
-            points.cend() - 1,
-            points.cbegin() + 1,
-            0,
-            std::plus<>(),
-            det2));
+      std::inner_product(
+        points.cbegin(),
+        points.cend() - 1,
+        points.cbegin() + 1,
+        0,
+        std::plus<>(),
+        det2));
 
     auto last_el = static_cast< double >(det2(points.back(), points.front()));
     return std::abs(area + last_el) / 2.0;
@@ -56,8 +57,8 @@ namespace gavrilova {
 
     os << polygon.points.size() << " ";
     std::copy(polygon.points.begin(),
-        polygon.points.end(),
-        std::ostream_iterator< Point >(os, " "));
+      polygon.points.end(),
+      std::ostream_iterator< Point >(os, " "));
 
     return os;
   }
@@ -78,8 +79,7 @@ namespace gavrilova {
     std::stringstream curr_line_string_stream(line);
     int num_of_points = 0;
 
-    if (!((curr_line_string_stream >> num_of_points) &&
-            (num_of_points > 0))) {
+    if (!((curr_line_string_stream >> num_of_points) && (num_of_points > 0))) {
       is.setstate(std::ios_base::failbit);
       return is;
     }
@@ -87,16 +87,14 @@ namespace gavrilova {
     polygon.points.clear();
     polygon.points.reserve(num_of_points);
 
-    std::copy_n(std::istream_iterator< Point >(curr_line_string_stream),
-        num_of_points,
-        std::back_inserter(polygon.points));
+    std::copy_n(std::istream_iterator< Point >(curr_line_string_stream), 
+      num_of_points,
+      std::back_inserter(polygon.points));
 
-    if (curr_line_string_stream.fail() ||
-        (polygon.points.size() != static_cast< size_t >(num_of_points))) {
+    if (curr_line_string_stream.fail() || (polygon.points.size() != static_cast< size_t >(num_of_points))) {
       is.setstate(std::ios_base::failbit);
     }
 
     return is;
   }
-
 }
