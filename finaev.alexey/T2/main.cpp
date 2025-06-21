@@ -4,8 +4,9 @@
 #include <iterator>
 #include <complex>
 #include <limits>
-#include "dataStruct.hpp"
+#include <delimiter.hpp>
 #include "ioData.hpp"
+#include "dataStruct.hpp"
 #include "sortDataVector.hpp"
 
 int main()

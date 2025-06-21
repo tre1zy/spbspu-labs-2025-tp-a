@@ -3,15 +3,14 @@
 #include <complex>
 #include <iomanip>
 #include <algorithm>
-#include "streamGuard.hpp"
+#include <streamGuard.hpp>
+#include <delimiter.hpp>
+
+using finaev::DelimiterIO;
+using finaev::StreamGuard;
 
 namespace
 {
-  struct DelimiterIO
-  {
-    char obj;
-  };
-
   struct SignedLongLongIo
   {
     long long& obj;
@@ -26,22 +25,6 @@ namespace
   {
     std::string& obj;
   };
-
-  std::istream& operator>>(std::istream& in, DelimiterIO&& rhs)
-  {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    char c = 0;
-    in >> c;
-    if (in && (c != rhs.obj))
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
 
   std::istream& operator>>(std::istream& in, SignedLongLongIo&& rhs)
   {
