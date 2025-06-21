@@ -1,11 +1,11 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include "polygon.hpp"
 #include <functional>
 #include <iostream>
 #include <vector>
 #include <map>
+#include "polygon.hpp"
 
 namespace klimova
 {
