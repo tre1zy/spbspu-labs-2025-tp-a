@@ -4,12 +4,12 @@
 
 namespace finaev
 {
-  struct delimiterIO
+  struct DelimiterIO
   {
     char obj;
   };
 
-  std::istream& operator>>(std::istream& in, delimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 
 #endif

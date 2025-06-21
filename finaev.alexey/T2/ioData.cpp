@@ -4,57 +4,40 @@
 #include <iomanip>
 #include <algorithm>
 #include <streamGuard.hpp>
+#include <delimiter.hpp>
+
+using finaev::DelimiterIO;
+using finaev::StreamGuard;
 
 namespace
 {
-  struct delimiterIO
-  {
-    char obj;
-  };
-
-  struct signedLongLongIo
+  struct SignedLongLongIo
   {
     long long& obj;
   };
 
-  struct complexIO
+  struct ComplexIO
   {
     std::complex< double >& obj;
   };
 
-  struct stringIO
+  struct StringIO
   {
     std::string& obj;
   };
 
-  std::istream& operator>>(std::istream& in, delimiterIO&& rhs)
-  {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    char c = 0;
-    in >> c;
-    if (in && (c != rhs.obj))
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, signedLongLongIo&& rhs)
+  std::istream& operator>>(std::istream& in, SignedLongLongIo&& rhs)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
     {
       return in;
     }
-    in >> rhs.obj >> delimiterIO{'l'} >> delimiterIO{'l'};
+    in >> rhs.obj >> DelimiterIO{'l'} >> DelimiterIO{'l'};
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, complexIO&& rhs)
+  std::istream& operator>>(std::istream& in, ComplexIO&& rhs)
   {
     std::istream::sentry s(in);
     if (!s)
@@ -63,22 +46,22 @@ namespace
     }
     double real = 0.0;
     double imag = 0.0;
-    in >> delimiterIO{ '#' } >> delimiterIO{ 'c' };
-    in >> delimiterIO{ '(' } >> real;
-    in >> imag >> delimiterIO{ ')' };
+    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' };
+    in >> DelimiterIO{ '(' } >> real;
+    in >> imag >> DelimiterIO{ ')' };
     std::complex< double > cmp { real, imag };
     rhs.obj = cmp;
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, stringIO&& rhs)
+  std::istream& operator>>(std::istream& in, StringIO&& rhs)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
     {
       return in;
     }
-    return std::getline(in >> delimiterIO{ '"' }, rhs.obj, '"');
+    return std::getline(in >> DelimiterIO{ '"' }, rhs.obj, '"');
   }
 }
 
@@ -91,10 +74,10 @@ std::istream& finaev::operator>>(std::istream& in, DataStruct& rhs)
   }
   DataStruct input;
   {
-    using sep = delimiterIO;
-    using ll = signedLongLongIo;
-    using cmpLsp = complexIO;
-    using str = stringIO;
+    using sep = DelimiterIO;
+    using ll = SignedLongLongIo;
+    using cmpLsp = ComplexIO;
+    using str = StringIO;
     in >> sep{ '(' } >> sep{ ':' };
     std::vector< std::string > usedKeys;
     std::string key = "";

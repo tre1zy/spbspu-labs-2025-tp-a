@@ -1,6 +1,6 @@
 #include "delimiter.hpp"
 
-std::istream& finaev::operator>>(std::istream& in, delimiterIO&& rhs)
+std::istream& finaev::operator>>(std::istream& in, DelimiterIO&& rhs)
 {
   std::istream::sentry s(in);
   if (!s)
