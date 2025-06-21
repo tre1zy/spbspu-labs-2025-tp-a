@@ -11,7 +11,8 @@ double karnauhova::CalcAreaPoint::operator()(const karnauhova::Point& p1, const 
 
 namespace
 {
-  struct AreaCalculator {
+  struct AreaCalculator
+  {
     karnauhova::Point& last_point;
     karnauhova::CalcAreaPoint& calculator;
     double operator()(double sum, const karnauhova::Point& current)
