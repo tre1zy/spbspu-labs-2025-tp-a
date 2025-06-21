@@ -67,7 +67,7 @@ std::istream& karnauhova::operator>>(std::istream& in, Polygon& pol)
   }
   std::vector< Point > temp(count);
   std::copy_n(std::istream_iterator< Point >(in), count, temp.begin());
-  if (!in || temp.size() != count || (in.peek() != '\n' && in.peek() != EOF))
+  if (!in || temp.size() != count)
   {
     in.setstate(std::ios::failbit);
     return in;
