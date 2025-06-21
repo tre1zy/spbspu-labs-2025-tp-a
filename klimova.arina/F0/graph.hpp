@@ -23,8 +23,8 @@ namespace klimova {
     void findNeighbors(const T& vertex) const;
     int degreeOfVertex(const T& vertex) const;
     void clear();
-    void findLongestPath(const T& startVertex, const T& endVertex);
-    void findShortestPath(const T& startVertex, const T& endVertex);
+    void findLongestPath(const T& startVertex, const T& endVertex) const;
+    void findShortestPath(const T& startVertex, const T& endVertex) const;
 
   private:
     std::vector< T > vertices;
@@ -196,7 +196,7 @@ namespace klimova {
   }
 
   template < typename T >
-  void Graph< T >::findShortestPath(const T& startVertex, const T& endVertex)
+  void Graph< T >::findShortestPath(const T& startVertex, const T& endVertex) const
   {
     try {
       size_t startIdx = getVertexIndex(startVertex);
@@ -284,7 +284,7 @@ namespace klimova {
   }
 
   template < typename T >
-  void Graph< T >::findLongestPath(const T& startVertex, const T& endVertex)
+  void Graph< T >::findLongestPath(const T& startVertex, const T& endVertex) const
   {
     try {
       size_t startIdx = getVertexIndex(startVertex);

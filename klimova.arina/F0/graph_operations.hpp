@@ -14,6 +14,16 @@ namespace klimova {
   void addVertex(GraphManager& graphs, std::istream& in, std::ostream& out);
   void addEdge(GraphManager& graphs, std::istream& in, std::ostream& out);
   void printGraph(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void removeVertex(GraphManager& graphs, std::istream& in, std::ostream& out);
+  void removeEdge(GraphManager& graphs, std::istream& in, std::ostream& out);
+  void clearGraph(GraphManager& graphs, std::istream& in, std::ostream& out);
+  void checkConnectivity(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void countVertices(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void countEdges(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void findNeighbors(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void degreeOfVertex(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void findShortestPath(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void findLongestPath(const GraphManager& graphs, std::istream& in, std::ostream& out);
 }
 
 #endif
