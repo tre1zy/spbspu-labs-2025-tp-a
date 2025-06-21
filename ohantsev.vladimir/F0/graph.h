@@ -626,6 +626,10 @@ namespace ohantsev
   template< bool AllowCycles >
   auto Graph< Key, Hash, KeyEqual >::nPaths(const Key& start, const Key& end, std::size_t k) const -> std::vector< Way >
   {
+    if (path(start, end).length_ == 0)
+    {
+      return {};
+    }
     return NPathsFinder< AllowCycles >{ *this, start, end }(k);
   }
 }
