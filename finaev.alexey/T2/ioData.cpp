@@ -7,7 +7,7 @@
 
 namespace
 {
-  struct delimiterIO
+  struct DelimiterIO
   {
     char obj;
   };
@@ -27,7 +27,7 @@ namespace
     std::string& obj;
   };
 
-  std::istream& operator>>(std::istream& in, delimiterIO&& rhs)
+  std::istream& operator>>(std::istream& in, DelimiterIO&& rhs)
   {
     std::istream::sentry s(in);
     if (!s)
@@ -50,7 +50,7 @@ namespace
     {
       return in;
     }
-    in >> rhs.obj >> delimiterIO{'l'} >> delimiterIO{'l'};
+    in >> rhs.obj >> DelimiterIO{'l'} >> DelimiterIO{'l'};
     return in;
   }
 
@@ -63,9 +63,9 @@ namespace
     }
     double real = 0.0;
     double imag = 0.0;
-    in >> delimiterIO{ '#' } >> delimiterIO{ 'c' };
-    in >> delimiterIO{ '(' } >> real;
-    in >> imag >> delimiterIO{ ')' };
+    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' };
+    in >> DelimiterIO{ '(' } >> real;
+    in >> imag >> DelimiterIO{ ')' };
     std::complex< double > cmp { real, imag };
     rhs.obj = cmp;
     return in;
@@ -78,7 +78,7 @@ namespace
     {
       return in;
     }
-    return std::getline(in >> delimiterIO{ '"' }, rhs.obj, '"');
+    return std::getline(in >> DelimiterIO{ '"' }, rhs.obj, '"');
   }
 }
 
@@ -91,7 +91,7 @@ std::istream& finaev::operator>>(std::istream& in, DataStruct& rhs)
   }
   DataStruct input;
   {
-    using sep = delimiterIO;
+    using sep = DelimiterIO;
     using ll = signedLongLongIo;
     using cmpLsp = complexIO;
     using str = stringIO;
