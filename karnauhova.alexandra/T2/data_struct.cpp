@@ -127,7 +127,7 @@ std::ostream& karnauhova::operator<<(std::ostream& out, const DoubleIO&& dest)
   {
     return out;
   }
-  iofmtguard fmtguard(out);
+  ScopeGuard fmtguard(out);
   out << std::fixed << std::setprecision(1) << dest.ref << "d";
   return out;
 }
@@ -152,7 +152,7 @@ std::ostream& karnauhova::operator<<(std::ostream& out, const DataStruct& src)
   }
   double dbl = src.key1;
   unsigned long long ull = src.key2;
-  iofmtguard fmtguard(out);
+  ScopeGuard fmtguard(out);
   out << "(:key1 " << DoubleIO{dbl};
   out << ":key2 " << UllIO{ull};
   out << ":key3 \"" << src.key3;

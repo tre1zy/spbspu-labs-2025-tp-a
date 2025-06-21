@@ -1,6 +1,6 @@
 #include "scope_guard.hpp"
 
-karnauhova::iofmtguard::iofmtguard(std::basic_ios< char >& s):
+karnauhova::ScopeGuard::ScopeGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
   fill_(s.fill()),
@@ -8,7 +8,7 @@ karnauhova::iofmtguard::iofmtguard(std::basic_ios< char >& s):
   fmt_(s.flags())
 {}
 
-karnauhova::iofmtguard::~iofmtguard()
+karnauhova::ScopeGuard::~ScopeGuard()
 {
   s_.width(width_);
   s_.fill(fill_);
