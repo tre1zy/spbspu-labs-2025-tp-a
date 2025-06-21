@@ -6,7 +6,6 @@
 #include <numeric>
 #include <sstream>
 #include "utils.hpp"
-#include <iostream>
 
 namespace {
   double calcArea(const gavrilova::Polygon& polygon)
@@ -203,7 +202,6 @@ void gavrilova::processCount(const std::vector< Polygon >& polygons,
 void gavrilova::processPerms(const std::vector< Polygon >& polygons,
     const std::vector< std::string >& commands, std::ostream& out)
 {
-  std::cout << "command[1]: " << commands[1] << " commands.size() : " << commands.size() << "\n";
   if (commands[1] < "3") {
     out << "<INVALID COMMAND>\n";
     return;
@@ -256,7 +254,7 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons,
 void gavrilova::processLessArea(const std::vector< Polygon >& polygons,
     const std::vector< std::string >& commands, std::ostream& out)
 {
-  if (commands[1] < "3") {
+  if (commands[.size()] < 3) {
     out << "<INVALID COMMAND>\n";
     return;
   }
