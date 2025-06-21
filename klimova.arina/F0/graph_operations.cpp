@@ -221,3 +221,38 @@ void klimova::findLongestPath(const GraphManager& graphs, std::istream& in, std:
     out << "<NO PATH FOUND>\n";
   }
 }
+
+void klimova::showHelp(std::ostream& out) {
+    out << "Graph Program - Available Commands:\n\n";
+    out << "   [graph] <filename>          - Load graph from file\n";
+    out << "   --check <filename>          - Check graph file correctness\n\n";
+
+    out << "   --shortest-path <start> <end> - Find shortest path between vertices\n";
+    out << "   --longest-path <start> <end>  - Find longest path between vertices\n";
+    out << "   --check-connectivity         - Check if graph is connected\n\n";
+
+    out << "   --add-vertex <graph> <vertex> - Add vertex to graph\n";
+    out << "   --add-edge <graph> <v1> <v2>  - Add edge between vertices\n";
+    out << "   --remove-vertex <graph> <vertex> - Remove vertex from graph\n";
+    out << "   --remove-edge <graph> <v1> <v2> - Remove edge between vertices\n";
+    out << "   --clear <graph>              - Clear graph\n\n";
+
+    out << "   --print <graph>             - Print graph structure\n";
+    out << "   --count-vertices <graph>    - Count vertices in graph\n";
+    out << "   --count-edges <graph>       - Count edges in graph\n";
+    out << "   --find-neighbors <graph> <vertex> - Find neighbors of vertex\n";
+    out << "   --degree <graph> <vertex>   - Get degree of vertex\n\n";
+
+    out << "   --help                     - Show this help message\n\n";
+
+    out << "File Format Example:\n";
+    out << "-------------------\n";
+    out << "MyGraph\n";
+    out << "Vertices:\n";
+    out << "A\n";
+    out << "B\n";
+    out << "C\n";
+    out << "Edges:\n";
+    out << "A -- B\n";
+    out << "B -- C\n";
+}
