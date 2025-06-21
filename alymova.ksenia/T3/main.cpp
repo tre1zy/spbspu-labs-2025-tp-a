@@ -6,12 +6,14 @@
 #include <vector>
 #include <limits>
 #include <iomanip>
-#include "user-commands.hpp"
 #include "shapes.hpp"
+#include "user-commands.hpp"
 
 int main(int argc, char** argv)
 {
   using namespace alymova;
+  using namespace std::placeholders;
+  using CommandDataset = std::map< std::string, std::function< void(const std::vector< Polygon >&) > >;
 
   if (argc != 2)
   {
@@ -37,7 +39,13 @@ int main(int argc, char** argv)
     std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
   }
 
-  CommandDataset commands = complectCommands(std::cin, std::cout);
+  CommandDataset commands;
+  commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["INFRAME"] = std::bind(inFrame, std::ref(std::cin), std::ref(std::cout), _1);
+  commands["RIGHTSHAPES"] = std::bind(rightShapes, std::ref(std::cout), _1);
   std::string command;
   while (!(std::cin >> command).eof())
   {
