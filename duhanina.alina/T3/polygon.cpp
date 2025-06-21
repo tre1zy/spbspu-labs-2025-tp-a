@@ -44,7 +44,7 @@ std::istream& duhanina::operator>>(std::istream& in, duhanina::Polygon& polygon)
     return in;
   }
   std::vector< Point > points(numPoints);
-  polygon.points.resize(numPoints);
+  polygon.points.reserve(numPoints);
   std::copy_n(std::istream_iterator< Point >(in), numPoints, points.begin());
   if (polygon.points.size() != numPoints)
   {
