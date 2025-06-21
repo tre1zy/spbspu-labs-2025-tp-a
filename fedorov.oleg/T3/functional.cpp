@@ -69,7 +69,6 @@ namespace fedorov
 
   Polygon LineToPolygonConverter::operator()(const Line &line) const
   {
-    // Разбиваем строку на токены
     std::vector< std::string > tokens;
     size_t start = 0;
     size_t end = 0;
@@ -77,14 +76,12 @@ namespace fedorov
 
     while (start < data.length())
     {
-      // Пропускаем пробелы
       start = data.find_first_not_of(" \t", end);
       if (start == std::string::npos)
       {
         break;
       }
 
-      // Находим конец токена
       end = data.find_first_of(" \t", start);
       if (end == std::string::npos)
       {
@@ -100,7 +97,6 @@ namespace fedorov
       return Polygon();
     }
 
-    // Первый токен - количество вершин
     size_t numVertices;
     try
     {
