@@ -330,8 +330,9 @@ void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& pol
   }
   Polygon ref;
   in >> ref;
-  if (in.fail())
+  if (!in || in.peek != '\n')
   {
+    in.clear();
     throw std::invalid_argument("Error");
   }
   double refArea = calculateArea(ref);
