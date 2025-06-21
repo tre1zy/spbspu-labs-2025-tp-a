@@ -1,7 +1,8 @@
 #include "commands.hpp"
+#include <algorithm>
 #include <iomanip>
+#include <format_guard.hpp>
 #include "area_commands.hpp"
-#include "../common/format_guard.hpp"
 #include "max_commands.hpp"
 #include "min_commands.hpp"
 #include "count_commands.hpp"
@@ -35,7 +36,7 @@ void mazitov::intersectsCommand(std::istream &in, std::ostream &out, const std::
   in >> ref;
   if (in)
   {
-    out << getIntersections(polygons, ref);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), IntersectsWith(ref));
   }
   else
   {
