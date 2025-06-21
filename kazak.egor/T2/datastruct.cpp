@@ -170,9 +170,9 @@ std::ostream& kazak::operator<<(std::ostream& out, const DataStruct& src)
   }
 
   StreamGuard guard(out);
-  out << "(:key1 0x" << std::hex << std::uppercase << src.key1
-      << ":key2 (:N " << std::dec << src.key2.first << ":D " << src.key2.second << ":)"
-      << ":key3 \"" << src.key3 << "\":)";
+  out << "(:key1 0x" << std::hex << std::uppercase << src.key1;
+  out << ":key2 (:N " << std::dec << src.key2.first << ":D " << src.key2.second << ":)";
+  out << ":key3 \"" << src.key3 << "\":)";
 
   return out;
 }
