@@ -37,11 +37,11 @@ double savintsev::calc_polygon_area(const Polygon a)
   return 0.5 * std::abs(area);
 }
 
-bool savintsev::is_lines_int(const Point m1, const Point m2, const Point n1, const Point n2)
+int savintsev::is_lines_int(const Point m1, const Point m2, const Point n1, const Point n2)
 {
   if (!is_bbox_int(m1, m2, n1, n2))
   {
-    return false;
+    return 0;
   }
 
   int d1 = (n2.x - n1.x) * (m1.y - n1.y) - (n2.y - n1.y) * (m1.x - n1.x);
@@ -51,19 +51,19 @@ bool savintsev::is_lines_int(const Point m1, const Point m2, const Point n1, con
 
   if ((d1 * d2 < 0) && (d3 * d4 < 0))
   {
-    return true;
+    return 1;
   }
 
   if (is_on_segment(m1, n1, n2) || is_on_segment(m2, n1, n2))
   {
-    return true;
+    return 1;
   }
   if (is_on_segment(n1, m1, m2) || is_on_segment(n2, m1, m2))
   {
-    return true;
+    return 1;
   }
 
-  return false;
+  return 0;
 }
 
 bool savintsev::is_bbox_int(const Point a1, const Point a2, const Point b1, const Point b2)

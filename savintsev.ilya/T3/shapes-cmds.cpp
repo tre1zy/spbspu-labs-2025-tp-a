@@ -107,27 +107,62 @@ namespace
     const savintsev::Polygon & p;
   };
 
+  struct SegmentIntersectionCounter
+  {
+    SegmentIntersectionCounter(const savintsev::Polygon & polyA, const savintsev::Polygon & polyB, size_t indexA):
+      a(polyA),
+      p(polyB),
+      i(indexA)
+    {}
+
+    int operator()(int acc, size_t j) const
+    {
+      const auto & a1 = a.points[j];
+      const auto & a2 = a.points[(i + 1) % a.points.size()];
+      const auto & b1 = p.points[j];
+      const auto & b2 = p.points[(j + 1) % p.points.size()];
+
+      return acc + savintsev::is_lines_int(a1, a2, b1, b2);
+    }
+
+    const savintsev::Polygon & a;
+    const savintsev::Polygon & p;
+    size_t i;
+  };
+
   struct CheckIntersect
   {
-    bool operator()(const savintsev::Polygon & a)
+    CheckIntersect(const savintsev::Polygon & polygon):
+      p(polygon)
+    {}
+
+    int operator()(const savintsev::Polygon & a) const
     {
-      size_t n = a.points.size();
-      for (size_t i = 0; i < n; ++i)
-      {
-        size_t m = p.points.size();
-        for (size_t j = 0; j < m; ++j)
-        {
-          const savintsev::Point & a1 = a.points[((i + 1) == n) ? 0 : i + 1];
-          const savintsev::Point & p1 = p.points[((j + 1) == m) ? 0 : j + 1];
-          bool is_intersect = savintsev::is_lines_int(p.points[j], p1, a.points[j], a1);
-          if (is_intersect)
-          {
-            return true;
-          }
-        }
-      }
-      return false;
+      std::vector< size_t > a_ix(a.points.size());
+      std::iota(a_ix.begin(), a_ix.end(), 0);
+
+      return std::accumulate(a_ix.begin(), a_ix.end(), 0, PolygonIntersectionAccumulator(a, p));
     }
+
+    struct PolygonIntersectionAccumulator
+    {
+      PolygonIntersectionAccumulator(const savintsev::Polygon & polyA, const savintsev::Polygon & polyB):
+        a(polyA),
+        p(polyB)
+      {}
+
+      int operator()(int acc, size_t i) const
+      {
+        std::vector< size_t > p_indices(p.points.size());
+        std::iota(p_indices.begin(), p_indices.end(), 0);
+
+        return acc + std::accumulate(p_indices.begin(), p_indices.end(), 0, SegmentIntersectionCounter(a, p, i));
+      }
+
+      const savintsev::Polygon & a;
+      const savintsev::Polygon & p;
+    };
+
     const savintsev::Polygon & p;
   };
 }
