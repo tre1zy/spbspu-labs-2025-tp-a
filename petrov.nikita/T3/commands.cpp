@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include "io_polygon.hpp"
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <iomanip>
@@ -11,7 +12,15 @@
 
 namespace
 {
-  bool isDigit(std::string & string);
+  bool isOdd(const petrov::Polygon & polygon)
+  {
+    return polygon.points.size() % 2 == 1; 
+  }
+
+  bool isEven(const petrov::Polygon & polygon)
+  {
+    return polygon.points.size() % 2 == 0; 
+  }
 
   bool isDigit(std::string & string)
   {
@@ -34,38 +43,32 @@ double petrov::calculateTrapezeArea(const Point & point_1, const Point & point_2
 
 double petrov::calculateArea(const Polygon & polygon)
 {
-  double result = 0.0;
-  for (size_t i = 0; i < polygon.points.size() - 1; i++)
-  {
-    result += calculateTrapezeArea(polygon.points[i], polygon.points[i + 1]);
-  }
-  result += calculateTrapezeArea(polygon.points[polygon.points.size() - 1], polygon.points[0]);
+  std::vector< double > trapezes_areas(polygon.points.size() - 1);
+  std::transform(polygon.points.cbegin(), polygon.points.cend(), polygon.points.cbegin() + 1, trapezes_areas.begin(), calculateTrapezeArea);
+  trapezes_areas.push_back(calculateTrapezeArea(polygon.points[polygon.points.size() - 1], polygon.points[0]));
+  double result = std::accumulate(trapezes_areas.cbegin(), trapezes_areas.cend(), 0.0);
   return std::abs(result);
 }
 
 void petrov::addIfEven(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  double result = 0.0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    if (polygons[i].points.size() % 2 == 0)
-    {
-      result += calculateArea(polygons[i]);
-    }
-  }
+  using namespace std::placeholders;
+  std::vector< Polygon > even_polygons;
+  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(even_polygons), std::bind(isEven, _1));
+  std::vector< double > sum_area(even_polygons.size());
+  std::transform(even_polygons.cbegin(), even_polygons.cend(), sum_area.begin(), calculateArea);
+  double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
   out << result;
 }
 
 void petrov::addIfOdd(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  double result = 0.0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    if (polygons[i].points.size() % 2 == 1)
-    {
-      result += calculateArea(polygons[i]);
-    }
-  }
+  using namespace std::placeholders;
+  std::vector< Polygon > odd_polygons;
+  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(odd_polygons), std::bind(isOdd, _1));
+  std::vector< double > sum_area(odd_polygons.size());
+  std::transform(odd_polygons.cbegin(), odd_polygons.cend(), sum_area.begin(), calculateArea);
+  double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
   out << result;
 }
 
@@ -75,11 +78,9 @@ void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  double result = 0.0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    result += calculateArea(polygons[i]);
-  }
+  std::vector< double > sum_area(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), sum_area.begin(), calculateArea);
+  double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
   out << result / polygons.size();
 }
 

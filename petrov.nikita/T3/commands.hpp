@@ -9,6 +9,7 @@ namespace petrov
 {
   double calculateTrapezeArea(const Point & point_1, const Point & point_2);
   double calculateArea(const Polygon & polygon);
+  double calculateAreaIfOdd(const Polygon & polygon);
 
 
   void addIfEven(const std::vector< Polygon > & polygons, std::ostream & out);
