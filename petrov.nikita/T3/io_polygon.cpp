@@ -38,9 +38,10 @@ std::istream & petrov::operator>>(std::istream & in, Polygon & polygon)
   {
     return in;
   }
-  StreamGuard strm_grd(in);
+  StreamGuard in_strm_grd(in);
   Polygon input;
   {
+    std::noskipws(in);
     using sep = DelimeterIO;
     size_t number_of_points = 0;
     if (in >> number_of_points && number_of_points >= 3)
@@ -49,6 +50,7 @@ std::istream & petrov::operator>>(std::istream & in, Polygon & polygon)
       int y = 0;
       for (size_t i = 0; i < number_of_points; i++)
       {
+        in >> sep{ ' ' };
         in >> sep{ '(' };
         if (in >> x && in >> sep{ ';' } && in >> y)
         {
@@ -56,11 +58,7 @@ std::istream & petrov::operator>>(std::istream & in, Polygon & polygon)
         }
         in >> sep{ ')' };
       }
-      std::noskipws(in);
-      if (!(in >> sep{ '\n' }))
-      {
-        in.setstate(std::ios_base::failbit);
-      }
+      in >> sep{ '\n' };
     }
     else
     {
