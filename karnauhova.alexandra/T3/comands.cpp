@@ -225,7 +225,7 @@ void karnauhova::lessareaComand(std::istream& in, std::ostream& out, const std::
 {
   Polygon it;
   in >> it;
-  if (!in)
+  if (!in || in.peek() != '\n')
   {
     in.clear();
     throw std::logic_error("<INVALID COMMAND>");
