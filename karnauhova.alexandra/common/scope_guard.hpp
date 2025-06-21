@@ -4,15 +4,15 @@
 
 namespace karnauhova
 {
-  class iofmtguard
+  class ScopeGuard
   {
   public:
-    explicit iofmtguard(std::basic_ios< char >& s);
-    ~iofmtguard();
-    iofmtguard(const iofmtguard&) = delete;
-    iofmtguard(iofmtguard&&) = delete;
-    iofmtguard& operator=(const iofmtguard&) = delete;
-    iofmtguard& operator=(iofmtguard&&) = delete;
+    explicit ScopeGuard(std::basic_ios< char >& s);
+    ~ScopeGuard();
+    ScopeGuard(const ScopeGuard&) = delete;
+    ScopeGuard(ScopeGuard&&) = delete;
+    ScopeGuard& operator=(const ScopeGuard&) = delete;
+    ScopeGuard& operator=(ScopeGuard&&) = delete;
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;
