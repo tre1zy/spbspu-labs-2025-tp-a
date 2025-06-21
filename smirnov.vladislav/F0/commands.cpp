@@ -1,11 +1,11 @@
-#include "commands.h"
+#include "commands.hpp"
 #include <algorithm>
 #include <iterator>
 #include <sstream>
 #include <fstream>
 #include <string>
 #include <regex>
-#include "dictionary_manager.h"
+#include "dictionary_manager.hpp"
 
 std::ostream& operator<<(std::ostream& os, const std::pair< const std::string, int >& p)
 {
