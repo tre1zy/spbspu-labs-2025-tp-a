@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <numeric>
 #include <stdexcept>
-#include <sstream>
 
 puzikov::AreaAccumulator::AreaAccumulator(const std::string &p):
   param(p)
@@ -30,7 +29,7 @@ double puzikov::AreaAccumulator::operator()(double acc, const puzikov::Polygon &
   }
   else
   {
-    std::size_t verticesCount = 0;
+    size_t verticesCount = 0;
     verticesCount = std::stoul(param);
 
     if (poly.points.size() == verticesCount)
@@ -73,7 +72,7 @@ double puzikov::ShapesAccumulator::operator()(double acc, const puzikov::Polygon
   }
   else
   {
-    std::size_t verticesCount = 0;
+    size_t verticesCount = 0;
     verticesCount = std::stoul(param);
 
     if (poly.points.size() == verticesCount)
@@ -93,14 +92,14 @@ bool puzikov::RmEchoPredicate::operator()(const Polygon &p1, const Polygon &p2)
   return (p1 == p2) && (ref == p1);
 }
 
-puzikov::TranslatePoint::TranslatePoint(int dx_, int dy_):
-  dx(dx_),
-  dy(dy_)
+puzikov::TranslatePoint::TranslatePoint(int dx, int dy):
+  dx_(dx),
+  dy_(dy)
 {}
 
 puzikov::Point puzikov::TranslatePoint::operator()(const Point &p) const
 {
-  return Point {p.x + dx, p.y + dy};
+  return Point{p.x + dx_, p.y + dy_};
 }
 
 puzikov::AnyOfShift::AnyOfShift(const PointVec &candidate_, const PointVec &reference_):
@@ -108,7 +107,7 @@ puzikov::AnyOfShift::AnyOfShift(const PointVec &candidate_, const PointVec &refe
   reference(reference_)
 {}
 
-bool puzikov::AnyOfShift::operator()(std::size_t shift) const
+bool puzikov::AnyOfShift::operator()(size_t shift) const
 {
   PointVec rotated(candidate.size());
   std::rotate_copy(candidate.begin(), candidate.begin() + shift, candidate.end(), rotated.begin());
@@ -133,7 +132,7 @@ bool puzikov::IsTranslationCongruent::operator()(const Polygon &poly) const
     return false;
   }
 
-  std::vector< std::size_t > shifts(reference.points.size());
+  std::vector< size_t > shifts(reference.points.size());
   std::iota(shifts.begin(), shifts.end(), 0);
 
   if (std::any_of(shifts.begin(), shifts.end(), AnyOfShift(poly.points, reference.points)))
@@ -142,47 +141,25 @@ bool puzikov::IsTranslationCongruent::operator()(const Polygon &poly) const
   }
 
   std::vector< Point > reversed(poly.points.rbegin(), poly.points.rend());
-  if (std::any_of(shifts.begin(), shifts.end(), AnyOfShift(reversed, reference.points)))
-  {
-    return true;
-  }
-
-  return false;
+  return std::any_of(shifts.begin(), shifts.end(), AnyOfShift(reversed, reference.points));
 }
 
-puzikov::Point puzikov::PointGenerator(std::istream &in)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    throw std::runtime_error("Not enough points.");
-  }
-
-  char c = in.peek();
-  Point p;
-  if (!(in >> p) || c == '\n')
-  {
-    throw std::runtime_error("Not enough points.");
-  }
-  return p;
-}
-
-puzikov::AreaIt puzikov::maxAreaElement(AreaIt first, AreaIt last, AreaComp comp)
+puzikov::constPolygonVecIt puzikov::maxAreaElement(constPolygonVecIt first, constPolygonVecIt last, AreaComp comp)
 {
   return std::max_element(first, last, comp);
 }
 
-puzikov::AreaIt puzikov::minAreaElement(AreaIt first, AreaIt last, AreaComp comp)
+puzikov::constPolygonVecIt puzikov::minAreaElement(constPolygonVecIt first, constPolygonVecIt last, AreaComp comp)
 {
   return std::min_element(first, last, comp);
 }
 
-puzikov::VertIt puzikov::maxVertElement(VertIt first, VertIt last, VertComp comp)
+puzikov::constPolygonVecIt puzikov::maxVertElement(constPolygonVecIt first, constPolygonVecIt last, VertComp comp)
 {
   return std::max_element(first, last, comp);
 }
 
-puzikov::VertIt puzikov::minVertElement(VertIt first, VertIt last, VertComp comp)
+puzikov::constPolygonVecIt puzikov::minVertElement(constPolygonVecIt first, constPolygonVecIt last, VertComp comp)
 {
   return std::min_element(first, last, comp);
 }

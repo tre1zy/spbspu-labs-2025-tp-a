@@ -7,10 +7,10 @@
 #include <format_guard.hpp>
 #include <input_wrapper_structs.hpp>
 
-std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
+std::istream &puzikov::operator>>(std::istream &in, Point &dest)
 {
   std::istream::sentry sentry(in);
-  using delim = puzikov::input::Character;
+  using delim = input::Character;
   if (!sentry)
   {
     return in;
@@ -25,12 +25,12 @@ std::istream &puzikov::operator>>(std::istream &in, puzikov::Point &dest)
   return in;
 }
 
-std::ostream &puzikov::operator<<(std::ostream &out, const puzikov::Point &src)
+std::ostream &puzikov::operator<<(std::ostream &out, const Point &src)
 {
   std::ostream::sentry sentry(out);
   if (sentry)
   {
-    puzikov::FormatGuard guard(out);
+    FormatGuard guard(out);
     out << '(' << src.x << ';' << src.y << ')';
   }
   return out;
@@ -72,7 +72,7 @@ std::ostream &puzikov::operator<<(std::ostream &out, const puzikov::Polygon &src
     return out;
   }
   puzikov::FormatGuard guard(out);
-  using output_it_t = std::ostream_iterator< puzikov::Point >;
+  using output_it_t = std::ostream_iterator< Point >;
 
   out << src.points.size() << ' ';
   std::copy(src.points.begin(), src.points.end(), output_it_t{out, " "});

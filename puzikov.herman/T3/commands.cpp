@@ -137,16 +137,14 @@ void puzikov::countCommand(std::istream &in, std::ostream &out, const std::vecto
     return;
   }
 
-  unsigned counter;
   checkVerticesParameter(param);
-  counter = std::accumulate(polygons.begin(), polygons.end(), 0, ShapesAccumulator(param));
+  unsigned counter = std::accumulate(polygons.begin(), polygons.end(), 0, ShapesAccumulator(param));
 
   out << counter << '\n';
 }
 
 void puzikov::rmEchoCommand(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
 {
-
   std::istream::sentry sentry(in);
   if (!sentry)
   {

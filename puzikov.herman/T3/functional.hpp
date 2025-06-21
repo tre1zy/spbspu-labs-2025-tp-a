@@ -1,10 +1,9 @@
 #ifndef FUNCTIONAL_HPP
 #define FUNCTIONAL_HPP
 
-#include "polygon.hpp"
-#include <functional>
 #include <vector>
 #include <string>
+#include "polygon.hpp"
 
 namespace puzikov
 {
@@ -34,9 +33,9 @@ namespace puzikov
 
   struct TranslatePoint
   {
-    TranslatePoint(int dx_, int dy_);
+    TranslatePoint(int dx, int dy);
     Point operator()(const Point &p) const;
-    int dx, dy;
+    int dx_, dy_;
   };
 
   struct AnyOfShift
@@ -55,19 +54,16 @@ namespace puzikov
     const Polygon &reference;
   };
 
-  Point PointGenerator(std::istream &);
-
   using AreaComp = bool (*)(const Polygon &, const Polygon &);
   using VertComp = bool (*)(const Polygon &, const Polygon &);
-  using AreaIt = std::vector< Polygon >::const_iterator;
-  using AreaAlgo = AreaIt (*)(AreaIt, AreaIt, AreaComp);
-  using VertIt = std::vector< Polygon >::const_iterator;
-  using VertAlgo = VertIt (*)(VertIt, VertIt, VertComp);
+  using constPolygonVecIt = std::vector< Polygon >::const_iterator;
+  using AreaAlgo = constPolygonVecIt (*)(constPolygonVecIt, constPolygonVecIt, AreaComp);
+  using VertAlgo = constPolygonVecIt (*)(constPolygonVecIt, constPolygonVecIt, VertComp);
 
-  AreaIt maxAreaElement(AreaIt first, AreaIt last, AreaComp comp);
-  AreaIt minAreaElement(AreaIt first, AreaIt last, AreaComp comp);
-  VertIt maxVertElement(VertIt first, VertIt last, VertComp comp);
-  VertIt minVertElement(VertIt first, VertIt last, VertComp comp);
+  constPolygonVecIt maxAreaElement(constPolygonVecIt first, constPolygonVecIt last, AreaComp comp);
+  constPolygonVecIt minAreaElement(constPolygonVecIt first, constPolygonVecIt last, AreaComp comp);
+  constPolygonVecIt maxVertElement(constPolygonVecIt first, constPolygonVecIt last, VertComp comp);
+  constPolygonVecIt minVertElement(constPolygonVecIt first, constPolygonVecIt last, VertComp comp);
 }
 
 #endif
