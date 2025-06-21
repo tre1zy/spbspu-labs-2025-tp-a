@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
-#include "../common/delimiter.hpp"
+#include <delimiter.hpp>
 
 std::istream &mazitov::operator>>(std::istream &in, Point &dest)
 {

@@ -5,7 +5,7 @@
 #include <numeric>
 #include <iomanip>
 #include <stdexcept>
-#include "../common/format_guard.hpp"
+#include <format_guard.hpp>
 
 namespace
 {
