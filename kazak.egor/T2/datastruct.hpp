@@ -9,7 +9,7 @@ namespace kazak
   struct DataStruct
   {
     unsigned long long key1;
-    std::pair<long long, unsigned long long> key2;
+    std::pair< long long, unsigned long long > key2;
     std::string key3;
   };
 
@@ -28,7 +28,7 @@ namespace kazak
 
   struct RationalIO
   {
-    std::pair<long long, unsigned long long>& ref;
+    std::pair< long long, unsigned long long >& ref;
   };
 
   struct StringIO
