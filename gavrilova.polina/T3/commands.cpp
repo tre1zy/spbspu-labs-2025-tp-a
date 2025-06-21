@@ -222,7 +222,8 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
-    throw std::runtime_error("Error while parsing Polygon");
+    out << "<INVALID COMMAND>";
+    return;
   }
 
   std::sort(ref_polygon.points.begin(), ref_polygon.points.end());
@@ -230,8 +231,7 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
   size_t count = std::count_if(
       polygons.begin(),
       polygons.end(),
-      [&ref_polygon](const Polygon& polygon)
-      {
+      [&ref_polygon](const Polygon& polygon) {
         auto points = polygon.points;
         std::sort(points.begin(), points.end());
         return points == ref_polygon.points;
@@ -260,7 +260,8 @@ void gavrilova::processLessArea(const std::vector< Polygon >& polygons, const st
   Polygon ref_polygon;
 
   if (!(iss >> ref_polygon && iss.eof())) {
-    throw std::runtime_error("Error while parsing Polygon");
+    out << "<INVALID COMMAND>";
+    return;
   }
 
   size_t count = std::count_if(

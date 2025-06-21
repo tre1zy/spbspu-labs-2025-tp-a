@@ -50,10 +50,10 @@ void gavrilova::readFile(const std::string& filename, std::vector< Polygon >& po
 void gavrilova::loadPolygons(const std::string& filename, std::vector< Polygon >& polygons, std::ostream& out)
 {
   readFile(filename, polygons);
-  std::copy(
-      polygons.begin(),
-      polygons.end(),
-      std::ostream_iterator< Polygon >(out, "\n"));
+  // std::copy(
+  //     polygons.begin(),
+  //     polygons.end(),
+  //     std::ostream_iterator< Polygon >(out, "\n"));
 }
 
 void gavrilova::startCommandInterface(const std::string& filename, std::istream& is, std::ostream& out)
@@ -95,7 +95,8 @@ void gavrilova::startCommandInterface(const std::string& filename, std::istream&
       }
       auto it = command_map.find(tokens[0]);
       if (it == command_map.end()) {
-        out << "<INVALID COMMAND>";
+        out << "<INVALID COMMAND>\n";
+        continue;
         // throw std::runtime_error("Invalid command");
       }
       it->second(out);
