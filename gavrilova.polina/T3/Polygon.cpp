@@ -54,6 +54,7 @@ namespace gavrilova {
       return os;
     }
 
+    os << polygon.points.size() << " ";
     std::copy(polygon.points.begin(),
         polygon.points.end(),
         std::ostream_iterator< Point >(os, " "));

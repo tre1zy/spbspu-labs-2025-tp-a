@@ -95,7 +95,8 @@ void gavrilova::startCommandInterface(const std::string& filename, std::istream&
       }
       auto it = command_map.find(tokens[0]);
       if (it == command_map.end()) {
-        throw std::runtime_error("Invalid command");
+        out << "<INVALID COMMAND>";
+        // throw std::runtime_error("Invalid command");
       }
       it->second(out);
     } catch (const std::exception&) {

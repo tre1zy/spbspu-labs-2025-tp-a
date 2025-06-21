@@ -1,5 +1,5 @@
-#ifndef GAVRILOVA_POINT_HPP
-#define GAVRILOVA_POINT_HPP
+#ifndef POINT_HPP
+#define POINT_HPP
 
 #include <fstream>
 

@@ -75,7 +75,9 @@ namespace {
 void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    throw std::runtime_error("Not enough arguments for AREA command");
+    out << "<INVALID COMMAND>";
+    return;
+    // throw std::runtime_error("Not enough arguments for AREA command");
   }
 
   auto& subcommand = commands.at(1);
@@ -103,7 +105,9 @@ void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::v
     try {
       num = std::stoll(subcommand);
       if (num < 3) {
-        throw std::runtime_error("Invalid number of vertices");
+        out << "<INVALID COMMAND>";
+        return;
+        // throw std::runtime_error("Invalid number of vertices");
       }
       area = apply_command(
           polygons,
@@ -121,7 +125,9 @@ void gavrilova::processArea(const std::vector< Polygon >& polygons, const std::v
 void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    throw std::runtime_error("Not enough arguments for MIN/MAX command");
+    out << "<INVALID COMMAND>";
+    return;
+    // throw std::runtime_error("Not enough arguments for MIN/MAX command");
   }
 
   static std::map< std::string, std::function< const Polygon&(
@@ -142,7 +148,9 @@ void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std:
       auto val = min_max_map.at(command)(polygons, minVertexesComp);
       out << val.points.size() << "\n";
     } else {
-      throw std::runtime_error("Invalid subcommand for MIN/MAX");
+      out << "<INVALID COMMAND>";
+      return;
+      // throw std::runtime_error("Invalid subcommand for MIN/MAX");
     }
   } catch (const std::exception&) {
     throw;
@@ -152,7 +160,9 @@ void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std:
 void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    throw std::runtime_error("Not enough arguments for COUNT command");
+    out << "<INVALID COMMAND>";
+    return;
+    // throw std::runtime_error("Not enough arguments for COUNT command");
   }
 
   auto& subcommand = commands.at(1);
@@ -174,7 +184,9 @@ void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::
     try {
       num = std::stoll(subcommand);
       if (num < 3) {
-        throw std::runtime_error("Invalid number of vertices");
+        // throw std::runtime_error("Invalid number of vertices");
+        out << "<INVALID COMMAND>";
+        return;
       }
       count = apply_command(
           polygons,
@@ -193,7 +205,9 @@ void gavrilova::processCount(const std::vector< Polygon >& polygons, const std::
 void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    throw std::runtime_error("Not enough arguments for PERMS command");
+    out << "<INVALID COMMAND>";
+    return;
+    // throw std::runtime_error("Not enough arguments for PERMS command");
   }
 
   auto polygon_str = std::accumulate(
@@ -216,7 +230,8 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
   size_t count = std::count_if(
       polygons.begin(),
       polygons.end(),
-      [&ref_polygon](const Polygon& polygon) {
+      [&ref_polygon](const Polygon& polygon)
+      {
         auto points = polygon.points;
         std::sort(points.begin(), points.end());
         return points == ref_polygon.points;
@@ -228,7 +243,9 @@ void gavrilova::processPerms(const std::vector< Polygon >& polygons, const std::
 void gavrilova::processLessArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
 {
   if (commands.size() < 2) {
-    throw std::runtime_error("Not enough arguments for LESSAREA command");
+    out << "<INVALID COMMAND>";
+    return;
+    // throw std::runtime_error("Not enough arguments for LESSAREA command");
   }
 
   auto polygon_str = std::accumulate(
