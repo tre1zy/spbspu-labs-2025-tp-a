@@ -276,6 +276,10 @@ void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, st
 
 void orlova::countSequence(const std::vector< Polygon >& polygons, const Polygon& polygon, size_t index, int& current, int& max)
 {
+  if (std::count(polygons.begin(), polygons.end(), polygon) == 0)
+  {
+    throw std::logic_error("THERE ARE NO IDENTIC POLYGONS");
+  }
   if (index >= polygons.size())
   {
     return;
