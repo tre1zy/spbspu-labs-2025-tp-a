@@ -17,7 +17,6 @@ namespace belyaev
 
   std::istream& operator>>(std::istream& in, Point& dest);
   std::ostream& operator<<(std::ostream& out, const Point& src);
-  Point checkNext(const Point& pnt, std::istream& in);
   std::istream& operator>>(std::istream& in, Polygon& dest);
   std::ostream& operator<<(std::ostream& out, const Polygon& src);
 
