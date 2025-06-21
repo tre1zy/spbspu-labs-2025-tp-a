@@ -9,10 +9,9 @@
 #include <map>
 #include "streamguard.hpp"
 
-constexpr size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
-
 namespace
 {
+  constexpr size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
   struct PredicateForVertices
   {
     size_t count;
