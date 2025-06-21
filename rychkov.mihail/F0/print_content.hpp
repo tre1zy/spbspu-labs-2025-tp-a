@@ -27,7 +27,7 @@ namespace rychkov
     void operator()(const entities::Literal& literal);
     void operator()(const entities::CastOperation& cast);
 
-    void operator()(const DinMemWrapper< entities::Expression >& root);
+    void operator()(const DynMemWrapper< entities::Expression >& root);
     void operator()(const entities::Expression& root);
     void operator()(const entities::Expression::operand& operand);
 

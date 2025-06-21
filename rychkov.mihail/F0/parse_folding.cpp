@@ -16,13 +16,14 @@ void rychkov::CParser::fold(CParseContext& context, const Operator* reference)
       log(context, "found not full operator during priority folding");
     }
     if ((reference != nullptr) && ((stack_.top()->operation->priority > reference->priority)
-      || ((stack_.top()->operation->priority == reference->priority) && reference->right_align)))
+        || ((stack_.top()->operation->priority == reference->priority) && reference->right_align)))
     {
-      move_down();
+      move_down(context);
       stack_.top()->operation = reference;
       return;
     }
     last = stack_.top();
+    calculate_type(context, *last);
     stack_.pop();
   }
   if (reference != nullptr)

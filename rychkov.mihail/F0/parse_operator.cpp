@@ -21,7 +21,7 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
     return false;
   }
 
-  if ((cases.size() == 1) && (cases[0].category == Operator::assign))
+  if ((cases.size() == 1) && (cases[0].category == Operator::ASSIGN))
   {
     if (entities::is_decl(*stack_.top()))
     {
@@ -40,11 +40,11 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
   bool result = false;
   if (cases.size() == 2)
   {
-    if (cases[0].type == Operator::binary)
+    if (cases[0].type == Operator::BINARY)
     {
       result = parse_binary(context, cases[0]) || parse_unary(context, cases[1]);
     }
-    else if (cases[1].type == Operator::binary)
+    else if (cases[1].type == Operator::BINARY)
     {
       result = parse_binary(context, cases[1]) || parse_unary(context, cases[0]);
     }
@@ -53,7 +53,7 @@ bool rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
       result = parse_unary(context, cases[0]) || parse_unary(context, cases[1]);
     }
   }
-  else if (cases[0].type == Operator::binary)
+  else if (cases[0].type == Operator::BINARY)
   {
     result = parse_binary(context, cases[0]);
   }
@@ -77,7 +77,7 @@ bool rychkov::CParser::parse_binary(CParseContext& context, const rychkov::Opera
   fold(context, &oper);
   return true;
 }
-bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper)
+bool rychkov::CParser::parse_unary(CParseContext& context, const rychkov::Operator& oper)
 {
   if (oper.right_align)
   {
@@ -85,7 +85,7 @@ bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper
     {
       return false;
     }
-    entities::Expression* temp = new entities::Expression{&oper, {}, {}};
+    entities::Expression* temp = new entities::Expression{&oper, {}};
     stack_.top()->operands.push_back(temp);
     stack_.push(temp);
   }
@@ -95,8 +95,12 @@ bool rychkov::CParser::parse_unary(CParseContext&, const rychkov::Operator& oper
     {
       return false;
     }
-    entities::Expression* temp = new entities::Expression{&oper, {}, {std::move(stack_.top()->operands.back())}};
-    stack_.top()->operands.back() = temp;
+    //entities::Expression* temp = new entities::Expression{&oper, {std::move(stack_.top()->operands.back())}};
+    //stack_.top()->operands.back() = temp;
+    move_down(context);
+    stack_.top()->operation = &oper;
+    calculate_type(context, *stack_.top());
+    stack_.pop();
   }
   return true;
 }
@@ -108,9 +112,13 @@ rychkov::entities::Expression* rychkov::CParser::move_up()
   stack_.top()->operands.push_back(old); // creates unique_ptr and then pushes (no leak)
   return old;
 }
-void rychkov::CParser::move_down()
+void rychkov::CParser::move_down(CParseContext& context)
 {
-  entities::Expression* temp = new entities::Expression{nullptr, {}, {std::move(stack_.top()->operands.back())}};
+  entities::Expression* temp = new entities::Expression{nullptr, {std::move(stack_.top()->operands.back())}};
   stack_.top()->operands.back() = temp;
   stack_.push(temp);
+  if (std::holds_alternative< DynMemWrapper< entities::Expression > >(temp->operands.back()))
+  {
+    calculate_type(context, *std::get< DynMemWrapper< entities::Expression > >(temp->operands.back()));
+  }
 }

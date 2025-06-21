@@ -14,29 +14,33 @@ rychkov::Lexer::Lexer(CParser* next):
 
 const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases = {
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "+", false, true, false, 2},
-        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "+", false, false, false, 4}
+        {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "+", false, true, false, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "+", false, false, false, 4}
       },
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, false, false, 1},
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "++", true, true, true, 2},
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, false, false, 1},
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, true, true, 2},
       },
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "-", false, true, false, 2},
-        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "-", false, false, false, 4}
+        {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "-", false, true, false, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "-", false, false, false, 4}
       },
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, false, false, 1},
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "--", true, true, true, 2},
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, false, false, 1},
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, true, true, 2},
       },
-      {{rychkov::Operator::unary, rychkov::Operator::special, "!", false, true, false, 2}},
+      {{rychkov::Operator::UNARY, rychkov::Operator::LOGIC, "!", false, true, false, 2}},
       {
-        {rychkov::Operator::unary, rychkov::Operator::arithmetic, "*", false, true, false, 2},
-        {rychkov::Operator::binary, rychkov::Operator::arithmetic, "*", false, false, false, 3}
+        {rychkov::Operator::UNARY, rychkov::Operator::DEREFERENCE, "*", false, true, true, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*", false, false, false, 3}
       },
-      {{rychkov::Operator::binary, rychkov::Operator::arithmetic, "*=", true, true, true, 14}},
-      {{rychkov::Operator::binary, rychkov::Operator::assign, "=", true, true, true, 14}},
-      {{rychkov::Operator::binary, rychkov::Operator::logic, "==", false, false, false, 7}}
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::ADDRESSOF, "&", true, true, false, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::BIT, "&", false, false, false, 8}
+      },
+      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*=", true, true, true, 14}},
+      {{rychkov::Operator::BINARY, rychkov::Operator::ASSIGN, "=", true, true, true, 14}},
+      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "==", false, false, false, 7}}
     };
 
 void rychkov::Lexer::parse(CParseContext& context, std::string str)
@@ -70,22 +74,34 @@ void rychkov::Lexer::flush(CParseContext& context)
     entities::Literal& lit = std::get< entities::Literal >(buf_);
     if (lit.type == entities::Literal::Number)
     {
-      if ((lit.suffix == "l") || (lit.suffix == "L"))
+      if ((lit.suffix == "f") || (lit.suffix == "F"))
       {
-        lit.result_type.length_category = typing::Type::LONG;
+        lit.result_type.name = "float";
+      }
+      else if (lit.result_type.name != "int")
+      {
+        if (!lit.suffix.empty())
+        {
+          log(context, "unknown numeric suffix - " + lit.suffix);
+          lit.suffix.clear();
+        }
+      }
+      else if ((lit.suffix == "l") || (lit.suffix == "L"))
+      {
+        lit.result_type.length_category = typing::LONG;
       }
       else if ((lit.suffix == "ul") || (lit.suffix == "UL"))
       {
-        lit.result_type.length_category = typing::Type::LONG;
+        lit.result_type.length_category = typing::LONG;
         lit.result_type.is_unsigned = true;
       }
       else if ((lit.suffix == "ll") || (lit.suffix == "LL"))
       {
-        lit.result_type.length_category = typing::Type::LONG_LONG;
+        lit.result_type.length_category = typing::LONG_LONG;
       }
       else if ((lit.suffix == "ull") || (lit.suffix == "ULL"))
       {
-        lit.result_type.length_category = typing::Type::LONG_LONG;
+        lit.result_type.length_category = typing::LONG_LONG;
         lit.result_type.is_unsigned = true;
       }
       else if (!lit.suffix.empty())
@@ -149,21 +165,21 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
   {
     buf_ = &*oper_p;
   }
-  else if (std::isalpha(c))
+  else if (std::isalpha(c) || (c == '_'))
   {
     buf_ = std::string{c};
   }
   else if (std::isdigit(c))
   {
-    buf_ = entities::Literal{{c}, {}, entities::Literal::Number, {"int", typing::Type::Int}};
+    buf_ = entities::Literal{{c}, {}, entities::Literal::Number, {"int", typing::BASIC}};
   }
   else if (c == '\'')
   {
-    buf_ = entities::Literal{{}, {}, entities::Literal::Char, {"char", typing::Type::Int}};
+    buf_ = entities::Literal{{}, {}, entities::Literal::Char, {"char", typing::BASIC}};
   }
   else if (c == '"')
   {
-    typing::Type type = {{}, typing::Type::Array, {"char", typing::Type::Int, nullptr, true}};
+    typing::Type type = {{}, typing::ARRAY, {"char", typing::BASIC, nullptr, true}};
     buf_ = entities::Literal{{}, {}, entities::Literal::String, std::move(type)};
   }
   else if (!std::isspace(c))
@@ -179,7 +195,7 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
 void rychkov::Lexer::append_name(CParseContext& context, char c)
 {
   std::string& str = std::get< std::string >(buf_);
-  if (std::isalnum(c))
+  if (std::isalnum(c) || (c == '_'))
   {
     str += c;
     return;
@@ -234,7 +250,13 @@ void rychkov::Lexer::append_literal(CParseContext& context, char c)
   case entities::Literal::Number:
     if (c == '.')
     {
-      literal.literal += c;
+      if (literal.result_type.name == "double")
+      {
+        log(context, "duplicates '.' in numeric literal");
+        return;
+      }
+      literal.literal += '.';
+      literal.result_type.name = "double";
       return;
     }
     if (c != '\'')

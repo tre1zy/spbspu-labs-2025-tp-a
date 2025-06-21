@@ -19,6 +19,8 @@ namespace rychkov
     size_t nerrors = 0;
   };
   void log(CParseContext& context, std::string message);
+  std::ostream& start_log(CParseContext& context);
+  void finish_log(CParseContext& context);
 }
 
 #endif

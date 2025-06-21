@@ -42,7 +42,7 @@ bool rychkov::TypeParser::append_const(CParseContext& context)
 {
   if (stack_.empty())
   {
-    combined_ = {{}, typing::Type::Combination};
+    combined_ = {{}, typing::COMBINATION};
     combined_.is_const = true;
     stack_.push({&combined_});
     return true;
@@ -64,7 +64,7 @@ bool rychkov::TypeParser::append_volatile(CParseContext& context)
 {
   if (stack_.empty())
   {
-    combined_ = {{}, typing::Type::Combination};
+    combined_ = {{}, typing::COMBINATION};
     combined_.is_volatile = true;
     stack_.push({&combined_});
     return true;

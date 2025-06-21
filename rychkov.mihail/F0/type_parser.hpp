@@ -17,6 +17,7 @@ namespace rychkov
     bool ready() const noexcept;
     bool is_function() const noexcept;
 
+    void prepare();
     typing::Type type() const;
     entities::Variable variable() const;
     entities::Function function() const;
@@ -54,6 +55,7 @@ namespace rychkov
     bool append_close_parenthesis(CParseContext& context);
     bool append_comma(CParseContext& context);
 
+    static void remove_combination(typing::Type& type);
     typing::Type* move_up();
     bool can_be_named_param(typing::Type* type_p);
   };

@@ -1,9 +1,22 @@
 #include "type_parser.hpp"
 
+#include <utility>
+
+void rychkov::TypeParser::remove_combination(typing::Type& type)
+{
+  if (type.category == typing::COMBINATION)
+  {
+    DynMemWrapper< typing::Type > temp = std::move(type.base);
+    temp->is_const = type.is_const || temp->is_const;
+    temp->is_volatile = type.is_volatile || temp->is_volatile;
+    type = std::move(*temp);
+  }
+}
 rychkov::typing::Type* rychkov::TypeParser::move_up()
 {
+  remove_combination(*stack_.top().data);
   typing::Type* old = new typing::Type{std::move(*stack_.top().data)};
-  *stack_.top().data = {{}, typing::Type::Combination, old};
+  *stack_.top().data = {{}, typing::COMBINATION, old};
   return old;
 }
 bool rychkov::TypeParser::can_be_named_param(typing::Type* type_p)
@@ -21,19 +34,26 @@ bool rychkov::TypeParser::ready() const noexcept
 }
 bool rychkov::TypeParser::is_function() const noexcept
 {
-  return !empty() && (combined_.category == typing::Type::Function);
+  return !empty() && (combined_.category == typing::FUNCTION);
 }
 
+void rychkov::TypeParser::prepare()
+{
+  remove_combination(combined_);
+}
 rychkov::typing::Type rychkov::TypeParser::type() const
 {
+  remove_combination(*stack_.top().data);
   return combined_;
 }
 rychkov::entities::Variable rychkov::TypeParser::variable() const
 {
+  remove_combination(*stack_.top().data);
   return {combined_, var_name_};
 }
 rychkov::entities::Function rychkov::TypeParser::function() const
 {
+  remove_combination(*stack_.top().data);
   return {combined_, var_name_, parameters_};
 }
 void rychkov::TypeParser::clear()
@@ -68,7 +88,7 @@ bool rychkov::TypeParser::append(CParseContext& context, typing::Type base_type)
     log(context, "types cannot be merged here");
     return false;
   }
-  if ((base_type.category == typing::Type::Array) || (base_type.category == typing::Type::Function))
+  if ((base_type.category == typing::ARRAY) || (base_type.category == typing::FUNCTION))
   {
     if (stack_.top().data->is_const || stack_.top().data->is_volatile)
     {
@@ -76,7 +96,7 @@ bool rychkov::TypeParser::append(CParseContext& context, typing::Type base_type)
       return false;
     }
   }
-  if ((base_type.category != typing::Type::Int) && (stack_.top().data->is_signed || stack_.top().data->is_unsigned))
+  if ((base_type.category != typing::BASIC) && (stack_.top().data->is_signed || stack_.top().data->is_unsigned))
   {
     log(context, "signed or unsigned cannot be applied not to integer type");
     return false;

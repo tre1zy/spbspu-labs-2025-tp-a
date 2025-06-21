@@ -11,27 +11,27 @@
 namespace rychkov
 {
   template< class T >
-  struct DinMemWrapper: std::unique_ptr< T >
+  struct DynMemWrapper: std::unique_ptr< T >
   {
     using value_type = T;
-    DinMemWrapper():
+    DynMemWrapper():
       std::unique_ptr< T >(new T)
     {}
-    DinMemWrapper(const DinMemWrapper& rhs):
+    DynMemWrapper(const DynMemWrapper& rhs):
       std::unique_ptr< T >(rhs != nullptr ? new T{*rhs} : nullptr)
     {}
-    DinMemWrapper(DinMemWrapper&&) = default;
-    DinMemWrapper(std::nullptr_t):
+    DynMemWrapper(DynMemWrapper&&) = default;
+    DynMemWrapper(std::nullptr_t):
       std::unique_ptr< T >(nullptr)
     {}
-    DinMemWrapper(T* ptr):
+    DynMemWrapper(T* ptr):
       std::unique_ptr< T >(ptr)
     {}
     template< class... Args >
-    DinMemWrapper(Args&&... args):
+    DynMemWrapper(Args&&... args):
       std::unique_ptr< T >(new T{std::forward< Args >(args)...})
     {}
-    DinMemWrapper& operator=(const DinMemWrapper& rhs)
+    DynMemWrapper& operator=(const DynMemWrapper& rhs)
     {
       if (rhs != nullptr)
       {
@@ -39,19 +39,19 @@ namespace rychkov
       }
       return *this;
     }
-    DinMemWrapper& operator=(DinMemWrapper&&) = default;
+    DynMemWrapper& operator=(DynMemWrapper&&) = default;
     template< class U = T >
-    DinMemWrapper& operator=(U&& rhs)
+    DynMemWrapper& operator=(U&& rhs)
     {
       static_cast< std::unique_ptr< T >& >(*this).reset(new T{std::forward< U >(rhs)});
       return *this;
     }
-    DinMemWrapper& operator=(std::nullptr_t)
+    DynMemWrapper& operator=(std::nullptr_t)
     {
       static_cast< std::unique_ptr< T >& >(*this) = nullptr;
       return *this;
     }
-    DinMemWrapper& operator=(T* ptr)
+    DynMemWrapper& operator=(T* ptr)
     {
       static_cast< std::unique_ptr< T >& >(*this).reset(ptr);
       return *this;
@@ -69,19 +69,24 @@ namespace rychkov
   {
     enum Type
     {
-      unary = 1,
-      binary = 2,
-      ternary = 3,
-      multiple = -1
+      UNARY = 1,
+      BINARY = 2,
+      TERNARY = 3,
+      MULTIPLE = -1
     };
     enum Category
     {
-      arithmetic, // +, -, *, ...
-      logic, // &&, ||, !, <, >, >=, <=, ==
-      bit, // &, |, ~, ^, <<, ...
-      address, // ., ->, *, &
-      special, // (), [], ?:, sizeof, ','
-      assign // =
+      ARITHMETIC, // +, -, *, /
+      INCREMENT, // ++, --
+      MODULUS, // %
+      LOGIC, // &&, ||, !
+      COMPARE, // <, >, >=, <=, ==, !=
+      BIT, // &, |, ~, ^, <<, ...
+      DEREFERENCE, // *
+      ADDRESSOF, // &
+      FIELD_ACCESS, // ., ->
+      SPECIAL, // (), [], ?:, sizeof, ','
+      ASSIGN // =
     };
 
     Type type;
@@ -94,28 +99,34 @@ namespace rychkov
   };
   namespace typing
   {
+    enum LengthCategory
+    {
+      NO_LENGTH,
+      SHORT,
+      LONG,
+      LONG_LONG
+    };
+    enum Category
+    {
+      STRUCT,
+      ENUM,
+      BASIC,
+      POINTER,
+      ARRAY,
+      FUNCTION,
+      COMBINATION
+    };
+    enum MatchType
+    {
+      EXACT,
+      IMPLICIT,
+      NO_CAST
+    };
     struct Type
     {
-      enum LengthCategory
-      {
-        NO_LENGTH,
-        SHORT,
-        LONG,
-        LONG_LONG
-      };
-      enum Category
-      {
-        Struct,
-        Int,
-        Pointer,
-        Array,
-        Function,
-        Combination
-      };
-
       std::string name;
-      Category category = Combination;
-      DinMemWrapper< Type > base = nullptr;
+      Category category = COMBINATION;
+      DynMemWrapper< Type > base = nullptr;
       bool is_const = false;
       bool is_volatile = false;
       bool is_signed = false;
@@ -126,7 +137,21 @@ namespace rychkov
       std::vector< Type > function_parameters;
 
       bool empty() const noexcept;
+      bool ready() const noexcept;
     };
+    bool is_basic(const Type* type);
+    bool is_enum(const Type* type);
+    bool is_function(const Type* type);
+    bool is_pointer(const Type* type);
+    bool is_array(const Type* type);
+    bool is_callable(const Type* type);
+    bool is_iterable(const Type* type);
+    bool is_integer(const Type* type);
+
+    bool exact_cv(const Type& dest, const Type& src);
+    MatchType check_cast(const Type& dest, const Type& src);
+    const typing::Type* largest_integer(const Type& lhs, const Type& rhs);
+    const typing::Type* common_type(const Type& lhs, const Type& rhs);
   }
   namespace entities
   {
@@ -176,14 +201,14 @@ namespace rychkov
     struct Declaration
     {
       std::variant< Variable, Struct, Enum, Union, Alias, Function > data;
-      DinMemWrapper< Expression > value;
+      DynMemWrapper< Expression > value;
       ScopeType scope = UNSPECIFIED;
     };
     struct CastOperation
     {
-      typing::Type from, to;
+      typing::Type to;
       bool is_explicit = false;
-      DinMemWrapper< Expression > expr;
+      DynMemWrapper< Expression > expr;
     };
     struct Literal
     {
@@ -201,10 +226,11 @@ namespace rychkov
     };
     struct Expression
     {
-      using operand = std::variant< DinMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation, Body >;
+      using operand = std::variant< DynMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation, Body >;
 
       const Operator* operation;
-      typing::Type result_type;
+      const typing::Type* result_type;
+      typing::Type buffered_;
       std::vector< operand > operands;
 
       Expression();
@@ -213,16 +239,21 @@ namespace rychkov
       Expression(Literal lit);
       Expression(CastOperation cast);
       Expression(Body body);
-      Expression(const Operator* op, typing::Type result, std::vector< operand > opers);
+      Expression(const Operator* op, std::vector< operand > opers);
 
       bool empty() const noexcept;
       bool full() const noexcept;
     };
 
-    bool is_body(const entities::Expression& expr);
-    bool is_decl(const entities::Expression& expr);
-    bool is_operator(const entities::Expression& expr);
-    bool is_bridge(const entities::Expression& expr);
+    bool is_body(const Expression& expr);
+    bool is_decl(const Expression& expr);
+    bool is_operator(const Expression& expr);
+    bool is_bridge(const Expression& expr);
+
+    void remove_bridge(Expression& expr);
+    const typing::Type* get_type(const Expression::operand& expr);
+    bool is_lvalue(const Expression::operand& operand);
+    bool is_lvalue(const Expression* expr);
   }
 }
 

@@ -34,20 +34,20 @@ bool rychkov::TypeParser::append_asterisk(CParseContext& context)
   {
     move_up();
   }
-  stack_.top().data->category = typing::Type::Pointer;
+  stack_.top().data->category = typing::POINTER;
   return true;
 }
 bool rychkov::TypeParser::append_open_bracket(CParseContext& context)
 {
   if (stack_.top().data->empty() || stack_.top().bracket_opened
-      || (stack_.top().data->category == typing::Type::Function))
+      || (stack_.top().data->category == typing::FUNCTION))
   {
     log(context, "array cannot be applied here");
     return false;
   }
   typing::Type* old = move_up();
-  stack_.top().data->category = typing::Type::Array;
-  if (old->category == typing::Type::Array)
+  stack_.top().data->category = typing::ARRAY;
+  if (old->category == typing::ARRAY)
   {
     stack_.top().data->array_has_length = old->array_has_length;
     stack_.top().data->array_length = old->array_length;
@@ -84,8 +84,8 @@ bool rychkov::TypeParser::append_open_parenthesis(CParseContext& context)
   }
   if (stack_.top().right_allign)
   {
-    if ((stack_.top().data->category == typing::Type::Array)
-        || (stack_.top().data->category == typing::Type::Function))
+    if ((stack_.top().data->category == typing::ARRAY)
+        || (stack_.top().data->category == typing::FUNCTION))
     {
       log(context, "function parentheses cannot be applied here");
       return false;
@@ -94,7 +94,7 @@ bool rychkov::TypeParser::append_open_parenthesis(CParseContext& context)
     {
       move_up();
     }
-    stack_.top().data->category = typing::Type::Function;
+    stack_.top().data->category = typing::FUNCTION;
     stack_.top().data->function_parameters.emplace_back();
     stack_.push({&stack_.top().data->function_parameters.back()});
     stack_.top().is_function_paremeter = true;
@@ -134,6 +134,11 @@ bool rychkov::TypeParser::append_close_parenthesis(CParseContext& context)
       log(context, "function parameter following after ',' cannot be empty");
       return false;
     }
+    else if (!stack_.top().data->ready())
+    {
+      log(context, "function parameter started but not finished");
+      return false;
+    }
     stack_.pop();
     return true;
   }
@@ -159,11 +164,12 @@ bool rychkov::TypeParser::append_close_parenthesis(CParseContext& context)
 }
 bool rychkov::TypeParser::append_comma(CParseContext& context)
 {
-  if ((stack_.size() <= 1) || !stack_.top().is_function_paremeter)
+  if ((stack_.size() <= 1) || !stack_.top().is_function_paremeter || !stack_.top().data->ready())
   {
     log(context, "',' cannot be applied here");
     return false;
   }
+  remove_combination(*stack_.top().data);
   stack_.pop();
   stack_.top().data->function_parameters.emplace_back();
   stack_.push({&stack_.top().data->function_parameters.back()});

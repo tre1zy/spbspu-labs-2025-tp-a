@@ -7,21 +7,20 @@
 using namespace std::literals::string_literals;
 
 const std::set< rychkov::Operator, rychkov::NameCompare > rychkov::CParser::operators = {
-      {rychkov::Operator::unary, rychkov::Operator::special, "sizeof", false, false, false, 0},
-      {rychkov::Operator::multiple, rychkov::Operator::special, "()", false, false, false, 0}
+      {rychkov::Operator::UNARY, rychkov::Operator::SPECIAL, "sizeof", false, false, false, 0}
     };
-const rychkov::Operator rychkov::CParser::parentheses = {rychkov::Operator::multiple,
-      rychkov::Operator::special, "()", false, false, false, 0};
-const rychkov::Operator rychkov::CParser::brackets = {rychkov::Operator::binary,
-      rychkov::Operator::special, "[]", false, false, false, 0};
-const rychkov::Operator rychkov::CParser::comma = {rychkov::Operator::binary,
-      rychkov::Operator::special, ",", false, false, false, 0};
+const rychkov::Operator rychkov::CParser::parentheses = {rychkov::Operator::MULTIPLE,
+      rychkov::Operator::SPECIAL, "()", false, false, false, 1};
+const rychkov::Operator rychkov::CParser::brackets = {rychkov::Operator::BINARY,
+      rychkov::Operator::SPECIAL, "[]", false, false, false, 1};
+const rychkov::Operator rychkov::CParser::comma = {rychkov::Operator::BINARY,
+      rychkov::Operator::SPECIAL, ",", false, false, false, 15};
 
 rychkov::CParser::CParser():
   program_{{}},
   base_types_{
-        {{"int", typing::Type::Int}, 0},
-        {{"char", typing::Type::Int}, 0}
+        {{"int", typing::BASIC}, 0},
+        {{"char", typing::BASIC}, 0}
       }
 {
   stack_.push(&program_[0]);
@@ -126,7 +125,8 @@ bool rychkov::CParser::append(CParseContext& context, std::string name)
       return false;
     }
   }
-  return true;
+  log(context, "unexpected name (" + name + ")");
+  return false;
 }
 bool rychkov::CParser::append(CParseContext& context, char c)
 {
@@ -168,6 +168,7 @@ bool rychkov::CParser::flush_type_parser(CParseContext& context)
       log(context, "type cannot be finished here");
       return false;
     }
+    type_parser_.prepare();
     // if typedef
     if (type_parser_.is_function())
     {

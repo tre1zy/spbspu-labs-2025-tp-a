@@ -1,5 +1,8 @@
 #include "cparser.hpp"
 
+#include <iostream>
+#include "print_content.hpp"
+
 bool rychkov::CParser::parse_semicolon(CParseContext& context)
 {
   bool not_first = false;
@@ -11,12 +14,14 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
       not_first = true;
     }
     fold(context, nullptr);
+    calculate_type(context, *stack_.top());
     stack_.pop();
   }
   if (stack_.empty())
   {
     return append_empty(context);
   }
+
   if (entities::is_body(*stack_.top())) //append new empty to body
   {
     entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
@@ -36,7 +41,7 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
       }
       stack_.pop();
       structs_.insert(std::make_pair(data, stack_.size()));
-      base_types_.insert(std::make_pair(typing::Type{data.name, typing::Type::Struct}, stack_.size()));
+      base_types_.insert(std::make_pair(typing::Type{data.name, typing::STRUCT}, stack_.size()));
       return append_empty(context);
     }
     if (std::holds_alternative< entities::Variable >(decl.data))
@@ -46,6 +51,20 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
       {
         log(context, "variable must have name");
         return false;
+      }
+      if ((decl.value != nullptr) && (decl.value->result_type != nullptr))
+      {
+        switch (typing::check_cast(data.type, *decl.value->result_type))
+        {
+        case typing::NO_CAST:
+          start_log(context) << "variable " << data.name << " cannot be initialized with " << *decl.value->result_type;
+          finish_log(context);
+          break;
+        case typing::IMPLICIT:
+          entities::CastOperation temp = {data.type, false, std::move(decl.value)};
+          decl.value = std::move(temp);
+          break;
+        }
       }
       //if (last_empty)
       //{

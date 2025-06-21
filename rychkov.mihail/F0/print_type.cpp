@@ -8,11 +8,11 @@ std::ostream& rychkov::details::print_left_parenthesis(std::ostream& out, const 
   {
     return out;
   }
-  if ((parent.category == typing::Type::Array) && (parent.base->category == typing::Type::Array))
+  if ((parent.category == typing::ARRAY) && (parent.base->category == typing::ARRAY))
   {
     return out;
   }
-  if ((parent.base->category == typing::Type::Function) || (parent.base->category == typing::Type::Array))
+  if ((parent.base->category == typing::FUNCTION) || (parent.base->category == typing::ARRAY))
   {
     out << '(';
   }
@@ -24,11 +24,11 @@ std::ostream& rychkov::details::print_right_parenthesis(std::ostream& out, const
   {
     return out;
   }
-  if ((parent.category == typing::Type::Array) && (parent.base->category == typing::Type::Array))
+  if ((parent.category == typing::ARRAY) && (parent.base->category == typing::ARRAY))
   {
     return out;
   }
-  if ((parent.base->category == typing::Type::Function) || (parent.base->category == typing::Type::Array))
+  if ((parent.base->category == typing::FUNCTION) || (parent.base->category == typing::ARRAY))
   {
     out << ')';
   }
@@ -42,10 +42,10 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
   }
   switch (type.category)
   {
-  case typing::Type::Struct:
+  case typing::STRUCT:
     out << type.name;
     break;
-  case typing::Type::Int:
+  case typing::BASIC:
     if (type.is_signed)
     {
       out << "signed ";
@@ -56,13 +56,13 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
     }
     switch (type.length_category)
     {
-    case typing::Type::SHORT:
+    case typing::SHORT:
       out << "short ";
       break;
-    case typing::Type::LONG:
+    case typing::LONG:
       out << "long ";
       break;
-    case typing::Type::LONG_LONG:
+    case typing::LONG_LONG:
       out << "long long ";
       break;
     }
@@ -76,7 +76,7 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
       out << " volatile";
     }
     break;
-  case typing::Type::Pointer:
+  case typing::POINTER:
     details::print_left_parenthesis(out, type);
     out << '*';
     if (type.is_const)
@@ -88,10 +88,10 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
       out << " volatile";
     }
     break;
-  case typing::Type::Array:
+  case typing::ARRAY:
     details::print_left_parenthesis(out, type);
     break;
-  case typing::Type::Combination:
+  case typing::COMBINATION:
     if (type.is_const)
     {
       out << " const";
@@ -106,7 +106,7 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
 }
 std::ostream& rychkov::print_right(std::ostream& out, const typing::Type& type)
 {
-  if (type.category == typing::Type::Function)
+  if (type.category == typing::FUNCTION)
   {
     out << '(';
     char comma[3] = "\0\0";
@@ -119,11 +119,11 @@ std::ostream& rychkov::print_right(std::ostream& out, const typing::Type& type)
     out << ')';
     details::print_right_parenthesis(out, type);
   }
-  else if (type.category == typing::Type::Pointer)
+  else if (type.category == typing::POINTER)
   {
     details::print_right_parenthesis(out, type);
   }
-  else if (type.category == typing::Type::Array)
+  else if (type.category == typing::ARRAY)
   {
     out << '[';
     if (type.array_has_length)

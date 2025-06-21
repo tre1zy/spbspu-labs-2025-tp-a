@@ -50,8 +50,10 @@ namespace rychkov
     bool flush_type_parser(CParseContext& context);
     bool append_empty(CParseContext& context);
     entities::Expression* move_up();
-    void move_down();
+    void move_down(CParseContext& context);
     void fold(CParseContext& context, const Operator* reference = nullptr);
+    void calculate_type(CParseContext& context, entities::Expression& expr);
+    void require_type(CParseContext& context, entities::Expression::operand& expr, const typing::Type& type);
 
     bool parse_semicolon(CParseContext& context);
     bool parse_open_brace(CParseContext& context);
