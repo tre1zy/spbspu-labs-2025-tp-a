@@ -98,24 +98,19 @@ bool puzikov::operator!=(const Polygon &p1, const Polygon &p2)
   return !(p1 == p2);
 }
 
-struct puzikov::PolygonAreaAccumulator
+puzikov::PolygonAreaAccumulator::PolygonAreaAccumulator(const Polygon &p):
+  poly(p),
+  n(p.points.size())
+{}
+
+double puzikov::PolygonAreaAccumulator::operator()(double acc, const Point &p1) const
 {
-  PolygonAreaAccumulator(const puzikov::Polygon &p):
-    poly(p),
-    n(p.points.size())
-  {}
+  size_t i = &p1 - &poly.points[0];
+  const Point &p2 = poly.points[(i + 1) % n];
+  return acc + (p1.x * p2.y - p2.x * p1.y);
+}
 
-  double operator()(double acc, const puzikov::Point &p1) const
-  {
-    size_t i = &p1 - &poly.points[0];
-    const puzikov::Point &p2 = poly.points[(i + 1) % n];
-    return acc + (p1.x * p2.y - p2.x * p1.y);
-  }
-  const puzikov::Polygon &poly;
-  size_t n;
-};
-
-double puzikov::calcPolygonArea(const puzikov::Polygon &poly)
+double puzikov::calcPolygonArea(const Polygon &poly)
 {
   if (poly.points.size() < 3)
   {
@@ -148,9 +143,4 @@ void puzikov::readPolygons(std::istream &in, std::vector< Polygon > &polygons)
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-}
-
-void puzikov::writePolygons(std::ostream &out, std::vector< Polygon > &vec)
-{
-  std::copy(vec.begin(), vec.end(), std::ostream_iterator< Polygon >(out, "\n"));
 }
