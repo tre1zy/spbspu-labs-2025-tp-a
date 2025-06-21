@@ -50,7 +50,6 @@ namespace ohantsev
 
     struct DSU;
     struct Edge;
-    struct DijkstraContainers;
     class DijkstraPathFinder;
     template< bool AllowCycles >
     class NPathsFinder;
