@@ -153,10 +153,10 @@ namespace
 
       int operator()(int acc, size_t i) const
       {
-        std::vector< size_t > p_indices(p.points.size());
-        std::iota(p_indices.begin(), p_indices.end(), 0);
+        std::vector< size_t > p_ix(p.points.size());
+        std::iota(p_ix.begin(), p_ix.end(), 0);
 
-        return acc + std::accumulate(p_indices.begin(), p_indices.end(), 0, SegmentIntersectionCounter(a, p, i));
+        return acc + std::accumulate(p_ix.begin(), p_ix.end(), 0, SegmentIntersectionCounter(a, p, i));
       }
 
       const savintsev::Polygon & a;
