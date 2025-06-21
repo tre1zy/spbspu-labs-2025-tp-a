@@ -107,7 +107,7 @@ namespace gavrilova {
 
     std::string trailing;
     curr_line_string_stream >> trailing;
-    if (!trailing.empty() || polygon.points.size() != num_of_points) {
+    if (!trailing.empty() || polygon.points.size() != static_cast< size_t >(num_of_points)) {
       polygon.points.clear();
       return is;
     }
