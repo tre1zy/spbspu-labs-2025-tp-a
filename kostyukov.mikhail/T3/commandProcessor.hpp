@@ -2,7 +2,7 @@
 #define COMMAND_PROCESSOR_HPP
 
 #include <functional>
-#include <iostream>
+#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>
@@ -11,14 +11,20 @@
 
 namespace kostyukov
 {
-  using cVecPoly = const std::vector< Polygon >;
+  using PolygonContainer = const std::vector< Polygon >;
+  using CommandFunc = void (*)(std::istream&, std::ostream&, PolygonContainer&);
+
   class CommandProcessor
   {
     public:
-      CommandProcessor(cVecPoly& polygons, std::istream& in, std::ostream& out);
-      const std::map< std::string, std::function< void() > >& getCommands() const;
+      CommandProcessor(PolygonContainer& polygons, std::istream& in, std::ostream& out);
+      void process(const std::string& commandName);
     private:
+      void add(const std::string& commandName, CommandFunc func);
       std::map< std::string, std::function< void() > > commands_;
+      PolygonContainer& polygons_;
+      std::istream& in_;
+      std::ostream& out_;
   };
 }
 #endif

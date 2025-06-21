@@ -1,20 +1,36 @@
 #include "commandProcessor.hpp"
 
-#include <functional>
-
 #include "commands.hpp"
+#include <stdexcept>
 
-kostyukov::CommandProcessor::CommandProcessor(cVecPoly& polygons, std::istream& in, std::ostream& out)
+kostyukov::CommandProcessor::CommandProcessor(PolygonContainer& polygons, std::istream& in, std::ostream& out):
+  polygons_(polygons),
+  in_(in),
+  out_(out)
 {
-  commands_["AREA"] = std::bind(area, std::ref(in), std::ref(out), std::cref(polygons));
-  commands_["MAX"] = std::bind(max, std::ref(in), std::ref(out), std::cref(polygons));
-  commands_["MIN"] = std::bind(min, std::ref(in), std::ref(out), std::cref(polygons));
-  commands_["COUNT"] = std::bind(count, std::ref(in), std::ref(out), std::cref(polygons));
-  commands_["PERMS"] = std::bind(permsCount, std::ref(in), std::ref(out), std::cref(polygons));
-  commands_["RIGHTSHAPES"] = std::bind(rightShapesCount, std::ref(out), std::cref(polygons));
+  add("AREA", area);
+  add("MAX", max);
+  add("MIN", min);
+  add("COUNT", count);
+  add("PERMS", permsCount);
+  commands_["RIGHTSHAPES"] = std::bind(rightShapesCount, std::ref(out_), std::cref(polygons));
 }
 
-const std::map< std::string, std::function< void() > >& kostyukov::CommandProcessor::getCommands() const
+void kostyukov::CommandProcessor::add(const std::string& commandName, CommandFunc func)
 {
-  return commands_;
+  commands_[commandName] = std::bind(func, std::ref(in_), std::ref(out_), std::cref(polygons_));
+  return;
+}
+
+void kostyukov::CommandProcessor::process(const std::string& commandName)
+{
+  try
+  {
+  commands_.at(commandName)();
+  }
+  catch (const std::out_of_range&)
+  {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
+  return;
 }

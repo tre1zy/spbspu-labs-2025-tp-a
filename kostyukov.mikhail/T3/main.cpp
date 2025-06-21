@@ -3,7 +3,6 @@
 #include <iostream>
 #include <iterator>
 #include <limits>
-#include <map>
 #include <string>
 
 #include "commandProcessor.hpp"
@@ -30,14 +29,12 @@ int main(int argc, char** argv)
     }
   }
   CommandProcessor processor(polygons, std::cin, std::cout);
-  auto commands = processor.getCommands();
-
   std::string command;
   while (!(std::cin >> command).eof())
   {
     try
     {
-      commands.at(command)();
+      processor.process(command);
       std::cout << '\n';
     }
     catch (...)
