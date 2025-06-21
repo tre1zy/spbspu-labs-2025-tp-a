@@ -1,11 +1,11 @@
 #include "functional.hpp"
 
 #include <numeric>
-#include <sstream>
 #include <iterator>
 #include <stdexcept>
 #include <cctype>
 #include <algorithm>
+#include <string>
 
 #include "polygon.hpp"
 
@@ -47,26 +47,105 @@ namespace fedorov
     {
       return false;
     }
-    std::istringstream iss(line.data);
-    size_t num;
-    return static_cast< bool >(iss >> num);
+
+    size_t start = line.data.find_first_not_of(" \t");
+    if (start == std::string::npos)
+    {
+      return false;
+    }
+
+    size_t end = line.data.find_first_of(" \t", start);
+    std::string token = (end == std::string::npos) ? line.data.substr(start) : line.data.substr(start, end - start);
+
+    for (char c : token)
+    {
+      if (!std::isdigit(static_cast< unsigned char >(c)))
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   Polygon LineToPolygonConverter::operator()(const Line &line) const
   {
-    std::istringstream iss(line.data);
+    // Разбиваем строку на токены
+    std::vector< std::string > tokens;
+    size_t start = 0;
+    size_t end = 0;
+    const std::string &data = line.data;
+
+    while (start < data.length())
+    {
+      // Пропускаем пробелы
+      start = data.find_first_not_of(" \t", end);
+      if (start == std::string::npos)
+      {
+        break;
+      }
+
+      // Находим конец токена
+      end = data.find_first_of(" \t", start);
+      if (end == std::string::npos)
+      {
+        tokens.push_back(data.substr(start));
+        break;
+      }
+      tokens.push_back(data.substr(start, end - start));
+      start = end + 1;
+    }
+
+    if (tokens.empty())
+    {
+      return Polygon();
+    }
+
+    // Первый токен - количество вершин
+    size_t numVertices;
+    try
+    {
+      numVertices = std::stoul(tokens[0]);
+    }
+    catch (...)
+    {
+      return Polygon();
+    }
+
+    if (numVertices < 3 || tokens.size() != numVertices + 1)
+    {
+      return Polygon();
+    }
+
     Polygon poly;
-    if (!(iss >> poly))
+    for (size_t i = 1; i < tokens.size(); ++i)
     {
-      return Polygon();
-    }
+      const std::string &token = tokens[i];
+      if (token.size() < 5 || token.front() != '(' || token.back() != ')')
+      {
+        return Polygon();
+      }
 
-    std::string remaining;
-    if (iss >> remaining)
-    {
-      return Polygon();
-    }
+      std::string content = token.substr(1, token.size() - 2);
+      size_t sepPos = content.find(';');
+      if (sepPos == std::string::npos)
+      {
+        return Polygon();
+      }
 
+      std::string xStr = content.substr(0, sepPos);
+      std::string yStr = content.substr(sepPos + 1);
+
+      try
+      {
+        int x = std::stoi(xStr);
+        int y = std::stoi(yStr);
+        poly.points.push_back({x, y});
+      }
+      catch (...)
+      {
+        return Polygon();
+      }
+    }
     return poly;
   }
 

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "polygon.hpp"
 #include "input_delimiter.hpp"
