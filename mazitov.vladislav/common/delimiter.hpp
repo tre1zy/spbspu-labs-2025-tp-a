@@ -5,11 +5,12 @@
 
 namespace mazitov
 {
-  struct Delimiter
+  struct DelimiterInput
   {
     char exp;
   };
-  std::istream &operator>>(std::istream &in, Delimiter &&dest);
+
+  std::istream &operator>>(std::istream &in, DelimiterInput &&dest);
 }
 
 #endif

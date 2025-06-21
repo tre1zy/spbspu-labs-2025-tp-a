@@ -12,7 +12,7 @@ std::istream &mazitov::operator>>(std::istream &in, Point &dest)
     return in;
   }
   Point temp{0, 0};
-  in >> Delimiter{'('} >> temp.x >> Delimiter{';'} >> temp.y >> Delimiter{')'};
+  in >> DelimiterInput{'('} >> temp.x >> DelimiterInput{';'} >> temp.y >> DelimiterInput{')'};
   if (in)
   {
     dest = temp;
