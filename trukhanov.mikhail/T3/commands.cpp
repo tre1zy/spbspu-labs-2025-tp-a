@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <iomanip>
-#include <limits>
 #include <stream_guard.hpp>
 #include "functors.hpp"
 #include "polygon.hpp"
