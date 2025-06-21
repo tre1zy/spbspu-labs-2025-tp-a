@@ -329,11 +329,11 @@ void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& pol
     throw std::invalid_argument("Error");
   }
   Polygon ref;
+  in >> ref;
   if (in.fail())
   {
     throw std::invalid_argument("Error");
   }
-  in >> ref;
   double refArea = calculateArea(ref);
   size_t count = std::count_if(polygons.begin(), polygons.end(), CountIfAreaLess(refArea));
   out << count;
