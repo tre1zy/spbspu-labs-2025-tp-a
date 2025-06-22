@@ -45,8 +45,6 @@ int main(int argc, char* argv[])
     std::cerr << e.what() << "\n";
     return 1;
   }
-
-  std::cout << "polygons " << polygons.size() << "\n";
   using command_func_t = std::function< void(const std::vector< gavrilova::Polygon >&, std::istream&, std::ostream&) >;
   std::map< std::string, command_func_t > command_map = {
       {"AREA", gavrilova::execArea},
