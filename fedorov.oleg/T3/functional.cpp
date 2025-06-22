@@ -6,7 +6,6 @@
 #include <cmath>
 #include <algorithm>
 #include <functional>
-
 #include "polygon.hpp"
 
 namespace fedorov
@@ -16,14 +15,6 @@ namespace fedorov
     double operator()(const Point &a, const Point &b) const
     {
       return a.x * b.y - b.x * a.y;
-    }
-  };
-
-  struct Validator
-  {
-    bool operator()(const Polygon &p) const
-    {
-      return p.points.size() >= 3;
     }
   };
 
@@ -56,9 +47,16 @@ namespace fedorov
   void readPolygons(std::istream &in, std::vector< Polygon > &polygons)
   {
     polygons.clear();
-    std::vector< Polygon > temp;
-    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(temp));
-    std::copy_if(temp.begin(), temp.end(), std::back_inserter(polygons), Validator());
+    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+
+    struct InvalidPolygon
+    {
+      bool operator()(const Polygon &p) const
+      {
+        return p.points.size() < 3;
+      }
+    };
+    polygons.erase(std::remove_if(polygons.begin(), polygons.end(), InvalidPolygon()), polygons.end());
   }
 
   bool AreaComparator::operator()(const Polygon &p1, const Polygon &p2) const

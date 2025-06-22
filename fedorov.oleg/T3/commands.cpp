@@ -9,12 +9,6 @@
 
 namespace fedorov
 {
-  static bool isEOL(std::istream &in)
-  {
-    in >> std::ws;
-    return in.eof() || in.peek() == '\n';
-  }
-
   void maxArea(std::ostream &out, const std::vector< Polygon > &polys)
   {
     if (polys.empty())
@@ -62,7 +56,7 @@ namespace fedorov
   void maxCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
   {
     std::string param;
-    if (!(in >> param) || !isEOL(in))
+    if (!(in >> param))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -85,7 +79,7 @@ namespace fedorov
   void minCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
   {
     std::string param;
-    if (!(in >> param) || !isEOL(in))
+    if (!(in >> param))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -108,7 +102,7 @@ namespace fedorov
   void areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     std::string param;
-    if (!(in >> param) || !isEOL(in))
+    if (!(in >> param))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -155,7 +149,7 @@ namespace fedorov
   void lessAreaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     Polygon target;
-    if (!(in >> target) || !PolygonValidator()(target) || !isEOL(in))
+    if (!(in >> target) || !PolygonValidator()(target))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -170,7 +164,7 @@ namespace fedorov
   void echoCommand(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
   {
     Polygon target;
-    if (!(in >> target) || !PolygonValidator()(target) || !isEOL(in))
+    if (!(in >> target) || !PolygonValidator()(target))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -192,7 +186,7 @@ namespace fedorov
   void countCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     std::string param;
-    if (!(in >> param) || !isEOL(in))
+    if (!(in >> param))
     {
       out << "<INVALID COMMAND>\n";
       return;
