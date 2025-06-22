@@ -4,7 +4,6 @@
 #include <limits>
 #include <map>
 #include "geometry.hpp"
-#include "io-utils.hpp"
 #include "polygon-commands.hpp"
 
 int main(int argc, char* argv[])
@@ -32,8 +31,8 @@ int main(int argc, char* argv[])
   commands["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   commands["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
   commands["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-  commands["INFRAME"] = std::bind(inframe, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
-  commands["RIGHTSHAPES"] = std::bind(rightshapes, std::cref(polygons), std::ref(std::cout));
+  commands["INFRAME"] = std::bind(inFrame, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  commands["RIGHTSHAPES"] = std::bind(rightShapes, std::cref(polygons), std::ref(std::cout));
 
   std::string command;
   while (!(std::cin >> command).eof())
