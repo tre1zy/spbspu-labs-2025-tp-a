@@ -160,7 +160,7 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
           invalid = true;
         }
         else {
-            intResult = std::count_if(polygons.begin(), polygons.end(), 
+            intResult = std::count_if(polygons.begin(), polygons.end(),
                 std::bind(polygons_intersect, std::placeholders::_1, std::cref(query)));
         }
     }
