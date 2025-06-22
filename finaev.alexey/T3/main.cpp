@@ -29,38 +29,27 @@ int main(int argc, char* argv[])
   {
     if (file.fail())
     {
-      file.clear();
+      file.clear(file.rdstate() ^ std::ios::failbit);
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(shapes));
   }
-  std::map< std::string, std::function< void() > > commands;
-  commands["AREA"] = std::bind(finaev::area, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
-  commands["COUNT"] = std::bind(finaev::count, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
-  commands["MAX"] = std::bind(finaev::max, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
-  commands["MIN"] = std::bind(finaev::min, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
-  commands["SAME"] = std::bind(finaev::same, std::ref(std::cin), std::ref(std::cout), std::cref(shapes));
-  commands["ECHO"] = std::bind(finaev::echo, std::ref(std::cin), std::ref(std::cout), std::ref(shapes));
+  auto commands = finaev::createCommandsHandler(std::cin, std::cout, shapes);
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      auto func = commands.find(cmd);
-      if (func != commands.end())
-      {
-        func->second();
-      }
-      else
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
+      commands.at(cmd)();
     }
-    catch(const std::exception& e)
+    catch(...)
     {
-      std::cin.clear();
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << e.what();
+      std::cout << "<INVALID COMMAND>";
     }
     std::cout << "\n";
   }

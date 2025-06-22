@@ -24,7 +24,6 @@ std::ostream& finaev::operator<<(std::ostream& out, const Point& point)
   return out;
 }
 
-
 std::istream& finaev::operator>>(std::istream& in, Polygon& poly)
 {
   std::istream::sentry sentry(in);

@@ -1,7 +1,6 @@
 #ifndef SHAPES_HPP
 #define SHAPES_HPP
 #include <vector>
-#include <iostream>
 #include <delimiter.hpp>
 
 namespace finaev
