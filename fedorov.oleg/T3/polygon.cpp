@@ -42,7 +42,6 @@ namespace fedorov
   {
     return !(p1 == p2);
   }
-
   std::istream &operator>>(std::istream &in, Polygon &dest)
   {
     int n;
@@ -53,13 +52,16 @@ namespace fedorov
     }
 
     dest.points.clear();
-    dest.points.resize(n);
-    std::copy_n(std::istream_iterator< Point >(in), n, dest.points.begin());
-
-    if (in.fail() || dest.points.size() != static_cast< size_t >(n))
+    for (int i = 0; i < n; ++i)
     {
-      dest.points.clear();
-      in.setstate(std::ios::failbit);
+      Point p;
+      if (!(in >> p))
+      {
+        dest.points.clear();
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      dest.points.push_back(p);
     }
     return in;
   }

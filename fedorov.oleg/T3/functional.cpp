@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include "polygon.hpp"
+#include <limits>
 
 namespace fedorov
 {
@@ -47,18 +48,19 @@ namespace fedorov
   void readPolygons(std::istream &in, std::vector< Polygon > &polygons)
   {
     polygons.clear();
-    std::vector< Polygon > temp;
-    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(temp));
-
-    struct Validator
+    Polygon p;
+    while (in >> p)
     {
-      bool operator()(const Polygon &p) const
+      if (PolygonValidator()(p))
       {
-        return p.points.size() >= 3;
+        polygons.push_back(p);
       }
-    };
+    }
 
-    std::copy_if(temp.begin(), temp.end(), std::back_inserter(polygons), Validator());
+    if (!in.eof())
+    {
+      in.clear();
+    }
   }
 
   bool AreaComparator::operator()(const Polygon &p1, const Polygon &p2) const
