@@ -160,7 +160,7 @@ void smirnov::printAreaSum(std::istream& input, const std::vector< Polygon >& po
   {
     result = handlers.at(param)();
   }
-  catch (...)
+  catch (const std::out_of_range& e)
   {
     size_t vertices = std::stoull(param);
     if (vertices < 3)
@@ -194,9 +194,11 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
   {
     handlers.at(param)();
   }
-  catch (...)
+  catch (const std::out_of_range& e)
   {
-    throw std::invalid_argument("Unknown command");
+    input.setstate(std::ios::failbit);
+    input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    return;
   }
 }
 
@@ -220,9 +222,11 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
   {
     handlers.at(param)();
   }
-  catch (...)
+  catch (const std::out_of_range& e)
   {
-    throw std::invalid_argument("Unknown command");
+    input.setstate(std::ios::failbit);
+    input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return;
   }
 }
 
@@ -240,7 +244,7 @@ void smirnov::printCountOf(std::istream& input, const std::vector< Polygon >& po
   {
     count = handlers.at(param)();
   }
-  catch (...)
+  catch (const std::out_of_range& e)
   {
     size_t vertices = std::stoull(param);
     if (vertices < 3)
