@@ -4,71 +4,102 @@
 #include <numeric>
 #include <algorithm>
 #include <functional>
+#include <map>
 
 #include "functional.hpp"
+#include "format_guard.hpp"
 
 namespace fedorov
 {
+  namespace
+  {
+    void outputAreaOdd(std::ostream &out, const std::vector< Polygon > &polygons)
+    {
+      double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
+      out << total << '\n';
+    }
+
+    void outputAreaEven(std::ostream &out, const std::vector< Polygon > &polygons)
+    {
+      double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
+      out << total << '\n';
+    }
+
+    void outputAreaMean(std::ostream &out, const std::vector< Polygon > &polygons)
+    {
+      if (polygons.empty())
+      {
+        throw std::logic_error("No polygons");
+      }
+      double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
+      out << total / polygons.size() << '\n';
+    }
+
+    void countOdd(std::ostream &out, const std::vector< Polygon > &polygons)
+    {
+      out << std::count_if(polygons.begin(), polygons.end(), CountOddPredicate()) << '\n';
+    }
+
+    void countEven(std::ostream &out, const std::vector< Polygon > &polygons)
+    {
+      out << std::count_if(polygons.begin(), polygons.end(), CountEvenPredicate()) << '\n';
+    }
+  }
+
+  static bool isEOL(std::istream &in)
+  {
+    in >> std::ws;
+    return in.eof() || in.peek() == '\n';
+  }
+
   void maxArea(std::ostream &out, const std::vector< Polygon > &polys)
   {
-    if (polys.empty())
-    {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
     auto it = std::max_element(polys.begin(), polys.end(), AreaComparator());
+    FormatGuard guard(out);
     out << std::fixed << std::setprecision(1) << calcPolygonArea(*it) << '\n';
   }
 
   void minArea(std::ostream &out, const std::vector< Polygon > &polys)
   {
-    if (polys.empty())
-    {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
     auto it = std::min_element(polys.begin(), polys.end(), AreaComparator());
+    FormatGuard guard(out);
     out << std::fixed << std::setprecision(1) << calcPolygonArea(*it) << '\n';
   }
 
   void maxVertices(std::ostream &out, const std::vector< Polygon > &polys)
   {
-    if (polys.empty())
-    {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
     auto it = std::max_element(polys.begin(), polys.end(), VerticesComparator());
     out << it->points.size() << '\n';
   }
 
   void minVertices(std::ostream &out, const std::vector< Polygon > &polys)
   {
-    if (polys.empty())
-    {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
     auto it = std::min_element(polys.begin(), polys.end(), VerticesComparator());
     out << it->points.size() << '\n';
   }
 
   void maxCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
   {
-    std::string param;
-    if (!(in >> param))
+    if (polys.empty())
     {
       out << "<INVALID COMMAND>\n";
       return;
     }
 
-    if (param == "AREA")
+    std::string param;
+    if (!(in >> param) || !isEOL(in))
     {
-      maxArea(out, polys);
+      out << "<INVALID COMMAND>\n";
+      return;
     }
-    else if (param == "VERTEXES")
+
+    using CommandFunction = std::function< void(std::ostream &, const std::vector< Polygon > &) >;
+    std::map< std::string, CommandFunction > subcommands = {{"AREA", maxArea}, {"VERTEXES", maxVertices}};
+
+    auto it = subcommands.find(param);
+    if (it != subcommands.end())
     {
-      maxVertices(out, polys);
+      it->second(out, polys);
     }
     else
     {
@@ -78,20 +109,26 @@ namespace fedorov
 
   void minCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
   {
-    std::string param;
-    if (!(in >> param))
+    if (polys.empty())
     {
       out << "<INVALID COMMAND>\n";
       return;
     }
 
-    if (param == "AREA")
+    std::string param;
+    if (!(in >> param) || !isEOL(in))
     {
-      minArea(out, polys);
+      out << "<INVALID COMMAND>\n";
+      return;
     }
-    else if (param == "VERTEXES")
+
+    using CommandFunction = std::function< void(std::ostream &, const std::vector< Polygon > &) >;
+    std::map< std::string, CommandFunction > subcommands = {{"AREA", minArea}, {"VERTEXES", minVertices}};
+
+    auto it = subcommands.find(param);
+    if (it != subcommands.end())
     {
-      minVertices(out, polys);
+      it->second(out, polys);
     }
     else
     {
@@ -102,7 +139,7 @@ namespace fedorov
   void areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     std::string param;
-    if (!(in >> param))
+    if (!(in >> param) || !isEOL(in))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -110,24 +147,21 @@ namespace fedorov
 
     try
     {
-      if (param == "ODD")
+      FormatGuard guard(out);
+      out << std::fixed << std::setprecision(1);
+
+      using CommandFunction = std::function< void() >;
+      std::map< std::string, CommandFunction > subcommands;
+
+      using namespace std::placeholders;
+      subcommands["ODD"] = std::bind(outputAreaOdd, std::ref(out), std::cref(polygons));
+      subcommands["EVEN"] = std::bind(outputAreaEven, std::ref(out), std::cref(polygons));
+      subcommands["MEAN"] = std::bind(outputAreaMean, std::ref(out), std::cref(polygons));
+
+      auto it = subcommands.find(param);
+      if (it != subcommands.end())
       {
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
-        out << std::fixed << std::setprecision(1) << total << '\n';
-      }
-      else if (param == "EVEN")
-      {
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
-        out << std::fixed << std::setprecision(1) << total << '\n';
-      }
-      else if (param == "MEAN")
-      {
-        if (polygons.empty())
-        {
-          throw std::logic_error("No polygons");
-        }
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
-        out << std::fixed << std::setprecision(1) << total / polygons.size() << '\n';
+        it->second();
       }
       else
       {
@@ -137,7 +171,7 @@ namespace fedorov
           throw std::invalid_argument("Invalid vertex count");
         }
         double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num));
-        out << std::fixed << std::setprecision(1) << total << '\n';
+        out << total << '\n';
       }
     }
     catch (...)
@@ -149,7 +183,7 @@ namespace fedorov
   void lessAreaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     Polygon target;
-    if (!(in >> target) || !PolygonValidator()(target))
+    if (!(in >> target) || !PolygonValidator()(target) || !isEOL(in))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -164,7 +198,7 @@ namespace fedorov
   void echoCommand(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
   {
     Polygon target;
-    if (!(in >> target) || !PolygonValidator()(target))
+    if (!(in >> target) || !PolygonValidator()(target) || !isEOL(in))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -186,7 +220,7 @@ namespace fedorov
   void countCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     std::string param;
-    if (!(in >> param))
+    if (!(in >> param) || !isEOL(in))
     {
       out << "<INVALID COMMAND>\n";
       return;
@@ -194,13 +228,17 @@ namespace fedorov
 
     try
     {
-      if (param == "ODD")
+      using CommandFunction = std::function< void() >;
+      std::map< std::string, CommandFunction > subcommands;
+
+      using namespace std::placeholders;
+      subcommands["ODD"] = std::bind(countOdd, std::ref(out), std::cref(polygons));
+      subcommands["EVEN"] = std::bind(countEven, std::ref(out), std::cref(polygons));
+
+      auto it = subcommands.find(param);
+      if (it != subcommands.end())
       {
-        out << std::count_if(polygons.begin(), polygons.end(), CountOddPredicate()) << '\n';
-      }
-      else if (param == "EVEN")
-      {
-        out << std::count_if(polygons.begin(), polygons.end(), CountEvenPredicate()) << '\n';
+        it->second();
       }
       else
       {

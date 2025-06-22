@@ -47,16 +47,18 @@ namespace fedorov
   void readPolygons(std::istream &in, std::vector< Polygon > &polygons)
   {
     polygons.clear();
-    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(polygons));
+    std::vector< Polygon > temp;
+    std::copy(std::istream_iterator< Polygon >(in), std::istream_iterator< Polygon >(), std::back_inserter(temp));
 
-    struct InvalidPolygon
+    struct Validator
     {
       bool operator()(const Polygon &p) const
       {
-        return p.points.size() < 3;
+        return p.points.size() >= 3;
       }
     };
-    polygons.erase(std::remove_if(polygons.begin(), polygons.end(), InvalidPolygon()), polygons.end());
+
+    std::copy_if(temp.begin(), temp.end(), std::back_inserter(polygons), Validator());
   }
 
   bool AreaComparator::operator()(const Polygon &p1, const Polygon &p2) const
