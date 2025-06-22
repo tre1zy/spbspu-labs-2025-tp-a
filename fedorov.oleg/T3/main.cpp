@@ -1,22 +1,20 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
 #include <functional>
 #include <limits>
+#include <iterator>
 
 #include "polygon.hpp"
 #include "commands.hpp"
 #include "functional.hpp"
 
-using std::placeholders::_1;
-using std::placeholders::_2;
-
 int main(int argc, char *argv[])
 {
   using namespace fedorov;
+  using namespace std::placeholders;
 
   if (argc != 2)
   {
@@ -40,43 +38,36 @@ int main(int argc, char *argv[])
     return 2;
   }
 
-  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands{
-      {"AREA", std::bind(areaCommand, _1, _2, std::cref(polygons))},
-      {"LESSAREA", std::bind(LessAreaCommand, _1, _2, std::ref(polygons))},
-      {"MAX", std::bind(maxCommand, _1, _2, std::cref(polygons))},
-      {"MIN", std::bind(minCommand, _1, _2, std::cref(polygons))},
-      {"ECHO", std::bind(EchoCommand, _1, _2, std::ref(polygons))},
-      {"COUNT", std::bind(countCommand, _1, _2, std::cref(polygons))}};
+  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
+  commands["AREA"] = std::bind(areaCommand, _1, _2, std::cref(polygons));
+  commands["LESSAREA"] = std::bind(lessAreaCommand, _1, _2, std::cref(polygons));
+  commands["MAX"] = std::bind(maxCommand, _1, _2, std::cref(polygons));
+  commands["MIN"] = std::bind(minCommand, _1, _2, std::cref(polygons));
+  commands["ECHO"] = std::bind(echoCommand, _1, _2, std::ref(polygons));
+  commands["COUNT"] = std::bind(countCommand, _1, _2, std::cref(polygons));
 
-  std::string cmd;
-  while (std::getline(std::cin, cmd))
+  std::string command;
+  while (std::cin >> command)
   {
-    if (cmd.empty())
-    {
-      continue;
-    }
-
-    std::istringstream iss(cmd);
-    std::string command;
-    iss >> command;
-
     try
     {
       auto it = commands.find(command);
       if (it != commands.end())
       {
-        it->second(iss, std::cout);
+        it->second(std::cin, std::cout);
       }
       else
       {
         throw std::invalid_argument("Unknown command");
       }
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
-      iss.clear();
-      iss.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }

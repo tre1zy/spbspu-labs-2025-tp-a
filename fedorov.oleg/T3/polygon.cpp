@@ -2,8 +2,7 @@
 
 #include <algorithm>
 #include <iterator>
-
-#include "input_delimiter.hpp"
+#include <functional>
 
 namespace fedorov
 {
@@ -14,33 +13,24 @@ namespace fedorov
 
   std::istream &operator>>(std::istream &in, Point &dest)
   {
-    char open = '\0';
-    char sep = '\0';
-    char close = '\0';
-    int x = 0;
-    int y = 0;
+    char open, sep, close;
+    int x, y;
 
-    if (!(in >> open >> x >> sep >> y >> close))
-    {
-      return in;
-    }
-
-    if (open != '(' || sep != ';' || close != ')')
-    {
-      in.setstate(std::ios::failbit);
-    }
-    else
+    if (in >> open >> x >> sep >> y >> close && open == '(' && sep == ';' && close == ')')
     {
       dest.x = x;
       dest.y = y;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
 
   std::ostream &operator<<(std::ostream &out, const Point &src)
   {
-    out << '(' << src.x << ';' << src.y << ')';
-    return out;
+    return out << '(' << src.x << ';' << src.y << ')';
   }
 
   bool operator==(const Polygon &p1, const Polygon &p2)
@@ -53,23 +43,6 @@ namespace fedorov
     return !(p1 == p2);
   }
 
-  struct PointGenerator
-  {
-    explicit PointGenerator(std::istream &in):
-      in(in)
-    {}
-    Point operator()() const
-    {
-      Point p{0, 0};
-      if (!(in >> p))
-      {
-        in.setstate(std::ios::failbit);
-      }
-      return p;
-    }
-    std::istream &in;
-  };
-
   std::istream &operator>>(std::istream &in, Polygon &dest)
   {
     int n;
@@ -80,14 +53,8 @@ namespace fedorov
     }
 
     dest.points.clear();
-    std::generate_n(std::back_inserter(dest.points), n, PointGenerator(in));
-
-    if (in.fail())
-    {
-      dest.points.clear();
-      in.setstate(std::ios::failbit);
-      return in;
-    }
+    dest.points.resize(n);
+    std::copy_n(std::istream_iterator< Point >(in), n, dest.points.begin());
 
     if (in.fail() || dest.points.size() != static_cast< size_t >(n))
     {
