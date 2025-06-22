@@ -12,6 +12,7 @@
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
+  using it = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
@@ -28,58 +29,28 @@ int main(int argc, char* argv[])
 
   while (!inFile.eof())
   {
-    Polygon poly;
-    std::streampos pos = inFile.tellg();
-    if (inFile >> poly)
-    {
-      polyList.push_back(std::move(poly));
-    }
-    else
+    std::copy(it(inFile), it(), std::back_inserter(polyList));
+    if (!inFile)
     {
       inFile.clear();
       inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
-  std::map< std::string, std::function< void(std::istream&) > > commandMap;
-  commandMap["AREA"] = std::bind(smirnov::printAreaSum,
-    std::placeholders::_1,
-    std::cref(polyList),
-    std::ref(std::cout));
-  commandMap["MAX"] = std::bind(smirnov::printMaxValueOf,
-    std::placeholders::_1,
-    std::cref(polyList),
-    std::ref(std::cout));
-  commandMap["MIN"] = std::bind(smirnov::printMinValueOf,
-    std::placeholders::_1,
-    std::cref(polyList),
-    std::ref(std::cout));
-  commandMap["COUNT"] = std::bind(smirnov::printCountOf,
-    std::placeholders::_1,
-    std::cref(polyList),
-    std::ref(std::cout));
-  commandMap["LESSAREA"] = std::bind(smirnov::printLessAreaCnt,
-    std::placeholders::_1,
-    std::cref(polyList),
-    std::ref(std::cout));
-  commandMap["INTERSECTIONS"] = std::bind(smirnov::printIntersectionsCnt,
-    std::placeholders::_1,
-    std::cref(polyList),
-    std::ref(std::cout));
+  std::map< std::string, std::function< void() > > commandMap;
+  commandMap["AREA"] = std::bind(smirnov::printAreaSum, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  commandMap["MAX"] = std::bind(smirnov::printMaxValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  commandMap["MIN"] = std::bind(smirnov::printMinValueOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  commandMap["COUNT"] = std::bind(smirnov::printCountOf, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  commandMap["LESSAREA"] = std::bind(smirnov::printLessAreaCnt, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
+  commandMap["INTERSECTIONS"] = std::bind(smirnov::printIntersectionsCnt, std::ref(std::cin), std::cref(plgs), std::ref(std::cout));
 
   std::string line;
-  while (std::cin >> line)
+  while (!(std::cin >> line).eof())
   {
-    auto it = commandMap.find(line);
-    if (it == commandMap.end())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      continue;
-    }
     try
     {
-      it->second(std::cin);
+      commandMap.at(command)();
       std::cout << '\n';
     }
     catch (const std::exception& e)

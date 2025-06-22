@@ -57,6 +57,7 @@ namespace geom
     if (!(in >> count) || count < 3)
     {
       in.setstate(std::ios::failbit);
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       return in;
     }
 
@@ -65,13 +66,51 @@ namespace geom
 
     try
     {
-      std::generate_n(std::back_inserter(tmp), count, PointReader{ in });
+      std::generate_n(std::back_inserter(tmp), count, [&] {
+        Point p;
+        if (!(in >> p))
+        {
+          throw std::ios_base::failure{ "Error" };
+        }
+        return p;
+        });
     }
     catch (const std::ios_base::failure&)
     {
       in.setstate(std::ios::failbit);
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       return in;
     }
+
+    char next_char = in.peek();
+    if (next_char != EOF)
+    {
+      if (!std::isspace(next_char) && next_char != '\n')
+      {
+        in.setstate(std::ios::failbit);
+        in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        return in;
+      }
+      else if (next_char == '\n')
+      {
+        in.get();
+      }
+      else
+      {
+        in >> std::ws;
+        next_char = in.peek();
+        if (next_char != EOF && next_char != '\n')
+        {
+          in.setstate(std::ios::failbit);
+          in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+          return in;
+        }
+        else if (next_char == '\n')
+        {
+          in.get();
+        }
+      }
+    }p
 
     poly.points = std::move(tmp);
     return in;
