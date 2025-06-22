@@ -1,6 +1,5 @@
 #ifndef COMMAND_HELPERS_HPP
 #define COMMAND_HELPERS_HPP
-#include "shapes.hpp"
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -8,6 +7,7 @@
 #include <numeric>
 #include <limits>
 #include <stream-guard.hpp>
+#include "shapes.hpp"
 
 namespace belyaev
 {

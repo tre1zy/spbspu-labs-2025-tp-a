@@ -1,8 +1,8 @@
-#include "command-handlers.hpp"
-#include "shapes.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iterator>
+#include "command-handlers.hpp"
+#include "shapes.hpp"
 
 int main(int argc, char* argv[])
 {
