@@ -141,13 +141,13 @@ namespace
   {
     out << countIf(polygons, VertexPred{ n }) << "\n";
   }
-  bool cheackPerms(const horoshilov::Polygon& plg1, const horoshilov::Polygon& plg2)
+  bool cheackPerms(const horoshilov::Polygon& polygon1, const horoshilov::Polygon& polygon2)
   {
-    if (plg1.points.size() != plg2.points.size())
+    if (polygon1.points.size() != polygon2.points.size())
     {
       return false;
     }
-    return std::is_permutation(plg1.points.cbegin(), plg1.points.cend(), plg2.points.cbegin());
+    return std::is_permutation(polygon1.points.cbegin(), polygon1.points.cend(), polygon2.points.cbegin());
   }
 }
 void horoshilov::printIntersections(std::istream& in, std::ostream& out, const std::vector< horoshilov::Polygon >& polygons)
