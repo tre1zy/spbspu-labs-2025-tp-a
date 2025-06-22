@@ -1,11 +1,11 @@
 #include "commands.hpp"
+#include <algorithm>
+#include <fstream>
+#include <iterator>
+#include <numeric>
 #include <ostream>
 #include <string>
-#include <algorithm>
-#include <numeric>
-#include <iterator>
 #include <vector>
-#include <fstream>
 
 namespace
 {
@@ -27,7 +27,6 @@ namespace
   struct DictPrinter
   {
     std::ostream& out;
-
     std::ostream& operator()(const kiselev::Dict::value_type& val) const
     {
       out << val.first;
@@ -63,7 +62,7 @@ namespace
 
   struct VectorChecker
   {
-    const std::vector<std::string>& vec;
+    const std::vector< std::string >& vec;
     bool operator()(const std::string& trans) const
     {
       return std::find(vec.begin(), vec.end(), trans) == vec.end();
@@ -80,7 +79,7 @@ namespace
       }
       else
       {
-        std::vector<std::string> newTranslations;
+        std::vector< std::string > newTranslations;
         VectorChecker check{ it->second };
         std::copy_if(val.second.begin(), val.second.end(), std::back_inserter(newTranslations), check);
         it->second.insert(it->second.end(), newTranslations.begin(), newTranslations.end());
@@ -122,7 +121,7 @@ namespace
       }
       else
       {
-        std::vector<std::string> newTranslations;
+        std::vector< std::string > newTranslations;
         std::copy_if(val.second.begin(), val.second.end(), std::back_inserter(newTranslations), VectorChecker{ val2->second });
         if (!newTranslations.empty())
         {

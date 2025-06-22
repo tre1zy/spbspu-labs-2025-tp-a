@@ -14,12 +14,12 @@ namespace
     std::string dictName;
     while (in >> dictName)
     {
-        kiselev::Dict dict;
+      kiselev::Dict dict;
       std::string eng;
       while (in >> eng)
       {
-        std::vector<std::string> ruswords;
-        std::copy(std::istream_iterator<std::string>(in), std::istream_iterator<std::string>(), std::back_inserter(ruswords));
+        std::vector< std::string > ruswords;
+        std::copy(std::istream_iterator< std::string >(in), std::istream_iterator< std::string >(), std::back_inserter(ruswords));
         if (!ruswords.empty() && ruswords.back().back() == '\n')
         {
           ruswords.back().pop_back();

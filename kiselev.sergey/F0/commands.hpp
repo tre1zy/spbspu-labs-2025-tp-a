@@ -1,10 +1,10 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <istream>
+#include <map>
 #include <ostream>
 #include <string>
-#include "map"
-#include "vector"
+#include <vector>
 namespace kiselev
 {
   using Dict = std::map< std::string, std::vector< std::string > >;
