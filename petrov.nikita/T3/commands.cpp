@@ -133,8 +133,9 @@ void petrov::sum(size_t & vrtxs_num, const std::vector< Polygon > & polygons, st
     throw std::logic_error("<INVALID COMMAND>");
   }
   using namespace std::placeholders;
-  std::vector< Polygon > proper_polygons(vrtxs_num);
-  std::copy_if(polygons.cbegin(), polygons.cend(), proper_polygons.begin(), std::bind(isRightNumber, _1, vrtxs_num));
+  std::vector< Polygon > proper_polygons;
+  auto is_required_num = std::bind(isRightNumber, _1, vrtxs_num);
+  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(proper_polygons), is_required_num);
   std::vector< double > sum_area(proper_polygons.size());
   std::transform(proper_polygons.cbegin(), proper_polygons.cend(), sum_area.begin(), calculateArea);
   double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
@@ -359,6 +360,10 @@ void petrov::maxseq(const std::vector< Polygon > & polygons, std::istream & in, 
     if (max_count)
     {
       out << ++max_count;
+    }
+    else if (std::count_if(polygons.cbegin(), polygons.cend(), std::bind(isEqualPolygon, std::cref(polygon), _1)))
+    {
+      out << 1;
     }
     else
     {
