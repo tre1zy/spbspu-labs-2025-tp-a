@@ -7,7 +7,7 @@
 #include <vector>
 #include <stack>
 #include <set>
-#include <parser.hpp>
+#include <map>
 #include "log.hpp"
 #include "content.hpp"
 #include "compare.hpp"
@@ -22,12 +22,23 @@ namespace rychkov
     Preprocessor(Lexer* next, std::vector< std::string > search_dirs);
 
     void parse(CParseContext& context, std::istream& in, bool need_flush = true);
-    void parse(CParseContext& context, std::string line);
     void flush(CParseContext& context);
     void flush(CParseContext& context, char c);
     void flush_buf(CParseContext& context);
 
   private:
+    enum State
+    {
+      SINGLE_LINE_COMMENT,
+      MULTI_LINE_COMMENT,
+      STRING_LITERAL,
+      CHAR_LITERAL,
+      NAME,
+      NUMBER,
+      MACRO_PARAMETERS,
+      DIRECTIVE,
+      NO_STATE
+    };
     enum IfStage
     {
       IF_BODY,
@@ -35,42 +46,49 @@ namespace rychkov
       ELSE_BODY,
       SKIP_ELSE
     };
-    struct CommandContext
-    {
-      std::istream& in;
-      std::ostream& err;
-      CParseContext& parse_context;
 
-      void parse_error();
-    };
-    static Parser::map_type< CommandContext, Preprocessor > call_map;
+    const std::map< std::string, void(Preprocessor::*)(std::istream&, CParseContext&) > directives_ = {
+          {"include", &rychkov::Preprocessor::include},
+          {"define", &rychkov::Preprocessor::define},
+          {"pragma", &rychkov::Preprocessor::pragma},
+          {"undef", &rychkov::Preprocessor::undef},
+          {"ifdef", &rychkov::Preprocessor::ifdef},
+          {"ifndef", &rychkov::Preprocessor::ifndef},
+          {"else", &rychkov::Preprocessor::else_cmd},
+          {"endif", &rychkov::Preprocessor::endif}
+        };
 
-    Lexer* next_;
-    bool multiline_comment_ = false;
-    bool directive_ = false;
+    char prev_ = '\0';
+    bool screened_ = false;
     bool empty_line_ = true;
+    State state_ = NO_STATE;
+    State prev_state_ = NO_STATE;
+
     const Macro* expansion_ = nullptr;
     size_t parentheses_depth_ = 0;
-
-    std::stack< IfStage > conditional_pairs_;
     std::vector< std::string > expansion_list_;
+
     std::string buf_;
-    std::vector< std::string > include_dirs_;
+    std::stack< IfStage > conditional_pairs_;
     std::set< Macro, NameCompare > macros_;
+
+    std::vector< std::string > include_dirs_;
+    Lexer* next_;
 
     static std::string get_name(std::istream& in);
     static void remove_whitespaces(std::string& str);
+    bool skip_all() const noexcept;
     void append(CParseContext& context, char c);
     void expanse_macro(CParseContext& context);
 
-    bool include(CommandContext&);
-    bool define(CommandContext&);
-    bool pragma(CommandContext&);
-    bool undef(CommandContext&);
-    bool ifdef(CommandContext&);
-    bool ifndef(CommandContext&);
-    bool else_cmd(CommandContext&);
-    bool endif(CommandContext&);
+    void include(std::istream& in, CParseContext& context);
+    void define(std::istream& in, CParseContext& context);
+    void pragma(std::istream& in, CParseContext& context);
+    void undef(std::istream& in, CParseContext& context);
+    void ifdef(std::istream& in, CParseContext& context);
+    void ifndef(std::istream& in, CParseContext& context);
+    void else_cmd(std::istream& in, CParseContext& context);
+    void endif(std::istream& in, CParseContext& context);
   };
 }
 

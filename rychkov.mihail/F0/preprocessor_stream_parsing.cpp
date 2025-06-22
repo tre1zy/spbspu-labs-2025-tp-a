@@ -4,119 +4,242 @@
 #include <utility>
 #include <algorithm>
 
-void rychkov::Preprocessor::parse(CParseContext& context, std::istream& in, bool need_flush)
+void rychkov::Preprocessor::append(CParseContext& context, char c)
 {
-  bool not_first = false;
-  while (in.good())
+  if (screened_ && (c == '\n'))
   {
-    if (not_first && !multiline_comment_)
+    screened_ = false;
+    return;
+  }
+  if (!screened_ && (c == '\\'))
+  {
+    screened_ = true;
+    return;
+  }
+  switch (state_)
+  {
+  case SINGLE_LINE_COMMENT:
+    if (c == '\n')
     {
+      state_ = prev_state_;
+      prev_state_ = NO_STATE;
+      screened_ = false;
       append(context, '\n');
-    }
-    not_first = true;
-    std::string acc;
-    std::getline(in, acc);
-    while (!acc.empty() && (acc.back() == '\\'))
-    {
-      acc.erase(acc.end() - 1);
-      std::string temp;
-      std::getline(in, temp);
-      acc += std::move(temp);
-    }
-    parse(context, std::move(acc));
-  }
-  if (need_flush)
-  {
-    flush(context);
-  }
-}
-void rychkov::Preprocessor::parse(CParseContext& context, std::string line)
-{
-  context.last_line = line;
-  if (multiline_comment_)
-  {
-    std::string::size_type multi_comment_end = line.find("*/");
-    line.erase(0, multi_comment_end);
-    if (multi_comment_end == std::string::npos)
-    {
       return;
     }
-  }
-
-  std::string::size_type single_comment_start = line.find("//");
-  std::string::size_type multi_comment_start = line.find("/*");
-  std::string::size_type quotes_comment_start = line.find("\"");
-  std::string::size_type last = 0;
-  while ((single_comment_start != std::string::npos) || (multi_comment_start != std::string::npos)
-    || (quotes_comment_start != std::string::npos))
-  {
-    std::string::size_type min = std::min({single_comment_start, multi_comment_start,
-      quotes_comment_start});
-    for (; last < min; last++)
+    return;
+  case MULTI_LINE_COMMENT:
+    if ((prev_ == '*') && (c == '/'))
     {
-      append(context, line[last]);
-      context.symbol++;
-    }
-    if (single_comment_start == min)
-    {
-      context.line++;
-      context.symbol = 0;
+      state_ = prev_state_;
+      prev_state_ = NO_STATE;
+      prev_ = '\0';
+      screened_ = false;
       return;
     }
-    if (multi_comment_start == min)
+    prev_ = c;
+    return;
+  case STRING_LITERAL:
+    if (screened_)
     {
-      line.erase(multi_comment_start, 2);
-      std::string::size_type multi_comment_end = line.find("*/");
-      if (multi_comment_end == std::string::npos)
+      buf_ += '\\';
+      buf_ += c;
+      screened_ = false;
+      return;
+    }
+    if (c == '\n')
+    {
+      log(context, "string literal cannot contain multiple lines");
+      return;
+    }
+    buf_ += c;
+    if (c == '"')
+    {
+      flush_buf(context);
+    }
+    return;
+  case CHAR_LITERAL:
+    if (screened_)
+    {
+      buf_ += '\\';
+      buf_ += c;
+      screened_ = false;
+      return;
+    }
+    if (c == '\n')
+    {
+      log(context, "char literal cannot contain multiple lines");
+      return;
+    }
+    buf_ += c;
+    if (c == '\'')
+    {
+      flush_buf(context);
+    }
+    return;
+  case NAME:
+    if (screened_)
+    {
+      flush_buf(context);
+      append(context, '\\');
+      append(context, c);
+      screened_ = false;
+      return;
+    }
+    if (!std::isalnum(c) && (c != '_'))
+    {
+      flush_buf(context);
+      append(context, c);
+      return;
+    }
+    buf_ += c;
+    return;
+  case NUMBER:
+    if (screened_)
+    {
+      flush_buf(context);
+      append(context, '\\');
+      append(context, c);
+      screened_ = false;
+      return;
+    }
+    if (!std::isalnum(c) && (c != '_') && (c != '.') && (c != '\''))
+    {
+      flush_buf(context);
+      append(context, c);
+      return;
+    }
+    buf_ += c;
+    return;
+  case MACRO_PARAMETERS:
+  case DIRECTIVE:
+  case NO_STATE:
+    if (screened_)
+    {
+      flush(context, '\\');
+      screened_ = false;
+      empty_line_ = false;
+    }
+    if (prev_ == '/')
+    {
+      if (c == '/')
       {
-        context.line++;
-        context.symbol = 0;
+        prev_state_ = state_;
+        state_ = SINGLE_LINE_COMMENT;
+        prev_ = '\0';
         return;
       }
-      context.symbol += 4 + multi_comment_end - multi_comment_start;
-      line.erase(multi_comment_start, multi_comment_end - multi_comment_start + 2);
-    }
-    else
-    {
-      bool screened = false;
-      while (true)
+      else if (c == '*')
       {
-        std::string::size_type quotes_comment_end = line.find("\"", min + 1);
-        if (quotes_comment_end == std::string::npos)
+        prev_state_ = state_;
+        state_ = MULTI_LINE_COMMENT;
+        prev_ = '\0';
+        return;
+      }
+      flush(context, '/');
+      empty_line_ = false;
+      prev_ = '\0';
+    }
+    if (c == '/') // hold
+    {
+      prev_ = '/';
+      return;
+    }
+    if (empty_line_ && (c == '#'))
+    {
+      prev_state_ = NO_STATE;
+      state_ = DIRECTIVE;
+      return;
+    }
+    if (empty_line_ && !std::isspace(c))
+    {
+      empty_line_ = false;
+    }
+    if (state_ == MACRO_PARAMETERS)
+    {
+      if (c == '(')
+      {
+        parentheses_depth_++;
+        if (parentheses_depth_ == 1)
         {
-          context.symbol += line.length() - min + 1;
-          log(context, "string literal hasn't end symbol");
           return;
         }
-        for (; last < quotes_comment_end; last++)
+      }
+      if (c == ')')
+      {
+        if (parentheses_depth_ == 0)
         {
-          screened = false;
-          append(context, line[last]);
-          context.symbol++;
-          if (line[last] == '\\')
-          {
-            screened = true;
-          }
+          log(context, "function-style macro must have call list");
+          return;
         }
-        append(context, '"');
-        last++;
-        min = quotes_comment_end + 1;
-        if (!screened)
+        parentheses_depth_--;
+        if (parentheses_depth_ == 0)
         {
-          break;
+          state_ = prev_state_;
+          prev_state_ = NO_STATE;
+          expanse_macro(context);
+          flush_buf(context);
+          return;
         }
       }
+      if ((c == ',') && (parentheses_depth_ == 1))
+      {
+        remove_whitespaces(buf_);
+        expansion_list_.push_back(std::move(buf_));
+        buf_.clear();
+        return;
+      }
+      if (!std::isspace(c) && (parentheses_depth_ == 0))
+      {
+        log(context, "function-style macro must have call list");
+        return;
+      }
+      if ((parentheses_depth_ != 0) && (c == '\n'))
+      {
+        log(context, "function-style macro parameters cannot contain multiple lines");
+        return;
+      }
     }
-    single_comment_start = line.find("//", min);
-    multi_comment_start = line.find("/*", min);
-    quotes_comment_start = line.find("\"", min);
+    else if (state_ != DIRECTIVE)
+    {
+      if (std::isalpha(c) || (c == '_'))
+      {
+        buf_ += c;
+        state_ = NAME;
+        return;
+      }
+      if (std::isdigit(c))
+      {
+        buf_ += c;
+        state_ = NUMBER;
+        return;
+      }
+    }
+    if (c == '"')
+    {
+      buf_ += '"';
+      prev_state_ = state_;
+      state_ = STRING_LITERAL;
+      return;
+    }
+    if (c == '\'')
+    {
+      buf_ += '\'';
+      prev_state_ = state_;
+      state_ = CHAR_LITERAL;
+      return;
+    }
+    if (c == '\n')
+    {
+      if (state_ == DIRECTIVE)
+      {
+        flush_buf(context);
+        append(context, '\n');
+        return;
+      }
+      empty_line_ = true;
+    }
+    flush(context, c);
+    return;
   }
-  for (; last < line.length(); last++)
-  {
-    append(context, line[last]);
-    context.symbol++;
-  }
-  context.line++;
-  context.symbol = 0;
-  return;
 }

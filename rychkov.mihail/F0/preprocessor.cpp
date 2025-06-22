@@ -6,26 +6,19 @@
 #include <utility>
 #include "lexer.hpp"
 
-rychkov::Parser::map_type< rychkov::Preprocessor::CommandContext, rychkov::Preprocessor >
-    rychkov::Preprocessor::call_map = {
-      {"include", &rychkov::Preprocessor::include},
-      {"define", &rychkov::Preprocessor::define},
-      {"pragma", &rychkov::Preprocessor::pragma},
-      {"undef", &rychkov::Preprocessor::undef},
-      {"ifdef", &rychkov::Preprocessor::ifdef},
-      {"ifndef", &rychkov::Preprocessor::ifndef},
-      {"else", &rychkov::Preprocessor::else_cmd},
-      {"endif", &rychkov::Preprocessor::endif}
-    };
-
 rychkov::Preprocessor::Preprocessor():
   next_{nullptr}
 {}
 rychkov::Preprocessor::Preprocessor(Lexer* next, std::vector< std::string > search_dirs):
-  next_{next},
-  include_dirs_(std::move(search_dirs))
+  include_dirs_(std::move(search_dirs)),
+  next_{next}
 {}
 
+bool rychkov::Preprocessor::skip_all() const noexcept
+{
+  return !conditional_pairs_.empty() && ((conditional_pairs_.top() == WAIT_ELSE)
+    || (conditional_pairs_.top() == SKIP_ELSE));
+}
 std::string rychkov::Preprocessor::get_name(std::istream& in)
 {
   std::string name;
@@ -36,9 +29,9 @@ std::string rychkov::Preprocessor::get_name(std::istream& in)
 void rychkov::Preprocessor::remove_whitespaces(std::string& str)
 {
   std::string::size_type pos = str.find_last_not_of(" \t\v\n\r");
-  if (pos != std::string::npos)
+  if ((pos != std::string::npos) && (pos + 1 < str.length()))
   {
-    str.erase(pos);
+    str.erase(pos + 1);
   }
   pos = str.find_first_not_of(" \t\v\n\r");
   if (pos != std::string::npos)
@@ -46,66 +39,94 @@ void rychkov::Preprocessor::remove_whitespaces(std::string& str)
     str.erase(0, pos);
   }
 }
-void rychkov::Preprocessor::CommandContext::parse_error()
-{
-  in.setstate(std::ios::failbit);
-}
 void rychkov::Preprocessor::flush(CParseContext& context, char c)
 {
-  if (next_ == nullptr)
+  if ((state_ == DIRECTIVE) || (state_ == MACRO_PARAMETERS))
   {
-    context.out << c;
+    buf_ += c;
   }
-  else
+  else if (!skip_all())
   {
-    next_->append(context, c);
+    if (next_ == nullptr)
+    {
+      context.out << c;
+    }
+    else
+    {
+      next_->append(context, c);
+    }
   }
 }
 void rychkov::Preprocessor::flush_buf(CParseContext& context)
 {
-  if (directive_)
+  if (state_ == DIRECTIVE)
   {
-    directive_ = false;
+    state_ = NO_STATE;
+    prev_state_ = NO_STATE;
     std::istringstream in(buf_);
-    CommandContext cmd_context{in >> std::noskipws, context.err, context};
-    rychkov::Parser::parse(cmd_context, *this, rychkov::Preprocessor::call_map);
-    if (!in)
+    std::string cmd;
+    in >> std::noskipws >> cmd >> std::skipws;
+    if (!skip_all() || (cmd == "endif") || (cmd == "else"))
     {
-      log(context, "unknown preprocessor command");
+      decltype(directives_)::const_iterator cmd_p = directives_.find(cmd);
+      if (cmd_p == directives_.cend())
+      {
+        log(context, "unknown preprocessor command");
+      }
+      else
+      {
+        (this->*(cmd_p->second))(in, context);
+      }
     }
     buf_.clear();
     return;
   }
-  if (!conditional_pairs_.empty() && ((conditional_pairs_.top() == WAIT_ELSE)
-      || (conditional_pairs_.top() == SKIP_ELSE)))
+  if (!skip_all())
   {
-    return;
-  }
-  if (expansion_ != nullptr)
-  {
-    log(context, "expansion of macro hasn't finished - aborting");
-    expansion_ = nullptr;
-    expansion_list_.clear();
-    return;
-  }
-  decltype(macros_)::iterator macro_p = macros_.find(buf_);
-  if (macro_p != macros_.end())
-  {
-    if (macro_p->func_style)
+    if (state_ == MACRO_PARAMETERS)
     {
-      expansion_ = &*macro_p;
-      parentheses_depth_ = 0;
-      buf_.clear();
-      return;
+      log(context, "expansion of macro hasn't finished - aborting");
+      expansion_ = nullptr;
+      expansion_list_.clear();
     }
-    expansion_ = &*macro_p;
-    expanse_macro(context);
-    return;
+    else
+    {
+      if (state_ == NAME)
+      {
+        decltype(macros_)::iterator macro_p = macros_.find(buf_);
+        if (macro_p != macros_.end())
+        {
+          if (macro_p->func_style)
+          {
+            state_ = MACRO_PARAMETERS;
+            prev_state_ = NO_STATE;
+            expansion_ = &*macro_p;
+            parentheses_depth_ = 0;
+            buf_.clear();
+            return;
+          }
+          expansion_ = &*macro_p;
+          state_ = prev_state_;
+          prev_state_ = NO_STATE;
+          expanse_macro(context);
+          flush_buf(context);
+          buf_.clear();
+          return;
+        }
+      }
+      state_ = prev_state_;
+      if ((state_ == DIRECTIVE) || (state_ == MACRO_PARAMETERS))
+      {
+        return;
+      }
+      for (char c: buf_)
+      {
+        flush(context, c);
+      }
+    }
   }
-  for (char c: buf_)
-  {
-    flush(context, c);
-  }
+  state_ = prev_state_;
+  prev_state_ = NO_STATE;
   buf_.clear();
 }
 void rychkov::Preprocessor::flush(CParseContext& context)
@@ -120,90 +141,29 @@ void rychkov::Preprocessor::flush(CParseContext& context)
     log(context, "not all #if-#else-#endif were closed");
   }
 }
-void rychkov::Preprocessor::append(CParseContext& context, char c)
+void rychkov::Preprocessor::parse(CParseContext& context, std::istream& in, bool need_flush)
 {
-  bool skip = !conditional_pairs_.empty() && ((conditional_pairs_.top() == WAIT_ELSE)
-    || (conditional_pairs_.top() == SKIP_ELSE));
-
-  if (empty_line_ && (c == '#'))
+  bool not_first_line = false;
+  while (in.good())
   {
-    directive_ = true;
-    empty_line_ = false;
-    return;
-  }
-  if (c == '\n')
-  {
-    flush_buf(context);
-    if (!skip)
+    if (not_first_line)
     {
-      flush(context, '\n');
+      append(context, '\n');
+      context.line++;
     }
-    empty_line_ = true;
-    return;
-  }
-  if (skip)
-  {
-    if (directive_)
+    not_first_line = true;
+    context.symbol = 0;
+    std::getline(in, context.last_line);
+    for (char c: context.last_line)
     {
-      buf_ += c;
-    }
-    if (!std::isspace(c))
-    {
-      empty_line_ = false;
-    }
-    return;
-  }
-
-  if (c == '(')
-  {
-    parentheses_depth_++;
-    if ((expansion_ != nullptr) && (parentheses_depth_ == 1))
-    {
-      return;
+      append(context, c);
+      context.symbol++;
     }
   }
-  if ((c == ')') && (expansion_ != nullptr))
+  if (need_flush)
   {
-    if (parentheses_depth_ == 0)
-    {
-      log(context, "function-style macro must have call list");
-      return;
-    }
-    parentheses_depth_--;
-    if (parentheses_depth_ == 0)
-    {
-      expanse_macro(context);
-      return;
-    }
+    flush(context);
   }
-  if ((c == ',') && (expansion_ != nullptr) && (parentheses_depth_ == 1))
-  {
-    remove_whitespaces(buf_);
-    expansion_list_.push_back(std::move(buf_));
-    buf_.clear();
-    return;
-  }
-  if (!std::isspace(c))
-  {
-    empty_line_ = false;
-    if ((expansion_ != nullptr) && (parentheses_depth_ == 0))
-    {
-      log(context, "function-style macro must have call list");
-      return;
-    }
-  }
-  if (std::isalnum(c) || (c == '_') || directive_ || (expansion_ != nullptr))
-  {
-    buf_ += c;
-    return;
-  }
-  flush_buf(context);
-  if (expansion_ != nullptr)
-  {
-    append(context, c);
-    return;
-  }
-  flush(context, c);
 }
 void rychkov::Preprocessor::expanse_macro(CParseContext& context)
 {
