@@ -23,6 +23,7 @@ int main(int argc, char ** argv)
     std::cerr << "<INVALID FILE STREAM>" << '\n';
     return 1;
   }
+
   std::list< zakirov::Polygon > shapes;
   zakirov::Polygon inserter;
   while (!fin.eof())
@@ -48,7 +49,7 @@ int main(int argc, char ** argv)
 
   std::string command;
   while (!(std::cin >> command).eof())
-    {
+  {
     try
     {
       commands.at(command)(std::cin, std::cout);
@@ -62,7 +63,7 @@ int main(int argc, char ** argv)
       }
 
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>" << '\n';
     }
   }
 }

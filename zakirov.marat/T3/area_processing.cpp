@@ -9,11 +9,6 @@
 
 void zakirov::process_area(const std::list< Polygon > & plgns, std::istream & in, std::ostream & out)
 {
-  if (plgns.empty())
-  {
-    throw std::logic_error("There are no figures to processing area");
-  }
-
   std::string subcommand;
   in >> subcommand;
   Guardian guard(out);
