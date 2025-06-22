@@ -5,7 +5,6 @@
 #include <iterator>
 #include <numeric>
 #include <vector>
-#include "StreamGuard.hpp"
 
 namespace {
 
@@ -56,13 +55,15 @@ namespace {
     }
     bool operator()(const Polygon& p) const
     {
-      if (p.points.size() != ref_polygon.points.size()) return false;
+      if (p.points.size() != ref_polygon.points.size()) {
+        return false;
+      }
       auto temp_points = p.points;
       std::sort(temp_points.begin(), temp_points.end());
       return temp_points == ref_polygon.points;
     }
   };
-  
+
   struct IsLessAreaPredicate {
     double ref_area;
     explicit IsLessAreaPredicate(const Polygon& p):
@@ -89,7 +90,9 @@ void gavrilova::execArea(const std::vector< Polygon >& polygons, std::istream& i
   } else if (arg == "EVEN") {
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), EvenAreaTransformFunctor());
   } else if (arg == "MEAN") {
-    if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
+    if (polygons.empty()) {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), AreaTransformFunctor());
     total_area = std::accumulate(areas.begin(), areas.end(), 0.0) / polygons.size();
     out << std::fixed << std::setprecision(1) << total_area;
@@ -97,7 +100,9 @@ void gavrilova::execArea(const std::vector< Polygon >& polygons, std::istream& i
   } else {
     try {
       size_t num_vertices = std::stoul(arg);
-      if (num_vertices < 3) throw std::invalid_argument("");
+      if (num_vertices < 3) {
+        throw std::invalid_argument("");
+      }
       std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), SpecificVertexAreaTransformFunctor(num_vertices));
     } catch (...) {
       throw std::invalid_argument("<INVALID COMMAND>");
@@ -109,7 +114,9 @@ void gavrilova::execArea(const std::vector< Polygon >& polygons, std::istream& i
 
 void gavrilova::execMax(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
+  if (polygons.empty()) {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
   std::string arg;
   in >> arg;
   if (arg == "AREA") {
@@ -125,7 +132,9 @@ void gavrilova::execMax(const std::vector< Polygon >& polygons, std::istream& in
 
 void gavrilova::execMin(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
+  if (polygons.empty()) {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
   std::string arg;
   in >> arg;
   if (arg == "AREA") {
@@ -151,7 +160,9 @@ void gavrilova::execCount(const std::vector< Polygon >& polygons, std::istream& 
   } else {
     try {
       size_t num_vertices = std::stoul(arg);
-      if (num_vertices < 3) throw std::invalid_argument("");
+      if (num_vertices < 3) {
+        throw std::invalid_argument("");
+      }
       count = std::count_if(polygons.begin(), polygons.end(), HasNVertexesPredicate(num_vertices));
     } catch (...) {
       throw std::invalid_argument("<INVALID COMMAND>");
@@ -163,13 +174,17 @@ void gavrilova::execCount(const std::vector< Polygon >& polygons, std::istream& 
 void gavrilova::execPerms(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
   Polygon ref_polygon;
-  if (!(in >> ref_polygon)) throw std::invalid_argument("<INVALID COMMAND>");
+  if (!(in >> ref_polygon)) {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
   out << std::count_if(polygons.begin(), polygons.end(), IsPermutationPredicate(ref_polygon));
 }
 
 void gavrilova::execLessArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
   Polygon ref_polygon;
-  if (!(in >> ref_polygon)) throw std::invalid_argument("<INVALID COMMAND>");
+  if (!(in >> ref_polygon)) {
+    throw std::invalid_argument("<INVALID COMMAND>");
+  }
   out << std::count_if(polygons.begin(), polygons.end(), IsLessAreaPredicate(ref_polygon));
 }

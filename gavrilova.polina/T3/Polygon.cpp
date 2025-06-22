@@ -5,6 +5,7 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
+#include <IOStreamGuard.hpp>
 
 namespace gavrilova {
 
@@ -76,6 +77,7 @@ namespace gavrilova {
     if (!sentry) {
       return os;
     }
+    IOStreamGuard guard(out);
     os << polygon.points.size() << " ";
     std::copy(
         polygon.points.begin(), polygon.points.end(),
