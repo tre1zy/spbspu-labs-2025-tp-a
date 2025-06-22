@@ -207,12 +207,12 @@ namespace
   void exportDictionaries(std::istream& in, const tree_of_dict& avltree, std::ios_base::openmode mode)
   {
     std::string filename;
-    int count_of_dicts = 0;
+    int number_of_dictionaries = 0;
     if (!(in >> filename) || filename.empty())
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
     }
-    if (!(in >> count_of_dicts) || (count_of_dicts < 0))
+    if (!(in >> number_of_dictionaries) || (number_of_dictionaries < 0))
     {
       throw std::logic_error("<INVALID NUMBER>");
     }
@@ -225,7 +225,7 @@ namespace
     {
       outFile << "\n";
     }
-    if (count_of_dicts == 0)
+    if (number_of_dictionaries == 0)
     {
       if (avltree.empty())
       {
@@ -235,8 +235,12 @@ namespace
     }
     else
     {
-      std::vector< std::string > dict_names(count_of_dicts);
-      std::copy_n(std::istream_iterator< std::string >{in}, count_of_dicts, dict_names.begin());
+      std::vector< std::string > dict_names(number_of_dictionaries);
+      std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
+      if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
+      {
+        throw std::logic_error("<INVALID ARGUMENTS>");
+      }
       if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
       {
         throw std::logic_error("<INVALID ARGUMENTS>");
@@ -378,12 +382,12 @@ namespace
   class CollectTranslations
   {
   public:
-    using pait_t = std::pair< std::set< std::string >, bool >;
+    using pair_t = std::pair< std::set< std::string >, bool >;
     CollectTranslations(const tree_of_dict& avltree, const std::string& eng_word):
         avltree_(avltree),
         eng_word_(eng_word)
     {}
-    pait_t operator()(pait_t curr_acc_pair, const std::string& dict_name) const
+    pair_t operator()(pair_t curr_acc_pair, const std::string& dict_name) const
     {
       auto it = avltree_.find(dict_name);
       if (it == avltree_.cend())
@@ -930,6 +934,10 @@ void tkach::mergeNumberDicts(std::istream& in, tree_of_dict& avltree)
   }
   std::vector< std::string > dict_names(number_of_dictionaries);
   std::copy_n(std::istream_iterator< std::string >(in), number_of_dictionaries, dict_names.begin());
+  if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
+  {
+    throw std::logic_error("<INVALID ARGUMENTS>");
+  }
   if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{})) {
       throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -1000,6 +1008,10 @@ void tkach::copyTranslations(std::istream& in, tree_of_dict& avltree)
   }
   std::vector< std::string > target_dict_names(number_of_dictionaries);
   std::copy_n(std::istream_iterator< std::string >(in), number_of_dictionaries, target_dict_names.begin());
+  if (target_dict_names.size() != static_cast< size_t >(number_of_dictionaries))
+  {
+    throw std::logic_error("<INVALID ARGUMENTS>");
+  }
   if (std::any_of(target_dict_names.cbegin(), target_dict_names.cend(), IsStringEmpty{}))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
@@ -1021,6 +1033,10 @@ void tkach::printTranslations(std::istream& in, std::ostream& out, const tree_of
   }
   std::vector< std::string > dict_names(number_of_dictionaries);
   std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
+  if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
+  {
+    throw std::logic_error("<INVALID ARGUMENTS>");
+  }
   if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
@@ -1095,6 +1111,10 @@ void tkach::printEngWordsWithTraslation(std::istream& in, std::ostream& out, con
   std::set< std::string > tree_word;
   std::vector< std::string > dict_names(number_of_dictionaries);
   std::copy_n(std::istream_iterator< std::string >(in), number_of_dictionaries, dict_names.begin());
+  if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
+  {
+    throw std::logic_error("<INVALID ARGUMENTS>");
+  }
   if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
