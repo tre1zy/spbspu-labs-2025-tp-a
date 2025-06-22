@@ -34,7 +34,7 @@ bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
 
 double orlova::accumulator(std::function< bool(const Polygon&) > function, double sum, const Polygon& polygon)
 {
-  return function ? sum + areaPolygon(polygon) : sum;
+  return function(polygon) ? sum + areaPolygon(polygon) : sum;
 }
 
 double orlova::numAreaAccumulator(double sum, const Polygon& polygon, size_t numOfVertexes)
@@ -45,13 +45,15 @@ double orlova::numAreaAccumulator(double sum, const Polygon& polygon, size_t num
 double orlova::areaEven(const std::vector< Polygon >& polygons)
 {
   using namespace std::placeholders;
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, isEven, _1, _2));
+  std::function< bool(const Polygon&) > even = isEven;
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, even, _1, _2));
 }
 
 double orlova::areaOdd(const std::vector< Polygon >& polygons)
 {
   using namespace std::placeholders;
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, !isEven, _1, _2));
+  std::function< bool(const Polygon&) > odd = !(isEven);
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, odd, _1, _2));
 }
 
 double orlova::areaMean(const std::vector< Polygon >& polygons)
