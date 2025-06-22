@@ -5,7 +5,6 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
-#include <IOStreamGuard.hpp>
 
 namespace gavrilova {
 
@@ -56,12 +55,24 @@ namespace gavrilova {
       return is;
     }
 
-    std::vector< Point > temp_points(num_points);
+    std::vector< Point > temp_points;
+    temp_points.reserve(num_points);
     for (size_t i = 0; i < num_points; ++i) {
-      if (!(is >> temp_points[i])) {
+      Point p;
+      if (!(is >> p)) {
         is.setstate(std::ios::failbit);
         return is;
       }
+      temp_points.push_back(p);
+    }
+
+    is >> std::ws;
+
+    int next_char = is.peek();
+
+    if (next_char != '\n' && next_char != EOF) {
+      is.setstate(std::ios::failbit);
+      return is;
     }
 
     polygon.points = std::move(temp_points);
@@ -74,7 +85,7 @@ namespace gavrilova {
     if (!sentry) {
       return os;
     }
-    IOStreamGuard guard(os);
+
     os << polygon.points.size() << " ";
     std::copy(
         polygon.points.begin(), polygon.points.end(),
