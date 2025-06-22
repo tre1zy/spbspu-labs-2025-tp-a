@@ -1,136 +1,48 @@
 #include "datastruct.h"
-#include <cctype>
+#include <iterator>
+#include <algorithm>
+#include <iomanip>
 
 namespace
 {
-    void skipWhitespace(std::istream& in)
+  void outputCmpLsp(std::ostream& os, const std::complex<double>& data)
+  {
+    os << std::fixed << std::setprecision(1);
+    os << "#c(" << data.real() << " " << data.imag() << ")";
+  }
+
+  void outputULLBin(std::ostream& os, unsigned long long num)
+  {
+    if (num == 0)
     {
-        while (std::isspace(in.peek()))
-        {
-            in.ignore();
-        }
+      os << "0b0";
+      return;
     }
-
-    bool expect(std::istream& in, char expected)
+    
+    os << "0b0";
+    bool leadingZero = true;
+    for (int i = sizeof(num) * 8 - 1; i >= 0; --i)
     {
-        skipWhitespace(in);
-        if (in.peek() != expected)
-        {
-            in.setstate(std::ios::failbit);
-            return false;
-        }
-        in.ignore();
-        return true;
+      bool bit = num & (1ULL << i);
+      if (!leadingZero || bit)
+      {
+        os << (bit ? '1' : '0');
+        leadingZero = false;
+      }
     }
-
-    unsigned long long parseULLBin(std::istream& in)
+    if (leadingZero)
     {
-        if (!expect(in, '0')) return 0;
-        if (!expect(in, 'b')) return 0;
-
-        unsigned long long result = 0;
-        while (in.peek() == '0' || in.peek() == '1')
-        {
-            result = (result << 1) | (in.get() - '0');
-        }
-        return result;
+      os << '0';
     }
-
-    std::complex< double > parseCmpLsp(std::istream& in)
-    {
-        if (!expect(in, '#')) return {0.0, 0.0};
-        if (!expect(in, 'c')) return {0.0, 0.0};
-        if (!expect(in, '(')) return {0.0, 0.0};
-
-        double real = 0.0;
-        in >> real;
-
-        double imag = 0.0;
-        in >> imag;
-
-        if (!expect(in, ')')) return {0.0, 0.0};
-
-        return {real, imag};
-    }
-
-    std::string parseQuotedString(std::istream& in)
-    {
-        if (!expect(in, '"')) return "";
-
-        std::string result;
-        char c;
-        while (in.get(c) && c != '"')
-        {
-            result += c;
-        }
-
-        if (c != '"')
-        {
-            in.setstate(std::ios::failbit);
-            return "";
-        }
-
-        return result;
-    }
+  }
 }
 
-std::istream& asafov::operator>>(std::istream& in, DataStruct& data)
+std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
 {
-    DataStruct temp;
-
-    if (!expect(in, '(')) return in;
-    if (!expect(in, ':')) return in;
-
-    std::string key1_tag;
-    in >> key1_tag;
-    if (key1_tag != "key1" || !expect(in, ' '))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    temp.key1 = parseULLBin(in);
-    if (temp.key1 == 0 && in.peek() != '0')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    if (!expect(in, ':')) return in;
-    std::string key2_tag;
-    in >> key2_tag;
-    if (key2_tag != "key2" || !expect(in, ' '))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    temp.key2 = parseCmpLsp(in);
-    if (temp.key2 == std::complex< double >{0.0, 0.0})
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    if (!expect(in, ':')) return in;
-    std::string key3_tag;
-    in >> key3_tag;
-    if (key3_tag != "key3" || !expect(in, ' '))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    temp.key3 = parseQuotedString(in);
-    if (temp.key3.empty())
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    if (!expect(in, ':')) return in;
-    if (!expect(in, ')')) return in;
-
-    data = temp;
-    return in;
+  os << "(:key1 ";
+  outputULLBin(os, data.key1);
+  os << ":key2 ";
+  outputCmpLsp(os, data.key2);
+  os << ":key3 \"" << data.key3 << "\":)";
+  return os;
 }
