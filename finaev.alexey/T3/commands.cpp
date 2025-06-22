@@ -138,7 +138,7 @@ namespace
 
   void maxVertexes(const std::vector< finaev::Polygon >& shapes, std::ostream& out)
   {
-    auto max = (*std::max_element(shapes.begin(), shapes.end(), compareArea));
+    auto max = (*std::max_element(shapes.begin(), shapes.end(), compareVertex));
     out << max.points.size();
   }
 
@@ -295,7 +295,7 @@ void finaev::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& s
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
-  if (std::getline(in, temp) && !temp.empty())
+  if (in.peek() != '\n')
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
@@ -323,7 +323,7 @@ void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygo
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
-  if (std::getline(in, temp) && !temp.empty())
+  if (in.peek() != '\n')
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
