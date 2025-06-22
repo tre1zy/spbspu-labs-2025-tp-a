@@ -9,7 +9,6 @@ namespace orlova
   double subArea(const Point&, const Point&);
   double areaPolygon(const Polygon&);
   bool isEven(const Polygon&);
-  bool isOdd(const Polygon&);
   bool isNum(const Polygon&, size_t);
   double evenAreaAccumulator(double, const Polygon&);
   double oddAreaAccumulator(double, const Polygon&);
@@ -41,7 +40,6 @@ namespace orlova
   bool isPermutation(const Polygon&, const Polygon&);
 
   void maxseq(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  void countSequence(const std::vector< Polygon >&, const Polygon&, size_t, int&, int&);
 }
 
 #endif

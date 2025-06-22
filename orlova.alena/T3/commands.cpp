@@ -27,11 +27,6 @@ bool orlova::isEven(const Polygon& polygon)
   return polygon.points.size() % 2 == 0;
 }
 
-bool orlova::isOdd(const Polygon& polygon)
-{
-  return polygon.points.size() % 2 != 0;
-}
-
 bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
 {
   return polygon.points.size() == numOfVertexes;
@@ -39,7 +34,7 @@ bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
 
 double orlova::oddAreaAccumulator(double sum, const Polygon& polygon)
 {
-  return isOdd(polygon) ? sum + areaPolygon(polygon) : sum;
+  return (!isEven(polygon)) ? sum + areaPolygon(polygon) : sum;
 }
 
 double orlova::evenAreaAccumulator(double sum, const Polygon& polygon)
@@ -229,7 +224,7 @@ size_t orlova::countEven(const std::vector< Polygon >& polygons)
 
 size_t orlova::countOdd(const std::vector< Polygon >& polygons)
 {
-  return std::count_if(polygons.begin(), polygons.end(), isOdd);
+  return std::count_if(polygons.begin(), polygons.end(), (!isEven));
 }
 
 size_t orlova::countNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
@@ -268,30 +263,23 @@ void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, st
   {
     throw std::logic_error("<WRONG POLYGON SIZE>");
   }
-  int current = 0, max = 0;
-  countSequence(polygons, polygon, 0, current, max);
-  out << max;
-  return;
-}
-
-void orlova::countSequence(const std::vector< Polygon >& polygons, const Polygon& polygon, size_t index, int& current, int& max)
-{
   if (std::count(polygons.begin(), polygons.end(), polygon) == 0)
   {
     throw std::logic_error("THERE ARE NO IDENTIC POLYGONS");
   }
-  if (index >= polygons.size())
+  size_t maxCount = 0;
+  size_t currentCount = 0;
+  for (const auto& poly : polygons)
   {
-    return;
+    if (poly == polygon)
+    {
+      currentCount++;
+      maxCount = std::max(maxCount, currentCount);
+    }
+    else
+    {
+      currentCount = 0;
+    }
   }
-  if (polygons[index] == polygon)
-  {
-    current++;
-    max = std::max(max, current);
-  }
-  else
-  {
-    current = 0;
-  }
-  countSequence(polygons, polygon, index + 1, current, max);
+  out << maxCount << "\n";
 }
