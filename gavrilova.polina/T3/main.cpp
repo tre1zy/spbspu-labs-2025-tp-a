@@ -9,7 +9,7 @@
 #include <vector>
 #include "Polygon.hpp"
 #include "commands.hpp"
-// #include <IOStreamGuard.hpp>
+#include <IOStreamGuard.hpp>
 
 namespace fileutils {
   void readPolygonsFromFile(const std::string& filename, std::vector< gavrilova::Polygon >& polygons)
@@ -26,7 +26,6 @@ namespace fileutils {
         file.clear();
         file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
-      file >> std::ws;
     }
   }
 }
@@ -62,7 +61,7 @@ int main(int argc, char* argv[])
       if (it == command_map.end()) {
         throw std::invalid_argument("<INVALID COMMAND>");
       }
-      // gavrilova::IOStreamGuard guard(std::cout);
+      gavrilova::IOStreamGuard guard(std::cout);
       it->second(polygons, std::cin, std::cout);
       std::cout << "\n";
     } catch (const std::exception& e) {

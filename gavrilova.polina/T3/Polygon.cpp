@@ -1,4 +1,5 @@
 #include "Polygon.hpp"
+#include <IOStreamGuard.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -46,6 +47,7 @@ namespace gavrilova {
     if (!sentry) {
       return is;
     }
+    IOStreamGuard guard(os);
 
     size_t num_points = 0;
     is >> num_points;
@@ -59,6 +61,10 @@ namespace gavrilova {
     temp_points.reserve(num_points);
     for (size_t i = 0; i < num_points; ++i) {
       Point p;
+      if (is.peek() == '\n' || is.peek() == EOF) {
+        is.setstate(std::ios::failbit);
+        return is;
+      }
       if (!(is >> p)) {
         is.setstate(std::ios::failbit);
         return is;
@@ -66,9 +72,7 @@ namespace gavrilova {
       temp_points.push_back(p);
     }
 
-    int next_char = is.peek();
-
-    if (next_char != '\n' && next_char != EOF) {
+    if (is.peek() != '\n' && is.peek() != EOF) {
       is.setstate(std::ios::failbit);
       return is;
     }

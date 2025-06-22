@@ -2,7 +2,7 @@
 #include <istream>
 #include <ostream>
 #include <tuple>
-// #include <IOStreamGuard.hpp>
+#include <IOStreamGuard.hpp>
 
 namespace gavrilova {
   bool operator==(const Point& a, const Point& b)
@@ -38,7 +38,7 @@ namespace gavrilova {
     if (!sentry) {
       return os;
     }
-    // IOStreamGuard guard(os);
+    IOStreamGuard guard(os);
     os << "(" << point.x << ";" << point.y << ")";
     return os;
   }
