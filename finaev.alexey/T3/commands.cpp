@@ -332,7 +332,7 @@ void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygo
 }
 
 using CmdMap = std::map< std::string, std::function< void() > >;
-CmdMap finaev::createCommandsHandler(std::istream& in, std::ostream& out, std::vector< Polygon >& shapes) 
+CmdMap finaev::createCommandsHandler(std::istream& in, std::ostream& out, std::vector< Polygon >& shapes)
 {
   CmdMap commands;
   commands["AREA"] = std::bind(finaev::area, std::ref(in), std::ref(out), std::cref(shapes));
