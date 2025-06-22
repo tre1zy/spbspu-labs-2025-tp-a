@@ -47,7 +47,6 @@ namespace gavrilova {
     if (!sentry) {
       return is;
     }
-    IOStreamGuard guard(os);
 
     size_t num_points = 0;
     is >> num_points;
@@ -87,6 +86,7 @@ namespace gavrilova {
     if (!sentry) {
       return os;
     }
+    IOStreamGuard guard(os);
 
     os << polygon.points.size() << " ";
     std::copy(
