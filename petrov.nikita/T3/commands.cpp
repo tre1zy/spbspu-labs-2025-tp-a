@@ -15,12 +15,12 @@ namespace
 {
   bool isOdd(const petrov::Polygon & polygon)
   {
-    return polygon.points.size() % 2 == 1; 
+    return polygon.points.size() % 2 == 1;
   }
 
   bool isEven(const petrov::Polygon & polygon)
   {
-    return polygon.points.size() % 2 == 0; 
+    return polygon.points.size() % 2 == 0;
   }
 
   bool isRightNumber(const petrov::Polygon & polygon, size_t exp)
@@ -368,4 +368,3 @@ void petrov::maxseq(const std::vector< Polygon > & polygons, std::istream & in, 
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 }
-
