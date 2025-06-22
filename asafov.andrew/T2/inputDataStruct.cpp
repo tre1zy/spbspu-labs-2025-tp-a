@@ -1,178 +1,134 @@
 #include "datastruct.h"
 #include <cctype>
-#include <limits>
+#include <algorithm>
 
 namespace
 {
-  void skipWhitespace(std::istream& in)
+  unsigned long long parseULLBin(const std::string& str)
   {
-    while (std::isspace(in.peek()))
+    if (str.length() < 3 || (str[0] != '0' && str[1] != 'b'))
     {
-      in.ignore();
+      return 0;
     }
+
+    unsigned long long result = 0;
+    for (size_t i = 2; i < str.size(); ++i)
+    {
+      result = result << 1;
+      if (str[i] == '1')
+      {
+        result = result | 1;
+      }
+      else if (str[i] != '0')
+      {
+        return 0;
+      }
+    }
+    return result;
   }
 
-  bool expect(std::istream& in, char expected)
+  std::complex< double > parseCmpLsp(const std::string& str)
   {
-    skipWhitespace(in);
-    if (in.peek() != expected) return false;
-    in.ignore();
-    return true;
-  }
-
-  bool parseULLBin(std::istream& in, unsigned long long& result)
-  {
-    if (!expect(in, '0')) return false;
-    if (!expect(in, 'b')) return false;
-
-    result = 0;
-    bool hasDigits = false;
-    while (in.peek() == '0' || in.peek() == '1')
+    if (str.length() < 5 || str[0] != '#' || str[1] != 'c' || str[2] != '(')
     {
-      result = (result << 1) | (in.get() - '0');
-      hasDigits = true;
-    }
-    return hasDigits;
-  }
-
-  bool parseCmpLsp(std::istream& in, std::complex< double >& result)
-  {
-    if (!expect(in, '#')) return false;
-    if (!expect(in, 'c')) return false;
-    if (!expect(in, '(')) return false;
-
-    double real, imag;
-    in >> real >> imag;
-    if (!in) return false;
-
-    if (!expect(in, ')')) return false;
-
-    result = {real, imag};
-    return true;
-  }
-
-  bool parseQuotedString(std::istream& in, std::string& result)
-  {
-    if (!expect(in, '"')) return false;
-
-    result.clear();
-    char c;
-    while (in.get(c) && c != '"')
-    {
-      result += c;
+      return {0.0, 0.0};
     }
 
-    return c == '"';
-  }
+    size_t start = 3;
+    size_t end = str.find_first_of(" )", start);
+    double real = 0.0;
+    double imag = 0.0;
 
-  bool tryParseRecord(std::istream& in, asafov::DataStruct& data)
-  {
-    asafov::DataStruct temp;
-    std::streampos start = in.tellg();
-
-    if (!expect(in, '(')) return false;
-    if (!expect(in, ':')) return false;
-
-    std::string key;
-    in >> key;
-    if (key != "key1")
+    std::string real_str = str.substr(start, end - start);
+    try
     {
-      in.seekg(start);
-      return false;
+      real = std::stod(real_str);
     }
-    if (!expect(in, ' '))
+    catch (const std::exception&)
     {
-      in.seekg(start);
-      return false;
+      return {0.0, 0.0};
     }
-
-    if (!parseULLBin(in, temp.key1))
+    if (end != std::string::npos && str[end] != ')')
     {
-      in.seekg(start);
-      return false;
+      start = end + 1;
+      end = str.find_first_of(" )", start);
+      std::string imag_str = str.substr(start, end - start);
+      try
+      {
+        imag = std::stod(imag_str);
+      }
+      catch (const std::exception&)
+      {
+        return {0.0, 0.0};
+      }
     }
-
-    if (!expect(in, ':'))
-    {
-      in.seekg(start);
-      return false;
-    }
-    in >> key;
-    if (key != "key2")
-    {
-      in.seekg(start);
-      return false;
-    }
-    if (!expect(in, ' '))
-    {
-      in.seekg(start);
-      return false;
-    }
-
-    if (!parseCmpLsp(in, temp.key2))
-    {
-      in.seekg(start);
-      return false;
-    }
-
-    if (!expect(in, ':'))
-    {
-      in.seekg(start);
-      return false;
-    }
-    in >> key;
-    if (key != "key3")
-    {
-      in.seekg(start);
-      return false;
-    }
-    if (!expect(in, ' '))
-    {
-      in.seekg(start);
-      return false;
-    }
-
-    if (!parseQuotedString(in, temp.key3))
-    {
-      in.seekg(start);
-      return false;
-    }
-
-    if (!expect(in, ':'))
-    {
-      in.seekg(start);
-      return false;
-    }
-    if (!expect(in, ')'))
-    {
-      in.seekg(start);
-      return false;
-    }
-
-    data = temp;
-    return true;
+    return {real, imag};
   }
 }
 
-std::istream& asafov::operator>>(std::istream& in, DataStruct& data)
+std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
-  while (in.peek() != EOF)
+  std::string line;
+  while (std::getline(is, line))
   {
-    skipWhitespace(in);
+    DataStruct temp;
+    bool has_key1 = false;
+    bool has_key2 = false;
+    bool has_key3 = false;
 
-    if (tryParseRecord(in, data))
+    size_t key1_pos = line.find(":key1 ");
+    if (key1_pos != std::string::npos)
     {
-      return in;
+      size_t key1_end = line.find(':', key1_pos + 1);
+      if (key1_end != std::string::npos)
+      {
+        std::string key1_str = line.substr(key1_pos + 6, key1_end - (key1_pos + 6));
+        temp.key1 = parseULLBin(key1_str);
+        if (temp.key1 != 0 || key1_str == "0b0")
+        {
+          has_key1 = true;
+        }
+      }
     }
 
-    while (in.peek() != '(' && in.peek() != '\n' && in.peek() != EOF)
+    size_t key2_pos = line.find(":key2 ");
+    if (key2_pos != std::string::npos)
     {
-      in.ignore();
+      size_t key2_end = line.find(':', key2_pos + 1);
+      if (key2_end != std::string::npos)
+      {
+        std::string key2_str = line.substr(key2_pos + 6, key2_end - (key2_pos + 6));
+        temp.key2 = parseCmpLsp(key2_str);
+        if (temp.key2 != std::complex< double >{0.0, 0.0} || key2_str == "#c(0.0 0.0)" || key2_str == "#c(0 0)" ||
+          key2_str == "#c(0. 0.)")
+        {
+          has_key2 = true;
+        }
+      }
     }
 
-    if (in.peek() == '\n') in.ignore();
+    size_t key3_pos = line.find(":key3 \"");
+    if (key3_pos != std::string::npos)
+    {
+      size_t quote_pos = key3_pos + 7;
+      size_t closing_quote = line.find('"', quote_pos);
+      if (closing_quote != std::string::npos)
+      {
+        temp.key3 = line.substr(quote_pos, closing_quote - quote_pos);
+        if (line.find(':', closing_quote + 1) != std::string::npos)
+        {
+          has_key3 = true;
+        }
+      }
+    }
+
+    if (has_key1 && has_key2 && has_key3)
+    {
+      data = temp;
+      return is;
+    }
   }
 
-  in.setstate(std::ios::failbit);
-  return in;
+  is.setstate(std::ios::failbit);
+  return is;
 }
