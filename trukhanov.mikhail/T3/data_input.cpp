@@ -1,9 +1,6 @@
 #include "data_input.hpp"
 #include <iterator>
 #include <algorithm>
-#include <string>
-#include <iostream>
-#include <sstream>
 
 std::istream& trukhanov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
@@ -36,20 +33,12 @@ std::ostream& trukhanov::operator<<(std::ostream& out, const Point& point)
 
 std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 {
-  polygon.points.clear();
-
-  std::string line;
-  if (!std::getline(in, line))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  std::istringstream iss(line);
+  std::istream::sentry sentry(in);
+  if (!sentry) return in;
 
   size_t n = 0;
-  iss >> n;
-  if (!iss || n < 3)
+  in >> n;
+  if (!in || n < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
@@ -57,13 +46,20 @@ std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 
   Polygon temp;
   temp.points.reserve(n);
-  std::copy_n(std::istream_iterator<Point>(iss), n, std::back_inserter(temp.points));
+  std::copy_n(std::istream_iterator< Point >(in), n, std::back_inserter(temp.points));
 
-  Point extra;
-  if (iss >> extra)
+  std::istream::sentry trailing_sentry(in, true);
+  if (trailing_sentry)
   {
-    in.setstate(std::ios::failbit);
-    return in;
+
+    Point extra;
+    in >> extra;
+    if (in)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in.clear();
   }
 
   polygon = std::move(temp);

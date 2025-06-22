@@ -1,5 +1,6 @@
 #include <functional>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <limits>
 #include <map>
@@ -24,20 +25,20 @@ int main(int argc, char* argv[])
 
   using trukhanov::Polygon;
   std::vector< Polygon > polygons;
+  std::string line;
 
-  while (!file.eof())
+  while (std::getline(file, line))
   {
-    Polygon poly;
-    file >> poly;
-
-    if (file.fail())
+    if (line.empty())
     {
-      file.clear(file.rdstate() ^ std::ios::failbit);
-      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       continue;
     }
 
-    if (poly.points.size() >= 3)
+    std::istringstream iss(line);
+    Polygon poly;
+    iss >> poly;
+
+    if (iss && poly.points.size() >= 3)
     {
       polygons.push_back(std::move(poly));
     }
@@ -68,6 +69,5 @@ int main(int argc, char* argv[])
       std::cout << "<INVALID COMMAND>\n";
     }
   }
-
   return 0;
 }
