@@ -6,6 +6,8 @@
 
 int main()
 {
+  using data_in_s_it = std::istream_iterator< zakirov::Data >;
+  using data_out_s_it = std::ostream_iterator< zakirov::Data >;
   std::vector< zakirov::Data > array;
   while (!std::cin.eof())
   {
@@ -14,16 +16,8 @@ int main()
       std::cin.clear();
     }
 
-    std::copy(
-      std::istream_iterator< zakirov::Data >(std::cin),
-      std::istream_iterator< zakirov::Data >(),
-      std::back_inserter(array)
-    );
+    std::copy(data_in_s_it(std::cin), data_in_s_it(), std::back_inserter(array));
   }
   std::sort(array.begin(), array.end());
-  std::copy(
-    array.begin(),
-    array.end(),
-    std::ostream_iterator< zakirov::Data >(std::cout, "\n")
-  );
+  std::copy(array.begin(), array.end(), data_out_s_it(std::cout, "\n"));
 }
