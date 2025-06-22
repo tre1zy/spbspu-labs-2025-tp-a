@@ -171,8 +171,7 @@ namespace
   class ExportSpecificDicts
   {
   public:
-    ExportSpecificDicts(std::istream& is, std::ostream& os, const tree_of_dict& dict_tree):
-      in_(is),
+    ExportSpecificDicts(std::ostream& os, const tree_of_dict& dict_tree):
       out_(os),
       dict_tree_(dict_tree)
     {}
@@ -191,7 +190,6 @@ namespace
       out_ << "\n";
     }
   private:
-    std::istream& in_;
     std::ostream& out_;
     const tree_of_dict& dict_tree_;
   };
@@ -245,7 +243,7 @@ namespace
       {
         throw std::logic_error("<INVALID ARGUMENTS>");
       }
-      std::for_each(dict_names.cbegin(), dict_names.cend(), ExportSpecificDicts{in, outFile, avltree});
+      std::for_each(dict_names.cbegin(), dict_names.cend(), ExportSpecificDicts{outFile, avltree});
     }
   }
 
