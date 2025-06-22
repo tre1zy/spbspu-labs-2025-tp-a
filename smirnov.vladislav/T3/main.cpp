@@ -22,15 +22,26 @@ int main(int argc, char* argv[])
 
   std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
+  if (!inFile)
+  {
+    std::cerr << "Could not open file\n";
+    return 1;
+  }
+
   while (!inFile.eof())
   {
-    std::copy(it(inFile), it(), std::back_inserter(polyList));
-    if (!inFile)
+    Polygon poly;
+    std::streampos pos = inFile.tellg();
+    if (inFile >> poly)
+    {
+      polyList.push_back(std::move(poly));
+    }
+    else
     {
       inFile.clear();
       inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-}
+  }
 
   std::map< std::string, std::function< void(std::istream&) > > commandMap;
   commandMap["AREA"] = std::bind(smirnov::printAreaSum,
