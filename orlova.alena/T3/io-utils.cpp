@@ -1,6 +1,6 @@
+#include "io-utils.h"
 #include <algorithm>
 #include <iterator>
-#include "io-utils.h"
 
 std::istream& orlova::operator>>(std::istream& in, DelimiterIO&& dest)
 {
@@ -72,16 +72,14 @@ std::ostream& orlova::operator<<(std::ostream& out, const Polygon& polygon)
   }
   IoGuard guard(out);
   out << polygon.points.size();
-  for (size_t i = 0; i < polygon.points.size(); ++i)
-  {
-    out << ' ' << polygon.points[i];
-  }
+  std::copy_n(polygon.points.begin(), polygon.points.end()-1, std::ostream_iterator< Point >(out, " "));
+  out << polygon.points[polygon.points.end() - 1];
   return out;
 }
 
 bool orlova::operator==(const Point& point1, const Point& point2)
 {
-  return (point1.x == point2.x && point1.y == point2.y) || (point1.x == point2.y && point1.y == point2.x);
+  return (point1.x == point2.x && point1.y == point2.y);
 }
 
 bool orlova::operator==(const Polygon& polygon1, const Polygon& polygon2)
