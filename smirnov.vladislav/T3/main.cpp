@@ -6,14 +6,12 @@
 #include <functional>
 #include <algorithm>
 #include <string>
-#include <sstream>
 #include "geometry.hpp"
 #include "commands.hpp"
 
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
-  using it = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
