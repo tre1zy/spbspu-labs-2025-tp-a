@@ -92,7 +92,7 @@ namespace
   void collectSuggestions(const mezentsev::Dictionary& dict, mezentsev::Dictionary::const_iterator it,
       const std::string& prefix, int n, std::vector< std::string >& result)
   {
-    if (n == 0  it == dict.end()  it->first.substr(0, prefix.size()) != prefix)
+    if (n == 0 || it == dict.end() || it->first.substr(0, prefix.size()) != prefix)
     {
       return;
     }
