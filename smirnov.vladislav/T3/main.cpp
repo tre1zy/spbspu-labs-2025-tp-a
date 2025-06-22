@@ -22,10 +22,10 @@ int main(int argc, char* argv[])
 
   std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
-  while (!file.eof())
+  while (!inFile.eof())
   {
     std::copy(it(inFile), it(), std::back_inserter(polyList));
-    if (!file)
+    if (!inFile)
     {
       inFile.clear();
       inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
