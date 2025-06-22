@@ -4,42 +4,40 @@
 #include <limits>
 #include "graph.hpp"
 #include "graph_operations.hpp"
+#include "command.hpp"
 
-int main() {
-  using namespace std::placeholders;
-  klimova::GraphManager graphs;
+int main(int argc, char* argv[]) {
+  using namespace klimova;
+  GraphManager graphs;
 
-  auto createGraphCmd = std::bind(klimova::createGraph, std::ref(graphs), _1, _2);
-  auto addVertexCmd = std::bind(klimova::addVertex, std::ref(graphs), _1, _2);
-  auto addEdgeCmd = std::bind(klimova::addEdge, std::ref(graphs), _1, _2);
-  auto printGraphCmd = std::bind(klimova::printGraph, std::cref(graphs), _1, _2);
-  auto removeVertexCmd = std::bind(klimova::removeVertex, std::ref(graphs), _1, _2);
-  auto removeEdgeCmd = std::bind(klimova::removeEdge, std::ref(graphs), _1, _2);
-  auto clearGraphCmd = std::bind(klimova::clearGraph, std::ref(graphs), _1, _2);
-  auto checkConnectivityCmd = std::bind(klimova::checkConnectivity, std::cref(graphs), _1, _2);
-  auto countVerticesCmd = std::bind(klimova::countVertices, std::cref(graphs), _1, _2);
-  auto countEdgesCmd = std::bind(klimova::countEdges, std::cref(graphs), _1, _2);
-  auto findNeighborsCmd = std::bind(klimova::findNeighbors, std::cref(graphs), _1, _2);
-  auto degreeOfVertexCmd = std::bind(klimova::degreeOfVertex, std::cref(graphs), _1, _2);
-  auto findShortestPathCmd = std::bind(klimova::findShortestPath, std::cref(graphs), _1, _2);
-  auto findLongestPathCmd = std::bind(klimova::findLongestPath, std::cref(graphs), _1, _2);
-  std::unordered_map< std::string, std::function< void(std::istream&, std::ostream&) > > cmdMap = {
-        {"creategraph", createGraphCmd},
-        {"addvertex", addVertexCmd},
-        {"addedge", addEdgeCmd},
-        {"printgraph", printGraphCmd},
-        {"removevertex", removeVertexCmd},
-        {"removeedge", removeEdgeCmd},
-        {"clear", clearGraphCmd},
-        {"checkconnectivity", checkConnectivityCmd},
-        {"countvertices", countVerticesCmd},
-        {"countedges", countEdgesCmd},
-        {"findneighbors", findNeighborsCmd},
-        {"degreeofvertex", degreeOfVertexCmd},
-        {"findshortestpath", findShortestPathCmd},
-        {"findlongestpath", findLongestPathCmd}
-  };
+  if (argc > 1) {
+    std::string option(argv[1]);
+    if (option == "--help") {
+      showHelp(std::cout);
+    }
+    else if (option == "--check" && argc == 3) {
+      std::string filename(argv[2]);
+      if (checkGraphFile(filename)) {
+        std::cout << "[OK] Graph file is valid.\n";
+      } else {
+        std::cout << "[ERROR] Graph file is invalid.\n";
+      }
+    }
+    else if (argc == 2) {
+      try {
+        loadGraphFromFile(graphs, argv[1]);
+        std::cout << "[OK] Graph loaded from '" << argv[1] << "'.\n";
+      } catch (const std::exception& e) {
+        std::cerr << "[ERROR] " << e.what() << "\n";
+      }
+    }
+    else {
+      std::cerr << "[ERROR] Invalid arguments. Use --help for usage.\n";
+    }
+  }
 
+  std::cout << "\nEntering interactive mode:\n";
+  auto cmdMap = createCommandHandler(graphs);
   std::string command;
   while (std::cin >> command) {
     try {

@@ -10,7 +10,6 @@
 namespace klimova {
   using GraphType = Graph< std::string >;
   using GraphManager = std::unordered_map< std::string, GraphType >;
-  void showHelp(std::ostream& out);
   void createGraph(GraphManager& graphs, std::istream& in, std::ostream& out);
   void addVertex(GraphManager& graphs, std::istream& in, std::ostream& out);
   void addEdge(GraphManager& graphs, std::istream& in, std::ostream& out);
