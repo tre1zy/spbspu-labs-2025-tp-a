@@ -39,11 +39,6 @@ void zakirov::process_area(const std::list< Polygon > & plgns, std::istream & in
   else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
     size_t a = std::stoull(subcommand);
-    if (std::none_of(plgns.begin(), plgns.end(), std::bind(equal_vertexes_pred, std::placeholders::_1, a)))
-    {
-      throw std::logic_error("Division by zero");
-    }
-
     std::vector< Polygon > polygons;
     std::copy_if(plgns.begin(), plgns.end(), std::back_inserter(polygons), std::bind(equal_vertexes_pred, std::placeholders::_1, a));
     std::vector< double > areas;
