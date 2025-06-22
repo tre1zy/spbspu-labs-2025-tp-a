@@ -193,7 +193,7 @@ void belyaev::rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream&
 
   Polygon rmPolygon;
   in >> rmPolygon;
-  if (in.fail())
+  if (in.fail() || in.peek() != '\n')
   {
     throw std::logic_error("Input failed in RMECHO.");
   }
@@ -214,7 +214,7 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
 
   Polygon inframePoly;
   in >> inframePoly;
-  if (in.fail())
+  if (in.fail() || in.peek() != '\n')
   {
     throw std::logic_error("Input failed in INFRAME.");
   }
@@ -223,11 +223,6 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
   bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
 
-  if (in.peek() != '\n')
-  {
-    in.setstate(std::ios::failbit);
-    return;
-  }
   StreamGuard guard(out);
   if (inside)
   {
