@@ -30,16 +30,16 @@ namespace
     }
   };
 
-  struct IntersectContext 
+  struct IntersectContext
   {
     const mezentsev::Dictionary& dict2;
     mezentsev::Dictionary& result;
   };
 
-  struct IntersectProcessor 
+  struct IntersectProcessor
   {
     void process(mezentsev::Dictionary::const_iterator it, mezentsev::Dictionary::const_iterator end,
-        const IntersectContext& context) const 
+        const IntersectContext& context) const
     {
       if (it == end)
       {
@@ -47,7 +47,7 @@ namespace
       }
       
       auto found = context.dict2.find(it->first);
-      if (found != context.dict2.end()) 
+      if (found != context.dict2.end())
       {
         mezentsev::Translations trans = it->second;
         trans.insert(found->second.begin(), found->second.end());
@@ -58,7 +58,7 @@ namespace
     }
   };
 
-  void copyDictionary(mezentsev::Dictionary::const_iterator it, mezentsev::Dictionary::const_iterator end, mezentsev::Dictionary& result) 
+  void copyDictionary(mezentsev::Dictionary::const_iterator it, mezentsev::Dictionary::const_iterator end, mezentsev::Dictionary& result)
   {
     if (it == end)
     {
@@ -69,7 +69,7 @@ namespace
     copyDictionary(std::next(it), end, result);
   }
 
-  void mergeDictionary(mezentsev::Dictionary::const_iterator it, mezentsev::Dictionary::const_iterator end, mezentsev::Dictionary& result) 
+  void mergeDictionary(mezentsev::Dictionary::const_iterator it, mezentsev::Dictionary::const_iterator end, mezentsev::Dictionary& result)
   {
     if (it == end)
     {
@@ -77,11 +77,11 @@ namespace
     }
     
     auto found = result.find(it->first);
-    if (found == result.end()) 
+    if (found == result.end())
     {
       result[it->first] = it->second;
     }
-    else 
+    else
     {
       found->second.insert(it->second.begin(), it->second.end());
     }
@@ -89,8 +89,8 @@ namespace
     mergeDictionary(std::next(it), end, result);
   }
 
-  void collectSuggestions(const mezentsev::Dictionary& dict, mezentsev::Dictionary::const_iterator it, 
-      const std::string& prefix, int n, std::vector< std::string >& result) 
+  void collectSuggestions(const mezentsev::Dictionary& dict, mezentsev::Dictionary::const_iterator it,
+      const std::string& prefix, int n, std::vector< std::string >& result)
   {
     if (n == 0  it == dict.end()  it->first.substr(0, prefix.size()) != prefix)
     {
@@ -103,9 +103,9 @@ namespace
 
   void collectWordsByPrefix(mezentsev::Dictionary::const_iterator it,
       mezentsev::Dictionary::const_iterator end, const std::string& prefix,
-      std::vector< std::pair< std::string, mezentsev::Translations > >& result) 
+      std::vector< std::pair< std::string, mezentsev::Translations > >& result)
   {
-    if (it == end || it->first.substr(0, prefix.size()) != prefix) 
+    if (it == end || it->first.substr(0, prefix.size()) != prefix)
     {
       return;
     }
@@ -116,7 +116,7 @@ namespace
 
   void exportWords(const std::vector< std::pair< std::string, mezentsev::Translations > >::const_iterator it,
       const std::vector< std::pair< std::string, mezentsev::Translations > >::const_iterator end,
-      mezentsev::Dictionary& target_dict) 
+      mezentsev::Dictionary& target_dict)
   {
     if (it == end)
     {
@@ -129,14 +129,14 @@ namespace
 
   void findDifferences(mezentsev::Dictionary::const_iterator it,
       mezentsev::Dictionary::const_iterator end, const mezentsev::Dictionary& dict2,
-      mezentsev::Dictionary& result) 
+      mezentsev::Dictionary& result)
   {
     if (it == end)
     {
       return;
     }
     
-    if (dict2.find(it->first) == dict2.end()) 
+    if (dict2.find(it->first) == dict2.end())
     {
       result[it->first] = it->second;
     }
@@ -146,7 +146,7 @@ namespace
 
   void copyDictionaryEntries(mezentsev::Dictionary::const_iterator it,
       mezentsev::Dictionary::const_iterator end,
-      mezentsev::Dictionary& result) 
+      mezentsev::Dictionary& result)
   {
     if (it == end)
     {
@@ -158,7 +158,7 @@ namespace
   }
 
   void mergeDictionaryEntries(mezentsev::Dictionary::const_iterator it,
-      mezentsev::Dictionary::const_iterator end, mezentsev::Dictionary& result) 
+      mezentsev::Dictionary::const_iterator end, mezentsev::Dictionary& result)
   {
     if (it == end)
     {
@@ -166,11 +166,11 @@ namespace
     }
     
     auto found = result.find(it->first);
-    if (found == result.end()) 
+    if (found == result.end())
     {
       result[it->first] = it->second;
     }
-    else 
+    else
     {
       found->second.insert(it->second.begin(), it->second.end());
     }
@@ -180,20 +180,20 @@ namespace
 
   void split_recursive(const std::string& s,
       char delim, std::vector< std::string >& tokens,
-      size_t start = 0) 
+      size_t start = 0)
   {
     size_t pos = s.find(delim, start);
     
-    if (pos == std::string::npos) 
+    if (pos == std::string::npos)
     {
-      if (start < s.length()) 
+      if (start < s.length())
       {
         tokens.push_back(s.substr(start));
       }
       return;
     }
     
-    if (pos > start) 
+    if (pos > start)
     {
       tokens.push_back(s.substr(start, pos - start));
     }
@@ -202,7 +202,7 @@ namespace
   }
 
   void addTranslations(const std::vector< std::string >& words,
-      size_t current_index, mezentsev::Translations& translations) 
+      size_t current_index, mezentsev::Translations& translations)
   {
     if (current_index >= words.size())
     {
@@ -214,17 +214,17 @@ namespace
   }
 
   void processFileLines(std::ifstream& ifs,
-      mezentsev::Dictionary& dict, std::string& line) 
+      mezentsev::Dictionary& dict, std::string& line)
   {
     if (!std::getline(ifs, line))
     {
       return;
     }
     
-    if (!line.empty()) 
+    if (!line.empty())
     {
       std::vector< std::string > words = mezentsev::split(line, ' ');
-      if (!words.empty()) 
+      if (!words.empty())
       {
         std::string eng_word = words[0];
         mezentsev::Translations translations;
@@ -237,80 +237,80 @@ namespace
   }
 }
 
-std::vector< std::string > mezentsev::split(const std::string& s, char delim) 
+std::vector< std::string > mezentsev::split(const std::string& s, char delim)
 {
   std::vector< std::string > tokens;
   split_recursive(s, delim, tokens);
   return tokens;
 }
 
-void mezentsev::addCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::addCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 4) 
+  if (tokens.size() < 4)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
   }
   Dictionary& dict = dict_it->second;
   auto word_it = dict.find(tokens[2]);
-  if (word_it == dict.end()) 
+  if (word_it == dict.end())
   {
     dict[tokens[2]] = Translations{ tokens[3] };
   }
-  else 
+  else
   {
-    if (word_it->second.find(tokens[3]) != word_it->second.end()) 
+    if (word_it->second.find(tokens[3]) != word_it->second.end())
     {
       std::cout << "ALREADY EXISTS" << std::endl;
     }
-    else 
+    else
     {
       word_it->second.insert(tokens[3]);
     }
   }
 }
 
-void mezentsev::removeCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::removeCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 3) 
+  if (tokens.size() < 3)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
   }
   Dictionary& dict = dict_it->second;
   auto word_it = dict.find(tokens[2]);
-  if (word_it == dict.end()) 
+  if (word_it == dict.end())
   {
     std::cout << "WORD NOT FOUND" << std::endl;
     return;
   }
-  if (tokens.size() == 3) 
+  if (tokens.size() == 3)
   {
     dict.erase(word_it);
   }
   else 
   {
     auto trans_it = word_it->second.find(tokens[3]);
-    if (trans_it == word_it->second.end()) 
+    if (trans_it == word_it->second.end())
     {
       std::cout << "NOT FOUND" << std::endl;
     }
-    else 
+    else
     {
       word_it->second.erase(trans_it);
-      if (word_it->second.empty()) 
+      if (word_it->second.empty())
       {
         dict.erase(word_it);
       }
@@ -318,26 +318,26 @@ void mezentsev::removeCommand(DictionarySet& dicts, const std::vector< std::stri
   }
 }
 
-void mezentsev::translateCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::translateCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 3) 
+  if (tokens.size() < 3)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
   }
   const Dictionary& dict = dict_it->second;
   auto word_it = dict.find(tokens[2]);
-  if (word_it == dict.end()) 
+  if (word_it == dict.end())
   {
     std::cout << "WORD NOT FOUND" << std::endl;
   }
-  else 
+  else
   {
     Concatenate concat;
     std::string result = std::accumulate(word_it->second.begin(), word_it->second.end(), std::string(), concat);
@@ -345,21 +345,21 @@ void mezentsev::translateCommand(DictionarySet& dicts, const std::vector< std::s
   }
 }
 
-void mezentsev::listCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::listCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 2) 
+  if (tokens.size() < 2)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
   }
   const Dictionary& dict = dict_it->second;
-  if (dict.empty()) 
+  if (dict.empty())
   {
     std::cout << "EMPTY" << std::endl;
   }
@@ -371,21 +371,21 @@ void mezentsev::listCommand(DictionarySet& dicts, const std::vector< std::string
   }
 }
 
-void mezentsev::saveCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::saveCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 3) 
+  if (tokens.size() < 3)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
   }
   std::ofstream ofs(tokens[2]);
-  if (!ofs) 
+  if (!ofs)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
@@ -397,16 +397,16 @@ void mezentsev::saveCommand(DictionarySet& dicts, const std::vector< std::string
   ofs << content;
 }
 
-void mezentsev::loadCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::loadCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 3) 
+  if (tokens.size() < 3)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   
   std::ifstream ifs(tokens[2]);
-  if (!ifs) 
+  if (!ifs)
   {
     std::cout << "FILE IS INVALID" << std::endl;
     return;
@@ -422,15 +422,15 @@ void mezentsev::loadCommand(DictionarySet& dicts, const std::vector< std::string
   dicts[tokens[1]] = dict;
 }
 
-void mezentsev::countCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::countCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 2) 
+  if (tokens.size() < 2)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
@@ -438,15 +438,15 @@ void mezentsev::countCommand(DictionarySet& dicts, const std::vector< std::strin
   std::cout << dict_it->second.size() << std::endl;
 }
 
-void mezentsev::clearCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::clearCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 2) 
+  if (tokens.size() < 2)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
@@ -454,15 +454,15 @@ void mezentsev::clearCommand(DictionarySet& dicts, const std::vector< std::strin
   dict_it->second.clear();
 }
 
-void mezentsev::suggestCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::suggestCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 4) 
+  if (tokens.size() < 4)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto dict_it = dicts.find(tokens[1]);
-  if (dict_it == dicts.end()) 
+  if (dict_it == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
@@ -477,9 +477,9 @@ void mezentsev::suggestCommand(DictionarySet& dicts, const std::vector< std::str
   std::copy(suggestions.begin(), suggestions.end(), std::ostream_iterator< std::string >(std::cout, "\n"));
 }
 
-void mezentsev::mergeCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::mergeCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 4) 
+  if (tokens.size() < 4)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
@@ -488,7 +488,7 @@ void mezentsev::mergeCommand(DictionarySet& dicts, const std::vector< std::strin
   auto it1 = dicts.find(tokens[1]);
   auto it2 = dicts.find(tokens[2]);
   
-  if (it1 == dicts.end() || it2 == dicts.end()) 
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
@@ -505,9 +505,9 @@ void mezentsev::mergeCommand(DictionarySet& dicts, const std::vector< std::strin
   dicts.erase(it2);
 }
 
-void mezentsev::diffCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::diffCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 4) 
+  if (tokens.size() < 4)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
@@ -516,7 +516,7 @@ void mezentsev::diffCommand(DictionarySet& dicts, const std::vector< std::string
   auto it1 = dicts.find(tokens[1]);
   auto it2 = dicts.find(tokens[2]);
   
-  if (it1 == dicts.end() || it2 == dicts.end()) 
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
@@ -526,7 +526,7 @@ void mezentsev::diffCommand(DictionarySet& dicts, const std::vector< std::string
   
   findDifferences(it1->second.begin(), it1->second.end(), it2->second, diff_dict);
   
-  if (diff_dict.empty()) 
+  if (diff_dict.empty())
   {
     std::cout << "<INDENTICAL>" << std::endl;
   }
@@ -536,15 +536,15 @@ void mezentsev::diffCommand(DictionarySet& dicts, const std::vector< std::string
   }
 }
 
-void mezentsev::copyCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::copyCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 3) 
+  if (tokens.size() < 3)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
   }
   auto source_it = dicts.find(tokens[1]);
-  if (source_it == dicts.end()) 
+  if (source_it == dicts.end())
   {
     std::cout << "SOURCE NOT FOUND" << std::endl;
     return;
@@ -552,9 +552,9 @@ void mezentsev::copyCommand(DictionarySet& dicts, const std::vector< std::string
   dicts[tokens[2]] = source_it->second;
 }
 
-void mezentsev::intersectCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::intersectCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
-  if (tokens.size() < 4) 
+  if (tokens.size() < 4)
   {
     std::cout << "INVALID COMMAND" << std::endl;
     return;
@@ -563,7 +563,7 @@ void mezentsev::intersectCommand(DictionarySet& dicts, const std::vector< std::s
   auto it1 = dicts.find(tokens[1]);
   auto it2 = dicts.find(tokens[2]);
   
-  if (it1 == dicts.end() || it2 == dicts.end()) 
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
     return;
@@ -575,17 +575,17 @@ void mezentsev::intersectCommand(DictionarySet& dicts, const std::vector< std::s
   
   processor.process(it1->second.begin(), it1->second.end(), context);
   
-  if (intersect_dict.empty()) 
+  if (intersect_dict.empty())
   {
     std::cout << "<NO INTERSECTION>" << std::endl;
   }
-  else 
+  else
   {
     dicts[tokens[3]] = intersect_dict;
   }
 }
 
-void mezentsev::exportCommand(DictionarySet& dicts, const std::vector< std::string >& tokens) 
+void mezentsev::exportCommand(DictionarySet& dicts, const std::vector< std::string >& tokens)
 {
   if (tokens.size() < 4)
   {
@@ -611,7 +611,7 @@ void mezentsev::exportCommand(DictionarySet& dicts, const std::vector< std::stri
   
   collectWordsByPrefix(start_it, source_dict.end(), prefix, words_to_export);
   
-  if (words_to_export.empty()) 
+  if (words_to_export.empty())
   {
     std::cout << "NO WORDS FOUND" << std::endl;
     return;
