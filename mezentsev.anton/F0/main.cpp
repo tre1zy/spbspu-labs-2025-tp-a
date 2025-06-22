@@ -10,25 +10,25 @@
 #include <string>
 #include <vector>
 
-void loadFromFile(mezentsev::DictionarySet& dicts, std::istream& file) 
+void loadFromFile(mezentsev::DictionarySet& dicts, std::istream& file)
 {
   std::string line;
   mezentsev::Dictionary* currentDict = nullptr;
   
-  while (std::getline(file, line)) 
+  while (std::getline(file, line))
   {
     if (line.empty())
     {
       continue;
     }
     
-    if (line.find(' ') == std::string::npos) 
+    if (line.find(' ') == std::string::npos)
     {
       std::string dictName = line;
       dicts[dictName] = mezentsev::Dictionary();
       currentDict = &dicts[dictName];
     }
-    else 
+    else
     {
       if (!currentDict)
       {
@@ -42,7 +42,7 @@ void loadFromFile(mezentsev::DictionarySet& dicts, std::istream& file)
       
       std::string engWord = tokens[0];
       mezentsev::Translations translations;
-      for (size_t i = 1; i < tokens.size(); ++i) 
+      for (size_t i = 1; i < tokens.size(); ++i)
       {
         translations.insert(tokens[i]);
       }
@@ -51,7 +51,7 @@ void loadFromFile(mezentsev::DictionarySet& dicts, std::istream& file)
   }
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
   using namespace mezentsev;
   DictionarySet dicts;
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   commands.insert(std::make_pair("export", std::bind(exportCommand, std::ref(dicts), _1)));
   
   std::string line;
-  while (std::getline(std::cin, line)) 
+  while (std::getline(std::cin, line))
   {
     std::vector< std::string > tokens = mezentsev::split(line, ' ');
     if (tokens.empty())
