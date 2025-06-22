@@ -1,21 +1,38 @@
 #include "shape-utils.hpp"
-#include <cstring>
+#include <map>
+#include <iterator>
+#include <algorithm>
 #include "rectangle.hpp"
 #include "concave.hpp"
 #include "complexquad.hpp"
 
-savintsev::Shape * savintsev::createShape(char * name, const double * n)
+savintsev::Shape * savintsev::createShape(std::istream & in, std::string name)
 {
-  if (!std::strcmp(name, "rectangle"))
+  if (name == "rectangle")
   {
+    double n[4];
+    for (size_t i = 0; i < 4; ++i)
+    {
+      in >> n[i];
+    }
     return new Rectangle({n[0], n[1]}, {n[2], n[3]});
   }
-  if (!std::strcmp(name, "complexquad"))
+  if (name == "complexquad")
   {
+    double n[8];
+    for (size_t i = 0; i < 8; ++i)
+    {
+      in >> n[i];
+    }
     return new Complexquad({n[0], n[1]}, {n[2], n[3]}, {n[4], n[5]}, {n[6], n[7]});
   }
-  if (!std::strcmp(name, "concave"))
+  if (name == "concave")
   {
+    double n[8];
+    for (size_t i = 0; i < 8; ++i)
+    {
+      in >> n[i];
+    }
     return new Concave({n[0], n[1]}, {n[2], n[3]}, {n[4], n[5]}, {n[6], n[7]});
   }
   return nullptr;
