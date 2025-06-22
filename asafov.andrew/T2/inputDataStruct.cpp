@@ -1,5 +1,7 @@
 #include "datastruct.h"
 #include <cctype>
+#include <sstream>
+#include <limits>
 
 namespace
 {
@@ -67,58 +69,46 @@ namespace
 
 std::istream& asafov::operator>>(std::istream& in, DataStruct& data)
 {
-  DataStruct temp;
-
-  if (!expect(in, '(') || !expect(in, ':'))
+  std::string line;
+  while (std::getline(in, line))
   {
-    in.setstate(std::ios::failbit);
+    std::istringstream iss(line);
+    DataStruct temp;
+    char c;
+
+    if (!(iss >> c) || c != '(') continue;
+    if (!(iss >> c) || c != ':') continue;
+
+    std::string key;
+    iss >> key;
+    if (key != "key1") continue;
+    if (!(iss >> c) || c != ' ') continue;
+
+    if (!parseULLBin(iss, temp.key1)) continue;
+
+    if (!(iss >> c) || c != ':') continue;
+    iss >> key;
+    if (key != "key2") continue;
+    if (!(iss >> c) || c != ' ') continue;
+
+    if (!parseCmpLsp(iss, temp.key2)) continue;
+
+    if (!(iss >> c) || c != ':') continue;
+    iss >> key;
+    if (key != "key3") continue;
+    if (!(iss >> c) || c != ' ') continue;
+
+    if (!parseQuotedString(iss, temp.key3)) continue;
+
+    if (!(iss >> c) || c != ':') continue;
+    if (!(iss >> c) || c != ')') continue;
+
+    if (iss.peek() != EOF) continue;
+
+    data = temp;
     return in;
   }
 
-  std::string key1_tag;
-  in >> key1_tag;
-  if (key1_tag != "key1" || !expect(in, ' '))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!parseULLBin(in, temp.key1))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!expect(in, ':') || !(in >> key1_tag) || key1_tag != "key2" || !expect(in, ' '))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!parseCmpLsp(in, temp.key2))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!expect(in, ':') || !(in >> key1_tag) || key1_tag != "key3" || !expect(in, ' '))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!parseQuotedString(in, temp.key3))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  if (!expect(in, ':') || !expect(in, ')'))
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  data = temp;
+  in.setstate(std::ios::failbit);
   return in;
 }
