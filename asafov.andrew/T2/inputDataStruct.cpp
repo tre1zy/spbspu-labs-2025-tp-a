@@ -1,6 +1,5 @@
 #include "datastruct.h"
 #include <cctype>
-#include <sstream>
 #include <limits>
 
 namespace
@@ -65,48 +64,113 @@ namespace
 
     return c == '"';
   }
+
+  bool tryParseRecord(std::istream& in, asafov::DataStruct& data)
+  {
+    asafov::DataStruct temp;
+    std::streampos start = in.tellg();
+
+    if (!expect(in, '(')) return false;
+    if (!expect(in, ':')) return false;
+
+    std::string key;
+    in >> key;
+    if (key != "key1")
+    {
+      in.seekg(start);
+      return false;
+    }
+    if (!expect(in, ' '))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    if (!parseULLBin(in, temp.key1))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    if (!expect(in, ':'))
+    {
+      in.seekg(start);
+      return false;
+    }
+    in >> key;
+    if (key != "key2")
+    {
+      in.seekg(start);
+      return false;
+    }
+    if (!expect(in, ' '))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    if (!parseCmpLsp(in, temp.key2))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    if (!expect(in, ':'))
+    {
+      in.seekg(start);
+      return false;
+    }
+    in >> key;
+    if (key != "key3")
+    {
+      in.seekg(start);
+      return false;
+    }
+    if (!expect(in, ' '))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    if (!parseQuotedString(in, temp.key3))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    if (!expect(in, ':'))
+    {
+      in.seekg(start);
+      return false;
+    }
+    if (!expect(in, ')'))
+    {
+      in.seekg(start);
+      return false;
+    }
+
+    data = temp;
+    return true;
+  }
 }
 
 std::istream& asafov::operator>>(std::istream& in, DataStruct& data)
 {
-  std::string line;
-  while (std::getline(in, line))
+  while (in.peek() != EOF)
   {
-    std::istringstream iss(line);
-    DataStruct temp;
-    char c;
+    skipWhitespace(in);
 
-    if (!(iss >> c) || c != '(') continue;
-    if (!(iss >> c) || c != ':') continue;
+    if (tryParseRecord(in, data))
+    {
+      return in;
+    }
 
-    std::string key;
-    iss >> key;
-    if (key != "key1") continue;
-    if (!(iss >> c) || c != ' ') continue;
+    while (in.peek() != '(' && in.peek() != '\n' && in.peek() != EOF)
+    {
+      in.ignore();
+    }
 
-    if (!parseULLBin(iss, temp.key1)) continue;
-
-    if (!(iss >> c) || c != ':') continue;
-    iss >> key;
-    if (key != "key2") continue;
-    if (!(iss >> c) || c != ' ') continue;
-
-    if (!parseCmpLsp(iss, temp.key2)) continue;
-
-    if (!(iss >> c) || c != ':') continue;
-    iss >> key;
-    if (key != "key3") continue;
-    if (!(iss >> c) || c != ' ') continue;
-
-    if (!parseQuotedString(iss, temp.key3)) continue;
-
-    if (!(iss >> c) || c != ':') continue;
-    if (!(iss >> c) || c != ')') continue;
-
-    if (iss.peek() != EOF) continue;
-
-    data = temp;
-    return in;
+    if (in.peek() == '\n') in.ignore();
   }
 
   in.setstate(std::ios::failbit);
