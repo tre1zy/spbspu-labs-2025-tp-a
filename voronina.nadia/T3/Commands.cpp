@@ -81,7 +81,7 @@ void voronina::min(const std::vector<Polygon> &shapes, std::istream &in, std::os
   in >> DelimiterIO{' '};
 
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(voronina::getAreaMin, std::cref(shapes), std::ref(out)); 
+  subcmds["AREA"] = std::bind(voronina::getAreaMin, std::cref(shapes), std::ref(out));
   subcmds["VERTEXES"] = std::bind(voronina::getVertexesMin, std::cref(shapes), std::ref(out));
 
   std::string parametr = "";
