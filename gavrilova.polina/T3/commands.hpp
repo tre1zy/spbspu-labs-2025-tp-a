@@ -7,11 +7,12 @@
 #include "Polygon.hpp"
 
 namespace gavrilova {
-  void processArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out);
-  void processMinMax(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out);
-  void processCount(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out);
-  void processPerms(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out);
-  void processLessArea(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out);
+  void execArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+  void execMax(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+  void execMin(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+  void execCount(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+  void execPerms(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+  void execLessArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
 }
 
 #endif

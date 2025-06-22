@@ -2,304 +2,174 @@
 #include <algorithm>
 #include <functional>
 #include <iomanip>
-#include <map>
+#include <iterator>
 #include <numeric>
-#include <sstream>
-#include "utils.hpp"
+#include <vector>
+#include "StreamGuard.hpp"
 
 namespace {
-  double calcArea(const gavrilova::Polygon& polygon)
-  {
-    return polygon.area();
-  }
 
-  double calcAreaOdd(const gavrilova::Polygon& polygon)
-  {
-    return polygon.isOdd() ? calcArea(polygon) : 0.0;
-  }
+  struct AreaTransformFunctor {
+    double operator()(const Polygon& p) const { return getArea(p); }
+  };
+  struct OddAreaTransformFunctor {
+    double operator()(const Polygon& p) const { return hasOddVertices(p) ? getArea(p) : 0.0; }
+  };
+  struct EvenAreaTransformFunctor {
+    double operator()(const Polygon& p) const { return hasEvenVertices(p) ? getArea(p) : 0.0; }
+  };
+  struct SpecificVertexAreaTransformFunctor {
+    size_t num_vertices;
+    explicit SpecificVertexAreaTransformFunctor(size_t n):
+      num_vertices(n)
+    {}
+    double operator()(const Polygon& p) const { return p.points.size() == num_vertices ? getArea(p) : 0.0; }
+  };
 
-  double calcAreaEven(const gavrilova::Polygon& polygon)
-  {
-    return polygon.isEven() ? calcArea(polygon) : 0.0;
-  }
+  struct IsOddPredicate {
+    bool operator()(const Polygon& p) const { return hasOddVertices(p); }
+  };
+  struct IsEvenPredicate {
+    bool operator()(const Polygon& p) const { return hasEvenVertices(p); }
+  };
+  struct HasNVertexesPredicate {
+    size_t num_vertices;
+    explicit HasNVertexesPredicate(size_t n):
+      num_vertices(n)
+    {}
+    bool operator()(const Polygon& p) const { return p.points.size() == num_vertices; }
+  };
 
-  double calcAreaNum(const gavrilova::Polygon& polygon, size_t num)
-  {
-    return (polygon.points.size() == num) ? calcArea(polygon) : 0.0;
-  }
+  struct AreaComparator {
+    bool operator()(const Polygon& a, const Polygon& b) const { return getArea(a) < getArea(b); }
+  };
+  struct VertexesComparator {
+    bool operator()(const Polygon& a, const Polygon& b) const { return a.points.size() < b.points.size(); }
+  };
 
-  bool minAreaComp(const gavrilova::Polygon& polygon_1, const gavrilova::Polygon& polygon_2)
-  {
-    return polygon_1.area() < polygon_2.area();
-  }
-
-  bool minVertexesComp(const gavrilova::Polygon& polygon_1, const gavrilova::Polygon& polygon_2)
-  {
-    return polygon_1.points.size() < polygon_2.points.size();
-  }
-
-  const gavrilova::Polygon& findMinPolygon(const std::vector< gavrilova::Polygon >& polygons,
-      const std::function< bool(const gavrilova::Polygon&, const gavrilova::Polygon&) >& comp)
-  {
-    if (polygons.empty()) {
-      throw std::runtime_error("");
+  struct IsPermutationPredicate {
+    Polygon ref_polygon;
+    explicit IsPermutationPredicate(const Polygon& p):
+      ref_polygon(p)
+    {
+      std::sort(ref_polygon.points.begin(), ref_polygon.points.end());
     }
-    return *std::min_element(polygons.begin(), polygons.end(), comp);
-  }
-
-  const gavrilova::Polygon& findMaxPolygon(const std::vector< gavrilova::Polygon >& polygons,
-      const std::function< bool(const gavrilova::Polygon&, const gavrilova::Polygon&) >& comp)
-  {
-    if (polygons.empty()) {
-      throw std::runtime_error("");
+    bool operator()(const Polygon& p) const
+    {
+      if (p.points.size() != ref_polygon.points.size()) return false;
+      auto temp_points = p.points;
+      std::sort(temp_points.begin(), temp_points.end());
+      return temp_points == ref_polygon.points;
     }
-    return *std::max_element(polygons.begin(), polygons.end(), comp);
-  }
+  };
+  
+  struct IsLessAreaPredicate {
+    double ref_area;
+    explicit IsLessAreaPredicate(const Polygon& p):
+      ref_area(getArea(p))
+    {}
+    bool operator()(const Polygon& p) const
+    {
+      return getArea(p) < ref_area;
+    }
+  };
 
-  size_t calcCountOdd(const gavrilova::Polygon& polygon)
-  {
-    return polygon.isOdd() ? 1 : 0;
-  }
-
-  size_t calcCountEven(const gavrilova::Polygon& polygon)
-  {
-    return polygon.isEven() ? 1 : 0;
-  }
-
-  double calcCountNum(const gavrilova::Polygon& polygon, size_t num)
-  {
-    return (polygon.points.size() == num) ? 1 : 0.0;
-  }
 }
 
-void gavrilova::processArea(const std::vector< Polygon >& polygons,
-    const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::execArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (commands.size() < 2) {
-    out << "<INVALID COMMAND>\n";
+  std::string arg;
+  in >> arg;
+  std::vector< double > areas;
+  areas.reserve(polygons.size());
+  double total_area = 0;
+
+  if (arg == "ODD") {
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), OddAreaTransformFunctor());
+  } else if (arg == "EVEN") {
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), EvenAreaTransformFunctor());
+  } else if (arg == "MEAN") {
+    if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), AreaTransformFunctor());
+    total_area = std::accumulate(areas.begin(), areas.end(), 0.0) / polygons.size();
+    out << std::fixed << std::setprecision(1) << total_area;
     return;
-  }
-
-  auto& subcommand = commands.at(1);
-  double area = 0.0;
-
-  static auto apply_command = std::bind(
-      gavrilova::applyCommand< std::vector< Polygon >, double, std::function< double(const Polygon&) >, std::plus<> >,
-      std::placeholders::_1,
-      0.0,
-      std::placeholders::_2,
-      std::plus<>());
-
-  if (subcommand == "MEAN") {
-    if (polygons.empty()) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    area = apply_command(polygons, calcArea);
-    area = area / static_cast< double >(polygons.size());
-  } else if (subcommand == "ODD") {
-    area = apply_command(polygons, calcAreaOdd);
-  } else if (subcommand == "EVEN") {
-    area = apply_command(polygons, calcAreaEven);
   } else {
-    size_t num = 0;
     try {
-      num = std::stoll(subcommand);
-      if (num < 3) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      area = apply_command(
-          polygons,
-          std::bind(
-              calcAreaNum,
-              std::placeholders::_1,
-              num));
-    } catch (const std::exception&) {
-      throw std::runtime_error("Invalid subcommand for AREA");
+      size_t num_vertices = std::stoul(arg);
+      if (num_vertices < 3) throw std::invalid_argument("");
+      std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), SpecificVertexAreaTransformFunctor(num_vertices));
+    } catch (...) {
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
   }
-  out << std::fixed << std::setprecision(1) << area << "\n";
+  total_area = std::accumulate(areas.begin(), areas.end(), 0.0);
+  out << std::fixed << std::setprecision(1) << total_area;
 }
 
-void gavrilova::processMinMax(const std::vector< Polygon >& polygons, const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::execMax(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (commands.size() < 2) {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  static std::map< std::string, std::function< const Polygon&(const std::vector< Polygon >&,
-                                    const std::function< bool(const Polygon&, const Polygon&) >&) > >
-      min_max_map = {
-          {"MIN", findMinPolygon},
-          {"MAX", findMaxPolygon}};
-
-  auto& command = commands.at(0);
-  auto& subcommand = commands.at(1);
-
-  try {
-    if (subcommand == "AREA") {
-      auto val = min_max_map.at(command)(polygons, minAreaComp);
-      out << std::fixed << std::setprecision(1) << val.area() << "\n";
-    } else if (subcommand == "VERTEXES") {
-      auto val = min_max_map.at(command)(polygons, minVertexesComp);
-      out << val.points.size() << "\n";
-    } else {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-  } catch (const std::exception&) {
-    out << "<INVALID COMMAND>\n";
-    return;
+  if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
+  std::string arg;
+  in >> arg;
+  if (arg == "AREA") {
+    const auto& p = *std::max_element(polygons.begin(), polygons.end(), AreaComparator());
+    out << std::fixed << std::setprecision(1) << getArea(p);
+  } else if (arg == "VERTEXES") {
+    const auto& p = *std::max_element(polygons.begin(), polygons.end(), VertexesComparator());
+    out << p.points.size();
+  } else {
+    throw std::invalid_argument("<INVALID COMMAND>");
   }
 }
 
-void gavrilova::processCount(const std::vector< Polygon >& polygons,
-    const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::execMin(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (commands.size() < 2) {
-    out << "<INVALID COMMAND>\n";
-    return;
+  if (polygons.empty()) throw std::invalid_argument("<INVALID COMMAND>");
+  std::string arg;
+  in >> arg;
+  if (arg == "AREA") {
+    const auto& p = *std::min_element(polygons.begin(), polygons.end(), AreaComparator());
+    out << std::fixed << std::setprecision(1) << getArea(p);
+  } else if (arg == "VERTEXES") {
+    const auto& p = *std::min_element(polygons.begin(), polygons.end(), VertexesComparator());
+    out << p.points.size();
+  } else {
+    throw std::invalid_argument("<INVALID COMMAND>");
   }
+}
 
-  auto& subcommand = commands.at(1);
-  static auto apply_command = std::bind(
-      gavrilova::applyCommand< std::vector< Polygon >, size_t, std::function< size_t(const Polygon&) >, std::plus<> >,
-      std::placeholders::_1,
-      static_cast< size_t >(0),
-      std::placeholders::_2,
-      std::plus<>());
-
+void gavrilova::execCount(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  std::string arg;
+  in >> arg;
   size_t count = 0;
-
-  if (subcommand == "ODD") {
-    count = apply_command(polygons, calcCountOdd);
-  } else if (subcommand == "EVEN") {
-    count = apply_command(polygons, calcCountEven);
+  if (arg == "ODD") {
+    count = std::count_if(polygons.begin(), polygons.end(), IsOddPredicate());
+  } else if (arg == "EVEN") {
+    count = std::count_if(polygons.begin(), polygons.end(), IsEvenPredicate());
   } else {
-    size_t num = 0;
     try {
-      num = std::stoll(subcommand);
-      if (num < 3) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      count = apply_command(
-          polygons,
-          std::bind(
-              calcCountNum,
-              std::placeholders::_1,
-              num));
-    } catch (const std::exception&) {
-      throw std::runtime_error("Invalid subcommand for COUNT");
+      size_t num_vertices = std::stoul(arg);
+      if (num_vertices < 3) throw std::invalid_argument("");
+      count = std::count_if(polygons.begin(), polygons.end(), HasNVertexesPredicate(num_vertices));
+    } catch (...) {
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
   }
-
-  out << count << "\n";
+  out << count;
 }
 
-void gavrilova::processPerms(const std::vector< Polygon >& polygons,
-    const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::execPerms(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (commands[1] < "3") {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  struct AccumulateJoin {
-    std::string operator()(const std::string& str_1, const std::string& str_2) const
-    {
-      return str_1 + " " + str_2;
-    }
-  };
-
-  auto polygon_str = std::accumulate(
-      commands.begin() + 1,
-      commands.end(),
-      std::string(""),
-      AccumulateJoin());
-
-  std::istringstream iss(polygon_str);
   Polygon ref_polygon;
-
-  if (!(iss >> ref_polygon && iss.eof())) {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  std::sort(ref_polygon.points.begin(), ref_polygon.points.end());
-
-  struct PointsEqual {
-    const Polygon& ref_polygon;
-    PointsEqual(const Polygon& polygon):
-      ref_polygon(polygon)
-    {}
-    bool operator()(const Polygon& polygon) const
-    {
-      auto points = polygon.points;
-      std::sort(points.begin(), points.end());
-      return points == ref_polygon.points;
-    }
-  };
-
-  size_t count = std::count_if(
-      polygons.begin(),
-      polygons.end(),
-      PointsEqual(ref_polygon));
-
-  out << count << "\n";
+  if (!(in >> ref_polygon)) throw std::invalid_argument("<INVALID COMMAND>");
+  out << std::count_if(polygons.begin(), polygons.end(), IsPermutationPredicate(ref_polygon));
 }
 
-void gavrilova::processLessArea(const std::vector< Polygon >& polygons,
-    const std::vector< std::string >& commands, std::ostream& out)
+void gavrilova::execLessArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
-  if (commands.size() < 3) {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  struct AccumulateJoin {
-    std::string operator()(const std::string& str_1, const std::string& str_2) const
-    {
-      return str_1 + " " + str_2;
-    }
-  };
-
-  auto polygon_str = std::accumulate(
-      commands.begin() + 1,
-      commands.end(),
-      std::string(""),
-      AccumulateJoin());
-
-  std::istringstream iss(polygon_str);
   Polygon ref_polygon;
-
-  if (!(iss >> ref_polygon && iss.eof())) {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  if (ref_polygon.area() == 0.0) {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  struct AreaLess {
-    const Polygon& ref_polygon;
-    AreaLess(const Polygon& polygon):
-      ref_polygon(polygon)
-    {}
-    bool operator()(const Polygon& polygon) const
-    {
-      return polygon.area() < ref_polygon.area();
-    }
-  };
-
-  size_t count = std::count_if(
-      polygons.begin(),
-      polygons.end(),
-      AreaLess(ref_polygon));
-
-  out << count << "\n";
+  if (!(in >> ref_polygon)) throw std::invalid_argument("<INVALID COMMAND>");
+  out << std::count_if(polygons.begin(), polygons.end(), IsLessAreaPredicate(ref_polygon));
 }

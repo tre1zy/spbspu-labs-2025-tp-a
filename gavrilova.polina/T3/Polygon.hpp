@@ -5,19 +5,16 @@
 #include "Point.hpp"
 
 namespace gavrilova {
-
   struct Polygon {
-    std::vector< gavrilova::Point > points;
-
-    double area() const;
-    bool isEven() const;
-    bool isOdd() const;
-    bool empty() const;
+    std::vector< Point > points;
   };
 
-  std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
-  std::istream& operator>>(std::istream& is, Polygon& polygon);
+  double getArea(const Polygon& polygon);
+  bool hasEvenVertices(const Polygon& polygon);
+  bool hasOddVertices(const Polygon& polygon);
 
+  std::istream& operator>>(std::istream& is, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
 }
 
 #endif

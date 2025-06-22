@@ -1,65 +1,43 @@
 #include "Polygon.hpp"
 #include <algorithm>
 #include <cmath>
-#include <functional>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <numeric>
-#include <sstream>
 
 namespace gavrilova {
 
-  double Polygon::area() const
-  {
-    if (points.empty()) {
-      return 0;
+  struct PointDeterminant {
+    double operator()(const Point& p1, const Point& p2) const
+    {
+      return static_cast< double >(p1.x) * p2.y - static_cast< double >(p2.x) * p1.y;
     }
+  };
 
-    auto det2 = [](const Point& a, const Point& b) {
-      return a.x * b.y - b.x * a.y;
-    };
-
-    auto area = static_cast< double >(
-        std::inner_product(
-            points.cbegin(),
-            points.cend() - 1,
-            points.cbegin() + 1,
-            0,
-            std::plus<>(),
-            det2));
-
-    auto last_el = static_cast< double >(det2(points.back(), points.front()));
-    return std::abs(area + last_el) / 2.0;
-  }
-
-  bool Polygon::isEven() const
+  double getArea(const Polygon& polygon)
   {
-    return points.size() % 2 == 0;
-  }
-
-  bool Polygon::isOdd() const
-  {
-    return !isEven();
-  }
-
-  bool Polygon::empty() const
-  {
-    return points.empty();
-  }
-
-  std::ostream& operator<<(std::ostream& os, const Polygon& polygon)
-  {
-    std::ostream::sentry sentry(os);
-    if (!sentry) {
-      return os;
+    if (polygon.points.size() < 3) {
+      return 0.0;
     }
+    double area = std::inner_product(
+        polygon.points.begin(), polygon.points.end() - 1,
+        polygon.points.begin() + 1,
+        0.0,
+        std::plus< double >(),
+        PointDeterminant());
+    area += PointDeterminant()(polygon.points.back(), polygon.points.front());
+    return std::abs(area) / 2.0;
+  }
 
-    os << polygon.points.size() << " ";
-    std::copy(polygon.points.begin(),
-        polygon.points.end(),
-        std::ostream_iterator< Point >(os, " "));
+  bool hasEvenVertices(const Polygon& polygon)
+  {
+    return polygon.points.size() % 2 == 0;
+  }
 
-    return os;
+  bool hasOddVertices(const Polygon& polygon)
+  {
+    return !hasEvenVertices(polygon);
   }
 
   std::istream& operator>>(std::istream& is, Polygon& polygon)
@@ -69,49 +47,39 @@ namespace gavrilova {
       return is;
     }
 
-    std::string line;
-    if (!std::getline(is, line)) {
-      is.setstate(std::ios_base::failbit);
+    size_t num_points = 0;
+    is >> num_points;
+
+    if (!is || num_points < 3) {
+      is.setstate(std::ios::failbit);
       return is;
     }
 
-    std::stringstream curr_line_string_stream(line);
-    int num_of_points = 0;
+    std::vector< Point > temp_points(num_points);
+    for (size_t i = 0; i < num_points; ++i) {
+      if (!(is >> temp_points[i])) {
+        std::cout << "fail in point: " << i << "\n";
+        std::cout << temp_points[i] << "\n";
 
-    if (!(curr_line_string_stream >> num_of_points)) {
-      is.setstate(std::ios_base::failbit);
-      return is;
+        is.setstate(std::ios::failbit);
+        return is;
+      }
     }
 
-    if (num_of_points < 0) {
-      is.setstate(std::ios_base::failbit);
-      return is;
-    }
-
-    polygon.points.clear();
-
-    if (num_of_points < 3) {
-      return is;
-    }
-
-    polygon.points.reserve(num_of_points);
-
-    std::copy_n(std::istream_iterator< Point >(curr_line_string_stream),
-        num_of_points,
-        std::back_inserter(polygon.points));
-
-    if (!curr_line_string_stream) {
-      polygon.points.clear();
-      return is;
-    }
-
-    std::string trailing;
-    curr_line_string_stream >> trailing;
-    if (!trailing.empty() || polygon.points.size() != static_cast< size_t >(num_of_points)) {
-      polygon.points.clear();
-      return is;
-    }
-
+    polygon.points = std::move(temp_points);
     return is;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const Polygon& polygon)
+  {
+    std::ostream::sentry sentry(os);
+    if (!sentry) {
+      return os;
+    }
+    os << polygon.points.size() << " ";
+    std::copy(
+        polygon.points.begin(), polygon.points.end(),
+        std::ostream_iterator< Point >(os, " "));
+    return os;
   }
 }
