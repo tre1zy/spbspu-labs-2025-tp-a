@@ -28,7 +28,7 @@ namespace
     return polygon.points.size() == exp;
   }
 
-  bool isEqualPoints(const petrov::Point & point_1, const petrov::Point & point_2)
+  bool isEqPts(const petrov::Point & point_1, const petrov::Point & point_2)
   {
     return point_1.x == point_2.x && point_1.y == point_2.y;
   }
@@ -39,7 +39,7 @@ namespace
     if (target.points.size() == seq.points.size())
     {
       std::vector< bool > isSimilarPts(seq.points.size());
-      std::transform(target.points.cbegin(), target.points.cend(), seq.points.cbegin(), isSimilarPts.begin(), isEqualPoints);
+      std::transform(target.points.cbegin(), target.points.cend(), seq.points.cbegin(), isSimilarPts.begin(), isEqPts);
       return std::none_of(isSimilarPts.cbegin(), isSimilarPts.cend(), std::bind(std::equal_to< bool >{}, _1, false));
     }
     return false;
@@ -326,7 +326,8 @@ void petrov::rmecho(std::vector< Polygon > & polygons, std::istream & in, std::o
     std::vector< bool > do_remove(polygons.size());
     auto isSimilar = std::bind(isEqualPolygon, std::cref(polygon), _2);
     auto isAsPrev = std::bind(isEqualPolygon, _2, _1);
-    std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, do_remove.begin(), std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev));
+    auto andAnd = std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev);
+    std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, do_remove.begin(), andAnd);
     size_t it = 0;
     std::remove_if(polygons.begin(), polygons.end(), std::bind(removeIfTrue, std::cref(do_remove), std::ref(it)));
     out << std::count(do_remove.cbegin(), do_remove.cend(), true);
@@ -346,10 +347,12 @@ void petrov::maxseq(const std::vector< Polygon > & polygons, std::istream & in, 
     std::vector< bool > is_part_of_seq(polygons.size());
     auto isSimilar = std::bind(isEqualPolygon, std::cref(polygon), _2);
     auto isAsPrev = std::bind(isEqualPolygon, _2, _1);
-    std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, is_part_of_seq.begin(), std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev));
+    auto andAnd = std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev);
+    std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, is_part_of_seq.begin(), andAnd);
     std::vector< size_t > sequences_length(is_part_of_seq.size());
     size_t count = 0;
-    std::transform(is_part_of_seq.cbegin(), is_part_of_seq.cend(), sequences_length.begin(), std::bind(countDuplicatesSequencesLength, _1, std::ref(count)));
+    auto counter = std::bind(countDuplicatesSequencesLength, _1, std::ref(count));
+    std::transform(is_part_of_seq.cbegin(), is_part_of_seq.cend(), sequences_length.begin(), counter);
     size_t max_count = *std::max_element(sequences_length.cbegin(), sequences_length.cend());
     if (max_count)
     {
