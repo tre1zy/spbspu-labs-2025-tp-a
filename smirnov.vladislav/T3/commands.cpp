@@ -136,16 +136,6 @@ namespace
     os << std::fixed << std::setprecision(1) << geom::getPolygonArea(min_poly);
   }
 
-  struct AreaComparator
-  {
-    double refArea;
-
-    bool operator()(const Polygon& plg) const
-    {
-      return geom::getPolygonArea(plg) < refArea;
-    }
-  };
-
   struct XComparator
   {
     bool operator()(const geom::Point& a, const geom::Point& b) const
@@ -296,13 +286,14 @@ void smirnov::printLessAreaCnt(std::istream& input, const std::vector< Polygon >
 {
   Polygon ref;
   input >> ref;
-  if (ref.points.size() < 3)
+  if (!in || in.peek() != '\n')
   {
-    throw std::invalid_argument("Invalid polygon");
+    in.clear();
+    throw std::logic_error("<INVALID COMMAND>");
   }
 
-  const double refArea = geom::getPolygonArea(ref);
-  output << std::count_if(polygons.begin(), polygons.end(), AreaComparator{ refArea });
+  using namespace std::placeholders;
+  output << std::count_if(polygons.begin(), polygons.end(), std::bind(compareByArea, _1, ref);
 }
 
 bool smirnov::polygonsIntersect(const Polygon& p1, const Polygon& p2)

@@ -21,11 +21,6 @@ int main(int argc, char* argv[])
 
   std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
-  if (!inFile)
-  {
-    std::cerr << "Could not open file\n";
-    return 1;
-  }
 
   while (!inFile.eof())
   {
@@ -51,16 +46,15 @@ int main(int argc, char* argv[])
     try
     {
       commandMap.at(line)();
-      std::cout << '\n';
     }
     catch (const std::exception& e)
     {
-      std::cout << "<INVALID COMMAND>\n";
       if (std::cin.fail())
       {
         std::cin.clear();
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
   return 0;
