@@ -69,7 +69,14 @@ double orlova::areaMean(const std::vector< Polygon >& polygons)
   {
     throw std::logic_error("<THERE ARE NO POLYGONS>");
   }
-  auto bind = std::bind(accumulator, std::integral_constant< bool, true >, _1, _2);
+  struct AlwaysTrue
+  {
+    bool operator()(const Polygon&) const
+    {
+      return true;
+    }
+  };
+  auto bind = std::bind(accumulator, AlwaysTrue{}, _1, _2);
   return std::accumulate(polygons.begin(), polygons.end(), 0.0, bind) / polygons.size();
 }
 
