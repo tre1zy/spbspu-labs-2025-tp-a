@@ -283,7 +283,7 @@ void smirnov::printIntersectionsCnt(std::istream& input, const std::vector< geom
       throw std::invalid_argument("Have equal points");
     }
     using namespace std::placeholders;
-    output << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectionCheck, temp, _1));
+    output << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectionCheck, ref, _1));
   }
 }
 
