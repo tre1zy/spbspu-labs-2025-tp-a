@@ -14,6 +14,20 @@ namespace geom
     return static_cast< double >(a.x) * b.y - static_cast< double >(b.x) * a.y;
   }
 
+  struct PointReader
+  {
+    std::istream& in;
+    Point operator()() const
+    {
+      Point p;
+      if (!(in >> p))
+      {
+        throw std::ios_base::failure("Error reading point");
+      }
+      return p;
+    }
+  };
+
   bool operator==(const Point& p1, const Point& p2)
   {
     return p1.x == p2.x && p1.y == p2.y;
@@ -52,14 +66,7 @@ namespace geom
 
     try
     {
-      std::generate_n(std::back_inserter(tmp), count, [&] {
-        Point p;
-        if (!(in >> p))
-        {
-          throw std::ios_base::failure{ "Error" };
-        }
-        return p;
-        });
+      std::generate_n(std::back_inserter(tmp), count, PointReader{ in });
     }
     catch (const std::ios_base::failure&)
     {

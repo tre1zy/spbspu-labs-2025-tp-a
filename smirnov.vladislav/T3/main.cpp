@@ -13,75 +13,75 @@
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
+  using it = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
     return 1;
   }
 
+  std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
-  if (!inFile)
+  while (!file.eof())
   {
-    std::cerr << "Could not open file\n";
-    return 1;
-  }
-
-  std::vector< geom::Polygon > polyList;
-  std::string line;
-  while (std::getline(inFile, line))
-  {
-    if (line.empty())
+    std::copy(it(inFile), it(), std::back_inserter(polyList));
+    if (!file)
     {
-      continue;
+      inFile.clear();
+      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::istringstream iss(line);
-    Polygon temp;
-    if (iss >> temp)
-    {
-      polyList.push_back(std::move(temp));
-    }
-  }
+}
 
   std::map< std::string, std::function< void(std::istream&) > > commandMap;
-  commandMap["AREA"] = [&](std::istream& args) {
-    smirnov::printAreaSum(args, std::cref(polyList), std::ref(std::cout));
-    };
-  commandMap["MAX"] = [&](std::istream& args) {
-    smirnov::printMaxValueOf(args, std::cref(polyList), std::ref(std::cout));
-    };
-  commandMap["MIN"] = [&](std::istream& args) {
-    smirnov::printMinValueOf(args, std::cref(polyList), std::ref(std::cout));
-    };
-  commandMap["COUNT"] = [&](std::istream& args) {
-    smirnov::printCountOf(args, std::cref(polyList), std::ref(std::cout));
-    };
-  commandMap["LESSAREA"] = [&](std::istream& args) {
-    smirnov::printLessAreaCnt(args, std::cref(polyList), std::ref(std::cout));
-    };
-  commandMap["INTERSECTIONS"] = [&](std::istream& args) {
-    smirnov::printIntersectionsCnt(args, std::cref(polyList), std::ref(std::cout));
-    };
+  commandMap["AREA"] = std::bind(smirnov::printAreaSum,
+    std::placeholders::_1,
+    std::cref(polyList),
+    std::ref(std::cout));
+  commandMap["MAX"] = std::bind(smirnov::printMaxValueOf,
+    std::placeholders::_1,
+    std::cref(polyList),
+    std::ref(std::cout));
+  commandMap["MIN"] = std::bind(smirnov::printMinValueOf,
+    std::placeholders::_1,
+    std::cref(polyList),
+    std::ref(std::cout));
+  commandMap["COUNT"] = std::bind(smirnov::printCountOf,
+    std::placeholders::_1,
+    std::cref(polyList),
+    std::ref(std::cout));
+  commandMap["LESSAREA"] = std::bind(smirnov::printLessAreaCnt,
+    std::placeholders::_1,
+    std::cref(polyList),
+    std::ref(std::cout));
+  commandMap["INTERSECTIONS"] = std::bind(smirnov::printIntersectionsCnt,
+    std::placeholders::_1,
+    std::cref(polyList),
+    std::ref(std::cout));
 
-  while (std::getline(std::cin, line))
+  std::string line;
+  while (std::cin >> line)
   {
-    std::istringstream iss(line);
-    std::string cmd;
-
-    if (!(iss >> cmd) || !commandMap.count(cmd))
+    auto it = commandMap.find(line);
+    if (it == commandMap.end())
     {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       continue;
     }
     try
     {
-      commandMap[cmd](iss);
-      std::cout << "\n";
+      it->second(std::cin);
+      std::cout << '\n';
     }
-    catch (...)
+    catch (const std::exception& e)
     {
       std::cout << "<INVALID COMMAND>\n";
+      if (std::cin.fail())
+      {
+        std::cin.clear();
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-
   return 0;
 }
