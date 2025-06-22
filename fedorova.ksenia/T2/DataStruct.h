@@ -22,9 +22,14 @@ namespace fedorova
     unsigned long long& ref;
   };
 
-  struct ULLBinaryIO
+  struct ULLBinaryI
   {
     unsigned long long& ref;
+  };
+
+  struct ULLBinaryO
+  {
+    const unsigned long long& ref;
   };
 
   struct StringIO
@@ -40,25 +45,25 @@ namespace fedorova
   class IoGuard
   {
   public:
-    explicit IoGuard(std::basic_ios<char>& s);
+    explicit IoGuard(std::basic_ios< char >& s);
     ~IoGuard();
   private:
-    std::basic_ios<char>& s_;
+    std::basic_ios< char >& s_;
     std::streamsize width_;
     char fill_;
     std::streamsize precision_;
-    std::basic_ios<char>::fmtflags fmt_;
+    std::basic_ios< char >::fmtflags fmt_;
   };
 
   bool compareDataStruct(const DataStruct& a, const DataStruct& b);
   std::istream& operator>>(std::istream& is, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& is, ULLLiteralIO&& dest);
-  std::istream& operator>>(std::istream& is, ULLBinaryIO&& dest);
+  std::istream& operator>>(std::istream& is, ULLBinaryI&& dest);
   std::istream& operator>>(std::istream& is, StringIO&& dest);
   std::istream& operator>>(std::istream& is, LabelIO&& dest);
   std::istream& operator>>(std::istream& is, DataStruct& data);
   std::ostream& operator<<(std::ostream& os, const DataStruct& data);
-  std::string changeKeyToBinary(unsigned long long key);
+  std::ostream& operator<<(std::ostream& os, const ULLBinaryO& dest);
 };
 
 #endif

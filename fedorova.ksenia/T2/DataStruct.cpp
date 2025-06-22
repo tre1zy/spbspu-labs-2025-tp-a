@@ -1,36 +1,24 @@
-#include "DataStruct.h"
 #include <iostream>
 #include <string>
 #include <limits>
+#include "DataStruct.h"
 
-std::string fedorova::changeKeyToBinary(unsigned long long key)
+std::ostream& fedorova::operator<<(std::ostream& os, const ULLBinaryO& dest)
 {
-  std::string result;
-
-  if (key == 0)
+  std::ostream::sentry sentry(os);
+  if (!sentry)
   {
-    return "0b0";
+    return os;
   }
-
-  for (int i = 63; i >= 0; --i)
+  if (dest.ref != 0)
   {
-    result += ((key >> i) & 1) ? '1' : '0';
+    os << "0" << dest.ref;
   }
-
-  size_t firstIndex = result.find('1');
-  if (firstIndex == std::string::npos)
+  else
   {
-    return "0b0";
+    os << dest.ref;
   }
-
-  result = result.substr(firstIndex);
-
-  if (result.length() == 1)
-  {
-    result = "0" + result;
-  }
-
-  return "0b" + result;
+  return os;
 }
 
 std::istream& fedorova::operator>>(std::istream& in, DelimiterIO&& data)
@@ -63,12 +51,12 @@ std::istream& fedorova::operator>>(std::istream& is, ULLLiteralIO&& dest)
   is >> dest.ref;
   if (is)
   {
-    is >> DelimiterIO{ 'u' } >> DelimiterIO{ 'l' } >> DelimiterIO{ 'l' } >> DelimiterIO{ ':' };
+    is >> DelimiterIO{ 'u' } >> DelimiterIO{ 'l' } >> DelimiterIO{ 'l' };
   }
   return is;
 }
 
-std::istream& fedorova::operator>>(std::istream& is, ULLBinaryIO&& data)
+std::istream& fedorova::operator>>(std::istream& is, ULLBinaryI&& data)
 {
   std::istream::sentry sentry(is);
   if (!sentry)
@@ -76,36 +64,7 @@ std::istream& fedorova::operator>>(std::istream& is, ULLBinaryIO&& data)
     return is;
   }
 
-  char c = 0;
-  unsigned long long number = 0;
-  is >> DelimiterIO{ '0' } >> c;
-
-  if (c != 'b' && c != 'B')
-  {
-    is.setstate(std::ios::failbit);
-    return is;
-  }
-
-  while (is >> c)
-  {
-    if (c == '1' || c == '0')
-    {
-      number = (number << 1) + (c - '0');
-    }
-    else
-    {
-      break;
-    }
-  }
-
-  if (c == ':')
-  {
-    data.ref = number;
-  }
-  else
-  {
-    is.setstate(std::ios::failbit);
-  }
+  is >> DelimiterIO{ '0' } >> DelimiterIO{ 'b' } >> data.ref;
 
   return is;
 }
@@ -124,8 +83,6 @@ std::istream& fedorova::operator>>(std::istream& is, StringIO&& dest)
     is.setstate(std::ios::failbit);
   }
 
-  is >> DelimiterIO{ ':' };
-
   return is;
 }
 
@@ -137,7 +94,7 @@ std::istream& fedorova::operator>>(std::istream& is, LabelIO&& dest)
     return is;
   }
 
-  for (char exp_char : dest.exp)
+  for (char exp_char:dest.exp)
   {
     char c;
     is >> c;
@@ -159,33 +116,35 @@ std::istream& fedorova::operator>>(std::istream& is, DataStruct& data)
   }
 
   DataStruct temp;
-
-  is >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-
-  for (size_t i = 0; i < 3; i++)
   {
-    std::string key;
-    is >> key;
-    if (key == "key1")
+    bool key1 = false, key2 = false, key3 = false;
+    is >> DelimiterIO{ '(' };
+    while (is && (key1 == false || key2 == false || key3 == false))
     {
-      is >> ULLLiteralIO{ temp.key1 };
+      std::string key;
+      is >> key;
+      if (key1 == false && key == ":key1")
+      {
+        is >> ULLLiteralIO{ temp.key1 };
+        key1 = true;
+      }
+      else if (key2 == false && key == ":key2")
+      {
+        is >> ULLBinaryI{ temp.key2 };
+        key2 = true;
+      }
+      else if (key3 == false && key == ":key3")
+      {
+        is >> StringIO{ temp.key3 };
+        key3 = true;
+      }
+      else
+      {
+        is.setstate(std::ios::failbit);
+      }
     }
-    else if (key == "key2")
-    {
-      is >> ULLBinaryIO{ temp.key2 };
-    }
-    else if (key == "key3")
-    {
-      is >> StringIO{ temp.key3 };
-    }
-    else
-    {
-      is.setstate(std::ios::failbit);
-      return is;
-    }
+    is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
   }
-
-  is >> DelimiterIO{ ')' };
 
   if (is)
   {
@@ -203,13 +162,13 @@ std::ostream& fedorova::operator<<(std::ostream& out, const fedorova::DataStruct
     return out;
   }
   IoGuard fmtguard(out);
-  out << "(:key1 " << data.key1 << "ull:"
-      << "key2 " << changeKeyToBinary(data.key2) << ":"
-      << "key3 \"" << data.key3 << "\":)";
+  out << "(:key1 " << data.key1 << "ull:";
+  out << "key2 " << "0b" << ULLBinaryO{ data.key2 } << ":";
+  out << "key3 \"" << data.key3 << "\":)";
   return out;
 }
 
-fedorova::IoGuard::IoGuard(std::basic_ios< char >& s) :
+fedorova::IoGuard::IoGuard(std::basic_ios<char>& s) :
   s_(s),
   width_(s.width()),
   fill_(s.fill()),
