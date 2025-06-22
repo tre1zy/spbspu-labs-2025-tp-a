@@ -65,9 +65,7 @@ namespace gavrilova {
       }
       temp_points.push_back(p);
     }
-
-    is >> std::ws;
-
+    
     int next_char = is.peek();
 
     if (next_char != '\n' && next_char != EOF) {
