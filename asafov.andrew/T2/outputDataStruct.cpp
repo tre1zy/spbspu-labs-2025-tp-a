@@ -18,7 +18,7 @@ namespace
       os << "0b0";
       return;
     }
-    
+
     os << "0b0";
     bool leadingZero = true;
     for (int i = sizeof(num) * 8 - 1; i >= 0; --i)
