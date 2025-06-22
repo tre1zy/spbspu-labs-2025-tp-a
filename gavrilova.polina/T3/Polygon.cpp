@@ -77,7 +77,7 @@ namespace gavrilova {
     if (!sentry) {
       return os;
     }
-    IOStreamGuard guard(out);
+    IOStreamGuard guard(os);
     os << polygon.points.size() << " ";
     std::copy(
         polygon.points.begin(), polygon.points.end(),

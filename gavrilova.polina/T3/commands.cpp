@@ -9,51 +9,90 @@
 namespace {
 
   struct AreaTransformFunctor {
-    double operator()(const Polygon& p) const { return getArea(p); }
+    double operator()(const gavrilova::Polygon& p) const
+    {
+      return gavrilova::getArea(p);
+    }
   };
+
   struct OddAreaTransformFunctor {
-    double operator()(const Polygon& p) const { return hasOddVertices(p) ? getArea(p) : 0.0; }
+    double operator()(const gavrilova::Polygon& p) const
+    {
+      return gavrilova::hasOddVertices(p) ? gavrilova::getArea(p) : 0.0;
+    }
   };
+
   struct EvenAreaTransformFunctor {
-    double operator()(const Polygon& p) const { return hasEvenVertices(p) ? getArea(p) : 0.0; }
+    double operator()(const gavrilova::Polygon& p) const
+    {
+      return gavrilova::hasEvenVertices(p) ? gavrilova::getArea(p) : 0.0;
+    }
   };
+
   struct SpecificVertexAreaTransformFunctor {
     size_t num_vertices;
+
     explicit SpecificVertexAreaTransformFunctor(size_t n):
       num_vertices(n)
     {}
-    double operator()(const Polygon& p) const { return p.points.size() == num_vertices ? getArea(p) : 0.0; }
+
+    double operator()(const gavrilova::Polygon& p) const
+    {
+      return p.points.size() == num_vertices ? gavrilova::getArea(p) : 0.0;
+    }
   };
 
   struct IsOddPredicate {
-    bool operator()(const Polygon& p) const { return hasOddVertices(p); }
+    bool operator()(const gavrilova::Polygon& p) const
+    {
+      return gavrilova::hasOddVertices(p);
+    }
   };
+
   struct IsEvenPredicate {
-    bool operator()(const Polygon& p) const { return hasEvenVertices(p); }
+    bool operator()(const gavrilova::Polygon& p) const
+    {
+      return gavrilova::hasEvenVertices(p);
+    }
   };
+
   struct HasNVertexesPredicate {
     size_t num_vertices;
+
     explicit HasNVertexesPredicate(size_t n):
       num_vertices(n)
     {}
-    bool operator()(const Polygon& p) const { return p.points.size() == num_vertices; }
+
+    bool operator()(const gavrilova::Polygon& p) const
+    {
+      return p.points.size() == num_vertices;
+    }
   };
 
   struct AreaComparator {
-    bool operator()(const Polygon& a, const Polygon& b) const { return getArea(a) < getArea(b); }
+    bool operator()(const gavrilova::Polygon& a, const gavrilova::Polygon& b) const
+    {
+      return gavrilova::getArea(a) < gavrilova::getArea(b);
+    }
   };
+
   struct VertexesComparator {
-    bool operator()(const Polygon& a, const Polygon& b) const { return a.points.size() < b.points.size(); }
+    bool operator()(const gavrilova::Polygon& a, const gavrilova::Polygon& b) const
+    {
+      return a.points.size() < b.points.size();
+    }
   };
 
   struct IsPermutationPredicate {
-    Polygon ref_polygon;
-    explicit IsPermutationPredicate(const Polygon& p):
+    gavrilova::Polygon ref_polygon;
+
+    explicit IsPermutationPredicate(const gavrilova::Polygon& p):
       ref_polygon(p)
     {
       std::sort(ref_polygon.points.begin(), ref_polygon.points.end());
     }
-    bool operator()(const Polygon& p) const
+
+    bool operator()(const gavrilova::Polygon& p) const
     {
       if (p.points.size() != ref_polygon.points.size()) {
         return false;
@@ -66,12 +105,14 @@ namespace {
 
   struct IsLessAreaPredicate {
     double ref_area;
-    explicit IsLessAreaPredicate(const Polygon& p):
-      ref_area(getArea(p))
+
+    explicit IsLessAreaPredicate(const gavrilova::Polygon& p):
+      ref_area(gavrilova::getArea(p))
     {}
-    bool operator()(const Polygon& p) const
+
+    bool operator()(const gavrilova::Polygon& p) const
     {
-      return getArea(p) < ref_area;
+      return gavrilova::getArea(p) < ref_area;
     }
   };
 

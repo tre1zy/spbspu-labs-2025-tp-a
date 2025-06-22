@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
       if (it == command_map.end()) {
         throw std::invalid_argument("<INVALID COMMAND>");
       }
-      gavrilova::StreamGuard guard(std::cout);
+      gavrilova::IOStreamGuard guard(std::cout);
       it->second(polygons, std::cin, std::cout);
       std::cout << "\n";
     } catch (const std::exception& e) {

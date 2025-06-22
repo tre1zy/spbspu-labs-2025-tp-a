@@ -21,7 +21,6 @@ namespace gavrilova {
     if (!sentry) {
       return is;
     }
-    IOStreamGuard guard(out);
     char open_bracket = 0, separator = 0, close_bracket = 0;
     int x = 0, y = 0;
     is >> open_bracket >> x >> separator >> y >> close_bracket;
@@ -39,7 +38,7 @@ namespace gavrilova {
     if (!sentry) {
       return os;
     }
-    IOStreamGuard guard(out);
+    IOStreamGuard guard(os);
     os << "(" << point.x << ";" << point.y << ")";
     return os;
   }
