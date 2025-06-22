@@ -6,92 +6,62 @@ namespace
   void skipWhitespace(std::istream& in)
   {
     while (std::isspace(in.peek()))
-        {
-            in.ignore();
-        }
+    {
+      in.ignore();
+    }
   }
 
   bool expect(std::istream& in, char expected)
   {
     skipWhitespace(in);
-    if (in.peek() != expected)
-    {
-      in.setstate(std::ios::failbit);
-      return false;
-    }
+    if (in.peek() != expected) return false;
     in.ignore();
     return true;
   }
 
-  unsigned long long parseULLBin(std::istream& in)
+  bool parseULLBin(std::istream& in, unsigned long long& result)
   {
-    if (!expect(in, '0'))
-    {
-      return 0;
-    }
-    if (!expect(in, 'b'))
-    {
-      return 0;
-    }
+    if (!expect(in, '0')) return false;
+    if (!expect(in, 'b')) return false;
 
-    unsigned long long result = 0;
+    result = 0;
+    bool hasDigits = false;
     while (in.peek() == '0' || in.peek() == '1')
     {
       result = (result << 1) | (in.get() - '0');
+      hasDigits = true;
     }
-    return result;
+    return hasDigits;
   }
 
-  std::complex<double> parseCmpLsp(std::istream& in)
+  bool parseCmpLsp(std::istream& in, std::complex< double >& result)
   {
-    if (!expect(in, '#'))
-    {
-      return {0.0, 0.0};
-    }
-    if (!expect(in, 'c'))
-    {
-      return {0.0, 0.0};
-    }
-    if (!expect(in, '('))
-    {
-      return {0.0, 0.0};
-    }
+    if (!expect(in, '#')) return false;
+    if (!expect(in, 'c')) return false;
+    if (!expect(in, '(')) return false;
 
-    double real = 0.0;
-    in >> real;
+    double real, imag;
+    in >> real >> imag;
+    if (!in) return false;
 
-    double imag = 0.0;
-    in >> imag;
+    if (!expect(in, ')')) return false;
 
-    if (!expect(in, ')'))
-    {
-      return {0.0, 0.0};
-    }
-
-    return {real, imag};
+    result = {real, imag};
+    return true;
   }
 
-  std::string parseQuotedString(std::istream& in)
+  bool parseQuotedString(std::istream& in, std::string& result)
   {
-    if (!expect(in, '"'))
-    {
-      return "";
-    }
+    if (!expect(in, '"')) return false;
 
-    std::string result;
+    result.clear();
     char c;
     while (in.get(c) && c != '"')
     {
       result += c;
     }
 
-    if (c != '"')
-    {
-      in.setstate(std::ios::failbit);
-      return "";
-    }
-
-    return result;
+    return c == '"';
   }
 }
 
@@ -99,12 +69,9 @@ std::istream& asafov::operator>>(std::istream& in, DataStruct& data)
 {
   DataStruct temp;
 
-  if (!expect(in, '('))
+  if (!expect(in, '(') || !expect(in, ':'))
   {
-    return in;
-  }
-  if (!expect(in, ':'))
-  {
+    in.setstate(std::ios::failbit);
     return in;
   }
 
@@ -116,57 +83,39 @@ std::istream& asafov::operator>>(std::istream& in, DataStruct& data)
     return in;
   }
 
-  temp.key1 = parseULLBin(in);
-  if (temp.key1 == 0 && in.peek() != '0')
+  if (!parseULLBin(in, temp.key1))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  if (!expect(in, ':'))
-  {
-    return in;
-  }
-  std::string key2_tag;
-  in >> key2_tag;
-  if (key2_tag != "key2" || !expect(in, ' '))
+  if (!expect(in, ':') || !(in >> key1_tag) || key1_tag != "key2" || !expect(in, ' '))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  temp.key2 = parseCmpLsp(in);
-  if (temp.key2 == std::complex<double>{0.0, 0.0})
+  if (!parseCmpLsp(in, temp.key2))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  if (!expect(in, ':'))
-  {
-    return in;
-  }
-  std::string key3_tag;
-  in >> key3_tag;
-  if (key3_tag != "key3" || !expect(in, ' '))
+  if (!expect(in, ':') || !(in >> key1_tag) || key1_tag != "key3" || !expect(in, ' '))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  temp.key3 = parseQuotedString(in);
-  if (temp.key3.empty())
+  if (!parseQuotedString(in, temp.key3))
   {
     in.setstate(std::ios::failbit);
     return in;
   }
 
-  if (!expect(in, ':'))
+  if (!expect(in, ':') || !expect(in, ')'))
   {
-    return in;
-  }
-  if (!expect(in, ')'))
-  {
+    in.setstate(std::ios::failbit);
     return in;
   }
 
