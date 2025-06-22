@@ -376,7 +376,7 @@ void kiselev::doSaveDict(std::istream& in, std::ostream& out, const Dicts& dicts
   file << dictName << "\n";
   Dict dict = dictIt->second;
   out << dictName << '\n';
-  std::for_each(dictIt->second.begin(), dictIt->second.end(), DictPrinter{ out });
+  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator< std::string >(out), DictPrinter{ out });
   file << "\n";
 }
 
