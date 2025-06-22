@@ -29,5 +29,20 @@ namespace voronina
   bool isThereRightAngleInPolygon(const Polygon& shape);
   Point getSide(const Point& p1, const Point& p2);
   bool isTrue(bool element);
+
+  void getEven(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getOdd(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getMean(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getVertexes(const std::vector< Polygon > &shapes, std::ostream &out, int vertexes);
+
+  void getAreaMax(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getVertexesMax(const std::vector< Polygon > &shapes, std::ostream &out);
+
+  void getAreaMin(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getVertexesMin(const std::vector< Polygon > &shapes, std::ostream &out);
+
+  void getEvenCount(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getOddCount(const std::vector< Polygon > &shapes, std::ostream &out);
+  void getVertexesCount(const std::vector< Polygon > &shapes, std::ostream &out, int vertexes);
 }
 #endif
