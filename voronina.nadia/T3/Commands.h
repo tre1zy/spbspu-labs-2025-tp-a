@@ -12,6 +12,6 @@ namespace voronina
   void min(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
   void count(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
   void maxseq(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
-  void rightshapes(const std::vector< Polygon >& shapes, std::istream& in, std::ostream& out);
+  void rightshapes(const std::vector< Polygon >& shapes, std::ostream& out);
 }
 #endif

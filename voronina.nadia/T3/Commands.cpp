@@ -146,7 +146,7 @@ void voronina::maxseq(const std::vector<Polygon> &shapes, std::istream &in, std:
   out << *std::max_element(supVector.cbegin(), supVector.cend());
 }
 
-void voronina::rightshapes(const std::vector<Polygon> &shapes, std::istream &in, std::ostream &out)
+void voronina::rightshapes(const std::vector<Polygon> &shapes, std::ostream &out)
 {
   out << std::count_if(shapes.cbegin(), shapes.cend(), isThereRightAngleInPolygon);
 }
