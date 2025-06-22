@@ -18,23 +18,25 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::vector< Polygon > polygons;
-  std::vector< Line > lines;
+  std::vector< amine::Polygon > polygons;
+  std::vector< amine::Line > lines;
 
-  std::copy(std::istream_iterator< Line >(infile), std::istream_iterator< Line >(), std::back_inserter(lines));
+  std::copy(std::istream_iterator< amine::Line >(infile), std::istream_iterator< amine::Line >(),
+            std::back_inserter(lines));
 
-  std::transform(lines.begin(), lines.end(), std::back_inserter(polygons), [](const Line& line) {
-    Polygon poly;
-    if (!line.content.empty() && parse_polygon(line.content, poly) && poly.points.size() >= 3)
+  std::transform(lines.begin(), lines.end(), std::back_inserter(polygons), [](const amine::Line& line) {
+    amine::Polygon poly;
+    if (!line.content.empty() && amine::parse_polygon(line.content, poly) && poly.points.size() >= 3)
     {
       return poly;
     }
-    return Polygon{};
+    return amine::Polygon{};
   });
 
-  polygons.erase(std::remove_if(polygons.begin(), polygons.end(), [](const Polygon& p) { return p.points.empty(); }),
-                 polygons.end());
+  polygons.erase(
+    std::remove_if(polygons.begin(), polygons.end(), [](const amine::Polygon& p) { return p.points.empty(); }),
+    polygons.end());
 
-  process_commands(polygons);
+  amine::process_commands(polygons);
   return 0;
 }

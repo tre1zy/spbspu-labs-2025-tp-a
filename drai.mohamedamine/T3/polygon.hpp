@@ -5,41 +5,46 @@
 #include <string>
 #include <vector>
 
-struct Point
+namespace amine
 {
-  int x;
-  int y;
-  Point(int x_val = 0, int y_val = 0):
-    x(x_val),
-    y(y_val)
-  {}
-};
 
-struct Polygon
-{
-  std::vector< Point > points;
-};
+  struct Point
+  {
+    int x;
+    int y;
+    Point(int x_val = 0, int y_val = 0):
+      x(x_val),
+      y(y_val)
+    {}
+  };
 
-struct Line
-{
-  std::string content;
-};
+  struct Polygon
+  {
+    std::vector< Point > points;
+  };
 
-std::istream& operator>>(std::istream& is, Line& line);
+  struct Line
+  {
+    std::string content;
+  };
 
-Point operator-(const Point& a, const Point& b);
-int dot(const Point& a, const Point& b);
-int cross(const Point& a, const Point& b);
+  std::istream& operator>>(std::istream& is, Line& line);
 
-double compute_area(const Polygon& poly);
-bool is_rectangle(const Polygon& poly);
-long long orient(const Point& p, const Point& q, const Point& r);
-bool on_segment(const Point& p, const Point& q, const Point& r);
-bool seg_intersect(const Point& p1, const Point& q1, const Point& p2, const Point& q2);
-bool point_in_polygon(const Point& pt, const Polygon& poly);
-bool polygons_intersect(const Polygon& a, const Polygon& b);
-bool parse_polygon(const std::string& str, Polygon& poly);
+  Point operator-(const Point& a, const Point& b);
+  int dot(const Point& a, const Point& b);
+  int cross(const Point& a, const Point& b);
 
-void process_commands(std::vector< Polygon >& polygons);
+  double compute_area(const Polygon& poly);
+  bool is_rectangle(const Polygon& poly);
+  long long orient(const Point& p, const Point& q, const Point& r);
+  bool on_segment(const Point& p, const Point& q, const Point& r);
+  bool seg_intersect(const Point& p1, const Point& q1, const Point& p2, const Point& q2);
+  bool point_in_polygon(const Point& pt, const Polygon& poly);
+  bool polygons_intersect(const Polygon& a, const Polygon& b);
+  bool parse_polygon(const std::string& str, Polygon& poly);
+
+  void process_commands(std::vector< Polygon >& polygons);
+
+}
 
 #endif
