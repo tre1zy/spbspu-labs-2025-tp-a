@@ -22,17 +22,17 @@ namespace
     return poly.points.size() == s;
   }
 
-  size_t countOdd(const std::vector< finaev::Polygon >& shapes) 
+  size_t countOdd(const std::vector< finaev::Polygon >& shapes)
   {
     return std::count_if(shapes.begin(), shapes.end(), isOdd);
   }
 
-  size_t countEven(const std::vector< finaev::Polygon >& shapes) 
+  size_t countEven(const std::vector< finaev::Polygon >& shapes)
   {
     return std::count_if(shapes.begin(), shapes.end(), isEven);
   }
 
-  size_t countVertexes(const std::vector< finaev::Polygon >& shapes, size_t num) 
+  size_t countVertexes(const std::vector< finaev::Polygon >& shapes, size_t num)
   {
     auto compare = std::bind(isNumOfVertex, std::placeholders::_1, num);
     return std::count_if(shapes.begin(), shapes.end(), compare);
@@ -54,12 +54,12 @@ namespace
     return std::abs(res) / 2.0;
   }
 
-  double areaOdd(const std::vector< finaev::Polygon >& shapes) 
+  double areaOdd(const std::vector< finaev::Polygon >& shapes)
   {
     double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i) 
+    for (size_t i = 0; i < shapes.size(); ++i)
     {
-      if (isOdd(shapes[i])) 
+      if (isOdd(shapes[i]))
       {
         res += areaOnePoly(shapes[i]);
       }
@@ -67,12 +67,12 @@ namespace
     return res;
   }
 
-  double areaEven(const std::vector< finaev::Polygon >& shapes) 
+  double areaEven(const std::vector< finaev::Polygon >& shapes)
   {
     double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i) 
+    for (size_t i = 0; i < shapes.size(); ++i)
     {
-      if (isEven(shapes[i])) 
+      if (isEven(shapes[i]))
       {
         res += areaOnePoly(shapes[i]);
       }
@@ -80,26 +80,26 @@ namespace
     return res;
   }
 
-  double areaMean(const std::vector< finaev::Polygon >& shapes) 
+  double areaMean(const std::vector< finaev::Polygon >& shapes)
   {
     if (shapes.empty())
     {
       throw std::out_of_range("<INVALID COMMAND>");
     }
     double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i) 
+    for (size_t i = 0; i < shapes.size(); ++i)
     {
       res += areaOnePoly(shapes[i]);
     }
     return res / shapes.size();
   }
 
-  double areaVertexes(const std::vector< finaev::Polygon >& shapes, size_t num) 
+  double areaVertexes(const std::vector< finaev::Polygon >& shapes, size_t num)
   {
     double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i) 
+    for (size_t i = 0; i < shapes.size(); ++i)
     {
-      if (isNumOfVertex(shapes[i], num)) 
+      if (isNumOfVertex(shapes[i], num))
       {
         res += areaOnePoly(shapes[i]);
       }
@@ -116,33 +116,33 @@ namespace
   {
     return areaOnePoly(poly1) < areaOnePoly(poly2);
   }
-  
+
   bool isDigit(const std::string& s)
   {
     return !s.empty() && std::all_of(s.begin(), s.end(), isdigit);
   }
 
-  void maxArea(const std::vector< finaev::Polygon >& shapes, std::ostream& out) 
+  void maxArea(const std::vector< finaev::Polygon >& shapes, std::ostream& out)
   {
     auto max = (*std::max_element(shapes.begin(), shapes.end(), compareArea));
     finaev::StreamGuard guard(out);
     out << std::fixed << std::setprecision(1) << areaOnePoly(max);
   }
 
-  void minArea(const std::vector< finaev::Polygon >& shapes, std::ostream& out) 
+  void minArea(const std::vector< finaev::Polygon >& shapes, std::ostream& out)
   {
     auto min = (*std::max_element(shapes.begin(), shapes.end(), compareArea));
     finaev::StreamGuard guard(out);
     out << std::fixed << std::setprecision(1) << areaOnePoly(min);
   }
 
-  void maxVertexes(const std::vector< finaev::Polygon >& shapes, std::ostream& out) 
+  void maxVertexes(const std::vector< finaev::Polygon >& shapes, std::ostream& out)
   {
     auto max = (*std::max_element(shapes.begin(), shapes.end(), compareArea));
     out << max.points.size();
   }
 
-  void minVertexes(const std::vector< finaev::Polygon >& shapes, std::ostream& out) 
+  void minVertexes(const std::vector< finaev::Polygon >& shapes, std::ostream& out)
   {
     auto min = (*std::min_element(shapes.begin(), shapes.end(), compareVertex));
     out << min.points.size();
@@ -190,23 +190,23 @@ void finaev::count(std::istream& in, std::ostream& out, const std::vector< Polyg
   std::map< std::string, std::function< size_t() > > cmd;
   cmd["ODD"] = std::bind(countOdd, std::cref(shapes));
   cmd["EVEN"] = std::bind(countEven, std::cref(shapes));
-  try 
+  try
   {
-    if (isDigit(substr)) 
+    if (isDigit(substr))
     {
       size_t s = std::stoul(substr);
-      if (s < 3) 
+      if (s < 3)
       {
         throw std::invalid_argument("<INVALID COMMAND>");
       }
       out << countVertexes(shapes, s);
-    } 
-    else 
+    }
+    else
     {
       out << cmd.at(substr)();
     }
-  } 
-  catch (const std::out_of_range&) 
+  }
+  catch (const std::out_of_range&)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
@@ -222,23 +222,23 @@ void finaev::area(std::istream& in, std::ostream& out, const std::vector< Polygo
   cmd["ODD"] = std::bind(areaOdd, std::cref(shapes));
   cmd["EVEN"] = std::bind(areaEven, std::cref(shapes));
   cmd["MEAN"] = std::bind(areaMean, std::cref(shapes));
-  try 
+  try
   {
-    if (isDigit(substr)) 
+    if (isDigit(substr))
     {
       size_t s = std::stoul(substr);
-      if (s < 3) 
+      if (s < 3)
       {
         throw std::invalid_argument("<INVALID COMMAND>");
       }
       out << areaVertexes(shapes, s);
-    } 
-    else 
+    }
+    else
     {
       out << cmd.at(substr)();
     }
-  } 
-  catch (const std::out_of_range&) 
+  }
+  catch (const std::out_of_range&)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
@@ -255,11 +255,11 @@ void finaev::max(std::istream& in, std::ostream& out, const std::vector< Polygon
   std::map< std::string, std::function< void() > > cmd;
   cmd["AREA"] = std::bind(maxArea, std::cref(shapes), std::ref(out));
   cmd["VERTEXES"] = std::bind(maxVertexes, std::cref(shapes), std::ref(out));
-  try 
+  try
   {
     cmd.at(substr)();
-  } 
-  catch (const std::out_of_range&) 
+  }
+  catch (const std::out_of_range&)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
@@ -276,11 +276,11 @@ void finaev::min(std::istream& in, std::ostream& out, const std::vector< Polygon
   std::map< std::string, std::function< void() > > cmd;
   cmd["AREA"] = std::bind(minArea, std::cref(shapes), std::ref(out));
   cmd["VERTEXES"] = std::bind(minVertexes, std::cref(shapes), std::ref(out));
-  try 
+  try
   {
     cmd.at(substr)();
-  } 
-  catch (const std::out_of_range&) 
+  }
+  catch (const std::out_of_range&)
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
@@ -331,9 +331,10 @@ void finaev::same(std::istream& in, std::ostream& out, const std::vector< Polygo
   out << std::count_if(shapes.begin(), shapes.end(), same);
 }
 
-std::map< std::string, std::function< void() > > finaev::createCommandsHandler(std::istream& in, std::ostream& out, std::vector< Polygon >& shapes) 
+using CmdMap = std::map< std::string, std::function< void() > >;
+CmdMap finaev::createCommandsHandler(std::istream& in, std::ostream& out, std::vector< Polygon >& shapes) 
 {
-  std::map< std::string, std::function< void() > > commands;
+  CmdMap commands;
   commands["AREA"] = std::bind(finaev::area, std::ref(in), std::ref(out), std::cref(shapes));
   commands["COUNT"] = std::bind(finaev::count, std::ref(in), std::ref(out), std::cref(shapes));
   commands["MAX"] = std::bind(finaev::max, std::ref(in), std::ref(out), std::cref(shapes));
