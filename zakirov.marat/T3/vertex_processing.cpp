@@ -20,6 +20,11 @@ void zakirov::count(const std::list< Polygon > & plgns, std::istream & in, std::
   else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
     size_t a = std::stoi(subcommand);
+    if (std::none_of(plgns.begin(), plgns.end(), std::bind(equal_vertexes_pred, std::placeholders::_1, a)))
+    {
+      throw std::logic_error("There are no figures with such a number of vertices");
+    }
+
     out << std::count_if(plgns.begin(), plgns.end(), std::bind(equal_vertexes_pred, std::placeholders::_1, a));
   }
 }

@@ -26,16 +26,19 @@ void zakirov::process_area(const std::list< Polygon > & plgns, std::istream & in
     std::transform(plgns.begin(), plgns.end(), std::back_inserter(areas), count_area);
     size_t size = areas.size();
     Guardian guard(out);
-    out << std::fixed << std::setprecision(1) << std::accumulate(areas.begin(), areas.end(), 0.0) / size;
+    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
+    if (result != 0.0)
+    {
+      out << std::fixed << std::setprecision(1) << std::accumulate(areas.begin(), areas.end(), 0.0) / size;
+    }
+    else
+    {
+      out << std::fixed << std::setprecision(1) << result;
+    }
   }
   else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
     size_t a = std::stoull(subcommand);
-    if (std::none_of(plgns.begin(), plgns.end(), std::bind(equal_vertexes_pred, std::placeholders::_1, a)))
-    {
-      throw std::logic_error("There are no figures with such a number of vertices");
-    }
-
     std::vector< Polygon > polygons;
     std::copy_if(plgns.begin(), plgns.end(),  std::back_inserter(polygons), std::bind(equal_vertexes_pred, std::placeholders::_1, a));
     std::vector< double > areas;

@@ -62,10 +62,14 @@ std::istream & zakirov::operator>>(std::istream & in, Polygon & polygon)
   size_t point_quantity = 0;
   in >> point_quantity;
   Point inserting_point{0, 0};
-  for (size_t i = 0; i < point_quantity; ++i)
+  while (in.peek() != '\n' && in >> inserting_point)
   {
-    in >> inserting_point;
     polygon_temp.points_.push_back(inserting_point);
+  }
+
+  if (polygon_temp.points_.size() != point_quantity || polygon_temp.points_.size() < 3)
+  {
+    in.setstate(std::ios::failbit);
   }
 
   if (in)
