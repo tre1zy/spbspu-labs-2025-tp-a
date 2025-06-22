@@ -272,10 +272,6 @@ namespace
 
 void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (plgs.empty())
-  {
-    throw std::invalid_argument("Empty polygons");
-  }
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
@@ -328,10 +324,6 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
 
 void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
 {
-  if (plgs.empty())
-  {
-    throw std::invalid_argument("Empty polygons");
-  }
   std::string param;
   in >> param;
   static std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
