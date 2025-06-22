@@ -33,6 +33,13 @@ namespace
     }
   };
 
+  bool intersectionCheck(const geom::Polygon& polygon, const geom::Polygon& other)
+  {
+    auto polygonMinMax = std::minmax_element(polygon.points.cbegin(), polygon.points.cend());
+    auto otherMinMax = std::minmax_element(other.points.cbegin(), other.points.cend());
+    return !(*polygonMinMax.second < *otherMinMax.first || *polygonMinMax.first > *otherMinMax.second);
+  }
+
   size_t countEvenVertices(const std::vector< Polygon >& polygons)
   {
     return std::count_if(polygons.begin(), polygons.end(), hasEvenVertices);
@@ -135,43 +142,6 @@ namespace
     auto min_poly = *std::min_element(polygons.begin(), polygons.end(), compareByArea);
     os << std::fixed << std::setprecision(1) << geom::getPolygonArea(min_poly);
   }
-
-  struct XComparator
-  {
-    bool operator()(const geom::Point& a, const geom::Point& b) const
-    {
-      return a.x < b.x;
-    }
-  };
-
-  struct YComparator
-  {
-    bool operator()(const geom::Point& a, const geom::Point& b) const
-    {
-      return a.y < b.y;
-    }
-  };
-
-  struct IntersectionChecker
-  {
-    const Polygon& ref;
-
-    bool operator()(const Polygon& plg) const
-    {
-      XComparator xComp;
-      YComparator yComp;
-
-      auto minmaxX1 = std::minmax_element(ref.points.begin(), ref.points.end(), xComp);
-      auto minmaxY1 = std::minmax_element(ref.points.begin(), ref.points.end(), yComp);
-      auto minmaxX2 = std::minmax_element(plg.points.begin(), plg.points.end(), xComp);
-      auto minmaxY2 = std::minmax_element(plg.points.begin(), plg.points.end(), yComp);
-
-      return !(minmaxX1.second->x < minmaxX2.first->x ||
-        minmaxX2.second->x < minmaxX1.first->x ||
-        minmaxY1.second->y < minmaxY2.first->y ||
-        minmaxY2.second->y < minmaxY1.first->y);
-    }
-  };
 }
 
 void smirnov::printAreaSum(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
@@ -296,33 +266,24 @@ void smirnov::printLessAreaCnt(std::istream& input, const std::vector< Polygon >
   output << std::count_if(polygons.begin(), polygons.end(), std::bind(compareByArea, _1, ref));
 }
 
-bool smirnov::polygonsIntersect(const Polygon& p1, const Polygon& p2)
-{
-  XComparator xComp;
-  YComparator yComp;
-
-  auto minmaxX1 = std::minmax_element(p1.points.begin(), p1.points.end(), xComp);
-  auto minmaxY1 = std::minmax_element(p1.points.begin(), p1.points.end(), yComp);
-  auto minmaxX2 = std::minmax_element(p2.points.begin(), p2.points.end(), xComp);
-  auto minmaxY2 = std::minmax_element(p2.points.begin(), p2.points.end(), yComp);
-
-  return !(minmaxX1.second->x < minmaxX2.first->x ||
-    minmaxX2.second->x < minmaxX1.first->x ||
-    minmaxY1.second->y < minmaxY2.first->y ||
-    minmaxY2.second->y < minmaxY1.first->y);
-}
-
 void smirnov::printIntersectionsCnt(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output)
 {
   Polygon ref;
   input >> ref;
-  if (ref.points.size() < 3)
+  if (!in)
   {
-    throw std::invalid_argument("Invalid polygon");
+    throw std::invalid_argument("Wrong argument");
   }
-
-  size_t count = std::count_if(polygons.begin(), polygons.end(), IntersectionChecker{ ref });
-  output << count;
+  else
+  {
+    std::set< Point > checkForEqualPoints(temp.points.cbegin(), temp.points.cend());
+    if (checkForEqualPoints.size() != temp.points.size())
+    {
+      throw std::invalid_argument("Have equal points");
+    }
+    using namespace std::placeholders;
+    out << std::count_if(polygon.cbegin(), polygon.cend(), std::bind(intersectionCheck, temp, _1));
+  }
 }
 
 
