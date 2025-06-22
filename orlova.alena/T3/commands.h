@@ -2,6 +2,7 @@
 #define COMMANDS_H
 
 #include <iostream>
+#include <functional>
 #include "geom.h"
 
 namespace orlova
@@ -10,9 +11,7 @@ namespace orlova
   double areaPolygon(const Polygon&);
   bool isEven(const Polygon&);
   bool isNum(const Polygon&, size_t);
-  double evenAreaAccumulator(double, const Polygon&);
-  double oddAreaAccumulator(double, const Polygon&);
-  double meanAreaAccumulator(double, const Polygon&);
+  double accumulator(std::function < bool(const Polygon&) >, double, const Polygon&);
   double numAreaAccumulator(double, const Polygon&, size_t);
   bool areaComparator(const Polygon&, const Polygon&);
   bool vertexesComparator(const Polygon&, const Polygon&);
