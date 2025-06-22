@@ -183,7 +183,7 @@ namespace
       size_t start = 0)
   {
     size_t pos = s.find(delim, start);
-    
+
     if (pos == std::string::npos)
     {
       if (start < s.length())
@@ -197,7 +197,7 @@ namespace
     {
       tokens.push_back(s.substr(start, pos - start));
     }
-    
+
     split_recursive(s, delim, tokens, pos + 1);
   }
 
@@ -415,10 +415,10 @@ void mezentsev::loadCommand(DictionarySet& dicts, const std::vector< std::string
   Dictionary dict;
   std::string header;
   std::getline(ifs, header);
-  
+
   std::string line;
   processFileLines(ifs, dict, line);
-  
+
   dicts[tokens[1]] = dict;
 }
 
@@ -487,7 +487,7 @@ void mezentsev::mergeCommand(DictionarySet& dicts, const std::vector< std::strin
 
   auto it1 = dicts.find(tokens[1]);
   auto it2 = dicts.find(tokens[2]);
-  
+
   if (it1 == dicts.end() || it2 == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
@@ -515,7 +515,7 @@ void mezentsev::diffCommand(DictionarySet& dicts, const std::vector< std::string
 
   auto it1 = dicts.find(tokens[1]);
   auto it2 = dicts.find(tokens[2]);
-  
+
   if (it1 == dicts.end() || it2 == dicts.end())
   {
     std::cout << "DICTIONARY NOT FOUND" << std::endl;
