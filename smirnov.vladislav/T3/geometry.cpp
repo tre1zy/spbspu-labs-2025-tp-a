@@ -66,14 +66,7 @@ namespace geom
 
     try
     {
-      std::generate_n(std::back_inserter(tmp), count, [&] {
-        Point p;
-        if (!(in >> p))
-        {
-          throw std::ios_base::failure{ "Error" };
-        }
-        return p;
-        });
+      std::generate_n(std::back_inserter(tmp), count, PointReader{ in });
     }
     catch (const std::ios_base::failure&)
     {
@@ -110,7 +103,7 @@ namespace geom
           in.get();
         }
       }
-    }p
+    }
 
     poly.points = std::move(tmp);
     return in;
