@@ -35,7 +35,7 @@ void zakirov::echo(std::list< Polygon > & plgns, std::istream & in, std::ostream
   in >> subcommand;
   if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
-    int count_vertexes = std::stoi(subcommand);
+    size_t count_vertexes = std::stoull(subcommand);
     if (count_vertexes < 3)
     {
       throw std::invalid_argument("Invalid figure");

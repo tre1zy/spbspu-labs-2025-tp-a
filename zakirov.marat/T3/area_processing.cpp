@@ -35,7 +35,7 @@ void zakirov::process_area(const std::list< Polygon > & plgns, std::istream & in
   }
   else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
-    int a = std::stoi(subcommand);
+    size_t a = std::stoull(subcommand);
     if (std::none_of(plgns.begin(), plgns.end(), std::bind(equal_vertexes_pred, std::placeholders::_1, a)))
     {
       throw std::logic_error("There are no figures with such a number of vertices");
@@ -62,24 +62,27 @@ void zakirov::process_less_area(const std::list< Polygon > & points, std::istrea
   Polygon plgn;
   if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
-    size_t vertexes = std::stoi(subcommand);
-    Point pnt;
-    for (size_t i = 0; i < vertexes; ++i)
+    size_t count_vertexes = std::stoull(subcommand);
+    if (count_vertexes < 3)
     {
-      in >> pnt;
+      throw std::invalid_argument("Invalid figure");
+    }
+
+    Point pnt;
+    while (in.peek() != '\n' && in >> pnt)
+    {
       plgn.points_.push_back(pnt);
     }
-  }
 
-  if (!in)
-  {
-    return;
-  }
+    if (in.fail() || plgn.points_.size() != count_vertexes)
+    {
+      throw std::invalid_argument("Invalid figure");
+    }
 
-  double base_area = count_area(plgn);
-  std::vector< double > areas;
-  std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
-  std::vector< double > less_areas;
-  std::copy_if(areas.begin(), areas.end(),  std::back_inserter(less_areas), std::bind(less_area_pred, base_area, std::placeholders::_1));
-  out << std::fixed << std::setprecision(1) << std::accumulate(less_areas.begin(), less_areas.end(), 0.0);
+    double base_area = count_area(plgn);
+    std::vector< double > areas;
+    std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
+    std::vector< double > less_areas;
+    out << std::count_if(areas.begin(), areas.end(), std::bind(less_area_pred, base_area, std::placeholders::_1));
+  }
 }
