@@ -328,8 +328,10 @@ void petrov::rmecho(std::vector< Polygon > & polygons, std::istream & in, std::o
     auto isAsPrev = std::bind(isEqualPolygon, _2, _1);
     auto andAnd = std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev);
     std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, do_remove.begin(), andAnd);
-    size_t it = 0;
-    std::remove_if(polygons.begin(), polygons.end(), std::bind(removeIfTrue, std::cref(do_remove), std::ref(it)));
+    size_t bool_vector_it = 0;
+    auto confirmRemove = std::bind(removeIfTrue, std::cref(do_remove), std::ref(bool_vector_it));
+    const auto no_space_end = std::remove_if(polygons.begin(), polygons.end(), confirmRemove);
+    polygons.erase(no_space_end, polygons.end());
     out << std::count(do_remove.cbegin(), do_remove.cend(), true);
   }
   else
