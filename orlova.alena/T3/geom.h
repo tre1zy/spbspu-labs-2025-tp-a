@@ -2,6 +2,7 @@
 #define GEOM_H
 
 #include <vector>
+#include <iostream>
 
 namespace orlova
 {

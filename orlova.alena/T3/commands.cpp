@@ -7,6 +7,7 @@
 #include <map>
 #include <functional>
 #include <numeric>
+#include <type_traits>
 #include "geom.h"
 
 double orlova::subArea(const Point& a, const Point& b)
@@ -52,7 +53,7 @@ double orlova::areaEven(const std::vector< Polygon >& polygons)
 double orlova::areaOdd(const std::vector< Polygon >& polygons)
 {
   using namespace std::placeholders;
-  std::function< bool(const Polygon&) > odd = !(isEven);
+  std::function< bool(const Polygon&) > odd = std::not_fn(isEven);
   return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, odd, _1, _2));
 }
 
@@ -63,7 +64,7 @@ double orlova::areaMean(const std::vector< Polygon >& polygons)
   {
     throw std::logic_error("<THERE ARE NO POLYGONS>");
   }
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, 1, _1, _2)) / polygons.size();
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, std::integral_constant< bool, true >, _1, _2)) / polygons.size();
 }
 
 double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
@@ -219,7 +220,8 @@ size_t orlova::countEven(const std::vector< Polygon >& polygons)
 
 size_t orlova::countOdd(const std::vector< Polygon >& polygons)
 {
-  return std::count_if(polygons.begin(), polygons.end(), (!isEven));
+  auto odd = std::not_fn(isEven);
+  return std::count_if(polygons.begin(), polygons.end(), odd);
 }
 
 size_t orlova::countNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
