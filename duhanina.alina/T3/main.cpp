@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-  using namespace duhanina;;
+  using namespace duhanina;
   using isIter = std::istream_iterator< Polygon >;
 
   if (argc != 2)

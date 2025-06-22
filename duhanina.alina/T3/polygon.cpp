@@ -17,11 +17,7 @@ namespace
 
 bool duhanina::operator==(const duhanina::Polygon& lhs, const duhanina::Polygon& rhs)
 {
-  if (lhs.points.size() != rhs.points.size())
-  {
-    return false;
-  }
-  return std::equal(lhs.points.begin(), lhs.points.end(), rhs.points.begin());
+  return lhs.points.size() != rhs.points.size() && std::equal(lhs.points.begin(), lhs.points.end(), rhs.points.begin());
 }
 
 bool duhanina::operator!=(const duhanina::Polygon& lhs, const duhanina::Polygon& rhs)
@@ -31,7 +27,7 @@ bool duhanina::operator!=(const duhanina::Polygon& lhs, const duhanina::Polygon&
 
 std::istream& duhanina::operator>>(std::istream& in, duhanina::Polygon& polygon)
 {
-  std::istream::sentry sentry(in);
+  std::istream::sentry sentry{ in };
   if (!sentry)
   {
     return in;
@@ -43,7 +39,7 @@ std::istream& duhanina::operator>>(std::istream& in, duhanina::Polygon& polygon)
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > points(numPoints);
+  std::vector< Point > points{ numPoints };
   std::copy_n(std::istream_iterator< Point >(in), numPoints, points.begin());
   if (!in || points.size() != numPoints)
   {
@@ -56,9 +52,9 @@ std::istream& duhanina::operator>>(std::istream& in, duhanina::Polygon& polygon)
 
 double duhanina::calculateArea(const duhanina::Polygon& polygon)
 {
-  const auto& points = polygon.points;
-  std::vector< Point > shifted_points(points.begin() + 1, points.end());
+  const auto& points{ polygon.points };
+  std::vector< Point > shifted_points{ points.begin() + 1, points.end() };
   shifted_points.push_back(points[0]);
-  double area = std::inner_product(points.begin(), points.end(), shifted_points.begin(), 0.0, std::plus< double >(), CrossProduct());
+  double area = std::inner_product(points.begin(), points.end(), shifted_points.begin(), 0.0, std::plus< double >{}, CrossProduct{});
   return std::abs(area) / 2.0;
 }

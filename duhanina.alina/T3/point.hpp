@@ -7,8 +7,8 @@ namespace duhanina
 {
   struct Point
   {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
   };
 
   bool operator==(const Point& lhs, const Point& rhs);
