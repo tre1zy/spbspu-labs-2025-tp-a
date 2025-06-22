@@ -13,7 +13,7 @@ namespace mezentsev
   using Translations = std::set< std::string >;
   using Dictionary = std::map< std::string, Translations >;
   using DictionarySet = std::map< std::string, Dictionary >;
-  
+
   std::vector< std::string > split(const std::string& s, char delim);
   void addCommand(DictionarySet& dicts, const std::vector< std::string >& tokens);
   void removeCommand(DictionarySet& dicts, const std::vector< std::string >& tokens);
