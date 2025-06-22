@@ -28,6 +28,11 @@ bool orlova::isEven(const Polygon& polygon)
   return polygon.points.size() % 2 == 0;
 }
 
+bool orlova::isOdd(const Polygon& polygon)
+{
+  return !isEven(polygon);
+}
+
 bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
 {
   return polygon.points.size() == numOfVertexes;
@@ -53,7 +58,7 @@ double orlova::areaEven(const std::vector< Polygon >& polygons)
 double orlova::areaOdd(const std::vector< Polygon >& polygons)
 {
   using namespace std::placeholders;
-  std::function< bool(const Polygon&) > odd = std::not_fn(isEven);
+  std::function< bool(const Polygon&) > odd = isOdd;
   return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator, odd, _1, _2));
 }
 
@@ -221,8 +226,7 @@ size_t orlova::countEven(const std::vector< Polygon >& polygons)
 
 size_t orlova::countOdd(const std::vector< Polygon >& polygons)
 {
-  auto odd = std::not_fn(isEven);
-  return std::count_if(polygons.begin(), polygons.end(), odd);
+  return std::count_if(polygons.begin(), polygons.end(), isOdd);
 }
 
 size_t orlova::countNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)

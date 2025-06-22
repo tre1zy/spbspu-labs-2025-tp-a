@@ -10,6 +10,7 @@ namespace orlova
   double subArea(const Point&, const Point&);
   double areaPolygon(const Polygon&);
   bool isEven(const Polygon&);
+  bool isOdd(const Polygon&);
   bool isNum(const Polygon&, size_t);
   double accumulator(std::function < bool(const Polygon&) >, double, const Polygon&);
   double numAreaAccumulator(double, const Polygon&, size_t);

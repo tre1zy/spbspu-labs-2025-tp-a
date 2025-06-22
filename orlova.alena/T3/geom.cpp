@@ -74,8 +74,8 @@ std::ostream& orlova::operator<<(std::ostream& out, const Polygon& polygon)
     }
     IoGuard guard(out);
     out << polygon.points.size();
-    std::copy_n(polygon.points.begin(), polygon.points.end() - 1, std::ostream_iterator< Point >(out, " "));
-    out << polygon.points[polygon.points.end() - 1];
+    std::copy_n(polygon.points.begin(), polygon.points.size() - 1, std::ostream_iterator< Point >(out, " "));
+    out << polygon.points[polygon.points.size() - 1];
     return out;
 }
 
