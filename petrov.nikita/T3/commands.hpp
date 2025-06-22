@@ -9,7 +9,6 @@ namespace petrov
 {
   double calculateTrapezeArea(const Point & point_1, const Point & point_2);
   double calculateArea(const Polygon & polygon);
-  double calculateAreaIfOdd(const Polygon & polygon);
 
 
   void addIfEven(const std::vector< Polygon > & polygons, std::ostream & out);
@@ -19,6 +18,8 @@ namespace petrov
 
   void area(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out);
 
+
+  size_t getVertexesNum(const Polygon & polygon);
 
   void max_area(const std::vector< Polygon > & polygons, std::ostream & out);
   void max_vertexes(const std::vector< Polygon > & polygons, std::ostream & out);

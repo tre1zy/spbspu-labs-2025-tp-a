@@ -1,25 +1,66 @@
 #include "commands.hpp"
 #include "io_polygon.hpp"
 #include <algorithm>
-#include <functional>
-#include <iostream>
-#include <iomanip>
 #include <numeric>
+#include <cmath>
+#include <functional>
+#include <iomanip>
 #include <map>
 #include <string>
 #include <cctype>
 #include <stdexcept>
+#include <iterator>
 
 namespace
 {
   bool isOdd(const petrov::Polygon & polygon)
   {
-    return polygon.points.size() % 2 == 1;
+    return polygon.points.size() % 2 == 1; 
   }
 
   bool isEven(const petrov::Polygon & polygon)
   {
-    return polygon.points.size() % 2 == 0;
+    return polygon.points.size() % 2 == 0; 
+  }
+
+  bool isRightNumber(const petrov::Polygon & polygon, size_t exp)
+  {
+    return polygon.points.size() == exp;
+  }
+
+  bool isEqualPoints(const petrov::Point & point_1, const petrov::Point & point_2)
+  {
+    return point_1.x == point_2.x && point_1.y == point_2.y;
+  }
+
+  bool isEqualPolygon(const petrov::Polygon & target, const petrov::Polygon & seq)
+  {
+    using namespace std::placeholders;
+    if (target.points.size() == seq.points.size())
+    {
+      std::vector< bool > isSimilarPts(seq.points.size());
+      std::transform(target.points.cbegin(), target.points.cend(), seq.points.cbegin(), isSimilarPts.begin(), isEqualPoints);
+      return std::none_of(isSimilarPts.cbegin(), isSimilarPts.cend(), std::bind(std::equal_to< bool >{}, _1, false));
+    }
+    return false;
+  }
+
+  bool removeIfTrue(const std::vector< bool > & doRemove, size_t & index)
+  {
+    return doRemove[index++];
+  }
+
+  size_t countDuplicatesSequencesLength(bool doCount, size_t & counter)
+  {
+    if (doCount)
+    {
+      return ++counter;
+    }
+    else
+    {
+      counter = 0;
+      return counter;
+    }
   }
 
   bool isDigit(std::string & string)
@@ -43,8 +84,9 @@ double petrov::calculateTrapezeArea(const Point & point_1, const Point & point_2
 
 double petrov::calculateArea(const Polygon & polygon)
 {
+  auto & pts = polygon.points;
   std::vector< double > trapezes_areas(polygon.points.size() - 1);
-  std::transform(polygon.points.cbegin(), polygon.points.cend(), polygon.points.cbegin() + 1, trapezes_areas.begin(), calculateTrapezeArea);
+  std::transform(pts.cbegin(), pts.cend() - 1, pts.cbegin() + 1, trapezes_areas.begin(), calculateTrapezeArea);
   trapezes_areas.push_back(calculateTrapezeArea(polygon.points[polygon.points.size() - 1], polygon.points[0]));
   double result = std::accumulate(trapezes_areas.cbegin(), trapezes_areas.cend(), 0.0);
   return std::abs(result);
@@ -54,8 +96,8 @@ void petrov::addIfEven(const std::vector< Polygon > & polygons, std::ostream & o
 {
   using namespace std::placeholders;
   std::vector< Polygon > even_polygons;
-  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(even_polygons), std::bind(isEven, _1));
-  std::vector< double > sum_area(even_polygons.size());
+  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(even_polygons), isEven);
+  std::vector< double > sum_area(polygons.size());
   std::transform(even_polygons.cbegin(), even_polygons.cend(), sum_area.begin(), calculateArea);
   double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
   out << result;
@@ -65,7 +107,7 @@ void petrov::addIfOdd(const std::vector< Polygon > & polygons, std::ostream & ou
 {
   using namespace std::placeholders;
   std::vector< Polygon > odd_polygons;
-  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(odd_polygons), std::bind(isOdd, _1));
+  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(odd_polygons), isOdd);
   std::vector< double > sum_area(odd_polygons.size());
   std::transform(odd_polygons.cbegin(), odd_polygons.cend(), sum_area.begin(), calculateArea);
   double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
@@ -84,20 +126,18 @@ void petrov::mean(const std::vector< Polygon > & polygons, std::ostream & out)
   out << result / polygons.size();
 }
 
-void petrov::sum(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
+void petrov::sum(size_t & vrtxs_num, const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  if (num_of_vertexes < 3)
+  if (vrtxs_num < 3)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  double result = 0.0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    if (polygons[i].points.size() == num_of_vertexes)
-    {
-      result += calculateArea(polygons[i]);
-    }
-  }
+  using namespace std::placeholders;
+  std::vector< Polygon > proper_polygons(vrtxs_num);
+  std::copy_if(polygons.cbegin(), polygons.cend(), proper_polygons.begin(), std::bind(isRightNumber, _1, vrtxs_num));
+  std::vector< double > sum_area(proper_polygons.size());
+  std::transform(proper_polygons.cbegin(), proper_polygons.cend(), sum_area.begin(), calculateArea);
+  double result = std::accumulate(sum_area.cbegin(), sum_area.cend(), 0.0);
   out << result;
 }
 
@@ -134,20 +174,22 @@ void petrov::area(const std::vector< Polygon > & polygons, std::istream & in, st
   }
 }
 
+size_t petrov::getVertexesNum(const Polygon & polygon)
+{
+  return polygon.points.size();
+}
+
 void petrov::max_area(const std::vector< Polygon > & polygons, std::ostream & out)
 {
   if (polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  double result = calculateArea(polygons[0]);
   StreamGuard outguard(out);
+  std::vector< double > sum_area(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), sum_area.begin(), calculateArea);
   out << std::fixed << std::setprecision(1);
-  for (size_t i = 1; i < polygons.size(); i++)
-  {
-    result = std::max(calculateArea(polygons[i]), result);
-  }
-  out << result;
+  out << *std::max_element(sum_area.cbegin(), sum_area.cend());
 }
 
 void petrov::max_vertexes(const std::vector< Polygon > & polygons, std::ostream & out)
@@ -156,12 +198,9 @@ void petrov::max_vertexes(const std::vector< Polygon > & polygons, std::ostream 
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  size_t max_vertexes = polygons[0].points.size();
-  for (size_t i = 1; i < polygons.size(); i++)
-  {
-    max_vertexes = std::max(polygons[i].points.size(), max_vertexes);
-  }
-  out << max_vertexes;
+  std::vector< size_t > vertexes(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), vertexes.begin(), getVertexesNum);
+  out << *std::max_element(vertexes.cbegin(), vertexes.cend());
 }
 
 void petrov::max(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
@@ -185,24 +224,26 @@ void petrov::max(const std::vector< Polygon > & polygons, std::istream & in, std
 
 void petrov::min_area(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  double result = calculateArea(polygons[0]);
-  StreamGuard outguard(out);
-  out << std::fixed << std::setprecision(1);
-  for (size_t i = 1; i < polygons.size(); i++)
+  if (polygons.empty())
   {
-    result = std::min(calculateArea(polygons[i]), result);
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  out << result;
+  StreamGuard outguard(out);
+  std::vector< double > sum_area(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), sum_area.begin(), calculateArea);
+  out << std::fixed << std::setprecision(1);
+  out << *std::min_element(sum_area.cbegin(), sum_area.cend());
 }
 
 void petrov::min_vertexes(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  size_t min_vertexes = polygons[0].points.size();
-  for (size_t i = 1; i < polygons.size(); i++)
+  if (polygons.empty())
   {
-    min_vertexes = std::min(polygons[i].points.size(), min_vertexes);
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  out << min_vertexes;
+  std::vector< size_t > vertexes(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), vertexes.begin(), getVertexesNum);
+  out << *std::min_element(vertexes.cbegin(), vertexes.cend());
 }
 
 void petrov::min(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
@@ -226,28 +267,12 @@ void petrov::min(const std::vector< Polygon > & polygons, std::istream & in, std
 
 void petrov::countIfEven(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  size_t count = 0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    if (polygons[i].points.size() % 2 == 0)
-    {
-      count++;
-    }
-  }
-  out << count;
+  out << std::count_if(polygons.cbegin(), polygons.cend(), isEven);
 }
 
 void petrov::countIfOdd(const std::vector< Polygon > & polygons, std::ostream & out)
 {
-  size_t count = 0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    if (polygons[i].points.size() % 2 == 1)
-    {
-      count++;
-    }
-  }
-  out << count;
+  out << std::count_if(polygons.cbegin(), polygons.cend(), isOdd);
 }
 
 void petrov::countIfThisNumber(size_t & num_of_vertexes, const std::vector< Polygon > & polygons, std::ostream & out)
@@ -256,15 +281,8 @@ void petrov::countIfThisNumber(size_t & num_of_vertexes, const std::vector< Poly
   {
     throw std::logic_error("<INVALID COMMAND");
   }
-  size_t count = 0;
-  for (size_t i = 0; i < polygons.size(); i++)
-  {
-    if (polygons[i].points.size() == num_of_vertexes)
-    {
-      count++;
-    }
-  }
-  out << count;
+  using namespace std::placeholders;
+  out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(isRightNumber, _1, num_of_vertexes));
 }
 
 void petrov::count(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
@@ -301,78 +319,50 @@ void petrov::count(const std::vector< Polygon > & polygons, std::istream & in, s
 
 void petrov::rmecho(std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
 {
-  size_t current_count = 0;
-  size_t deleted_count = 0;
+  using namespace std::placeholders;
   Polygon polygon;
   if (in >> polygon)
   {
-    for (size_t i = 0; i < polygons.size(); i++)
-    {
-      bool isEqual = true;
-      for (size_t j = 0; j < polygons[i].points.size() && isEqual; j++)
-      {
-        if (!(polygon.points[j].x == polygons[i].points[j].x && polygon.points[j].y == polygons[i].points[j].y))
-        {
-          isEqual = false;
-        }
-      }
-      if (isEqual == true)
-      {
-        current_count++;
-        if (current_count > 1)
-        {
-          polygons.erase(polygons.begin() + i);
-          deleted_count++;
-        }
-      }
-      else
-      {
-        current_count = 0;
-      }
-    }
+    std::vector< bool > do_remove(polygons.size());
+    auto isSimilar = std::bind(isEqualPolygon, std::cref(polygon), _2);
+    auto isAsPrev = std::bind(isEqualPolygon, _2, _1);
+    std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, do_remove.begin(), std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev));
+    size_t it = 0;
+    std::remove_if(polygons.begin(), polygons.end(), std::bind(removeIfTrue, std::cref(do_remove), std::ref(it)));
+    out << std::count(do_remove.cbegin(), do_remove.cend(), true);
   }
   else
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
-  out << deleted_count;
 }
 
 void petrov::maxseq(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
 {
-  size_t current_count = 0;
-  size_t max_count = 0;
+  using namespace std::placeholders;
   Polygon polygon;
   if (in >> polygon)
   {
-    for (size_t i = 0; i < polygons.size(); i++)
+    std::vector< bool > is_part_of_seq(polygons.size());
+    auto isSimilar = std::bind(isEqualPolygon, std::cref(polygon), _2);
+    auto isAsPrev = std::bind(isEqualPolygon, _2, _1);
+    std::transform(polygons.cbegin(), polygons.cend() - 1, polygons.cbegin() + 1, is_part_of_seq.begin(), std::bind(std::logical_and< bool >{}, isSimilar, isAsPrev));
+    std::vector< size_t > sequences_length(is_part_of_seq.size());
+    size_t count = 0;
+    std::transform(is_part_of_seq.cbegin(), is_part_of_seq.cend(), sequences_length.begin(), std::bind(countDuplicatesSequencesLength, _1, std::ref(count)));
+    size_t max_count = *std::max_element(sequences_length.cbegin(), sequences_length.cend());
+    if (max_count)
     {
-      bool isEqual = true;
-      for (size_t j = 0; j < polygons[i].points.size() && isEqual; j++)
-      {
-        if (!(polygon.points[j].x == polygons[i].points[j].x && polygon.points[j].y == polygons[i].points[j].y))
-        {
-          isEqual = false;
-        }
-      }
-      if (isEqual == true)
-      {
-        current_count++;
-      }
-      else
-      {
-        if (max_count < current_count)
-        {
-          max_count = current_count;
-        }
-        current_count = 0;
-      }
+      out << ++max_count;
+    }
+    else
+    {
+      out << 0;
     }
   }
   else
   {
     throw std::invalid_argument("<INVALID COMMAND>");
   }
-  out << max_count;
 }
 
