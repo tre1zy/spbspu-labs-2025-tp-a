@@ -1,4 +1,4 @@
-#include "poligon.hpp"
+#include "polygon.hpp"
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -27,7 +27,7 @@ namespace
 
   struct TriangleAreaCalculator
   {
-    double operator()(const std::vector<dribas::Point>& trianglePoints) const
+    double operator()(const std::vector< dribas::Point >& trianglePoints) const
     {
       if (trianglePoints.size() != 3) {
         return 0.0;
@@ -55,7 +55,7 @@ std::istream& dribas::operator>>(std::istream& in, Point& point)
   return in;
 }
 
-std::istream& dribas::operator>>(std::istream& in, Poligon& plg)
+std::istream& dribas::operator>>(std::istream& in, Polygon& plg)
 {
   std::istream::sentry sentry(in);
   if (!sentry) {
@@ -75,19 +75,19 @@ std::istream& dribas::operator>>(std::istream& in, Poligon& plg)
   return in;
 }
 
-double dribas::getPoligonArea(const Poligon& poligon)
+double dribas::getPolygonArea(const Polygon& polygon)
 {
-  if (poligon.points.size() < 3) {
+  if (polygon.points.size() < 3) {
     return 0.0;
   }
 
-  const Point& firstPt = poligon.points[0];
-  std::vector< size_t > indices(poligon.points.size() - 2);
+  const Point& firstPt = polygon.points[0];
+  std::vector< size_t > indices(polygon.points.size() - 2);
   std::iota(indices.begin(), indices.end(), 1);
 
   std::vector< std::vector< dribas::Point > > triangles;
   triangles.reserve(indices.size());
-  TriangleVectorCreator createTriangle(firstPt, poligon.points);
+  TriangleVectorCreator createTriangle(firstPt, polygon.points);
   std::transform(indices.begin(), indices.end(), std::back_inserter(triangles), createTriangle);
 
   std::vector< double > triangleAreas;

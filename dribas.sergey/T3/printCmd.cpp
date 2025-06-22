@@ -9,87 +9,87 @@
 
 namespace
 {
-  bool isOdd(const dribas::Poligon& plg)
+  bool isOdd(const dribas::Polygon& plg)
   {
     return plg.points.size() % 2;
   }
 
-  bool isEven(const dribas::Poligon& plg)
+  bool isEven(const dribas::Polygon& plg)
   {
     return !isOdd(plg);
   }
 
-  bool isNumOfVertex(const dribas::Poligon& plg, size_t vertx)
+  bool isNumOfVertex(const dribas::Polygon& plg, size_t vertx)
   {
     return plg.points.size() == vertx;
   }
 
   template< typename Predicate >
-  void printAreaPredicate(const std::vector< dribas::Poligon >& plg, std::ostream& out, Predicate predicate)
+  void printAreaPredicate(const std::vector< dribas::Polygon >& plg, std::ostream& out, Predicate predicate)
   {
-    std::vector< dribas::Poligon > temp;
+    std::vector< dribas::Polygon > temp;
     std::copy_if(plg.cbegin(), plg.cend(), std::back_inserter(temp), predicate);
 
     std::vector< double > areas;
-    std::transform(temp.begin(), temp.end(), std::back_inserter(areas), dribas::getPoligonArea);
+    std::transform(temp.begin(), temp.end(), std::back_inserter(areas), dribas::getPolygonArea);
 
     double total = std::accumulate(areas.begin(), areas.end(), 0.0);
     dribas::StreamGuard guard(out);
     out << std::fixed << std::setprecision(1) << total;
   }
 
-  bool areaCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)
+  bool areaCompare(const dribas::Polygon& lhs, const dribas::Polygon& rhs)
   {
-    return dribas::getPoligonArea(lhs) < dribas::getPoligonArea(rhs);
+    return dribas::getPolygonArea(lhs) < dribas::getPolygonArea(rhs);
   }
 
-  bool vertexCompare(const dribas::Poligon& lhs, const dribas::Poligon& rhs)
+  bool vertexCompare(const dribas::Polygon& lhs, const dribas::Polygon& rhs)
   {
     return lhs.points.size() < rhs.points.size();
   }
 
-  void printNumofVertex(const std::vector< dribas::Poligon >& plg, size_t vertex, std::ostream& out)
+  void printNumofVertex(const std::vector< dribas::Polygon >& plg, size_t vertex, std::ostream& out)
   {
     printAreaPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
   }
 
   template< typename Compare >
-  void printVertexMax(const std::vector< dribas::Poligon >& plgs, std::ostream& out, Compare compare)
+  void printVertexMax(const std::vector< dribas::Polygon >& plgs, std::ostream& out, Compare compare)
   {
-    auto poligon = *std::max_element(plgs.begin(), plgs.end(), compare);
-    out << poligon.points.size();
+    auto polygon = *std::max_element(plgs.begin(), plgs.end(), compare);
+    out << polygon.points.size();
   }
 
   template< typename Compare >
-  void printAreaMax(const std::vector< dribas::Poligon >& plgs, std::ostream& out, Compare compare)
+  void printAreaMax(const std::vector< dribas::Polygon >& plgs, std::ostream& out, Compare compare)
   {
-    auto poligon = *std::max_element(plgs.begin(), plgs.end(), compare);
+    auto polygon = *std::max_element(plgs.begin(), plgs.end(), compare);
     dribas::StreamGuard guard(out);
-    out << std::fixed << std::setprecision(1) << dribas::getPoligonArea(poligon);
+    out << std::fixed << std::setprecision(1) << dribas::getPolygonArea(polygon);
   }
 
   template< typename Compare >
-  void printVertexMin(const std::vector< dribas::Poligon >& plgs, std::ostream& out, Compare compare)
+  void printVertexMin(const std::vector< dribas::Polygon >& plgs, std::ostream& out, Compare compare)
   {
-    auto poligon = *std::min_element(plgs.begin(), plgs.end(), compare);
+    auto polygon = *std::min_element(plgs.begin(), plgs.end(), compare);
     dribas::StreamGuard guard(out);
-    out << std::fixed << std::setprecision(1) << dribas::getPoligonArea(poligon);
+    out << std::fixed << std::setprecision(1) << dribas::getPolygonArea(polygon);
   }
 
   template< typename Compare >
-  void printAreaMin(const std::vector< dribas::Poligon >& plgs, std::ostream& out, Compare compare)
+  void printAreaMin(const std::vector< dribas::Polygon >& plgs, std::ostream& out, Compare compare)
   {
-    auto poligon = *std::min_element(plgs.begin(), plgs.end(), compare);
-    out << dribas::getPoligonArea(poligon);
+    auto polygon = *std::min_element(plgs.begin(), plgs.end(), compare);
+    out << dribas::getPolygonArea(polygon);
   }
 
   template< typename Predicate >
-  void printCountPredicate(const std::vector< dribas::Poligon >& plg, std::ostream& out, Predicate predicate)
+  void printCountPredicate(const std::vector< dribas::Polygon >& plg, std::ostream& out, Predicate predicate)
   {
     out << std::count_if(plg.cbegin(), plg.cend(), predicate);
   }
 
-  void printCountNumofVertex(const std::vector< dribas::Poligon >& plg, size_t vertex, std::ostream& out)
+  void printCountNumofVertex(const std::vector< dribas::Polygon >& plg, size_t vertex, std::ostream& out)
   {
     printCountPredicate(plg, out, std::bind(isNumOfVertex, std::placeholders::_1, vertex));
   }
@@ -99,7 +99,7 @@ namespace
     const std::vector< dribas::Point >& polygonPoints;
     size_t numPoints;
 
-    AngleTriangleCreator(const dribas::Poligon& plg):
+    AngleTriangleCreator(const dribas::Polygon& plg):
       polygonPoints(plg.points),
       numPoints(plg.points.size())
     {}
@@ -134,7 +134,7 @@ namespace
     }
   };
 
-  bool hasPlgRightAngle(const dribas::Poligon& plg)
+  bool hasPlgRightAngle(const dribas::Polygon& plg)
   {
     if (plg.points.size() < 3) {
       return false;
@@ -151,13 +151,13 @@ namespace
     return std::any_of(angleTriangles.begin(), angleTriangles.end(), isRightAngle);
   }
 
-  void printAreaMean(const std::vector< dribas::Poligon >& plg, std::ostream& out)
+  void printAreaMean(const std::vector< dribas::Polygon >& plg, std::ostream& out)
   {
     if (!plg.size()) {
-      throw std::invalid_argument("No poligon found");
+      throw std::invalid_argument("No polygon found");
     }
     std::vector< double > areas;
-    std::transform(plg.begin(), plg.end(), std::back_inserter(areas), dribas::getPoligonArea);
+    std::transform(plg.begin(), plg.end(), std::back_inserter(areas), dribas::getPolygonArea);
 
     dribas::StreamGuard guard(out);
     double total = std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -165,7 +165,7 @@ namespace
   }
 }
 
-void dribas::printArea(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
+void dribas::printArea(const std::vector< Polygon >& plg, std::istream& in, std::ostream& out)
 {
   std::map< std::string, std::function< void() > > cmds;
   cmds["EVEN"] = std::bind(printAreaPredicate< decltype(isEven) >, std::cref(plg), std::ref(out), std::cref(isEven));
@@ -185,7 +185,7 @@ void dribas::printArea(const std::vector< Poligon >& plg, std::istream& in, std:
   }
 }
 
-void dribas::printMax(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
+void dribas::printMax(const std::vector< Polygon >& plg, std::istream& in, std::ostream& out)
 {
   if (!plg.size()) {
     throw std::invalid_argument("no figure found");
@@ -199,7 +199,7 @@ void dribas::printMax(const std::vector< Poligon >& plg, std::istream& in, std::
   cmds.at(command)();
 }
 
-void dribas::printMin(const std::vector< Poligon >& plg, std::istream& in, std::ostream& out)
+void dribas::printMin(const std::vector< Polygon >& plg, std::istream& in, std::ostream& out)
 {
   if (!plg.size()) {
     throw std::invalid_argument("no figure found");
@@ -212,7 +212,7 @@ void dribas::printMin(const std::vector< Poligon >& plg, std::istream& in, std::
   cmds.at(command)();
 }
 
-void dribas::printCount(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
+void dribas::printCount(const std::vector< Polygon >& plg, std::istream& in , std::ostream& out)
 {
   std::map< std::string, std::function< void() > > cmds;
   cmds["EVEN"] = std::bind(printCountPredicate< decltype(isEven) >, std::cref(plg), std::ref(out), std::cref(isEven));
@@ -230,17 +230,17 @@ void dribas::printCount(const std::vector< Poligon >& plg, std::istream& in , st
   }
 }
 
-void dribas::printLessArea(const std::vector< Poligon >& plg, std::istream& in , std::ostream& out)
+void dribas::printLessArea(const std::vector< Polygon >& plg, std::istream& in , std::ostream& out)
 {
-  Poligon temp;
+  Polygon temp;
   in >> temp;
   if (!in || in.peek() != '\n') {
-    throw std::invalid_argument("Invalid argument for less are poligon");
+    throw std::invalid_argument("Invalid argument for less are polygon");
   }
   printCountPredicate(plg, out, std::bind(areaCompare, std::placeholders::_1, temp));
 }
 
-void dribas::printRightShapes(const std::vector< Poligon >& plg, std::ostream& out)
+void dribas::printRightShapes(const std::vector< Polygon >& plg, std::ostream& out)
 {
   out << std::count_if(plg.begin(), plg.end(), hasPlgRightAngle);
 }
