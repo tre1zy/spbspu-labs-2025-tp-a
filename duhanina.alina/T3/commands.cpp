@@ -282,9 +282,8 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
   if (std::isdigit(param[0]))
   {
     size_t num = std::stoull(param);
-    if (!in || in.peek() != '\n')
+    if (num < 3)
     {
-      in.clear();
       throw std::invalid_argument("Error in input");
     }
     commands[param] = VertexCountAreaSum(num);
@@ -332,9 +331,8 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
   if (std::isdigit(param[0]))
   {
     size_t num = std::stoull(param);
-    if (!in || in.peek() != '\n')
+    if (num < 3)
     {
-      in.clear();
       throw std::invalid_argument("Error in input");
     }
     out << std::count_if(plgs.begin(), plgs.end(), ExactVertexCounter(num));
