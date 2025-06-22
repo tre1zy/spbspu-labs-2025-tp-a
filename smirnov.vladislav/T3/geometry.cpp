@@ -33,6 +33,16 @@ namespace geom
     return p1.x == p2.x && p1.y == p2.y;
   }
 
+  bool operator>(const Point& p, const Point& other)
+  {
+    return (p.x > other.x && p.y > other.y);
+  }
+
+  bool operator<(const Point& p, const Point& other)
+  {
+    return (p.x < other.x && p.y < other.y);
+  }
+
   std::istream& operator>>(std::istream& in, Point& p)
   {
     std::istream::sentry sentry(in);

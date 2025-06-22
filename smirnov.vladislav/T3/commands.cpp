@@ -6,6 +6,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <string>
+#include <set>
 #include "geometry.hpp"
 #include <stream_guard.hpp>
 
@@ -270,19 +271,19 @@ void smirnov::printIntersectionsCnt(std::istream& input, const std::vector< geom
 {
   Polygon ref;
   input >> ref;
-  if (!in)
+  if (!input)
   {
     throw std::invalid_argument("Wrong argument");
   }
   else
   {
-    std::set< Point > checkForEqualPoints(temp.points.cbegin(), temp.points.cend());
-    if (checkForEqualPoints.size() != temp.points.size())
+    std::set< geom::Point > checkForEqualPoints(ref.points.cbegin(), ref.points.cend());
+    if (checkForEqualPoints.size() != ref.points.size())
     {
       throw std::invalid_argument("Have equal points");
     }
     using namespace std::placeholders;
-    out << std::count_if(polygon.cbegin(), polygon.cend(), std::bind(intersectionCheck, temp, _1));
+    output << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectionCheck, temp, _1));
   }
 }
 
