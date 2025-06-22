@@ -26,7 +26,8 @@ int cross(const Point& a, const Point& b)
 
 struct ShoelaceAccumulator {
   long long operator()(long long acc, const std::pair<Point, Point>& points) const {
-    const auto& [a, b] = points;
+    const Point& a = points.first;
+    const Point& b = points.second;
     return acc + static_cast<long long>(a.x) * b.y - static_cast<long long>(a.y) * b.x;
   }
 };
@@ -88,7 +89,8 @@ struct SegmentIntersectionChecker {
   const Point& p1;
   const Point& q1;
   bool operator()(const std::pair<Point, Point>& seg2) const {
-    const auto& [p2, q2] = seg2;
+    const Point& p2 = seg2.first;
+    const Point& q2 = seg2.second;
     long long o1 = orient(p1, q1, p2);
     long long o2 = orient(p1, q1, q2);
     long long o3 = orient(p2, q2, p1);

@@ -8,15 +8,15 @@
 namespace amine
 {
 
-  struct Point
-  {
+  struct Point {
     int x;
     int y;
-    Point(int x_val = 0, int y_val = 0):
-      x(x_val),
-      y(y_val)
-    {}
-  };
+    Point(int x_val = 0, int y_val = 0): x(x_val), y(y_val) {}
+
+    bool operator==(const Point& other) const {
+        return x == other.x && y == other.y;
+    }
+  }
 
   struct Polygon
   {
