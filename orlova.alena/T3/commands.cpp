@@ -1,3 +1,4 @@
+#include "commands.h"
 #include <iostream>
 #include <sstream>
 #include <limits>
@@ -6,8 +7,7 @@
 #include <map>
 #include <functional>
 #include <numeric>
-#include "commands.h"
-#include "io-utils.h"
+#include "geom.h"
 
 double orlova::subArea(const Point& a, const Point& b)
 {
