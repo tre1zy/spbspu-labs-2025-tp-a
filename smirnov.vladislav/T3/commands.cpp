@@ -286,14 +286,14 @@ void smirnov::printLessAreaCnt(std::istream& input, const std::vector< Polygon >
 {
   Polygon ref;
   input >> ref;
-  if (!in || in.peek() != '\n')
+  if (!input || input.peek() != '\n')
   {
-    in.clear();
+    input.clear();
     throw std::logic_error("<INVALID COMMAND>");
   }
 
   using namespace std::placeholders;
-  output << std::count_if(polygons.begin(), polygons.end(), std::bind(compareByArea, _1, ref);
+  output << std::count_if(polygons.begin(), polygons.end(), std::bind(compareByArea, _1, ref));
 }
 
 bool smirnov::polygonsIntersect(const Polygon& p1, const Polygon& p2)
