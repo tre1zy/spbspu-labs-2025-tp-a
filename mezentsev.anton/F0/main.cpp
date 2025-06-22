@@ -14,14 +14,14 @@ void loadFromFile(mezentsev::DictionarySet& dicts, std::istream& file)
 {
   std::string line;
   mezentsev::Dictionary* currentDict = nullptr;
-  
+
   while (std::getline(file, line))
   {
     if (line.empty())
     {
       continue;
     }
-    
+
     if (line.find(' ') == std::string::npos)
     {
       std::string dictName = line;
@@ -39,7 +39,7 @@ void loadFromFile(mezentsev::DictionarySet& dicts, std::istream& file)
       {
         continue;
       }
-      
+
       std::string engWord = tokens[0];
       mezentsev::Translations translations;
       for (size_t i = 1; i < tokens.size(); ++i)
@@ -66,10 +66,10 @@ int main(int argc, char* argv[])
     loadFromFile(dicts, file);
     file.close();
   }
-  
+
   std::map< std::string, std::function< void(const std::vector< std::string >&) > > commands;
   using namespace std::placeholders;
-  
+
   commands.insert(std::make_pair("add", std::bind(addCommand,std::ref(dicts), _1)));
   commands.insert(std::make_pair("remove", std::bind(removeCommand, std::ref(dicts), _1)));
   commands.insert(std::make_pair("translate", std::bind(translateCommand, std::ref(dicts), _1)));
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
   commands.insert(std::make_pair("copy", std::bind(copyCommand, std::ref(dicts), _1)));
   commands.insert(std::make_pair("intersect", std::bind(intersectCommand, std::ref(dicts), _1)));
   commands.insert(std::make_pair("export", std::bind(exportCommand, std::ref(dicts), _1)));
-  
+
   std::string line;
   while (std::getline(std::cin, line))
   {
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     {
       continue;
     }
-    
+
     const std::string& command = tokens[0];
     try
     {
@@ -106,6 +106,5 @@ int main(int argc, char* argv[])
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  
   return 0;
 }
