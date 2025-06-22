@@ -2,12 +2,12 @@
 #include <map>
 #include <functional>
 #include <fstream>
+#include <limits>
 #include "geometric_shape.hpp"
 #include "area_processing.hpp"
 #include "vertex_processing.hpp"
 #include "extremum_processing.hpp"
 #include "utilities.hpp"
-#include <limits>
 
 int main(int argc, char ** argv)
 {

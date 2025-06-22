@@ -3,12 +3,12 @@
 
   bool zakirov::odd_polygon_pred(const zakirov::Polygon & polygon)
   {
-    return polygon.points_.size() % 2 == 0;
+    return polygon.points_.size() % 2 == 1;
   }
 
   bool zakirov::even_polygon_pred(const zakirov::Polygon & polygon)
   {
-    return polygon.points_.size() % 2 == 1;
+    return polygon.points_.size() % 2 == 0;
   }
 
   bool zakirov::less_area_pred(double area_base, double area_other)

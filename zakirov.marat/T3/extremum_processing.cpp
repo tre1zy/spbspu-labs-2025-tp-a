@@ -6,6 +6,11 @@
 
 void zakirov::find_max_extremum(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
+  if (points.empty())
+  {
+    throw std::logic_error("There are no figures to find max");
+  }
+
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA")
@@ -25,6 +30,11 @@ void zakirov::find_max_extremum(const std::list< Polygon > & points, std::istrea
 
 void zakirov::find_min_extremum(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
+  if (points.empty())
+  {
+    throw std::logic_error("There are no figures to find min");
+  }
+
   std::string subcommand;
   in >> subcommand;
   if (subcommand == "AREA")

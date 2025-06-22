@@ -7,23 +7,28 @@
 #include <stream_guardian.hpp>
 #include "utilities.hpp"
 
-void zakirov::process_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
+void zakirov::process_area(const std::list< Polygon > & plgns, std::istream & in, std::ostream & out)
 {
+  if (plgns.empty())
+  {
+    throw std::logic_error("There are no figures to processing area");
+  }
+
   std::string subcommand;
   in >> subcommand;
   Guardian guard(out);
   if (subcommand == "EVEN")
   {
-    out << std::fixed << std::setprecision(1) << count_sum_area(points, even_polygon_pred);
+    out << std::fixed << std::setprecision(1) << count_sum_area(plgns, even_polygon_pred);
   }
   else if (subcommand == "ODD")
   {
-    out << std::fixed << std::setprecision(1) << count_sum_area(points, odd_polygon_pred);
+    out << std::fixed << std::setprecision(1) << count_sum_area(plgns, odd_polygon_pred);
   }
   else if (subcommand == "MEAN")
   {
     std::vector< double > areas;
-    std::transform(points.begin(), points.end(), std::back_inserter(areas), count_area);
+    std::transform(plgns.begin(), plgns.end(), std::back_inserter(areas), count_area);
     size_t size = areas.size();
     Guardian guard(out);
     out << std::fixed << std::setprecision(1) << std::accumulate(areas.begin(), areas.end(), 0.0) / size;
@@ -31,8 +36,13 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
   else if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
     int a = std::stoi(subcommand);
+    if (std::none_of(plgns.begin(), plgns.end(), std::bind(equal_vertexes_pred, std::placeholders::_1, a)))
+    {
+      throw std::logic_error("There are no figures with such a number of vertices");
+    }
+
     std::vector< Polygon > polygons;
-    std::copy_if(points.begin(), points.end(),  std::back_inserter(polygons), std::bind(equal_vertexes_pred, std::placeholders::_1, a));
+    std::copy_if(plgns.begin(), plgns.end(),  std::back_inserter(polygons), std::bind(equal_vertexes_pred, std::placeholders::_1, a));
     std::vector< double > areas;
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), count_area);
     out << std::fixed << std::setprecision(1) << std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -41,6 +51,11 @@ void zakirov::process_area(const std::list< Polygon > & points, std::istream & i
 
 void zakirov::process_less_area(const std::list< Polygon > & points, std::istream & in, std::ostream & out)
 {
+  if (points.empty())
+  {
+    throw std::logic_error("There are no figures to processing area");
+  }
+
   Guardian guard(out);
   std::string subcommand;
   in >> subcommand;
