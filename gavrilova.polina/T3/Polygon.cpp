@@ -59,9 +59,6 @@ namespace gavrilova {
     std::vector< Point > temp_points(num_points);
     for (size_t i = 0; i < num_points; ++i) {
       if (!(is >> temp_points[i])) {
-        std::cout << "fail in point: " << i << "\n";
-        std::cout << temp_points[i] << "\n";
-
         is.setstate(std::ios::failbit);
         return is;
       }
