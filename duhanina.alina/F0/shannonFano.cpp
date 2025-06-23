@@ -5,10 +5,22 @@
 #include <algorithm>
 
 std::map< std::string, duhanina::CodeTable > encoding_store;
-
 namespace
 {
   using str_t = const std::string&;
+
+  const std::string TEXT_EXT = ".txt";
+  const std::string COMPRESSED_EXT = ".sfano";
+  const std::string CODE_TABLE_EXT = ".sfcodes";
+
+  void validate_extension(const std::string& filename, const std::string& expected_ext)
+  {
+    size_t dot_pos = filename.find_last_of('.');
+    if (dot_pos == std::string::npos || filename.substr(dot_pos) != expected_ext)
+    {
+      throw std::runtime_error("Invalid file extension. Expected: " + expected_ext);
+    }
+  }
 
   bool compare_nodes(const std::pair< char, int >& a, const std::pair< char, int >& b)
   {
@@ -324,6 +336,7 @@ namespace
 
 void duhanina::build_codes(str_t input_file, str_t encoding_id, std::ostream& out)
 {
+  validate_extension(input_file, TEXT_EXT);
   if (encoding_store.count(encoding_id) > 0)
   {
     throw std::runtime_error("ID_EXISTS");
@@ -366,6 +379,7 @@ void duhanina::show_codes(str_t encoding_id, std::ostream& out)
 
 void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& out)
 {
+  validate_extension(output_file, COMPRESSED_EXT);
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
   {
@@ -376,15 +390,16 @@ void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& ou
 }
 
 
-void duhanina::load_codes(str_t input_file, str_t encoding_id, std::ostream& out)
+void duhanina::load_codes(str_t codes_file, str_t encoding_id, std::ostream& out)
 {
+  validate_extension(codes_file, CODE_TABLE_EXT);
   if (encoding_store.count(encoding_id) > 0)
   {
     throw std::runtime_error("ID_EXISTS");
   }
-  CodeTable table = load_code_table(input_file);
+  CodeTable table = load_code_table(codes_file);
   encoding_store[encoding_id] = table;
-  out << "Code table successfully loaded from file '" << input_file << "' with ID '" << encoding_id << "'\n";
+  out << "Code table successfully loaded from file '" << codes_file << "' with ID '" << encoding_id << "'\n";
 }
 
 
@@ -403,6 +418,9 @@ void duhanina::clear_codes(str_t encoding_id, std::ostream& out)
 
 void duhanina::encode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
+  validate_extension(codes_file, CODE_TABLE_EXT);
+  validate_extension(input_file, TEXT_EXT);
+  validate_extension(output_file, COMPRESSED_EXT);
   CodeTable table = load_code_table(codes_file);
   encode_file_impl(input_file, output_file, table, out);
 }
@@ -410,6 +428,9 @@ void duhanina::encode_file_with_codes(str_t input_file, str_t output_file, str_t
 
 void duhanina::decode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
+  validate_extension(codes_file, CODE_TABLE_EXT);
+  validate_extension(input_file, TEXT_EXT);
+  validate_extension(output_file, COMPRESSED_EXT);
   CodeTable table = load_code_table(codes_file);
   decode_file_impl(input_file, output_file, table, out);
 }
@@ -417,6 +438,8 @@ void duhanina::decode_file_with_codes(str_t input_file, str_t output_file, str_t
 
 void duhanina::encode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
+  validate_extension(input_file, TEXT_EXT);
+  validate_extension(output_file, COMPRESSED_EXT);
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
   {
@@ -428,6 +451,8 @@ void duhanina::encode_file(str_t input_file, str_t output_file, str_t encoding_i
 
 void duhanina::decode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
+  validate_extension(input_file, TEXT_EXT);
+  validate_extension(output_file, COMPRESSED_EXT);
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
   {
@@ -438,6 +463,8 @@ void duhanina::decode_file(str_t input_file, str_t output_file, str_t encoding_i
 
 void duhanina::compare(str_t file1, str_t file2, str_t encod_id1, str_t encod_id2, std::ostream& out)
 {
+  validate_extension(file1, TEXT_EXT);
+  validate_extension(file2, TEXT_EXT);
   if (file1 == file2)
   {
     throw std::runtime_error("IDENTICAL_TEXTS");
