@@ -296,95 +296,11 @@ namespace averenkov
     }
   }
 
-void printCountOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out) 
-{
-    std::string param;
-    if (!(in >> param))
-    {
-        throw std::runtime_error("<INVALID COMMAND>");
-    }
-
-    struct ValidPolygonChecker {
-        bool operator()(const Polygon& poly) const {
-            return poly.points.size() >= 3;
-        }
-    };
-
-    struct EvenCountValidator {
-        EvenCounter counter;
-        ValidPolygonChecker validator;
-        size_t operator()(const std::vector<Polygon>& polys) const {
-            size_t count = 0;
-            for (const auto& poly : polys) {
-                if (validator(poly) && counter(std::vector<Polygon>{poly}) > 0) {
-                    ++count;
-                }
-            }
-            return count;
-        }
-    };
-
-    struct OddCountValidator {
-        OddCounter counter;
-        ValidPolygonChecker validator;
-        size_t operator()(const std::vector<Polygon>& polys) const {
-            size_t count = 0;
-            for (const auto& poly : polys) {
-                if (validator(poly) && counter(std::vector<Polygon>{poly}) > 0) {
-                    ++count;
-                }
-            }
-            return count;
-        }
-    };
-
-    struct NumCountValidator {
-        NumVertexCounter counter;
-        ValidPolygonChecker validator;
-        size_t operator()(const std::vector<Polygon>& polys) const {
-            size_t count = 0;
-            for (const auto& poly : polys) {
-                if (validator(poly) && counter(std::vector<Polygon>{poly}) > 0) {
-                    ++count;
-                }
-            }
-            return count;
-        }
-    };
-
-    static const std::map<std::string, std::function<size_t(const std::vector<Polygon>&)>> commands = {
-        {"EVEN", EvenCountValidator()},
-        {"ODD", OddCountValidator()}
-    };
-
-    auto it = commands.find(param);
-    if (it != commands.end())
-    {
-        out << it->second(polygons);
-    }
-    else
-    {
-        try
-        {
-            size_t num = std::stoul(param);
-            if (num < 3)
-            {
-                throw std::runtime_error("<INVALID COMMAND>");
-            }
-            out << NumCountValidator{NumVertexCounter{num}, ValidPolygonChecker()}(polygons);
-        }
-        catch (...)
-        {
-            throw std::runtime_error("<INVALID COMMAND>");
-        }
-    }
-}
-
- /* void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
-    std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
+    static std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
     commands["EVEN"] = EvenCounter();
     commands["ODD"] = OddCounter();
     if (std::isdigit(param[0]))
@@ -398,7 +314,7 @@ void printCountOf(std::istream& in, const std::vector<Polygon>& polygons, std::o
       return;
     }
     out << commands.at(param)(polygons);
-  }*/
+  }
 
   void printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
