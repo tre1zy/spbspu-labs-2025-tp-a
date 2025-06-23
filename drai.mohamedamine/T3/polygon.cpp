@@ -100,28 +100,7 @@ namespace amine
 
     return false;
   }
-  struct PointInPolygonAccumulator
-  {
-    const Point& pt;
-    bool& inside;
-
-    PointInPolygonAccumulator(const Point& p, bool& ins):
-      pt(p),
-      inside(ins)
-    {}
-
-    std::pair< Point, bool > operator()(std::pair< Point, bool > acc, const Point& current) const
-    {
-      const Point& prev = acc.first;
-      bool cond = (current.y > pt.y) != (prev.y > pt.y);
-      bool intersect =
-        cond &&
-        (pt.x < static_cast< long double >(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) + current.x);
-      if (intersect)
-        inside = !inside;
-      return std::make_pair(current, inside);
-    }
-  };
+ 
   bool point_in_polygon(const Point& pt, const Polygon& poly)
   {
     bool inside = false;
