@@ -19,13 +19,20 @@ namespace
     }
 
     unsigned long long result = 0;
+    bool has_digit = false;
     while (is.get(ch) && (ch == '0' || ch == '1'))
     {
+      has_digit = true;
       result = result << 1;
       if (ch == '1')
       {
         result = result | 1;
       }
+    }
+    if (!has_digit)
+    {
+      is.setstate(std::ios::failbit);
+      return 0;
     }
     if (is)
     {
@@ -92,32 +99,35 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     if (ch == ':')
     {
       std::string key;
-      while (is.get(ch) && ch != ' ' && ch != '\n')
+      while (is.get(ch) && ch != ' ' && ch != '\n' && ch != ':')
       {
         key.push_back(ch);
       }
+      is.unget();
+
       if (key == "key1")
       {
+        is >> std::ws;
         unsigned long long val = parseULLBin(is);
-        if (is || is.eof())
+        if (!is.fail())
         {
           temp.key1 = val;
           has_key1 = true;
-          is.clear();
         }
       }
       else if (key == "key2")
       {
+        is >> std::ws;
         std::complex< double > val = parseCmpLsp(is);
-        if (is || is.eof())
+        if (!is.fail())
         {
           temp.key2 = val;
           has_key2 = true;
-          is.clear();
         }
       }
       else if (key == "key3")
       {
+        is >> std::ws;
         if (is.get(ch) && ch == '"')
         {
           std::string str;
@@ -133,20 +143,41 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
         }
       }
     }
-    if (has_key1 && has_key2 && has_key3)
-    {
-      data = temp;
-      return is;
-    }
     if (ch == '\n')
     {
       break;
     }
   }
 
-  if (!has_key1 || !has_key2 || !has_key3)
+  if (has_key1 && has_key2 && has_key3)
+  {
+    data = temp;
+  }
+  else
   {
     is.setstate(std::ios::failbit);
   }
   return is;
+}
+
+std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
+{
+  os << "(:key1 0b";
+  if (data.key1 == 0)
+  {
+    os << "0";
+  }
+  else
+  {
+    std::string bin;
+    unsigned long long n = data.key1;
+    while (n > 0)
+    {
+      bin = (n % 2 ? "1" : "0") + bin;
+      n /= 2;
+    }
+    os << bin;
+  }
+  os << ":key2 #c(" << data.key2.real() << " " << data.key2.imag() << "):key3 \"" << data.key3 << "\":)";
+  return os;
 }
