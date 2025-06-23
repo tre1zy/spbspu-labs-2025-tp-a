@@ -85,41 +85,52 @@ struct VertexCountComparator {
     }
 };
 
-void process_command(const std::vector<Polygon>& polygons, const std::string& cmd, std::istringstream& iss)
-{
+void process_command(const std::vector<Polygon>& polygons, const std::string& cmd, std::istringstream& iss) {
     bool invalid = false;
     bool printDouble = false;
     double dblResult = 0.0;
     int intResult = 0;
 
-    else if (cmd == "AREA") {
-    std::string arg;
-    iss >> arg;
-    AreaFilter filter;
+    if (cmd == "AREA") {
+        std::string arg;
+        iss >> arg;
+        AreaFilter filter;
 
-    if (arg == "EVEN") filter.mode = AreaFilter::EVEN;
-    else if (arg == "ODD") filter.mode = AreaFilter::ODD;
-    else if (arg == "MEAN") {
-        if (polygons.empty()) invalid = true;
-        else {
-            filter.mode = AreaFilter::MEAN;
-            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter) /
-                        std::count_if(polygons.begin(), polygons.end(),
-                                    [](const Polygon& p){ return p.points.size() >= 3; });
+        if (arg == "EVEN") {
+            filter.mode = AreaFilter::EVEN;
+            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter);
             printDouble = true;
         }
-    }
+        else if (arg == "ODD") {
+            filter.mode = AreaFilter::ODD;
+            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter);
+            printDouble = true;
+        }
+        else if (arg == "MEAN") {
+            if (polygons.empty()) {
+                invalid = true;
+            } else {
+                filter.mode = AreaFilter::MEAN;
+                double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter);
+                size_t count = std::count_if(polygons.begin(), polygons.end(), ValidPolygonChecker{});
+                dblResult = count > 0 ? total / count : 0.0;
+                printDouble = true;
+            }
+        }
         else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
             int num = std::stoi(arg);
-            if (num < 3) invalid = true;
-            else {
+            if (num < 3) {
+                invalid = true;
+            } else {
                 filter.mode = AreaFilter::COUNT;
                 filter.vertex_count = num;
                 dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter);
                 printDouble = true;
             }
+        } else {
+            invalid = true;
         }
-        else invalid = true;
+    }
     }
     else if (cmd == "MAX" || cmd == "MIN") {
         std::string arg;
