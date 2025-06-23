@@ -30,11 +30,34 @@ namespace averenkov
 
   bool PolygonEqual::operator()(const Polygon& a, const Polygon& b) const
   {
-    if (a == target && b == target)
+    if (a.points.size() != b.points.size())
     {
-      return true;
+      return false;
+    }
+
+    for (size_t shift = 0; shift < b.points.size(); ++shift)
+    {
+      bool match = true;
+      for (size_t i = 0; i < b.points.size(); ++i)
+      {
+        size_t j = (i + shift) % b.points.size();
+        if (!(a.points[i] == b.points[j]))
+        {
+          match = false;
+          break;
+        }
+      }
+      if (match)
+      {
+        return true;
+      }
     }
     return false;
+  }
+
+  bool PolygonEqual::operator()(const Polygon& poly) const
+  {
+    return (*this)(poly, target);
   }
 
   double calculateArea(const Polygon& poly)
@@ -318,8 +341,8 @@ namespace averenkov
     {
       throw std::runtime_error("Invalid PERMS parameter");
     }
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-      std::bind(std::equal_to< Polygon >(), std::placeholders::_1, target));
+    PolygonEqual comparator{ target };
+    size_t count = std::count_if(polygons.begin(), polygons.end(), comparator);
     out << count;
   }
 
