@@ -116,21 +116,37 @@ struct PointInPolygonAccumulator {
         return std::make_pair(current, inside);
     }
 };
-  bool point_in_polygon(const Point& pt, const Polygon& poly)
-  {
+  bool point_in_polygon(const Point& pt, const Polygon& poly) {
     bool inside = false;
     const auto& p = poly.points;
     int n = p.size();
     if (n < 3)
-      return false;
+        return false;
 
-    bool inside = false;
+    struct PointInPolygonAccumulator {
+        const Point& pt;
+        bool& inside;
+
+        PointInPolygonAccumulator(const Point& p, bool& ins) : pt(p), inside(ins) {}
+
+        std::pair<Point, bool> operator()(std::pair<Point, bool> acc, const Point& current) const {
+            const Point& prev = acc.first;
+            bool cond = (current.y > pt.y) != (prev.y > pt.y);
+            bool intersect =
+                cond && (pt.x < static_cast<long double>(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) +
+                                current.x);
+            if (intersect)
+                inside = !inside;
+            return std::make_pair(current, inside);
+        }
+    };
+
     std::accumulate(
-    p.begin(), p.end(), std::make_pair(p.back(), false),
-    PointInPolygonAccumulator(pt, inside));
+        p.begin(), p.end(), std::make_pair(p.back(), false),
+        PointInPolygonAccumulator(pt, inside));
 
     return inside;
-    }
+}
 struct SegmentIntersectChecker {
     const Polygon& a;
     const Polygon& b;
@@ -177,21 +193,27 @@ struct SegmentIntersectChecker {
     }
     return false;
   }
-std::generate_n(std::back_inserter(poly.points), n, [&iss]() {
-    Point pt;
-    char c;
-    if (!(iss >> c) || c != '(')
-        return Point{};
-    if (!(iss >> pt.x))
-        return Point{};
-    if (!(iss >> c) || c != ';')
-        return Point{};
-    if (!(iss >> pt.y))
-        return Point{};
-    if (!(iss >> c) || c != ')')
-        return Point{};
-    return pt;
-});
+struct PointParser {
+    std::istringstream& iss;
+
+    explicit PointParser(std::istringstream& stream) : iss(stream) {}
+
+    Point operator()() const {
+        Point pt;
+        char c;
+        if (!(iss >> c) || c != '(')
+            return Point{};
+        if (!(iss >> pt.x))
+            return Point{};
+        if (!(iss >> c) || c != ';')
+            return Point{};
+        if (!(iss >> pt.y))
+            return Point{};
+        if (!(iss >> c) || c != ')')
+            return Point{};
+        return pt;
+    }
+};
 
   bool parse_polygon(const std::string& str, Polygon& poly)
   {
