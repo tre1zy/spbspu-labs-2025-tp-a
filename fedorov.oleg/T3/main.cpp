@@ -23,20 +23,14 @@ int main(int argc, char *argv[])
   }
 
   std::vector< Polygon > polygons;
-  try
+  std::ifstream file(argv[1]);
+
+  if (!file)
   {
-    std::ifstream file(argv[1]);
-    if (!file)
-    {
-      throw std::runtime_error("Failed to open file");
-    }
-    readPolygons(file, polygons);
-  }
-  catch (const std::exception &e)
-  {
-    std::cerr << "Error: " << e.what() << '\n';
+    std::cerr << "Error: file not read" << '\n';
     return 2;
   }
+  readPolygons(file, polygons);
 
   std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
   commands["AREA"] = std::bind(areaCommand, _1, _2, std::cref(polygons));
@@ -63,7 +57,7 @@ int main(int argc, char *argv[])
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    catch (...)
+    catch (std::invalid_argument)
     {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();

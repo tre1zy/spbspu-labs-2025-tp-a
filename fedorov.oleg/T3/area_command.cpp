@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <numeric>
+#include <map>
 
 #include "commands.hpp"
 #include "functional.hpp"
@@ -7,6 +8,29 @@
 
 namespace fedorov
 {
+  namespace
+  {
+    double areaOddHandler(const std::vector< Polygon > &polygons)
+    {
+      return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
+    }
+
+    double areaEvenHandler(const std::vector< Polygon > &polygons)
+    {
+      return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
+    }
+
+    double areaMeanHandler(const std::vector< Polygon > &polygons)
+    {
+      if (polygons.empty())
+      {
+        throw std::logic_error("No polygons");
+      }
+      double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
+      return total / polygons.size();
+    }
+  }
+
   void areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     std::string param;
@@ -16,26 +40,17 @@ namespace fedorov
       return;
     }
 
+    using Handler = double (*)(const std::vector< Polygon > &);
+    std::map< std::string, Handler > handlers = {
+        {"ODD", areaOddHandler}, {"EVEN", areaEvenHandler}, {"MEAN", areaMeanHandler}};
+
     try
     {
-      if (param == "ODD")
+      auto it = handlers.find(param);
+      if (it != handlers.end())
       {
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
-        outputFormattedArea(total, out);
-      }
-      else if (param == "EVEN")
-      {
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
-        outputFormattedArea(total, out);
-      }
-      else if (param == "MEAN")
-      {
-        if (polygons.empty())
-        {
-          throw std::logic_error("No polygons");
-        }
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
-        outputFormattedArea(total / polygons.size(), out);
+        double result = it->second(polygons);
+        outputFormattedArea(result, out);
       }
       else
       {

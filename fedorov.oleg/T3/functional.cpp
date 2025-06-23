@@ -30,8 +30,9 @@ namespace fedorov
 
     if (poly.points.size() > 1)
     {
-      sum = std::inner_product(poly.points.begin(), poly.points.end() - 1, poly.points.begin() + 1, 0.0, std::plus<>(),
-                               PointArea());
+      auto begin = poly.points.begin();
+      auto end = poly.points.end();
+      sum = std::inner_product(begin, end - 1, begin + 1, 0.0, std::plus<>{}, PointArea{});
     }
 
     sum += (last.x * first.y - first.x * last.y);
