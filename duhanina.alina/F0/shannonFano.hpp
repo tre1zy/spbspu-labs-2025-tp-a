@@ -52,6 +52,8 @@ namespace duhanina
   void decode_file(str_t input_file, str_t output_file, str_t encoding_name, std::ostream& out);
   void compare(str_t file1, str_t file2, str_t encod_name1, str_t encod_name2, std::ostream& out);
   void list_encodings(std::ostream& out);
+  void check_encoding(str_t input_file, str_t encoding_id, std::ostream& out);
+  void suggest_encodings(str_t input_file, std::ostream& out);
 }
 
 #endif

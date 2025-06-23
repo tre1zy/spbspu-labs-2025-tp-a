@@ -1,5 +1,6 @@
 #include "shannonFano.hpp"
 #include <fstream>
+#include <set>
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -13,7 +14,7 @@ namespace
   const std::string COMPRESSED_EXT = ".sfano";
   const std::string CODE_TABLE_EXT = ".sfcodes";
 
-  void validate_extension(const std::string& filename, const std::string& expected_ext)
+  void validate_extension(str_t filename, str_t expected_ext)
   {
     size_t dot_pos = filename.find_last_of('.');
     if (dot_pos == std::string::npos || filename.substr(dot_pos) != expected_ext)
@@ -332,6 +333,40 @@ namespace
     out_file << decoded;
     out << "File successfully decompressed to '" << output_file << "'\n";
   }
+
+  std::set< char > find_missing_chars(str_t text, const std::map< char, std::string >& char_to_code)
+  {
+    std::set< char > missing;
+    for (char c: text)
+    {
+      if (char_to_code.find(c) == char_to_code.end())
+      {
+        missing.insert(c);
+      }
+    }
+    return missing;
+  }
+
+  void print_missing_chars(const std::set< char >& missing, std::ostream& out)
+  {
+    if (missing.empty())
+    {
+      return;
+    }
+    out << "Missing characters (" << missing.size() << "): ";
+    for (char c: missing)
+    {
+      if (std::isprint(c))
+      {
+        out << "'" << c << "' ";
+      }
+      else
+      {
+        out << "[0x" << std::hex << static_cast< int >(c) << "] ";
+      }
+    }
+    out << "\n";
+  }
 }
 
 void duhanina::build_codes(str_t input_file, str_t encoding_id, std::ostream& out)
@@ -540,4 +575,54 @@ void duhanina::print_help(std::ostream& out)
   out << "compare <file1> <file2> <encoding_id1> <encoding_id2> - compare efficiency\n";
   out << "list_encodings - list all encodings\n";
   out << "--help - show this help\n";
+}
+
+void duhanina::check_encoding(str_t input_file, str_t encoding_id, std::ostream& out)
+{
+  auto it = encoding_store.find(encoding_id);
+  if (it == encoding_store.end())
+  {
+    throw std::runtime_error("Encoding '" + encoding_id + "' not found");
+  }
+  std::ifstream in(input_file);
+  if (!in)
+  {
+    throw std::runtime_error("Failed to open file");
+  }
+  std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
+  auto missing = find_missing_chars(text, it->second.char_to_code);
+  if (missing.empty())
+  {
+    out << "Encoding fully supports the file\n";
+  }
+  else
+  {
+    out << "Encoding issues in '" << encoding_id << "':\n";
+    print_missing_chars(missing, out);
+  }
+}
+
+void duhanina::suggest_encodings(str_t input_file, std::ostream& out)
+{
+  std::ifstream in(input_file);
+  if (!in)
+  {
+    throw std::runtime_error("Failed to open file");
+  }
+  std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
+  out << "Encoding compatibility report:\n";
+  for (const auto& encoding_pair: encoding_store)
+  {
+    str_t id = encoding_pair.first;
+    const CodeTable& table = encoding_pair.second;
+    std::set< char > missing = find_missing_chars(text, table.char_to_code);
+    if (missing.empty())
+    {
+      out << " - " << id << ": " << "FULL" << " support\n";
+    }
+    else
+    {
+      out << " - " << id << ": " << "partial" << " support\n";
+    }
+  }
 }

@@ -115,9 +115,31 @@ void duhanina::compare_wrapper(std::istream& in, std::ostream& out)
   compare(file1, file2, encoding_name1, encoding_name2, out);
 }
 
+void duhanina::suggest_encodings_wrapper(std::istream& in, std::ostream& out)
+{
+  std::string input_file;
+  if (!(in >> input_file))
+  {
+    throw std::runtime_error("Invalid arguments");
+  }
+  suggest_encodings(input_file, out);
+}
+
+void duhanina::check_encoding_wrapper(std::istream& in, std::ostream& out)
+{
+  std::string input_file;
+  std::string encoding_id;
+  if (!(in >> input_file >> encoding_id))
+  {
+    throw std::runtime_error("Invalid arguments");
+  }
+  check_encoding(input_file, encoding_id, out);
+}
+
 std::map< std::string, std::function< void() > > duhanina::initialize_commands(std::istream& in, std::ostream& out)
 {
-  std::map<std::string, std::function<void()>> commands;
+  std::map< std::string, std::function< void() > > commands;
+
   commands["build_codes"] = std::bind(build_codes_wrapper, std::ref(in), std::ref(out));
   commands["show_codes"] = std::bind(show_codes_wrapper, std::ref(in), std::ref(out));
   commands["save_codes"] = std::bind(save_codes_wrapper, std::ref(in), std::ref(out));
@@ -129,5 +151,7 @@ std::map< std::string, std::function< void() > > duhanina::initialize_commands(s
   commands["decode_file"] = std::bind(decode_file_wrapper, std::ref(in), std::ref(out));
   commands["compare"] = std::bind(compare_wrapper, std::ref(in), std::ref(out));
   commands["list_encodings"] = std::bind(list_encodings, std::ref(out));
+  commands["suggest_encodings"] = std::bind(suggest_encodings_wrapper, std::ref(in), std::ref(out));
+  commands["check_encoding"] = std::bind(check_encoding_wrapper, std::ref(in), std::ref(out));
   return commands;
 }

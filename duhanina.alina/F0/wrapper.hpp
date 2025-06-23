@@ -17,6 +17,8 @@ namespace duhanina
   void encode_file_wrapper(std::istream&, std::ostream&);
   void decode_file_wrapper(std::istream&, std::ostream&);
   void compare_wrapper(std::istream&, std::ostream&);
+  void suggest_encodings_wrapper(std::istream& in, std::ostream& out);
+  void check_encoding_wrapper(std::istream& in, std::ostream& out);
 
   std::map< std::string, std::function< void() > > initialize_commands(std::istream& in, std::ostream& out);
 }
