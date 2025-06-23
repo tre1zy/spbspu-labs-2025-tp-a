@@ -22,7 +22,7 @@ namespace
     std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result;
+    out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getAreaOdd(std::ostream & out, const std::vector< Polygon > & polygons)
@@ -34,7 +34,7 @@ namespace
     std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result;
+    out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getAreaMean(std::ostream & out, const std::vector< Polygon > & polygons)
@@ -48,7 +48,7 @@ namespace
     areas.reserve(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
-    out << std::fixed << std::setprecision(1) << result;
+    out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getAreaVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
@@ -61,7 +61,7 @@ namespace
     std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result;
+    out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getMaxArea(std::ostream & out, const std::vector< Polygon > & polygons)
@@ -70,14 +70,14 @@ namespace
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
     double result = *std::max_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result;
+    out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getMaxVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
     StreamGuard guard(out);
     auto result = *std::max_element(polygons.begin(), polygons.end(), compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size();
+    out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
   }
 
   void getMinArea(std::ostream & out, const std::vector< Polygon > & polygons)
@@ -86,30 +86,30 @@ namespace
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
     double result = *std::min_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result;
+    out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
   void getMinVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
     StreamGuard guard(out);
     auto result = *std::min_element(polygons.begin(), polygons.end(), compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size();
+    out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
   }
 
   void getCountEven(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), isEven);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), isEven) << '\n';
   }
 
   void getCountOdd(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), isOdd);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), isOdd) << '\n';
   }
 
   void getCountVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
   {
     auto pred = std::bind(hasNVertexes, std::placeholders::_1, num);
-    out << std::count_if(polygons.cbegin(), polygons.cend(), pred);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), pred) << '\n';
   }
 
   struct RightAngleCheck
