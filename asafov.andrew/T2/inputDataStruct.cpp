@@ -46,38 +46,34 @@ namespace
     }
 
     double real = 0.0;
-    is >> real;
-    if (!is)
+    if (!(is >> real))
     {
       is.clear();
-      while (is.get() != ')')
+      while (is && is.get() != ')')
       {
       }
       return {0.0, 0.0};
     }
 
     char sep;
-    is >> sep;
+    if (!(is >> sep))
+      return {0.0, 0.0};
+
     if (sep == ')')
       return {real, 0.0};
 
     double imag = 0.0;
-    is >> imag;
-    if (!is)
+    if (!(is >> imag))
     {
       is.clear();
-      while (is.get() != ')')
+      while (is && is.get() != ')')
       {
       }
       return {0.0, 0.0};
     }
 
-    is >> sep;
-    if (sep != ')')
-    {
-      is.putback(sep);
+    if (!(is >> sep) || sep != ')')
       return {0.0, 0.0};
-    }
 
     return {real, imag};
   }
@@ -104,69 +100,31 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 
       if (key == "key1")
       {
-        std::string value_str;
-        char next = is.peek();
-        if (next == '0')
+        char prefix[2];
+        if (is.read(prefix, 2) && prefix[0] == '0' && prefix[1] == 'b')
         {
-          is.get(ch);
-          value_str += ch;
-          next = is.peek();
-          if (next == 'b')
+          unsigned long long value = parseULLBin(is);
+          if (value != 0 || (is.peek() == '0'))
           {
-            is.get(ch);
-            value_str += ch;
-            unsigned long long value = parseULLBin(is);
-            if (value != 0 || value_str == "0b")
-            {
-              temp.key1 = value;
-              has_key1 = true;
-            }
+            temp.key1 = value;
+            has_key1 = true;
           }
-          else
-          {
-            is.putback(ch);
-          }
+        }
+        else
+        {
+          for (int i = is.gcount() - 1; i >= 0; --i)
+            is.putback(prefix[i]);
         }
       }
       else if (key == "key2")
       {
-        char next = is.peek();
-        if (next == '#')
+        std::complex< double > value = parseCmpLsp(is);
+        if (value != std::complex< double >{0.0, 0.0} ||
+          (is.peek() == '#' && is.get() == '#' && is.peek() == 'c' && is.get() == 'c' && is.peek() == '(' && is.get() ==
+            '('))
         {
-          std::string prefix;
-          for (int i = 0; i < 3; ++i)
-          {
-            is.get(ch);
-            prefix += ch;
-          }
-
-          if (prefix == "#c(")
-          {
-            double real, imag = 0.0;
-            is >> real;
-
-            char sep;
-            is >> sep;
-            if (sep == ')')
-            {
-              temp.key2 = {real, 0.0};
-              has_key2 = true;
-            }
-            else
-            {
-              is >> imag >> sep;
-              if (sep == ')')
-              {
-                temp.key2 = {real, imag};
-                has_key2 = true;
-              }
-            }
-          }
-          else
-          {
-            for (int i = prefix.size() - 1; i >= 0; --i)
-              is.putback(prefix[i]);
-          }
+          temp.key2 = value;
+          has_key2 = true;
         }
       }
       else if (key == "key3")
