@@ -2,10 +2,6 @@
 #define DETAIL_COMMANDS_HPP
 
 #include <iostream>
-#include <vector>
-
-#include "polygon.hpp"
-#include "format_guard.hpp"
 
 namespace fedorov
 {

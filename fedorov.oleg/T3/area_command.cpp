@@ -1,10 +1,8 @@
 #include <stdexcept>
-#include <functional>
 #include <numeric>
 
 #include "commands.hpp"
 #include "functional.hpp"
-#include "format_guard.hpp"
 #include "detail_commands.hpp"
 
 namespace fedorov

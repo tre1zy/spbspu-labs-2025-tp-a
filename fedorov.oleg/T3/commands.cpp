@@ -1,10 +1,7 @@
 #include "commands.hpp"
 
 #include <iomanip>
-#include <numeric>
 #include <algorithm>
-#include <functional>
-#include <map>
 
 #include "format_guard.hpp"
 #include "functional.hpp"

@@ -2,7 +2,6 @@
 #include <map>
 
 #include "commands.hpp"
-#include "functional.hpp"
 #include "detail_commands.hpp"
 
 namespace fedorov

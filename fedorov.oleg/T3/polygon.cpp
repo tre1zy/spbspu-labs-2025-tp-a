@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <iterator>
-#include <functional>
 
 namespace fedorov
 {

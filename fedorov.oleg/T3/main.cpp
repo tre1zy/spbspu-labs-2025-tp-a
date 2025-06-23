@@ -5,7 +5,6 @@
 #include <map>
 #include <functional>
 #include <limits>
-#include <iterator>
 
 #include "polygon.hpp"
 #include "commands.hpp"

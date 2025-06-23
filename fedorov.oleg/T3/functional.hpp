@@ -1,9 +1,6 @@
 #ifndef FUNCTIONAL_HPP
 #define FUNCTIONAL_HPP
 
-#include <algorithm>
-#include <functional>
-#include <string>
 #include <vector>
 
 #include "polygon.hpp"

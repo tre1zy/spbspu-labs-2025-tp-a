@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <algorithm>
 
 #include "commands.hpp"
 #include "functional.hpp"
