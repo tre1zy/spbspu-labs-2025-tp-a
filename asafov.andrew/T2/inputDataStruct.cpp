@@ -1,129 +1,152 @@
 #include "datastruct.h"
 #include <cctype>
 #include <algorithm>
-#include <cstring>
-#include <complex>
 
 namespace
 {
-  bool parseULLBin(std::istream& is, unsigned long long& result)
+  unsigned long long parseULLBin(std::istream& is)
   {
     char ch;
-    if (!(is >> ch) || ch != '0') return false;
-    if (!(is >> ch) || ch != 'b') return false;
-
-    result = 0;
-    bool has_digits = false;
-    while (is.get(ch))
+    if (!is.get(ch) || ch != '0')
     {
-      if (ch == '0' || ch == '1')
+      is.setstate(std::ios::failbit);
+      return 0;
+    }
+    if (!is.get(ch) || ch != 'b')
+    {
+      is.setstate(std::ios::failbit);
+      return 0;
+    }
+
+    unsigned long long result = 0;
+    while (is.get(ch) && (ch == '0' || ch == '1'))
+    {
+      result = result << 1;
+      if (ch == '1')
       {
-        result = (result << 1) | (ch - '0');
-        has_digits = true;
-      }
-      else
-      {
-        is.putback(ch);
-        break;
+        result = result | 1;
       }
     }
-    return has_digits;
+    if (is)
+    {
+      is.unget();
+    }
+    return result;
   }
 
-  bool parseCmpLsp(std::istream& is, std::complex< double >& result)
+  std::complex< double > parseCmpLsp(std::istream& is)
   {
     char ch;
-    if (!(is >> ch) || ch != '#') return false;
-    if (!(is >> ch) || ch != 'c') return false;
-    if (!(is >> ch) || ch != '(') return false;
-
-    double real, imag = 0.0;
-    if (!(is >> real)) return false;
-
-    if (!(is >> ch)) return false;
-    if (ch == ')')
+    if (!is.get(ch) || ch != '#')
     {
-      result = {real, 0.0};
-      return true;
+      is.setstate(std::ios::failbit);
+      return {0.0, 0.0};
+    }
+    if (!is.get(ch) || ch != 'c')
+    {
+      is.setstate(std::ios::failbit);
+      return {0.0, 0.0};
+    }
+    if (!is.get(ch) || ch != '(')
+    {
+      is.setstate(std::ios::failbit);
+      return {0.0, 0.0};
     }
 
-    if (!(is >> imag)) return false;
-    if (!(is >> ch) || ch != ')') return false;
+    double real = 0.0;
+    double imag = 0.0;
+    is >> real;
+    if (!is)
+    {
+      return {0.0, 0.0};
+    }
 
-    result = {real, imag};
-    return true;
+    if (is.get(ch) && ch != ')')
+    {
+      is.unget();
+      is >> imag;
+      if (!is)
+      {
+        return {0.0, 0.0};
+      }
+      if (!is.get(ch) || ch != ')')
+      {
+        is.setstate(std::ios::failbit);
+        return {0.0, 0.0};
+      }
+    }
+    return {real, imag};
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   DataStruct temp;
-  int keys_found = 0;
   char ch;
+  bool has_key1 = false;
+  bool has_key2 = false;
+  bool has_key3 = false;
 
-  while (is >> ch)
+  while (is.get(ch))
   {
     if (ch == ':')
     {
       std::string key;
-      while (is.get(ch) && ch != ' ' && ch != ':')
+      while (is.get(ch) && ch != ' ' && ch != '\n')
       {
-        key += ch;
+        key.push_back(ch);
       }
-
       if (key == "key1")
       {
-        unsigned long long value;
-        if (parseULLBin(is, value) || (is.peek() == '0'))
+        unsigned long long val = parseULLBin(is);
+        if (is || is.eof())
         {
-          temp.key1 = value;
-          keys_found |= 1;
+          temp.key1 = val;
+          has_key1 = true;
+          is.clear();
         }
       }
       else if (key == "key2")
       {
-        std::complex< double > value;
-        if (parseCmpLsp(is, value))
+        std::complex< double > val = parseCmpLsp(is);
+        if (is || is.eof())
         {
-          temp.key2 = value;
-          keys_found |= 2;
+          temp.key2 = val;
+          has_key2 = true;
+          is.clear();
         }
       }
       else if (key == "key3")
       {
-        is >> std::ws;
-        if (is.peek() == '"')
+        if (is.get(ch) && ch == '"')
         {
-          is.get();
-          std::string value;
-          while (is.get(ch) && ch != '"')
+          std::string str;
+          while (is.get(ch) && ch != '"' && ch != '\n')
           {
-            value += ch;
+            str.push_back(ch);
           }
           if (ch == '"')
           {
-            temp.key3 = value;
-            keys_found |= 4;
+            temp.key3 = str;
+            has_key3 = true;
           }
         }
       }
     }
-
-    if (keys_found == 7) // 1 | 2 | 4
+    if (has_key1 && has_key2 && has_key3)
     {
       data = temp;
       return is;
     }
-
-    if (ch == '\n') break;
+    if (ch == '\n')
+    {
+      break;
+    }
   }
 
-  if (keys_found == 7)
+  if (!has_key1 || !has_key2 || !has_key3)
   {
-    data = temp;
-    return is;
+    is.setstate(std::ios::failbit);
   }
-
-  is.setstate(std::ios::failbit);
   return is;
 }
