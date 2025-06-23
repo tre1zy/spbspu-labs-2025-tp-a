@@ -64,6 +64,17 @@ namespace
       std::for_each(dict.second.cbegin(), dict.second.cend(), PrintWord{out});
     }
   };
+
+  bool intersectWord(const maslov::Dict & dict2, const maslov::Word & word)
+  {
+    return dict2.find(word.first) != dict2.end();
+  }
+
+  maslov::Word frequencyUpdate(const maslov::Dict & dict2, const maslov::Word & word)
+  {
+    auto it = dict2.find(word.first);
+    return {word.first, std::min(word.second, it->second)};
+  }
 }
 
 void maslov::createDictionary(std::istream & in, Dicts & dicts)
@@ -140,10 +151,10 @@ void maslov::unionDictionary(std::istream & in, Dicts & dicts)
 
 void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
 {
-  std::string dict1, dict2, resultName;
-  in >> resultName >> dict1 >> dict2;
-  auto it1 = dicts.find(dict1);
-  auto it2 = dicts.find(dict2);
+  std::string dictName1, dictName2, resultName;
+  in >> resultName >> dictName1 >> dictName2;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
     throw std::runtime_error("<INVALID DICTIONARY>");
@@ -152,15 +163,16 @@ void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
   {
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
-  auto & resultDict = dicts[resultName];
-  for (auto it = it1->second.begin(); it != it1->second.end(); it++)
-  {
-    auto wordIt = it2->second.find(it->first);
-    if (wordIt != it2->second.end())
-    {
-      resultDict[it->first] = std::min(it->second, wordIt->second);
-    }
-  }
+  auto & result = dicts[resultName];
+  auto & dict1 = dicts[dictName1];
+  auto & dict2 = dicts[dictName2];
+  using namespace std::placeholders;
+  auto func = std::bind(intersectWord, std::cref(dict2), _1);
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), func);
+  auto update = std::bind(frequencyUpdate,std::cref(dict2), _1);
+  Dict temp;
+  std::transform(result.begin(), result.end(), std::inserter(temp, temp.end()), update);
+  result = std::move(temp);
 }
 
 void maslov::copyDictionary(std::istream & in, Dicts & dicts)
