@@ -1,4 +1,3 @@
-#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -6,8 +5,6 @@
 #include <map>
 #include <string>
 #include <functional>
-#include "point.h"
-#include "poligon.h"
 #include "commands.h"
 
 int main(int argc, char** argv)
