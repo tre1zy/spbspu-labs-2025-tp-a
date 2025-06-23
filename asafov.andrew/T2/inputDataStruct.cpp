@@ -159,25 +159,3 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
   }
   return is;
 }
-
-std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
-{
-  os << "(:key1 0b";
-  if (data.key1 == 0)
-  {
-    os << "0";
-  }
-  else
-  {
-    std::string bin;
-    unsigned long long n = data.key1;
-    while (n > 0)
-    {
-      bin = (n % 2 ? "1" : "0") + bin;
-      n /= 2;
-    }
-    os << bin;
-  }
-  os << ":key2 #c(" << data.key2.real() << " " << data.key2.imag() << "):key3 \"" << data.key3 << "\":)";
-  return os;
-}
