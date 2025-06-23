@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <vector>
 #include <iostream>
 #include <stdexcept>
 
@@ -69,24 +70,30 @@ void abramov::setDicts(DictionaryCollection &collect, std::istream &in)
 {
   std::string new_name;
   in >> new_name;
-  std::string name;
-  in >> name;
-  if (name.empty() || new_name.empty())
+  char bracket = '\0';
+  in >> bracket;
+  if (bracket != '(')
   {
-    throw std::logic_error("There is no enough arguments\n");
+    throw std::logic_error("Expected '('\n");
   }
-  Dictionary res = Dictionary(collect.findDict(name));
-  while (in >> name)
+  std::string name;
+  Dictionary res{};
+  bool first = true;
+  while (in >> name && name != ")")
   {
-    if (name.empty())
+    if (first)
     {
-      continue;
+      res = collect.findDict(name);
+      first = false;
     }
-    res = res.setWithDict(collect.cfindDict(name));
-    if (in.peek() == '\n')
+    else
     {
-      break;
+      res = res.setWithDict(collect.cfindDict(name));
     }
+  }
+  if (name != ")")
+  {
+    throw std::logic_error("Expected ')'\n");
   }
   collect.addCompleteDict(new_name, res);
 }
@@ -95,24 +102,30 @@ void abramov::intersectDicts(DictionaryCollection &collect, std::istream &in)
 {
   std::string new_name;
   in >> new_name;
-  std::string name;
-  in >> name;
-  if (name.empty() || new_name.empty())
+  char bracket = '\0';
+  in >> bracket;
+  if (bracket != '(')
   {
-    throw std::logic_error("There is no enough arguments\n");
+    throw std::logic_error("Expected '('\n");
   }
-  Dictionary res = Dictionary(collect.findDict(name));
-  while (in >> name)
+  Dictionary res{};
+  std::string name;
+  bool first = true;
+  while (in >> name && name != ")")
   {
-    if (name.empty())
+    if (first)
     {
-      continue;
+      res = collect.findDict(name);
+      first = false;
     }
-    res = res.intersectWithDict(collect.cfindDict(name));
-    if (in.peek() == '\n')
+    else
     {
-      break;
+      res = res.intersectWithDict(collect.cfindDict(name));
     }
+  }
+  if (name != ")")
+  {
+    throw std::logic_error("Expected ')'\n");
   }
   collect.addCompleteDict(new_name, res);
 }
@@ -121,25 +134,30 @@ void abramov::unionDicts(DictionaryCollection &collect, std::istream &in)
 {
   std::string new_name;
   in >> new_name;
-  std::string name;
-  in >> name;
-  if (name.empty() || new_name.empty())
+  char bracket = '\0';
+  in >> bracket;
+  if (bracket != '(')
   {
-    throw std::logic_error("There is no enough arguments\n");
+    throw std::logic_error("Expected '('\n");
   }
-  Dictionary res = Dictionary(collect.findDict(name));
-  while (in >> name)
+  std::string name;
+  Dictionary res{};
+  bool first = true;
+  while (in >> name && name != ")")
   {
-    if (name.empty())
+    if (first)
     {
-      continue;
+      res = collect.findDict(name);
+      first = false;
     }
-    res = res.unionWithDict(collect.cfindDict(name));
-    if (in.peek() == '\n')
+    else
     {
-      break;
+      res = res.unionWithDict(collect.cfindDict(name));
     }
-
+  }
+  if (name != ")")
+  {
+    throw std::logic_error("Expected ')'\n");
   }
   collect.addCompleteDict(new_name, res);
 }
@@ -148,26 +166,30 @@ void abramov::diffDicts(DictionaryCollection &collect, std::istream &in)
 {
   std::string new_name;
   in >> new_name;
-  std::string name;
-  in >> name;
-  if (name.empty() || new_name.empty())
+  char bracket = '\0';
+  in >> bracket;
+  if (bracket != '(')
   {
-    throw std::logic_error("There is no enough arguments\n");
+    throw std::logic_error("Expected '('\n");
   }
-  Dictionary res = Dictionary(collect.findDict(name));
-  while (in >> name)
+  std::string name;
+  Dictionary res{};
+  bool first = true;
+  while (in >> name && name != ")")
   {
-    if (name.empty())
+    if (first)
     {
-      continue;
+      res = collect.findDict(name);
+      first = false;
     }
-    const Dictionary &sub_dict = collect.cfindDict(name);
-    res = res.diffDict(sub_dict);
-    if (in.peek() == '\n')
+    else
     {
-      break;
+      res = res.diffDict(collect.cfindDict(name));
     }
-
+  }
+  if (name != ")")
+  {
+    throw std::logic_error("Expected ')'\n");
   }
   collect.addCompleteDict(new_name, res);
 }
@@ -176,28 +198,39 @@ void abramov::mergeDicts(DictionaryCollection &collect, std::istream &in)
 {
   std::string new_name;
   in >> new_name;
-  std::string name;
-  in >> name;
-  if (name.empty() || new_name.empty())
+  char bracket = '\0';
+  in >> bracket;
+  if (bracket != '(')
   {
-    throw std::logic_error("There is no enough arguments\n");
+    throw std::logic_error("Expected '('\n");
   }
-  Dictionary res = Dictionary(collect.findDict(name));
-  while (in >> name)
+  std::string name;
+  Dictionary res{};
+  bool first = true;
+  std::vector< std::string > del;
+  while (in >> name && name != ")")
   {
-    if (name.empty())
+    if (first)
     {
-      continue;
+      res = collect.findDict(name);
+      first = false;
+      del.push_back(name);
     }
-    const Dictionary &sub_dict = collect.cfindDict(name);
-    res = res.mergeDict(sub_dict);
-    collect.deleteDict(name);
-    if (in.peek() == '\n')
+    else
     {
-      break;
+      res = res.mergeDict(collect.cfindDict(name));
+      del.push_back(name);
     }
+  }
+  if (name != ")")
+  {
+    throw std::logic_error("Expected ')'\n");
   }
   collect.addCompleteDict(new_name, res);
+  for (const auto &dict_name : del)
+  {
+    collect.deleteDict(dict_name);
+  }
 }
 
 void abramov::printDict(const DictionaryCollection &collect, std::istream &in, std::ostream &out)
