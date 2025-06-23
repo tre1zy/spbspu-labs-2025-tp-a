@@ -29,20 +29,36 @@ namespace rychkov
     Preprocessor preproc;
     Lexer lex;
     CParser parser;
+    bool real_file = true;
   };
 
   class MainProcessor
   {
   public:
+    static constexpr char help_file[] = "help.txt";
     static Parser::map_type< ParserContext, MainProcessor > call_map;
 
     void help(std::ostream& out);
     bool parse(CParseContext file_context, bool overwrite);
 
     bool init(ParserContext& context, int argc, char** argv);
-    bool tree(ParserContext& context);
-    bool parsed(ParserContext& context);
+    bool save(ParserContext& context);
+    bool load(ParserContext& context);
     bool reload(ParserContext& context);
+    bool parse(ParserContext& context);
+    bool parse_after(ParserContext& context);
+
+    bool external(ParserContext& context);
+    bool exposition(ParserContext& context);
+    bool defines(ParserContext& context);
+    bool tree(ParserContext& context);
+    bool files(ParserContext& context);
+
+    bool dependencies(ParserContext& context);
+    bool uses(ParserContext& context);
+    bool intersections(ParserContext& context);
+    bool diff(ParserContext& context);
+    bool unopen_defines(ParserContext& context);
 
   private:
     Stage last_stage_ = CPARSER;

@@ -140,7 +140,7 @@ void rychkov::Preprocessor::append(CParseContext& context, char c)
       empty_line_ = false;
       prev_ = '\0';
     }
-    if (c == '/') // hold
+    if (c == '/')
     {
       prev_ = '/';
       return;
