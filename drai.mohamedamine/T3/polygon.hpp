@@ -27,73 +27,45 @@ namespace amine
   {
     std::string content;
   };
-struct AreaAccumulator {
-    double operator()(double acc, const Polygon& p) const {
-        return acc + compute_area(p);
+  struct PointPairArea {
+    long long operator()(const Point& a, const Point& b) const {
+        return static_cast<long long>(a.x) * b.y - static_cast<long long>(a.y) * b.x;
     }
 };
 
-struct EvenAreaAccumulator {
-    double operator()(double acc, const Polygon& p) const {
-        return acc + (p.points.size() % 2 == 0 ? compute_area(p) : 0.0);
-    }
-};
-
-struct OddAreaAccumulator {
-    double operator()(double acc, const Polygon& p) const {
-        return acc + (p.points.size() % 2 != 0 ? compute_area(p) : 0.0);
-    }
-};
-
-struct VertexCountAreaAccumulator {
-    int num;
-    VertexCountAreaAccumulator(int n) : num(n) {}
-    double operator()(double acc, const Polygon& p) const {
-        return acc + (static_cast<int>(p.points.size()) == num ? compute_area(p) : 0.0);
-    }
-};
-
-struct AreaComparator {
-    bool operator()(const Polygon& a, const Polygon& b) const {
-        return compute_area(a) < compute_area(b);
-    }
-};
-
-struct VertexCountComparator {
-    bool operator()(const Polygon& a, const Polygon& b) const {
-        return a.points.size() < b.points.size();
-    }
-};
-
-struct EvenVertexCountChecker {
-    bool operator()(const Polygon& p) const {
-        return p.points.size() % 2 == 0;
-    }
-};
-
-struct OddVertexCountChecker {
-    bool operator()(const Polygon& p) const {
-        return p.points.size() % 2 != 0;
-    }
-};
-
-struct SpecificVertexCountChecker {
-    int num;
-    SpecificVertexCountChecker(int n) : num(n) {}
-    bool operator()(const Polygon& p) const {
-        return static_cast<int>(p.points.size()) == num;
+struct PointInPolygonAccumulator {
+    const Point& pt;
+    bool& inside;
+    std::pair<Point, bool> operator()(std::pair<Point, bool> acc, const Point& current) const {
+        const Point& prev = acc.first;
+        bool cond = (current.y > pt.y) != (prev.y > pt.y);
+        bool intersect = cond && (pt.x < static_cast<long double>(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) + current.x);
+        if (intersect) inside = !inside;
+        return std::make_pair(current, inside);
     }
 };
 
 struct PolygonIntersectionChecker {
-    const Polygon& query;
-    PolygonIntersectionChecker(const Polygon& q) : query(q) {}
-    bool operator()(const Polygon& p) const {
-        return polygons_intersect(p, query);
+    const Polygon& a;
+    const Polygon& b;
+    int na, nb;
+    bool operator()(const Point& p1) const {
+        int i = &p1 - &a.points[0];
+        return std::any_of(b.points.begin(), b.points.end(), SegmentIntersectionChecker{a, b, i, na, nb});
     }
 };
 
-struct PointGenerator {
+struct SegmentIntersectionChecker {
+    const Polygon& a;
+    const Polygon& b;
+    int i, na, nb;
+    bool operator()(const Point& p2) const {
+        int j = &p2 - &b.points[0];
+        return seg_intersect(a.points[i], a.points[(i + 1) % na], b.points[j], b.points[(j + 1) % nb]);
+    }
+};
+
+struct PointParser {
     std::istringstream& iss;
     Point operator()() const {
         Point pt;
@@ -106,6 +78,23 @@ struct PointGenerator {
         return pt;
     }
 };
+
+struct PolygonValidator {
+    bool operator()(const Polygon& p) const {
+        return !p.points.empty();
+    }
+};
+
+struct LineToPolygonConverter {
+    Polygon operator()(const Line& line) const {
+        Polygon poly;
+        if (!line.content.empty() && parse_polygon(line.content, poly) && poly.points.size() >= 3) {
+            return poly;
+        }
+        return Polygon{};
+    }
+};
+
   std::istream& operator>>(std::istream& is, Line& line);
 
   Point operator-(const Point& a, const Point& b);
