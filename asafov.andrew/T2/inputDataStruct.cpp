@@ -1,6 +1,8 @@
 #include "datastruct.h"
 #include <cctype>
 #include <algorithm>
+#include <cstring>
+#include <complex>
 
 namespace
 {
