@@ -6,16 +6,13 @@
 
 namespace
 {
-  unsigned long long parseULLBin(std::istream& is)
+  bool parseULLBin(std::istream& is, unsigned long long& result)
   {
     char ch;
-    if (!(is >> ch) || ch != '0' || !(is >> ch) || ch != 'b')
-    {
-      is.putback(ch);
-      return 0;
-    }
+    if (!(is >> ch) || ch != '0') return false;
+    if (!(is >> ch) || ch != 'b') return false;
 
-    unsigned long long result = 0;
+    result = 0;
     bool has_digits = false;
     while (is.get(ch))
     {
@@ -30,101 +27,66 @@ namespace
         break;
       }
     }
-
-    return has_digits ? result : 0;
+    return has_digits;
   }
 
-  std::complex< double > parseCmpLsp(std::istream& is)
+  bool parseCmpLsp(std::istream& is, std::complex< double >& result)
   {
-    char buffer[5] = {0};
-    is.read(buffer, 3);
-    if (strncmp(buffer, "#c(", 3) != 0)
+    char ch;
+    if (!(is >> ch) || ch != '#') return false;
+    if (!(is >> ch) || ch != 'c') return false;
+    if (!(is >> ch) || ch != '(') return false;
+
+    double real, imag = 0.0;
+    if (!(is >> real)) return false;
+
+    if (!(is >> ch)) return false;
+    if (ch == ')')
     {
-      for (int i = is.gcount() - 1; i >= 0; --i)
-        is.putback(buffer[i]);
-      return {0.0, 0.0};
+      result = {real, 0.0};
+      return true;
     }
 
-    double real = 0.0;
-    if (!(is >> real))
-    {
-      is.clear();
-      while (is && is.get() != ')')
-      {
-      }
-      return {0.0, 0.0};
-    }
+    if (!(is >> imag)) return false;
+    if (!(is >> ch) || ch != ')') return false;
 
-    char sep;
-    if (!(is >> sep))
-      return {0.0, 0.0};
-
-    if (sep == ')')
-      return {real, 0.0};
-
-    double imag = 0.0;
-    if (!(is >> imag))
-    {
-      is.clear();
-      while (is && is.get() != ')')
-      {
-      }
-      return {0.0, 0.0};
-    }
-
-    if (!(is >> sep) || sep != ')')
-      return {0.0, 0.0};
-
-    return {real, imag};
+    result = {real, imag};
+    return true;
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   DataStruct temp;
-  bool has_key1 = false;
-  bool has_key2 = false;
-  bool has_key3 = false;
-
+  int keys_found = 0;
   char ch;
-  while (is.get(ch))
+
+  while (is >> ch)
   {
     if (ch == ':')
     {
       std::string key;
       while (is.get(ch) && ch != ' ' && ch != ':')
       {
-        key.push_back(ch);
+        key += ch;
       }
-      is.putback(ch);
 
       if (key == "key1")
       {
-        char prefix[2];
-        if (is.read(prefix, 2) && prefix[0] == '0' && prefix[1] == 'b')
+        unsigned long long value;
+        if (parseULLBin(is, value) || (is.peek() == '0'))
         {
-          unsigned long long value = parseULLBin(is);
-          if (value != 0 || (is.peek() == '0'))
-          {
-            temp.key1 = value;
-            has_key1 = true;
-          }
-        }
-        else
-        {
-          for (int i = is.gcount() - 1; i >= 0; --i)
-            is.putback(prefix[i]);
+          temp.key1 = value;
+          keys_found |= 1;
         }
       }
       else if (key == "key2")
       {
-        std::complex< double > value = parseCmpLsp(is);
-        if (value != std::complex< double >{0.0, 0.0} ||
-          (is.peek() == '#' && is.get() == '#' && is.peek() == 'c' && is.get() == 'c' && is.peek() == '(' && is.get() ==
-            '('))
+        std::complex< double > value;
+        if (parseCmpLsp(is, value))
         {
           temp.key2 = value;
-          has_key2 = true;
+          keys_found |= 2;
         }
       }
       else if (key == "key3")
@@ -136,31 +98,27 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
           std::string value;
           while (is.get(ch) && ch != '"')
           {
-            value.push_back(ch);
+            value += ch;
           }
           if (ch == '"')
           {
             temp.key3 = value;
-            has_key3 = true;
+            keys_found |= 4;
           }
         }
       }
     }
 
-    if (has_key1 && has_key2 && has_key3)
+    if (keys_found == 7) // 1 | 2 | 4
     {
       data = temp;
       return is;
     }
 
-    if (ch == '\n')
-    {
-      temp = DataStruct();
-      has_key1 = has_key2 = has_key3 = false;
-    }
+    if (ch == '\n') break;
   }
 
-  if (has_key1 && has_key2 && has_key3)
+  if (keys_found == 7)
   {
     data = temp;
     return is;
