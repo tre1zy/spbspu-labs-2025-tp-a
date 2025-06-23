@@ -12,29 +12,33 @@
 namespace
 {
   using namespace bocharov;
+  using Predicate = std::function<bool(const Polygon &)>;
+
+  struct AreaAccumulator
+  {
+    Predicate pred;
+    double operator()(double sum, const Polygon & poly) const
+    {
+      return pred(poly) ? sum + getPolygonArea(poly) : sum;
+    }
+  };
+
+  void getAreaByPredicate(std::ostream & out, const std::vector<Polygon> & polygons, Predicate pred)
+  {
+    StreamGuard guard(out);
+    AreaAccumulator accumulator{pred};
+    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+    out << std::fixed << std::setprecision(1) << result << '\n';
+  }
 
   void getAreaEven(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    StreamGuard guard(out);
-    std::vector< Polygon > filtered;
-    filtered.reserve(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isEven);
-    std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    getAreaByParity(out, polygons, isEven);
   }
 
   void getAreaOdd(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    StreamGuard guard(out);
-    std::vector< Polygon > filtered;
-    filtered.reserve(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isOdd);
-    std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    getAreaByParity(out, polygons, isOdd);
   }
 
   void getAreaMean(std::ostream & out, const std::vector< Polygon > & polygons)
