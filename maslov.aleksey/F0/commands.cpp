@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <vector>
+#include <functional>
 #include "ioTypes.hpp"
 
 namespace
@@ -41,6 +42,11 @@ namespace
     {
       std::sort(words.begin(), words.end(), comparatorDescending);
     }
+  }
+
+  bool comparatorFrequency(const std::pair< std::string, int > & word, int low, int high)
+  {
+    return word.second >= low && word.second <= high;
   }
 }
 
@@ -233,7 +239,6 @@ void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & d
   {
     throw std::runtime_error("<INVALID NUMBER>");
   }
-  using Words = std::pair< std::string, int >;
   std::vector< Words > words;
   words.reserve(dictIt->second.size());
   std::copy(dictIt->second.begin(), dictIt->second.end(), std::back_inserter(words));
@@ -273,13 +278,9 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & resultDict = dicts[resultName];
-  for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
-  {
-    if (it->second >= freq1 && it->second <= freq2)
-    {
-      resultDict[it->first] = it->second;
-    }
-  }
+  using namespace std::placeholders;
+  auto cmp = std::bind(comparatorFrequency, _1, freq1, freq2);
+  std::copy_if(dictIt->second.begin(), dictIt->second.end(), std::inserter(resultDict, resultDict.end()), cmp);
   if (resultDict.empty())
   {
     dicts.erase(resultName);
