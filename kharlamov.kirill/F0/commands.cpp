@@ -64,20 +64,7 @@ namespace kharlamov
       }
     } matcher{ prefix };
 
-    struct PairInserter
-    {
-      std::vector<std::pair<std::string, std::string>>& result;
-
-      void operator()(const std::pair<std::string, std::string>& p) const
-      {
-        result.push_back(p);
-      }
-    }
-    inserter{ result };
-
-    std::vector<std::pair<std::string, std::string>> temp;
-    std::copy_if(data.begin(), data.end(), std::back_inserter(temp), matcher);
-    std::copy(temp.begin(), temp.end(), std::back_inserter(result));
+    std::copy_if(data.begin(), data.end(), std::back_inserter(result), matcher);
 
     return result;
   }
@@ -95,9 +82,7 @@ namespace kharlamov
     }
     matcher{ pattern };
 
-    std::vector<std::pair<std::string, std::string>> temp;
-    std::copy_if(data.begin(), data.end(), std::back_inserter(temp), matcher);
-    std::copy(temp.begin(), temp.end(), std::back_inserter(result));
+    std::copy_if(data.begin(), data.end(), std::back_inserter(result), matcher);
 
     return result;
   }
@@ -324,7 +309,6 @@ namespace kharlamov
 
       std::vector<size_t> indices(tokens.size() - 3);
       std::iota(indices.begin(), indices.end(), 3);
-
       std::transform(indices.begin(), indices.end(), indices.begin(), handler.processor);
 
       if (wordExistsInDict(dictId, word)) return "<INVALID COMMAND>";
@@ -354,30 +338,30 @@ namespace kharlamov
       auto matches = dictionaries[dictId].findByPrefix(tokens[2]);
       if (matches.empty()) return "<NO MATCHES>";
 
-      std::string result;
-
-      struct MatchProcessor
+      struct ResultBuilder
       {
-        std::string& result;
-
-        void operator()(const std::pair<std::string, std::string>& p) const
+        std::string result;
+        void operator()(const std::pair<std::string, std::string>& p)
         {
           if (!result.empty()) result += "\n";
           result += p.first + " - " + p.second;
         }
-      } processor{ result };
+      } builder;
 
-      struct Accumulator
+      struct MatchProcessor
       {
-        void operator()(MatchProcessor& proc, const std::pair<std::string, std::string>& p) const
+        ResultBuilder& builder;
+        std::pair<std::string, std::string> operator()(const std::pair<std::string, std::string>& p) const
         {
-          proc(p);
+          builder(p);
+          return p;
         }
-      } accumulator;
+      } processor{ builder };
 
-      std::accumulate(matches.begin(), matches.end(), std::ref(processor), accumulator);
+      std::vector<std::pair<std::string, std::string>> temp(matches);
+      std::transform(temp.begin(), temp.end(), temp.begin(), processor);
 
-      return result;
+      return builder.result;
     }
     else if (cmd == "search" && tokens.size() == 3)
     {
@@ -387,50 +371,41 @@ namespace kharlamov
       auto matches = dictionaries[dictId].searchByPattern(tokens[2]);
       if (matches.empty()) return "<NO MATCHES>";
 
+      struct PairConverter
+      {
+        std::string operator()(const std::pair<std::string, std::string>& p) const
+        {
+            return p.first + " - " + p.second;
+        }
+      } converter;
+
+      std::vector<std::string> formattedStrings;
+      formattedStrings.reserve(matches.size());
+      std::transform(matches.begin(), matches.end(), std::back_inserter(formattedStrings), converter);
+
       struct ResultHandler
       {
         std::string result;
-
-        struct PairConverter
+        void operator()(const std::string& str)
         {
-          std::string operator()(const std::pair<std::string, std::string>& p) const
-          {
-            return p.first + " - " + p.second;
-          }
-        } converter;
-
-        struct StringConcatenator
-        {
-          std::string& result_ref;
-          void operator()(const std::string& str) const
-          {
-            if (!result_ref.empty()) result_ref += "\n";
-            result_ref += str;
-          }
-        };
-
-        void process(const std::vector<std::pair<std::string, std::string>>& matches)
-        {
-          std::vector<std::string> formattedStrings;
-          formattedStrings.reserve(matches.size());
-          std::transform(matches.begin(), matches.end(), std::back_inserter(formattedStrings), converter);
-
-          StringConcatenator concat{ result };
-          struct TransformationHelper
-          {
-            StringConcatenator& concat_ref;
-            std::string operator()(const std::string& str) const
-            {
-              concat_ref(str);
-              return str;
-            }
-          } helper{ concat };
-
-          std::transform(formattedStrings.begin(), formattedStrings.end(), formattedStrings.begin(), helper);
+          if (!result.empty()) result += "\n";
+          result += str;
         }
       } handler;
 
-      handler.process(matches);
+      struct StringProcessor
+      {
+        ResultHandler& handler;
+        std::string operator()(const std::string& str) const
+        {
+          handler(str);
+          return str;
+        }
+      } processor{ handler };
+
+      std::vector<std::string> temp(formattedStrings);
+      std::transform(temp.begin(), temp.end(), temp.begin(), processor);
+
       return handler.result;
     }
     else if (cmd == "count" && tokens.size() == 2)
@@ -469,16 +444,18 @@ namespace kharlamov
         }
       } concatenator;
 
-      struct Processor
+      struct StringProcessor
       {
         Concatenator& concat;
-        void operator()(const std::string& str) const
+        std::string operator()(const std::string& str) const
         {
           concat(str);
+          return str;
         }
       } processor{ concatenator };
 
-      std::transform(formattedWords.begin(), formattedWords.end(), formattedWords.begin(), processor);
+      std::vector<std::string> temp(formattedWords);
+      std::transform(temp.begin(), temp.end(), temp.begin(), processor);
 
       return concatenator.result;
     }
@@ -499,24 +476,42 @@ namespace kharlamov
     {
       if (dictionaries.empty()) return "No dictionaries";
 
-      struct ResultHandler
+      struct DictInfo
+      {
+        std::string operator()(const std::pair<int, Dictionary>& p) const
+        {
+          return std::to_string(p.first) + ": " + std::to_string(p.second.size()) + " words";
+        }
+      } dictInfo;
+
+      std::vector<std::string> dictInfos;
+      dictInfos.reserve(dictionaries.size());
+      std::transform(dictionaries.begin(), dictionaries.end(), std::back_inserter(dictInfos), dictInfo);
+
+      struct Concatenator
       {
         std::string result;
-
-        struct DictProcessor
+        void operator()(const std::string& str)
         {
-          ResultHandler& handler;
-          void operator()(const std::pair<int, Dictionary>& p) const
-          {
-            if (!handler.result.empty()) handler.result += "\n";
-            handler.result += std::to_string(p.first) + ": " + std::to_string(p.second.size()) + " words";
-          }
-        } processor{ *this };
-      } handler;
+          if (!result.empty()) result += "\n";
+          result += str;
+        }
+      } concatenator;
 
-      std::transform(dictionaries.begin(), dictionaries.end(), dictionaries.begin(), handler.processor);
+      struct StringProcessor
+      {
+        Concatenator& concat;
+        std::string operator()(const std::string& str) const
+        {
+          concat(str);
+          return str;
+        }
+      } processor{ concatenator };
 
-      return handler.result;
+      std::vector<std::string> temp(dictInfos);
+      std::transform(temp.begin(), temp.end(), temp.begin(), processor);
+
+      return concatenator.result;
     }
     else if (cmd == "copy" && tokens.size() == 4)
     {
@@ -766,6 +761,7 @@ namespace kharlamov
     {
       return help();
     }
+
     return "<INVALID COMMAND>";
   }
 
