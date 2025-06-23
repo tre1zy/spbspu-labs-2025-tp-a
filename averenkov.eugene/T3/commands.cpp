@@ -110,17 +110,17 @@ double MeanAreaCalculator::operator()(const std::vector<Polygon>& polygons) cons
 }
 
 
-void MaxAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const 
+void MaxAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
 {
-  if (polygons.empty()) 
+  if (polygons.empty())
   {
     throw std::runtime_error("No polygons for MAX calculation");
   }
   double maxArea = calculateArea(polygons[0]);
-  for (const auto& poly : polygons) 
+  for (const auto& poly: polygons)
   {
     double area = calculateArea(poly);
-    if (area > maxArea) 
+    if (area > maxArea)
     {
       maxArea = area;
     }
@@ -129,17 +129,17 @@ void MaxAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostrea
   out << std::fixed << std::setprecision(1) << maxArea;
 }
 
-void MaxVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const 
+void MaxVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
 {
-  if (polygons.empty()) 
+  if (polygons.empty())
   {
     throw std::runtime_error("No polygons for MAX calculation");
   }
   size_t maxVertices = polygons[0].points.size();
-  for (const auto& poly : polygons) 
+  for (const auto& poly: polygons)
   {
     size_t vertices = poly.points.size();
-    if (vertices > maxVertices) 
+    if (vertices > maxVertices)
     {
       maxVertices = vertices;
     }
@@ -148,17 +148,17 @@ void MaxVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std:
 }
 
 
-void MinAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const 
+void MinAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
 {
-  if (polygons.empty()) 
+  if (polygons.empty())
   {
     throw std::runtime_error("No polygons for MIN calculation");
   }
   double minArea = calculateArea(polygons[0]);
-  for (const auto& poly : polygons) 
+  for (const auto& poly: polygons)
   {
     double area = calculateArea(poly);
-    if (area < minArea) 
+    if (area < minArea)
     {
       minArea = area;
     }
@@ -283,7 +283,7 @@ void printMaxValueOf(std::istream& in, const std::vector<Polygon>& polygons, std
   }
 }
 
-void printMinValueOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out) 
+void printMinValueOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
 {
   std::string param;
   in >> param;
