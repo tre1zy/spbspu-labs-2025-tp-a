@@ -3,18 +3,70 @@
 #include <iostream>
 #include "stream_guard.hpp"
 
-namespace
+std::istream & smirnov::operator>>(std::istream & in, DelimiterIO && dest)
 {
-  static bool checkChar(std::istream & in, char expected)
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
-    char c = 0;
-    in >> c;
-    if (!in)
-    {
-      return false;
-    }
-    return std::tolower(c) == std::tolower(expected);
+    return in;
   }
+  char c = 0;
+  in >> c;
+  if (!in || std::tolower(c) != std::tolower(dest.exp))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream & smirnov::operator>>(std::istream & in, ULLIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> dest.ref;
+  char u, l1, l2;
+  in >> u >> l1 >> l2;
+  if (!in || std::tolower(u) != 'u' || std::tolower(l1) != 'l' || std::tolower(l2) != 'l')
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream & smirnov::operator>>(std::istream & in, LLIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> dest.ref;
+  char l1, l2;
+  in >> l1 >> l2;
+  if (!in || std::tolower(l1) != 'l' || std::tolower(l2) != 'l')
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream & smirnov::operator>>(std::istream & in, QuotedStringIO && dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  in >> DelimiterIO{'"'};
+  std::getline(in, dest.ref, '"');
+  if (!in)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
 
 std::istream & smirnov::operator>>(std::istream & in, DataStruct & data)
@@ -25,18 +77,20 @@ std::istream & smirnov::operator>>(std::istream & in, DataStruct & data)
     return in;
   }
   StreamGuard guard(in);
-  DataStruct temp;
+  DataStruct temp{};
   bool hasKey1 = false;
   bool hasKey2 = false;
   bool hasKey3 = false;
-  if (!checkChar(in, '('))
+  in >> DelimiterIO{'('};
+  if (!in)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
   for (int i = 0; i < 3; ++i)
   {
-    if (!checkChar(in, ':') || !checkChar(in, 'k') || !checkChar(in, 'e') || !checkChar(in, 'y'))
+    in >> DelimiterIO{':'} >> DelimiterIO{'k'} >> DelimiterIO{'e'} >> DelimiterIO{'y'};
+    if (!in)
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -50,44 +104,48 @@ std::istream & smirnov::operator>>(std::istream & in, DataStruct & data)
     }
     if (keyIndex == 1)
     {
-      unsigned long long val = 0;
-      in >> val;
-      if (!in || !checkChar(in, 'u') || !checkChar(in, 'l') || !checkChar(in, 'l') || hasKey1)
+      if (hasKey1)
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      temp.key1 = val;
       hasKey1 = true;
-    }
-    else if (keyIndex == 2)
-    {
-      long long val = 0;
-      in >> val;
-      if (!in || !checkChar(in, 'l') || !checkChar(in, 'l') || hasKey2)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      temp.key2 = val;
-      hasKey2 = true;
-    }
-    else if (keyIndex == 3)
-    {
-      if (!checkChar(in, '"') || hasKey3)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      std::string s;
-      std::getline(in, s, '"');
+      in >> ULLIO{temp.key1};
       if (!in)
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      temp.key3 = std::move(s);
+    }
+    else if (keyIndex == 2)
+    {
+      if (hasKey2)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      hasKey2 = true;
+      in >> LLIO{temp.key2};
+      if (!in)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+    }
+    else if (keyIndex == 3)
+    {
+      if (hasKey3)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
       hasKey3 = true;
+      in >> QuotedStringIO{temp.key3};
+      if (!in)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
     }
     else
     {
@@ -95,19 +153,13 @@ std::istream & smirnov::operator>>(std::istream & in, DataStruct & data)
       return in;
     }
   }
-  if (!checkChar(in, ':') || !checkChar(in, ')'))
+  in >> DelimiterIO{':'} >> DelimiterIO{')'};
+  if (!in)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  if (hasKey1 && hasKey2 && hasKey3)
-  {
-    data = std::move(temp);
-  }
-  else
-  {
-    in.setstate(std::ios::failbit);
-  }
+  data = std::move(temp);
   return in;
 }
 
@@ -132,6 +184,8 @@ std::ostream & smirnov::operator<<(std::ostream & out, const DataStruct & data)
     return out;
   }
   StreamGuard guard(out);
-  out << "(:key1 " << data.key1 << "ull:key2 " << data.key2 << "ll:key3 \"" << data.key3 << "\":)";
+  out << "(:key1 " << data.key1 << "ull";
+  out << ":key2 " << data.key2 << "ll";
+  out << ":key3 \"" << data.key3 << "\":)";
   return out;
 }
