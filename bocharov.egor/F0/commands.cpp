@@ -9,10 +9,10 @@ namespace
 {
   struct TranslationPrinter
   {
-    std::ostream& out;
+    std::ostream & out;
     bool first = true;
 
-    void operator()(const std::string& tr)
+    void operator()(const std::string & tr)
     {
       if (!first) out << ",";
       out << " " << tr;
@@ -22,14 +22,14 @@ namespace
 
   struct DictPrinter
   {
-    std::ostream& out;
+    std::ostream & out;
 
-    void operator()(const std::pair<std::string, std::vector<std::string>>& entry)
+    void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
     {
       out << entry.first << ":";
       TranslationPrinter printer{ out };
       printer.first = true;
-      for (const auto& tr : entry.second)
+      for (const auto & tr : entry.second)
       {
         printer(tr);
       }
@@ -39,9 +39,9 @@ namespace
 
   struct DictWriter
   {
-    std::ostream& out;
+    std::ostream & out;
 
-    void operator()(const std::pair<std::string, std::vector<std::string>>& entry)
+    void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
     {
       out << entry.first;
       if (!entry.second.empty())
@@ -58,13 +58,13 @@ namespace
 
   struct FullDictWriter
   {
-    std::ostream& out;
-    const std::string& name;
+    std::ostream & out;
+    const std::string & name;
 
-    void operator()(const bocharov::dict_t& dict)
+    void operator()(const bocharov::dict_t & dict)
     {
       out << name << "\n";
-      for (const auto& entry : dict)
+      for (const auto & entry : dict)
       {
         DictWriter{ out }(entry);
       }
@@ -74,7 +74,7 @@ namespace
 
   struct FreqComparator
   {
-    bool operator()(const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) const
+    bool operator()(const std::pair<std::string, int> & a, const std::pair<std::string, int> & b) const
     {
       return a.second > b.second || (a.second == b.second && a.first < b.first);
     }
@@ -82,8 +82,8 @@ namespace
 
   struct RusRemover
   {
-    const std::set<std::string>& rusSet;
-    bool operator()(const std::string& tr) const
+    const std::set<std::string> & rusSet;
+    bool operator()(const std::string & tr) const
     {
       return rusSet.find(tr) != rusSet.end();
     }
@@ -91,11 +91,11 @@ namespace
 
   struct DictMergerAccumulator
   {
-    const bocharov::dict_dict_t& dicts;
-    bocharov::dict_t operator()(bocharov::dict_t acc, const std::string& dictName) const
+    const bocharov::dict_dict_t & dicts;
+    bocharov::dict_t operator()(bocharov::dict_t acc, const std::string & dictName) const
     {
-      const bocharov::dict_t& dict = dicts.at(dictName);
-      for (const auto& entry : dict)
+      const bocharov::dict_t & dict = dicts.at(dictName);
+      for (const auto & entry : dict)
       {
         if (acc.find(entry.first) == acc.end())
         {
@@ -110,7 +110,7 @@ namespace
 
 namespace bocharov
 {
-  void printHelp(std::ostream& out)
+  void printHelp(std::ostream & out)
   {
     out << "Available commands:\n"
         << "createdict <dictname> - create empty dictionary\n"
@@ -129,7 +129,7 @@ namespace bocharov
         << "--help - show help\n";
   }
 
-  void createDict(std::istream& in, dict_dict_t& dicts)
+  void createDict(std::istream & in, dict_dict_t & dicts)
   {
     std::string dictname;
     in >> dictname;
@@ -140,7 +140,7 @@ namespace bocharov
     dicts[dictname] = dict_t();
   }
 
-  void deleteDict(std::istream& in, dict_dict_t& dicts)
+  void deleteDict(std::istream& in, dict_dict_t & dicts)
   {
     std::string dictname;
     in >> dictname;
@@ -150,44 +150,44 @@ namespace bocharov
     }
   }
 
-  void printDict(std::istream& in, std::ostream& out, const dict_dict_t& dicts)
+  void printDict(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
   {
     std::string dictname;
     in >> dictname;
-    const dict_t& dict = dicts.at(dictname);
-    for (const auto& entry : dict)
+    const dict_t & dict = dicts.at(dictname);
+    for (const auto & entry : dict)
     {
       DictPrinter{ out }(entry);
     }
   }
 
-  void getTranslationSln(std::istream& in, std::ostream& out, const dict_dict_t& dicts)
+  void getTranslationSln(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
   {
     std::string dictname, sln;
     in >> dictname >> sln;
-    const dict_t& dict = dicts.at(dictname);
-    const list_t& translations = dict.at(sln);
+    const dict_t & dict = dicts.at(dictname);
+    const list_t & translations = dict.at(sln);
 
     out << sln << ":";
     TranslationPrinter printer{ out };
     printer.first = true;
-    for (const auto& tr : translations)
+    for (const auto & tr : translations)
     {
       printer(tr);
     }
     out << "\n";
   }
 
-  void getTranslationRu(std::istream& in, std::ostream& out, const dict_dict_t& dicts)
+  void getTranslationRu(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
   {
     std::string dictname, ru;
     in >> dictname >> ru;
-    const dict_t& dict = dicts.at(dictname);
+    const dict_t & dict = dicts.at(dictname);
     list_t slangWords;
 
-    for (const auto& entry : dict)
+    for (const auto & entry : dict)
     {
-      const auto& translations = entry.second;
+      const auto & translations = entry.second;
       if (std::find(translations.begin(), translations.end(), ru) != translations.end())
       {
         slangWords.push_back(entry.first);
@@ -197,31 +197,31 @@ namespace bocharov
     out << ru << ":";
     TranslationPrinter printer{ out };
     printer.first = true;
-    for (const auto& word : slangWords)
+    for (const auto & word : slangWords)
     {
       printer(word);
     }
     out << "\n";
   }
 
-  void deleteSln(std::istream& in, dict_dict_t& dicts)
+  void deleteSln(std::istream & in, dict_dict_t & dicts)
   {
     std::string dictname, sln;
     in >> dictname >> sln;
-    dict_t& dict = dicts.at(dictname);
+    dict_t & dict = dicts.at(dictname);
     if (dict.erase(sln) == 0)
     {
       throw std::invalid_argument("INVALID COMMAND");
     }
   }
 
-  void addSln(std::istream& in, dict_dict_t& dicts)
+  void addSln(std::istream & in, dict_dict_t & dicts)
   {
     std::string dictname, sln;
     size_t n;
     in >> dictname >> sln >> n;
 
-    dict_t& dict = dicts.at(dictname);
+    dict_t & dict = dicts.at(dictname);
     if (dict.find(sln) != dict.end())
     {
       throw std::invalid_argument("INVALID COMMAND");
@@ -237,14 +237,14 @@ namespace bocharov
     dict[sln] = translations;
   }
 
-  void addRu(std::istream& in, dict_dict_t& dicts)
+  void addRu(std::istream & in, dict_dict_t & dicts)
   {
     std::string dictname, sln;
     size_t n;
     in >> dictname >> sln >> n;
 
-    dict_t& dict = dicts.at(dictname);
-    list_t& translations = dict.at(sln);
+    dict_t & dict = dicts.at(dictname);
+    list_t & translations = dict.at(sln);
 
     std::string word;
     for (size_t i = 0; i < n; ++i)
@@ -254,14 +254,14 @@ namespace bocharov
     }
   }
 
-  void deleteRu(std::istream& in, dict_dict_t& dicts)
+  void deleteRu(std::istream & in, dict_dict_t & dicts)
   {
     std::string dictname, sln;
     size_t n;
     in >> dictname >> sln >> n;
 
-    dict_t& dict = dicts.at(dictname);
-    list_t& translations = dict.at(sln);
+    dict_t & dict = dicts.at(dictname);
+    list_t & translations = dict.at(sln);
 
     std::set<std::string> rusSet;
     std::string word;
@@ -275,7 +275,7 @@ namespace bocharov
     translations.erase(new_end, translations.end());
   }
 
-  void writeDicts(std::istream& in, const dict_dict_t& dicts)
+  void writeDicts(std::istream & in, const dict_dict_t & dicts)
   {
     std::string filename;
     size_t n;
@@ -292,13 +292,13 @@ namespace bocharov
       dictNames.push_back(name);
     }
 
-    for (const auto& dictName : dictNames)
+    for (const auto & dictName : dictNames)
     {
       FullDictWriter{ file, dictName }(dicts.at(dictName));
     }
   }
 
-  void makeUnion(std::istream& in, dict_dict_t& dicts)
+  void makeUnion(std::istream & in, dict_dict_t & dicts)
   {
     std::string newDictname;
     size_t n;
@@ -317,7 +317,7 @@ namespace bocharov
     dicts[newDictname] = unionDict;
   }
 
-  void printMostCommon(std::istream& in, std::ostream& out, const dict_dict_t& dicts)
+  void printMostCommon(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
   {
     int n, k;
     in >> n >> k;
@@ -332,10 +332,10 @@ namespace bocharov
     }
 
     std::map<std::string, int> frequencies;
-    for (const auto& dictName : dictNames)
+    for (const auto & dictName : dictNames)
     {
-      const dict_t& dict = dicts.at(dictName);
-      for (const auto& entry : dict)
+      const dict_t & dict = dicts.at(dictName);
+      for (const auto & entry : dict)
       {
         frequencies[entry.first]++;
       }
@@ -345,14 +345,14 @@ namespace bocharov
     std::sort(sorted.begin(), sorted.end(), FreqComparator{});
 
     int count = n;
-    for (const auto& p : sorted)
+    for (const auto & p : sorted)
     {
       if (count-- <= 0) break;
       out << p.first << " " << p.second << "\n";
     }
   }
 
-  void rewriteFile(std::istream& in, const dict_dict_t& dicts)
+  void rewriteFile(std::istream & in, const dict_dict_t & dicts)
   {
     std::string filename;
     size_t n;
@@ -369,13 +369,13 @@ namespace bocharov
       dictNames.push_back(name);
     }
 
-    for (const auto& dictName : dictNames)
+    for (const auto & dictName : dictNames)
     {
       FullDictWriter{ file, dictName }(dicts.at(dictName));
     }
   }
 
-  void rare(std::istream& in, dict_dict_t& dicts)
+  void rare(std::istream & in, dict_dict_t & dicts)
   {
     int K;
     in >> K;
@@ -397,7 +397,7 @@ namespace bocharov
       dictNames.push_back(name);
     }
 
-    for (const auto& dictName : dictNames)
+    for (const auto & dictName : dictNames)
     {
       if (dicts.find(dictName) == dicts.end())
       {
@@ -407,13 +407,13 @@ namespace bocharov
 
     using TempMap = std::map<std::string, std::pair<int, std::vector<std::string>>>;
     TempMap temp;
-    for (const auto& dictName : dictNames)
+    for (const auto & dictName : dictNames)
     {
-      const dict_t& dict = dicts.at(dictName);
-      for (const auto& entry : dict)
+      const dict_t & dict = dicts.at(dictName);
+      for (const auto & entry : dict)
       {
-        const std::string& sln = entry.first;
-        const list_t& translations = entry.second;
+        const std::string & sln = entry.first;
+        const list_t & translations = entry.second;
         auto it = temp.find(sln);
         if (it == temp.end())
         {
@@ -428,7 +428,7 @@ namespace bocharov
     }
 
     dict_t newDict;
-    for (const auto& entry : temp)
+    for (const auto & entry : temp)
     {
       if (entry.second.first <= K)
       {

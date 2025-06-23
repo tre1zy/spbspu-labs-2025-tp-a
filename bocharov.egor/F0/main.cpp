@@ -7,7 +7,7 @@
 
 namespace
 {
-  void inputDict(std::istream& in, bocharov::dict_dict_t& dicts)
+  void inputDict(std::istream & in, bocharov::dict_dict_t & dicts)
   {
     std::string line;
     while (std::getline(in, line))
@@ -56,7 +56,7 @@ namespace
   }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char * argv[])
 {
   using namespace bocharov;
   if (argc != 2)
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
   {
     inputDict(file, dicts);
   }
-  catch (const std::exception& e)
+  catch (const std::exception & e)
   {
     std::cerr << "<INVALID FILE>\n";
     return 1;
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     {
       commands.at(cmd)();
     }
-    catch (const std::exception& e)
+    catch (const std::exception & e)
     {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
