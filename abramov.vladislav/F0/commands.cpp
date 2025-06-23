@@ -62,7 +62,7 @@ void abramov::deleteFromDict(DictionaryCollection &collect, std::istream &in)
     throw std::logic_error("There is no enough arguments\n");
   }
   Dictionary &dict = collect.findDict(name);
-  dict.deleteWord(name);
+  dict.deleteWord(word);
 }
 
 void abramov::setDicts(DictionaryCollection &collect, std::istream &in)
@@ -82,11 +82,11 @@ void abramov::setDicts(DictionaryCollection &collect, std::istream &in)
     {
       continue;
     }
+    res = res.setWithDict(collect.cfindDict(name));
     if (in.peek() == '\n')
     {
       break;
     }
-    res = res.setWithDict(collect.cfindDict(name));
   }
   collect.addCompleteDict(new_name, res);
 }
@@ -108,11 +108,11 @@ void abramov::intersectDicts(DictionaryCollection &collect, std::istream &in)
     {
       continue;
     }
+    res = res.intersectWithDict(collect.cfindDict(name));
     if (in.peek() == '\n')
     {
       break;
     }
-    res = res.intersectWithDict(collect.cfindDict(name));
   }
   collect.addCompleteDict(new_name, res);
 }
@@ -134,62 +134,70 @@ void abramov::unionDicts(DictionaryCollection &collect, std::istream &in)
     {
       continue;
     }
+    res = res.unionWithDict(collect.cfindDict(name));
     if (in.peek() == '\n')
     {
       break;
     }
-    res = res.unionWithDict(collect.cfindDict(name));
+
   }
   collect.addCompleteDict(new_name, res);
 }
 
 void abramov::diffDicts(DictionaryCollection &collect, std::istream &in)
 {
+  std::string new_name;
+  in >> new_name;
   std::string name;
   in >> name;
-  if (name.empty())
+  if (name.empty() || new_name.empty())
   {
     throw std::logic_error("There is no enough arguments\n");
   }
-  Dictionary &dict = collect.findDict(name);
+  Dictionary res = Dictionary(collect.findDict(name));
   while (in >> name)
   {
     if (name.empty())
     {
       continue;
     }
+    const Dictionary &sub_dict = collect.cfindDict(name);
+    res = res.diffDict(sub_dict);
     if (in.peek() == '\n')
     {
       break;
     }
-    const Dictionary &sub_dict = collect.cfindDict(name);
-    dict.diffDict(sub_dict);
+
   }
+  collect.addCompleteDict(new_name, res);
 }
 
 void abramov::mergeDicts(DictionaryCollection &collect, std::istream &in)
 {
+  std::string new_name;
+  in >> new_name;
   std::string name;
   in >> name;
-  if (name.empty())
+  if (name.empty() || new_name.empty())
   {
     throw std::logic_error("There is no enough arguments\n");
   }
-  Dictionary &dict = collect.findDict(name);
+  Dictionary res = Dictionary(collect.findDict(name));
   while (in >> name)
   {
     if (name.empty())
     {
       continue;
     }
+    const Dictionary &sub_dict = collect.cfindDict(name);
+    res = res.mergeDict(sub_dict);
+    collect.deleteDict(name);
     if (in.peek() == '\n')
     {
       break;
     }
-    const Dictionary &sub_dict = collect.cfindDict(name);
-    dict.mergeDict(sub_dict);
-    collect.deleteDict(name);
   }
+  collect.addCompleteDict(new_name, res);
 }
 
 void abramov::printDict(const DictionaryCollection &collect, std::istream &in, std::ostream &out)

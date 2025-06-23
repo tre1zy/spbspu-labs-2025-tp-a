@@ -17,11 +17,12 @@ int main()
     {
       commands.at(command)();
     }
-    catch (const std::exception &)
+    catch (const std::exception &e)
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
+      std::cout << e.what();
     }
   }
 }

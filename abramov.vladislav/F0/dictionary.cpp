@@ -109,23 +109,30 @@ abramov::Dictionary abramov::Dictionary::unionWithDict(const Dictionary &dict) c
   return res;
 }
 
-void abramov::Dictionary::diffDict(const Dictionary &dict)
+abramov::Dictionary abramov::Dictionary::diffDict(const Dictionary &dict)
 {
-  for (auto it = dict.dict_.cbegin(); it != dict.dict_.cend(); ++it)
+  Dictionary res{};
+  for (auto it = dict_.cbegin(); it != dict_.cend(); ++it)
   {
-    dict_.erase(it->first);
-  }
-}
-
-void abramov::Dictionary::mergeDict(const Dictionary &dict)
-{
-  for (auto it = dict.dict_.cbegin(); it != dict.dict_.cend(); ++it)
-  {
-    if (dict_.find(it->first) == dict_.end())
+    if (dict.dict_.find(it->first) == dict.dict_.cend())
     {
-      addWord(it->first, it->second);
+      res.dict_.insert({ it->first, it->second });
     }
   }
+  return res;
+}
+
+abramov::Dictionary abramov::Dictionary::mergeDict(const Dictionary &dict)
+{
+  Dictionary res(*this);
+  for (auto it = dict.dict_.cbegin(); it != dict.dict_.cend(); ++it)
+  {
+    if (res.dict_.find(it->first) == res.dict_.end())
+    {
+      res.dict_.insert({ it->first, it->second });
+    }
+  }
+  return res;
 }
 
 bool abramov::Dictionary::empty() const noexcept
