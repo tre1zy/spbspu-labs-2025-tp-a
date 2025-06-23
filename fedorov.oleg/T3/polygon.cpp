@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include "input_delimiter.hpp"
+
 namespace fedorov
 {
   bool operator==(const Point &p1, const Point &p2)
@@ -12,17 +14,16 @@ namespace fedorov
 
   std::istream &operator>>(std::istream &in, Point &dest)
   {
-    char open, sep, close;
-    int x, y;
-
-    if (in >> open >> x >> sep >> y >> close && open == '(' && sep == ';' && close == ')')
+    std::istream::sentry sentry(in);
+    if (!sentry)
     {
-      dest.x = x;
-      dest.y = y;
+      return in;
     }
-    else
+    Point temp{0, 0};
+    in >> DelimiterInput{'('} >> temp.x >> DelimiterInput{';'} >> temp.y >> DelimiterInput{')'};
+    if (in)
     {
-      in.setstate(std::ios::failbit);
+      dest = temp;
     }
     return in;
   }
@@ -43,24 +44,28 @@ namespace fedorov
   }
   std::istream &operator>>(std::istream &in, Polygon &dest)
   {
-    int n;
-    if (!(in >> n) || n < 3)
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+    std::size_t vertex_num = 0;
+    in >> vertex_num;
+    if (!in || vertex_num < 3)
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-
     dest.points.clear();
-    for (int i = 0; i < n; ++i)
+    std::copy_n(std::istream_iterator< Point >{in}, vertex_num - 1, std::back_inserter(dest.points));
+    if (in.peek() != '\n')
     {
-      Point p;
-      if (!(in >> p))
-      {
-        dest.points.clear();
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      dest.points.push_back(p);
+      std::copy_n(std::istream_iterator< Point >{in}, 1, std::back_inserter(dest.points));
+    }
+    if (!in || dest.points.size() != vertex_num || in.peek() != '\n')
+    {
+      dest.points.clear();
+      in.setstate(std::ios::failbit);
     }
     return in;
   }

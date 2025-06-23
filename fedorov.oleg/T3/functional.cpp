@@ -1,5 +1,7 @@
 #include "functional.hpp"
 
+#include <iterator>
+#include <limits>
 #include <numeric>
 #include <cmath>
 #include <functional>
@@ -43,19 +45,15 @@ namespace fedorov
 
   void readPolygons(std::istream &in, std::vector< Polygon > &polygons)
   {
-    polygons.clear();
-    Polygon p;
-    while (in >> p)
+    using inputIt = std::istream_iterator< Polygon >;
+    while (!in.eof())
     {
-      if (PolygonValidator()(p))
+      if (in.fail())
       {
-        polygons.push_back(p);
+        in.clear(in.rdstate() ^ std::ios::failbit);
+        in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
-    }
-
-    if (!in.eof())
-    {
-      in.clear();
+      std::copy(inputIt(in), inputIt(), std::back_inserter(polygons));
     }
   }
 
