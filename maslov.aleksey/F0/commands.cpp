@@ -1,24 +1,46 @@
 #include "commands.hpp"
+#include <iterator>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
 #include <vector>
+#include "ioTypes.hpp"
 
 namespace
 {
   bool isAlpha(char c)
   {
-    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+    std::isalpha(c);
   }
 
   char toLowercase(char c)
   {
-    if (c >= 'A' && c <= 'Z')
+    std::tolower(c);
+  }
+
+  bool comparatorAscending(const std::pair< std::string, int > & a, 
+      const std::pair< std::string, int > & b)
+  {
+    return a.second < b.second;
+  }
+
+  bool comparatorDescending(const std::pair< std::string, int > & a, 
+      const std::pair< std::string, int > & b)
+  {
+    return a.second > b.second;
+  }
+
+  void sortWords(std::vector< std::pair< std::string, int > > & words, const std::string & order)
+  {
+    if (order == "ascending")
     {
-      return c + ('a' - 'A');
+      std::sort(words.begin(), words.end(), comparatorAscending);
     }
-    return c;
+    else
+    {
+      std::sort(words.begin(), words.end(), comparatorDescending);
+    }
   }
 }
 
@@ -211,18 +233,12 @@ void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & d
   {
     throw std::runtime_error("<INVALID NUMBER>");
   }
-  std::vector< std::pair< std::string, int > > words;
+  using Words = std::pair< std::string, int >;
+  std::vector< Words > words;
   words.reserve(dictIt->second.size());
-  for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
-  {
-    words.push_back({it->first, it->second});
-  }
-  //selectionSort(words, order);
-  auto it = words.begin();
-  for (size_t i = 0; i < number && it != words.end(); i++, it++)
-  {
-    out << it->first << ' ' << it->second << '\n';
-  }
+  std::copy(dictIt->second.begin(), dictIt->second.end(), std::back_inserter(words));
+  sortWords(words, order);
+  std::copy_n(std::begin(words), number, std::ostream_iterator< Words >(out, "\n"));
 }
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
