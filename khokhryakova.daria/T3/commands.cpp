@@ -194,12 +194,7 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector< P
   }
   catch (...)
   {
-    size_t n = std::stoull(command);
-    if (n < 3)
-    {
-        throw std::logic_error("Error: vertices < 3");
-    }
-    countNum(polygons, out, n);
+    throw std::logic_error("<INVALID COMMAND>");
   }
 }
 
@@ -212,23 +207,16 @@ void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector<
   subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
   try
   {
-    if (subcommands.count(command))
-    {
-      subcommands.at(command)();
-    }
-    else
-    {
-      size_t n = std::stoull(command);
-      if (n < 3)
-      {
-        throw std::logic_error("Error: vertices < 3");
-      }
-      countNum(polygons, out, n);
-    }
+    subcommands.at(command)();
   }
   catch (...)
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    size_t n = std::stoull(command);
+    if (n < 3)
+    {
+        throw std::logic_error("Error: vertices < 3");
+    }
+    countNum(polygons, out, n);
   }
 }
 
