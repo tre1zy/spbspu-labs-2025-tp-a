@@ -168,7 +168,7 @@ namespace
       out << teamName << " " << pair.first << " " << pair.second;
       return out;
     }
-    std::string& teamName;
+    const std::string& teamName;
     std::ostream& out;
   };
 
@@ -210,12 +210,115 @@ namespace
 
   struct FreeAgentPrinter
   {
-    void operator()(const std::pair<std::string, brevnov::Player>& player) const
+    bool operator()(const std::pair<std::string, brevnov::Player>& player) const
     {
       out << "FA " << player.first << " " << player.second << "\n";
+      return true;
     }
     std::ostream& out;
   };
+
+  struct NullOstreamIterator : public std::iterator<std::output_iterator_tag, void, void, void, void>
+  {
+    template < class T >
+    NullOstreamIterator& operator=(const T&)
+    {
+      return *this;
+    }
+    NullOstreamIterator& operator*()
+    {
+      return *this;
+    }
+    NullOstreamIterator& operator++()
+    {
+      return *this;
+    }
+    NullOstreamIterator operator++(int)
+    {
+      return *this;
+    }
+  };
+
+  struct FilteredPrinter
+  {
+    bool operator()(const std::pair< const std::string, brevnov::Player >& player) const
+    {
+      if (matcher(player))
+      {
+        printer(player);
+        return true;
+      }
+      return false;
+    }
+    PositionMatcher& matcher;
+    TeamPlayerPrinter& printer;
+  };
+
+  struct PositionFilter
+  {
+    bool operator()(const std::pair<std::string, brevnov::Player>& p) const
+    {
+      return p.second.position_ == pos;
+    }
+    brevnov::Position pos;
+  };
+
+  struct RatingComparator
+  {
+    bool operator()(const std::pair<std::string, brevnov::Player>& a, const std::pair<std::string, brevnov::Player>& b) const
+    {
+      return a.second.raiting_ < b.second.raiting_;
+    }
+  };
+
+  struct PositionProcessor
+  {
+    PositionProcessor(brevnov::Team& t, std::ostream& o):
+      team(t),
+      out(o)
+    {}
+    int operator()(brevnov::Position pos) const
+    {
+      std::vector<std::pair<std::string, brevnov::Player>> players_on_pos;
+      PositionFilter filter{pos};
+      std::copy_if(team.players_.begin(), team.players_.end(), std::back_inserter(players_on_pos), filter);
+      if (!players_on_pos.empty())
+      {
+        RatingComparator comp;
+        auto best_player = std::max_element(players_on_pos.begin(), players_on_pos.end(), comp);
+        out << best_player->first << " " << best_player->second << "\n";
+        return 1;
+      }
+      else
+      {
+        out << "No player on position!\n";
+        return 0;
+      }
+    }
+    brevnov::Team& team;
+    std::ostream& out;
+  };
+
+  void viewTeamP(std::ostream& out, std::string teamName, std::string pos, brevnov::League& league)
+  {
+    if (!brevnov::checkPosition(pos))
+    {
+      std::cerr << "Not correct position!\n";
+      return;
+    }
+    brevnov::Position sPos = brevnov::definePosition(pos);
+    auto findTeam = league.teams_.find(teamName);
+    if (findTeam == league.teams_.end())
+    {
+      std::cerr << "Team not found!\n";
+    }
+    PositionMatcher matcher{sPos};
+    TeamPlayerPrinter printer{teamName, out};
+    FilteredPrinter adapter{matcher, printer};
+    NullOstreamIterator null_iter;
+    std::copy_if(findTeam->second.players_.begin(), findTeam->second.players_.end(), null_iter, adapter);
+    out << "\n";
+  }
 }
 
 bool brevnov::checkPosition(std::string pos)
@@ -582,20 +685,11 @@ void brevnov::startTeam(std::istream& in, std::ostream& out, League& league)
     return;
   }
   Team& club = findTeam->second;
-  for (int i = 0; i < 6; i++)
-  {
-    Position current_pos = static_cast<Position>(i);
-    PositionRaitingComparator comp{current_pos};
-    auto max_player = std::max_element(club.players_.begin(), club.players_.end(), comp);
-    if (max_player != club.players_.end() && max_player->second.position_ == current_pos)
-    {
-      out << max_player->first << " " << max_player->second << "\n";
-    }
-    else
-    {
-      out << "Not player on this position!\n";
-    }
-  }
+  const std::array<Position, 6> positions = {Position::LF, Position::RF, Position::CF,
+    Position::LB, Position::RB, Position::G};
+  PositionProcessor processor{club, out};
+  std::vector<int> dummy(positions.size());
+  std::transform(positions.begin(), positions.end(), dummy.begin(), processor);
 }
 
 void brevnov::viewPlayer(std::istream& in, std::ostream& out, League& league)
@@ -636,42 +730,13 @@ void brevnov::viewTeamPosition(std::istream& in, std::ostream& out, League& leag
 {
   std::string teamName, pos;
   in >> teamName >> pos;
-  if (!checkPosition(pos))
-  {
-    std::cerr << "Not correct position!\n";
-    return;
-  }
-  Position sPos = definePosition(pos);
-  auto findTeam = league.teams_.find(teamName);
-  if (findTeam != league.teams_.end())
-  {
-    PositionMatcher matcher{sPos};
-    TeamPlayerPrinter printer{teamName, out};
-    auto it = findTeam->second.players_.begin();
-    while (it != findTeam->second.players_.end())
-    {
-      if (matcher(*it))
-      {
-        printer(*it);
-      }
-      ++it;
-    }
-  }
-  else
-  {
-    std::cerr << "Team not found!\n";
-  }
+  viewTeamP(out, teamName, pos, league);
 }
 
 void brevnov::viewMarket(std::ostream& out, League& league)
 {
   FreeAgentPrinter printer{out};
-  auto it = league.fa_.begin();
-  while (it != league.fa_.end())
-  {
-    printer(*it);
-    ++it;
-  }
+  std::transform(league.fa_.begin(), league.fa_.end(), NullOstreamIterator{}, printer);
 }
 
 void brevnov::viewMarketPosition(std::istream& in, std::ostream& out, League& league)
