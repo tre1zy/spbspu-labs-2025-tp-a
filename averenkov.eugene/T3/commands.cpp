@@ -28,6 +28,16 @@ namespace averenkov
     return false;
   }
 
+  VertexCount::VertexCount(size_t num):
+    num_(num)
+  {
+  }
+
+  bool VertexCount::operator()(const Polygon& poly) const
+  {
+    return poly.points.size() == num_;
+  }
+
   bool PolygonEqual::operator()(const Polygon& a, const Polygon& b) const
   {
     if (a.points.size() != b.points.size())
@@ -49,7 +59,7 @@ namespace averenkov
     return std::abs(area) / 2.0;
   }
 
-  double AreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  double AreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -59,7 +69,7 @@ namespace averenkov
     return sum;
   }
 
-  double EvenAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  double EvenAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -72,7 +82,7 @@ namespace averenkov
     return sum;
   }
 
-  double OddAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  double OddAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -85,7 +95,7 @@ namespace averenkov
     return sum;
   }
 
-  double NumVertexAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  double NumVertexAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -98,7 +108,7 @@ namespace averenkov
     return sum;
   }
 
-  double MeanAreaCalculator::operator()(const std::vector<Polygon>& polygons) const
+  double MeanAreaCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     if (polygons.empty())
     {
@@ -107,7 +117,7 @@ namespace averenkov
     return AreaSumCalculator()(polygons) / polygons.size();
   }
 
-  void MaxAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
+  void MaxAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -126,7 +136,7 @@ namespace averenkov
     out << std::fixed << std::setprecision(1) << maxArea;
   }
 
-  void MaxVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
+  void MaxVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -144,7 +154,7 @@ namespace averenkov
     out << maxVertices;
   }
 
-  void MinAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
+  void MinAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -163,7 +173,7 @@ namespace averenkov
     out << std::fixed << std::setprecision(1) << minArea;
   }
 
-  void MinVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
+  void MinVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -181,7 +191,7 @@ namespace averenkov
     out << minVertices;
   }
 
-  size_t EvenCounter::operator()(const std::vector<Polygon>& polygons) const
+  size_t EvenCounter::operator()(const std::vector< Polygon >& polygons) const
   {
     size_t count = 0;
     for (const auto& poly: polygons)
@@ -194,7 +204,7 @@ namespace averenkov
     return count;
   }
 
-  size_t OddCounter::operator()(const std::vector<Polygon>& polygons) const
+  size_t OddCounter::operator()(const std::vector< Polygon >& polygons) const
   {
     size_t count = 0;
     for (const auto& poly: polygons)
@@ -207,7 +217,7 @@ namespace averenkov
     return count;
   }
 
-  size_t NumVertexCounter::operator()(const std::vector<Polygon>& polygons) const
+  size_t NumVertexCounter::operator()(const std::vector< Polygon >& polygons) const
   {
     size_t count = 0;
     for (const auto& poly: polygons)
@@ -220,11 +230,11 @@ namespace averenkov
     return count;
   }
 
-  void printAreaSum(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+  void printAreaSum(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
-    std::map<std::string, std::function<double(const std::vector<Polygon>&)>> commands;
+    std::map<std::string, std::function<double(const std::vector< Polygon >&)>> commands;
     commands["EVEN"] = EvenAreaSumCalculator();
     commands["ODD"] = OddAreaSumCalculator();
     commands["MEAN"] = MeanAreaCalculator();
@@ -247,11 +257,11 @@ namespace averenkov
     }
   }
 
-  void printMaxValueOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+  void printMaxValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
-    std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
+    std::map<std::string, std::function<void(const std::vector< Polygon >&, std::ostream&)>> commands;
     commands["AREA"] = MaxAreaFinder();
     commands["VERTEXES"] = MaxVertexCountFinder();
 
@@ -266,12 +276,12 @@ namespace averenkov
     }
   }
 
-  void printMinValueOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+  void printMinValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
 
-    std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
+    std::map<std::string, std::function<void(const std::vector< Polygon >&, std::ostream&)>> commands;
     commands["AREA"] = MinAreaFinder();
     commands["VERTEXES"] = MinVertexCountFinder();
 
@@ -286,29 +296,24 @@ namespace averenkov
     }
   }
 
-  void printCountOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+  void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
-
-    std::map<std::string, std::function<size_t(const std::vector<Polygon>&)>> commands;
+    std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
     commands["EVEN"] = EvenCounter();
     commands["ODD"] = OddCounter();
-    size_t tem;
-    try
+    if (std::isdigit(param[0]))
     {
-      tem = commands.at(param)(polygons);
-    }
-    catch (...)
-    {
-      size_t num = std::stoul(param);
+      size_t num = std::stoull(param);
       if (num < 3)
       {
-        throw std::invalid_argument("Invalid input");
+        throw std::invalid_argument("Error in input");
       }
-      tem = NumVertexCounter{ num }(polygons);
+      out << std::count_if(polygons.begin(), polygons.end(), VertexCount(num));
+      return;
     }
-    out << tem;
+    out << commands.at(param)(polygons);
   }
 
   void printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)

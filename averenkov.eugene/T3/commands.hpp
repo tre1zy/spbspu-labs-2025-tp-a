@@ -10,6 +10,15 @@
 namespace averenkov
 {
 
+  struct VertexCount
+  {
+    VertexCount(size_t num);
+    bool operator()(const Polygon& poly) const;
+
+  private:
+    size_t num_;
+  };
+
   struct AreaSumCalculator
   {
     double operator()(const std::vector<Polygon>& polygons) const;
