@@ -27,6 +27,11 @@ namespace amine
   {
     return a.x * b.y - a.y * b.x;
   }
+struct CrossProduct {
+    long long operator()(const Point& a, const Point& b) const {
+        return static_cast<long long>(a.x) * b.y - static_cast<long long>(a.y) * b.x;
+    }
+};
 
   double compute_area(const Polygon& poly)
   {
@@ -35,9 +40,8 @@ namespace amine
     if (n < 3)
       return 0.0;
     long long area2 = std::inner_product(
-      pts.begin(), pts.end() - 1, pts.begin() + 1, 0LL, std::plus< long long >(), [](const Point& a, const Point& b) {
-        return static_cast< long long >(a.x) * b.y - static_cast< long long >(a.y) * b.x;
-      });
+    pts.begin(), pts.end() - 1, pts.begin() + 1, 0LL, std::plus<long long>(),
+    CrossProduct());
     const Point& last = pts.back();
     const Point& first = pts.front();
     area2 += static_cast< long long >(last.x) * first.y - static_cast< long long >(last.y) * first.x;
@@ -95,7 +99,23 @@ namespace amine
 
     return false;
   }
+struct PointInPolygonAccumulator {
+    const Point& pt;
+    bool& inside;
 
+    PointInPolygonAccumulator(const Point& p, bool& ins) : pt(p), inside(ins) {}
+
+    std::pair<Point, bool> operator()(std::pair<Point, bool> acc, const Point& current) const {
+        const Point& prev = acc.first;
+        bool cond = (current.y > pt.y) != (prev.y > pt.y);
+        bool intersect =
+            cond && (pt.x < static_cast<long double>(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) +
+                            current.x);
+        if (intersect)
+            inside = !inside;
+        return std::make_pair(current, inside);
+    }
+};
   bool point_in_polygon(const Point& pt, const Polygon& poly)
   {
     bool inside = false;
@@ -104,33 +124,50 @@ namespace amine
     if (n < 3)
       return false;
 
+    bool inside = false;
     std::accumulate(
-      p.begin(), p.end(), std::make_pair(p.back(), false), [&pt, &inside](auto acc, const Point& current) {
-        const Point& prev = acc.first;
-        bool cond = (current.y > pt.y) != (prev.y > pt.y);
-        bool intersect =
-          cond && (pt.x < static_cast< long double >(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) +
-                            current.x);
-        if (intersect)
-          inside = !inside;
-        return std::make_pair(current, inside);
-      });
+    p.begin(), p.end(), std::make_pair(p.back(), false),
+    PointInPolygonAccumulator(pt, inside));
 
     return inside;
-  }
+    }
+struct SegmentIntersectChecker {
+    const Polygon& a;
+    const Polygon& b;
+    int na;
+    int nb;
+
+    SegmentIntersectChecker(const Polygon& poly1, const Polygon& poly2, int n1, int n2)
+        : a(poly1), b(poly2), na(n1), nb(n2) {}
+
+    bool operator()(const Point& p1) const {
+        int i = &p1 - &a.points[0];
+        struct InnerChecker {
+            const Polygon& a;
+            const Polygon& b;
+            int i;
+            int na;
+            int nb;
+
+            InnerChecker(const Polygon& poly1, const Polygon& poly2, int idx, int n1, int n2)
+                : a(poly1), b(poly2), i(idx), na(n1), nb(n2) {}
+
+            bool operator()(const Point& p2) const {
+                int j = &p2 - &b.points[0];
+                return seg_intersect(a.points[i], a.points[(i + 1) % na], b.points[j], b.points[(j + 1) % nb]);
+            }
+        };
+        return std::any_of(b.points.begin(), b.points.end(), InnerChecker(a, b, i, na, nb));
+    }
+};
 
   bool polygons_intersect(const Polygon& a, const Polygon& b)
   {
     int na = a.points.size();
     int nb = b.points.size();
 
-    bool segment_intersection = std::any_of(a.points.begin(), a.points.end(), [&a, &b, na, nb](const Point& p1) {
-      int i = &p1 - &a.points[0];
-      return std::any_of(b.points.begin(), b.points.end(), [&a, &b, i, na, nb](const Point& p2) {
-        int j = &p2 - &b.points[0];
-        return seg_intersect(a.points[i], a.points[(i + 1) % na], b.points[j], b.points[(j + 1) % nb]);
-      });
-    });
+    bool segment_intersection = std::any_of(a.points.begin(), a.points.end(),
+    SegmentIntersectChecker(a, b, na, nb));
 
     if (segment_intersection)
       return true;
@@ -140,6 +177,21 @@ namespace amine
     }
     return false;
   }
+std::generate_n(std::back_inserter(poly.points), n, [&iss]() {
+    Point pt;
+    char c;
+    if (!(iss >> c) || c != '(')
+        return Point{};
+    if (!(iss >> pt.x))
+        return Point{};
+    if (!(iss >> c) || c != ';')
+        return Point{};
+    if (!(iss >> pt.y))
+        return Point{};
+    if (!(iss >> c) || c != ')')
+        return Point{};
+    return pt;
+});
 
   bool parse_polygon(const std::string& str, Polygon& poly)
   {
@@ -151,21 +203,7 @@ namespace amine
     poly.points.clear();
     poly.points.reserve(n);
 
-    std::generate_n(std::back_inserter(poly.points), n, [&iss]() {
-      Point pt;
-      char c;
-      if (!(iss >> c) || c != '(')
-        return Point{};
-      if (!(iss >> pt.x))
-        return Point{};
-      if (!(iss >> c) || c != ';')
-        return Point{};
-      if (!(iss >> pt.y))
-        return Point{};
-      if (!(iss >> c) || c != ')')
-        return Point{};
-      return pt;
-    });
+    std::generate_n(std::back_inserter(poly.points), n, PointParser(iss));
 
     iss >> std::ws;
     return !iss.fail() && iss.eof() && poly.points.size() == static_cast< size_t >(n);
