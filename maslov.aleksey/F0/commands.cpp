@@ -6,33 +6,30 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
-#include "ioTypes.hpp"
 
 namespace
 {
   bool isAlpha(char c)
   {
-    std::isalpha(c);
+    return std::isalpha(c);
   }
 
   char toLowercase(char c)
   {
-    std::tolower(c);
+    return std::tolower(c);
   }
 
-  bool comparatorAscending(const std::pair< std::string, int > & a, 
-      const std::pair< std::string, int > & b)
+  bool comparatorAscending(const maslov::Word & a, const maslov::Word & b)
   {
     return a.second < b.second;
   }
 
-  bool comparatorDescending(const std::pair< std::string, int > & a, 
-      const std::pair< std::string, int > & b)
+  bool comparatorDescending(const maslov::Word & a, const maslov::Word & b)
   {
     return a.second > b.second;
   }
 
-  void sortWords(std::vector< std::pair< std::string, int > > & words, const std::string & order)
+  void sortWords(std::vector< maslov::Word > & words, const std::string & order)
   {
     if (order == "ascending")
     {
@@ -44,10 +41,29 @@ namespace
     }
   }
 
-  bool comparatorFrequency(const std::pair< std::string, int > & word, int low, int high)
+  bool comparatorFrequency(const maslov::Word & word, int low, int high)
   {
     return word.second >= low && word.second <= high;
   }
+
+  struct PrintWord
+  {
+    std::ostream & out;
+    void operator()(const maslov::Word & word) const
+    {
+      out << word.first << ' ' << word.second << '\n';
+    }
+  };
+
+  struct PrintDicts
+  {
+    std::ostream & out;
+    void operator()(const std::pair< std::string, maslov::Dict > & dict) const
+    {
+      out << dict.first << ' ' << dict.second.size() << '\n';
+      std::for_each(dict.second.cbegin(), dict.second.cend(), PrintWord{out});
+    }
+  };
 }
 
 void maslov::createDictionary(std::istream & in, Dicts & dicts)
@@ -91,13 +107,8 @@ void maslov::loadText(std::istream & in, Dicts & dicts)
   while (file >> word)
   {
     std::string realWord;
-    for (char c: word)
-    {
-      if (isAlpha(c))
-      {
-        realWord += toLowercase(c);
-      }
-    }
+    std::copy_if(word.begin(), word.end(), std::back_inserter(realWord), isAlpha);
+    std::transform(realWord.begin(), realWord.end(), realWord.begin(), toLowercase);
     if (!realWord.empty())
     {
       it->second[realWord] += 1;
@@ -239,11 +250,11 @@ void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & d
   {
     throw std::runtime_error("<INVALID NUMBER>");
   }
-  std::vector< Words > words;
+  std::vector< Word > words;
   words.reserve(dictIt->second.size());
   std::copy(dictIt->second.begin(), dictIt->second.end(), std::back_inserter(words));
   sortWords(words, order);
-  std::copy_n(std::begin(words), number, std::ostream_iterator< Words >(out, "\n"));
+  for_each(words.begin(), words.begin() + number, PrintWord{out});
 }
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
@@ -298,14 +309,7 @@ void maslov::saveDictionaries(std::istream & in, const Dicts & dicts)
     throw std::runtime_error("<INVALID FILE>");
   }
   file << dicts.size() << '\n';
-  for (auto dictIt = dicts.cbegin(); dictIt != dicts.cend(); dictIt++)
-  {
-    file << dictIt->first << ' ' << dictIt->second.size() << '\n';
-    for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
-    {
-      file << it->first << ' ' << it->second << '\n';
-    }
-  }
+  std::for_each(dicts.cbegin(), dicts.cend(), PrintDicts{file});
 }
 
 void maslov::loadFileCommand(std::istream & in, Dicts & dicts)

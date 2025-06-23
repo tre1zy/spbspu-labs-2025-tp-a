@@ -8,6 +8,7 @@ namespace maslov
 {
   using Dict = std::unordered_map< std::string, int >;
   using Dicts = std::unordered_map< std::string, Dict >;
+  using Word = std::pair< std::string, int >;
   void createDictionary(std::istream & in, Dicts & dicts);
   void showDictionary(std::ostream & out, const Dicts & dicts);
   void loadText(std::istream & in, Dicts & dicts);
