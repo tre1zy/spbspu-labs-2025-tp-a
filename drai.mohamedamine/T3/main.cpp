@@ -4,24 +4,6 @@
 #include <iterator>
 #include "polygon.hpp"
 
-namespace amine {
-
-struct LineToPolygonConverter {
-    Polygon operator()(const Line& line) const {
-        Polygon poly;
-        if (!line.content.empty() && parse_polygon(line.content, poly) && poly.points.size() >= 3) {
-            return poly;
-        }
-        return Polygon{};
-    }
-};
-
-struct EmptyPolygonChecker {
-    bool operator()(const Polygon& p) const {
-        return p.points.empty();
-    }
-};
-
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -49,12 +31,11 @@ int main(int argc, char* argv[])
                   amine::LineToPolygonConverter{});
 
     polygons.erase(
-    std::remove_if(polygons.begin(), polygons.end(),
-                  amine::InvalidPolygonChecker{}),
-    polygons.end()
+        std::remove_if(polygons.begin(), polygons.end(),
+                      amine::InvalidPolygonChecker{}),
+        polygons.end()
     );
 
     amine::process_commands(polygons);
     return 0;
-}
 }

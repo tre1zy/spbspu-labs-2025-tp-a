@@ -25,6 +25,10 @@ namespace amine
         std::string content;
     };
 
+    struct LineToPolygonConverter {
+    Polygon operator()(const Line& line) const;
+    };
+
     struct ValidPolygonChecker {
         bool operator()(const Polygon& p) const {
             return p.points.size() >= 3;
