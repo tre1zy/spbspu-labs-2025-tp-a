@@ -19,17 +19,12 @@ namespace
     }
 
     unsigned long long result = 0;
-    bool has_digit = false;
+    std::string bits;
     while (is.get(ch) && (ch == '0' || ch == '1'))
     {
-      has_digit = true;
-      result = result << 1;
-      if (ch == '1')
-      {
-        result = result | 1;
-      }
+      bits.push_back(ch);
     }
-    if (!has_digit)
+    if (bits.empty())
     {
       is.setstate(std::ios::failbit);
       return 0;
@@ -37,6 +32,11 @@ namespace
     if (is)
     {
       is.unget();
+    }
+
+    for (char bit: bits)
+    {
+      result = (result << 1) | (bit == '1');
     }
     return result;
   }
@@ -89,63 +89,70 @@ namespace
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   DataStruct temp;
-  char ch;
+  std::string line;
+  if (!std::getline(is, line))
+  {
+    return is;
+  }
+
+  size_t pos = 0;
   bool has_key1 = false;
   bool has_key2 = false;
   bool has_key3 = false;
 
-  while (is.get(ch))
+  while (pos < line.length())
   {
-    if (ch == ':')
+    if (line[pos] == ':')
     {
-      std::string key;
-      while (is.get(ch) && ch != ' ' && ch != '\n' && ch != ':')
+      size_t key_start = pos + 1;
+      size_t key_end = line.find_first_of(" :", key_start);
+      if (key_end == std::string::npos)
       {
-        key.push_back(ch);
+        break;
       }
-      is.unget();
 
-      if (key == "key1")
+      std::string key = line.substr(key_start, key_end - key_start);
+      pos = line.find_first_not_of(" ", key_end);
+
+      if (key == "key1" && pos != std::string::npos)
       {
-        is >> std::ws;
-        unsigned long long val = parseULLBin(is);
-        if (!is.fail())
+        size_t val_end = line.find(':', pos);
+        std::string val_str = line.substr(pos, val_end - pos);
+        std::istringstream iss(val_str);
+        temp.key1 = parseULLBin(iss);
+        if (!iss.fail() || val_str == "0b0")
         {
-          temp.key1 = val;
           has_key1 = true;
+          pos = val_end;
         }
       }
-      else if (key == "key2")
+      else if (key == "key2" && pos != std::string::npos)
       {
-        is >> std::ws;
-        std::complex< double > val = parseCmpLsp(is);
-        if (!is.fail())
+        size_t val_end = line.find(':', pos);
+        std::string val_str = line.substr(pos, val_end - pos);
+        std::istringstream iss(val_str);
+        temp.key2 = parseCmpLsp(iss);
+        if (!iss.fail())
         {
-          temp.key2 = val;
           has_key2 = true;
+          pos = val_end;
         }
       }
-      else if (key == "key3")
+      else if (key == "key3" && pos != std::string::npos && line[pos] == '"')
       {
-        is >> std::ws;
-        if (is.get(ch) && ch == '"')
+        pos++;
+        size_t quote_end = line.find('"', pos);
+        if (quote_end != std::string::npos)
         {
-          std::string str;
-          while (is.get(ch) && ch != '"' && ch != '\n')
-          {
-            str.push_back(ch);
-          }
-          if (ch == '"')
-          {
-            temp.key3 = str;
-            has_key3 = true;
-          }
+          temp.key3 = line.substr(pos, quote_end - pos);
+          has_key3 = true;
+          pos = quote_end + 1;
         }
       }
     }
-    if (ch == '\n')
+    else
     {
-      break;
+      pos++;
     }
   }
 

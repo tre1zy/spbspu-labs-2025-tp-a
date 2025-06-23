@@ -1,16 +1,9 @@
 #include "datastruct.h"
-#include <iterator>
-#include <algorithm>
 #include <iomanip>
+#include <bitset>
 
 namespace
 {
-  void outputCmpLsp(std::ostream& os, const std::complex< double >& data)
-  {
-    os << std::fixed << std::setprecision(1);
-    os << "#c(" << data.real() << " " << data.imag() << ")";
-  }
-
   void outputULLBin(std::ostream& os, unsigned long long num)
   {
     if (num == 0)
@@ -20,20 +13,20 @@ namespace
     }
 
     os << "0b";
-    bool leadingZero = true;
-    for (int i = sizeof(num) * 8 - 1; i >= 0; --i)
+    std::string bits;
+    while (num > 0)
     {
-      bool bit = num & (1ULL << i);
-      if (!leadingZero || bit)
-      {
-        os << (bit ? '1' : '0');
-        leadingZero = false;
-      }
+      bits.push_back((num & 1) ? '1' : '0');
+      num >>= 1;
     }
-    if (leadingZero)
-    {
-      os << '0';
-    }
+    std::reverse(bits.begin(), bits.end());
+    os << bits;
+  }
+
+  void outputCmpLsp(std::ostream& os, const std::complex< double >& data)
+  {
+    os << std::fixed << std::setprecision(1);
+    os << "#c(" << data.real() << " " << data.imag() << ")";
   }
 }
 
