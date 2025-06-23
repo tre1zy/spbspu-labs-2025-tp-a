@@ -5,7 +5,7 @@
 
 void rychkov::CParser::calculate_type(CParseContext& context, entities::Expression& expr)
 {
-  expr.result_type = nullptr;
+  expr.result_type = {};
   if (entities::is_operator(expr) && (expr.operation != &comma))
   {
     if (!expr.full())
@@ -33,7 +33,7 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
     switch (expr.operation->category)
     {
     case Operator::FIELD_ACCESS:
-      expr.result_type = entities::get_type(expr.operands[1]);
+      expr.result_type = *entities::get_type(expr.operands[1]);
       return;
     case Operator::SPECIAL:
       if (expr.operation == &brackets)
@@ -49,8 +49,23 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
         }
         else
         {
-          expr.result_type = &*iterable->base;
+          expr.result_type = *iterable->base;
         }
+      }
+      if (expr.operation == &inline_if)
+      {
+        const typing::Type* main_body = entities::get_type(expr.operands[1]);
+        const typing::Type* else_body = entities::get_type(expr.operands[2]);
+        const typing::Type* common = typing::common_type(*main_body, *else_body);
+        if (common == nullptr)
+        {
+          log(context, "operator?: must be applied to basic types");
+          return;
+        }
+        require_type(context, expr.operands[0], {"int", typing::BASIC});
+        require_type(context, expr.operands[1], *common);
+        require_type(context, expr.operands[2], *common);
+        expr.result_type = *common;
       }
       return;
     case Operator::DEREFERENCE:
@@ -62,16 +77,24 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
         finish_log(context);
         return;
       }
-      expr.result_type = &*iterable->base;
+      expr.result_type = *iterable->base;
       return;
     }
     case Operator::ADDRESSOF:
-      expr.buffered_ = {{}, typing::POINTER, *entities::get_type(expr.operands[0])};
-      expr.result_type = &expr.buffered_;
+      expr.result_type = {{}, typing::POINTER, *entities::get_type(expr.operands[0])};
       return;
     case Operator::INCREMENT:
-      expr.result_type = entities::get_type(expr.operands[0]);
+    {
+      const typing::Type* child = entities::get_type(expr.operands[0]);
+      if (!typing::is_integer(child) && !(is_pointer(child)))
+      {
+        start_log(context) << "operator" << expr.operation->token << " cannot be applied to " << *child;
+        finish_log(context);
+        return;
+      }
+      expr.result_type = *child;
       return;
+    }
     case Operator::ARITHMETIC:
     {
       if (expr.operation->type == Operator::BINARY)
@@ -85,7 +108,7 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
         finish_log(context);
         return;
       }
-      expr.result_type = basic;
+      expr.result_type = *basic;
       return;
     }
     case Operator::BIT:
@@ -100,7 +123,7 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
         log(context, "operator~ requires an integer");
         return;
       }
-      expr.result_type = integer;
+      expr.result_type = *integer;
       return;
     }
     case Operator::LOGIC:
@@ -108,9 +131,8 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
       {
         break;
       }
-      expr.buffered_ = {"int", typing::BASIC};
-      expr.result_type = &expr.buffered_;
-      require_type(context, expr.operands[0], expr.buffered_);
+      expr.result_type = {"int", typing::BASIC};
+      require_type(context, expr.operands[0], expr.result_type);
       return;
     }
 
@@ -130,24 +152,22 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
       if (expr.operation->require_lvalue)
       {
         require_type(context, expr.operands[1], *lhs);
-        expr.result_type = lhs;
+        expr.result_type = *lhs;
         return;
       }
       require_type(context, expr.operands[0], *common);
       require_type(context, expr.operands[1], *common);
-      expr.result_type = common;
+      expr.result_type = *common;
       return;
     }
     case Operator::LOGIC:
-      expr.buffered_ = {"int", typing::BASIC};
-      expr.result_type = &expr.buffered_;
-      require_type(context, expr.operands[0], expr.buffered_);
-      require_type(context, expr.operands[1], expr.buffered_);
+      expr.result_type = {"int", typing::BASIC};
+      require_type(context, expr.operands[0], expr.result_type);
+      require_type(context, expr.operands[1], expr.result_type);
       return;
     case Operator::COMPARE:
     {
-      expr.buffered_ = {"int", typing::BASIC};
-      expr.result_type = &expr.buffered_;
+      expr.result_type = {"int", typing::BASIC};
       const typing::Type* common = typing::common_type(*lhs, *rhs);
       if (common == nullptr)
       {
@@ -172,30 +192,36 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
       if (expr.operation->require_lvalue)
       {
         require_type(context, expr.operands[1], *lhs);
-        expr.result_type = lhs;
+        expr.result_type = *lhs;
         return;
       }
       require_type(context, expr.operands[0], *common);
       require_type(context, expr.operands[1], *common);
-      expr.result_type = common;
+      expr.result_type = *common;
       return;
     }
     case Operator::ASSIGN:
+      expr.result_type = *lhs;
       require_type(context, expr.operands[1], *lhs);
       return;
     }
-    //log(context, "cannot calculate result type for operator" + expr.operation->token);
     return;
   }
   if (!expr.operands.empty())
   {
-    expr.result_type = entities::get_type(expr.operands.back());
+    const typing::Type* temp = entities::get_type(expr.operands.back());
+    expr.result_type = (temp == nullptr ? typing::Type{} : *temp);
   }
 }
 void rychkov::CParser::require_type(CParseContext& context, entities::Expression::operand& expr,
     const typing::Type& type)
 {
   const typing::Type* from = entities::get_type(expr);
+  if (from == nullptr)
+  {
+    log(context, "cannot use this expression as type");
+    return;
+  }
   switch (typing::check_cast(type, *from))
   {
   case typing::NO_CAST:
@@ -205,6 +231,27 @@ void rychkov::CParser::require_type(CParseContext& context, entities::Expression
   case typing::IMPLICIT:
     entities::CastOperation temp = {type, false, entities::Expression{nullptr, {std::move(expr)}}};
     expr = std::move(temp);
+    break;
+  }
+}
+void rychkov::CParser::require_type(CParseContext& context, entities::Expression& expr,
+    const typing::Type& type)
+{
+  if (!expr.result_type.ready())
+  {
+    log(context, "cannot use this expression as type");
+    return;
+  }
+  switch (typing::check_cast(type, expr.result_type))
+  {
+  case typing::NO_CAST:
+    start_log(context) << "cannot cast " << expr.result_type << " to " << type;
+    finish_log(context);
+    break;
+  case typing::IMPLICIT:
+    entities::CastOperation temp = {type, false, std::move(expr)};
+    expr = std::move(temp);
+    calculate_type(context, *std::get< entities::CastOperation >(expr.operands[0]).expr);
     break;
   }
 }

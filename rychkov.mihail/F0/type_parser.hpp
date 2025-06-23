@@ -15,18 +15,20 @@ namespace rychkov
   public:
     bool empty() const noexcept;
     bool ready() const noexcept;
+    bool is_type() const noexcept;
     bool is_function() const noexcept;
 
     void prepare();
     typing::Type type() const;
     entities::Variable variable() const;
     entities::Function function() const;
+    std::string name() const;
     void clear();
 
-    bool append(CParseContext& context, char c);
-    bool append(CParseContext& context, std::string name);
-    bool append(CParseContext& context, size_t numeric_literal);
-    bool append(CParseContext& context, typing::Type base_type);
+    void append(CParseContext& context, char c);
+    void append(CParseContext& context, std::string name);
+    void append(CParseContext& context, size_t numeric_literal);
+    void append(CParseContext& context, typing::Type base_type);
 
   private:
     struct ParseCell
@@ -43,17 +45,17 @@ namespace rychkov
     std::string var_name_;
     std::vector< std::string > parameters_;
 
-    bool append_const(CParseContext& context);
-    bool append_volatile(CParseContext& context);
-    bool append_signed(CParseContext& context);
-    bool append_unsigned(CParseContext& context);
+    void append_const(CParseContext& context);
+    void append_volatile(CParseContext& context);
+    void append_signed(CParseContext& context);
+    void append_unsigned(CParseContext& context);
 
-    bool append_asterisk(CParseContext& context);
-    bool append_open_bracket(CParseContext& context);
-    bool append_close_bracket(CParseContext& context);
-    bool append_open_parenthesis(CParseContext& context);
-    bool append_close_parenthesis(CParseContext& context);
-    bool append_comma(CParseContext& context);
+    void append_asterisk(CParseContext& context);
+    void append_open_bracket(CParseContext& context);
+    void append_close_bracket(CParseContext& context);
+    void append_open_parenthesis(CParseContext& context);
+    void append_close_parenthesis(CParseContext& context);
+    void append_comma(CParseContext& context);
 
     static void remove_combination(typing::Type& type);
     typing::Type* move_up();

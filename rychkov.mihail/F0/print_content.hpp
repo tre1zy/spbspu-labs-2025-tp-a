@@ -18,6 +18,7 @@ namespace rychkov
     void operator()(const entities::Variable& var);
     void operator()(const entities::Function& func);
     void operator()(const entities::Body& body);
+    void operator()(const entities::Statement& statement);
     void operator()(const entities::Struct& structure);
     void operator()(const entities::Enum& structure);
     void operator()(const entities::Union& structure);

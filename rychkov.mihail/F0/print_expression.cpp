@@ -41,9 +41,9 @@ void rychkov::ContentPrinter::operator()(const entities::Expression& expr)
     indent() << "* [multi] operator" << expr.operation->token << " - size=" << expr.operands.size() << '\n';
     oper_size = expr.operands.size();
   }
-  if (expr.result_type != nullptr)
+  if (expr.result_type.ready())
   {
-    indent() << (entities::is_lvalue(&expr) ? "<type(l)> " : "<type> ") << *expr.result_type << '\n';
+    indent() << (entities::is_lvalue(&expr) ? "<type(l)> " : "<type> ") << expr.result_type << '\n';
   }
   else
   {

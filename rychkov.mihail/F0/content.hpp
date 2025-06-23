@@ -4,9 +4,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <set>
 #include <variant>
 #include <cstddef>
 #include <utility>
+#include "compare.hpp"
 
 namespace rychkov
 {
@@ -178,10 +180,25 @@ namespace rychkov
       std::string name;
       std::vector< std::string > parameters;
     };
+    struct Statement
+    {
+      enum Type
+      {
+        IF,
+        ELSE,
+        FOR,
+        WHILE,
+        DO,
+        RETURN,
+        DO_WHILE
+      };
+      Type type;
+      std::vector< Expression > conditions;
+    };
     struct Struct
     {
       std::string name;
-      std::vector< Variable > fields;
+      std::set< Variable, NameCompare > fields;
     };
     struct Enum
     {
@@ -200,8 +217,8 @@ namespace rychkov
     };
     struct Declaration
     {
-      std::variant< Variable, Struct, Enum, Union, Alias, Function > data;
-      DynMemWrapper< Expression > value;
+      std::variant< Variable, Struct, Enum, Union, Alias, Function, Statement > data;
+      DynMemWrapper< Expression > value = nullptr;
       ScopeType scope = UNSPECIFIED;
     };
     struct CastOperation
@@ -229,8 +246,7 @@ namespace rychkov
       using operand = std::variant< DynMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation, Body >;
 
       const Operator* operation;
-      const typing::Type* result_type;
-      typing::Type buffered_;
+      typing::Type result_type;
       std::vector< operand > operands;
 
       Expression();

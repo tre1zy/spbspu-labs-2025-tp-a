@@ -158,7 +158,7 @@ bool rychkov::MainProcessor::reload(ParserContext& context)
     return false;
   }
   std::map< std::string, ParseCell > new_parsed;
-  for (const std::pair< std::string, ParseCell >& file: parsed_)
+  for (const std::pair< const std::string, ParseCell >& file: parsed_)
   {
     CParseContext parse_context{context.out, context.err, file.first};
     std::ifstream in(file.first);

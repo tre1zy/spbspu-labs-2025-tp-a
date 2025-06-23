@@ -3,7 +3,7 @@
 #include <iostream>
 #include "print_content.hpp"
 
-bool rychkov::CParser::parse_semicolon(CParseContext& context)
+void rychkov::CParser::parse_semicolon(CParseContext& context)
 {
   bool not_first = false;
   while (!stack_.empty() && !entities::is_body(*stack_.top()) && !entities::is_decl(*stack_.top()))
@@ -14,19 +14,21 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
       not_first = true;
     }
     fold(context, nullptr);
+    entities::remove_bridge(*stack_.top());
     calculate_type(context, *stack_.top());
     stack_.pop();
   }
   if (stack_.empty())
   {
-    return append_empty(context);
+    append_empty(context);
+    return;
   }
 
-  if (entities::is_body(*stack_.top())) //append new empty to body
+  if (entities::is_body(*stack_.top()))
   {
     entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
     stack_.push(&body.data.emplace_back());
-    return true;
+    return;
   }
   if (entities::is_decl(*stack_.top()))
   {
@@ -37,12 +39,13 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
       if (data.name.empty())
       {
         log(context, "struct must have name");
-        return false;
+        return;
       }
       stack_.pop();
       structs_.insert(std::make_pair(data, stack_.size()));
       base_types_.insert(std::make_pair(typing::Type{data.name, typing::STRUCT}, stack_.size()));
-      return append_empty(context);
+      append_empty(context);
+      return;
     }
     if (std::holds_alternative< entities::Variable >(decl.data))
     {
@@ -50,38 +53,52 @@ bool rychkov::CParser::parse_semicolon(CParseContext& context)
       if (data.name.empty())
       {
         log(context, "variable must have name");
-        return false;
+        return;
       }
-      if ((decl.value != nullptr) && (decl.value->result_type != nullptr))
+      if (decl.value != nullptr)
       {
-        switch (typing::check_cast(data.type, *decl.value->result_type))
-        {
-        case typing::NO_CAST:
-          start_log(context) << "variable " << data.name << " cannot be initialized with " << *decl.value->result_type;
-          finish_log(context);
-          break;
-        case typing::IMPLICIT:
-          entities::CastOperation temp = {data.type, false, std::move(decl.value)};
-          decl.value = std::move(temp);
-          break;
-        }
+        require_type(context, *decl.value, data.type);
       }
-      //if (last_empty)
-      //{
-        //log(context, "variable definition wasn't finished");
-      //}
       stack_.pop();
-      variables_.insert(std::make_pair(data, stack_.size()));
-      return append_empty(context);
+      //variables_.insert(std::make_pair(data, stack_.size()));
+      append_empty(context);
+      return;
     }
     if (std::holds_alternative< entities::Function >(decl.data))
     {
-      entities::Function& data = std::get< entities::Function >(decl.data);
+      //entities::Function& data = std::get< entities::Function >(decl.data);
       stack_.pop();
-      variables_.insert(std::make_pair(entities::Variable{data.type, data.name}, stack_.size()));
-      return append_empty(context);
+      //variables_.insert(std::make_pair(entities::Variable{data.type, data.name}, stack_.size()));
+      append_empty(context);
+      return;
     }
+    if (std::holds_alternative< entities::Alias >(decl.data))
+    {
+      entities::Alias& data = std::get< entities::Alias >(decl.data);
+      if (data.name.empty())
+      {
+        log(context, "missing alias name");
+      }
+      else
+      {
+        aliases_.insert(data);
+      }
+      stack_.pop();
+      append_empty(context);
+      return;
+    }
+    if (std::holds_alternative< entities::Statement >(decl.data))
+    {
+      entities::Statement& data = std::get< entities::Statement >(decl.data);
+      if ((data.type == entities::Statement::RETURN) || (data.type == entities::Statement::IF)
+          || (data.type == entities::Statement::WHILE))
+      {
+        stack_.pop();
+        append_empty(context);
+        return;
+      }
+    }
+    log(context, "cannot parse ';' here");
   }
-  stack_.push(&program_.emplace_back()); //append new empty to program
-  return true;
+  stack_.push(&program_.emplace_back());
 }

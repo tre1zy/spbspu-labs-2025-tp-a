@@ -3,32 +3,15 @@
 
 #include <string>
 #include <utility>
-#include "content.hpp"
+#include <vector>
 
 namespace rychkov
 {
+  struct Operator;
   struct NameCompare
   {
     using is_transparent = void;
-
-    using base_type_value = std::pair< typing::Type, size_t >;
-    using struct_value = std::pair< entities::Struct, size_t >;
-    using variable_value = std::pair< entities::Variable, size_t >;
     using operator_value = std::vector< Operator >;
-
-    bool operator()(const struct_value& lhs, const struct_value& rhs) const;
-
-    bool operator()(const base_type_value& lhs, const base_type_value& rhs) const;
-    bool operator()(const base_type_value& lhs, const std::string& rhs) const;
-    bool operator()(const std::string& lhs, const base_type_value& rhs) const;
-
-    bool operator()(const variable_value& lhs, const variable_value& rhs) const;
-    bool operator()(const variable_value& lhs, const std::string& rhs) const;
-    bool operator()(const std::string& lhs, const variable_value& rhs) const;
-
-    bool operator()(const entities::Variable& lhs, const entities::Variable& rhs) const;
-    bool operator()(const entities::Variable& lhs, const std::string& rhs) const;
-    bool operator()(const std::string& lhs, const entities::Variable& rhs) const;
 
     bool operator()(const operator_value& lhs, const operator_value& rhs) const;
     bool operator()(const operator_value& lhs, const std::string& rhs) const;
@@ -38,10 +21,52 @@ namespace rychkov
     bool operator()(const Operator& lhs, const std::string& rhs) const;
     bool operator()(const std::string& lhs, const Operator& rhs) const;
 
-    bool operator()(const Macro& lhs, const Macro& rhs) const;
-    bool operator()(const Macro& lhs, const std::string& rhs) const;
-    bool operator()(const std::string& lhs, const Macro& rhs) const;
+    template< class T >
+    bool operator()(const std::pair< T, size_t >& lhs, const std::pair< T, size_t >& rhs) const;
+    template< class T >
+    bool operator()(const std::pair< T, size_t >& lhs, const std::string& rhs) const;
+    template< class T >
+    bool operator()(const std::string& lhs, const std::pair< T, size_t >& rhs) const;
+
+    template< class T >
+    bool operator()(const T& lhs, const T& rhs) const;
+    template< class T >
+    bool operator()(const T& lhs, const std::string& rhs) const;
+    template< class T >
+    bool operator()(const std::string& lhs, const T& rhs) const;
   };
+}
+
+template< class T >
+bool rychkov::NameCompare::operator()(const std::pair< T, size_t >& lhs, const std::pair< T, size_t >& rhs) const
+{
+  return operator()(lhs.first, rhs.first) || (!operator()(rhs.first, lhs.first) && (lhs.second > rhs.second));
+}
+template< class T >
+bool rychkov::NameCompare::operator()(const std::pair< T, size_t >& lhs, const std::string& rhs) const
+{
+  return operator()(lhs.first, rhs);
+}
+template< class T >
+bool rychkov::NameCompare::operator()(const std::string& lhs, const std::pair< T, size_t >& rhs) const
+{
+  return operator()(lhs, rhs.first);
+}
+
+template< class T >
+bool rychkov::NameCompare::operator()(const T& lhs, const T& rhs) const
+{
+  return lhs.name < rhs.name;
+}
+template< class T >
+bool rychkov::NameCompare::operator()(const T& lhs, const std::string& rhs) const
+{
+  return lhs.name < rhs;
+}
+template< class T >
+bool rychkov::NameCompare::operator()(const std::string& lhs, const T& rhs) const
+{
+  return lhs < rhs.name;
 }
 
 #endif

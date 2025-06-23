@@ -84,11 +84,27 @@ void rychkov::ContentPrinter::operator()(const entities::Struct& structure)
 {
   indent() << "* [struct] " << structure.name << '\n';
   indent_++;
-  for (size_t i = 0; i < structure.fields.size(); i++)
+  for (const entities::Variable& i: structure.fields)
   {
-    indent() << "* [field] " << structure.fields[i] << '\n';
+    indent() << "* [field] " << i << '\n';
   }
   indent_--;
+}
+void rychkov::ContentPrinter::operator()(const entities::Statement& statement)
+{
+  const char* names[] = {"if", "else", "for", "while", "do", "return", "do-while"};
+  indent() << "* [statement] " << names[statement.type] << '\n';
+  if ((statement.type != entities::Statement::DO) && (statement.type != entities::Statement::RETURN)
+      && (statement.type != entities::Statement::ELSE))
+  {
+    indent() << "<conditions>:\n";
+    indent_++;
+    for (size_t i = 0; i < statement.conditions.size(); i++)
+    {
+      operator()(statement.conditions[i]);
+    }
+    indent_--;
+  }
 }
 void rychkov::ContentPrinter::operator()(const entities::Enum& structure)
 {
@@ -136,7 +152,7 @@ void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
   indent_++;
   std::visit(*this, decl.data);
   indent_--;
-  if (!decl.value->empty())
+  if (decl.value != nullptr)
   {
     indent() << "<definition>:\n";
     indent_++;

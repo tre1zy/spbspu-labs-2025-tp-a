@@ -10,26 +10,26 @@ bool rychkov::typing::Type::ready() const noexcept
 }
 rychkov::entities::Expression::Expression():
   operation{nullptr},
-  result_type{nullptr}
+  result_type{}
 {}
 rychkov::entities::Expression::Expression(Variable var):
   operation{nullptr},
-  result_type{&var.type},
+  result_type{var.type},
   operands{std::move(var)}
 {}
 rychkov::entities::Expression::Expression(Declaration decl):
   operation{nullptr},
-  result_type{nullptr},
+  result_type{},
   operands{std::move(decl)}
 {}
 rychkov::entities::Expression::Expression(Literal lit):
   operation{nullptr},
-  result_type{&lit.result_type},
+  result_type{lit.result_type},
   operands{std::move(lit)}
 {}
 rychkov::entities::Expression::Expression(CastOperation cast):
   operation{nullptr},
-  result_type{&cast.to},
+  result_type{cast.to},
   operands{std::move(cast)}
 {}
 rychkov::entities::Expression::Expression(Body body):
@@ -39,7 +39,7 @@ rychkov::entities::Expression::Expression(Body body):
 {}
 rychkov::entities::Expression::Expression(const Operator* op, std::vector< operand > opers):
   operation{op},
-  result_type{nullptr},
+  result_type{},
   operands(std::move(opers))
 {}
 rychkov::entities::Body::Body():
@@ -99,7 +99,7 @@ const rychkov::typing::Type* rychkov::entities::get_type(const Expression::opera
 {
   if (std::holds_alternative< DynMemWrapper< Expression > >(operand))
   {
-    return std::get< DynMemWrapper< Expression > >(operand)->result_type;
+    return &std::get< DynMemWrapper< Expression > >(operand)->result_type;
   }
   else if (std::holds_alternative< Variable >(operand))
   {
@@ -140,6 +140,10 @@ rychkov::typing::MatchType rychkov::typing::check_cast(const Type& dest, const T
 {
   if (dest.category != src.category)
   {
+    if (is_integer(&dest) && (is_iterable(&src)))
+    {
+      return IMPLICIT;
+    }
     if (is_pointer(&dest) && is_array(&src))
     {
       return check_cast(*dest.base, *src.base) == EXACT ? IMPLICIT : NO_CAST;

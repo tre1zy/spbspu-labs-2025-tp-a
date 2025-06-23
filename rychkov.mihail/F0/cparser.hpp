@@ -22,22 +22,30 @@ namespace rychkov
 
     CParser();
 
-    bool append(CParseContext& context, char c);
-    bool append(CParseContext& context, entities::Literal literal);
-    bool append(CParseContext& context, std::string name);
-    bool append(CParseContext& context, const std::vector< rychkov::Operator >& cases);
+    void append(CParseContext& context, char c);
+    void append(CParseContext& context, entities::Literal literal);
+    void append(CParseContext& context, std::string name);
+    void append(CParseContext& context, const std::vector< rychkov::Operator >& cases);
 
     void print(std::ostream& out) const;
   private:
     static constexpr int min_priority = -1;
-    static const Operator parentheses;
-    static const Operator brackets;
-    static const Operator comma;
+    const Operator parentheses = {Operator::MULTIPLE, Operator::SPECIAL, "()", false, false, false, 1};
+    const Operator brackets = {Operator::BINARY, Operator::SPECIAL, "[]", false, false, false, 1};
+    const Operator comma = {Operator::BINARY, Operator::SPECIAL, ",", false, false, false, 15};
+    const Operator inline_if = {Operator::TERNARY, Operator::SPECIAL, "?:", false, false, false, 13};
+
+    std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_ = {
+          {{"int", typing::BASIC}, 0},
+          {{"char", typing::BASIC}, 0},
+          {{"float", typing::BASIC}, 0},
+          {{"double", typing::BASIC}, 0},
+          {{"void", typing::BASIC}, 0}
+        };
 
     std::vector< entities::Expression > program_;
-    std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_;
-    std::set< entities::Alias > aliases_;
-    std::set< std::pair< entities::Variable, size_t >, NameCompare > variables_;
+    std::set< entities::Alias, NameCompare > aliases_;
+    std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables_;
     std::set< entities::Variable, NameCompare > defined_functions_;
     std::set< std::pair< entities::Struct, size_t >, NameCompare > structs_;
     std::set< std::pair< entities::Union, size_t > > unions_;
@@ -50,19 +58,37 @@ namespace rychkov
     bool flush_type_parser(CParseContext& context);
     bool append_empty(CParseContext& context);
     entities::Expression* move_up();
-    void move_down(CParseContext& context);
+    void move_down();
+    void move_up_down();
     void fold(CParseContext& context, const Operator* reference = nullptr);
+    void clear_scope();
     void calculate_type(CParseContext& context, entities::Expression& expr);
     void require_type(CParseContext& context, entities::Expression::operand& expr, const typing::Type& type);
+    void require_type(CParseContext& context, entities::Expression& expr, const typing::Type& type);
 
-    bool parse_semicolon(CParseContext& context);
-    bool parse_open_brace(CParseContext& context);
-    bool parse_close_brace(CParseContext& context);
-    bool parse_open_parenthesis(CParseContext& context);
-    bool parse_close_parenthesis(CParseContext& context);
-    bool parse_open_bracket(CParseContext& context);
-    bool parse_close_bracket(CParseContext& context);
-    bool parse_comma(CParseContext& context);
+    void parse_semicolon(CParseContext& context);
+    void parse_open_brace(CParseContext& context);
+    void parse_close_brace(CParseContext& context);
+    void parse_open_parenthesis(CParseContext& context);
+    void parse_close_parenthesis(CParseContext& context);
+    void parse_open_bracket(CParseContext& context);
+    void parse_close_bracket(CParseContext& context);
+    void parse_comma(CParseContext& context);
+    void parse_question_mark(CParseContext& context);
+    void parse_colon(CParseContext& context);
+
+    void parse_typedef(CParseContext& context);
+    void parse_struct(CParseContext& context);
+    void parse_union(CParseContext& context);
+    void parse_enum(CParseContext& context);
+    void parse_return(CParseContext& context);
+    void parse_if(CParseContext& context);
+    void parse_else(CParseContext& context);
+    void parse_do(CParseContext& context);
+    void parse_while(CParseContext& context);
+    void parse_for(CParseContext& context);
+
+    void check_statement_placement(CParseContext& context);
 
     bool parse_unary(CParseContext& context, const Operator& oper);
     bool parse_binary(CParseContext& context, const Operator& oper);

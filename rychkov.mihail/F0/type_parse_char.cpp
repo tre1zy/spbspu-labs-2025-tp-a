@@ -2,9 +2,9 @@
 
 #include <map>
 
-bool rychkov::TypeParser::append(CParseContext& context, char c)
+void rychkov::TypeParser::append(CParseContext& context, char c)
 {
-  using append_signature = bool(TypeParser::*)(CParseContext&);
+  using append_signature = void(TypeParser::*)(CParseContext&);
   using append_map = std::map< char, append_signature >;
   static const append_map dispatch_map = {
         {'*', &TypeParser::append_asterisk},
@@ -18,32 +18,31 @@ bool rychkov::TypeParser::append(CParseContext& context, char c)
   append_map::const_iterator found = dispatch_map.find(c);
   if (found != dispatch_map.cend())
   {
-    return (this->*(found->second))(context);
+    (this->*(found->second))(context);
+    return;
   }
   log(context, "unknown symbol in type declaration");
-  return false;
 }
-bool rychkov::TypeParser::append_asterisk(CParseContext& context)
+void rychkov::TypeParser::append_asterisk(CParseContext& context)
 {
   if (stack_.empty() || stack_.top().right_allign)
   {
     log(context, "pointer cannot be applied here");
-    return false;
+    return;
   }
   if (!stack_.top().data->empty())
   {
     move_up();
   }
   stack_.top().data->category = typing::POINTER;
-  return true;
 }
-bool rychkov::TypeParser::append_open_bracket(CParseContext& context)
+void rychkov::TypeParser::append_open_bracket(CParseContext& context)
 {
   if (stack_.top().data->empty() || stack_.top().bracket_opened
       || (stack_.top().data->category == typing::FUNCTION))
   {
     log(context, "array cannot be applied here");
-    return false;
+    return;
   }
   typing::Type* old = move_up();
   stack_.top().data->category = typing::ARRAY;
@@ -58,29 +57,27 @@ bool rychkov::TypeParser::append_open_bracket(CParseContext& context)
   }
   stack_.top().bracket_opened = true;
   stack_.top().right_allign = true;
-  return true;
 }
-bool rychkov::TypeParser::append_close_bracket(CParseContext& context)
+void rychkov::TypeParser::append_close_bracket(CParseContext& context)
 {
   if (stack_.empty() || !stack_.top().bracket_opened)
   {
     log(context, "found unpaired ']'");
-    return false;
+    return;
   }
   if (stack_.top().array_must_have_size && !stack_.top().data->array_has_length)
   {
     log(context, "array cannot be abstract here");
-    return false;
+    return;
   }
   stack_.top().bracket_opened = false;
-  return true;
 }
-bool rychkov::TypeParser::append_open_parenthesis(CParseContext& context)
+void rychkov::TypeParser::append_open_parenthesis(CParseContext& context)
 {
   if (stack_.top().data->empty())
   {
     log(context, "type cannot starts with '('");
-    return false;
+    return;
   }
   if (stack_.top().right_allign)
   {
@@ -88,7 +85,7 @@ bool rychkov::TypeParser::append_open_parenthesis(CParseContext& context)
         || (stack_.top().data->category == typing::FUNCTION))
     {
       log(context, "function parentheses cannot be applied here");
-      return false;
+      return;
     }
     if (!stack_.top().data->empty())
     {
@@ -102,24 +99,23 @@ bool rychkov::TypeParser::append_open_parenthesis(CParseContext& context)
     {
       parameters_.emplace_back();
     }
-    return true;
+    return;
   }
   typing::Type* old = move_up();
   std::swap(old, stack_.top().data);
   stack_.push({old});
   stack_.top().parenthesis_opened = true;
-  return true;
 }
-bool rychkov::TypeParser::append_close_parenthesis(CParseContext& context)
+void rychkov::TypeParser::append_close_parenthesis(CParseContext& context)
 {
   if (stack_.size() <= 1)
   {
     log(context, "found unpaired ')'");
-    return false;
+    return;
   }
   if (stack_.top().is_function_paremeter)
   {
-    if (stack_.top().data->empty())
+    if (stack_.top().data->empty() && (stack_.top().data->base == nullptr))
     {
       stack_.pop();
       if (stack_.top().data->function_parameters.size() == 1)
@@ -129,23 +125,23 @@ bool rychkov::TypeParser::append_close_parenthesis(CParseContext& context)
           parameters_.clear();
         }
         stack_.top().data->function_parameters.clear();
-        return true;
+        return;
       }
       log(context, "function parameter following after ',' cannot be empty");
-      return false;
+      return;
     }
     else if (!stack_.top().data->ready())
     {
       log(context, "function parameter started but not finished");
-      return false;
+      return;
     }
     stack_.pop();
-    return true;
+    return;
   }
   if (stack_.top().bracket_opened)
   {
     log(context, "')' cannot follow '['");
-    return false;
+    return;
   }
   if (stack_.top().data->empty())
   {
@@ -156,18 +152,17 @@ bool rychkov::TypeParser::append_close_parenthesis(CParseContext& context)
     stack_.pop();
     stack_.top().data = old;
     stack_.top().right_allign = true;
-    return true;
+    return;
   }
   stack_.pop();
   stack_.top().right_allign = true;
-  return true;
 }
-bool rychkov::TypeParser::append_comma(CParseContext& context)
+void rychkov::TypeParser::append_comma(CParseContext& context)
 {
   if ((stack_.size() <= 1) || !stack_.top().is_function_paremeter || !stack_.top().data->ready())
   {
     log(context, "',' cannot be applied here");
-    return false;
+    return;
   }
   remove_combination(*stack_.top().data);
   stack_.pop();
@@ -178,5 +173,4 @@ bool rychkov::TypeParser::append_comma(CParseContext& context)
   {
     parameters_.emplace_back();
   }
-  return true;
 }
