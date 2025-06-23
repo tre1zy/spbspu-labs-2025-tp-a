@@ -185,6 +185,26 @@ rychkov::typing::MatchType rychkov::typing::check_cast(const Type& dest, const T
   }
   return NO_CAST;
 }
+rychkov::typing::MatchType rychkov::typing::check_overload(const Type& function, const std::vector< Type >& args)
+{
+  if (function.function_parameters.size() != args.size())
+  {
+    return NO_CAST;
+  }
+  MatchType result = EXACT;
+  for (size_t i = 0; i < args.size(); i++)
+  {
+    switch (check_cast(function.function_parameters[i], args[i]))
+    {
+    case IMPLICIT:
+      result = IMPLICIT;
+      break;
+    case NO_CAST:
+      return NO_CAST;
+    }
+  }
+  return result;
+}
 
 const rychkov::typing::Type* rychkov::typing::largest_integer(const Type& lhs, const Type& rhs)
 {
@@ -201,6 +221,11 @@ const rychkov::typing::Type* rychkov::typing::common_type(const Type& lhs, const
     return nullptr;
   }
   return &lhs;
+}
+bool rychkov::typing::pointer_comparable(const Type& lhs, const Type& rhs)
+{
+  return (is_pointer(&lhs) || is_array(&lhs)) && (is_pointer(&rhs) || is_array(&rhs))
+      && (check_cast(lhs, rhs) == EXACT);
 }
 
 bool rychkov::typing::is_basic(const Type* type)

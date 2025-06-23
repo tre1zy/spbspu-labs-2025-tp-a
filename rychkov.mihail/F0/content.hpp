@@ -152,8 +152,10 @@ namespace rychkov
 
     bool exact_cv(const Type& dest, const Type& src);
     MatchType check_cast(const Type& dest, const Type& src);
+    MatchType check_overload(const Type& function, const std::vector< Type >& args);
     const typing::Type* largest_integer(const Type& lhs, const Type& rhs);
     const typing::Type* common_type(const Type& lhs, const Type& rhs);
+    bool pointer_comparable(const Type& lhs, const Type& rhs);
   }
   namespace entities
   {

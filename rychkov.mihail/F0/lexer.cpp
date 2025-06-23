@@ -115,6 +115,11 @@ void rychkov::Lexer::flush(CParseContext& context)
       log(context, "unknown literal suffix - " + lit.suffix);
       lit.suffix.clear();
     }
+    if (lit.type == entities::Literal::String)
+    {
+      lit.result_type.array_has_length = true;
+      lit.result_type.array_length = lit.literal.length() + 1;
+    }
 
     if (next_ == nullptr)
     {

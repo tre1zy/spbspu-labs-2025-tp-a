@@ -210,7 +210,6 @@ bool rychkov::CParser::flush_type_parser(CParseContext& context)
       }
       *stack_.top() = entities::Declaration{type_parser_.function()};
       variables_.insert({type_parser_.variable(), stack_.size()});
-      defined_functions_.insert(type_parser_.variable());
     }
     else
     {

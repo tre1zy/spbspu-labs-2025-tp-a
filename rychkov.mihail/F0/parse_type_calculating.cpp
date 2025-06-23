@@ -171,6 +171,10 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
       const typing::Type* common = typing::common_type(*lhs, *rhs);
       if (common == nullptr)
       {
+        if (pointer_comparable(*lhs, *rhs))
+        {
+          return;
+        }
         start_log(context) << "operator" << expr.operation->token << " must be applied to basic types";
         finish_log(context);
         return;
@@ -254,4 +258,18 @@ void rychkov::CParser::require_type(CParseContext& context, entities::Expression
     calculate_type(context, *std::get< entities::CastOperation >(expr.operands[0]).expr);
     break;
   }
+}
+std::pair< const rychkov::entities::Variable*, rychkov::typing::MatchType > rychkov::CParser::find_overload
+    (const std::string& name, const std::vector< typing::Type >& args)
+{
+  using Iter = decltype(defined_functions_)::iterator;
+  std::pair< Iter, Iter > range = defined_functions_.equal_range(name);
+  for (; range.first != range.second; ++range.first)
+  {
+    if (typing::check_overload(range.first->type, args) == typing::EXACT)
+    {
+      return {&*range.first, typing::EXACT};
+    }
+  }
+  return {nullptr, typing::NO_CAST};
 }

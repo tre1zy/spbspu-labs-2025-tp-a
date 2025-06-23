@@ -59,6 +59,22 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       {
         require_type(context, *decl.value, data.type);
       }
+      if (typing::is_array(&data.type) && !data.type.array_has_length)
+      {
+        if (decl.value != nullptr)
+        {
+          if (!decl.value->result_type.array_has_length)
+          {
+            log(context, "cannot deduce array length");
+          }
+          else
+          {
+            data.type.array_has_length = true;
+            data.type.array_length = decl.value->result_type.array_length;
+          }
+        }
+      }
+
       stack_.pop();
       //variables_.insert(std::make_pair(data, stack_.size()));
       append_empty(context);
@@ -95,6 +111,7 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       {
         stack_.pop();
         append_empty(context);
+        clear_scope();
         return;
       }
     }

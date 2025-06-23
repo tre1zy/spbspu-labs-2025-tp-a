@@ -46,10 +46,10 @@ namespace rychkov
     std::vector< entities::Expression > program_;
     std::set< entities::Alias, NameCompare > aliases_;
     std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables_;
-    std::set< entities::Variable, NameCompare > defined_functions_;
+    std::multiset< entities::Variable, NameCompare > defined_functions_;
     std::set< std::pair< entities::Struct, size_t >, NameCompare > structs_;
-    std::set< std::pair< entities::Union, size_t > > unions_;
-    std::set< std::pair< entities::Enum, size_t > > enums_;
+    std::set< std::pair< entities::Union, size_t >, NameCompare > unions_;
+    std::set< std::pair< entities::Enum, size_t >, NameCompare > enums_;
     std::stack< entities::Expression* > stack_;
     TypeParser type_parser_;
 
@@ -62,9 +62,13 @@ namespace rychkov
     void move_up_down();
     void fold(CParseContext& context, const Operator* reference = nullptr);
     void clear_scope();
+    template< class T >
+    void clear_scope(T& pair_set);
     void calculate_type(CParseContext& context, entities::Expression& expr);
     void require_type(CParseContext& context, entities::Expression::operand& expr, const typing::Type& type);
     void require_type(CParseContext& context, entities::Expression& expr, const typing::Type& type);
+    std::pair< const entities::Variable*, typing::MatchType > find_overload(const std::string& name,
+        const std::vector< typing::Type >& args);
 
     void parse_semicolon(CParseContext& context);
     void parse_open_brace(CParseContext& context);

@@ -57,4 +57,24 @@ void rychkov::CParser::move_up_down()
 }
 
 void rychkov::CParser::clear_scope()
-{}
+{
+  clear_scope(variables_);
+  clear_scope(structs_);
+  clear_scope(unions_);
+  clear_scope(enums_);
+}
+template< class T >
+void rychkov::CParser::clear_scope(T& pair_set)
+{
+  typename T::iterator pos = pair_set.begin();
+  while (pos != pair_set.end())
+  {
+    if (pos->second <= stack_.size())
+    {
+      pos = pair_set.upper_bound(pos->first.name);
+      continue;
+    }
+    typename T::iterator to = pair_set.lower_bound({pos->first, stack_.size()});
+    pos = pair_set.erase(pos, to);
+  }
+}

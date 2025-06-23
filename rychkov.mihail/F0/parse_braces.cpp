@@ -1,5 +1,8 @@
 #include "cparser.hpp"
 
+#include <iostream>
+#include "print_content.hpp"
+
 void rychkov::CParser::parse_open_brace(CParseContext& context)
 {
   if (global_scope())
@@ -28,6 +31,15 @@ void rychkov::CParser::parse_open_brace(CParseContext& context)
         {
           variables_.insert({{data.type.function_parameters[i], data.parameters[i]}, stack_.size() + 1});
         }
+      }
+      if (find_overload(data.name, data.type.function_parameters).first != nullptr)
+      {
+        start_log(context) << "cannot define same function again - " << data;
+        finish_log(context);
+      }
+      else
+      {
+        defined_functions_.insert({data.type, data.name});
       }
     }
     else
@@ -66,6 +78,7 @@ void rychkov::CParser::parse_close_brace(CParseContext& context)
     entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
     body.data.pop_back();
     stack_.pop();
+    clear_scope();
     if (entities::is_decl(*stack_.top()))
     {
       entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
@@ -113,6 +126,7 @@ void rychkov::CParser::parse_close_brace(CParseContext& context)
         {
           stack_.pop();
           append_empty(context);
+          clear_scope();
           return;
         }
       }
