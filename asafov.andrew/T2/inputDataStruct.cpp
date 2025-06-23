@@ -6,11 +6,10 @@ namespace
 {
   unsigned long long parseULLBin(std::istream& is)
   {
-    std::streampos start = is.tellg();
     char ch;
     if (!(is >> ch) || ch != '0' || !(is >> ch) || ch != 'b')
     {
-      is.seekg(start);
+      is.putback(ch);
       return 0;
     }
 
@@ -30,49 +29,52 @@ namespace
       }
     }
 
-    if (!has_digits)
-    {
-      is.seekg(start);
-      return 0;
-    }
-    return result;
+    return has_digits ? result : 0;
   }
 
   std::complex< double > parseCmpLsp(std::istream& is)
   {
-    std::streampos start = is.tellg();
-    char ch;
-    if (!(is >> ch) || ch != '#' || !(is >> ch) || ch != 'c' || !(is >> ch) || ch != '(')
+    char buffer[5] = {0};
+    is.read(buffer, 3);
+    if (strncmp(buffer, "#c(", 3) != 0)
     {
-      is.seekg(start);
+      for (int i = is.gcount() - 1; i >= 0; --i)
+        is.putback(buffer[i]);
       return {0.0, 0.0};
     }
 
     double real = 0.0;
-    double imag = 0.0;
     is >> real;
     if (!is)
     {
-      is.seekg(start);
+      is.clear();
+      while (is.get() != ')')
+      {
+      }
       return {0.0, 0.0};
     }
 
-    is >> ch;
-    if (ch != ')')
+    char sep;
+    is >> sep;
+    if (sep == ')')
+      return {real, 0.0};
+
+    double imag = 0.0;
+    is >> imag;
+    if (!is)
     {
-      is.putback(ch);
-      is >> imag;
-      if (!is)
+      is.clear();
+      while (is.get() != ')')
       {
-        is.seekg(start);
-        return {0.0, 0.0};
       }
-      is >> ch;
-      if (ch != ')')
-      {
-        is.seekg(start);
-        return {0.0, 0.0};
-      }
+      return {0.0, 0.0};
+    }
+
+    is >> sep;
+    if (sep != ')')
+    {
+      is.putback(sep);
+      return {0.0, 0.0};
     }
 
     return {real, imag};
@@ -96,68 +98,79 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
       {
         key.push_back(ch);
       }
+      is.putback(ch);
 
       if (key == "key1")
       {
-        std::streampos before_key = is.tellg();
-        unsigned long long value = parseULLBin(is);
-        if (value != 0)
+        std::string value_str;
+        char next = is.peek();
+        if (next == '0')
         {
-          temp.key1 = value;
-          has_key1 = true;
-        }
-        else
-        {
-          is.clear();
-          is.seekg(before_key);
-          char prefix[3];
-          if (is.read(prefix, 3) && prefix[0] == '0' && prefix[1] == 'b' && prefix[2] == '0')
+          is.get(ch);
+          value_str += ch;
+          next = is.peek();
+          if (next == 'b')
           {
-            temp.key1 = 0;
-            has_key1 = true;
+            is.get(ch);
+            value_str += ch;
+            unsigned long long value = parseULLBin(is);
+            if (value != 0 || value_str == "0b")
+            {
+              temp.key1 = value;
+              has_key1 = true;
+            }
           }
           else
           {
-            is.seekg(before_key);
+            is.putback(ch);
           }
         }
       }
       else if (key == "key2")
       {
-        std::streampos before_key = is.tellg();
-        std::complex< double > value = parseCmpLsp(is);
-        if (value != std::complex< double >{0.0, 0.0})
+        char next = is.peek();
+        if (next == '#')
         {
-          temp.key2 = value;
-          has_key2 = true;
-        }
-        else
-        {
-          is.clear();
-          is.seekg(before_key);
           std::string prefix;
-          char c;
-          while (is.get(c) && prefix.size() < 6)
+          for (int i = 0; i < 3; ++i)
           {
-            prefix.push_back(c);
-            if (prefix == "#c(0.0 0.0)" ||
-              prefix == "#c(0 0)" ||
-              prefix == "#c(0. 0.)")
+            is.get(ch);
+            prefix += ch;
+          }
+
+          if (prefix == "#c(")
+          {
+            double real, imag = 0.0;
+            is >> real;
+
+            char sep;
+            is >> sep;
+            if (sep == ')')
             {
-              temp.key2 = {0.0, 0.0};
+              temp.key2 = {real, 0.0};
               has_key2 = true;
-              break;
+            }
+            else
+            {
+              is >> imag >> sep;
+              if (sep == ')')
+              {
+                temp.key2 = {real, imag};
+                has_key2 = true;
+              }
             }
           }
-          if (!has_key2)
+          else
           {
-            is.seekg(before_key);
+            for (int i = prefix.size() - 1; i >= 0; --i)
+              is.putback(prefix[i]);
           }
         }
       }
       else if (key == "key3")
       {
-        if (is >> std::ws && is.peek() == '"')
+        is >> std::ws;
+        if (is.peek() == '"')
         {
           is.get();
           std::string value;
