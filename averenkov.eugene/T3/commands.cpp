@@ -296,26 +296,100 @@ namespace averenkov
     }
   }
 
-  void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
-  {
-    std::string param;
-    in >> param;
-    static std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
-    commands["EVEN"] = EvenCounter();
-    commands["ODD"] = OddCounter();
-    if (std::isdigit(param[0]))
-    {
-      size_t num = std::stoull(param);
-      if (num < 3)
-      {
-        throw std::invalid_argument("Error in input");
-      }
-      out << std::count_if(polygons.begin(), polygons.end(), VertexCount(num));
-      return;
-    }
-    out << commands.at(param)(polygons);
-  }
 
+
+void printCountOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+{
+    std::string param;
+    if (!(in >> param))
+    {
+        throw std::runtime_error("<INVALID COMMAND>");
+    }
+
+    struct ValidCounter
+    {
+        bool operator()(const Polygon& poly) const
+        {
+            return poly.points.size() >= 3;
+        }
+    } validator;
+
+    if (param == "EVEN")
+    {
+        size_t count = 0;
+        for (const auto& poly : polygons)
+        {
+            if (validator(poly) && EvenCounter()(std::vector<Polygon>{poly}))
+            {
+                ++count;
+            }
+        }
+        out << count;
+    }
+    else if (param == "ODD")
+    {
+        size_t count = 0;
+        for (const auto& poly : polygons)
+        {
+            if (validator(poly) && OddCounter()(std::vector<Polygon>{poly}))
+            {
+                ++count;
+            }
+        }
+        out << count;
+    }
+    else
+    {
+        try
+        {
+            size_t num = std::stoul(param);
+            if (num < 3)
+            {
+                throw std::runtime_error("<INVALID COMMAND>");
+            }
+            size_t count = 0;
+            for (const auto& poly : polygons)
+            {
+                if (validator(poly) && NumVertexCounter{num}(std::vector<Polygon>{poly}))
+                {
+                    ++count;
+                }
+            }
+            out << count;
+        }
+        catch (...)
+        {
+            throw std::runtime_error("<INVALID COMMAND>");
+        }
+    }
+}
+
+
+/*  void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    static std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
+    commands["EVEN"] = std::bind(EvenCounter(), std::cref(polygons));
+    commands["ODD"] = std::bind(OddCounter(), std::cref(polygons));
+
+    std::string command;
+    in >> command;
+    size_t cnt;
+    try
+    {
+      cnt = commands.at(command)();
+    }
+    catch (...)
+    {
+      size_t vrt_cnt = std::stoull(command);
+      if (vrt_cnt < 3)
+      {
+        throw std::invalid_argument("Invalid input");
+      }
+      cnt = countVrt(polygons, vrt_cnt);
+    }
+    out << cnt;
+  }
+*/
   void printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     Polygon target;
