@@ -97,6 +97,10 @@ namespace averenkov
 
   void printAreaSum(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
+    if (!in)
+    {
+      throw std::invalid_argument("Invalid input");
+    }
     std::string param;
     in >> param;
 
@@ -133,6 +137,10 @@ namespace averenkov
 
   void printMaxValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
+    if (!in)
+    {
+      throw std::invalid_argument("Invalid input");
+    }
     if (polygons.empty())
     {
       throw std::runtime_error("No polygons for MAX calculation");
@@ -160,6 +168,10 @@ namespace averenkov
 
   void printMinValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
+    if (!in)
+    {
+      throw std::invalid_argument("Invalid input");
+    }
     if (polygons.empty())
     {
       throw std::runtime_error("No polygons for MIN calculation");
@@ -187,9 +199,11 @@ namespace averenkov
 
   void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
+    if (!in)
+    {
+      throw std::invalid_argument("Invalid input");
+    }
     std::string param;
-    in >> param;
-
     if (param == "EVEN")
     {
       size_t count = std::count_if(polygons.begin(), polygons.end(), EvenVertexCounter());

@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::vector<averenkov::Polygon> polygons;
+  std::vector< averenkov::Polygon > polygons;
   averenkov::Polygon poly;
   while (file >> poly)
   {
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
     catch (const std::exception&)
     {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
   }
