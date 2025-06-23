@@ -92,7 +92,7 @@ struct VertexesComparator {
   void process_commands(std::vector<Polygon>& polygons)
 {
     std::for_each(
-        std::istream_iterator<Line>(std::cin), std::istream_iterator<Line>(), 
+        std::istream_iterator<Line>(std::cin), std::istream_iterator<Line>(),
         [&polygons](const Line& line) {
             if (line.content.empty())
                 return;
@@ -104,7 +104,6 @@ struct VertexesComparator {
             bool printDouble = false;
             double dblResult = 0.0;
             int intResult = 0;
-            
             if (cmd == "AREA") {
                 std::string arg;
                 iss >> arg;
