@@ -356,7 +356,7 @@ struct CommandProcessor {
           std::cout << intResult << "\n";
         }
       };
-  }
+  };
 void process_commands(std::vector<Polygon>& polygons) {
     std::for_each(
         std::istream_iterator<Line>(std::cin),
