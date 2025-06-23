@@ -59,7 +59,7 @@ namespace
 int main(int argc, char* argv[])
 {
   using namespace bocharov;
-  if (argc != 2) 
+  if (argc != 2)
   {
     std::cerr << "Usage: " << argv[0] << " <input_file>\n";
     return 1;
