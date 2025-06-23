@@ -8,6 +8,7 @@
 #include <vector>
 #include <utility>
 
+#include "lexer.hpp"
 #include "type_parser.hpp"
 #include "content.hpp"
 #include "compare.hpp"
@@ -18,18 +19,35 @@ namespace rychkov
   class CParser
   {
   public:
-    static const std::set< Operator, rychkov::NameCompare > operators;
-
     CParser();
 
     void append(CParseContext& context, char c);
     void append(CParseContext& context, entities::Literal literal);
     void append(CParseContext& context, std::string name);
     void append(CParseContext& context, const std::vector< rychkov::Operator >& cases);
+    void append(CParseContext& context, Lexer::TypeKeyword keyword);
+
+    void parse_typedef(CParseContext& context);
+    void parse_struct(CParseContext& context);
+    void parse_union(CParseContext& context);
+    void parse_enum(CParseContext& context);
+    void parse_return(CParseContext& context);
+    void parse_if(CParseContext& context);
+    void parse_else(CParseContext& context);
+    void parse_do(CParseContext& context);
+    void parse_while(CParseContext& context);
+    void parse_for(CParseContext& context);
 
     void print(std::ostream& out) const;
   private:
     static constexpr int min_priority = -1;
+    const std::map< Lexer::TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
+          {Lexer::CONST, &TypeParser::append_const},
+          {Lexer::VOLATILE, &TypeParser::append_volatile},
+          {Lexer::SIGNED, &TypeParser::append_signed},
+          {Lexer::UNSIGNED, &TypeParser::append_unsigned}
+        };
+
     const Operator parentheses = {Operator::MULTIPLE, Operator::SPECIAL, "()", false, false, false, 1};
     const Operator brackets = {Operator::BINARY, Operator::SPECIAL, "[]", false, false, false, 1};
     const Operator comma = {Operator::BINARY, Operator::SPECIAL, ",", false, false, false, 15};
@@ -80,17 +98,6 @@ namespace rychkov
     void parse_comma(CParseContext& context);
     void parse_question_mark(CParseContext& context);
     void parse_colon(CParseContext& context);
-
-    void parse_typedef(CParseContext& context);
-    void parse_struct(CParseContext& context);
-    void parse_union(CParseContext& context);
-    void parse_enum(CParseContext& context);
-    void parse_return(CParseContext& context);
-    void parse_if(CParseContext& context);
-    void parse_else(CParseContext& context);
-    void parse_do(CParseContext& context);
-    void parse_while(CParseContext& context);
-    void parse_for(CParseContext& context);
 
     void check_statement_placement(CParseContext& context);
 

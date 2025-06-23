@@ -6,10 +6,6 @@
 
 using namespace std::literals::string_literals;
 
-const std::set< rychkov::Operator, rychkov::NameCompare > rychkov::CParser::operators = {
-      {rychkov::Operator::UNARY, rychkov::Operator::SPECIAL, "sizeof", false, false, false, 0}
-    };
-
 rychkov::CParser::CParser():
   program_{{}}
 {
@@ -55,6 +51,10 @@ void rychkov::CParser::append(CParseContext& context, entities::Literal literal)
   }
   stack_.top()->operands.push_back(std::move(literal));
 }
+void rychkov::CParser::append(CParseContext& context, Lexer::TypeKeyword keyword)
+{
+  (type_parser_.*(type_keywords.at(keyword)))(context);
+}
 void rychkov::CParser::append(CParseContext& context, std::string name)
 {
   decltype(base_types_)::const_iterator base_type_p = base_types_.find(name);
@@ -74,13 +74,6 @@ void rychkov::CParser::append(CParseContext& context, std::string name)
     type_parser_.append(context, name);
     return;
   }
-  static const std::set< std::string > type_keywords = {"const", "volatile", "signed", "unsigned"};
-  if (type_keywords.find(name) != type_keywords.end())
-  {
-    type_parser_.append(context, name);
-    return;
-  }
-
   decltype(variables_)::const_iterator var_p = variables_.find(name);
   if (var_p != variables_.cend())
   {
@@ -90,20 +83,6 @@ void rychkov::CParser::append(CParseContext& context, std::string name)
       return;
     }
     stack_.top()->operands.push_back(var_p->first);
-    return;
-  }
-
-  static const std::map< std::string, void(CParser::*)(CParseContext&) > keywords = {
-        {"typedef", &CParser::parse_typedef},
-        {"struct", &CParser::parse_struct},
-        {"return", &CParser::parse_return},
-        {"if", &CParser::parse_if},
-        {"while", &CParser::parse_while}
-      };
-  decltype(keywords)::const_iterator keyword_p = keywords.find(name);
-  if (keyword_p != keywords.cend())
-  {
-    (this->*(keyword_p->second))(context);
     return;
   }
 

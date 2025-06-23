@@ -4,22 +4,6 @@
 
 void rychkov::TypeParser::append(CParseContext& context, std::string name)
 {
-  using append_signature = void(TypeParser::*)(CParseContext&);
-  using append_map = std::map< std::string, append_signature >;
-  static const append_map dispatch_map = {
-        {"const", &TypeParser::append_const},
-        {"volatile", &TypeParser::append_volatile},
-        {"signed", &TypeParser::append_signed},
-        {"unsigned", &TypeParser::append_unsigned}
-      };
-
-  append_map::const_iterator found = dispatch_map.find(name);
-  if (found != dispatch_map.cend())
-  {
-    (this->*(found->second))(context);
-    return;
-  }
-
   if (stack_.top().data != &combined_)
   {
     if (can_be_named_param(stack_.top().data))

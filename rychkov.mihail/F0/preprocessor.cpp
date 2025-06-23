@@ -114,14 +114,45 @@ void rychkov::Preprocessor::flush_buf(CParseContext& context)
           return;
         }
       }
+      State prev = state_;
       state_ = prev_state_;
       if ((state_ == DIRECTIVE) || (state_ == MACRO_PARAMETERS))
       {
         return;
       }
-      for (char c: buf_)
+      if (!skip_all())
       {
-        flush(context, c);
+        if (next_ == nullptr)
+        {
+          for (char c: buf_)
+          {
+            flush(context, c);
+          }
+        }
+        else
+        {
+          switch (prev)
+          {
+          case rychkov::Preprocessor::STRING_LITERAL:
+            next_->append_string_literal(context, buf_);
+            break;
+          case rychkov::Preprocessor::CHAR_LITERAL:
+            next_->append_char_literal(context, buf_);
+            break;
+          case rychkov::Preprocessor::NAME:
+            next_->append_name(context, buf_);
+            break;
+          case rychkov::Preprocessor::NUMBER:
+            next_->append_number(context, buf_);
+            break;
+          default:
+            for (char c: buf_)
+            {
+              flush(context, c);
+            }
+            break;
+          }
+        }
       }
     }
   }

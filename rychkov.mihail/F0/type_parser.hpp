@@ -30,6 +30,11 @@ namespace rychkov
     void append(CParseContext& context, size_t numeric_literal);
     void append(CParseContext& context, typing::Type base_type);
 
+    void append_const(CParseContext& context);
+    void append_volatile(CParseContext& context);
+    void append_signed(CParseContext& context);
+    void append_unsigned(CParseContext& context);
+
   private:
     struct ParseCell
     {
@@ -44,11 +49,6 @@ namespace rychkov
     std::stack< ParseCell > stack_;
     std::string var_name_;
     std::vector< std::string > parameters_;
-
-    void append_const(CParseContext& context);
-    void append_volatile(CParseContext& context);
-    void append_signed(CParseContext& context);
-    void append_unsigned(CParseContext& context);
 
     void append_asterisk(CParseContext& context);
     void append_open_bracket(CParseContext& context);
