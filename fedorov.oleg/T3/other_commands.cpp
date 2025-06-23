@@ -18,9 +18,8 @@ namespace fedorov
     }
 
     double threshold = calcPolygonArea(target);
-    out << std::count_if(polygons.begin(), polygons.end(),
-                         std::bind(std::less< double >(), std::bind(calcPolygonArea, std::placeholders::_1), threshold))
-        << '\n';
+    auto calcAreaLess = std::bind(std::less< double >(), std::bind(calcPolygonArea, std::placeholders::_1), threshold);
+    out << std::count_if(polygons.begin(), polygons.end(), calcAreaLess) << '\n';
   }
 
   void echoCommand(std::istream &in, std::ostream &out, std::vector< Polygon > &polygons)
@@ -38,8 +37,9 @@ namespace fedorov
     result.reserve(polygons.size() + count);
 
     std::copy(polygons.begin(), polygons.end(), std::back_inserter(result));
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(result),
-                 std::bind(std::equal_to< Polygon >(), std::placeholders::_1, target));
+
+    auto polygonEqT = std::bind(std::equal_to< Polygon >(), std::placeholders::_1, target);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(result), polygonEqT);
 
     polygons.swap(result);
     out << count << '\n';

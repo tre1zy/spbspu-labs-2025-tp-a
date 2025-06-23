@@ -8,27 +8,24 @@
 
 namespace fedorov
 {
-  namespace
+  double areaOddHandler(const std::vector< Polygon > &polygons)
   {
-    double areaOddHandler(const std::vector< Polygon > &polygons)
-    {
-      return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
-    }
+    return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
+  }
 
-    double areaEvenHandler(const std::vector< Polygon > &polygons)
-    {
-      return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
-    }
+  double areaEvenHandler(const std::vector< Polygon > &polygons)
+  {
+    return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
+  }
 
-    double areaMeanHandler(const std::vector< Polygon > &polygons)
+  double areaMeanHandler(const std::vector< Polygon > &polygons)
+  {
+    if (polygons.empty())
     {
-      if (polygons.empty())
-      {
-        throw std::logic_error("No polygons");
-      }
-      double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
-      return total / polygons.size();
+      throw std::logic_error("No polygons");
     }
+    double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
+    return total / polygons.size();
   }
 
   void areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)

@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();

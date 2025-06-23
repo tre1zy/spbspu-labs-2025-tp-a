@@ -8,17 +8,15 @@
 
 namespace fedorov
 {
-  namespace
-  {
-    size_t countOddHandler(const std::vector< Polygon > &polygons)
-    {
-      return std::count_if(polygons.begin(), polygons.end(), CountOddPredicate());
-    }
 
-    size_t countEvenHandler(const std::vector< Polygon > &polygons)
-    {
-      return std::count_if(polygons.begin(), polygons.end(), CountEvenPredicate());
-    }
+  size_t countOddHandler(const std::vector< Polygon > &polygons)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), CountOddPredicate());
+  }
+
+  size_t countEvenHandler(const std::vector< Polygon > &polygons)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), CountEvenPredicate());
   }
 
   void countCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
