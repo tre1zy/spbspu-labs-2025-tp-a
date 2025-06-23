@@ -1,10 +1,10 @@
 #include "ioGeometry.hpp"
-#include <ioDelimiter.hpp>
 #include <functional>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
 #include <numeric>
+#include <ioDelimiter.hpp>
 
 namespace
 {
