@@ -57,3 +57,4 @@ int main(int argc, char* argv[])
     amine::process_commands(polygons);
     return 0;
 }
+}
