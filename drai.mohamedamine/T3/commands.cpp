@@ -256,7 +256,7 @@ struct VertexesComparator {
                             }
                         };
                         size_t initial_size = polygons.size();
-                        auto new_end = std::unique(polygons.begin(), polygons.end(), 
+                        auto new_end = std::unique(polygons.begin(), polygons.end(),
                             [&](const Polygon& a, const Polygon& b) {
                                 EqualToQuery eq(query);
                                 return eq(a) && eq(b);
