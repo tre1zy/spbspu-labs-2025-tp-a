@@ -23,6 +23,16 @@ namespace
     }
   };
 
+  struct SequenceCounter
+  {
+    const Polygon & target;
+    std::pair<size_t, size_t> operator()(const std::pair<size_t, size_t> & acc, const Polygon & poly) const
+    {
+      size_t current = (poly == target) ? acc.second + 1 : 0;
+      return {std::max(acc.first, current), current};
+    }
+  };
+
   void getAreaByPredicate(std::ostream & out, const std::vector<Polygon> & polygons, Predicate pred)
   {
     StreamGuard guard(out);
@@ -227,25 +237,16 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std
 {
   Polygon target;
   in >> target;
+
   if (!in || in.peek() != '\n')
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  size_t maxCount = 0;
-  size_t currentCount = 0;
-  for (const auto & poly : polygons)
-  {
-    if (poly == target)
-    {
-      currentCount++;
-      maxCount = std::max(maxCount, currentCount);
-    }
-    else
-    {
-      currentCount = 0;
-    }
-  }
-    out << maxCount << "\n";
+
+  auto init = std::make_pair(0u, 0u);
+  SequenceCounter counter{target};
+  auto result = std::accumulate(polygons.begin(), polygons.end(), init, counter);
+  out << result.first << "\n";
 }
 
 void bocharov::getRightsCnt(std::ostream & out, const std::vector< Polygon > & polygons)
