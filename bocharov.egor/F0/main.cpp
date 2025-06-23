@@ -73,12 +73,12 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  try 
+  try
   {
     inputDict(file, dicts);
   }
   catch (const std::exception& e)
-  {   
+  {
     std::cerr << "<INVALID FILE>\n";
     return 1;
   }
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
   std::string cmd;
   while (std::cin >> cmd)
   {
-    try 
+    try
     {
       commands.at(cmd)();
     }
