@@ -11,110 +11,110 @@
 
 namespace
 {
-  using bocharov::Polygon;
+  using namespace bocharov;
 
-  void getAreaEven(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getAreaEven(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< bocharov::Polygon > filtered;
+    StreamGuard guard(out);
+    std::vector< Polygon > filtered;
     filtered.reserve(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), bocharov::isEven);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isEven);
     std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), bocharov::getPolygonArea);
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getAreaOdd(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getAreaOdd(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< bocharov::Polygon > filtered;
+    StreamGuard guard(out);
+    std::vector< Polygon > filtered;
     filtered.reserve(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), bocharov::isOdd);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isOdd);
     std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), bocharov::getPolygonArea);
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getAreaMean(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getAreaMean(std::ostream & out, const std::vector< Polygon > & polygons)
   {
     if (polygons.empty())
     {
       throw std::runtime_error("ERROR: there are no polygons");
     }
-    bocharov::StreamGuard guard(out);
+    StreamGuard guard(out);
     std::vector< double > areas;
     areas.reserve(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), bocharov::getPolygonArea);
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getAreaVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons, size_t num)
+  void getAreaVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< bocharov::Polygon > filtered;
+    StreamGuard guard(out);
+    std::vector< Polygon > filtered;
     filtered.reserve(polygons.size());
-    auto pred = std::bind(bocharov::hasNVertexes, std::placeholders::_1, num);
+    auto pred = std::bind(hasNVertexes, std::placeholders::_1, num);
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
     std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), bocharov::getPolygonArea);
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
     double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getMaxArea(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getMaxArea(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
+    StreamGuard guard(out);
     std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), bocharov::getPolygonArea);
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
     double result = *std::max_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getMaxVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getMaxVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    auto result = *std::max_element(polygons.begin(), polygons.end(), bocharov::compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
+    StreamGuard guard(out);
+    auto result = *std::max_element(polygons.begin(), polygons.end(), compareVertexes);
+    out << std::fixed << std::setprecision(1) << result.points.size();
   }
 
-  void getMinArea(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getMinArea(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
+    StreamGuard guard(out);
     std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), bocharov::getPolygonArea);
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
     double result = *std::min_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getMinVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getMinVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    auto result = *std::min_element(polygons.begin(), polygons.end(), bocharov::compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
+    StreamGuard guard(out);
+    auto result = *std::min_element(polygons.begin(), polygons.end(), compareVertexes);
+    out << std::fixed << std::setprecision(1) << result.points.size();
   }
 
-  void getCountEven(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getCountEven(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), bocharov::isEven) << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), isEven);
   }
 
-  void getCountOdd(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getCountOdd(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), bocharov::isOdd) << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), isOdd);
   }
 
-  void getCountVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons, size_t num)
+  void getCountVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
   {
-    auto pred = std::bind(bocharov::hasNVertexes, std::placeholders::_1, num);
-    out << std::count_if(polygons.cbegin(), polygons.cend(), pred) << '\n';
+    auto pred = std::bind(hasNVertexes, std::placeholders::_1, num);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), pred);
   }
 
   struct RightAngleCheck
   {
-    const bocharov::Polygon & plg;
+    const Polygon & plg;
 
     bool operator()(size_t ind) const
     {
