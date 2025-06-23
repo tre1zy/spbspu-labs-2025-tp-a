@@ -1,5 +1,5 @@
-#ifndef STREAM_GUARD_HPP
-#define STREAM_GUARD_HPP
+#ifndef GUARD_HPP
+#define GUARD_HPP
 #include <iostream>
 
 namespace smirnov
