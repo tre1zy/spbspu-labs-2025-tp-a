@@ -7,8 +7,8 @@
 int main()
 {
   using namespace smirnov;
-  using DataInputIt = std::istream_iterator<DataStruct>;
-  using DataOutputIt =  std::ostream_iterator<DataStruct>;
+  using DataInputIt = std::istream_iterator< DataStruct >;
+  using DataOutputIt = std::ostream_iterator< DataStruct >;
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {

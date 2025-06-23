@@ -1,6 +1,6 @@
 #include "stream_guard.hpp"
 
-smirnov::StreamGuard::StreamGuard(std::basic_ios<char> & stream):
+smirnov::StreamGuard::StreamGuard(std::basic_ios< char > & stream):
   stream_(stream),
   fmt_(stream.flags()),
   width_(stream.width()),

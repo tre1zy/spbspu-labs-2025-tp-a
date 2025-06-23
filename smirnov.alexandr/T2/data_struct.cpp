@@ -1,7 +1,7 @@
 #include "data_struct.hpp"
-#include "stream_guard.hpp"
 #include <cctype>
 #include <iostream>
+#include "stream_guard.hpp"
 
 namespace
 {
