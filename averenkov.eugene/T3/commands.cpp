@@ -59,7 +59,6 @@ namespace averenkov
     return sum;
   }
 
-
   double EvenAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
   {
     double sum = 0.0;
@@ -99,7 +98,6 @@ namespace averenkov
     return sum;
   }
 
-
 double MeanAreaCalculator::operator()(const std::vector<Polygon>& polygons) const
 {
   if (polygons.empty())
@@ -108,7 +106,6 @@ double MeanAreaCalculator::operator()(const std::vector<Polygon>& polygons) cons
   }
   return AreaSumCalculator()(polygons) / polygons.size();
 }
-
 
 void MaxAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
 {
@@ -147,7 +144,6 @@ void MaxVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std:
   out << maxVertices;
 }
 
-
 void MinAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
 {
   if (polygons.empty())
@@ -167,7 +163,6 @@ void MinAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostrea
   out << std::fixed << std::setprecision(1) << minArea;
 }
 
-
 void MinVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
 {
   if (polygons.empty())
@@ -185,7 +180,6 @@ void MinVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std:
   }
   out << minVertices;
 }
-
 
 size_t EvenCounter::operator()(const std::vector<Polygon>& polygons) const
 {
@@ -226,7 +220,6 @@ size_t NumVertexCounter::operator()(const std::vector<Polygon>& polygons) const
   return count;
 }
 
-
 void printAreaSum(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
 {
   std::string param;
@@ -265,8 +258,7 @@ void printMaxValueOf(std::istream& in, const std::vector<Polygon>& polygons, std
 {
   std::string param;
   in >> param;
-
-  const std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands = 
+  const std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands =
   {
     {"AREA", MaxAreaFinder()},
     {"VERTEXES", MaxVertexCountFinder()}
