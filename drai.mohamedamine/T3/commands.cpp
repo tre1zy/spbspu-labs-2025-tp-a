@@ -104,7 +104,7 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
         else {
             filter.mode = AreaFilter::MEAN;
             dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter) /
-                        std::count_if(polygons.begin(), polygons.end(), 
+                        std::count_if(polygons.begin(), polygons.end(),
                                     [](const Polygon& p){ return p.points.size() >= 3; });
             printDouble = true;
         }
