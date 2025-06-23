@@ -22,20 +22,6 @@ struct EmptyPolygonChecker {
     }
 };
 
-struct ValidPolygonChecker {
-        bool operator()(const Polygon& p) const {
-            return p.points.size() >= 3;
-        }
-    };
-
-    struct InvalidPolygonChecker {
-        bool operator()(const Polygon& p) const {
-            return p.points.size() < 3;
-        }
-    };
-
-}
-
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -63,9 +49,9 @@ int main(int argc, char* argv[])
                   amine::LineToPolygonConverter{});
 
     polygons.erase(
-        std::remove_if(polygons.begin(), polygons.end(),
-                      amine::InvalidPolygonChecker{}),
-        polygons.end()
+    std::remove_if(polygons.begin(), polygons.end(),
+                  amine::InvalidPolygonChecker{}),
+    polygons.end()
     );
 
     amine::process_commands(polygons);

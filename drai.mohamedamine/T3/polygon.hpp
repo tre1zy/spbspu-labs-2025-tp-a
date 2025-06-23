@@ -31,6 +31,12 @@ namespace amine
         }
     };
 
+    struct InvalidPolygonChecker {
+        bool operator()(const Polygon& p) const {
+            return p.points.size() < 3;
+        }
+    };
+
     std::istream& operator>>(std::istream& is, Line& line);
 
     Point operator-(const Point& a, const Point& b);
