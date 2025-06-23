@@ -79,8 +79,6 @@ namespace averenkov
 
   struct PolygonEqual
   {
-    const Polygon& target;
-    bool operator()(const Polygon& poly) const;
     bool operator()(const Polygon& a, const Polygon& b) const;
   };
 

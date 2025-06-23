@@ -34,30 +34,7 @@ namespace averenkov
     {
       return false;
     }
-
-    for (size_t shift = 0; shift < b.points.size(); ++shift)
-    {
-      bool match = true;
-      for (size_t i = 0; i < b.points.size(); ++i)
-      {
-        size_t j = (i + shift) % b.points.size();
-        if (!(a.points[i] == b.points[j]))
-        {
-          match = false;
-          break;
-        }
-      }
-      if (match)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool PolygonEqual::operator()(const Polygon& poly) const
-  {
-    return (*this)(poly, target);
+    return std::is_permutation(a.points.cbegin(), a.points.cend(), b.points.cbegin());
   }
 
   double calculateArea(const Polygon& poly)
@@ -317,21 +294,21 @@ namespace averenkov
     std::map<std::string, std::function<size_t(const std::vector<Polygon>&)>> commands;
     commands["EVEN"] = EvenCounter();
     commands["ODD"] = OddCounter();
-
-    auto it = commands.find(param);
-    if (it != commands.end())
+    size_t tem;
+    try
     {
-      out << it->second(polygons);
+      tem = commands.at(param)(polygons);
     }
-    else
+    catch (...)
     {
       size_t num = std::stoul(param);
       if (num < 3)
       {
         throw std::invalid_argument("Invalid input");
       }
-        out << NumVertexCounter{ num }(polygons);
+      tem = NumVertexCounter{ num }(polygons);
     }
+    out << tem;
   }
 
   void printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
@@ -341,8 +318,9 @@ namespace averenkov
     {
       throw std::runtime_error("Invalid PERMS parameter");
     }
-    PolygonEqual comparator{ target };
-    size_t count = std::count_if(polygons.begin(), polygons.end(), comparator);
+    PolygonEqual comparator;
+    auto func = std::bind(&PolygonEqual::operator(), &comparator, std::placeholders::_1, target);
+    size_t count = std::count_if(polygons.begin(), polygons.end(), func);
     out << count;
   }
 
@@ -361,7 +339,9 @@ namespace averenkov
     }
 
     size_t removed = 0;
-    auto newEnd = std::unique(polygons.begin(), polygons.end(), PolygonEqual{ target });
+    PolygonEqual comparator;
+    auto func = std::bind(&PolygonEqual::operator(), &comparator, std::placeholders::_1, target);
+    auto newEnd = std::unique(polygons.begin(), polygons.end(), func);
 
     removed = std::distance(newEnd, polygons.end());
     polygons.erase(newEnd, polygons.end());
