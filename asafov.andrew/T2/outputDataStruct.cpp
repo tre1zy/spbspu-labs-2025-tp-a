@@ -1,6 +1,7 @@
 #include "datastruct.h"
 #include <iomanip>
 #include <bitset>
+#include <algorithm>
 
 namespace
 {
