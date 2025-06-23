@@ -133,13 +133,15 @@ void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
     std::cout << (initial_size - polygons.size()) << "\n";
 }
 
-void process_commands(std::vector< Polygon >& polygons)
-  {
-    std::for_each(
-      std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), [&polygons](const Line& line) {
-        if (line.content.empty())
-          return;
-
+struct CommandProcessor {
+    std::vector<Polygon>& polygons;
+    
+    explicit CommandProcessor(std::vector<Polygon>& polys) : polygons(polys) {}
+    
+    void operator()(const Line& line) const {
+        if (line.content.empty()) {
+            return;
+        }
         std::istringstream iss(line.content);
         std::string cmd;
         iss >> cmd;
@@ -310,49 +312,30 @@ void process_commands(std::vector< Polygon >& polygons)
             }
           }
         }
-        else if (cmd == "RMECHO")
-        {
-          std::string rest;
-          std::getline(iss, rest);
-          if (rest.empty())
-          {
-            invalid = true;
+          else if (cmd == "RMECHO") {
+        std::string rest;
+        std::getline(iss, rest);
+        if (rest.empty()) {
+         invalid = true;
+         }
+        else {
+         size_t pos = rest.find_first_not_of(' ');
+          if (pos != std::string::npos) {
+            rest = rest.substr(pos);
           }
-          else
-          {
-            size_t pos = rest.find_first_not_of(' ');
-            if (pos != std::string::npos)
-            {
-              rest = rest.substr(pos);
-            }
-            Polygon query;
-            if (!parse_polygon(rest, query))
-            {
-              invalid = true;
-            }
-            else
-            {
-              struct EqualToQuery
-              {
-                const Polygon& query;
-                explicit EqualToQuery(const Polygon& q):
-                  query(q)
-                {}
-                bool operator()(const Polygon& p) const
-                {
-                  return p.points.size() == query.points.size() &&
-                         std::equal(p.points.begin(), p.points.end(), query.points.begin(), query.points.end(),
-                                    [](const Point& a, const Point& b) { return a.x == b.x && a.y == b.y; });
-                }
-              };
-              size_t initial_size = polygons.size();
-              auto new_end = std::unique(polygons.begin(), polygons.end(), [&](const Polygon& a, const Polygon& b) {
-                EqualToQuery eq(query);
-                return eq(a) && eq(b);
-              });
-              polygons.erase(new_end, polygons.end());
-              std::cout << (initial_size - polygons.size()) << "\n";
-              return;
+          Polygon query;
+         if (!parse_polygon(rest, query)) {
+            invalid = true;
+         }
+             else {
+            EqualToQuery equal_to_query(query);
+            UniqueChecker unique_checker(query);
+
+            size_t initial_size = polygons.size();
+            auto new_end = std::unique(polygons.begin(), polygons.end(), unique_checker);
+            polygons.erase(new_end, polygons.end());
+            std::cout << (initial_size - polygons.size()) << "\n";
+            return;
             }
           }
         }
@@ -372,7 +355,13 @@ void process_commands(std::vector< Polygon >& polygons)
         {
           std::cout << intResult << "\n";
         }
-      });
+      };
   }
-
+void process_commands(std::vector<Polygon>& polygons) {
+    std::for_each(
+        std::istream_iterator<Line>(std::cin),
+        std::istream_iterator<Line>(),
+        CommandProcessor(polygons)
+    );
+  }
 }
