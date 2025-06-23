@@ -27,7 +27,9 @@ std::istream & smirnov::operator>>(std::istream & in, ULLIO && dest)
     return in;
   }
   in >> dest.ref;
-  char u, l1, l2;
+  char u = 0;
+  char l1 = 0;
+  char l2 = 0;
   in >> u >> l1 >> l2;
   if (!in || std::tolower(u) != 'u' || std::tolower(l1) != 'l' || std::tolower(l2) != 'l')
   {
@@ -44,7 +46,8 @@ std::istream & smirnov::operator>>(std::istream & in, LLIO && dest)
     return in;
   }
   in >> dest.ref;
-  char l1, l2;
+  char l1 = 0;
+  char l2 = 0;
   in >> l1 >> l2;
   if (!in || std::tolower(l1) != 'l' || std::tolower(l2) != 'l')
   {
