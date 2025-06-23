@@ -23,57 +23,52 @@ namespace
     return !isEven(poly);
   }
 
+  bool acceptAll(const khokhryakova::Polygon&)
+  {
+    return true;
+  }
+
+  struct VertexPred
+  {
+    size_t count;
+    bool operator()(const khokhryakova::Polygon& poly)
+    {
+        return poly.points.size() == count;
+    }
+  };
+
+  template< typename Predicate >
+  double areaSum(const std::vector< khokhryakova::Polygon >& polygons, Predicate p)
+  {
+    std::vector< khokhryakova::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
+    std::vector< double > areas;
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), khokhryakova::getArea);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
+
   double areaEven(const std::vector< khokhryakova::Polygon >& polygons)
   {
-    double sum = 0.0;
-    for (const auto& poly : polygons)
-    {
-      if (isEven(poly))
-      {
-        sum += khokhryakova::getArea(poly);
-      }
-    }
-    return sum;
+    return areaSum(polygons, isEven);
   }
 
   double areaOdd(const std::vector< khokhryakova::Polygon >& polygons)
   {
-    double sum = 0.0;
-    for (const auto& poly : polygons)
-    {
-      if (isOdd(poly))
-      {
-        sum += khokhryakova::getArea(poly);
-      }
-    }
-    return sum;
+    return areaSum(polygons, isOdd);
   }
 
   double areaMedian(const std::vector< khokhryakova::Polygon >& polygons)
   {
     if (polygons.empty())
     {
-      throw std::logic_error("Error: not found polygon");
+      throw std::logic_error("No polygons");
     }
-    double sum = 0.0;
-    for (const auto& poly : polygons)
-    {
-      sum += khokhryakova::getArea(poly);
-    }
-    return sum / polygons.size();
+    return areaSum(polygons, acceptAll) / polygons.size();
   }
 
   double areaNum(const std::vector< khokhryakova::Polygon >& polygons, size_t angle)
   {
-    double sum = 0.0;
-    for (const auto& poly : polygons)
-    {
-      if (poly.points.size() == angle)
-      {
-        sum += khokhryakova::getArea(poly);
-      }
-    }
-    return sum;
+    return areaSum(polygons, VertexPred{ angle });
   }
 
   bool vertexCompare(const khokhryakova::Polygon& polygon1, const khokhryakova::Polygon& polygon2)
@@ -86,43 +81,27 @@ namespace
     return khokhryakova::getArea(polygon1) < khokhryakova::getArea(polygon2);
   }
 
+  template< typename Predicate >
+  size_t countIf(const std::vector< khokhryakova::Polygon >& polygons, Predicate p)
+  {
+    std::vector< khokhryakova::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
+    return filtered.size();
+  }
+
   void countEven(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
-    size_t count = 0;
-    for (const auto& poly : polygons)
-    {
-      if (isEven(poly))
-      {
-        count++;
-      }
-    }
-    out << count << "\n";
+    out << countIf(polygons, isEven) << "\n";
   }
 
   void countOdd(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
-    size_t count = 0;
-    for (const auto& poly : polygons)
-    {
-      if (isOdd(poly))
-      {
-        count++;
-      }
-    }
-    out << count << "\n";
+    out << countIf(polygons, isOdd) << "\n";
   }
 
   void countNum(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out, size_t n)
   {
-    size_t count = 0;
-    for (const auto& poly : polygons)
-    {
-      if (poly.points.size() == n)
-      {
-        count++;
-      }
-    }
-    out << count << "\n";
+    out << countIf(polygons, VertexPred{ n }) << "\n";
   }
 
   void areaMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
@@ -215,7 +194,12 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector< P
   }
   catch (...)
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    size_t n = std::stoull(command);
+    if (n < 3)
+    {
+        throw std::logic_error("Error: vertices < 3");
+    }
+    countNum(polygons, out, n);
   }
 }
 

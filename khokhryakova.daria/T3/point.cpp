@@ -56,10 +56,6 @@ std::ostream& khokhryakova::operator<<(std::ostream& out, const Point& p)
     return out;
   }
   khokhryakova::StreamGuard guard(out);
-  out << "(";
-  out << p.x;
-  out << ";";
-  out << p.y;
-  out << ")";
+  out << "(" << p.x << ";" << p.y << ")";
   return out;
 }

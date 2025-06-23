@@ -59,8 +59,7 @@ namespace khokhryakova
     out << poly.points.size();
     for (const auto& p : poly.points)
     {
-      out << " ";
-      out << p;
+      out << " " << p;
     }
     return out;
   }
