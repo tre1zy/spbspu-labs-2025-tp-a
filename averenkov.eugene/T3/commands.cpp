@@ -2,52 +2,6 @@
 
 namespace averenkov
 {
-
-  double AreaAccumulator::operator()(double sum, const Polygon& poly) const
-  {
-    return sum + calculateArea(poly);
-  }
-
-  double EvenAreaAccumulator::operator()(double sum, const Polygon& poly) const
-  {
-    return (poly.points.size() % 2 == 0) ? AreaAccumulator()(sum, poly) : sum;
-  }
-
-  double OddAreaAccumulator::operator()(double sum, const Polygon& poly) const
-  {
-    return (poly.points.size() % 2 != 0) ? AreaAccumulator()(sum, poly) : sum;
-  }
-
-  double NumVertexAreaAccumulator::operator()(double sum, const Polygon& poly) const
-  {
-    return (poly.points.size() == num) ? AreaAccumulator()(sum, poly) : sum;
-  }
-
-  bool AreaComparator::operator()(const Polygon& a, const Polygon& b) const
-  {
-    return calculateArea(a) < calculateArea(b);
-  }
-
-  bool VertexCountComparator::operator()(const Polygon& a, const Polygon& b) const
-  {
-    return a.points.size() < b.points.size();
-  }
-
-  bool EvenVertexCounter::operator()(const Polygon& poly) const
-  {
-    return poly.points.size() % 2 == 0;
-  }
-
-  bool OddVertexCounter::operator()(const Polygon& poly) const
-  {
-    return poly.points.size() % 2 != 0;
-  }
-
-  bool NumVertexCounter::operator()(const Polygon& poly) const
-  {
-    return poly.points.size() == num;
-  }
-
   bool RightAngleChecker::operator()(const Polygon& poly) const
   {
     const auto& pts = poly.points;
@@ -95,124 +49,291 @@ namespace averenkov
     return std::abs(area) / 2.0;
   }
 
-  void printAreaSum(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  double AreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
   {
-    std::string param;
-    in >> param;
+    double sum = 0.0;
+    for (const auto& poly: polygons)
+    {
+      sum += calculateArea(poly);
+    }
+    return sum;
+  }
 
-    if (param == "EVEN")
+
+  double EvenAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  {
+    double sum = 0.0;
+    for (const auto& poly: polygons)
     {
-      double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, EvenAreaAccumulator());
-      averenkov::iofmtguard guard(out);
-      out << std::fixed << std::setprecision(1) << sum;
-    }
-    else if (param == "ODD")
-    {
-      double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, OddAreaAccumulator());
-      averenkov::iofmtguard guard(out);
-      out << std::fixed << std::setprecision(1) << sum;
-    }
-    else if (param == "MEAN")
-    {
-      if (polygons.empty())
+      if (poly.points.size() % 2 == 0)
       {
-        throw std::runtime_error("No polygons for MEAN calculation");
+        sum += calculateArea(poly);
       }
-      double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator());
-      averenkov::iofmtguard guard(out);
-      out << std::fixed << std::setprecision(1) << (sum / polygons.size());
     }
-    else
+    return sum;
+  }
+
+  double OddAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  {
+    double sum = 0.0;
+    for (const auto& poly: polygons)
+    {
+      if (poly.points.size() % 2 != 0)
+      {
+        sum += calculateArea(poly);
+      }
+    }
+    return sum;
+  }
+
+  double NumVertexAreaSumCalculator::operator()(const std::vector<Polygon>& polygons) const
+  {
+    double sum = 0.0;
+    for (const auto& poly: polygons)
+    {
+      if (poly.points.size() == num)
+      {
+        sum += calculateArea(poly);
+      }
+    }
+    return sum;
+  }
+
+
+double MeanAreaCalculator::operator()(const std::vector<Polygon>& polygons) const
+{
+  if (polygons.empty())
+  {
+    throw std::runtime_error("No polygons for MEAN calculation");
+  }
+  return AreaSumCalculator()(polygons) / polygons.size();
+}
+
+
+void MaxAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const 
+{
+  if (polygons.empty()) 
+  {
+    throw std::runtime_error("No polygons for MAX calculation");
+  }
+  double maxArea = calculateArea(polygons[0]);
+  for (const auto& poly : polygons) 
+  {
+    double area = calculateArea(poly);
+    if (area > maxArea) 
+    {
+      maxArea = area;
+    }
+  }
+  averenkov::iofmtguard guard(out);
+  out << std::fixed << std::setprecision(1) << maxArea;
+}
+
+void MaxVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const 
+{
+  if (polygons.empty()) 
+  {
+    throw std::runtime_error("No polygons for MAX calculation");
+  }
+  size_t maxVertices = polygons[0].points.size();
+  for (const auto& poly : polygons) 
+  {
+    size_t vertices = poly.points.size();
+    if (vertices > maxVertices) 
+    {
+      maxVertices = vertices;
+    }
+  }
+  out << maxVertices;
+}
+
+
+void MinAreaFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const 
+{
+  if (polygons.empty()) 
+  {
+    throw std::runtime_error("No polygons for MIN calculation");
+  }
+  double minArea = calculateArea(polygons[0]);
+  for (const auto& poly : polygons) 
+  {
+    double area = calculateArea(poly);
+    if (area < minArea) 
+    {
+      minArea = area;
+    }
+  }
+  averenkov::iofmtguard guard(out);
+  out << std::fixed << std::setprecision(1) << minArea;
+}
+
+
+void MinVertexCountFinder::operator()(const std::vector<Polygon>& polygons, std::ostream& out) const
+{
+  if (polygons.empty())
+  {
+    throw std::runtime_error("No polygons for MIN calculation");
+  }
+  size_t minVertices = polygons[0].points.size();
+  for (const auto& poly: polygons)
+  {
+    size_t vertices = poly.points.size();
+    if (vertices < minVertices)
+    {
+      minVertices = vertices;
+    }
+  }
+  out << minVertices;
+}
+
+
+size_t EvenCounter::operator()(const std::vector<Polygon>& polygons) const
+{
+  size_t count = 0;
+  for (const auto& poly: polygons)
+  {
+    if (poly.points.size() % 2 == 0)
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
+size_t OddCounter::operator()(const std::vector<Polygon>& polygons) const
+{
+  size_t count = 0;
+  for (const auto& poly: polygons)
+  {
+    if (poly.points.size() % 2 != 0)
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
+size_t NumVertexCounter::operator()(const std::vector<Polygon>& polygons) const
+{
+  size_t count = 0;
+  for (const auto& poly: polygons)
+  {
+    if (poly.points.size() == num)
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
+
+void printAreaSum(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+{
+  std::string param;
+  in >> param;
+
+  const std::map<std::string, std::function<double(const std::vector<Polygon>&)>> commands =
+  {
+    {"EVEN", EvenAreaSumCalculator()},
+    {"ODD", OddAreaSumCalculator()},
+    {"MEAN", MeanAreaCalculator()}
+  };
+
+  auto it = commands.find(param);
+  if (it != commands.end())
+  {
+    averenkov::iofmtguard guard(out);
+    out << std::fixed << std::setprecision(1) << it->second(polygons);
+  }
+  else
+  {
+    try
     {
       size_t num = std::stoul(param);
-      double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, NumVertexAreaAccumulator{ num });
+      double sum = NumVertexAreaSumCalculator{num}(polygons);
       averenkov::iofmtguard guard(out);
       out << std::fixed << std::setprecision(1) << sum;
     }
+    catch (...)
+    {
+      throw std::runtime_error("Invalid AREA parameter");
+    }
   }
+}
 
-  void printMaxValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+void printMaxValueOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+{
+  std::string param;
+  in >> param;
+
+  const std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands = 
   {
-    if (polygons.empty())
-    {
-      throw std::runtime_error("No polygons for MAX calculation");
-    }
+    {"AREA", MaxAreaFinder()},
+    {"VERTEXES", MaxVertexCountFinder()}
+  };
 
-    std::string param;
-    in >> param;
-
-    if (param == "AREA")
-    {
-      auto maxIt = std::max_element(polygons.begin(), polygons.end(), AreaComparator());
-      averenkov::iofmtguard guard(out);
-      out << std::fixed << std::setprecision(1) << calculateArea(*maxIt);
-    }
-    else if (param == "VERTEXES")
-    {
-      auto maxIt = std::max_element(polygons.begin(), polygons.end(), VertexCountComparator());
-      out << maxIt->points.size();
-    }
-    else
-    {
-      throw std::runtime_error("Invalid MAX parameter");
-    }
-  }
-
-  void printMinValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  auto it = commands.find(param);
+  if (it != commands.end())
   {
-    if (polygons.empty())
-    {
-      throw std::runtime_error("No polygons for MIN calculation");
-    }
-
-    std::string param;
-    in >> param;
-
-    if (param == "AREA")
-    {
-      auto minIt = std::min_element(polygons.begin(), polygons.end(), AreaComparator());
-      averenkov::iofmtguard guard(out);
-      out << std::fixed << std::setprecision(1) << calculateArea(*minIt);
-    }
-    else if (param == "VERTEXES")
-    {
-      auto minIt = std::min_element(polygons.begin(), polygons.end(), VertexCountComparator());
-      out << minIt->points.size();
-    }
-    else
-    {
-      throw std::runtime_error("Invalid MIN parameter");
-    }
+    it->second(polygons, out);
   }
-
-  void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  else
   {
-    std::string param;
-    if (param == "EVEN")
+    throw std::runtime_error("Invalid MAX parameter");
+  }
+}
+
+void printMinValueOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out) 
+{
+  std::string param;
+  in >> param;
+
+  const std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands =
+  {
+    {"AREA", MinAreaFinder()},
+    {"VERTEXES", MinVertexCountFinder()}
+  };
+
+  auto it = commands.find(param);
+  if (it != commands.end())
+  {
+    it->second(polygons, out);
+  }
+  else
+  {
+    throw std::runtime_error("Invalid MIN parameter");
+  }
+}
+
+void printCountOf(std::istream& in, const std::vector<Polygon>& polygons, std::ostream& out)
+{
+  std::string param;
+  in >> param;
+
+  const std::map<std::string, std::function<size_t(const std::vector<Polygon>&)>> commands =
+  {
+    {"EVEN", EvenCounter()},
+    {"ODD", OddCounter()}
+  };
+
+  auto it = commands.find(param);
+  if (it != commands.end())
+  {
+    out << it->second(polygons);
+  }
+  else
+  {
+    try
     {
-      size_t count = std::count_if(polygons.begin(), polygons.end(), EvenVertexCounter());
-      out << count;
+      size_t num = std::stoul(param);
+      out << NumVertexCounter{num}(polygons);
     }
-    else if (param == "ODD")
+    catch (...)
     {
-      size_t count = std::count_if(polygons.begin(), polygons.end(), OddVertexCounter());
-      out << count;
-    }
-    else
-    {
-      try
-      {
-        size_t num = std::stoul(param);
-        size_t count = std::count_if(polygons.begin(), polygons.end(), NumVertexCounter{ num });
-        out << count;
-      }
-      catch (...)
-      {
-        throw std::runtime_error("Invalid COUNT parameter");
-      }
+      throw std::runtime_error("Invalid COUNT parameter");
     }
   }
-
+}
   void printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     Polygon target;

@@ -3,56 +3,73 @@
 #include <numeric>
 #include <algorithm>
 #include <iomanip>
+#include <map>
 #include <dataStruct.hpp>
 #include "polygon.hpp"
 
 namespace averenkov
 {
-  struct AreaAccumulator
+
+  struct AreaSumCalculator
   {
-    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector<Polygon>& polygons) const;
   };
 
-  struct EvenAreaAccumulator
+  struct EvenAreaSumCalculator
   {
-    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector<Polygon>& polygons) const;
   };
 
-  struct OddAreaAccumulator
+  struct OddAreaSumCalculator
   {
-    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector<Polygon>& polygons) const;
   };
 
-  struct NumVertexAreaAccumulator
+  struct NumVertexAreaSumCalculator
   {
     size_t num;
-    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector<Polygon>& polygons) const;
   };
 
-  struct AreaComparator
+  struct MeanAreaCalculator
   {
-    bool operator()(const Polygon& a, const Polygon& b) const;
+    double operator()(const std::vector<Polygon>& polygons) const;
   };
 
-  struct VertexCountComparator
+  struct MaxAreaFinder
   {
-    bool operator()(const Polygon& a, const Polygon& b) const;
+    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
   };
 
-  struct EvenVertexCounter
+  struct MaxVertexCountFinder
   {
-    bool operator()(const Polygon& poly) const;
+    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
   };
 
-  struct OddVertexCounter
+  struct MinAreaFinder
   {
-    bool operator()(const Polygon& poly) const;
+    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
+  };
+
+  struct MinVertexCountFinder
+  {
+    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
+  };
+
+  struct EvenCounter
+  {
+    size_t operator()(const std::vector<Polygon>& polygons) const;
+  };
+
+  struct OddCounter
+  {
+    size_t operator()(const std::vector<Polygon>& polygons) const;
   };
 
   struct NumVertexCounter
   {
     size_t num;
-    bool operator()(const Polygon& poly) const;
+    size_t operator()(const std::vector<Polygon>& polygons) const;
   };
 
   struct RightAngleChecker
