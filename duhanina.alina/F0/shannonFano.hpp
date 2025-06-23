@@ -38,17 +38,19 @@ namespace duhanina
     {}
   };
 
+  using str_t = const std::string&;
+
   void print_help(std::ostream& out);
-  void build_codes(const std::string& input_file, const std::string& encoding_name, std::ostream& out);
-  void show_codes(const std::string& encoding_name, std::ostream& out);
-  void save_codes(const std::string& encoding_name, const std::string& output_file, std::ostream& out);
-  void load_codes(const std::string& input_file, const std::string& encoding_name, std::ostream& out);
-  void clear_codes(const std::string& encoding_name, std::ostream& out);
-  void encode_file_with_codes(const std::string& input_file, const std::string& encoding_name, const std::string& output_file, std::ostream& out);
-  void decode_file_with_codes(const std::string& input_file, const std::string& encoding_name, const std::string& output_file, std::ostream& out);
-  void encode_file(const std::string& input_file, const std::string& output_file, const std::string& encoding_name, std::ostream& out);
-  void decode_file(const std::string& input_file, const std::string& output_file, const std::string& encoding_name, std::ostream& out);
-  void compare(const std::string& file1, const std::string& file2, const std::string& encod_name1, const std::string& encod_name2, std::ostream& out);
+  void build_codes(str_t input_file, str_t encoding_name, std::ostream& out);
+  void show_codes(str_t encoding_name, std::ostream& out);
+  void save_codes(str_t encoding_name, str_t output_file, std::ostream& out);
+  void load_codes(str_t input_file, str_t encoding_name, std::ostream& out);
+  void clear_codes(str_t encoding_name, std::ostream& out);
+  void encode_file_with_codes(str_t input_file, str_t encoding_name, str_t output_file, std::ostream& out);
+  void decode_file_with_codes(str_t input_file, str_t encoding_name, str_t output_file, std::ostream& out);
+  void encode_file(str_t input_file, str_t output_file, str_t encoding_name, std::ostream& out);
+  void decode_file(str_t input_file, str_t output_file, str_t encoding_name, std::ostream& out);
+  void compare(str_t file1, str_t file2, str_t encod_name1, str_t encod_name2, std::ostream& out);
   void list_encodings(std::ostream& out);
 }
 

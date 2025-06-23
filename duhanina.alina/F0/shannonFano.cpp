@@ -8,6 +8,8 @@ std::map< std::string, duhanina::CodeTable > encoding_store;
 
 namespace
 {
+  using str_t = const std::string&;
+
   bool compare_nodes(const std::pair< char, int >& a, const std::pair< char, int >& b)
   {
     return a.second > b.second;
@@ -90,7 +92,7 @@ namespace
     return new_nodes;
   }
 
-  duhanina::CodeTable build_code_table(const std::string& text)
+  duhanina::CodeTable build_code_table(str_t text)
   {
     if (text.empty())
     {
@@ -132,7 +134,7 @@ namespace
     return table;
   }
 
-  std::string encode_text(const std::string& text, const duhanina::CodeTable& table)
+  std::string encode_text(str_t text, const duhanina::CodeTable& table)
   {
     std::string encoded;
     for (size_t i = 0; i < text.size(); i++)
@@ -148,7 +150,7 @@ namespace
     return encoded;
   }
 
-  std::string decode_text(const std::string& encoded, const duhanina::CodeTable& table)
+  std::string decode_text(str_t encoded, const duhanina::CodeTable& table)
   {
     std::string decoded;
     std::string current_code;
@@ -170,7 +172,7 @@ namespace
     return decoded;
   }
 
-  void write_bits_to_file(const std::string& bits, const std::string& filename)
+  void write_bits_to_file(str_t bits, str_t filename)
   {
     std::ofstream out(filename, std::ios::binary);
     if (!out)
@@ -205,7 +207,7 @@ namespace
     }
   }
 
-  std::string read_bits_from_file(const std::string& filename)
+  std::string read_bits_from_file(str_t filename)
   {
     std::ifstream in(filename, std::ios::binary);
     if (!in)
@@ -246,7 +248,7 @@ namespace
     return bits;
   }
 
-  void save_code_table(const duhanina::CodeTable& table, const std::string& filename)
+  void save_code_table(const duhanina::CodeTable& table, str_t filename)
   {
     std::ofstream out(filename);
     if (!out)
@@ -261,7 +263,7 @@ namespace
   }
 
 
-  duhanina::CodeTable load_code_table(const std::string& filename)
+  duhanina::CodeTable load_code_table(str_t filename)
   {
     std::ifstream in(filename);
     if (!in)
@@ -287,7 +289,7 @@ namespace
     return table;
   }
 
-  void encode_file_impl(const std::string& input_file, const std::string& output_file, const duhanina::CodeTable& table, std::ostream& out)
+  void encode_file_impl(str_t input_file, str_t output_file, const duhanina::CodeTable& table, std::ostream& out)
   {
     std::ifstream in(input_file);
     if (!in)
@@ -306,7 +308,7 @@ namespace
     out << "Compression ratio: " << std::fixed << std::setprecision(2) << ratio << "%\n";
   }
 
-  void decode_file_impl(const std::string& input_file, const std::string& output_file, const duhanina::CodeTable& table, std::ostream& out)
+  void decode_file_impl(str_t input_file, str_t output_file, const duhanina::CodeTable& table, std::ostream& out)
   {
     std::string encoded = read_bits_from_file(input_file);
     std::string decoded = decode_text(encoded, table);
@@ -320,7 +322,7 @@ namespace
   }
 }
 
-void duhanina::build_codes(const std::string& input_file, const std::string& encoding_id, std::ostream& out)
+void duhanina::build_codes(str_t input_file, str_t encoding_id, std::ostream& out)
 {
   if (encoding_store.count(encoding_id) > 0)
   {
@@ -337,7 +339,7 @@ void duhanina::build_codes(const std::string& input_file, const std::string& enc
   out << "Code table successfully built and saved with ID '" << encoding_id << "'\n";
 }
 
-void duhanina::show_codes(const std::string& encoding_id, std::ostream& out)
+void duhanina::show_codes(str_t encoding_id, std::ostream& out)
 {
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
@@ -362,7 +364,7 @@ void duhanina::show_codes(const std::string& encoding_id, std::ostream& out)
 }
 
 
-void duhanina::save_codes(const std::string& encoding_id, const std::string& output_file, std::ostream& out)
+void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& out)
 {
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
@@ -374,7 +376,7 @@ void duhanina::save_codes(const std::string& encoding_id, const std::string& out
 }
 
 
-void duhanina::load_codes(const std::string& input_file, const std::string& encoding_id, std::ostream& out)
+void duhanina::load_codes(str_t input_file, str_t encoding_id, std::ostream& out)
 {
   if (encoding_store.count(encoding_id) > 0)
   {
@@ -386,7 +388,7 @@ void duhanina::load_codes(const std::string& input_file, const std::string& enco
 }
 
 
-void duhanina::clear_codes(const std::string& encoding_id, std::ostream& out)
+void duhanina::clear_codes(str_t encoding_id, std::ostream& out)
 {
   if (encoding_store.erase(encoding_id) > 0)
   {
@@ -399,21 +401,21 @@ void duhanina::clear_codes(const std::string& encoding_id, std::ostream& out)
 }
 
 
-void duhanina::encode_file_with_codes(const std::string& input_file, const std::string& output_file, const std::string& codes_file, std::ostream& out)
+void duhanina::encode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
   CodeTable table = load_code_table(codes_file);
   encode_file_impl(input_file, output_file, table, out);
 }
 
 
-void duhanina::decode_file_with_codes(const std::string& input_file, const std::string& output_file, const std::string& codes_file, std::ostream& out)
+void duhanina::decode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
   CodeTable table = load_code_table(codes_file);
   decode_file_impl(input_file, output_file, table, out);
 }
 
 
-void duhanina::encode_file(const std::string& input_file, const std::string& output_file, const std::string& encoding_id, std::ostream& out)
+void duhanina::encode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
@@ -424,7 +426,7 @@ void duhanina::encode_file(const std::string& input_file, const std::string& out
 }
 
 
-void duhanina::decode_file(const std::string& input_file, const std::string& output_file, const std::string& encoding_id, std::ostream& out)
+void duhanina::decode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
@@ -434,7 +436,7 @@ void duhanina::decode_file(const std::string& input_file, const std::string& out
   decode_file_impl(input_file, output_file, it->second, out);
 }
 
-void duhanina::compare(const std::string& file1, const std::string& file2, const std::string& encod_id1, const std::string& encod_id2, std::ostream& out)
+void duhanina::compare(str_t file1, str_t file2, str_t encod_id1, str_t encod_id2, std::ostream& out)
 {
   if (file1 == file2)
   {
