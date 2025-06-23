@@ -1,7 +1,7 @@
 #include "data_struct.hpp"
 #include <cctype>
 #include <iostream>
-#include "stream_guard.hpp"
+#include <guard.hpp>
 
 std::istream & smirnov::operator>>(std::istream & in, DelimiterIO && dest)
 {

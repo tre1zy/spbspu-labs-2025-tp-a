@@ -1,4 +1,4 @@
-#include "stream_guard.hpp"
+#include "guard.hpp"
 
 smirnov::StreamGuard::StreamGuard(std::basic_ios< char > & stream):
   stream_(stream),
