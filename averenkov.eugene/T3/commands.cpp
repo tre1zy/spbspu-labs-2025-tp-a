@@ -191,17 +191,17 @@ namespace averenkov
     out << minVertices;
   }
 
-  struct EvenVertexCounter
-  {
-    bool operator()(const Polygon& poly) const
-    {
-      return poly.points.size() % 2 == 0;
-    }
-  };
-
   size_t EvenCounter::operator()(const std::vector< Polygon >& polygons) const
   {
-    return std::count_if(polygons.begin(), polygons.end(), EvenVertexCounter());
+    size_t count = 0;
+    for (const auto& poly: polygons)
+    {
+      if (poly.points.size() % 2 == 0)
+      {
+        ++count;
+      }
+    }
+    return count;
   }
 
   size_t OddCounter::operator()(const std::vector< Polygon >& polygons) const
