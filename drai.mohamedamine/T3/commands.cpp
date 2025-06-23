@@ -10,63 +10,85 @@
 
 namespace amine
 {
-  struct AreaEvenAccumulator {
-    double operator()(double acc, const Polygon& p) const {
-        return acc + ((p.points.size() % 2 == 0) ? compute_area(p) : 0.0);
+  struct AreaEvenAccumulator
+  {
+    double operator()(double acc, const Polygon& p) const
+    {
+      return acc + ((p.points.size() % 2 == 0) ? compute_area(p) : 0.0);
     }
-};
+  };
 
-struct AreaOddAccumulator {
-    double operator()(double acc, const Polygon& p) const {
-        return acc + ((p.points.size() % 2 != 0) ? compute_area(p) : 0.0);
+  struct AreaOddAccumulator
+  {
+    double operator()(double acc, const Polygon& p) const
+    {
+      return acc + ((p.points.size() % 2 != 0) ? compute_area(p) : 0.0);
     }
-};
+  };
 
-struct AreaMeanAccumulator {
-    double operator()(double acc, const Polygon& p) const {
-        return acc + compute_area(p);
+  struct AreaMeanAccumulator
+  {
+    double operator()(double acc, const Polygon& p) const
+    {
+      return acc + compute_area(p);
     }
-};
+  };
 
-struct AreaNumAccumulator {
+  struct AreaNumAccumulator
+  {
     int num;
-    explicit AreaNumAccumulator(int n) : num(n) {}
-    double operator()(double acc, const Polygon& p) const {
-        return acc + (static_cast<int>(p.points.size()) == num ? compute_area(p) : 0.0);
+    explicit AreaNumAccumulator(int n):
+      num(n)
+    {}
+    double operator()(double acc, const Polygon& p) const
+    {
+      return acc + (static_cast< int >(p.points.size()) == num ? compute_area(p) : 0.0);
     }
-};
+  };
 
-struct CountEven {
-    bool operator()(const Polygon& p) const {
-        return p.points.size() % 2 == 0;
+  struct CountEven
+  {
+    bool operator()(const Polygon& p) const
+    {
+      return p.points.size() % 2 == 0;
     }
-};
+  };
 
-struct CountOdd {
-    bool operator()(const Polygon& p) const {
-        return p.points.size() % 2 != 0;
+  struct CountOdd
+  {
+    bool operator()(const Polygon& p) const
+    {
+      return p.points.size() % 2 != 0;
     }
-};
+  };
 
-struct CountNum {
+  struct CountNum
+  {
     int num;
-    explicit CountNum(int n) : num(n) {}
-    bool operator()(const Polygon& p) const {
-        return static_cast<int>(p.points.size()) == num;
+    explicit CountNum(int n):
+      num(n)
+    {}
+    bool operator()(const Polygon& p) const
+    {
+      return static_cast< int >(p.points.size()) == num;
     }
-};
+  };
 
-struct AreaComparator {
-    bool operator()(const Polygon& a, const Polygon& b) const {
-        return compute_area(a) < compute_area(b);
+  struct AreaComparator
+  {
+    bool operator()(const Polygon& a, const Polygon& b) const
+    {
+      return compute_area(a) < compute_area(b);
     }
-};
+  };
 
-struct VertexesComparator {
-    bool operator()(const Polygon& a, const Polygon& b) const {
-        return a.points.size() < b.points.size();
+  struct VertexesComparator
+  {
+    bool operator()(const Polygon& a, const Polygon& b) const
+    {
+      return a.points.size() < b.points.size();
     }
-};
+  };
   std::istream& operator>>(std::istream& is, Line& line)
   {
     std::getline(is, line.content);
@@ -89,186 +111,233 @@ struct VertexesComparator {
     std::cout << (initial_size - polygons.size()) << "\n";
   }
 
-  void process_commands(std::vector<Polygon>& polygons)
-{
+  void process_commands(std::vector< Polygon >& polygons)
+  {
     std::for_each(
-        std::istream_iterator<Line>(std::cin), std::istream_iterator<Line>(),
-        [&polygons](const Line& line) {
-            if (line.content.empty())
-                return;
+      std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), [&polygons](const Line& line) {
+        if (line.content.empty())
+          return;
 
-            std::istringstream iss(line.content);
-            std::string cmd;
-            iss >> cmd;
-            bool invalid = false;
-            bool printDouble = false;
-            double dblResult = 0.0;
-            int intResult = 0;
-            if (cmd == "AREA") {
-                std::string arg;
-                iss >> arg;
-                if (arg == "EVEN") {
-                    dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
-                    printDouble = true;
-                }
-                else if (arg == "ODD") {
-                    dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
-                    printDouble = true;
-                }
-                else if (arg == "MEAN") {
-                    if (polygons.empty()) {
-                        invalid = true;
-                    }
-                    else {
-                        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
-                        dblResult = total / polygons.size();
-                        printDouble = true;
-                    }
-                }
-                else {
-                    bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-                    if (is_num) {
-                        int num = std::stoi(arg);
-                        if (num < 3) {
-                            invalid = true;
-                        }
-                        else {
-                            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num));
-                            printDouble = true;
-                        }
-                    }
-                    else {
-                        invalid = true;
-                    }
-                }
+        std::istringstream iss(line.content);
+        std::string cmd;
+        iss >> cmd;
+        bool invalid = false;
+        bool printDouble = false;
+        double dblResult = 0.0;
+        int intResult = 0;
+        if (cmd == "AREA")
+        {
+          std::string arg;
+          iss >> arg;
+          if (arg == "EVEN")
+          {
+            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
+            printDouble = true;
+          }
+          else if (arg == "ODD")
+          {
+            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
+            printDouble = true;
+          }
+          else if (arg == "MEAN")
+          {
+            if (polygons.empty())
+            {
+              invalid = true;
             }
-            else if (cmd == "MAX") {
-                std::string arg;
-                iss >> arg;
-                if (polygons.empty()) {
-                    invalid = true;
-                }
-                else if (arg == "AREA") {
-                    auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator());
-                    dblResult = compute_area(*it);
-                    printDouble = true;
-                }
-                else if (arg == "VERTEXES") {
-                    auto it = std::max_element(polygons.begin(), polygons.end(), VertexesComparator());
-                    intResult = it->points.size();
-                }
-                else {
-                    invalid = true;
-                }
+            else
+            {
+              double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
+              dblResult = total / polygons.size();
+              printDouble = true;
             }
-            else if (cmd == "MIN") {
-                std::string arg;
-                iss >> arg;
-                if (polygons.empty()) {
-                    invalid = true;
-                }
-                else if (arg == "AREA") {
-                    auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator());
-                    dblResult = compute_area(*it);
-                    printDouble = true;
-                }
-                else if (arg == "VERTEXES") {
-                    auto it = std::min_element(polygons.begin(), polygons.end(), VertexesComparator());
-                    intResult = it->points.size();
-                }
-                else {
-                    invalid = true;
-                }
-            }
-            else if (cmd == "COUNT") {
-                std::string arg;
-                iss >> arg;
-                if (arg == "EVEN") {
-                    intResult = std::count_if(polygons.begin(), polygons.end(), CountEven());
-                }
-                else if (arg == "ODD") {
-                    intResult = std::count_if(polygons.begin(), polygons.end(), CountOdd());
-                }
-                else {
-                    bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-                    if (is_num) {
-                        int num = std::stoi(arg);
-                        if (num < 3) {
-                            invalid = true;
-                        }
-                        else {
-                            intResult = std::count_if(polygons.begin(), polygons.end(), CountNum(num));
-                        }
-                    }
-                    else {
-                        invalid = true;
-                    }
-                }
-            }
-            else if (cmd == "INTERSECTIONS") {
-                std::string rest;
-                std::getline(iss, rest);
-                if (rest.empty()) {
-                    invalid = true;
-                }
-                else {
-                    rest.erase(0, rest.find_first_not_of(' '));
-                    Polygon query;
-                    if (!parse_polygon(rest, query) || query.points.size() < 3) {
-                        invalid = true;
-                    }
-                    else {
-                        struct IntersectsWith {
-                            const Polygon& query;
-                            explicit IntersectsWith(const Polygon& q) : query(q) {}
-                            bool operator()(const Polygon& p) const {
-                                return polygons_intersect(p, query);
-                            }
-                        };
-                        intResult = polygons.empty() ? 0 : std::count_if(polygons.begin(), polygons.end(), IntersectsWith(query));
-                    }
-                }
-            }
-            else if (cmd == "RMECHO") {
-                std::string rest;
-                std::getline(iss, rest);
-                if (rest.empty()) {
-                    invalid = true;
-                }
-                else {
-                    size_t pos = rest.find_first_not_of(' ');
-                    if (pos != std::string::npos) {
-                        rest = rest.substr(pos);
-                    }
-                    Polygon query;
-                    if (!parse_polygon(rest, query)) {
-                        invalid = true;
-                    }
-                    else {
-                        struct EqualToQuery {
-                            const Polygon& query;
-                            explicit EqualToQuery(const Polygon& q) : query(q) {}
-                            bool operator()(const Polygon& p) const {
-                                return p.points.size() == query.points.size() &&
-                                    std::equal(p.points.begin(), p.points.end(), query.points.begin(), query.points.end(),
-                                        [](const Point& a, const Point& b) { return a.x == b.x && a.y == b.y; });
-                            }
-                        };
-                        size_t initial_size = polygons.size();
-                        auto new_end = std::unique(polygons.begin(), polygons.end(),
-                            [&](const Polygon& a, const Polygon& b) {
-                                EqualToQuery eq(query);
-                                return eq(a) && eq(b);
-                            });
-                        polygons.erase(new_end, polygons.end());
-                        std::cout << (initial_size - polygons.size()) << "\n";
-                        return;
-                    }
-                }
-            }
-            else {
+          }
+          else
+          {
+            bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
+            if (is_num)
+            {
+              int num = std::stoi(arg);
+              if (num < 3)
+              {
                 invalid = true;
+              }
+              else
+              {
+                dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num));
+                printDouble = true;
+              }
             }
+            else
+            {
+              invalid = true;
+            }
+          }
+        }
+        else if (cmd == "MAX")
+        {
+          std::string arg;
+          iss >> arg;
+          if (polygons.empty())
+          {
+            invalid = true;
+          }
+          else if (arg == "AREA")
+          {
+            auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator());
+            dblResult = compute_area(*it);
+            printDouble = true;
+          }
+          else if (arg == "VERTEXES")
+          {
+            auto it = std::max_element(polygons.begin(), polygons.end(), VertexesComparator());
+            intResult = it->points.size();
+          }
+          else
+          {
+            invalid = true;
+          }
+        }
+        else if (cmd == "MIN")
+        {
+          std::string arg;
+          iss >> arg;
+          if (polygons.empty())
+          {
+            invalid = true;
+          }
+          else if (arg == "AREA")
+          {
+            auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator());
+            dblResult = compute_area(*it);
+            printDouble = true;
+          }
+          else if (arg == "VERTEXES")
+          {
+            auto it = std::min_element(polygons.begin(), polygons.end(), VertexesComparator());
+            intResult = it->points.size();
+          }
+          else
+          {
+            invalid = true;
+          }
+        }
+        else if (cmd == "COUNT")
+        {
+          std::string arg;
+          iss >> arg;
+          if (arg == "EVEN")
+          {
+            intResult = std::count_if(polygons.begin(), polygons.end(), CountEven());
+          }
+          else if (arg == "ODD")
+          {
+            intResult = std::count_if(polygons.begin(), polygons.end(), CountOdd());
+          }
+          else
+          {
+            bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
+            if (is_num)
+            {
+              int num = std::stoi(arg);
+              if (num < 3)
+              {
+                invalid = true;
+              }
+              else
+              {
+                intResult = std::count_if(polygons.begin(), polygons.end(), CountNum(num));
+              }
+            }
+            else
+            {
+              invalid = true;
+            }
+          }
+        }
+        else if (cmd == "INTERSECTIONS")
+        {
+          std::string rest;
+          std::getline(iss, rest);
+          if (rest.empty())
+          {
+            invalid = true;
+          }
+          else
+          {
+            rest.erase(0, rest.find_first_not_of(' '));
+            Polygon query;
+            if (!parse_polygon(rest, query) || query.points.size() < 3)
+            {
+              invalid = true;
+            }
+            else
+            {
+              struct IntersectsWith
+              {
+                const Polygon& query;
+                explicit IntersectsWith(const Polygon& q):
+                  query(q)
+                {}
+                bool operator()(const Polygon& p) const
+                {
+                  return polygons_intersect(p, query);
+                }
+              };
+              intResult = polygons.empty() ? 0 : std::count_if(polygons.begin(), polygons.end(), IntersectsWith(query));
+            }
+          }
+        }
+        else if (cmd == "RMECHO")
+        {
+          std::string rest;
+          std::getline(iss, rest);
+          if (rest.empty())
+          {
+            invalid = true;
+          }
+          else
+          {
+            size_t pos = rest.find_first_not_of(' ');
+            if (pos != std::string::npos)
+            {
+              rest = rest.substr(pos);
+            }
+            Polygon query;
+            if (!parse_polygon(rest, query))
+            {
+              invalid = true;
+            }
+            else
+            {
+              struct EqualToQuery
+              {
+                const Polygon& query;
+                explicit EqualToQuery(const Polygon& q):
+                  query(q)
+                {}
+                bool operator()(const Polygon& p) const
+                {
+                  return p.points.size() == query.points.size() &&
+                         std::equal(p.points.begin(), p.points.end(), query.points.begin(), query.points.end(),
+                                    [](const Point& a, const Point& b) { return a.x == b.x && a.y == b.y; });
+                }
+              };
+              size_t initial_size = polygons.size();
+              auto new_end = std::unique(polygons.begin(), polygons.end(), [&](const Polygon& a, const Polygon& b) {
+                EqualToQuery eq(query);
+                return eq(a) && eq(b);
+              });
+              polygons.erase(new_end, polygons.end());
+              std::cout << (initial_size - polygons.size()) << "\n";
+              return;
+            }
+          }
+        }
+        else
+        {
+          invalid = true;
+        }
         if (invalid)
         {
           std::cout << "<INVALID COMMAND>\n";
