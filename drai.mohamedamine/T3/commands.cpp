@@ -17,21 +17,30 @@ namespace amine
     return is;
   }
 
-  void process_rmecho(std::vector< Polygon >& polygons, const Polygon& query)
-  {
-    auto equal_to_query = [&query](const Polygon& p) {
-      return p.points.size() == query.points.size() &&
-             std::equal(p.points.begin(), p.points.end(), query.points.begin(), query.points.end(),
-                        [](const Point& a, const Point& b) { return a.x == b.x && a.y == b.y; });
-    };
+  struct PolygonEqual {
+    const Polygon& query;
+    bool operator()(const Polygon& p) const {
+        return p.points.size() == query.points.size() &&
+               std::equal(p.points.begin(), p.points.end(), query.points.begin(),
+                         [](const Point& a, const Point& b) { return a.x == b.x && a.y == b.y; });
+    }
+};
 
+struct ConsecutiveEqual {
+    PolygonEqual eq;
+    ConsecutiveEqual(const Polygon& q) : eq{q} {}
+    bool operator()(const Polygon& a, const Polygon& b) const {
+        return eq(a) && eq(b);
+    }
+};
+
+void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
     size_t initial_size = polygons.size();
-    auto new_end = std::unique(polygons.begin(), polygons.end(), [&](const Polygon& a, const Polygon& b) {
-      return equal_to_query(a) && equal_to_query(b);
-    });
-    polygons.erase(new_end, polygons.end());
+    polygons.erase(
+        std::unique(polygons.begin(), polygons.end(), ConsecutiveEqual(query)),
+        polygons.end());
     std::cout << (initial_size - polygons.size()) << "\n";
-  }
+}
 
   void process_commands(std::vector< Polygon >& polygons)
   {
