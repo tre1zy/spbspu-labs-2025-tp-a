@@ -135,9 +135,9 @@ void process_rmecho(std::vector<Polygon>& polygons, const Polygon& query) {
 
 struct CommandProcessor {
     std::vector<Polygon>& polygons;
-    
+
     explicit CommandProcessor(std::vector<Polygon>& polys) : polygons(polys) {}
-    
+
     void operator()(const Line& line) const {
         if (line.content.empty()) {
             return;
