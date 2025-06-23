@@ -100,7 +100,7 @@ namespace amine
 
     return false;
   }
- 
+
   bool point_in_polygon(const Point& pt, const Polygon& poly)
   {
     bool inside = false;
