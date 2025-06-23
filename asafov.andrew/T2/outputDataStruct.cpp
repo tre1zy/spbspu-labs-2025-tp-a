@@ -5,7 +5,7 @@
 
 namespace
 {
-  void outputCmpLsp(std::ostream& os, const std::complex<double>& data)
+  void outputCmpLsp(std::ostream& os, const std::complex< double >& data)
   {
     os << std::fixed << std::setprecision(1);
     os << "#c(" << data.real() << " " << data.imag() << ")";
@@ -19,7 +19,7 @@ namespace
       return;
     }
 
-    os << "0b0";
+    os << "0b";
     bool leadingZero = true;
     for (int i = sizeof(num) * 8 - 1; i >= 0; --i)
     {
