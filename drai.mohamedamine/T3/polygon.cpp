@@ -133,28 +133,40 @@ bool point_in_polygon(const Point& pt, const Polygon& poly)
   return checker.inside;
 }
 
-struct PolygonIntersectionChecker {
-  const Polygon& a;
-  const Polygon& b;
-  bool operator()(const Point& p1) const {
-    int i = &p1 - &a.points[0];
-    return std::any_of(b.points.begin(), b.points.end(), [this, i](const Point& p2) {
-      int j = &p2 - &b.points[0];
-      return seg_intersect(a.points[i], a.points[(i + 1) % a.points.size()],
-                          b.points[j], b.points[(j + 1) % b.points.size()]);
-    });
-  }
+struct EdgeIntersectionChecker {
+    const Point& a1;
+    const Point& a2;
+    bool operator()(const std::pair<Point, Point>& edge) const {
+        return seg_intersect(a1, a2, edge.first, edge.second);
+    }
 };
 
-bool polygons_intersect(const Polygon& a, const Polygon& b)
-{
-  if (a.points.empty() || b.points.empty()) return false;
+struct PolygonIntersectionChecker {
+    const Polygon& poly;
+    const Polygon& query;
+    bool operator()(const Point& p1) const {
+        const Point& p2 = poly.points[(&p1 - &poly.points[0] + 1) % poly.points.size()];
+        std::vector<std::pair<Point, Point>> query_edges;
+        std::transform(query.points.begin(), query.points.end()-1,
+                      query.points.begin()+1,
+                      std::back_inserter(query_edges),
+                      [](const Point& a, const Point& b) {
+                          return std::make_pair(a, b);
+                      });
 
-  bool segment_intersection = std::any_of(a.points.begin(), a.points.end(),
-                                         PolygonIntersectionChecker{a, b});
+        return std::any_of(query_edges.begin(), query_edges.end(),
+                          EdgeIntersectionChecker{p1, p2});
+    }
+};
 
-  if (segment_intersection) return true;
-  return point_in_polygon(a.points[0], b) || point_in_polygon(b.points[0], a);
+bool polygons_intersect(const Polygon& a, const Polygon& b) {
+    if (a.points.size() < 3 || b.points.size() < 3) return false;
+
+    bool edges_intersect = std::any_of(a.points.begin(), a.points.end(),
+                                     PolygonIntersectionChecker{a, b});
+    return edges_intersect ||
+           point_in_polygon(a.points[0], b) ||
+           point_in_polygon(b.points[0], a);
 }
 
 struct PointParser {

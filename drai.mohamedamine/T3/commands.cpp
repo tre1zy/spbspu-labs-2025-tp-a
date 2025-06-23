@@ -46,11 +46,14 @@ struct AreaFilter {
     Mode mode;
     int vertex_count = 0;
     double operator()(double acc, const Polygon& p) const {
+        if (p.points.size() < 3) return acc;
+        const double area = compute_area(p);
         switch(mode) {
-            case EVEN: return acc + (p.points.size() % 2 == 0 ? compute_area(p) : 0.0);
-            case ODD: return acc + (p.points.size() % 2 != 0 ? compute_area(p) : 0.0);
-            case MEAN: return acc + compute_area(p);
-            default: return acc + (static_cast<int>(p.points.size()) == vertex_count ? compute_area(p) : 0.0);
+            case EVEN: return p.points.size() % 2 == 0 ? acc + area : acc;
+            case ODD: return p.points.size() % 2 != 0 ? acc + area : acc;
+            case MEAN: return acc + area;
+            default: return static_cast<int>(p.points.size()) == vertex_count ?
+                   acc + area : acc;
         }
     }
 };
@@ -60,10 +63,12 @@ struct CountFilter {
     Mode mode;
     int vertex_count = 0;
     bool operator()(const Polygon& p) const {
+        const size_t vertices = p.points.size();
+        if (vertices < 3) return false;
         switch(mode) {
-            case EVEN: return p.points.size() % 2 == 0;
-            case ODD: return p.points.size() % 2 != 0;
-            default: return static_cast<int>(p.points.size()) == vertex_count;
+            case EVEN: return vertices % 2 == 0;
+            case ODD: return vertices % 2 != 0;
+            default: return static_cast<int>(vertices) == vertex_count;
         }
     }
 };
@@ -87,21 +92,23 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
     double dblResult = 0.0;
     int intResult = 0;
 
-    if (cmd == "AREA") {
-        std::string arg;
-        iss >> arg;
-        AreaFilter filter;
+    else if (cmd == "AREA") {
+    std::string arg;
+    iss >> arg;
+    AreaFilter filter;
 
-        if (arg == "EVEN") filter.mode = AreaFilter::EVEN;
-        else if (arg == "ODD") filter.mode = AreaFilter::ODD;
-        else if (arg == "MEAN") {
-            if (polygons.empty()) invalid = true;
-            else {
-                filter.mode = AreaFilter::MEAN;
-                dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter) / polygons.size();
-                printDouble = true;
-            }
+    if (arg == "EVEN") filter.mode = AreaFilter::EVEN;
+    else if (arg == "ODD") filter.mode = AreaFilter::ODD;
+    else if (arg == "MEAN") {
+        if (polygons.empty()) invalid = true;
+        else {
+            filter.mode = AreaFilter::MEAN;
+            dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, filter) /
+                        std::count_if(polygons.begin(), polygons.end(), 
+                                    [](const Polygon& p){ return p.points.size() >= 3; });
+            printDouble = true;
         }
+    }
         else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
             int num = std::stoi(arg);
             if (num < 3) invalid = true;
@@ -134,22 +141,25 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
         else invalid = true;
     }
     else if (cmd == "COUNT") {
-        std::string arg;
-        iss >> arg;
-        CountFilter filter;
+    std::string arg;
+    iss >> arg;
+    CountFilter filter;
 
-        if (arg == "EVEN") filter.mode = CountFilter::EVEN;
-        else if (arg == "ODD") filter.mode = CountFilter::ODD;
-        else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
-            int num = std::stoi(arg);
-            if (num < 3) invalid = true;
-            else {
-                filter.mode = CountFilter::COUNT;
-                filter.vertex_count = num;
-                intResult = std::count_if(polygons.begin(), polygons.end(), filter);
-            }
+    if (arg == "EVEN") filter.mode = CountFilter::EVEN;
+    else if (arg == "ODD") filter.mode = CountFilter::ODD;
+    else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
+        int num = std::stoi(arg);
+        if (num < 3) invalid = true;
+        else {
+            filter.mode = CountFilter::COUNT;
+            filter.vertex_count = num;
         }
-        else invalid = true;
+    }
+    else invalid = true;
+
+    if (!invalid) {
+        intResult = std::count_if(polygons.begin(), polygons.end(), filter);
+     }
     }
     else if (cmd == "INTERSECTIONS") {
         std::string rest;
