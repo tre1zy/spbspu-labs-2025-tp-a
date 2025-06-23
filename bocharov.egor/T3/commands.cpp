@@ -33,12 +33,12 @@ namespace
 
   void getAreaEven(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    getAreaByParity(out, polygons, isEven);
+    getAreaByPredicate(out, polygons, isEven);
   }
 
   void getAreaOdd(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    getAreaByParity(out, polygons, isOdd);
+    getAreaByPredicate(out, polygons, isOdd);
   }
 
   void getAreaMean(std::ostream & out, const std::vector< Polygon > & polygons)
