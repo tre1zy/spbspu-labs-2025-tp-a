@@ -131,7 +131,6 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
             invalid = true;
         }
     }
-    }
     else if (cmd == "MAX" || cmd == "MIN") {
         std::string arg;
         iss >> arg;
@@ -152,25 +151,25 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
         else invalid = true;
     }
     else if (cmd == "COUNT") {
-    std::string arg;
-    iss >> arg;
-    CountFilter filter;
+        std::string arg;
+        iss >> arg;
+        CountFilter filter;
 
-    if (arg == "EVEN") filter.mode = CountFilter::EVEN;
-    else if (arg == "ODD") filter.mode = CountFilter::ODD;
-    else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
-        int num = std::stoi(arg);
-        if (num < 3) invalid = true;
-        else {
-            filter.mode = CountFilter::COUNT;
-            filter.vertex_count = num;
+        if (arg == "EVEN") filter.mode = CountFilter::EVEN;
+        else if (arg == "ODD") filter.mode = CountFilter::ODD;
+        else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
+            int num = std::stoi(arg);
+            if (num < 3) invalid = true;
+            else {
+                filter.mode = CountFilter::COUNT;
+                filter.vertex_count = num;
+            }
         }
-    }
-    else invalid = true;
+        else invalid = true;
 
-    if (!invalid) {
-        intResult = std::count_if(polygons.begin(), polygons.end(), filter);
-     }
+        if (!invalid) {
+            intResult = std::count_if(polygons.begin(), polygons.end(), filter);
+        }
     }
     else if (cmd == "INTERSECTIONS") {
         std::string rest;
@@ -178,7 +177,7 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
         rest.erase(0, rest.find_first_not_of(' '));
         Polygon query;
         if (!parse_polygon(rest, query) || query.points.size() < 3) {
-          invalid = true;
+            invalid = true;
         }
         else {
             intResult = std::count_if(polygons.begin(), polygons.end(),
@@ -186,9 +185,17 @@ void process_command(const std::vector<Polygon>& polygons, const std::string& cm
         }
     }
     else if (cmd == "RMECHO") {
-
+        std::string rest;
+        std::getline(iss, rest);
+        rest.erase(0, rest.find_first_not_of(' '));
+        Polygon query;
+        if (!parse_polygon(rest, query)) {
+            invalid = true;
+        }
     }
-    else invalid = true;
+    else {
+        invalid = true;
+    }
 
     if (invalid) {
         std::cout << "<INVALID COMMAND>\n";
