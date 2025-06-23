@@ -17,7 +17,7 @@ namespace
   }
 }
 
-std::istream & smirnov::operator>>(std::istream& in, DataStruct & data)
+std::istream & smirnov::operator>>(std::istream & in, DataStruct & data)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -132,8 +132,6 @@ std::ostream & smirnov::operator<<(std::ostream & out, const DataStruct & data)
     return out;
   }
   StreamGuard guard(out);
-  out << "(:key1 " << data.key1 << "ull"
-      << ":key2 " << data.key2 << "ll"
-      << ":key3 \"" << data.key3 << "\":)";
+  out << "(:key1 " << data.key1 << "ull:key2 " << data.key2 << "ll:key3 \"" << data.key3 << "\":)";
   return out;
 }
