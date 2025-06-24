@@ -6,7 +6,6 @@
 #include <set>
 #include <iterator>
 
-
 namespace
 {
   struct TranslationPrinter
@@ -243,11 +242,6 @@ namespace
     }
   };
 
-
-
-
-
-
   struct DictNameReader
   {
     std::istream & in;
@@ -293,7 +287,10 @@ namespace
   struct DictAccumulator
   {
     const bocharov::dict_dict_t & dicts;
-    explicit DictAccumulator(const bocharov::dict_dict_t & dictsRef) : dicts(dictsRef) {}
+    explicit DictAccumulator(const bocharov::dict_dict_t & dictsRef):
+      dicts(dictsRef)
+    {}
+
     TempMap operator()(TempMap accum, const std::string& dictName) const
     {
       const bocharov::dict_t & dict = dicts.at(dictName);
@@ -304,7 +301,10 @@ namespace
   struct BuildNewDict
   {
     int K;
-    explicit BuildNewDict(int k) : K(k) {}
+    explicit BuildNewDict(int k):
+      K(k)
+    {}
+
     bocharov::dict_t operator()(bocharov::dict_t acc, const TempMap::value_type & entry) const
     {
       if (entry.second.first <= K)
@@ -336,6 +336,7 @@ namespace bocharov
         << "union <newdict> <N> <dictname1> ... <dictnameN> - union of dictionaries\n"
         << "mostcommon <N> <K> <dictname1> ... <dictnameK> - print most common words\n"
         << "rewritefile <filename> <N> <dictname1> ... <dictnameN> - rewrite file with dictionaries\n"
+        << "rare <K> <result dict> <N> <dict1> <dict2> ... <dictn> - create dictionary with words present in at most K of N dictionaries\n"
         << "--help - show help\n";
   }
 
