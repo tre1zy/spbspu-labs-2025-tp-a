@@ -352,13 +352,8 @@ namespace bocharov
     std::ofstream file(filename, std::ios::app);
     if (!file) throw std::runtime_error("INVALID FILE");
 
-    std::vector<std::string> dictNames;
-    std::string name;
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> name;
-      dictNames.push_back(name);
-    }
+    std::vector<std::string> dictNames(n);
+    std::generate_n(dictNames.begin(), n, WordReader{ in });
 
     std::accumulate(dictNames.begin(), dictNames.end(), Empty{}, FullDictWriterWrapper{ file, dicts });
   }
