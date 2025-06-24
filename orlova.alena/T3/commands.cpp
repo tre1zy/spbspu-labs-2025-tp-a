@@ -174,8 +174,8 @@ void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::
   out << std::fixed << std::setprecision(1);
 
   std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
-  subcmds["AREA"] = maxArea;
-  subcmds["VERTEXES"] = maxVertexes;
+  subcmds["AREA"] = minArea;
+  subcmds["VERTEXES"] = minVertexes;
   auto it = subcmds.find(subcommand);
   if (it != subcmds.end())
   {
