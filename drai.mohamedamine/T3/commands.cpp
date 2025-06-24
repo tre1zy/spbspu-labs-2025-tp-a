@@ -237,16 +237,16 @@ void CommandProcessor::command_intersections(const std::string& rest) const {
   if (!rest.empty()) throw std::runtime_error("Unexpected argument");
 
   int count = 0;
-  if (polygons_.size() > 1 && intersect(polygons_[0], polygons_[1])) ++count;
-  if (polygons_.size() > 2 && intersect(polygons_[0], polygons_[2])) ++count;
-  if (polygons_.size() > 3 && intersect(polygons_[0], polygons_[3])) ++count;
-  if (polygons_.size() > 4 && intersect(polygons_[0], polygons_[4])) ++count;
-  if (polygons_.size() > 2 && intersect(polygons_[1], polygons_[2])) ++count;
-  if (polygons_.size() > 3 && intersect(polygons_[1], polygons_[3])) ++count;
-  if (polygons_.size() > 4 && intersect(polygons_[1], polygons_[4])) ++count;
-  if (polygons_.size() > 3 && intersect(polygons_[2], polygons_[3])) ++count;
-  if (polygons_.size() > 4 && intersect(polygons_[2], polygons_[4])) ++count;
-  if (polygons_.size() > 4 && intersect(polygons_[3], polygons_[4])) ++count;
+  if (polygons_.size() > 1 && polygons_intersect(polygons_[0], polygons_[1])) ++count;
+  if (polygons_.size() > 2 && polygons_intersect(polygons_[0], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[0], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[0], polygons_[4])) ++count;
+  if (polygons_.size() > 2 && polygons_intersect(polygons_[1], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[1], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[1], polygons_[4])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[2], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[2], polygons_[4])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[3], polygons_[4])) ++count;
 
   std::cout << count << "\n";
 }
