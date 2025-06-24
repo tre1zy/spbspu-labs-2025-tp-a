@@ -83,9 +83,11 @@ void maslevtsov::Graph::print_adjacency_list(std::ostream& out) const
       out << ' ' << *j;
     }
   }
-  out << '\n' << solo_vertices_[0] << " :";
-  for (size_t i = 1; i != solo_vertices_.size(); ++i) {
-    out << '\n' << solo_vertices_[i] << " :";
+  if (!solo_vertices_.empty()) {
+    out << '\n' << solo_vertices_[0] << " :";
+    for (size_t i = 1; i != solo_vertices_.size(); ++i) {
+      out << '\n' << solo_vertices_[i] << " :";
+    }
   }
 }
 

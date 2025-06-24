@@ -142,3 +142,14 @@ void maslevtsov::print_graph(const graphs_t& graphs, std::istream& in, std::ostr
   graphs.at(graph_name).print_adjacency_list(out);
   std::cout << '\n';
 }
+
+void maslevtsov::copy_graph(graphs_t& graphs, std::istream& in)
+{
+  std::string gr_name, new_gr_name;
+  in >> gr_name >> new_gr_name;
+  if (graphs.find(new_gr_name) != graphs.end()) {
+    throw std::invalid_argument("invalid graph names");
+  }
+  Graph new_gr(graphs.at(gr_name));
+  graphs[new_gr_name] = new_gr;
+}

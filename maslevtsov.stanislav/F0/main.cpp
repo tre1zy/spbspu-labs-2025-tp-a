@@ -47,7 +47,7 @@ int main(int argc, char** argv)
   commands["add-vertice"] = std::bind(add_vertice, std::ref(graphs), std::ref(std::cin));
   commands["add-edge"] = std::bind(add_edge, std::ref(graphs), std::ref(std::cin));
   commands["print-graph"] = std::bind(print_graph, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
-  // commands["copy-graph"] = std::bind(copy_graph, std::ref(graphs), std::ref(std::cin));
+  commands["copy-graph"] = std::bind(copy_graph, std::ref(graphs), std::ref(std::cin));
   // commands["delete-graph"] = std::bind(delete_graph, std::ref(graphs), std::ref(std::cin));
   // commands["delete-vertice"] = std::bind(delete_vertice, std::ref(graphs), std::ref(std::cin));
   // commands["delete-edge"] = std::bind(delete_edge, std::ref(graphs), std::ref(std::cin));
