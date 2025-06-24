@@ -15,20 +15,12 @@ int main(int argc, char* argv[]) {
     if (option == "--help") {
       showHelp(std::cout);
     }
-    else if (option == "--check" && argc == 3) {
-      std::string filename(argv[2]);
-      if (checkGraphFile(filename)) {
-        std::cout << "[OK] Graph file is valid.\n";
-      } else {
-        std::cout << "[ERROR] Graph file is invalid.\n";
-      }
-    }
     else if (argc == 2) {
       try {
         loadGraphFromFile(graphs, argv[1]);
         std::cout << "[OK] Graphs loaded from '" << argv[1] << "'.\n";
-      } catch (const std::exception& e) {
-        std::cerr << "[ERROR] " << e.what() << "\n";
+      } catch (const std::exception&) {
+        std::cerr << "[ERROR] Graph didnt load from file\n";
       }
     }
     else {

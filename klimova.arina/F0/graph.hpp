@@ -169,7 +169,6 @@ namespace klimova {
   {
     try {
       size_t idx = getVertexIndex(vertex);
-      std::cout << "Neighbors of " << vertex << ": ";
       for (size_t neighbor : adjList[idx]) {
         std::cout << vertices[neighbor] << " ";
       }
