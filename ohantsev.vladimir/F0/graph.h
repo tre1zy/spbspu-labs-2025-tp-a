@@ -5,9 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include <unordered_set>
 #include <unordered_map>
-#include "vector_hash.h"
 
 namespace ohantsev
 {
@@ -510,7 +508,6 @@ namespace ohantsev
     const Key& end_;
     std::vector< Way > result;
     std::priority_queue< Way, std::vector< Way >, std::greater< Way > > candidates;
-    std::unordered_set< std::vector< Key >, VectorHash< Key, Hash > > visited;
 
     void finishWayProcessing(const Way& current);
     template< bool AC = AllowCycles >
@@ -555,17 +552,6 @@ namespace ohantsev
 
   template< class Key, class Hash, class KeyEqual >
   template< bool AllowCycles >
-  void Graph< Key, Hash, KeyEqual >::NPathsFinder< AllowCycles >::finishWayProcessing(const Way& current)
-  {
-    if (visited.find(current.steps_) == visited.end())
-    {
-      result.push_back(current);
-      visited.insert(current.steps_);
-    }
-  }
-
-  template< class Key, class Hash, class KeyEqual >
-  template< bool AllowCycles >
   template< bool AC >
   std::enable_if_t< !AC >
   Graph< Key, Hash, KeyEqual >::NPathsFinder< AllowCycles >::connectNeighbor(const Way& current,
@@ -587,10 +573,7 @@ namespace ohantsev
     Way newPath = current;
     newPath.steps_.push_back(neighbor);
     newPath.length_ += weight;
-    if (visited.find(newPath.steps_) == visited.end())
-    {
-      candidates.push(newPath);
-    }
+    candidates.push(newPath);
   }
 
   template< class Key, class Hash, class KeyEqual >
@@ -615,7 +598,7 @@ namespace ohantsev
     Key lastKey = current.steps_.back();
     if (lastKey == end_)
     {
-      finishWayProcessing(current);
+      result.push_back(current);
       return;
     }
     const auto& neighbors = graph_.graph_.at(lastKey);
