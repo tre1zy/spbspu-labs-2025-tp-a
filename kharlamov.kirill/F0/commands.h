@@ -13,7 +13,7 @@ namespace kharlamov
 {
   using dictionary = std::map< std::string, std::string >;
   using dictionaries = std::map< std::string, dictionary >;
-  
+
   void doDownload(std::istream& in, std::ostream& out, dictionaries& dicts);
   void doSave(std::istream& in, std::ostream& out, const dictionaries& dicts);
   void doAdd(std::istream& in, std::ostream& out, dictionaries& dicts);
