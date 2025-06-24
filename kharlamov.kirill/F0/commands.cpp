@@ -1,6 +1,7 @@
 #include "commands.h"
 #include <cctype>
 #include <fstream>
+#include <iterator>
 #include <numeric>
 #include <vector>
 
