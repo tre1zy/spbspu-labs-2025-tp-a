@@ -3,9 +3,15 @@
 #include <regex>
 #include <cmath>
 
-bool shapkov::isAnagram::operator()(const std::string& word) const
+bool shapkov::isAnagram::operator()(const std::pair< std::string, size_t >& wordPair) const
 {
+  const std::string& word = wordPair.first;
   return word.size() == wrd.size() && std::is_permutation(word.begin(), word.end(), wrd.begin());
+}
+
+bool shapkov::FrequencyChecker::operator()(const std::pair< std::string, size_t >& wordPair) const
+{
+  return (wordPair.second <= targetFreq + delta) && (static_cast< int >(wordPair.second) >= static_cast< int >(targetFreq) - delta);
 }
 
 bool shapkov::isPalindrome::operator()(const std::string& word)
@@ -60,40 +66,6 @@ std::ostream& shapkov::operator<<(std::ostream& out, const PairIO p)
 shapkov::PairIO shapkov::makePairIO(const std::pair< std::string, size_t >& p)
 {
   return PairIO{ p };
-}
-
-void shapkov::ProcessWordPair::operator()(const std::pair< std::string, size_t >& word_pair) const
-{
-  if (checker(word_pair.first))
-  {
-    out << dict_name << ": word - " << word_pair.first << '\n';
-    counter++;
-  }
-}
-
-void shapkov::ProcessDictPair::operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const
-{
-  ProcessWordPair word_processor{ out, dict_pair.first, checker, counter };
-  std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), word_processor);
-}
-
-void shapkov::CheckFrequency::operator()(const std::pair< std::string, size_t >& word_pair) const
-{
-  if ((word_pair.second <= target_freq + delta) && (static_cast< int >(word_pair.second) >= static_cast< int >(target_freq) - delta))
-  {
-    out << dict_name << ": " << word_pair.first << " - " << word_pair.second << '\n';
-    counter++;
-  }
-}
-
-void shapkov::ProcessDictionary::operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const
-{
-  auto wrd = dict_pair.second.dictionary.find(word);
-  if (wrd != dict_pair.second.dictionary.end())
-  {
-    CheckFrequency checker{ wrd->second, delta, out, dict_pair.first, counter };
-    std::for_each(dict_pair.second.dictionary.begin(), dict_pair.second.dictionary.end(), checker);
-  }
 }
 
 void shapkov::MergeFunctor::operator()(const std::pair< const std::string, size_t >& p) const

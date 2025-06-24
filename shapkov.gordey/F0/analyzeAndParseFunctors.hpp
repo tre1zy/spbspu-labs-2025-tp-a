@@ -2,6 +2,7 @@
 #define ANALYZE_PARSE_FUNCTORS
 #include <unordered_map>
 #include <string>
+#include <algorithm>
 #include <iostream>
 #include "FrequencyDictionary.hpp"
 
@@ -10,7 +11,15 @@ namespace shapkov
   struct isAnagram
   {
     std::string& wrd;
-    bool operator()(const std::string& word) const;
+    bool operator()(const std::pair< std::string, size_t >& wordPair) const;
+  };
+  struct FrequencyChecker
+  {
+    std::string& word;
+    int delta;
+    std::ostream& out;
+    size_t targetFreq;
+    bool operator()(const std::pair< std::string, size_t >& wordPair) const;
   };
   struct isPalindrome
   {
@@ -40,37 +49,72 @@ namespace shapkov
   };
   std::ostream& operator<<(std::ostream& out, const PairIO p);
   PairIO makePairIO(const std::pair< std::string, size_t >& p);
-  struct ProcessWordPair
+  template< class Cond >
+  class ConditionPrinter
   {
-    std::ostream& out;
-    const std::string& dict_name;
-    isAnagram& checker;
-    size_t& counter;
-    void operator()(const std::pair< std::string, size_t >& word_pair) const;
+  public:
+    ConditionPrinter(std::ostream& out, const std::string& dictName, Cond& checker, size_t& counter):
+      out_(out),
+      dictName_(dictName),
+      checker_(checker),
+      counter_(counter)
+    {}
+    void operator()(const std::pair< std::string, size_t >& wordPair) const
+    {
+      if (checker_(wordPair))
+      {
+        out_ << dictName_ << ": " << wordPair.first << " - " << wordPair.second << '\n';
+        counter_++;
+      }
+    }
+  private:
+    std::ostream& out_;
+    const std::string& dictName_;
+    Cond& checker_;
+    size_t& counter_;
   };
-  struct ProcessDictPair
+  template< class Cond >
+  class DictProc
   {
-    std::ostream& out;
-    isAnagram& checker;
-    size_t& counter;
-    void operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const;
+  public:
+    DictProc(std::ostream& out, Cond& checker, size_t& counter):
+      out_(out),
+      checker_(checker),
+      counter_(counter)
+    {}
+    void operator()(const std::pair< std::string, OneFreqDict >& dictPair) const
+    {
+      ConditionPrinter< Cond > printer{ out_, dictPair.first, checker_, counter_ };
+      std::for_each(dictPair.second.dictionary.begin(), dictPair.second.dictionary.end(), printer);
+    }
+  private:
+    std::ostream& out_;
+    Cond& checker_;
+    size_t& counter_;
   };
-  struct CheckFrequency
+  template<>
+  class DictProc< FrequencyChecker >
   {
-    size_t target_freq;
-    int delta;
-    std::ostream& out;
-    const std::string& dict_name;
-    size_t& counter;
-    void operator()(const std::pair< std::string, size_t >& word_pair) const;
-  };
-  struct ProcessDictionary
-  {
-    std::ostream& out;
-    const std::string& word;
-    int delta;
-    size_t& counter;
-    void operator()(const std::pair< std::string, OneFreqDict >& dict_pair) const;
+  public:
+    DictProc(std::ostream& out, FrequencyChecker& checker, size_t& counter):
+      out_(out),
+      checker_(checker),
+      counter_(counter)
+    {}
+    void operator()(const std::pair<std::string, OneFreqDict>& dictPair) const
+    {
+      auto wrd = dictPair.second.dictionary.find(checker_.word);
+      if (wrd != dictPair.second.dictionary.end())
+      {
+        checker_.targetFreq = wrd->second;
+        ConditionPrinter< FrequencyChecker > printer(out_, dictPair.first, checker_, counter_);
+        std::for_each(dictPair.second.dictionary.begin(), dictPair.second.dictionary.end(), printer);
+      }
+    }
+  private:
+    std::ostream& out_;
+    FrequencyChecker& checker_;
+    size_t& counter_;
   };
   struct MergeFunctor
   {

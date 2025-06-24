@@ -72,8 +72,8 @@ void shapkov::anagrams(std::istream& in, std::ostream& out, const FrequencyDicti
   cleanWord(word);
   isAnagram anagramChecker{ word };
   size_t anagramsCnt = 0;
-  ProcessDictPair dict_processor{ out, anagramChecker, anagramsCnt };
-  std::for_each(dict.dicts.begin(), dict.dicts.end(), dict_processor);
+  DictProc< isAnagram > dictProcessor{ out, anagramChecker, anagramsCnt };
+  std::for_each(dict.dicts.begin(), dict.dicts.end(), dictProcessor);
   if (anagramsCnt == 0)
   {
     out << "<NO ANAGRAMS>\n";
@@ -91,8 +91,9 @@ void shapkov::similar_frequency(std::istream& in, std::ostream& out, const Frequ
   }
   cleanWord(word);
   size_t freqCnt = 0;
-  ProcessDictionary processor{ out, word, delta, freqCnt };
-  std::for_each(dict.dicts.begin(), dict.dicts.end(), processor);
+  FrequencyChecker freqChecker{ word, delta, out, 0 };
+  DictProc< FrequencyChecker > dictProcessor{ out, freqChecker, freqCnt };
+  std::for_each(dict.dicts.begin(), dict.dicts.end(), dictProcessor);
   if (freqCnt == 0)
   {
     out << "<NO WORD>\n";
