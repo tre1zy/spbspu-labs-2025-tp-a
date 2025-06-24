@@ -21,16 +21,6 @@ namespace abramov
   };
   std::istream &operator>>(std::istream &in, Polygon &polygon);
 
-  struct AreaOddAcc
-  {
-    double operator()(double s, const Polygon &polygon) const;
-  };
-
-  struct AreaEvenAcc
-  {
-    double operator()(double s, const Polygon &polygon) const;
-  };
-
   struct AreaVertAcc
   {
     size_t k;
@@ -61,6 +51,8 @@ namespace abramov
   bool isPointsEqual(const Point &p1, const Point &p2);
   bool isPolygonsEqual(const Polygon &p1, const Polygon &p2);
   bool isPolygonsEqualToExample(const Polygon &p1, const Polygon &p2, const Polygon &ex);
+  bool isEven(const Polygon &p);
+  bool isOdd(const Polygon &p);
 };
 
 

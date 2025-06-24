@@ -9,12 +9,12 @@
 namespace abramov
 {
   void getCommands(std::map< std::string, std::function< void() > > &commands, std::vector< Polygon > &polygons);
-  void area(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
-  void max(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in);
-  void min(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
-  void count(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
-  void rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
-  void perms(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  void doAreaComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  void doMaxComm(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in);
+  void doMinComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  void doCountComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  void doRmechoComm(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  void doPermsComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
 }
 
 #endif
