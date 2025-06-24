@@ -160,6 +160,20 @@ namespace
       return printerWrapper;
     }
   };
+
+  struct AccumulateIfContains
+  {
+    const std::string & target;
+    bocharov::list_t operator()(bocharov::list_t acc, const bocharov::dict_t::value_type & entry) const
+    {
+      const auto & translations = entry.second;
+      if (std::find(translations.begin(), translations.end(), target) != translations.end())
+      {
+        acc.push_back(entry.first);
+      }
+      return acc;
+    }
+  };
 }
 
 
@@ -213,44 +227,38 @@ namespace bocharov
     std::accumulate(dict.begin(), dict.end(), Empty{}, AccumulatePrinter{ out });
   }
 
- void getTranslationSln(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
- {
-   std::string dictname, sln;
-   in >> dictname >> sln;
-   const dict_t & dict = dicts.at(dictname);
-   const list_t & translations = dict.at(sln);
+  void getTranslationSln(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
+  {
+    std::string dictname, sln;
+    in >> dictname >> sln;
+    const dict_t & dict = dicts.at(dictname);
+    const list_t & translations = dict.at(sln);
 
-   out << sln << ":";
+    out << sln << ":";
 
-   TranslationPrinter printer{ out };
-   printer.first = true;
+    TranslationPrinter printer{ out };
+    printer.first = true;
 
-   std::accumulate(translations.begin(), translations.end(), std::ref(printer), CallPrinter{});
-   out << "\n";
- }
+    std::accumulate(translations.begin(), translations.end(), std::ref(printer), CallPrinter{});
+    out << "\n";
+  }
 
   void getTranslationRu(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
   {
     std::string dictname, ru;
     in >> dictname >> ru;
     const dict_t & dict = dicts.at(dictname);
-    list_t slangWords;
 
-    for (const auto & entry : dict)
-    {
-      const auto & translations = entry.second;
-      if (std::find(translations.begin(), translations.end(), ru) != translations.end())
-      {
-        slangWords.push_back(entry.first);
-      }
-    }
+    list_t slangWords = std::accumulate(dict.begin(), dict.end(), list_t{}, AccumulateIfContains{ ru });
 
     out << ru << ":";
     TranslationPrinter printer{ out };
     printer.first = true;
-    for (const auto & word : slangWords)
+
+    if (!slangWords.empty())
     {
-      printer(word);
+      auto printerRef = std::ref(printer);
+      std::accumulate(slangWords.begin(), slangWords.end(), printerRef, CallPrinter{});
     }
     out << "\n";
   }
