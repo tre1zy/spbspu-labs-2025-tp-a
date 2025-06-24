@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <numeric>
 #include <set>
+#include <iterator>
+
 
 namespace
 {
