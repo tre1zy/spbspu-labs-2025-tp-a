@@ -13,6 +13,8 @@ namespace maslevtsov {
     Graph(const Graph& gr1, const Graph& gr2);
     Graph(const Graph& gr, const std::vector< unsigned >& vertices);
 
+    size_t get_vertice_count() const;
+
     void add_vertice(unsigned vertice);
     void add_edge(unsigned vertice1, unsigned vertice2);
     void delete_vertice(unsigned vertice);
@@ -20,8 +22,8 @@ namespace maslevtsov {
     void print_adjacency_list(std::ostream& out) const;
 
   private:
-    using edges_t = std::unordered_map< unsigned, std::vector< unsigned > >;
-    edges_t edges_;
+    using adjacency_list_t = std::unordered_map< unsigned, std::vector< unsigned > >;
+    adjacency_list_t adjacency_list_;
     std::vector< unsigned > solo_vertices_;
 
     friend std::istream& operator>>(std::istream& in, Graph& gr);

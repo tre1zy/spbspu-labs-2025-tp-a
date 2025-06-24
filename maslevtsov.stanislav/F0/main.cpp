@@ -40,8 +40,8 @@ int main(int argc, char** argv)
   }
 
   std::unordered_map< std::string, std::function< void() > > commands;
-  // commands["save"] = std::bind(save_graphs, std::cref(graphs), std::ref(std::cin));
-  // commands["open"] = std::bind(open_graphs, std::ref(graphs), std::ref(std::cin));
+  commands["save"] = std::bind(save_graphs, std::cref(graphs), std::ref(std::cin));
+  commands["open"] = std::bind(open_graphs, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
 
   commands["add-graph"] = std::bind(add_graph, std::ref(graphs), std::ref(std::cin));
   commands["add-vertice"] = std::bind(add_vertice, std::ref(graphs), std::ref(std::cin));

@@ -11,7 +11,7 @@ namespace maslevtsov {
   void print_help_manual(std::ostream& out);
 
   void save_graphs(const graphs_t& graphs, std::istream& in);
-  void open_graphs(graphs_t& graphs, std::istream& in);
+  void open_graphs(graphs_t& graphs, std::istream& in, std::ostream& out);
 
   void add_graph(graphs_t& graphs, std::istream& in);
   void add_vertice(graphs_t& graphs, std::istream& in);

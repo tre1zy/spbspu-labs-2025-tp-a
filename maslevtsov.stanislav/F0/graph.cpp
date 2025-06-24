@@ -43,6 +43,11 @@ namespace {
   }
 }
 
+size_t maslevtsov::Graph::get_vertice_count() const
+{
+  return adjacency_list_.size() + solo_vertices_.size();
+}
+
 void maslevtsov::Graph::add_vertice(unsigned vertice)
 {
   if (find_if_contain(solo_vertices_, vertice)) {
@@ -53,30 +58,34 @@ void maslevtsov::Graph::add_vertice(unsigned vertice)
 
 void maslevtsov::Graph::add_edge(unsigned vertice1, unsigned vertice2)
 {
-  auto it1 = edges_.find(vertice1);
-  if (it1 != edges_.end() && find_if_contain(it1->second, vertice2)) {
+  auto it1 = adjacency_list_.find(vertice1);
+  if (it1 != adjacency_list_.end() && find_if_contain(it1->second, vertice2)) {
     throw std::invalid_argument("edge already exist");
   }
-  edges_[vertice1].push_back(vertice2);
-  edges_[vertice2].push_back(vertice1);
+  adjacency_list_[vertice1].push_back(vertice2);
+  adjacency_list_[vertice2].push_back(vertice1);
   delete_solo_vertice(solo_vertices_, vertice1);
   delete_solo_vertice(solo_vertices_, vertice2);
 }
 
 void maslevtsov::Graph::print_adjacency_list(std::ostream& out) const
 {
-  if (edges_.empty()) {
+  if (adjacency_list_.empty()) {
     return;
   }
-  out << edges_.cbegin()->first << " :";
-  for (auto i = edges_.cbegin()->second.cbegin(); i != edges_.cbegin()->second.cend(); ++i) {
+  out << adjacency_list_.cbegin()->first << " :";
+  for (auto i = adjacency_list_.cbegin()->second.cbegin(); i != adjacency_list_.cbegin()->second.cend(); ++i) {
     out << ' ' << *i;
   }
-  for (auto i = ++edges_.cbegin(); i != edges_.cend(); ++i) {
+  for (auto i = ++adjacency_list_.cbegin(); i != adjacency_list_.cend(); ++i) {
     out << '\n' << i->first << " :";
     for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
       out << ' ' << *j;
     }
+  }
+  out << '\n' << solo_vertices_[0] << " :";
+  for (size_t i = 1; i != solo_vertices_.size(); ++i) {
+    out << '\n' << solo_vertices_[i] << " :";
   }
 }
 
@@ -95,6 +104,7 @@ std::istream& maslevtsov::operator>>(std::istream& in, Graph& gr)
     bool is_neighbour = false;
     while (in.peek() != '\n') {
       in >> neighbour;
+      is_neighbour = true;
       try {
         result.add_edge(vertice, neighbour);
       } catch (const std::invalid_argument&) {
@@ -103,7 +113,6 @@ std::istream& maslevtsov::operator>>(std::istream& in, Graph& gr)
         in.setstate(std::ios::failbit);
         return in;
       }
-      is_neighbour = true;
     }
     if (!is_neighbour) {
       try {

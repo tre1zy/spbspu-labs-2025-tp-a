@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <fstream>
 #include "graph.hpp"
 
 bool maslevtsov::check_graphs_format(std::istream& in)
@@ -51,6 +52,53 @@ void maslevtsov::print_help_manual(std::ostream& out)
   out << "    calculate the minimum distance in <graph_name>;\n";
   out << "15. width <graph_name> - find width of <graph_name>;\n";
   out << "16. components <graph_name> - find connected components in <graph_name>.";
+}
+
+void maslevtsov::save_graphs(const graphs_t& graphs, std::istream& in)
+{
+  std::string filename;
+  in >> filename;
+  std::ofstream save_file(filename);
+  if (!save_file) {
+    throw std::invalid_argument("invalid filename");
+  }
+  for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
+    save_file << i->first << '\n';
+    save_file << i->second.get_vertice_count() << '\n';
+    i->second.print_adjacency_list(save_file);
+    save_file << '\n';
+  }
+}
+
+void maslevtsov::open_graphs(graphs_t& graphs, std::istream& in, std::ostream& out)
+{
+  std::string filename;
+  in >> filename;
+  std::ifstream open_file(filename);
+  if (!open_file) {
+    throw std::invalid_argument("invalid filename");
+  }
+  out << "Do you want to save current graphs? y/n: ";
+  std::string save_info;
+  in >> save_info;
+  if (save_info != "y" && save_info != "n") {
+    throw std::invalid_argument("invalid save info");
+  }
+  if (save_info == "y") {
+    out << "Enter filename: ";
+    save_graphs(graphs, in);
+  }
+  graphs_t new_graphs;
+  std::string graph_name;
+  while ((open_file >> graph_name) && (!open_file.eof())) {
+    Graph gr;
+    open_file >> gr;
+    new_graphs[graph_name] = gr;
+  }
+  if (!open_file.eof()) {
+    throw std::invalid_argument("invalid graphs format");
+  }
+  graphs = new_graphs;
 }
 
 void maslevtsov::add_graph(graphs_t& graphs, std::istream& in)
