@@ -22,6 +22,7 @@ namespace rychkov
   public:
     std::vector< std::string > include_paths;
     std::unique_ptr< Lexer > next;
+    std::set< Macro, NameCompare > macros;
 
     Preprocessor();
     Preprocessor(std::unique_ptr< Lexer > lexer, std::vector< std::string > search_dirs);
@@ -75,7 +76,6 @@ namespace rychkov
 
     std::string buf_;
     std::stack< IfStage > conditional_pairs_;
-    std::set< Macro, NameCompare > macros_;
 
     static std::string get_name(std::istream& in);
     static void remove_whitespaces(std::string& str);

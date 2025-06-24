@@ -24,6 +24,8 @@ Program implements code parsing (semantic analysis) on restricted and not signif
 * load [<save_file>] - load (reload) reload saved data (only fully parsed). Replaces existing data
   only on success
 * parse <files...> - parse files. Replaces existing data only on full success
+* parse-after [<parsed>] - parse input in non-interactive environment in file context. On success
+  prints id, which will be equal to filename
 * reload-all - reparse all existing files (with reloading)
 
 * external - print all external symbols

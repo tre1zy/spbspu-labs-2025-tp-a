@@ -134,6 +134,8 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
       expr.result_type = {"int", typing::BASIC};
       require_type(context, expr.operands[0], expr.result_type);
       return;
+    default:
+      break;
     }
 
     const typing::Type* lhs = entities::get_type(expr.operands[0]);
@@ -208,6 +210,8 @@ void rychkov::CParser::calculate_type(CParseContext& context, entities::Expressi
       expr.result_type = *lhs;
       require_type(context, expr.operands[1], *lhs);
       return;
+    default:
+      break;
     }
     return;
   }
@@ -228,13 +232,17 @@ void rychkov::CParser::require_type(CParseContext& context, entities::Expression
   }
   switch (typing::check_cast(type, *from))
   {
+  case typing::EXACT:
+    break;
+  case typing::IMPLICIT:
+  {
+    entities::CastOperation temp = {type, false, entities::Expression{nullptr, {std::move(expr)}}};
+    expr = std::move(temp);
+    break;
+  }
   case typing::NO_CAST:
     start_log(context) << "cannot cast " << *from << " to " << type;
     finish_log(context);
-    break;
-  case typing::IMPLICIT:
-    entities::CastOperation temp = {type, false, entities::Expression{nullptr, {std::move(expr)}}};
-    expr = std::move(temp);
     break;
   }
 }
@@ -248,14 +256,18 @@ void rychkov::CParser::require_type(CParseContext& context, entities::Expression
   }
   switch (typing::check_cast(type, expr.result_type))
   {
-  case typing::NO_CAST:
-    start_log(context) << "cannot cast " << expr.result_type << " to " << type;
-    finish_log(context);
+  case typing::EXACT:
     break;
   case typing::IMPLICIT:
+  {
     entities::CastOperation temp = {type, false, std::move(expr)};
     expr = std::move(temp);
     calculate_type(context, *boost::variant2::get< entities::CastOperation >(expr.operands[0]).expr);
+    break;
+  }
+  case typing::NO_CAST:
+    start_log(context) << "cannot cast " << expr.result_type << " to " << type;
+    finish_log(context);
     break;
   }
 }

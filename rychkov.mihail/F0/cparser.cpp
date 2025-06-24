@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <algorithm>
 #include "print_content.hpp"
 
 using namespace std::literals::string_literals;
@@ -10,6 +11,15 @@ rychkov::CParser::CParser():
   program_{{}}
 {
   stack_.push(&program_[0]);
+}
+
+std::vector< rychkov::entities::Expression >::const_iterator rychkov::CParser::begin() const
+{
+  return program_.cbegin();
+}
+std::vector< rychkov::entities::Expression >::const_iterator rychkov::CParser::end() const
+{
+  return program_.cend();
 }
 
 const rychkov::Operator rychkov::CParser::parentheses = {Operator::MULTIPLE, Operator::SPECIAL,
@@ -23,11 +33,7 @@ const rychkov::Operator rychkov::CParser::inline_if = {Operator::TERNARY, Operat
 
 void rychkov::CParser::print(std::ostream& out) const
 {
-  ContentPrinter printer{out};
-  for (const entities::Expression& i: program_)
-  {
-    printer(i);
-  }
+  std::for_each(program_.begin(), program_.end(),  ContentPrinter{out});
 }
 bool rychkov::CParser::global_scope() const noexcept
 {

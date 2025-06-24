@@ -93,8 +93,8 @@ void rychkov::Preprocessor::flush_buf(CParseContext& context)
     {
       if (state_ == NAME)
       {
-        decltype(macros_)::iterator macro_p = macros_.find(buf_);
-        if (macro_p != macros_.end())
+        decltype(macros)::iterator macro_p = macros.find(buf_);
+        if (macro_p != macros.end())
         {
           if (macro_p->func_style)
           {

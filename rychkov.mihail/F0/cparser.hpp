@@ -31,6 +31,9 @@ namespace rychkov
     CParser(const CParser&) = delete;
     CParser(CParser&&) = default;
 
+    std::vector< entities::Expression >::const_iterator begin() const;
+    std::vector< entities::Expression >::const_iterator end() const;
+
     void append(CParseContext& context, char c);
     void append(CParseContext& context, entities::Literal literal);
     void append(CParseContext& context, std::string name);

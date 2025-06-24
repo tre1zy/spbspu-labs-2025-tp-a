@@ -1,6 +1,8 @@
 #include "main_processor.hpp"
 
 #include <fstream>
+#include <algorithm>
+#include <iterator>
 
 bool rychkov::MainProcessor::files(ParserContext& context)
 {

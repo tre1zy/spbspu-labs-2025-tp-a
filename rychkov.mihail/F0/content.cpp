@@ -182,8 +182,9 @@ rychkov::typing::MatchType rychkov::typing::check_cast(const Type& dest, const T
       return NO_CAST;
     }
     return check_cast(*dest.base, *src.base) == EXACT ? EXACT : NO_CAST;
+  default:
+    return NO_CAST;
   }
-  return NO_CAST;
 }
 rychkov::typing::MatchType rychkov::typing::check_overload(const Type& function, const std::vector< Type >& args)
 {
@@ -196,6 +197,8 @@ rychkov::typing::MatchType rychkov::typing::check_overload(const Type& function,
   {
     switch (check_cast(function.function_parameters[i], args[i]))
     {
+    case EXACT:
+      break;
     case IMPLICIT:
       result = IMPLICIT;
       break;

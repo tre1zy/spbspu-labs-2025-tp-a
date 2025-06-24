@@ -5,10 +5,11 @@
 #include <utility>
 
 rychkov::Parser::map_type< rychkov::ParserContext, rychkov::MainProcessor > rychkov::MainProcessor::call_map = {
-      {"tree", &rychkov::MainProcessor::tree},
-      {"files", &rychkov::MainProcessor::files},
+      {"save", &rychkov::MainProcessor::save},
       {"reload-all", &rychkov::MainProcessor::reload},
-      {"parse", &rychkov::MainProcessor::parse}
+      {"parse", &rychkov::MainProcessor::parse},
+      {"tree", &rychkov::MainProcessor::tree},
+      {"files", &rychkov::MainProcessor::files}
     };
 
 rychkov::ParseCell::ParseCell(CParseContext context, Stage last_stage,
@@ -77,5 +78,24 @@ bool rychkov::MainProcessor::reload(ParserContext& context)
   }
   context.out << "<--DONE-->\n";
   parsed_ = std::move(new_parsed);
+  return true;
+}
+
+bool rychkov::MainProcessor::save(ParserContext& context)
+{
+  std::string result;
+  if (!eol(context.in))
+  {
+    context.in >> result;
+    if (!context.in || !eol(context.in))
+    {
+      return false;
+    }
+  }
+  else
+  {
+    result = save_file_;
+  }
+  save(context.err, result);
   return true;
 }

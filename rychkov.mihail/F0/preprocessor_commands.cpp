@@ -103,8 +103,8 @@ void rychkov::Preprocessor::define(std::istream& in, CParseContext& context)
   }
   std::getline(in >> std::ws, macro.body);
   remove_whitespaces(macro.body);
-  macros_.erase(macro);
-  macros_.insert(std::move(macro));
+  macros.erase(macro);
+  macros.insert(std::move(macro));
 }
 void rychkov::Preprocessor::pragma(std::istream&, CParseContext& context)
 {
@@ -115,7 +115,7 @@ void rychkov::Preprocessor::undef(std::istream& in, CParseContext& context)
   std::string name;
   if (eol(in >> std::ws >> name) && !name.empty())
   {
-    macros_.erase({name});
+    macros.erase({name});
     return;
   }
   log(context, "wrong #undef format");
@@ -128,7 +128,7 @@ void rychkov::Preprocessor::ifdef(std::istream& in, CParseContext& context)
     log(context, "wrong macro name format");
     return;
   }
-  conditional_pairs_.push(macros_.find(name) == macros_.end() ? WAIT_ELSE : IF_BODY);
+  conditional_pairs_.push(macros.find(name) == macros.end() ? WAIT_ELSE : IF_BODY);
 }
 void rychkov::Preprocessor::ifndef(std::istream& in, CParseContext& context)
 {
@@ -138,7 +138,7 @@ void rychkov::Preprocessor::ifndef(std::istream& in, CParseContext& context)
     log(context, "wrong macro name format");
     return;
   }
-  conditional_pairs_.push(macros_.find(name) != macros_.end() ? WAIT_ELSE : IF_BODY);
+  conditional_pairs_.push(macros.find(name) != macros.end() ? WAIT_ELSE : IF_BODY);
 }
 void rychkov::Preprocessor::else_cmd(std::istream& in, CParseContext& context)
 {

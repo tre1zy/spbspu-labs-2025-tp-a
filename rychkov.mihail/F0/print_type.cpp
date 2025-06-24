@@ -42,6 +42,7 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
   }
   switch (type.category)
   {
+  case typing::ENUM:
   case typing::STRUCT:
     out << type.name;
     break;
@@ -64,6 +65,8 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
       break;
     case typing::LONG_LONG:
       out << "long long ";
+      break;
+    default:
       break;
     }
     out << type.name;
@@ -100,6 +103,8 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
     {
       out << " volatile";
     }
+    break;
+  case typing::FUNCTION:
     break;
   }
   return out;
