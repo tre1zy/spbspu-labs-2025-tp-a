@@ -41,10 +41,12 @@ namespace
   void addPlayer(std::istream& in, brevnov::League& league, std::string teamName)
   {
     std::string playerName, position;
-    size_t raiting, price;
-    in >> playerName >> position >> raiting >> price;
-    if (raiting > 0 && price > 0 && brevnov::checkPosition(position))
+    int rait, pr;
+    in >> playerName >> position >> rait >> pr;
+    if (rait > 0 && pr > 0 && brevnov::checkPosition(position))
     {
+      size_t raiting = rait; 
+      size_t price = pr;
       auto teamIt = league.teams_.find(teamName);
       auto& targetMap = (teamIt != league.teams_.end()) ? teamIt->second.players_ : league.fa_;
       PlayerNameComparator comp{playerName};
@@ -58,6 +60,10 @@ namespace
         std::cerr << "Player already exist!\n";
       }
     }
+    else
+    {
+      std::cerr << "Not correct parameters!\n";
+    }
   }
 
   bool isTeamNamed(const std::pair<std::string, brevnov::Team>& teamPair, const std::string& name)
@@ -67,10 +73,11 @@ namespace
 
   void addT(std::istream& in, brevnov::League& league, const std::string& teamName)
   {
-    size_t budget = 0;
-    in >> budget;
-    if (budget > 0)
+    int bud = 0;
+    in >> bud;
+    if (bud > 0)
     {
+      size_t budget = bud;
       bool teamExists = std::any_of(league.teams_.begin(), league.teams_.end(),
         std::bind(isTeamNamed, std::placeholders::_1, teamName));
       if (!teamExists)
@@ -210,7 +217,7 @@ namespace
   {
     std::ostream& operator()(const std::pair<const std::string, brevnov::Player>& pair) const
     {
-      out << teamName << " " << pair.first << " " << pair.second;
+      out << teamName << " " << pair.first << " " << pair.second << "\n";
       return out;
     }
     const std::string& teamName;
@@ -231,7 +238,7 @@ namespace
       {
         return false;
       }
-      return a.second.raiting_ > b.second.raiting_;
+      return a.second.raiting_ < b.second.raiting_;
     }
     size_t budget;
   };
@@ -341,7 +348,6 @@ namespace
     FilteredPrinter adapter{matcher, printer};
     NullOstreamIterator null_iter;
     std::copy_if(findTeam->second.players_.begin(), findTeam->second.players_.end(), null_iter, adapter);
-    out << "\n";
   }
 
   struct PlayerOutputter
@@ -561,18 +567,19 @@ void brevnov::transfer(std::istream& in, std::ostream& out, League& league)
 void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
 {
   std::string teamName, pos;
-  size_t bud = 0;
-  in >> bud >> pos >> teamName;
+  int budg = 0;
+  in >> budg >> pos >> teamName;
   if (!checkPosition(pos))
   {
     std::cerr << "Not correct position!\n";
     return;
   }
-  if (bud == 0)
+  if (budg <= 0)
   {
     std::cerr << "Not correct budget!\n";
     return;
   }
+  size_t bud = budg;
   TeamFinder teamFinder{teamName};
   auto teamIt = std::find_if(league.teams_.begin(), league.teams_.end(), teamFinder);
   if (teamIt == league.teams_.end())
@@ -591,13 +598,14 @@ void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
 void brevnov::buyTeam(std::istream& in, std::ostream& out, League& league)
 {
   std::string teamName;
-  size_t bud = 0;
-  in >> bud >> teamName;
-  if (bud == 0)
+  int budg = 0;
+  in >> budg >> teamName;
+  if (budg == 0)
   {
     std::cerr << "Not correct budget!\n";
     return;
   }
+  size_t bud = budg;
   auto teamIt = league.teams_.find(teamName);
   if (teamIt == league.teams_.end())
   {
@@ -716,13 +724,14 @@ void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league)
 void brevnov::buyPlayer(std::istream& in, std::ostream& out, League& league)
 {
   std::string teamName;
-  size_t bud = 0;
-  in >> bud >> teamName;
-  if (bud == 0)
+  int budg = 0;
+  in >> budg >> teamName;
+  if (budg <= 0)
   {
     std::cerr << "Not correct budget!\n";
     return;
   }
+  size_t bud = budg;
   auto findTeam = league.teams_.find(teamName);
   if (findTeam == league.teams_.end())
   {
