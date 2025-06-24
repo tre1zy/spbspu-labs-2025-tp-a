@@ -50,33 +50,33 @@ namespace
     }
   };
 
- struct Empty {};
+  struct Empty {};
 
- struct DictWriter
- {
-   std::ostream & out;
+  struct DictWriter
+  {
+    std::ostream & out;
 
-   struct AddSpace
-   {
-     std::ostream & out;
-     Empty operator()(Empty accum, const std::string & word) const
-     {
-       out << " " << word;
-       return accum;
-     }
-   };
+    struct AddSpace
+    {
+      std::ostream & out;
+      Empty operator()(Empty accum, const std::string & word) const
+      {
+        out << " " << word;
+        return accum;
+      }
+    };
 
-   void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
-   {
-     out << entry.first;
-     if (!entry.second.empty())
-     {
-       out << " " << entry.second[0];
-       std::accumulate(std::next(entry.second.begin()), entry.second.end(), Empty{}, AddSpace{ out });
-     }
-     out << "\n";
-   }
- };
+    void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
+    {
+      out << entry.first;
+      if (!entry.second.empty())
+      {
+        out << " " << entry.second[0];
+        std::accumulate(std::next(entry.second.begin()), entry.second.end(), Empty{}, AddSpace{ out });
+      }
+      out << "\n";
+    }
+  };
 
   struct FullDictWriter
   {
@@ -172,6 +172,17 @@ namespace
         acc.push_back(entry.first);
       }
       return acc;
+    }
+  };
+
+  struct WordReader
+  {
+    std::istream & in;
+    std::string operator()() const
+    {
+      std::string word;
+      in >> word;
+      return word;
     }
   };
 }
@@ -287,12 +298,8 @@ namespace bocharov
     }
 
     list_t translations;
-    std::string word;
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> word;
-      translations.push_back(word);
-    }
+    translations.reserve(n);
+    std::generate_n(std::back_inserter(translations), n, WordReader{ in });
     dict[sln] = translations;
   }
 
