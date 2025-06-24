@@ -45,7 +45,7 @@ namespace
     in >> playerName >> position >> rait >> pr;
     if (rait > 0 && pr > 0 && brevnov::checkPosition(position))
     {
-      size_t raiting = rait; 
+      size_t raiting = rait;
       size_t price = pr;
       auto teamIt = league.teams_.find(teamName);
       auto& targetMap = (teamIt != league.teams_.end()) ? teamIt->second.players_ : league.fa_;
