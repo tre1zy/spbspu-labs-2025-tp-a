@@ -401,7 +401,8 @@ namespace
     bool operator()(const std::pair<std::string, brevnov::Team>& team) const
     {
       TeamPlayerPositionPrinter printer{out, team.first, matcher};
-      std::any_of(team.second.players_.begin(), team.second.players_.end(), printer);
+      NullOstreamIterator null_it;
+      std::transform(team.second.players_.begin(), team.second.players_.end(), null_it, printer);
       return false;
     }
     std::ostream& out;
