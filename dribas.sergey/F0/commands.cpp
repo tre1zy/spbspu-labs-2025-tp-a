@@ -3,7 +3,10 @@
 #include <iterator>
 #include <numeric>
 #include <vector>
+#include <functional>
 #include <delimiter.hpp>
+
+#include "survival.hpp"
 
 namespace
 {
@@ -161,7 +164,7 @@ namespace
   private:
     int param_id_;
   public:
-    WorkoutComparator(int id, const std::string& name):
+    WorkoutComparator(int id):
       param_id_(id)
     {}
     bool operator()(const dribas::workout& a, const dribas::workout& b) const
@@ -396,7 +399,7 @@ void dribas::get_top_trainings(std::istream& in, std::ostream& out, const suite&
   auto second = it_main_workouts->second.end();
   std::transform(first, second, std::back_inserter(all_workouts), get_workout_from_pair);
 
-  WorkoutComparator comparator_obj(param_id, parameter_name);
+  WorkoutComparator comparator_obj(param_id);
   std::sort(all_workouts.begin(), all_workouts.end(), comparator_obj);
   out << "Top " << n_top << " trainings by " << parameter_name << ":\n";
   auto begin = all_workouts.begin();
@@ -408,7 +411,7 @@ void dribas::get_top_trainings(std::istream& in, std::ostream& out, const suite&
   }
 }
 
-void dribas::get_top_trainings(std::istream& in, std::ostream& out, const suite& trainings)
+void dribas::get_under_trainings(std::istream& in, std::ostream& out, const suite& trainings)
 {
   std::string parameter_name;
   size_t n_top;
@@ -437,8 +440,9 @@ void dribas::get_top_trainings(std::istream& in, std::ostream& out, const suite&
   auto second = it_main_workouts->second.end();
   std::transform(first, second, std::back_inserter(all_workouts), get_workout_from_pair);
 
-  WorkoutComparator comparator_obj(param_id, parameter_name);
-  std::sort(all_workouts.begin(), all_workouts.end(), comparator_obj);
+  WorkoutComparator comparator_obj(param_id);
+  auto cmp = std::bind(comparator_obj, std::placeholders::_2, std::placeholders::_1);
+  std::sort(all_workouts.begin(), all_workouts.end(), cmp);
   out << "Top " << n_top << " trainings by " << parameter_name << ":\n";
   auto begin = all_workouts.begin();
   auto end = all_workouts.begin() + std::min(n_top, all_workouts.size());
@@ -448,4 +452,16 @@ void dribas::get_top_trainings(std::istream& in, std::ostream& out, const suite&
     out << "Note: Only " << all_workouts.size() << " trainings available, showing all of them.\n";
   }
 }
+
+void dribas::survival_score(std::ostream& out, const suite& suites) {
+  try {
+    const auto& main_suite = suites.at(1);
+    out << calculate_survival_score(main_suite);
+  } catch (const std::out_of_range&) {
+    out << "Error: No workouts found in main suite (id=1)\n";
+  } catch (const std::exception& e) {
+    out << "Error: " << e.what() << "\n";
+  }
+}
+
 

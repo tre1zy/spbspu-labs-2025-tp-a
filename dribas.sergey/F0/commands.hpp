@@ -15,6 +15,7 @@ namespace dribas
   void calculate_average(std::istream&, std::ostream&, suite&);//2;
   void get_top_trainings(std::istream&, std::ostream&, const suite&);//3
   void get_under_trainings(std::istream&, std::ostream&, const suite&);
+  void survival_score(std::ostream&, const suite&);//2
 }
 
 
