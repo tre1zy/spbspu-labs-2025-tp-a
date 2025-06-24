@@ -141,6 +141,15 @@ namespace
     }
   };
 
+  struct AccumulatePrinter
+  {
+    std::ostream & out;
+    Empty operator()(Empty accum, const std::pair<std::string, std::vector<std::string>> & entry) const
+    {
+      DictPrinter{ out }(entry);
+      return Empty{};
+    }
+  };
 }
 
 
@@ -191,10 +200,7 @@ namespace bocharov
     std::string dictname;
     in >> dictname;
     const dict_t & dict = dicts.at(dictname);
-    for (const auto & entry : dict)
-    {
-      DictPrinter{ out }(entry);
-    }
+    std::accumulate(dict.begin(), dict.end(), Empty{}, AccumulatePrinter{ out });
   }
 
   void getTranslationSln(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
