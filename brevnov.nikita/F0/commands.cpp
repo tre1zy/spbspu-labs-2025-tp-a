@@ -8,6 +8,26 @@
 
 namespace
 {
+  struct NullOstreamIterator : public std::iterator<std::output_iterator_tag, void, void, void, void>
+  {
+    template < class T >
+    NullOstreamIterator& operator=(const T&)
+    {
+      return *this;
+    }
+    NullOstreamIterator& operator*()
+    {
+      return *this;
+    }
+    NullOstreamIterator& operator++()
+    {
+      return *this;
+    }
+    NullOstreamIterator operator++(int)
+    {
+      return *this;
+    }
+  };
 
   struct PlayerNameComparator
   {
@@ -237,27 +257,6 @@ namespace
       return true;
     }
     std::ostream& out;
-  };
-
-  struct NullOstreamIterator : public std::iterator<std::output_iterator_tag, void, void, void, void>
-  {
-    template < class T >
-    NullOstreamIterator& operator=(const T&)
-    {
-      return *this;
-    }
-    NullOstreamIterator& operator*()
-    {
-      return *this;
-    }
-    NullOstreamIterator& operator++()
-    {
-      return *this;
-    }
-    NullOstreamIterator operator++(int)
-    {
-      return *this;
-    }
   };
 
   struct FilteredPrinter
