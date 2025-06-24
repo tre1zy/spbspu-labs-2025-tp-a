@@ -691,7 +691,7 @@ void brevnov::viewTeam(std::istream& in, std::ostream& out, League& league)
   if (findTeam != league.teams_.end())
   {
     PlayerOutputter outputter{teamName, out};
-    std::vector<std::pair<std::string, Player>> players(findTeam->second.players_.begin(), 
+    std::vector<std::pair<std::string, Player>> players(findTeam->second.players_.begin(),
       findTeam->second.players_.end());
     std::vector<int> dummy(players.size());
     std::transform(players.begin(), players.end(), dummy.begin(), outputter);
