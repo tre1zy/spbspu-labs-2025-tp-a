@@ -364,13 +364,8 @@ namespace bocharov
     size_t n;
     in >> newDictname >> n;
 
-    std::vector<std::string> dictNames;
-    std::string name;
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> name;
-      dictNames.push_back(name);
-    }
+    std::vector<std::string> dictNames(n);
+    std::generate_n(dictNames.begin(), n, WordReader{ in });
 
     dict_t unionDict = std::accumulate(dictNames.begin(), dictNames.end(), dict_t{}, DictMergerAccumulator{ dicts });
 
