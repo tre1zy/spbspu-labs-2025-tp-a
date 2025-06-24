@@ -7,6 +7,7 @@
 #include <cmath>
 #include <istream>
 #include <ostream>
+#include <map>
 
 namespace dribas
 {
@@ -20,6 +21,11 @@ namespace dribas
     double avgPaceMinPerKm = 0.0;
     time_t timeStart = 0;
     time_t timeEnd = 0;
+  };
+
+  struct training_suite
+  {
+    std::map< size_t, std::map< time_t, workout > > suite;
   };
 
   workout parseGpx(const std::string& gpxContent);
