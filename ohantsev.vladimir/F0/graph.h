@@ -54,8 +54,8 @@ namespace ohantsev
 
     std::vector< Edge > collectEdges() const;
 
+    struct MakeEdge;
     struct EdgeCollector;
-    struct ConnectionProcessor;
     struct EdgeProcessor;
     struct ConnectionRemover;
   };
@@ -131,7 +131,7 @@ namespace ohantsev
     Graph& graph;
     const Key& toRemove;
 
-    void operator()(const typename ConnectionMap::value_type& cnt)
+    void operator()(const typename ConnectionMap::value_type& cnt) const
     {
       graph.graph_.at(cnt.first).erase(toRemove);
     }
@@ -173,26 +173,33 @@ namespace ohantsev
     Key findRoot(const Key& key);
     void unionSets(const Key& first, const Key& second);
 
-    struct Initializer;
+    struct InitParent;
+    struct InitRank;
   };
 
   template< class Key, class Hash, class KeyEqual >
-  struct Graph< Key, Hash, KeyEqual >::DSU::Initializer
+  struct Graph< Key, Hash, KeyEqual >::DSU::InitRank
   {
-    DSU& dsu;
-
-    void operator()(const typename GraphMap::value_type& pair)
+    typename decltype(rank)::value_type operator()(const typename GraphMap::value_type& pair) const
     {
-      const Key& key = pair.first;
-      dsu.parent.emplace(key, key);
-      dsu.rank.emplace(key, 0);
+      return std::make_pair(pair.first, 0);
+    }
+  };
+
+  template< class Key, class Hash, class KeyEqual >
+  struct Graph< Key, Hash, KeyEqual >::DSU::InitParent
+  {
+    typename decltype(parent)::value_type operator()(const typename GraphMap::value_type& pair) const
+    {
+      return std::make_pair(pair.first, pair.first);
     }
   };
 
   template< class Key, class Hash, class KeyEqual >
   Graph< Key, Hash, KeyEqual >::DSU::DSU(const Graph& graph)
   {
-    std::for_each(graph.graph_.begin(), graph.graph_.end(), Initializer{ *this });
+    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(parent, parent.end()), InitParent{});
+    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(rank, rank.end()), InitRank{});
   }
 
   template< class Key, class Hash, class KeyEqual >
@@ -237,6 +244,7 @@ namespace ohantsev
 
     Edge(Key from, Key to, std::size_t weight);
     bool operator<(const Edge& rhs) const;
+    static bool uniformSelection(const Edge& edge);
   };
 
   template< class Key, class Hash, class KeyEqual >
@@ -253,18 +261,19 @@ namespace ohantsev
   }
 
   template< class Key, class Hash, class KeyEqual >
-  struct Graph< Key, Hash, KeyEqual >::ConnectionProcessor
+  bool Graph< Key, Hash, KeyEqual >::Edge::uniformSelection(const Edge& edge)
   {
-    std::vector< Edge >& edges;
-    const Key& from;
+    return edge.from_ < edge.to_;
+  }
 
-    void operator()(const typename ConnectionMap::value_type& connection)
+  template< class Key, class Hash, class KeyEqual >
+  struct Graph< Key, Hash, KeyEqual >::MakeEdge
+   {
+    const Key& from;
+    
+    auto operator()(const typename ConnectionMap::value_type& cnt) const -> Edge
     {
-      const Key& to = connection.first;
-      if (from < to)
-      {
-        edges.emplace_back(from, to, connection.second);
-      }
+        return Edge{ from, cnt.first, cnt.second };
     }
   };
 
@@ -276,7 +285,11 @@ namespace ohantsev
     void operator()(const typename GraphMap::value_type& pair)
     {
       const Key& from = pair.first;
-      std::for_each(pair.second.begin(), pair.second.end(), ConnectionProcessor{ edges, from });
+      const auto& to = pair.second;
+      std::vector< Edge > temp;
+      temp.reserve(to.size());
+      std::transform(to.cbegin(), to.cend(), std::back_inserter(temp), MakeEdge{ from });
+      std::copy_if(temp.cbegin(), temp.cend(), std::back_inserter(edges), Edge::uniformSelection);
     }
   };
 
@@ -377,18 +390,16 @@ namespace ohantsev
     Way constructPath();
     Way releasePath();
 
-    struct DistanceInitializer;
+    struct InitDistance;
     struct NeighborProcessor;
   };
 
   template< class Key, class Hash, class KeyEqual >
-  struct Graph< Key, Hash, KeyEqual >::DijkstraPathFinder::DistanceInitializer
+  struct Graph< Key, Hash, KeyEqual >::DijkstraPathFinder::InitDistance
   {
-    std::unordered_map< Key, std::size_t >& distances;
-
-    void operator()(const typename GraphMap::value_type& pair)
+    typename std::pair< Key, std::size_t > operator()(const typename GraphMap::value_type& pair)
     {
-      distances[pair.first] = std::numeric_limits< std::size_t >::max();
+      return std::make_pair(pair.first, std::numeric_limits< std::size_t >::max());
     }
   };
 
@@ -399,7 +410,7 @@ namespace ohantsev
     end_(end),
     graph_(graph)
   {
-    std::for_each(graph.graph_.begin(), graph.graph_.end(), DistanceInitializer{ distances_ });
+    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(distances_, distances_.end()), InitDistance{});
     distances_[start] = 0;
     queue_.emplace(0, start);
   }

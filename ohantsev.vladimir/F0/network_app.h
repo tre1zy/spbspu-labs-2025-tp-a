@@ -45,10 +45,8 @@ namespace ohantsev
 
     static std::string getName(const map_type::value_type& pair);
 
-    struct WayPrinter;
     struct DeviceConnectionsPrinter;
     struct ConnectionPrinter;
-    struct StepPrinter;
     struct ConnectionAdder;
     struct NetworkMerger;
     struct NetworkSaver;
@@ -60,5 +58,6 @@ namespace ohantsev
   std::istream& operator>>(std::istream& in, Graph< std::string >& graph);
   void skipGraph(std::istream& in);
   void readConnection(std::istream& in, Graph< std::string >& graph);
+  std::ostream& operator<<(std::ostream& out, const Graph< std::string >::Way& way);
 }
 #endif

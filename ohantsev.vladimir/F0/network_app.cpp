@@ -305,28 +305,12 @@ void ohantsev::NetworkApp::distance(const map_type& networks, std::istream& in, 
   }
 }
 
-struct ohantsev::NetworkApp::StepPrinter
+std::ostream& ohantsev::operator<<(std::ostream& out, const Graph< std::string >::Way& way)
 {
-  std::ostream& out;
-
-  void operator()(const std::string& step) const
-  {
-    out << " -> " << step;
-  }
-};
-
-struct ohantsev::NetworkApp::WayPrinter
-{
-  std::ostream& out;
-
-  void operator()(const graph_type::Way& way) const
-  {
-    out << way.length_;
-    out << '\t' << way.steps_.front();
-    std::for_each(way.steps_.begin() + 1, way.steps_.end(), StepPrinter{ out });
-    out << '\n';
-  }
-};
+  out << way.length_ << '\t';
+  std::copy(way.steps_.begin(), way.steps_.end() - 1, std::ostream_iterator< std::string >{ out, " -> " });
+  return (out << way.steps_.back() << '\n');
+}
 
 template< bool AllowCycles >
 void ohantsev::NetworkApp::topPaths(const map_type& networks, std::istream& in, std::ostream& out)
@@ -354,7 +338,7 @@ void ohantsev::NetworkApp::topPaths(const map_type& networks, std::istream& in, 
     throw std::invalid_argument("Device " + to + " not found");
   }
   auto ways = network.nPaths< AllowCycles >(from, to, count);
-  std::for_each(ways.begin(), ways.end(), WayPrinter{ out });
+  std::copy(ways.begin(), ways.end(), std::ostream_iterator< graph_type::Way >{ out });
 }
 
 void ohantsev::NetworkApp::topPathsWithCycles(const map_type& networks, std::istream& in, std::ostream& out)
