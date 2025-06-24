@@ -10,8 +10,6 @@
 
 int main(int argc, char* argv[])
 {
-  using isIter = std::istream_iterator< averenkov::Polygon >;
-
   if (argc != 2)
   {
     std::cerr << "Error: missing filename argument\n";
@@ -19,15 +17,18 @@ int main(int argc, char* argv[])
   }
 
   std::ifstream file(argv[1]);
-  std::vector< averenkov::Polygon > polygons;
-  while (!file.eof())
+  if (!file)
   {
-    std::copy(isIter(file), isIter(), std::back_inserter(polygons));
-    if (!file)
-    {
-      file.clear();
-      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
+    std::cerr << "Error: cannot open file\n";
+    return 1;
+  }
+
+  std::vector< averenkov::Polygon > polygons;
+  averenkov::Polygon poly;
+  while (file >> poly)
+  {
+    polygons.push_back(poly);
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
 
   std::map<std::string, std::function<void()>> cmds;
