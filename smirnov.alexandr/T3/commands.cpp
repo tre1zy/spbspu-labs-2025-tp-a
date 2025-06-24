@@ -219,7 +219,7 @@ void smirnov::inframeCommand(const std::vector< Polygon > & polygons, std::istre
   }
   Polygon test_poly;
   in >> test_poly;
-  if (!in)
+  if (!in || in.peek() != '\n')
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -260,7 +260,7 @@ void smirnov::maxseqCommand(const std::vector< Polygon > & polygons, std::istrea
 {
   Polygon pattern;
   in >> pattern;
-  if (!in)
+  if (!in || in.peek() != '\n')
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
