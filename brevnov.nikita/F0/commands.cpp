@@ -335,6 +335,18 @@ namespace
     TeamPlayerPrinter printer;
     std::ostream& out;
   };
+
+  struct PlayerHandler
+  {
+    bool operator()(const std::pair<std::string, brevnov::Player>& player) const
+    {
+      team.budget_ += player.second.price_;
+      league.fa_.insert(player);
+      return true;
+    }
+    brevnov::Team& team;
+    brevnov::League& league;
+  };
 }
 
 bool brevnov::checkPosition(std::string pos)
@@ -572,11 +584,11 @@ void brevnov::soldTeam(std::istream& in, League& league)
     std::cerr << "Team not found!\n";
     return;
   }
-  for (auto& player : teamIt->second.players_)
-  {
-    teamIt->second.budget_ += player.second.price_;
-    league.fa_.insert(player);
-  }
+  PlayerHandler handler{teamIt->second, league};
+  std::vector<std::pair<std::string, Player>> players(teamIt->second.players_.begin(),
+    teamIt->second.players_.end());
+  std::vector<int> dummy(players.size());
+  std::transform(players.begin(), players.end(), dummy.begin(), handler);
   teamIt->second.players_.clear();
 }
 
