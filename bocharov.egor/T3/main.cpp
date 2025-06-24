@@ -47,7 +47,8 @@ int main(int argc, char * argv[])
   {
     try
     {
-      cmds.at(command)() << '\n';
+      cmds.at(command)();
+      std::cout << '\n';
     }
     catch (const std::exception &)
     {
