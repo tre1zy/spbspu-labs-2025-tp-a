@@ -65,14 +65,14 @@ namespace
     }
   };
 
-  bool intersectWord(const maslov::Dict & dict2, const maslov::Word & word)
+  bool intersectWord(const maslov::Dict & dict, const maslov::Word & word)
   {
-    return dict2.find(word.first) != dict2.end();
+    return dict.find(word.first) != dict.end();
   }
 
-  maslov::Word frequencyUpdate(const maslov::Dict & dict2, const maslov::Word & word)
+  maslov::Word frequencyUpdate(const maslov::Dict & dict, const maslov::Word & word)
   {
-    auto it = dict2.find(word.first);
+    auto it = dict.find(word.first);
     return {word.first, std::min(word.second, it->second)};
   }
 
@@ -186,7 +186,7 @@ void maslov::unionDictionary(std::istream & in, Dicts & dicts)
   auto & result = dicts[resultName];
   const auto & dict1 = it1->second;
   const auto & dict2 = it2->second;
-  std::copy(dict1.cbegin(), dict1.cend(), std::inserter(result, result.begin()));
+  std::copy(dict1.cbegin(), dict1.cend(), std::inserter(result, result.end()));
   using namespace std::placeholders;
   auto func = std::bind(mergeWords, std::ref(result), _1);
   std::for_each(dict2.begin(), dict2.end(), func);
@@ -307,9 +307,10 @@ void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & d
   }
   std::vector< Word > words;
   words.reserve(dictIt->second.size());
-  std::copy(dictIt->second.begin(), dictIt->second.end(), std::back_inserter(words));
+  const auto & dict = dictIt->second;
+  std::copy(dict.cbegin(), dict.cend(), std::back_inserter(words));
   sortWords(words, order);
-  std::for_each(words.begin(), words.begin() + number, PrintWord{out});
+  std::for_each(words.cbegin(), words.cbegin() + number, PrintWord{out});
 }
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
@@ -346,11 +347,12 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   auto & result = dicts[resultName];
   using namespace std::placeholders;
   auto cmp = std::bind(comparatorFrequency, _1, freq1, freq2);
-  std::copy_if(dictIt->second.cbegin(), dictIt->second.cend(), std::inserter(result, result.end()), cmp);
+  const auto & dict = dictIt->second;
+  std::copy_if(dict.cbegin(), dict.cend(), std::inserter(result, result.end()), cmp);
   if (result.empty())
   {
     dicts.erase(resultName);
-    throw std::runtime_error("<EMPTY DICTIONARY>");
+    throw std::runtime_error("<EMPTY INTERVAL>");
   }
 }
 
