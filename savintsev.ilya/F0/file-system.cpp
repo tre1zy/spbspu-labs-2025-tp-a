@@ -1,6 +1,27 @@
-#include "validator.hpp"
+#include "file-system.hpp"
 #include <fstream>
 #include <unordered_map>
+
+std::string savintsev::get_filename(const std::string & filename)
+{
+  size_t slash = filename.rfind('/');
+  size_t dot = filename.rfind('.');
+  if (slash == std::string::npos || dot == std::string::npos)
+  {
+    return filename;
+  }
+  return filename.substr(slash + 1, dot - slash - 1);
+}
+
+std::string savintsev::get_filename_wext(const std::string & filename)
+{
+  size_t slash = filename.rfind('/');
+  if (slash == std::string::npos)
+  {
+    return filename;
+  }
+  return filename.substr(slash + 1);
+}
 
 bool savintsev::has_savi_extension(const std::string & filename)
 {
@@ -53,4 +74,12 @@ bool savintsev::validate_savi_file(const std::string & filename)
   }
 
   return file.eof();
+}
+
+void savintsev::write_file_data(std::ostream & out, Project & proj)
+{
+  for (auto it = proj.begin(); it != proj.end(); ++it)
+  {
+    
+  }
 }

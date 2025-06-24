@@ -4,48 +4,46 @@
 #include <algorithm>
 #include <functional>
 #include <limits>
-#include <string>
-#include <map>
-#include <vector>
-#include <list>
 #include <shape-utils.hpp>
-#include <shape.hpp>
-#include "validator.hpp"
+#include "project-body.hpp"
+#include "file-system.hpp"
 
 int main(int argc, char * argv[])
 {
   using namespace savintsev;
 
-  std::map< std::string, std::list< std::pair< std::string, Shape * > > > projects;
+  std::cout << "Starting...\n";
+
+  Projects projects;
 
   for (int i = 1; i < argc; ++i)
   {
     std::ifstream file(argv[i]);
     if (!validate_savi_file(argv[i]))
     {
-      std::cerr << "ERROR: Can't open file " << argv[i] << '\n';
+      std::cerr << "ERROR: Can't open file " << get_filename_wext(argv[i]) << '\n';
       continue;
     }
 
-    std::list< std::pair< std::string, Shape * > > project;
+    Project project;
 
     while (!file.eof())
     {
       std::string figure;
       std::string name;
       file >> figure >> name;
-      std::pair< std::string, Shape * > new_pair;
+      Layer new_pair;
       Shape * new_shape = createShape(file, figure);
       if (!new_shape)
       {
-        std::cerr << "ERROR: Unknown error. Invalid file " << argv[i] << '\n';
+        std::cerr << "ERROR: Unknown error. Invalid file " << get_filename_wext(argv[i]) << '\n';
         return 1;
       }
       new_pair = {name, new_shape};
       project.push_back(new_pair);
     }
 
-    projects[argv[i]] = project;
+    projects[get_filename(argv[i])] = project;
   }
 
   for (auto it = projects.begin(); it != projects.end(); ++it)
@@ -56,6 +54,8 @@ int main(int argc, char * argv[])
       std::cout << jt->first << '\n';
     }
   }
+
+  std::cout << "Welcome to the CMD-PAINT\n";
 
   std::map< std::string, std::function< void() > > cmds;
 
