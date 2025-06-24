@@ -4,18 +4,15 @@
 #include <iterator>
 #include <numeric>
 
+std::ostream& belyaev::operator<<(std::ostream& out, const entryPair& pair)
+{
+  out << pair.first << " -> " << pair.second;
+  return out;
+}
+
 std::string belyaev::formPairString(const entryPair& pair)
 {
   return pair.first + " -> " + pair.second;
-}
-
-std::string belyaev::accumulatePairString(std::string result, const entryPair& pair)
-{
-  if (result.empty())
-  {
-    return formPairString(pair);
-  }
-  return std::move(result) + "\n" + formPairString(pair);
 }
 
 std::ostream& belyaev::operator<<(std::ostream& out, const Dictionary& dictionary)
@@ -25,9 +22,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Dictionary& dictionar
     out << "<EMPTY>\n";
     return out;
   }
-  using namespace std::placeholders;
-  auto accumPairBind = std::bind(accumulatePairString, _1, _2);
-  std::string result = std::accumulate(dictionary.dict.begin(), dictionary.dict.end(), std::string{}, accumPairBind);
-  out << result << '\n';
+  using ostreamItStr = std::ostream_iterator<std::string>;
+  std::transform(dictionary.dict.begin(), dictionary.dict.end(), ostreamItStr{out, "\n"}, formPairString);
   return out;
 }

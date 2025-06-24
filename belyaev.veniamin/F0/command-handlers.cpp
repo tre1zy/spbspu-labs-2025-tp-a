@@ -126,9 +126,9 @@ void belyaev::searchContains(const Dictionaries& data, std::istream& in, std::os
 
   try
   {
+    using ostreamItStr = std::ostream_iterator<std::string>;
     auto it = std::stable_partition(dictCopy.begin(), dictCopy.end(), commandRuOrEng[ruOrEng]);
-    std::string result = std::accumulate(dictCopy.begin(), it, std::string{}, accumulatePairString); // govno iz jopi
-    out << result << '\n';
+    std::transform(dictCopy.begin(), it, ostreamItStr{out, "\n"}, formPairString);
   }
   catch (const std::out_of_range& e)
   {
@@ -168,7 +168,6 @@ belyaev::commandMap belyaev::mapCommandHandlers(Dictionaries& data)
   cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(searchContains, std::cref(data), _1, _2, "ENG");
   cmds["PRINT"] = std::bind(printDict, std::cref(data), _1, _2);
   /*
-  cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(area, std::cref(data), _1, _2);
   cmds["PRINT_ALL"] = std::bind(area, std::cref(data), _1, _2);
   cmds["CLEAR"] = std::bind(area, std::ref(data), _1, _2);
   cmds["COPY"] = std::bind(area, std::ref(data), _1, _2);

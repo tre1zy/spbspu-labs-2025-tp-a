@@ -13,8 +13,8 @@ namespace belyaev
   };
   using entryPair = std::pair<const std::string, std::string>;
   using nonConstEntryPair = std::pair<std::string, std::string>;
+  std::ostream& operator<<(std::ostream& out, const entryPair& pair);
   std::string formPairString(const entryPair& pair);
-  std::string accumulatePairString(std::string result, const entryPair& pair);
   std::ostream& operator<<(std::ostream& out, const Dictionary& dictionary);
 
   struct Dictionaries
