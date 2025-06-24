@@ -14,7 +14,7 @@ namespace kushekbaev
 
   void print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
 
-  void remove();
+  void remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
 
   void search();
 

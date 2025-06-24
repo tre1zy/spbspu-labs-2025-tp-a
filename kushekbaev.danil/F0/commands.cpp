@@ -23,7 +23,6 @@ void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& c
   if (dict_it == current_dictionary.end())
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
-    return;
   }
   auto& word_map = dict_it->second;
   for (auto word_it = word_map.begin(); word_it != word_map.end(); ++word_it)
@@ -35,7 +34,26 @@ void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& c
     {
       out << std::string(" ") << *translation_it;
     }
+    out << std::string("\n");
   }
+}
+
+void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+{
+  std::string dictionary_name, word_to_remove;
+  in >> dictionary_name >> word_to_remove;
+  auto dict_it = current_dictionary.find(dictionary_name);
+  if (dict_it == current_dictionary.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  auto word_it = dict_it->second.find(word_to_remove);
+  if (word_it == dict_it->second.end())
+  {
+    throw std::out_of_range("<WORD NOT FOUND>");
+  }
+  dict_it->second.erase(word_it);
+  out << std::string("Word with its translation successfully removed.\n");
 }
 
 void kushekbaev::print_list_of_commands(std::ostream& out)
