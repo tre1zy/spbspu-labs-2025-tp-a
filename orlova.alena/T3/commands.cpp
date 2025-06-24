@@ -121,19 +121,17 @@ void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std:
   subcmds["EVEN"] = std::bind(calculateAreaByCondition< Predicate >, _1, isEven);
   subcmds["ODD"] = std::bind(calculateAreaByCondition< Predicate >, _1, isOdd);
   subcmds["MEAN"] = areaMean;
-  auto it = subcmds.find(subcommand);
-  if (it != subcmds.end())
+  try
   {
-    out << it->second(polygons);
+    out << subcmds.at(subcommand)(polygons);
   }
-  else
+  catch (...)
   {
-    size_t numOfVertexes = std::stoull(subcommand);
+    int numOfVertexes = std::stoull(subcommand);
     if (numOfVertexes < 3)
     {
       throw std::logic_error("<WRONG SUBCOMMAND>");
     }
-
     out << areaNum(polygons, numOfVertexes);
   }
 }
@@ -152,19 +150,17 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds2;
   subcmds1["AREA"] = maxArea;
   subcmds2["VERTEXES"] = maxVertexes;
-  auto it1 = subcmds1.find(subcommand);
-  if (it1 != subcmds1.end())
+  try
   {
-    out << it1->second(polygons);
+    out << subcmds1.at(subcommand)(polygons);
   }
-  else
+  catch (...)
   {
-    auto it2 = subcmds2.find(subcommand);
-    if (it2 != subcmds2.end())
+    try
     {
-      out << it2->second(polygons);
+      out << subcmds2.at(subcommand)(polygons);
     }
-    else
+    catch (...)
     {
       throw std::logic_error("<WRONG SUBCOMMAND>");
     }
@@ -191,17 +187,24 @@ void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
 
-  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds;
-  subcmds["AREA"] = minArea;
-  subcmds["VERTEXES"] = minVertexes;
-  auto it = subcmds.find(subcommand);
-  if (it != subcmds.end())
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds1;
+  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds2;
+  subcmds1["AREA"] = minArea;
+  subcmds2["VERTEXES"] = minVertexes;
+  try
   {
-    out << it->second(polygons);
+    out << subcmds1.at(subcommand)(polygons);
   }
-  else
+  catch (...)
   {
-    throw std::logic_error("<WRONG SUBCOMMAND>");
+    try
+    {
+      out << subcmds2.at(subcommand)(polygons);
+    }
+    catch (...)
+    {
+      throw std::logic_error("<WRONG SUBCOMMAND>");
+    }
   }
 }
 
@@ -224,19 +227,17 @@ void orlova::count(const std::vector< Polygon >& polygons, std::istream& in, std
   std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds;
   subcmds["EVEN"] = countEven;
   subcmds["ODD"] = countOdd;
-  auto it = subcmds.find(subcommand);
-  if (it != subcmds.end())
+  try
   {
-    out << it->second(polygons);
+    out << subcmds.at(subcommand)(polygons);
   }
-  else
+  catch (...)
   {
     size_t numOfVertexes = std::stoull(subcommand);
     if (numOfVertexes < 3)
     {
       throw std::logic_error("<WRONG SUBCOMMAND>");
     }
-
     out << countNum(polygons, numOfVertexes);
   }
 }
