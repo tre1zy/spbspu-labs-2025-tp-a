@@ -6,55 +6,86 @@
 #include <numeric>
 #include "geom.h"
 
-double orlova::subArea(const Point& a, const Point& b)
+namespace
 {
-  return a.x * b.y - a.y * b.x;
-}
+  double subArea(const orlova::Point& a, const orlova::Point& b)
+  {
+    return a.x * b.y - a.y * b.x;
+  }
 
-double orlova::areaPolygon(const Polygon& polygon)
-{
-  const auto& p = polygon.points;
-  double sum = std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, subArea);
-  sum += subArea (p.back(), p.front());
-  return std::abs(sum) / 2.0;
-}
+  double areaPolygon(const orlova::Polygon& polygon)
+  {
+    const auto& p = polygon.points;
+    double sum = std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, subArea);
+    sum += subArea (p.back(), p.front());
+    return std::abs(sum) / 2.0;
+  }
 
-double orlova::sumPolygonAreas(double sum, const Polygon& polygon)
-{
-  return sum + areaPolygon(polygon);
-}
+  double sumPolygonAreas(double sum, const orlova::Polygon& polygon)
+  {
+    return sum + areaPolygon(polygon);
+  }
 
-bool orlova::isEven(const Polygon& polygon)
-{
-  return polygon.points.size() % 2 == 0;
-}
+  bool isEven(const orlova::Polygon& polygon)
+  {
+    return polygon.points.size() % 2 == 0;
+  }
 
-bool orlova::isOdd(const Polygon& polygon)
-{
-  return !isEven(polygon);
-}
+  bool isOdd(const orlova::Polygon& polygon)
+  {
+    return !isEven(polygon);
+  }
 
-bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
-{
-  return polygon.points.size() == numOfVertexes;
-}
+  bool isNum(const orlova::Polygon& polygon, size_t numOfVertexes)
+  {
+    return polygon.points.size() == numOfVertexes;
+  }
 
-int orlova::isEqual(const Polygon& a, const Polygon& b)
-{
-  return a == b;
-}
+  int isEqual(const orlova::Polygon& a, const orlova::Polygon& b)
+  {
+    return a == b;
+  }
 
-template < typename T >
-double orlova::accumulator(double sum, const Polygon& polygon, T function)
-{
-  return function(polygon) ? sum + areaPolygon(polygon) : sum;
-}
+  template < typename T >
+  double accumulator(double sum, const orlova::Polygon& polygon, T function)
+  {
+    return function(polygon) ? sum + areaPolygon(polygon) : sum;
+  }
 
-template < typename T >
-double orlova::calculateAreaByCondition(const std::vector< Polygon >& polygons, T function)
-{
-  using namespace std::placeholders;
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator< T >, _1, _2, function));
+  template < typename T >
+  double calculateAreaByCondition(const std::vector< orlova::Polygon >& polygons, T function)
+  {
+    using namespace std::placeholders;
+    return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator< T >, _1, _2, function));
+  }
+
+  bool areaComparator(const orlova::Polygon& a, const orlova::Polygon& b)
+  {
+    return areaPolygon(a) < areaPolygon(b);
+  }
+
+  bool vertexesComparator(const orlova::Polygon& a, const orlova::Polygon& b)
+  {
+    return a.points.size() < b.points.size();
+  }
+
+  bool isPermutation(const orlova::Polygon& polygon1, const orlova::Polygon& polygon2)
+  {
+    if (polygon1.points.size() != polygon2.points.size())
+    {
+      return false;
+    }
+    return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
+  }
+
+  int getMaxSeq(int a, int b)
+  {
+    if (a == 0 || b == 0)
+    {
+      return a;
+    }
+    return a + b;
+  }
 }
 
 double orlova::areaEven(const std::vector< Polygon >& polygons)
@@ -143,19 +174,9 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   }
 }
 
-bool orlova::areaComparator(const Polygon& a, const Polygon& b)
-{
-  return areaPolygon(a) < areaPolygon(b);
-}
-
 double orlova::maxArea(const std::vector< Polygon >& polygons)
 {
   return areaPolygon(*std::max_element(polygons.begin(), polygons.end(), areaComparator));
-}
-
-bool orlova::vertexesComparator(const Polygon& a, const Polygon& b)
-{
-  return a.points.size() < b.points.size();
 }
 
 size_t orlova::maxVertexes(const std::vector< Polygon >& polygons)
@@ -251,15 +272,6 @@ void orlova::perms(const std::vector< Polygon >& polygons, std::istream& in, std
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, _1, polygon));
 }
 
-bool orlova::isPermutation(const Polygon& polygon1, const Polygon& polygon2)
-{
-  if (polygon1.points.size() != polygon2.points.size())
-  {
-    return false;
-  }
-  return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
-}
-
 void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
   using namespace std::placeholders;
@@ -277,13 +289,4 @@ void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, st
   std::transform(polygons.begin(), polygons.end(), seqVector.begin(), std::bind(isEqual, _1, std::cref(polygon)));
   std::transform(seqVector.begin() + 1, seqVector.end(), seqVector.begin(), seqVector.begin() + 1, getMaxSeq);
   out << *std::max_element(seqVector.begin(), seqVector.end());
-}
-
-int orlova::getMaxSeq(int a, int b)
-{
-  if (a == 0 || b == 0)
-  {
-    return a;
-  }
-  return a + b;
 }

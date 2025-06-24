@@ -7,20 +7,6 @@
 
 namespace orlova
 {
-  double subArea(const Point&, const Point&);
-  double areaPolygon(const Polygon&);
-  double sumPolygonAreas(double, const Polygon&);
-  bool isEven(const Polygon&);
-  bool isOdd(const Polygon&);
-  bool isNum(const Polygon&, size_t);
-  int isEqual(const Polygon&, const Polygon&);
-  template < typename T >
-  double accumulator(double, const Polygon&, T);
-  template < typename T >
-  double calculateAreaByCondition(const std::vector< Polygon >&, T);
-  bool areaComparator(const Polygon&, const Polygon&);
-  bool vertexesComparator(const Polygon&, const Polygon&);
-
   void area(const std::vector< Polygon >&, std::istream&, std::ostream&);
   double areaEven(const std::vector< Polygon >&);
   double areaOdd(const std::vector< Polygon >&);
@@ -41,10 +27,8 @@ namespace orlova
   size_t countNum(const std::vector< Polygon >&, size_t);
 
   void perms(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  bool isPermutation(const Polygon&, const Polygon&);
 
   void maxseq(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  int getMaxSeq(int, int);
 }
 
 #endif
