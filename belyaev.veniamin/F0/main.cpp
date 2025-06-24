@@ -1,15 +1,15 @@
 #include "command-handlers.hpp"
-#include "shapes.hpp"
+#include "dictionary.hpp"
 #include <algorithm>
 #include <iterator>
 #include <limits>
 
-int main(int argc, char* argv[])
+int main()
 {
   using namespace belyaev;
   using namespace std::placeholders;
 
-  std::vector<Dictionary> data;
+  Dictionaries data;
   commandMap cmds = mapCommandHandlers(data);
   std::string command;
   while (!(std::cin >> command).eof())
