@@ -12,6 +12,8 @@ int main()
   std::unordered_map< std::string, std::function< void(std::istream &) > > commands;
   using namespace std::placeholders;
   commands["create"] = std::bind(createCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["add"] = std::bind(addCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["translate"] = std::bind(translateCommand, std::ref(dicts), _1, std::ref(std::cout));
   std::string cmd;
   while (std::cin >> cmd)
   {
