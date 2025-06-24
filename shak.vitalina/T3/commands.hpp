@@ -1,6 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <iomanip>
+#include <map>
 #include <string>
 #include <functional>
 #include "polygon.hpp"
