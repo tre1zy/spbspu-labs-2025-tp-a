@@ -38,6 +38,7 @@ int main(int argc, char * argv[])
   cmds["create"] = std::bind(create, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["save"] = std::bind(save, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["save_as"] = std::bind(save_as, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["save_all"] = std::bind(save_all, std::ref(std::cout), std::ref(projects));
   cmds["copy"] = std::bind(copy, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["rename"] = std::bind(rename_project, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["projects"] = std::bind(print, std::ref(std::cout), std::ref(projects));

@@ -1,5 +1,7 @@
 #include "project-cmds.hpp"
 #include <fstream>
+#include <algorithm>
+#include <functional>
 #include <shape-utils.hpp>
 #include "file-system.hpp"
 
@@ -80,6 +82,24 @@ void savintsev::save_as(std::istream & in, std::ostream & out, Projects & projs)
   in >> proj >> new_file;
   write_savi_file(new_file, projs.at(proj));
   out << "The project was successfully saved in " << new_file << ".savi\n";
+}
+
+namespace
+{
+  struct SaveProject
+  {
+    template< typename Iterator >
+    void operator()(Iterator & entry) const
+    {
+      savintsev::write_savi_file(entry.first, entry.second);
+    }
+  };
+}
+
+void savintsev::save_all(std::ostream & out, Projects & projs)
+{
+  std::for_each(projs.begin(), projs.end(), SaveProject());
+  out << "All projects were saved successfully\n";
 }
 
 void savintsev::print(std::ostream & out, Projects & projs)
