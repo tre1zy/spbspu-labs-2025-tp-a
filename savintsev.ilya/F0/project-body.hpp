@@ -10,8 +10,6 @@ namespace savintsev
   using Layer = std::pair< std::string, Shape * >;
   using Project = std::list< Layer >;
   using Projects = std::map< std::string, Project >;
-
-  //void save_project(Project & p);
 }
 
 #endif

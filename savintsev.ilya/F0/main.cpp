@@ -19,31 +19,14 @@ int main(int argc, char * argv[])
 
   for (int i = 1; i < argc; ++i)
   {
-    std::ifstream file(argv[i]);
-    if (!validate_savi_file(argv[i]))
+    try
     {
-      std::cerr << "ERROR: Can't open " << get_filename_wext(argv[i]) << '\n';
-      continue;
+      read_savi_file(argv[i], projects);
     }
-
-    Project project;
-
-    while (!file.eof())
+    catch (const std::runtime_error & e)
     {
-      std::string figure;
-      file >> figure;
-      Layer new_pair;
-      Shape * new_shape = createShape(file, figure);
-      if (!new_shape)
-      {
-        std::cerr << "ERROR: Unknown error. Invalid file " << get_filename_wext(argv[i]) << '\n';
-        return 1;
-      }
-      new_pair = {figure, new_shape};
-      project.push_back(new_pair);
+      std::cerr << e.what() << '\n';
     }
-
-    projects[get_filename(argv[i])] = project;
   }
 
   std::cout << "Welcome to the CMD-PAINT\n";
@@ -63,6 +46,15 @@ int main(int argc, char * argv[])
     {
       cmds.at(command)();
     }
+    catch (const std::runtime_error & e)
+    {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cerr << e.what() << '\n';
+    }
     catch (const std::out_of_range & e)
     {
       if (std::cin.fail())
@@ -70,7 +62,7 @@ int main(int argc, char * argv[])
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << e.what();
+      std::cerr << e.what() << '\n';
     }
     catch (...)
     {
@@ -79,6 +71,7 @@ int main(int argc, char * argv[])
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cerr << "Unknown error\n";
     }
   }
 }

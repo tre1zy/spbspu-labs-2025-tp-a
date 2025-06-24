@@ -11,7 +11,8 @@ namespace savintsev
   bool has_savi_extension(const std::string & filename);
   bool validate_savi_file(const std::string & filename);
 
-  void write_file_data(std::ostream & out, Project & proj);
+  void write_savi_file(const std::string & filename, Project & proj);
+  void read_savi_file(const std::string & filename, Projects & projs);
 }
 
 #endif

@@ -1,6 +1,7 @@
 #include "file-system.hpp"
 #include <fstream>
 #include <unordered_map>
+#include "shape-utils.hpp"
 
 std::string savintsev::get_filename(const std::string & filename)
 {
@@ -76,16 +77,51 @@ bool savintsev::validate_savi_file(const std::string & filename)
   return file.eof();
 }
 
-void savintsev::write_file_data(std::ostream & out, Project & proj)
+void savintsev::read_savi_file(const std::string & filename, Projects & projs)
 {
+  std::ifstream file(filename);
+
+  if (!file || !validate_savi_file(filename))
+  {
+    throw std::runtime_error("Can't open file " + get_filename_wext(filename));
+  }
+
+  Project project;
+
+  while (!file.eof())
+  {
+    std::string figure;
+    file >> figure;
+    Layer new_pair;
+    Shape * new_shape = createShape(file, figure);
+    if (!new_shape)
+    {
+      throw std::runtime_error("Invalid file " + get_filename_wext(filename));
+    }
+    new_pair = {figure, new_shape};
+    project.push_back(new_pair);
+  }
+
+  projs[get_filename(filename)] = project;
+}
+
+void savintsev::write_savi_file(const std::string & filename, Project & proj)
+{
+  std::ofstream file(filename + ".savi");
+
+  if (!file)
+  {
+    throw std::runtime_error("Failed to save project to " + filename + ".savi");
+  }
+
   for (auto it = proj.begin(); it != proj.end(); ++it)
   {
-    out << it->first << " " << it->second->get_name();
+    file << it->first << " " << it->second->get_name();
     point_t ps[4];
     for (size_t i = 0; i < it->second->get_all_points(ps); ++i)
     {
-      out << " " << ps[i].x << " " << ps[i].y;
+      file << " " << ps[i].x << " " << ps[i].y;
     }
-    out << '\n';
+    file << '\n';
   }
 }
