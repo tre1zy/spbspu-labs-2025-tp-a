@@ -312,12 +312,7 @@ namespace bocharov
     dict_t & dict = dicts.at(dictname);
     list_t & translations = dict.at(sln);
 
-    std::string word;
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> word;
-      translations.push_back(word);
-    }
+    std::generate_n(std::back_inserter(translations), n, WordReader{ in });
   }
 
   void deleteRu(std::istream & in, dict_dict_t & dicts)
