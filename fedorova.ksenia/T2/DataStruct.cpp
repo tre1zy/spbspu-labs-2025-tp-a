@@ -168,7 +168,7 @@ std::ostream& fedorova::operator<<(std::ostream& out, const fedorova::DataStruct
   return out;
 }
 
-fedorova::IoGuard::IoGuard(std::basic_ios<char>& s) :
+fedorova::IoGuard::IoGuard(std::basic_ios< char >& s):
   s_(s),
   width_(s.width()),
   fill_(s.fill()),
