@@ -1,4 +1,18 @@
 #include "commands.hpp"
+#include "graph.hpp"
+
+bool maslevtsov::check_graphs_format(std::istream& in)
+{
+  std::string graph_name;
+  while ((in >> graph_name) && (!in.eof())) {
+    Graph gr;
+    in >> gr;
+  }
+  if (in.eof()) {
+    return true;
+  }
+  return false;
+}
 
 void maslevtsov::print_help_manual(std::ostream& out)
 {
@@ -37,4 +51,46 @@ void maslevtsov::print_help_manual(std::ostream& out)
   out << "    calculate the minimum distance in <graph_name>;\n";
   out << "15. width <graph_name> - find width of <graph_name>;\n";
   out << "16. components <graph_name> - find connected components in <graph_name>.";
+}
+
+void maslevtsov::add_graph(graphs_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  in >> graph_name;
+  if (graphs.find(graph_name) != graphs.end()) {
+    throw std::invalid_argument("graph already exist");
+  }
+  Graph gr;
+  size_t edge_count = 0;
+  in >> edge_count;
+  for (size_t i = 0; i != edge_count; ++i) {
+    unsigned vertice1 = 0, vertice2 = 0;
+    in >> vertice1 >> vertice2;
+    gr.add_edge(vertice1, vertice2);
+  }
+  graphs[graph_name] = gr;
+}
+
+void maslevtsov::add_vertice(graphs_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  unsigned vertice = 0;
+  in >> graph_name >> vertice;
+  graphs.at(graph_name).add_vertice(vertice);
+}
+
+void maslevtsov::add_edge(graphs_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  unsigned vertice1 = 0, vertice2 = 0;
+  in >> graph_name >> vertice1 >> vertice2;
+  graphs.at(graph_name).add_edge(vertice1, vertice2);
+}
+
+void maslevtsov::print_graph(const graphs_t& graphs, std::istream& in, std::ostream& out)
+{
+  std::string graph_name;
+  in >> graph_name;
+  graphs.at(graph_name).print_adjacency_list(out);
+  std::cout << '\n';
 }

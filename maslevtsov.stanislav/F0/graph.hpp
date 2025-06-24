@@ -17,13 +17,17 @@ namespace maslevtsov {
     void add_edge(unsigned vertice1, unsigned vertice2);
     void delete_vertice(unsigned vertice);
     void delete_edge(unsigned vertice1, unsigned vertice2);
-    void print_adjacency_list(std::ostream& out);
+    void print_adjacency_list(std::ostream& out) const;
 
   private:
     using edges_t = std::unordered_map< unsigned, std::vector< unsigned > >;
-
     edges_t edges_;
+    std::vector< unsigned > solo_vertices_;
+
+    friend std::istream& operator>>(std::istream& in, Graph& gr);
   };
+
+  std::istream& operator>>(std::istream& in, Graph& gr);
 }
 
 #endif
