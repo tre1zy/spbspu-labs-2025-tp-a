@@ -13,7 +13,7 @@ namespace orlova
   bool isEven(const Polygon&);
   bool isOdd(const Polygon&);
   bool isNum(const Polygon&, size_t);
-  double accumulator(std::function < bool(const Polygon&) >, double, const Polygon&);
+  double accumulator(double, const Polygon&, std::function < bool(const Polygon&) >);
   double numAreaAccumulator(double, const Polygon&, size_t);
   bool areaComparator(const Polygon&, const Polygon&);
   bool vertexesComparator(const Polygon&, const Polygon&);
