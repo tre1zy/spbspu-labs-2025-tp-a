@@ -1,15 +1,14 @@
 #ifndef POINT_HPP
 #define POINT_HPP
-#include <iostream>
+#include <ostream>
 
-struct Point {
-  int x, y;
+namespace kazak {
+  struct Point {
+    int x, y;
+    bool operator==(const Point & other) const;
+  };
 
-  bool operator==(const Point & other) const;
-  bool operator<(const Point & other) const;
-};
-
-std::ostream & operator<<(std::ostream & os, const Point & p);
-std::istream & operator>>(std::istream & is, Point & p);
+  std::ostream & operator<<(std::ostream & os, const Point & point);
+}
 
 #endif

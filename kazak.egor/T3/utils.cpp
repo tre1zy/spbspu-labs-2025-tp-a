@@ -1,40 +1,63 @@
+#include <sstream>
+#include <limits>
+#include <algorithm>
 #include "utils.hpp"
 
-namespace utils {
+namespace kazak {
+  namespace utils {
 
-bool polygonInFrame(const Polygon & poly, const Point & minP, const Point & maxP) {
-  for (size_t i = 0; i < poly.points.size(); ++i) {
-    const Point & p = poly.points[i];
-    if (p.x < minP.x || p.x > maxP.x || p.y < minP.y || p.y > maxP.y) {
-      return false;
+    bool parsePolygon(const std::string & line, Polygon & poly)
+    {
+      std::istringstream iss(line);
+      size_t count = 0;
+      if (!(iss >> count)) {
+        return false;
+      }
+      if (count == 0) {
+        return false;
+      }
+      poly.points.clear();
+      for (size_t i = 0; i < count; ++i) {
+        char ch1, ch2, ch3;
+        int x, y;
+        if (!(iss >> ch1 >> x >> ch2 >> y >> ch3)) {
+          return false;
+        }
+        if (ch1 != '(' || ch2 != ';' || ch3 != ')') {
+          return false;
+        }
+        poly.points.push_back(Point{x, y});
+      }
+      return true;
     }
-  }
-  return true;
-}
 
-void boundingBox(const std::vector<Polygon> & polys, Point & minP, Point & maxP) {
-  if (polys.empty()) {
-    minP = Point{0, 0};
-    maxP = Point{0, 0};
-    return;
-  }
-  int minX = std::numeric_limits<int>::max();
-  int minY = std::numeric_limits<int>::max();
-  int maxX = std::numeric_limits<int>::min();
-  int maxY = std::numeric_limits<int>::min();
+    void boundingBox(const std::vector<Polygon> & polygons, Point & minP, Point & maxP)
+    {
+      minP.x = std::numeric_limits<int>::max();
+      minP.y = std::numeric_limits<int>::max();
+      maxP.x = std::numeric_limits<int>::min();
+      maxP.y = std::numeric_limits<int>::min();
 
-  for (size_t i = 0; i < polys.size(); ++i) {
-    const Polygon & poly = polys[i];
-    for (size_t j = 0; j < poly.points.size(); ++j) {
-      const Point & p = poly.points[j];
-      if (p.x < minX) minX = p.x;
-      if (p.y < minY) minY = p.y;
-      if (p.x > maxX) maxX = p.x;
-      if (p.y > maxY) maxY = p.y;
+      for (const auto & poly : polygons) {
+        for (const auto & p : poly.points) {
+          minP.x = std::min(minP.x, p.x);
+          minP.y = std::min(minP.y, p.y);
+          maxP.x = std::max(maxP.x, p.x);
+          maxP.y = std::max(maxP.y, p.y);
+        }
+      }
     }
+
+    bool polygonInFrame(const Polygon & poly, const Point & minP, const Point & maxP)
+    {
+      for (const auto & p : poly.points) {
+        if (p.x < minP.x || p.x > maxP.x || p.y < minP.y || p.y > maxP.y) {
+          return false;
+        }
+      }
+      return true;
+    }
+
   }
-  minP = Point{minX, minY};
-  maxP = Point{maxX, maxY};
 }
 
-}

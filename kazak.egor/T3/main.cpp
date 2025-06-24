@@ -1,116 +1,108 @@
-#include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
-#include <functional>
+#include <iostream>
 #include <map>
-#include <cstdlib>
+#include <functional>
 #include <limits>
-#include "polygon.hpp"
+#include <sstream>
+#include <string>
+#include <vector>
 #include "commands.hpp"
+#include "utils.hpp"
 
-static bool readPolygonsFromFile(const std::string & filename, std::vector<Polygon> & polygons) {
-  std::ifstream ifs(filename.c_str());
-  if (!ifs)
-    return false;
+namespace kazak {
+  namespace main_ns {
+    std::vector<Polygon> polygons;
 
-  std::string line;
-  while (std::getline(ifs, line)) {
-    Polygon poly;
-    if (parsePolygon(line, poly)) {
-      polygons.push_back(poly);
-    }
-  }
-  return true;
-}
-
-static void printInvalidCommand() {
-  std::cout << "<INVALID COMMAND>\n";
-}
-
-int main(int argc, char * argv[]) {
-  if (argc != 2) {
-    std::cerr << "Error: filename argument missing\n";
-    return 1;
-  }
-  std::vector<Polygon> polygons;
-  if (!readPolygonsFromFile(argv[1], polygons)) {
-    std::cerr << "Error: could not open or read file\n";
-    return 2;
-  }
-
-  std::string line;
-  while (std::getline(std::cin, line)) {
-    if (line.empty())
-      continue;
-    std::istringstream iss(line);
-    std::string cmd;
-    iss >> cmd;
-    if (cmd == "AREA") {
+    void cmdArea(std::istream & is) {
       std::string param;
-      iss >> param;
-      if (!iss) {
-        printInvalidCommand();
-        continue;
-      }
+      is >> param;
       commands::commandArea(polygons, param, std::cout);
-    } else if (cmd == "MAX") {
-      std::string param;
-      iss >> param;
-      if (!iss) {
-        printInvalidCommand();
-        continue;
-      }
-      commands::commandMax(polygons, param, std::cout);
-    } else if (cmd == "MIN") {
-      std::string param;
-      iss >> param;
-      if (!iss) {
-        printInvalidCommand();
-        continue;
-      }
-      commands::commandMin(polygons, param, std::cout);
-    } else if (cmd == "COUNT") {
-      std::string param;
-      iss >> param;
-      if (!iss) {
-        printInvalidCommand();
-        continue;
-      }
-      commands::commandCount(polygons, param, std::cout);
-    } else if (cmd == "ECHO") {
-      std::string rest;
-      std::getline(iss, rest);
-      if (rest.empty()) {
-        printInvalidCommand();
-        continue;
-      }
+    }
 
-      size_t pos = rest.find_first_not_of(" ");
-      if (pos == std::string::npos) {
-        printInvalidCommand();
-        continue;
+    void cmdMax(std::istream & is) {
+      std::string param;
+      is >> param;
+      commands::commandMax(polygons, param, std::cout);
+    }
+
+    void cmdMin(std::istream & is) {
+      std::string param;
+      is >> param;
+      commands::commandMin(polygons, param, std::cout);
+    }
+
+    void cmdCount(std::istream & is) {
+      std::string param;
+      is >> param;
+      commands::commandCount(polygons, param, std::cout);
+    }
+
+    void cmdEcho(std::istream & is) {
+      std::string line;
+      std::getline(is, line);
+
+      if (!line.empty() && line[0] == ' ') {
+        line.erase(0,1);
       }
-      rest = rest.substr(pos);
-      commands::commandEcho(polygons, rest, std::cout);
-    } else if (cmd == "INFRAME") {
-      std::string rest;
-      std::getline(iss, rest);
-      if (rest.empty()) {
-        printInvalidCommand();
-        continue;
+      commands::commandEcho(polygons, line, std::cout);
+    }
+
+    void cmdInframe(std::istream & is) {
+      std::string line;
+      std::getline(is, line);
+      if (!line.empty() && line[0] == ' ') {
+        line.erase(0,1);
       }
-      size_t pos = rest.find_first_not_of(" ");
-      if (pos == std::string::npos) {
-        printInvalidCommand();
-        continue;
-      }
-      rest = rest.substr(pos);
-      commands::commandInframe(polygons, rest, std::cout);
-    } else {
-      printInvalidCommand();
+      commands::commandInframe(polygons, line, std::cout);
     }
   }
 
-  return 0;
+  int main(int argc, char * argv[])
+  {
+    if (argc != 2) {
+      std::cerr << "Error: Filename not provided." << std::endl;
+      return 1;
+    }
+
+    std::ifstream input(argv[1]);
+    if (!input) {
+      std::cerr << "Error: Cannot open file." << std::endl;
+      return 1;
+    }
+
+    std::string line;
+    while (std::getline(input, line)) {
+      Polygon poly;
+      if (utils::parsePolygon(line, poly)) {
+        main_ns::polygons.push_back(poly);
+      }
+    }
+
+    std::map<std::string, std::function<void(std::istream &)>> commands_map;
+
+    using namespace std::placeholders;
+    commands_map["AREA"] = std::bind(main_ns::cmdArea, _1);
+    commands_map["MAX"] = std::bind(main_ns::cmdMax, _1);
+    commands_map["MIN"] = std::bind(main_ns::cmdMin, _1);
+    commands_map["COUNT"] = std::bind(main_ns::cmdCount, _1);
+    commands_map["ECHO"] = std::bind(main_ns::cmdEcho, _1);
+    commands_map["INFRAME"] = std::bind(main_ns::cmdInframe, _1);
+
+    while (std::cin >> line) {
+      try {
+        if (commands_map.count(line)) {
+          commands_map.at(line)(std::cin);
+        } else {
+          std::cout << "<INVALID COMMAND>\n";
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+      } catch (...) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "<INVALID COMMAND>\n";
+      }
+    }
+
+    return 0;
+  }
 }
