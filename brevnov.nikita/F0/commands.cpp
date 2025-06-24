@@ -360,6 +360,33 @@ namespace
     brevnov::Team& team;
     size_t budget;
   };
+
+  struct TeamPlayerPositionPrinter
+  {
+    bool operator()(const std::pair<std::string, brevnov::Player>& player) const
+    {
+      if (matcher(player))
+      {
+        out << teamName << " " << player.first << " " << player.second << "\n";
+      }
+      return false;
+    }
+    std::ostream& out;
+    const std::string& teamName;
+    PositionMatcher& matcher;
+  };
+
+  struct TeamProcessor
+  {
+    bool operator()(const std::pair<std::string, brevnov::Team>& team) const
+    {
+      TeamPlayerPositionPrinter printer{out, team.first, matcher};
+      std::any_of(team.second.players_.begin(), team.second.players_.end(), printer);
+      return false;
+    }
+    std::ostream& out;
+    PositionMatcher& matcher;
+  };
 }
 
 bool brevnov::checkPosition(std::string pos)
@@ -479,8 +506,7 @@ void brevnov::transfer(std::istream& in, std::ostream& out, League& league)
   auto soldTeamIt = league.teams_.find(soldTeamName);
   auto playerIt = (soldTeamIt != league.teams_.end()) ? soldTeamIt->second.players_.find(playerSold)
     : league.fa_.find(playerSold);
-  if (playerIt == ((soldTeamIt != league.teams_.end()) ? soldTeamIt->second.players_.end()
-    : league.fa_.end()))
+  if (playerIt == ((soldTeamIt != league.teams_.end()) ? soldTeamIt->second.players_.end() : league.fa_.end()))
   {
     std::cerr << "Player not found!\n";
     return;
@@ -657,16 +683,9 @@ void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league)
     return;
   }
   PositionMatcher matcher{sPos};
-  for (auto& team : league.teams_)
-  {
-    for (auto& player : team.second.players_)
-    {
-      if (matcher(player))
-      {
-        out << team.first << " " << player.first << " " << player.second << "\n";
-      }
-    }
-  }
+  TeamProcessor processor{out, matcher};
+  std::vector<int> dummy(league.teams_.size());
+  std::transform(league.teams_.begin(), league.teams_.end(), dummy.begin(), processor);
 }
 
 void brevnov::buyPlayer(std::istream& in, std::ostream& out, League& league)
