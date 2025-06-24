@@ -8,5 +8,6 @@ namespace smirnov
   void createCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void addCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void translateCommand(Dicts & dicts, std::istream & in, std::ostream & out);
+  void removeCommand(Dicts & dicts, std::istream & in, std::ostream & out);
 }
 #endif

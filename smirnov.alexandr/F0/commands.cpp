@@ -77,3 +77,29 @@ void smirnov::translateCommand(Dicts & dicts, std::istream & in, std::ostream & 
   std::copy(wordIt->second.begin(), wordIt->second.end(), std::ostream_iterator< std::string >(out, " "));
   out << "\n";
 }
+
+void smirnov::removeCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string dictName, word;
+  in >> dictName >> word;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.end())
+  {
+    out << "The dictionary with name " << dictName << " doesn't exist.\n";
+    return;
+  }
+  auto & dict = dictIt->second;
+  auto wordIt = dict.find(word);
+  if (wordIt == dict.end())
+  {
+    out << "The word " << word << " doesn't exist in " << dictName << "\n";
+    return;
+  }
+  dict.erase(wordIt);
+  out << "The word " << word << " successfully deleted from " << dictName << "\n";
+}
