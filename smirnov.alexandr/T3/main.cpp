@@ -1,8 +1,11 @@
 #include <fstream>
 #include <iterator>
-#include <string>
+#include <fstream>
+#include <iterator>
 #include <limits>
+#include <map>
 #include "polygon.hpp"
+#include "commands.hpp"
 
 int main(int argc, char * argv[])
 {
@@ -29,7 +32,31 @@ int main(int argc, char * argv[])
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::cout << "Прочитано фигур: " << polygons.size() << "\n";
-  return 0;
+  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > cmds;
+  using namespace std::placeholders;
+  cmds["AREA"] = std::bind(areaCommand, std::cref(polygons), _1, _2);
+  cmds["MAX"] = std::bind(maxCommand, std::cref(polygons), _1, _2);
+  cmds["MIN"] = std::bind(minCommand, std::cref(polygons), _1, _2);
+  cmds["COUNT"] = std::bind(countCommand, std::cref(polygons), _1, _2);
+  cmds["INFRAME"] = std::bind(inframeCommand, std::cref(polygons), _1, _2);
+  cmds["MAXSEQ"] = std::bind(maxseqCommand, std::cref(polygons), _1, _2);
+  std::string cmd;
+  while (std::cin >> cmd)
+  {
+    try
+    {
+      cmds.at(cmd)(std::cin, std::cout);
+    }
+    catch (const std::logic_error &)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
 }
 
