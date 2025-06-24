@@ -238,7 +238,7 @@ void CommandProcessor::command_count(const std::string& rest) const {
   if (rest == "3") num = 3;
   else if (rest == "4") num = 4;
   else if (rest == "8") num = 8;
-  else throw std::runtime_error("Invalid  number");
+  else throw std::runtime_error("Invalid number");
   if (num < 3) throw std::runtime_error("Invalid  number");
 
   int count = 0;
