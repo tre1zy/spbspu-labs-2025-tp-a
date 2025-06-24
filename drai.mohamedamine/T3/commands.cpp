@@ -192,32 +192,28 @@ void CommandProcessor::command_area(const std::string& rest) const {
     if (polygons_.size() > 3) result += compute_area(polygons_[3]);
     if (polygons_.size() > 4) result += compute_area(polygons_[4]);
     result /= polygons_.size();
-  } else {
-    // manually parse integer (no istringstream or std::all_of)
-    if (rest.empty()) throw std::runtime_error("Invalid command");
-    int target = 0;
-    bool valid = true;
-    for (std::size_t i = 0; i < rest.size(); ++i) {
-      char c = rest[i];
-      if (c < '0' || c > '9') valid = false;
-      target = target * 10 + (c - '0');
+  } else if (rest.find_first_not_of("0123456789") == std::string::npos) {
+    int target = std::stoi(rest);
+    if (target < 3) {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
     }
-    if (!valid || target < 3) throw std::runtime_error("Invalid command");
-
-    if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<std::size_t>(target)) result += compute_area(polygons_[0]);
-    if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<std::size_t>(target)) result += compute_area(polygons_[1]);
-    if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<std::size_t>(target)) result += compute_area(polygons_[2]);
-    if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<std::size_t>(target)) result += compute_area(polygons_[3]);
-    if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<std::size_t>(target)) result += compute_area(polygons_[4]);
+    if (polygons_.size() > 0 && static_cast<int>(polygons_[0].points.size()) == target) result += compute_area(polygons_[0]);
+    if (polygons_.size() > 1 && static_cast<int>(polygons_[1].points.size()) == target) result += compute_area(polygons_[1]);
+    if (polygons_.size() > 2 && static_cast<int>(polygons_[2].points.size()) == target) result += compute_area(polygons_[2]);
+    if (polygons_.size() > 3 && static_cast<int>(polygons_[3].points.size()) == target) result += compute_area(polygons_[3]);
+    if (polygons_.size() > 4 && static_cast<int>(polygons_[4].points.size()) == target) result += compute_area(polygons_[4]);
+  } else {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
   }
 
   std::cout << std::fixed << std::setprecision(1) << result << "\n";
 }
 
 void CommandProcessor::command_count(const std::string& rest) const {
-  int count = 0;
-
   if (rest == "ODD") {
+    int count = 0;
     if (polygons_.size() > 0 && polygons_[0].points.size() % 2 != 0) ++count;
     if (polygons_.size() > 1 && polygons_[1].points.size() % 2 != 0) ++count;
     if (polygons_.size() > 2 && polygons_[2].points.size() % 2 != 0) ++count;
@@ -228,6 +224,7 @@ void CommandProcessor::command_count(const std::string& rest) const {
   }
 
   if (rest == "EVEN") {
+    int count = 0;
     if (polygons_.size() > 0 && polygons_[0].points.size() % 2 == 0) ++count;
     if (polygons_.size() > 1 && polygons_[1].points.size() % 2 == 0) ++count;
     if (polygons_.size() > 2 && polygons_[2].points.size() % 2 == 0) ++count;
@@ -237,23 +234,23 @@ void CommandProcessor::command_count(const std::string& rest) const {
     return;
   }
 
-  // parse digit manually
-  if (rest.empty()) throw std::runtime_error("Invalid command");
-  int target = 0;
-  bool valid = true;
-  for (std::size_t i = 0; i < rest.size(); ++i) {
-    char c = rest[i];
-    if (c < '0' || c > '9') valid = false;
-    target = target * 10 + (c - '0');
+  if (rest.empty() || rest.find_first_not_of("0123456789") != std::string::npos) {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
   }
-  if (!valid || target < 3) throw std::runtime_error("Invalid command");
 
-  if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<std::size_t>(target)) ++count;
-  if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<std::size_t>(target)) ++count;
-  if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<std::size_t>(target)) ++count;
-  if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<std::size_t>(target)) ++count;
-  if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<std::size_t>(target)) ++count;
+  int num = std::stoi(rest);
+  if (num < 3) {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
 
+  int count = 0;
+  if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(num)) ++count;
   std::cout << count << "\n";
 }
 
