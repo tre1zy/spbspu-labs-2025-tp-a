@@ -185,6 +185,18 @@ namespace
       return word;
     }
   };
+
+  struct FullDictWriterWrapper
+  {
+    std::ostream & out;
+    const bocharov::dict_dict_t & dicts;
+
+    Empty operator()(Empty accum, const std::string & dictName) const
+    {
+      FullDictWriter{ out, dictName }(dicts.at(dictName));
+      return accum;
+    }
+  };
 }
 
 
@@ -348,10 +360,7 @@ namespace bocharov
       dictNames.push_back(name);
     }
 
-    for (const auto & dictName : dictNames)
-    {
-      FullDictWriter{ file, dictName }(dicts.at(dictName));
-    }
+    std::accumulate(dictNames.begin(), dictNames.end(), Empty{}, FullDictWriterWrapper{ file, dicts });
   }
 
   void makeUnion(std::istream & in, dict_dict_t & dicts)
