@@ -4,12 +4,7 @@
 
 int main(int argc, char* argv[])
 {
-  if (argc != 2)
-  {
-    std::cerr << "Error in parameters\n";
-    return 1;
-  }
-  if (std::string(argv[1]) == "--help")
+  if (argc == 1 && std::string(argv[0]) == "--help")
   {
     duhanina::print_help(std::cout);
     return 0;

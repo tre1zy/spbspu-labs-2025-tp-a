@@ -30,6 +30,10 @@ namespace
 
   void build_shannon_fano_codes(duhanina::Node* node, std::string code, std::map< char, std::string >& codes)
   {
+    if (!node)
+    {
+      return;
+    }
     if (node->left == nullptr && node->right == nullptr)
     {
       codes[node->symbol] = code;
@@ -57,7 +61,7 @@ namespace
 
  duhanina::Node* build_subtree(const std::vector< duhanina::Node* >& nodes, size_t start, size_t end)
   {
-    if (start >= end)
+    if (start >= end || nodes.empty() || start >= nodes.size())
     {
       return nullptr;
     }
@@ -289,8 +293,12 @@ namespace
     std::string line;
     while (std::getline(in, line))
     {
+      if (line.empty())
+      {
+        continue;
+      }
       size_t space_pos = line.find(' ');
-      if (space_pos == std::string::npos)
+      if (space_pos == std::string::npos || space_pos == line.length() - 1)
       {
         continue;
       }
@@ -574,6 +582,8 @@ void duhanina::print_help(std::ostream& out)
   out << "decode_file <input> <output> <encoding_id> - decompress file\n";
   out << "compare <file1> <file2> <encoding_id1> <encoding_id2> - compare efficiency\n";
   out << "list_encodings - list all encodings\n";
+  out << "check_encoding <input_file> <encoding_id> - verify if encoding supports all file characters\n";
+  out << "suggest_encodings <input_file> - show which encodings best support the file\n";
   out << "--help - show this help\n";
 }
 
