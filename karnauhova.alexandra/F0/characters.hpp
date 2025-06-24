@@ -19,10 +19,15 @@ namespace karnauhova
     void take_philosophy(std::string philosophy);
     void take_story(std::string story);
     void take_quotes(std::string quote_win, std::string quote_lose);
+    bool is_lost();
+    void damage(int size_damage);
+    int volume_hp();
+    int base_hp();
 
   private:
     std::string name_;
     int hp_;
+    int total_hp_;
     int atk1_;
     int atk2_;
     std::string story_;
