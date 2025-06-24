@@ -12,7 +12,7 @@ void savintsev::open(std::istream & in, std::ostream & out, Projects & projs)
 
   read_savi_file(filename, projs);
 
-  out << "The project \"" << get_filename(filename) << "\" was successfully opened\n";
+  out << "Project \"" << get_filename(filename) << "\" was successfully opened\n";
 }
 
 void savintsev::close(std::istream & in, std::ostream & out, Projects & projs)
@@ -40,7 +40,7 @@ void savintsev::close(std::istream & in, std::ostream & out, Projects & projs)
   }
 
   projs.erase(filename);
-  out << "The project \"" << filename << "\" was successfully closed\n";
+  out << "Project \"" << filename << "\" was successfully closed\n";
 }
 
 void savintsev::create(std::istream & in, std::ostream & out, Projects & projs)
@@ -48,7 +48,7 @@ void savintsev::create(std::istream & in, std::ostream & out, Projects & projs)
   std::string name;
   in >> name;
   projs[name];
-  out << "The project \"" << name << "\" was successfully created\n";
+  out << "Project \"" << name << "\" was successfully created\n";
 }
 
 void savintsev::copy(std::istream & in, std::ostream & out, Projects & projs)
@@ -56,7 +56,7 @@ void savintsev::copy(std::istream & in, std::ostream & out, Projects & projs)
   std::string proj, new_name;
   in >> proj >> new_name;
   projs[new_name] = projs.at(proj);
-  out << "The project \"" << proj << "\" was successfully copied to \"" << new_name << "\"\n";
+  out << "Project \"" << proj << "\" was successfully copied to \"" << new_name << "\"\n";
 }
 
 void savintsev::rename_project(std::istream & in, std::ostream & out, Projects & projs)
@@ -65,7 +65,7 @@ void savintsev::rename_project(std::istream & in, std::ostream & out, Projects &
   in >> proj >> new_name;
   projs[new_name] = projs.at(proj);
   projs.erase(proj);
-  out << "The project \"" << proj << "\" was successfully renamed to \"" << new_name << "\"\n";
+  out << "Project \"" << proj << "\" was successfully renamed to \"" << new_name << "\"\n";
 }
 
 void savintsev::save(std::istream & in, std::ostream & out, Projects & projs)
@@ -100,6 +100,26 @@ void savintsev::save_all(std::ostream & out, Projects & projs)
 {
   std::for_each(projs.begin(), projs.end(), SaveProject());
   out << "All projects were saved successfully\n";
+}
+
+void savintsev::merge(std::istream & in, std::ostream & out, Projects & projs)
+{
+  std::string proj, proj1, proj2;
+  in >> proj >> proj1 >> proj2;
+  if (proj == proj1)
+  {
+    projs.at(proj).insert(projs.at(proj).end(), projs.at(proj2).begin(), projs.at(proj2).end());
+  }
+  else if (proj == proj2)
+  {
+    projs.at(proj).insert(projs.at(proj).begin(), projs.at(proj1).begin(), projs.at(proj1).end());
+  }
+  else
+  {
+    projs[proj].insert(projs.at(proj).end(), projs.at(proj2).begin(), projs.at(proj2).end());
+    projs[proj].insert(projs.at(proj).end(), projs.at(proj1).begin(), projs.at(proj1).end());
+  }
+  out << "Project \"" << proj1 << "\" has been successfully merged with project \"" << proj2 << "\"\n";
 }
 
 void savintsev::print(std::ostream & out, Projects & projs)

@@ -7,9 +7,13 @@ std::string savintsev::get_filename(const std::string & filename)
 {
   size_t slash = filename.rfind('/');
   size_t dot = filename.rfind('.');
-  if (slash == std::string::npos || dot == std::string::npos)
+  if (dot == std::string::npos)
   {
     return filename;
+  }
+  if (slash == std::string::npos)
+  {
+    return filename.substr(0, dot);
   }
   return filename.substr(slash + 1, dot - slash - 1);
 }
@@ -83,23 +87,26 @@ void savintsev::read_savi_file(const std::string & filename, Projects & projs)
 
   if (!file || !validate_savi_file(filename))
   {
-    throw std::runtime_error("Can't open file " + get_filename_wext(filename));
+    throw std::runtime_error("Can't open " + get_filename_wext(filename));
   }
 
   Project project;
 
+  std::string figure;
+  file >> figure;
+
   while (!file.eof())
   {
-    std::string figure;
-    file >> figure;
     Layer new_pair;
     Shape * new_shape = createShape(file, figure);
     if (!new_shape)
     {
-      throw std::runtime_error("Invalid file " + get_filename_wext(filename));
+      throw std::runtime_error("Can't open " + get_filename_wext(filename));
     }
     new_pair = {figure, new_shape};
     project.push_back(new_pair);
+
+    file >> figure;
   }
 
   projs[get_filename(filename)] = project;
