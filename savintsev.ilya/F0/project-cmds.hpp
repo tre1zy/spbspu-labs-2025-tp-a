@@ -9,7 +9,7 @@ namespace savintsev
   void close(std::istream & in, std::ostream & out, Projects & projs);
   void create(std::istream & in, std::ostream & out, Projects & projs);
   void copy(std::istream & in, std::ostream & out, Projects & projs);
-  void rename(std::istream & in, std::ostream & out, Projects & projs);
+  void rename_project(std::istream & in, std::ostream & out, Projects & projs);
   void save(std::istream & in, std::ostream & out, Projects & projs);
   void save_as(std::istream & in, std::ostream & out, Projects & projs);
   void print(std::ostream & out, Projects & projs);

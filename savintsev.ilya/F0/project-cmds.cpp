@@ -38,7 +38,7 @@ void savintsev::close(std::istream & in, std::ostream & out, Projects & projs)
   }
 
   projs.erase(filename);
-  out << "The project was successfully closed\n";
+  out << "The project \"" << filename << "\" was successfully closed\n";
 }
 
 void savintsev::create(std::istream & in, std::ostream & out, Projects & projs)
@@ -47,6 +47,23 @@ void savintsev::create(std::istream & in, std::ostream & out, Projects & projs)
   in >> name;
   projs[name];
   out << "The project \"" << name << "\" was successfully created\n";
+}
+
+void savintsev::copy(std::istream & in, std::ostream & out, Projects & projs)
+{
+  std::string proj, new_name;
+  in >> proj >> new_name;
+  projs[new_name] = projs.at(proj);
+  out << "The project \"" << proj << "\" was successfully copied to \"" << new_name << "\"\n";
+}
+
+void savintsev::rename_project(std::istream & in, std::ostream & out, Projects & projs)
+{
+  std::string proj, new_name;
+  in >> proj >> new_name;
+  projs[new_name] = projs.at(proj);
+  projs.erase(proj);
+  out << "The project \"" << proj << "\" was successfully renamed to \"" << new_name << "\"\n";
 }
 
 void savintsev::save(std::istream & in, std::ostream & out, Projects & projs)
@@ -67,12 +84,10 @@ void savintsev::save_as(std::istream & in, std::ostream & out, Projects & projs)
 
 void savintsev::print(std::ostream & out, Projects & projs)
 {
+  out << "== List of open projects ==\n";
+  size_t counter = projs.size();
   for (auto it = projs.begin(); it != projs.end(); ++it)
   {
-    out << "Project " << it->first << '\n';
-    for (auto jt = it->second.begin(); jt != it->second.end(); ++jt)
-    {
-      out << jt->first << '\n';
-    }
+    out << "[" << counter-- << "] " << it->first << '\n';
   }
 }
