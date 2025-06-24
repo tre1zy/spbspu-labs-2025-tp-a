@@ -6,8 +6,6 @@
 namespace orlova
 {
   void area(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  double areaEven(const std::vector< Polygon >&);
-  double areaOdd(const std::vector< Polygon >&);
   double areaMean(const std::vector< Polygon >&);
   double areaNum(const std::vector< Polygon >&, size_t);
 

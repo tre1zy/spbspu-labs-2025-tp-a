@@ -1,7 +1,7 @@
 #ifndef DELIMITER_H
 #define DELIMITER_H
 
-#include <iostream>
+#include <istream>
 
 namespace orlova
 {
