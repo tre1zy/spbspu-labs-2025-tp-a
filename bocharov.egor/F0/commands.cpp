@@ -83,13 +83,20 @@ namespace
     std::ostream & out;
     const std::string & name;
 
-    void operator()(const bocharov::dict_t & dict)
+    struct AccumulateWriter
     {
-      out << name << "\n";
-      for (const auto & entry : dict)
+      std::ostream & out;
+      Empty operator()(Empty, const std::pair<std::string, std::vector<std::string>> & entry) const
       {
         DictWriter{ out }(entry);
+        return Empty{};
       }
+    };
+
+    void operator()(const bocharov::dict_t & dict) const
+    {
+      out << name << "\n";
+      std::accumulate(dict.begin(), dict.end(), Empty{}, AccumulateWriter{ out });
       out << "\n";
     }
   };
