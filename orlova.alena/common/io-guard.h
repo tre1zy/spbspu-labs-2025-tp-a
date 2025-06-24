@@ -18,3 +18,5 @@ class IoGuard
     std::basic_ios< char >::fmtflags fmt_;
   };
 }
+#endif
+
