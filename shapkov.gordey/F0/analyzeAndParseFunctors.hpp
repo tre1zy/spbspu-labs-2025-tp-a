@@ -2,6 +2,7 @@
 #define ANALYZE_PARSE_FUNCTORS
 #include <unordered_map>
 #include <string>
+#include <iostream>
 #include "FrequencyDictionary.hpp"
 
 namespace shapkov
@@ -33,11 +34,12 @@ namespace shapkov
     bool operator()(const std::string& word);
   };
   bool CompareByFreq(const std::pair< std::string, size_t >& p1, const std::pair< std::string, size_t >& p2);
-  struct PairPrinter
+  struct PairIO
   {
-    std::ostream& out;
-    void operator()(const std::pair< std::string, size_t >& p) const;
+    const std::pair< std::string, size_t >& pair;
   };
+  std::ostream& operator<<(std::ostream& out, const PairIO p);
+  PairIO makePairIO(const std::pair< std::string, size_t >& p);
   struct ProcessWordPair
   {
     std::ostream& out;

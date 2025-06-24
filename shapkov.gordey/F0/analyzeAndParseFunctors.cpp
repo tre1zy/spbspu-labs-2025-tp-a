@@ -52,9 +52,14 @@ bool shapkov::CompareByFreq(const std::pair< std::string, size_t >& p1, const st
   return p1.second < p2.second;
 }
 
-void shapkov::PairPrinter::operator()(const std::pair< std::string, size_t >& p) const
+std::ostream& shapkov::operator<<(std::ostream& out, const PairIO p)
 {
-  out << p.first << ": " << p.second << '\n';
+  return out << p.pair.first << ": " << p.pair.second;
+}
+
+shapkov::PairIO shapkov::makePairIO(const std::pair< std::string, size_t >& p)
+{
+  return PairIO{ p };
 }
 
 void shapkov::ProcessWordPair::operator()(const std::pair< std::string, size_t >& word_pair) const
