@@ -35,7 +35,7 @@ namespace amine
     }
   };
 
-  double compute_area(const Polygon& poly)
+  double amine::compute_area(const Polygon& poly)
   {
     const auto& pts = poly.points;
     int n = pts.size();
