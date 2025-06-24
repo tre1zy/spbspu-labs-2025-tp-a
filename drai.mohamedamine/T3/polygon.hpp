@@ -23,9 +23,6 @@ namespace amine
     std::vector< Point > points;
   };
 
-
-  std::istream& operator>>(std::istream& is, Line& line);
-
   Point operator-(const Point& a, const Point& b);
   int dot(const Point& a, const Point& b);
   int cross(const Point& a, const Point& b);

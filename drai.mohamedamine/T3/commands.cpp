@@ -453,9 +453,4 @@ try {
      }
     };
   };
-  CommandProcessor processor(polygons);
-
-  std::string command;
-  std::getline(std::cin, command);
-  processor(command);
 }
