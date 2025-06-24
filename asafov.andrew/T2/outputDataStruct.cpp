@@ -13,7 +13,7 @@ namespace
       return;
     }
 
-    os << "0b";
+    os << "0b0";
     std::string bits;
     while (num > 0)
     {
