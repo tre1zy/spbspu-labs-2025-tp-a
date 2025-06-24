@@ -17,5 +17,8 @@ namespace abramov
   void diffDicts(DictionaryCollection &collect, std::istream &in);
   void mergeDicts(DictionaryCollection &collect, std::istream &in);
   void printDict(const DictionaryCollection &collect, std::istream &in, std::ostream &out);
+
+  template< class Func >
+  void processDicts(DictionaryCollection &collect, std::istream &in, Func func, bool del = false);
 }
 #endif

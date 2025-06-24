@@ -68,169 +68,67 @@ void abramov::deleteFromDict(DictionaryCollection &collect, std::istream &in)
 
 void abramov::setDicts(DictionaryCollection &collect, std::istream &in)
 {
-  std::string new_name;
-  in >> new_name;
-  char bracket = '\0';
-  in >> bracket;
-  if (bracket != '(')
+  struct SetOperation
   {
-    throw std::logic_error("Expected '('\n");
-  }
-  std::string name;
-  Dictionary res{};
-  bool first = true;
-  while (in >> name && name != ")")
-  {
-    if (first)
+    Dictionary operator()(Dictionary &res, const Dictionary &other) const
     {
-      res = collect.findDict(name);
-      first = false;
+      return res.setWithDict(other);
     }
-    else
-    {
-      res = res.setWithDict(collect.cfindDict(name));
-    }
-  }
-  if (name != ")")
-  {
-    throw std::logic_error("Expected ')'\n");
-  }
-  collect.addCompleteDict(new_name, res);
+  };
+
+  processDicts(collect, in, SetOperation());
 }
 
 void abramov::intersectDicts(DictionaryCollection &collect, std::istream &in)
 {
-  std::string new_name;
-  in >> new_name;
-  char bracket = '\0';
-  in >> bracket;
-  if (bracket != '(')
+  struct IntersectOperation
   {
-    throw std::logic_error("Expected '('\n");
-  }
-  Dictionary res{};
-  std::string name;
-  bool first = true;
-  while (in >> name && name != ")")
-  {
-    if (first)
+    Dictionary operator()(Dictionary &res, const Dictionary &other) const
     {
-      res = collect.findDict(name);
-      first = false;
+      return res.intersectWithDict(other);
     }
-    else
-    {
-      res = res.intersectWithDict(collect.cfindDict(name));
-    }
-  }
-  if (name != ")")
-  {
-    throw std::logic_error("Expected ')'\n");
-  }
-  collect.addCompleteDict(new_name, res);
+  };
+
+  processDicts(collect, in, IntersectOperation());
 }
 
 void abramov::unionDicts(DictionaryCollection &collect, std::istream &in)
 {
-  std::string new_name;
-  in >> new_name;
-  char bracket = '\0';
-  in >> bracket;
-  if (bracket != '(')
+  struct UnionOperation
   {
-    throw std::logic_error("Expected '('\n");
-  }
-  std::string name;
-  Dictionary res{};
-  bool first = true;
-  while (in >> name && name != ")")
-  {
-    if (first)
+    Dictionary operator()(Dictionary &res, const Dictionary &other) const
     {
-      res = collect.findDict(name);
-      first = false;
+      return res.unionWithDict(other);
     }
-    else
-    {
-      res = res.unionWithDict(collect.cfindDict(name));
-    }
-  }
-  if (name != ")")
-  {
-    throw std::logic_error("Expected ')'\n");
-  }
-  collect.addCompleteDict(new_name, res);
+  };
+
+  processDicts(collect, in, UnionOperation());
 }
 
 void abramov::diffDicts(DictionaryCollection &collect, std::istream &in)
 {
-  std::string new_name;
-  in >> new_name;
-  char bracket = '\0';
-  in >> bracket;
-  if (bracket != '(')
+  struct DiffOperation
   {
-    throw std::logic_error("Expected '('\n");
-  }
-  std::string name;
-  Dictionary res{};
-  bool first = true;
-  while (in >> name && name != ")")
-  {
-    if (first)
+    Dictionary operator()(Dictionary &res, const Dictionary &other) const
     {
-      res = collect.findDict(name);
-      first = false;
+      return res.diffDict(other);
     }
-    else
-    {
-      res = res.diffDict(collect.cfindDict(name));
-    }
-  }
-  if (name != ")")
-  {
-    throw std::logic_error("Expected ')'\n");
-  }
-  collect.addCompleteDict(new_name, res);
+  };
+
+  processDicts(collect, in, DiffOperation());
 }
 
 void abramov::mergeDicts(DictionaryCollection &collect, std::istream &in)
 {
-  std::string new_name;
-  in >> new_name;
-  char bracket = '\0';
-  in >> bracket;
-  if (bracket != '(')
+  struct MergeOperation
   {
-    throw std::logic_error("Expected '('\n");
-  }
-  std::string name;
-  Dictionary res{};
-  bool first = true;
-  std::vector< std::string > del;
-  while (in >> name && name != ")")
-  {
-    if (first)
+    Dictionary operator()(Dictionary &res, const Dictionary &other) const
     {
-      res = collect.findDict(name);
-      first = false;
-      del.push_back(name);
+      return res.mergeDict(other);
     }
-    else
-    {
-      res = res.mergeDict(collect.cfindDict(name));
-      del.push_back(name);
-    }
-  }
-  if (name != ")")
-  {
-    throw std::logic_error("Expected ')'\n");
-  }
-  collect.addCompleteDict(new_name, res);
-  for (const auto &dict_name : del)
-  {
-    collect.deleteDict(dict_name);
-  }
+  };
+
+  processDicts(collect, in, MergeOperation(), true);
 }
 
 void abramov::printDict(const DictionaryCollection &collect, std::istream &in, std::ostream &out)
@@ -245,3 +143,47 @@ void abramov::printDict(const DictionaryCollection &collect, std::istream &in, s
   dict.print(out);
 }
 
+template< class Func >
+void abramov::processDicts(DictionaryCollection &collect, std::istream &in, Func func, bool del)
+{
+  std::string new_name;
+  in >> new_name;
+  char bracket = '\0';
+  in >> bracket;
+  if (bracket != '(')
+  {
+    throw std::logic_error("Expected '('\n");
+  }
+  Dictionary res{};
+  std::string name;
+  std::vector< std::string > to_del;
+  bool first = true;
+  while (in >> name && name != ")")
+  {
+    if (first)
+    {
+      res = collect.findDict(name);
+      first = false;
+    }
+    else
+    {
+      res = func(res, collect.cfindDict(name));
+    }
+    if (del)
+    {
+      to_del.push_back(name);
+    }
+  }
+  if (name != ")")
+  {
+    throw std::logic_error("Expected ')'\n");
+  }
+  collect.addCompleteDict(new_name, res);
+  if (del)
+  {
+    for (const auto &dict_name : to_del)
+    {
+      collect.deleteDict(dict_name);
+    }
+  }
+}
