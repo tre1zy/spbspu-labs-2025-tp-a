@@ -270,7 +270,7 @@ namespace ohantsev
   struct Graph< Key, Hash, KeyEqual >::MakeEdge
    {
     const Key& from;
-    
+
     auto operator()(const typename ConnectionMap::value_type& cnt) const -> Edge
     {
         return Edge{ from, cnt.first, cnt.second };
