@@ -12,6 +12,9 @@
 
 namespace amine
 {
+  CommandProcessor::CommandProcessor(const std::vector<Polygon>& polygons)
+  : polygons_(polygons)
+{}
 double areaEven(const std::vector<Polygon>& polys)
 {
   double result = 0.0;
