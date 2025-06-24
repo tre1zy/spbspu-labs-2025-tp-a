@@ -3,11 +3,12 @@
 #include <stdexcept>
 #include "geometry-utils.hpp"
 
-savintsev::Complexquad::Complexquad(point_t p1, point_t p2, point_t p3, point_t p4):
+savintsev::Complexquad::Complexquad(point_t p1, point_t p2, point_t p3, point_t p4, std::string name):
   p1_(p1),
   p2_(p2),
   p3_(p3),
-  p4_(p4)
+  p4_(p4),
+  Shape(std::move(name))
 {
   point_t center = {0.0, 0.0};
   if (!findLinesIntersect(p1_, p2_, p3_, p4_, center) || !isTriangle(p1_, p4_, center) || !isTriangle(p2_, p3_, center))
@@ -16,13 +17,7 @@ savintsev::Complexquad::Complexquad(point_t p1, point_t p2, point_t p3, point_t 
   }
 }
 
-double savintsev::Complexquad::getArea() const
-{
-  point_t center = getFrameRect().pos;
-  return getTriangleArea(p1_, p4_, center) + getTriangleArea(p2_, p3_, center);
-}
-
-savintsev::rectangle_t savintsev::Complexquad::getFrameRect() const
+savintsev::rectangle_t savintsev::Complexquad::get_frame_rect() const
 {
   double mostLeft = std::min({p1_.x, p2_.x, p3_.x, p4_.x});
   double mostRight = std::max({p1_.x, p2_.x, p3_.x, p4_.x});
@@ -30,6 +25,12 @@ savintsev::rectangle_t savintsev::Complexquad::getFrameRect() const
   double mostHigh = std::max({p1_.y, p2_.y, p3_.y, p4_.y});
   point_t center = {mostLeft + (mostRight - mostLeft) / 2, mostLow + (mostHigh - mostLow) / 2};
   return {mostRight - mostLeft, mostHigh - mostLow, center};
+}
+
+savintsev::point_t * savintsev::Complexquad::get_all_points() const
+{
+  point_t points[4] = {p1_, p2_, p3_, p4_};
+  return points;
 }
 
 void savintsev::Complexquad::move(point_t p)
@@ -57,7 +58,7 @@ savintsev::Shape * savintsev::Complexquad::clone() const
   return new Complexquad(*this);
 }
 
-void savintsev::Complexquad::unsafeScale(double k) noexcept
+void savintsev::Complexquad::unsafe_scale(double k) noexcept
 {
   point_t center = {0.0, 0.0};
   findLinesIntersect(p1_, p2_, p3_, p4_, center);

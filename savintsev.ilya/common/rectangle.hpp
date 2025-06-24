@@ -8,16 +8,18 @@ namespace savintsev
   class Rectangle final: public Shape
   {
   public:
-    Rectangle(point_t lhs, point_t rhs);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
+    Rectangle(point_t lhs, point_t rhs, std::string name = "");
+    Shape * clone() const override;
+
+    rectangle_t get_frame_rect() const override;
+    point_t * get_all_points() const override;
+
+    void unsafe_scale(double k) noexcept override;
     void move(point_t p) override;
     void move(double x, double y) override;
-    Shape * clone() const override;
-    void unsafeScale(double k) noexcept override;
   private:
-    Complexquad stay_;
-    Complexquad lay_;
+    point_t l_;
+    point_t r_;
   };
 }
 #endif

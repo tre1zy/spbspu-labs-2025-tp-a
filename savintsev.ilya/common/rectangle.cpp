@@ -2,36 +2,43 @@
 #include <cmath>
 #include <stdexcept>
 
-savintsev::Rectangle::Rectangle(point_t lhs, point_t rhs):
-  stay_(lhs, rhs, {lhs.x, rhs.y}, {rhs.x, lhs.y}),
-  lay_(lhs, rhs, {rhs.x, lhs.y}, {lhs.x, rhs.y})
+savintsev::Rectangle::Rectangle(point_t lhs, point_t rhs, std::string name):
+  l_(lhs),
+  r_(rhs),
+  Shape(std::move(name))
 {
-  if (lhs.x >= rhs.x || lhs.y >= rhs.y)
+  if (l_.x >= r_.x || l_.y >= r_.y)
   {
     throw std::invalid_argument("ERROR: Invalid argumets for Rectangle");
   }
 }
 
-double savintsev::Rectangle::getArea() const
+savintsev::rectangle_t savintsev::Rectangle::get_frame_rect() const
 {
-  return stay_.getArea() + lay_.getArea();
+  double centerByX = l_.x + ((r_.x - l_.x) / 2.);
+  double centerByY = l_.y + ((r_.y - l_.y) / 2.);
+  return {r_.x - l_.x, r_.y - l_.y, {centerByX, centerByY}};
 }
 
-savintsev::rectangle_t savintsev::Rectangle::getFrameRect() const
+savintsev::point_t * savintsev::Rectangle::get_all_points() const
 {
-  return stay_.getFrameRect();
+  point_t points[2] = {l_, r_};
+  return ;
 }
 
 void savintsev::Rectangle::move(point_t p)
 {
-  stay_.move(p);
-  lay_.move(p);
+  point_t center = get_frame_rect().pos;
+  double moveByX = p.x - center.x;
+  double moveByY = p.y - center.y;
+  l_ = {l_.x + moveByX, l_.y + moveByY};
+  r_ = {r_.x + moveByX, r_.y + moveByY};
 }
 
 void savintsev::Rectangle::move(double x, double y)
 {
-  stay_.move(x, y);
-  lay_.move(x, y);
+  l_ = {l_.x + x, l_.y + y};
+  r_ = {r_.x + x, r_.y + y};
 }
 
 savintsev::Shape * savintsev::Rectangle::clone() const
@@ -39,8 +46,9 @@ savintsev::Shape * savintsev::Rectangle::clone() const
   return new Rectangle(*this);
 }
 
-void savintsev::Rectangle::unsafeScale(double k) noexcept
+void savintsev::Rectangle::unsafe_scale(double k) noexcept
 {
-  stay_.scale(k);
-  lay_.scale(k);
+  point_t center = get_frame_rect().pos;
+  l_ = {center.x - (center.x - l_.x) * k, center.y - (center.y - l_.y) * k};
+  r_ = {center.x + (r_.x - center.x) * k, center.y + (r_.y - center.y) * k};
 }

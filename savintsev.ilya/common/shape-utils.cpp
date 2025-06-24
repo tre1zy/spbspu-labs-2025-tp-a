@@ -8,6 +8,8 @@
 
 savintsev::Shape * savintsev::createShape(std::istream & in, std::string name)
 {
+  std::string title;
+  in >> title;
   if (name == "rectangle")
   {
     double n[4];
@@ -15,7 +17,7 @@ savintsev::Shape * savintsev::createShape(std::istream & in, std::string name)
     {
       in >> n[i];
     }
-    return new Rectangle({n[0], n[1]}, {n[2], n[3]});
+    return new Rectangle({n[0], n[1]}, {n[2], n[3]}, title);
   }
   if (name == "complexquad")
   {
@@ -24,7 +26,7 @@ savintsev::Shape * savintsev::createShape(std::istream & in, std::string name)
     {
       in >> n[i];
     }
-    return new Complexquad({n[0], n[1]}, {n[2], n[3]}, {n[4], n[5]}, {n[6], n[7]});
+    return new Complexquad({n[0], n[1]}, {n[2], n[3]}, {n[4], n[5]}, {n[6], n[7]}, title);
   }
   if (name == "concave")
   {
@@ -33,7 +35,7 @@ savintsev::Shape * savintsev::createShape(std::istream & in, std::string name)
     {
       in >> n[i];
     }
-    return new Concave({n[0], n[1]}, {n[2], n[3]}, {n[4], n[5]}, {n[6], n[7]});
+    return new Concave({n[0], n[1]}, {n[2], n[3]}, {n[4], n[5]}, {n[6], n[7]}, title);
   }
   return nullptr;
 }
