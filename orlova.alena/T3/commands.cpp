@@ -1,4 +1,5 @@
 #include "commands.h"
+#include <functional>
 #include <limits>
 #include <algorithm>
 #include <iomanip>

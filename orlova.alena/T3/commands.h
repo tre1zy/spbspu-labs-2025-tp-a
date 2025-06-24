@@ -1,8 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include <iostream>
-#include <functional>
 #include "geom.h"
 
 namespace orlova
