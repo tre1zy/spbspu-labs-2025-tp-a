@@ -7,14 +7,14 @@ Program implements code parsing (semantic analysis) on restricted and not signif
 
 --help print manual info
 -c <files...> parse code from files before start. If parsing fails in any of the files, print
-	the corresponding errors and exit with a non-zero return code without completing processing
-	of the remaining files
+  the corresponding errors and exit with a non-zero return code without completing processing
+  of the remaining files
 --load <file> load saved data (only fully parsed). If loading fails, print the corresponding
-	errors but start interactive environment (if there is no -c flag)
+  errors but start interactive environment (if there is no -c flag)
 -E stop on preprocessor parsing stage
 -L stop on tokenizer parsing stage
 -o print result in the corresponding files (.i after preprocessor, .lex after tokenizer,
-	.json after full parsing). If it is specified, interactive environment will not be started
+  .json after full parsing). If it is specified, interactive environment will not be started
 -I <path> add global include path
 
 
@@ -22,10 +22,8 @@ Program implements code parsing (semantic analysis) on restricted and not signif
 
 * save [<save_file>] - save (rewrite) fully parsed data to file
 * load [<save_file>] - load (reload) reload saved data (only fully parsed). Replaces existing data
-	only on success
+  only on success
 * parse <files...> - parse files. Replaces existing data only on full success
-* parse-after [<parsed>] - parse input in non-interactive environment in file context. On success
-	prints id, which will be equal to filename
 * reload-all - reparse all existing files (with reloading)
 
 * external - print all external symbols
@@ -35,14 +33,14 @@ Program implements code parsing (semantic analysis) on restricted and not signif
 * files - print all parsed filenames and ids
 
 * dependencies <parsed> <symbol> - find and print all symbol's dependencies (symbol =
-	function/global variable)
+  function/global variable)
 * uses <parsed> (<symbol> || <class_like_obj>) - find and print all places where
-	symbol/struct/union/enum is used
+  symbol/struct/union/enum is used
 * intersections - find and print identical symbols/macros (functions only in same overloads)
 * diff [<parsed...>] - find and print identical symbols/macros (functions only in same overloads)
-	which are defined and their definition differs
+  which are defined and their definition differs
 * unopen-defines <parsed> - print all lines, which contain macro names, but it is not opened
-	(before #define or after #undef)
+  (before #define or after #undef)
 
 
 **1 non-interactive environment = before "$EOF" or eof

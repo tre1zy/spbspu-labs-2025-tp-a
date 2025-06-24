@@ -21,7 +21,7 @@ bool rychkov::MainProcessor::tree(ParserContext& context)
   {
     return false;
   }
-  parsed_.at(filename).parser.print(context.out);
+  parsed_.at(filename).preproc.next->next->print(context.out);
   return true;
 }
 void rychkov::MainProcessor::help(std::ostream& out)

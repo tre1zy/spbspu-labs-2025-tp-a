@@ -107,8 +107,8 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
 
 bool rychkov::MainProcessor::parse(CParseContext file_context, bool overwrite)
 {
-  std::pair< decltype(parsed_)::iterator, bool > cell = parsed_.try_emplace(file_context.file,
-    file_context, last_stage_, include_dirs_);
+  std::pair< decltype(parsed_)::iterator, bool > cell = parsed_.emplace(file_context.file,
+    ParseCell{file_context, last_stage_, include_dirs_});
   if (!cell.second && !overwrite)
   {
     return true;

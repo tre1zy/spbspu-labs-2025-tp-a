@@ -6,42 +6,13 @@
 #include "cparser.hpp"
 #include "print_content.hpp"
 
-rychkov::Lexer::Lexer(CParser* next):
-  cases_{
-        {
-          {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "+", false, true, false, 2},
-          {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "+", false, false, false, 4}
-        },
-        {
-          {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, false, false, 1},
-          {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, true, true, 2},
-        },
-        {
-          {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "-", false, true, false, 2},
-          {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "-", false, false, false, 4}
-        },
-        {
-          {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, false, false, 1},
-          {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, true, true, 2},
-        },
-        {{rychkov::Operator::UNARY, rychkov::Operator::LOGIC, "!", false, true, false, 2}},
-        {
-          {rychkov::Operator::UNARY, rychkov::Operator::DEREFERENCE, "*", false, true, true, 2},
-          {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*", false, false, false, 3}
-        },
-        {
-          {rychkov::Operator::UNARY, rychkov::Operator::ADDRESSOF, "&", true, true, false, 2},
-          {rychkov::Operator::BINARY, rychkov::Operator::BIT, "&", false, false, false, 8}
-        },
-        {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*=", true, true, true, 14}},
-        {{rychkov::Operator::BINARY, rychkov::Operator::ASSIGN, "=", true, true, true, 14}},
-        {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "==", false, false, false, 7}}
-      },
+rychkov::Lexer::Lexer(std::unique_ptr< CParser > cparser):
+  next{std::move(cparser)},
   type_keywords_{
-        {"const", CONST},
-        {"volatile", VOLATILE},
-        {"signed", SIGNED},
-        {"unsigned", UNSIGNED}
+        {"const", CParser::CONST},
+        {"volatile", CParser::VOLATILE},
+        {"signed", CParser::SIGNED},
+        {"unsigned", CParser::UNSIGNED}
       },
   keywords_{
         {"typedef", &CParser::parse_typedef},
@@ -49,9 +20,39 @@ rychkov::Lexer::Lexer(CParser* next):
         {"return", &CParser::parse_return},
         {"if", &CParser::parse_if},
         {"while", &CParser::parse_while}
-      },
-  next_{next}
+      }
 {}
+
+const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases_{
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "+", false, true, false, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "+", false, false, false, 4}
+      },
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, false, false, 1},
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, true, true, 2},
+      },
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "-", false, true, false, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "-", false, false, false, 4}
+      },
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, false, false, 1},
+        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, true, true, 2},
+      },
+      {{rychkov::Operator::UNARY, rychkov::Operator::LOGIC, "!", false, true, false, 2}},
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::DEREFERENCE, "*", false, true, true, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*", false, false, false, 3}
+      },
+      {
+        {rychkov::Operator::UNARY, rychkov::Operator::ADDRESSOF, "&", true, true, false, 2},
+        {rychkov::Operator::BINARY, rychkov::Operator::BIT, "&", false, false, false, 8}
+      },
+      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*=", true, true, true, 14}},
+      {{rychkov::Operator::BINARY, rychkov::Operator::ASSIGN, "=", true, true, true, 14}},
+      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "==", false, false, false, 7}}
+    };
 
 void rychkov::Lexer::append_name(CParseContext& context, std::string name)
 {
@@ -59,37 +60,37 @@ void rychkov::Lexer::append_name(CParseContext& context, std::string name)
   decltype(type_keywords_)::const_iterator type_keyword_p = type_keywords_.find(name);
   if (type_keyword_p != type_keywords_.end())
   {
-    if (next_ == nullptr)
+    if (next == nullptr)
     {
       context.out << "<keyw> " << name << '\n';
     }
     else
     {
-      next_->append(context, type_keyword_p->second);
+      next->append(context, type_keyword_p->second);
     }
     return;
   }
   decltype(keywords_)::const_iterator keyword_p = keywords_.find(name);
   if (keyword_p != keywords_.cend())
   {
-    if (next_ == nullptr)
+    if (next == nullptr)
     {
       context.out << "<keyw> " << name << '\n';
     }
     else
     {
-      (next_->*(keyword_p->second))(context);
+      ((*next).*(keyword_p->second))(context);
     }
     return;
   }
 
-  if (next_ == nullptr)
+  if (next == nullptr)
   {
     context.out << "<name> " << name << '\n';
   }
   else
   {
-    next_->append(context, std::move(name));
+    next->append(context, std::move(name));
   }
 }
 void rychkov::Lexer::append_number(CParseContext& context, std::string name)
@@ -168,13 +169,13 @@ void rychkov::Lexer::append_number(CParseContext& context, std::string name)
     lit.suffix.clear();
   }
 
-  if (next_ == nullptr)
+  if (next == nullptr)
   {
     context.out << "<numb> " << lit << '\n';
   }
   else
   {
-    next_->append(context, lit);
+    next->append(context, lit);
   }
 }
 void rychkov::Lexer::append_string_literal(CParseContext& context, std::string name)
@@ -194,40 +195,40 @@ void rychkov::Lexer::append_char_literal(CParseContext& context, std::string nam
 }
 void rychkov::Lexer::flush(CParseContext& context)
 {
-  if (std::holds_alternative< entities::Literal >(buf_))
+  if (boost::variant2::holds_alternative< entities::Literal >(buf_))
   {
-    entities::Literal& lit = std::get< entities::Literal >(buf_);
+    entities::Literal& lit = boost::variant2::get< entities::Literal >(buf_);
     if (lit.type == entities::Literal::String)
     {
       lit.result_type.array_has_length = true;
       lit.result_type.array_length = lit.literal.length() + 1;
     }
 
-    if (next_ == nullptr)
+    if (next == nullptr)
     {
       context.out << "<lit>  " << lit << '\n';
     }
     else
     {
-      next_->append(context, lit);
+      next->append(context, lit);
     }
   }
-  else if (std::holds_alternative< operator_value >(buf_))
+  else if (boost::variant2::holds_alternative< operator_value >(buf_))
   {
-    if (next_ == nullptr)
+    if (next == nullptr)
     {
-      context.out << "<oper> " << (*std::get< operator_value >(buf_))[0].token << '\n';
+      context.out << "<oper> " << (*boost::variant2::get< operator_value >(buf_))[0].token << '\n';
     }
     else
     {
-      next_->append(context, *std::get< operator_value >(buf_));
+      next->append(context, *boost::variant2::get< operator_value >(buf_));
     }
   }
   buf_.emplace< 0 >();
 }
 void rychkov::Lexer::append(CParseContext& context, char c)
 {
-  if (std::holds_alternative< operator_value >(buf_))
+  if (boost::variant2::holds_alternative< operator_value >(buf_))
   {
     append_operator(context, c);
     return;
@@ -244,17 +245,17 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
   }
   else if (!std::isspace(c))
   {
-    if (next_ == nullptr)
+    if (next == nullptr)
     {
       context.out << "<spec> " << c << '\n';
       return;
     }
-    next_->append(context, c);
+    next->append(context, c);
   }
 }
 void rychkov::Lexer::append_operator(CParseContext& context, char c)
 {
-  operator_value& oper = std::get< operator_value >(buf_);
+  operator_value& oper = boost::variant2::get< operator_value >(buf_);
   decltype(cases_)::const_iterator oper_p = cases_.find((*oper)[0].token + c);
   if (oper_p != cases_.cend())
   {

@@ -40,7 +40,7 @@ void rychkov::Preprocessor::include(std::istream& in, CParseContext& context)
   }
   else
   {
-    for (const std::string& base_path: include_dirs_)
+    for (const std::string& base_path: include_paths)
     {
       file.open(base_path + '/' + filename);
       if (file.is_open())

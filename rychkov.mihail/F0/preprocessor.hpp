@@ -8,9 +8,11 @@
 #include <stack>
 #include <set>
 #include <map>
+
 #include "log.hpp"
 #include "content.hpp"
 #include "compare.hpp"
+#include "lexer.hpp"
 
 namespace rychkov
 {
@@ -18,8 +20,11 @@ namespace rychkov
   class Preprocessor
   {
   public:
+    std::vector< std::string > include_paths;
+    std::unique_ptr< Lexer > next;
+
     Preprocessor();
-    Preprocessor(Lexer* next, std::vector< std::string > search_dirs);
+    Preprocessor(std::unique_ptr< Lexer > lexer, std::vector< std::string > search_dirs);
 
     void parse(CParseContext& context, std::istream& in, bool need_flush = true);
     void flush(CParseContext& context);
@@ -71,9 +76,6 @@ namespace rychkov
     std::string buf_;
     std::stack< IfStage > conditional_pairs_;
     std::set< Macro, NameCompare > macros_;
-
-    std::vector< std::string > include_dirs_;
-    Lexer* next_;
 
     static std::string get_name(std::istream& in);
     static void remove_whitespaces(std::string& str);

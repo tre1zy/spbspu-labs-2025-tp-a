@@ -4,13 +4,14 @@ void rychkov::CParser::parse_open_parenthesis(CParseContext& context)
 {
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (std::holds_alternative< entities::Statement >(decl.data))
+    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+    if (boost::variant2::holds_alternative< entities::Statement >(decl.data))
     {
-      entities::Statement& statement = std::get< entities::Statement >(decl.data);
+      entities::Statement& statement = boost::variant2::get< entities::Statement >(decl.data);
       if ((statement.type == entities::Statement::IF) || (statement.type == entities::Statement::WHILE))
       {
-        stack_.push(&statement.conditions.emplace_back());
+        statement.conditions.emplace_back();
+        stack_.push(&statement.conditions.back());
         return;
       }
     }
@@ -33,10 +34,10 @@ void rychkov::CParser::parse_close_parenthesis(CParseContext& context)
   stack_.pop();
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (std::holds_alternative< entities::Statement >(decl.data))
+    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+    if (boost::variant2::holds_alternative< entities::Statement >(decl.data))
     {
-      entities::Statement& statement = std::get< entities::Statement >(decl.data);
+      entities::Statement& statement = boost::variant2::get< entities::Statement >(decl.data);
       if ((statement.type == entities::Statement::IF) || (statement.type == entities::Statement::WHILE))
       {
         if (!statement.conditions.empty() && (last == &statement.conditions.back()))

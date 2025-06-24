@@ -7,24 +7,24 @@
 #include "lexer.hpp"
 
 rychkov::Preprocessor::Preprocessor():
-  next_{nullptr}
+  next{nullptr}
 {}
-rychkov::Preprocessor::Preprocessor(Lexer* next, std::vector< std::string > search_dirs):
-  include_dirs_(std::move(search_dirs)),
-  next_{next}
+rychkov::Preprocessor::Preprocessor(std::unique_ptr< Lexer > lexer, std::vector< std::string > search_dirs):
+  include_paths(std::move(search_dirs)),
+  next{std::move(lexer)}
 {}
 
 bool rychkov::Preprocessor::skip_all() const noexcept
 {
   return !conditional_pairs_.empty() && ((conditional_pairs_.top() == WAIT_ELSE)
-    || (conditional_pairs_.top() == SKIP_ELSE));
+      || (conditional_pairs_.top() == SKIP_ELSE));
 }
 std::string rychkov::Preprocessor::get_name(std::istream& in)
 {
   std::string name;
-  for (; in && std::isalnum(in.peek()) || (in.peek() == '_'); name += in.get())
+  for (; in && (std::isalnum(in.peek()) || (in.peek() == '_')); name += in.get())
   {}
-  return std::move(name);
+  return name;
 }
 void rychkov::Preprocessor::remove_whitespaces(std::string& str)
 {
@@ -47,13 +47,13 @@ void rychkov::Preprocessor::flush(CParseContext& context, char c)
   }
   else if (!skip_all())
   {
-    if (next_ == nullptr)
+    if (next == nullptr)
     {
       context.out << c;
     }
     else
     {
-      next_->append(context, c);
+      next->append(context, c);
     }
   }
 }
@@ -122,7 +122,7 @@ void rychkov::Preprocessor::flush_buf(CParseContext& context)
       }
       if (!skip_all())
       {
-        if (next_ == nullptr)
+        if (next == nullptr)
         {
           for (char c: buf_)
           {
@@ -134,16 +134,16 @@ void rychkov::Preprocessor::flush_buf(CParseContext& context)
           switch (prev)
           {
           case rychkov::Preprocessor::STRING_LITERAL:
-            next_->append_string_literal(context, buf_);
+            next->append_string_literal(context, buf_);
             break;
           case rychkov::Preprocessor::CHAR_LITERAL:
-            next_->append_char_literal(context, buf_);
+            next->append_char_literal(context, buf_);
             break;
           case rychkov::Preprocessor::NAME:
-            next_->append_name(context, buf_);
+            next->append_name(context, buf_);
             break;
           case rychkov::Preprocessor::NUMBER:
-            next_->append_number(context, buf_);
+            next->append_number(context, buf_);
             break;
           default:
             for (char c: buf_)
@@ -163,9 +163,9 @@ void rychkov::Preprocessor::flush_buf(CParseContext& context)
 void rychkov::Preprocessor::flush(CParseContext& context)
 {
   flush_buf(context);
-  if (next_ != nullptr)
+  if (next != nullptr)
   {
-    next_->flush(context);
+    next->flush(context);
   }
   if (!conditional_pairs_.empty())
   {

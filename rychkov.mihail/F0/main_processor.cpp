@@ -14,9 +14,9 @@ rychkov::Parser::map_type< rychkov::ParserContext, rychkov::MainProcessor > rych
 rychkov::ParseCell::ParseCell(CParseContext context, Stage last_stage,
     std::vector< std::string > include_dirs):
   base_context{std::move(context)},
-  preproc{(last_stage == PREPROCESSOR ? nullptr : &lex), std::move(include_dirs)},
-  lex{(last_stage == PREPROCESSOR) || (last_stage == LEXER) ? nullptr : &parser},
-  parser{}
+  preproc{std::unique_ptr< Lexer >{last_stage == PREPROCESSOR ? nullptr : new Lexer
+        {std::unique_ptr< CParser >{last_stage != CPARSER ? nullptr : new CParser{}}}},
+      std::move(include_dirs)}
 {}
 bool rychkov::ParseCell::parse(std::istream& in)
 {
@@ -45,7 +45,7 @@ bool rychkov::MainProcessor::parse(ParserContext& context)
   }
   context.out << "<--DONE-->\n";
   parsed_.erase(filename);
-  parsed_.try_emplace(filename, std::move(cell));
+  parsed_.emplace(filename, std::move(cell));
   return true;
 }
 bool rychkov::MainProcessor::reload(ParserContext& context)
@@ -63,8 +63,8 @@ bool rychkov::MainProcessor::reload(ParserContext& context)
     {
       context.err << "failed to reopen source file: \"" << file.first << "\"\n";
     }
-    std::pair< decltype(new_parsed)::iterator, bool > cell_p = new_parsed.try_emplace(file.first,
-          std::move(parse_context), last_stage_, include_dirs_);
+    std::pair< decltype(new_parsed)::iterator, bool > cell_p = new_parsed.emplace(file.first,
+          ParseCell{std::move(parse_context), last_stage_, include_dirs_});
     if (cell_p.second)
     {
       context.out << "<--PARSE: \"" << file.first << "\"-->\n";

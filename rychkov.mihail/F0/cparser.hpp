@@ -5,10 +5,10 @@
 #include <iosfwd>
 #include <string>
 #include <set>
+#include <map>
 #include <vector>
 #include <utility>
 
-#include "lexer.hpp"
 #include "type_parser.hpp"
 #include "content.hpp"
 #include "compare.hpp"
@@ -19,13 +19,23 @@ namespace rychkov
   class CParser
   {
   public:
+    enum TypeKeyword
+    {
+      CONST,
+      VOLATILE,
+      SIGNED,
+      UNSIGNED
+    };
+
     CParser();
+    CParser(const CParser&) = delete;
+    CParser(CParser&&) = default;
 
     void append(CParseContext& context, char c);
     void append(CParseContext& context, entities::Literal literal);
     void append(CParseContext& context, std::string name);
     void append(CParseContext& context, const std::vector< rychkov::Operator >& cases);
-    void append(CParseContext& context, Lexer::TypeKeyword keyword);
+    void append(CParseContext& context, TypeKeyword keyword);
 
     void parse_typedef(CParseContext& context);
     void parse_struct(CParseContext& context);
@@ -41,17 +51,18 @@ namespace rychkov
     void print(std::ostream& out) const;
   private:
     static constexpr int min_priority = -1;
-    const std::map< Lexer::TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
-          {Lexer::CONST, &TypeParser::append_const},
-          {Lexer::VOLATILE, &TypeParser::append_volatile},
-          {Lexer::SIGNED, &TypeParser::append_signed},
-          {Lexer::UNSIGNED, &TypeParser::append_unsigned}
-        };
 
-    const Operator parentheses = {Operator::MULTIPLE, Operator::SPECIAL, "()", false, false, false, 1};
-    const Operator brackets = {Operator::BINARY, Operator::SPECIAL, "[]", false, false, false, 1};
-    const Operator comma = {Operator::BINARY, Operator::SPECIAL, ",", false, false, false, 15};
-    const Operator inline_if = {Operator::TERNARY, Operator::SPECIAL, "?:", false, false, false, 13};
+    static const Operator parentheses;
+    static const Operator brackets;
+    static const Operator comma;
+    static const Operator inline_if;
+
+    const std::map< TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
+          {CONST, &TypeParser::append_const},
+          {VOLATILE, &TypeParser::append_volatile},
+          {SIGNED, &TypeParser::append_signed},
+          {UNSIGNED, &TypeParser::append_unsigned}
+        };
 
     std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_ = {
           {{"int", typing::BASIC}, 0},

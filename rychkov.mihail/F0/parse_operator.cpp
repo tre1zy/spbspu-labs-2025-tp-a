@@ -25,8 +25,8 @@ void rychkov::CParser::append(CParseContext& context, const std::vector< rychkov
   {
     if (entities::is_decl(*stack_.top()))
     {
-      entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-      if (std::holds_alternative< entities::Variable >(decl.data))
+      entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+      if (boost::variant2::holds_alternative< entities::Variable >(decl.data))
       {
         decl.value = entities::Expression{};
         stack_.push(&*decl.value);

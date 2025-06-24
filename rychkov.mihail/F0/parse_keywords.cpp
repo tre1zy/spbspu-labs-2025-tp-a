@@ -80,14 +80,14 @@ void rychkov::CParser::check_statement_placement(CParseContext& context)
   stack_.pop();
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-    if ((last != &*decl.value) || !std::holds_alternative< entities::Statement >(decl.data))
+    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+    if ((last != &*decl.value) || !boost::variant2::holds_alternative< entities::Statement >(decl.data))
     {
       log(context, "cannot place statement here");
     }
     else
     {
-      entities::Statement& statement = std::get< entities::Statement >(decl.data);
+      entities::Statement& statement = boost::variant2::get< entities::Statement >(decl.data);
       if (statement.type == entities::Statement::RETURN)
       {
         log(context, "cannot place statement as return result");

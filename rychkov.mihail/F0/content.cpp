@@ -65,12 +65,12 @@ bool rychkov::entities::Expression::full() const noexcept
 bool rychkov::entities::is_body(const Expression& expr)
 {
   return (expr.operation == nullptr) && !expr.operands.empty()
-      && std::holds_alternative< Body >(expr.operands[0]);
+      && boost::variant2::holds_alternative< Body >(expr.operands[0]);
 }
 bool rychkov::entities::is_decl(const Expression& expr)
 {
   return (expr.operation == nullptr) && !expr.operands.empty()
-      && std::holds_alternative< Declaration >(expr.operands[0]);
+      && boost::variant2::holds_alternative< Declaration >(expr.operands[0]);
 }
 bool rychkov::entities::is_operator(const Expression& expr)
 {
@@ -87,41 +87,41 @@ void rychkov::entities::remove_bridge(Expression& expr)
   {
     return;
   }
-  if (!std::holds_alternative< DynMemWrapper< Expression > >(expr.operands[0]))
+  if (!boost::variant2::holds_alternative< DynMemWrapper< Expression > >(expr.operands[0]))
   {
     return;
   }
-  Expression temp = std::move(*std::get< DynMemWrapper< Expression > >(expr.operands[0]));
+  Expression temp = std::move(*boost::variant2::get< DynMemWrapper< Expression > >(expr.operands[0]));
   expr = std::move(temp);
 }
 
 const rychkov::typing::Type* rychkov::entities::get_type(const Expression::operand& operand)
 {
-  if (std::holds_alternative< DynMemWrapper< Expression > >(operand))
+  if (boost::variant2::holds_alternative< DynMemWrapper< Expression > >(operand))
   {
-    return &std::get< DynMemWrapper< Expression > >(operand)->result_type;
+    return &boost::variant2::get< DynMemWrapper< Expression > >(operand)->result_type;
   }
-  else if (std::holds_alternative< Variable >(operand))
+  else if (boost::variant2::holds_alternative< Variable >(operand))
   {
-    return &std::get< Variable >(operand).type;
+    return &boost::variant2::get< Variable >(operand).type;
   }
-  else if (std::holds_alternative< Literal >(operand))
+  else if (boost::variant2::holds_alternative< Literal >(operand))
   {
-    return &std::get< Literal >(operand).result_type;
+    return &boost::variant2::get< Literal >(operand).result_type;
   }
-  else if (std::holds_alternative< CastOperation >(operand))
+  else if (boost::variant2::holds_alternative< CastOperation >(operand))
   {
-    return &std::get< Variable >(operand).type;
+    return &boost::variant2::get< Variable >(operand).type;
   }
   return nullptr;
 }
 bool rychkov::entities::is_lvalue(const Expression::operand& operand)
 {
-  if (std::holds_alternative< DynMemWrapper< Expression > >(operand))
+  if (boost::variant2::holds_alternative< DynMemWrapper< Expression > >(operand))
   {
-    return is_lvalue(&*std::get< DynMemWrapper< Expression > >(operand));
+    return is_lvalue(&*boost::variant2::get< DynMemWrapper< Expression > >(operand));
   }
-  return std::holds_alternative< entities::Variable >(operand);
+  return boost::variant2::holds_alternative< entities::Variable >(operand);
 }
 bool rychkov::entities::is_lvalue(const Expression* expr)
 {
@@ -164,7 +164,7 @@ rychkov::typing::MatchType rychkov::typing::check_cast(const Type& dest, const T
   case STRUCT:
   case ENUM:
     return dest.name == src.name ? EXACT : NO_CAST;
-  case BASIC: // up cast logic
+  case BASIC:
     return EXACT;
   case FUNCTION:
     return exact_cv(*dest.base, *src.base) && std::equal(dest.function_parameters.begin(),

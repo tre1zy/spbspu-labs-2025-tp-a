@@ -27,15 +27,13 @@ namespace rychkov
     bool parse(std::istream& in);
     CParseContext base_context;
     Preprocessor preproc;
-    Lexer lex;
-    CParser parser;
     bool real_file = true;
   };
 
   class MainProcessor
   {
   public:
-    static constexpr char help_file[] = "help.txt";
+    static constexpr const char* help_file = "help.txt";
     static Parser::map_type< ParserContext, MainProcessor > call_map;
 
     void help(std::ostream& out);
@@ -46,7 +44,6 @@ namespace rychkov
     bool load(ParserContext& context);
     bool reload(ParserContext& context);
     bool parse(ParserContext& context);
-    bool parse_after(ParserContext& context);
 
     bool external(ParserContext& context);
     bool exposition(ParserContext& context);

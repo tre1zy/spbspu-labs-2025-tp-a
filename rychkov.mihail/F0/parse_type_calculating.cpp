@@ -255,7 +255,7 @@ void rychkov::CParser::require_type(CParseContext& context, entities::Expression
   case typing::IMPLICIT:
     entities::CastOperation temp = {type, false, std::move(expr)};
     expr = std::move(temp);
-    calculate_type(context, *std::get< entities::CastOperation >(expr.operands[0]).expr);
+    calculate_type(context, *boost::variant2::get< entities::CastOperation >(expr.operands[0]).expr);
     break;
   }
 }

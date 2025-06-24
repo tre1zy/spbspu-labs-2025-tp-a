@@ -12,6 +12,15 @@ rychkov::CParser::CParser():
   stack_.push(&program_[0]);
 }
 
+const rychkov::Operator rychkov::CParser::parentheses = {Operator::MULTIPLE, Operator::SPECIAL,
+    "()", false, false, false, 1};
+const rychkov::Operator rychkov::CParser::brackets = {Operator::BINARY, Operator::SPECIAL,
+    "[]", false, false, false, 1};
+const rychkov::Operator rychkov::CParser::comma = {Operator::BINARY, Operator::SPECIAL,
+    ",", false, false, false, 15};
+const rychkov::Operator rychkov::CParser::inline_if = {Operator::TERNARY, Operator::SPECIAL,
+    "?:", false, false, false, 13};
+
 void rychkov::CParser::print(std::ostream& out) const
 {
   ContentPrinter printer{out};
@@ -51,7 +60,7 @@ void rychkov::CParser::append(CParseContext& context, entities::Literal literal)
   }
   stack_.top()->operands.push_back(std::move(literal));
 }
-void rychkov::CParser::append(CParseContext& context, Lexer::TypeKeyword keyword)
+void rychkov::CParser::append(CParseContext& context, TypeKeyword keyword)
 {
   (type_parser_.*(type_keywords.at(keyword)))(context);
 }
@@ -93,10 +102,10 @@ void rychkov::CParser::append(CParseContext& context, std::string name)
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (std::holds_alternative< entities::Struct >(decl.data))
+    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
     {
-      entities::Struct& data = std::get< entities::Struct >(decl.data);
+      entities::Struct& data = boost::variant2::get< entities::Struct >(decl.data);
       if (data.name.empty())
       {
         data.name = std::move(name);
@@ -158,10 +167,10 @@ bool rychkov::CParser::flush_type_parser(CParseContext& context)
     type_parser_.prepare();
     if (entities::is_decl(*stack_.top()))
     {
-      entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-      if (std::holds_alternative< entities::Alias >(decl.data))
+      entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+      if (boost::variant2::holds_alternative< entities::Alias >(decl.data))
       {
-        entities::Alias& alias = std::get< entities::Alias >(decl.data);
+        entities::Alias& alias = boost::variant2::get< entities::Alias >(decl.data);
         if (!alias.name.empty())
         {
           log(context, "duplicating types in typedef declaration");
@@ -215,18 +224,20 @@ bool rychkov::CParser::append_empty(CParseContext& context)
 {
   if (stack_.empty())
   {
-    stack_.push(&program_.emplace_back());
+    program_.emplace_back();
+    stack_.push(&program_.back());
     return true;
   }
   if (entities::is_body(*stack_.top()))
   {
-    entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
-    stack_.push(&body.data.emplace_back());
+    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    body.data.emplace_back();
+    stack_.push(&body.data.back());
     return true;
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
+    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
     if (decl.value != nullptr)
     {
       stack_.pop();

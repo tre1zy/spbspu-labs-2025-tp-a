@@ -26,16 +26,17 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
 
   if (entities::is_body(*stack_.top()))
   {
-    entities::Body& body = std::get< entities::Body >(stack_.top()->operands[0]);
-    stack_.push(&body.data.emplace_back());
+    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    body.data.emplace_back();
+    stack_.push(&body.data.back());
     return;
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = std::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (std::holds_alternative< entities::Struct >(decl.data))
+    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
     {
-      entities::Struct& data = std::get< entities::Struct >(decl.data);
+      entities::Struct& data = boost::variant2::get< entities::Struct >(decl.data);
       if (data.name.empty())
       {
         log(context, "struct must have name");
@@ -47,9 +48,9 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       append_empty(context);
       return;
     }
-    if (std::holds_alternative< entities::Variable >(decl.data))
+    if (boost::variant2::holds_alternative< entities::Variable >(decl.data))
     {
-      entities::Variable& data = std::get< entities::Variable >(decl.data);
+      entities::Variable& data = boost::variant2::get< entities::Variable >(decl.data);
       if (data.name.empty())
       {
         log(context, "variable must have name");
@@ -76,21 +77,18 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       }
 
       stack_.pop();
-      //variables_.insert(std::make_pair(data, stack_.size()));
       append_empty(context);
       return;
     }
-    if (std::holds_alternative< entities::Function >(decl.data))
+    if (boost::variant2::holds_alternative< entities::Function >(decl.data))
     {
-      //entities::Function& data = std::get< entities::Function >(decl.data);
       stack_.pop();
-      //variables_.insert(std::make_pair(entities::Variable{data.type, data.name}, stack_.size()));
       append_empty(context);
       return;
     }
-    if (std::holds_alternative< entities::Alias >(decl.data))
+    if (boost::variant2::holds_alternative< entities::Alias >(decl.data))
     {
-      entities::Alias& data = std::get< entities::Alias >(decl.data);
+      entities::Alias& data = boost::variant2::get< entities::Alias >(decl.data);
       if (data.name.empty())
       {
         log(context, "missing alias name");
@@ -103,9 +101,9 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       append_empty(context);
       return;
     }
-    if (std::holds_alternative< entities::Statement >(decl.data))
+    if (boost::variant2::holds_alternative< entities::Statement >(decl.data))
     {
-      entities::Statement& data = std::get< entities::Statement >(decl.data);
+      entities::Statement& data = boost::variant2::get< entities::Statement >(decl.data);
       if ((data.type == entities::Statement::RETURN) || (data.type == entities::Statement::IF)
           || (data.type == entities::Statement::WHILE))
       {
@@ -117,5 +115,6 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
     }
     log(context, "cannot parse ';' here");
   }
-  stack_.push(&program_.emplace_back());
+  program_.emplace_back();
+  stack_.push(&program_.back());
 }
