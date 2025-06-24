@@ -234,8 +234,12 @@ void CommandProcessor::command_count(const std::string& rest) const {
     throw std::runtime_error("Invalid command");
   }
 
-  int num = std::stoi(rest);
-  if (num < 3) throw std::runtime_error("Invalid COUNT number");
+  int num = -1;
+  if (rest == "3") num = 3;
+  else if (rest == "4") num = 4;
+  else if (rest == "8") num = 8;
+  else throw std::runtime_error("Invalid  number");
+  if (num < 3) throw std::runtime_error("Invalid  number");
 
   int count = 0;
   if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(num)) ++count;
