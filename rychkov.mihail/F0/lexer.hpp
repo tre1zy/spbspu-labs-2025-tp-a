@@ -14,7 +14,6 @@
 
 namespace rychkov
 {
-  class CParser;
   class Lexer
   {
   public:

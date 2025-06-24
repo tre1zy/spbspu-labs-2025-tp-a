@@ -27,6 +27,13 @@ namespace rychkov
       UNSIGNED
     };
 
+    std::set< entities::Alias, NameCompare > aliases;
+    std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables;
+
+    std::set< std::pair< entities::Struct, size_t >, NameCompare > structs;
+    std::set< std::pair< entities::Union, size_t >, NameCompare > unions;
+    std::set< std::pair< entities::Enum, size_t >, NameCompare > enums;
+
     CParser();
     CParser(const CParser&) = delete;
     CParser(CParser&&) = default;
@@ -76,12 +83,7 @@ namespace rychkov
         };
 
     std::vector< entities::Expression > program_;
-    std::set< entities::Alias, NameCompare > aliases_;
-    std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables_;
     std::multiset< entities::Variable, NameCompare > defined_functions_;
-    std::set< std::pair< entities::Struct, size_t >, NameCompare > structs_;
-    std::set< std::pair< entities::Union, size_t >, NameCompare > unions_;
-    std::set< std::pair< entities::Enum, size_t >, NameCompare > enums_;
     std::stack< entities::Expression* > stack_;
     TypeParser type_parser_;
 

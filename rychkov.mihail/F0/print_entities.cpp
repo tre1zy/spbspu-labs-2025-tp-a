@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 std::ostream& rychkov::operator<<(std::ostream& out, const entities::Variable& var)
 {
@@ -53,6 +54,23 @@ std::ostream& rychkov::ContentPrinter::indent()
 void rychkov::ContentPrinter::print_empty()
 {
   indent() << "* [EMPTY]\n";
+}
+void rychkov::ContentPrinter::operator()(const Macro& macro)
+{
+  indent() << "* [macro] " << macro.name;
+  if (macro.func_style)
+  {
+    out << '(';
+    char comma[3] = "\0\0";
+    for (const std::string& param: macro.parameters)
+    {
+      out << comma << param;
+      comma[0] = ',';
+      comma[1] = ' ';
+    }
+    out << ')';
+  }
+  out << ' ' << macro.body << '\n';
 }
 void rychkov::ContentPrinter::operator()(const entities::Variable& var)
 {

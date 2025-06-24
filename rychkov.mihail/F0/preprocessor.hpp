@@ -16,13 +16,13 @@
 
 namespace rychkov
 {
-  class Lexer;
   class Preprocessor
   {
   public:
     std::vector< std::string > include_paths;
     std::unique_ptr< Lexer > next;
     std::set< Macro, NameCompare > macros;
+    std::multiset< Macro, NameCompare > legacy_macros;
 
     Preprocessor();
     Preprocessor(std::unique_ptr< Lexer > lexer, std::vector< std::string > search_dirs);

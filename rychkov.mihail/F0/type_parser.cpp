@@ -72,7 +72,7 @@ void rychkov::TypeParser::clear()
   parameters_.clear();
 }
 
-void rychkov::TypeParser::append(CParseContext& context, size_t numeric_literal)
+void rychkov::TypeParser::append(CParseContext& context, unsigned long long numeric_literal)
 {
   if (stack_.empty() || !stack_.top().bracket_opened)
   {

@@ -58,10 +58,10 @@ void rychkov::CParser::move_up_down()
 
 void rychkov::CParser::clear_scope()
 {
-  clear_scope(variables_);
-  clear_scope(structs_);
-  clear_scope(unions_);
-  clear_scope(enums_);
+  clear_scope(variables);
+  clear_scope(structs);
+  clear_scope(unions);
+  clear_scope(enums);
 }
 template< class T >
 void rychkov::CParser::clear_scope(T& pair_set)

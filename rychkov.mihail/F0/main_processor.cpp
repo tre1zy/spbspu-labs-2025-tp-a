@@ -9,7 +9,10 @@ rychkov::Parser::map_type< rychkov::ParserContext, rychkov::MainProcessor > rych
       {"reload-all", &rychkov::MainProcessor::reload},
       {"parse", &rychkov::MainProcessor::parse},
       {"tree", &rychkov::MainProcessor::tree},
-      {"files", &rychkov::MainProcessor::files}
+      {"files", &rychkov::MainProcessor::files},
+      {"external", &rychkov::MainProcessor::external},
+      {"exposition", &rychkov::MainProcessor::exposition},
+      {"defines", &rychkov::MainProcessor::defines}
     };
 
 rychkov::ParseCell::ParseCell(CParseContext context, Stage last_stage,

@@ -27,7 +27,7 @@ namespace rychkov
 
     void append(CParseContext& context, char c);
     void append(CParseContext& context, std::string name);
-    void append(CParseContext& context, size_t numeric_literal);
+    void append(CParseContext& context, unsigned long long numeric_literal);
     void append(CParseContext& context, typing::Type base_type);
 
     void append_const(CParseContext& context);

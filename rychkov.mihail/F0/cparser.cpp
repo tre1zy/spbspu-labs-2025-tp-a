@@ -78,8 +78,8 @@ void rychkov::CParser::append(CParseContext& context, std::string name)
     type_parser_.append(context, base_type_p->first);
     return;
   }
-  decltype(aliases_)::const_iterator alias_p = aliases_.find(name);
-  if (alias_p != aliases_.cend())
+  decltype(aliases)::const_iterator alias_p = aliases.find(name);
+  if (alias_p != aliases.cend())
   {
     type_parser_.append(context, alias_p->type);
     return;
@@ -89,8 +89,8 @@ void rychkov::CParser::append(CParseContext& context, std::string name)
     type_parser_.append(context, name);
     return;
   }
-  decltype(variables_)::const_iterator var_p = variables_.find(name);
-  if (var_p != variables_.cend())
+  decltype(variables)::const_iterator var_p = variables.find(name);
+  if (var_p != variables.cend())
   {
     if (stack_.top()->full())
     {
@@ -203,7 +203,7 @@ bool rychkov::CParser::flush_type_parser(CParseContext& context)
         return false;
       }
       *stack_.top() = entities::Declaration{type_parser_.function()};
-      variables_.insert({type_parser_.variable(), stack_.size()});
+      variables.insert({type_parser_.variable(), stack_.size()});
     }
     else
     {
@@ -213,14 +213,14 @@ bool rychkov::CParser::flush_type_parser(CParseContext& context)
         type_parser_.clear();
         return false;
       }
-      if (variables_.find({{{}, type_parser_.name()}, stack_.size()}) != variables_.end())
+      if (variables.find({{{}, type_parser_.name()}, stack_.size()}) != variables.end())
       {
         log(context, "variable name repeats in one scope");
         type_parser_.clear();
         return false;
       }
       *stack_.top() = entities::Declaration{type_parser_.variable()};
-      variables_.insert({type_parser_.variable(), stack_.size()});
+      variables.insert({type_parser_.variable(), stack_.size()});
     }
   }
   type_parser_.clear();

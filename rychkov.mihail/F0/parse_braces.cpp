@@ -29,7 +29,7 @@ void rychkov::CParser::parse_open_brace(CParseContext& context)
       {
         if (!data.parameters[i].empty())
         {
-          variables_.insert({{data.type.function_parameters[i], data.parameters[i]}, stack_.size() + 1});
+          variables.insert({{data.type.function_parameters[i], data.parameters[i]}, stack_.size() + 1});
         }
       }
       if (find_overload(data.name, data.type.function_parameters).first != nullptr)

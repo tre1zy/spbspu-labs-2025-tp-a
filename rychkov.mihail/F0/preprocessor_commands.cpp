@@ -115,7 +115,12 @@ void rychkov::Preprocessor::undef(std::istream& in, CParseContext& context)
   std::string name;
   if (eol(in >> std::ws >> name) && !name.empty())
   {
-    macros.erase({name});
+    decltype(macros)::iterator temp = macros.find(name);
+    if (temp != macros.end())
+    {
+      legacy_macros.insert(*temp);
+      macros.erase(temp);
+    }
     return;
   }
   log(context, "wrong #undef format");

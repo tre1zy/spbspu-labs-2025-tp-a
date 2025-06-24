@@ -43,7 +43,7 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
         return;
       }
       stack_.pop();
-      structs_.insert(std::make_pair(data, stack_.size()));
+      structs.insert(std::make_pair(data, stack_.size()));
       base_types_.insert(std::make_pair(typing::Type{data.name, typing::STRUCT}, stack_.size()));
       append_empty(context);
       return;
@@ -95,7 +95,7 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       }
       else
       {
-        aliases_.insert(data);
+        aliases.insert(data);
       }
       stack_.pop();
       append_empty(context);

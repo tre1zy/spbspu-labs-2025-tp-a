@@ -15,6 +15,7 @@ namespace rychkov
       indent_(0)
     {}
 
+    void operator()(const Macro& macro);
     void operator()(const entities::Variable& var);
     void operator()(const entities::Function& func);
     void operator()(const entities::Body& body);
