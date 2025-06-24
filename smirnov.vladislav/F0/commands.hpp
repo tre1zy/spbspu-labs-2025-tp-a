@@ -11,28 +11,26 @@
 
 namespace smirnov
 {
-  using CommandFunction = std::function< void(std::istream&, DictionaryManager&, std::ostream&) >;
+  void addWord(const std::string& word, const std::string& freq_str, DictionaryManager& dm, std::ostream& os);
+  void removeWord(const std::string& word, DictionaryManager& dm, std::ostream& os);
+  void freq(const std::string& word, DictionaryManager& dm, std::ostream& os);
+  void createDictCmd(const std::string& name, DictionaryManager& dm, std::ostream& os);
+  void deleteDictCmd(const std::string& name, DictionaryManager& dm, std::ostream& os);
+  void pushDictCmd(const std::string& name, DictionaryManager& dm, std::ostream& os);
+  void popDictCmd(DictionaryManager& dm, std::ostream& os);
+  void stackListCmd(DictionaryManager& dm, std::ostream& os);
+  void list(DictionaryManager& dm, std::ostream& os);
+  void mostFreq(const std::string& n_str, DictionaryManager& dm, std::ostream& os);
+  void leastFreq(const std::string& n_str, DictionaryManager& dm, std::ostream& os);
+  void mergeDictionariesCmd(const std::string& otherName, const std::string& newDictName, DictionaryManager& dm, std::ostream& os);
+  void intersectDictionariesCmd(const std::string& otherName, const std::string& newDictName, DictionaryManager& dm, std::ostream& os);
+  void loadFromFileCmd(const std::string& filename, DictionaryManager& dm, std::ostream& os);
+  void saveToFileCmd(const std::string& filename, DictionaryManager& dm, std::ostream& os);
+  void filterByPatternCmd(const std::string& regex_str, const std::string& resultDictName, DictionaryManager& dm, std::ostream& os);
 
-  void addWord(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void removeWord(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void freq(std::istream& is, DictionaryManager& dm, std::ostream& os);
+  using CommandFunction = std::function< void(const std::vector< std::string >&, DictionaryManager&, std::ostream&) >;
 
-  void createDictCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void deleteDictCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void pushDictCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void popDictCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void stackListCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void list(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void mostFreq(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void leastFreq(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void mergeCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void intersectCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void loadCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void saveCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-  void filterByPatternCmd(std::istream& is, DictionaryManager& dm, std::ostream& os);
-
-  std::map< std::string, CommandFunction > createCommandMap();
-
+  std::map< std::string, CommandFunction > createCommandMap(DictionaryManager& dm, std::ostream& os);
 }
 
 #endif

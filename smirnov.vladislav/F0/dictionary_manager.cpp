@@ -5,6 +5,62 @@
 #include <iterator>
 #include <stdexcept>
 
+struct MergePredicate
+{
+  std::map< std::string, int >& mergedDict_;
+  MergePredicate(std::map< std::string, int >& dict) : mergedDict_(dict) {}
+  void operator()(const std::pair< const std::string, int >& p) const
+  {
+    mergedDict_[p.first] += p.second;
+  }
+};
+
+struct IntersectPredicate
+{
+  const std::map< std::string, int >* otherDict_;
+  std::map< std::string, int >& intersectionDict_;
+  IntersectPredicate(const std::map< std::string, int >* other, std::map< std::string, int >& intersection) :
+    otherDict_(other), intersectionDict_(intersection) {}
+  void operator()(const std::pair< const std::string, int >& p) const
+  {
+    auto oit = otherDict_->find(p.first);
+    if (oit != otherDict_->end())
+    {
+      intersectionDict_[p.first] = std::min(p.second, oit->second);
+    }
+  }
+};
+
+char toLowerChar(unsigned char c)
+{
+    return static_cast< char >(std::tolower(c));
+}
+
+bool isNotAlpha(unsigned char c)
+{
+    return !std::isalpha(c);
+}
+
+struct SaveToFilePredicate
+{
+  std::ofstream& fout_;
+  SaveToFilePredicate(std::ofstream& fout) : fout_(fout) {}
+  void operator()(const std::pair< const std::string, int >& p) const
+  {
+    fout_ << p.first << " " << p.second << "\n";
+  }
+};
+
+struct FilterByPatternPredicate
+{
+  const std::regex& pattern_;
+  FilterByPatternPredicate(const std::regex& p) : pattern_(p) {}
+  bool operator()(const std::pair< const std::string, int >& p) const
+  {
+    return std::regex_match(p.first, pattern_);
+  }
+};
+
 const std::map< std::string, int >* DictionaryManager::getDictByName(const std::string& name) const
 {
   auto it = dicts_.find(name);
@@ -134,13 +190,8 @@ bool DictionaryManager::mergeDictionaries(const std::string& otherName, const st
   }
 
   std::map< std::string, int > mergedDict = *currentDict;
-
   std::for_each(otherDict->begin(), otherDict->end(),
-    [&mergedDict](const std::pair< const std::string, int >& p)
-    {
-      mergedDict[p.first] += p.second;
-    });
-
+    MergePredicate(mergedDict));
   dicts_[newDictName] = std::move(mergedDict);
   return true;
 }
@@ -165,16 +216,8 @@ bool DictionaryManager::intersectDictionaries(const std::string& otherName, cons
   }
 
   std::map< std::string, int > intersectionDict;
-
   std::for_each(currentDict->begin(), currentDict->end(),
-    [&otherDict, &intersectionDict](const std::pair<const std::string, int>& p) {
-      auto oit = otherDict->find(p.first);
-      if (oit != otherDict->end())
-      {
-        intersectionDict[p.first] = std::min(p.second, oit->second);
-      }
-    });
-
+    IntersectPredicate(otherDict, intersectionDict));
   dicts_[newDictName] = std::move(intersectionDict);
   return true;
 }
@@ -197,13 +240,8 @@ bool DictionaryManager::loadFromFile(const std::string & filename)
   std::string word;
   while (file >> word)
   {
-    std::transform(word.begin(), word.end(), word.begin(),
-      [](unsigned char c) { return static_cast< char >(std::tolower(c)); });
-    word.erase(std::remove_if(word.begin(), word.end(),
-      [](unsigned char c) { return !std::isalpha(c); }),
-      word.end());
-
-
+    std::transform(word.begin(), word.end(), word.begin(), toLowerChar);
+    word.erase(std::remove_if(word.begin(), word.end(), isNotAlpha), word.end());
     if (!word.empty())
     {
       (*currentDict)[word]++;
@@ -239,9 +277,7 @@ bool DictionaryManager::saveToFile(const std::string& filename) const
   }
 
   std::for_each(dict->begin(), dict->end(),
-    [&fout](const std::pair< const std::string, int >& p) {
-      fout << p.first << " " << p.second << "\n";
-    });
+    SaveToFilePredicate(fout));
   return true;
 }
 
@@ -269,13 +305,9 @@ bool DictionaryManager::filterByPattern(const std::string& regex_str, const std:
   }
 
   std::map< std::string, int > filteredDict;
-
   std::copy_if(currentDict->begin(), currentDict->end(),
     std::inserter(filteredDict, filteredDict.begin()),
-    [&pattern](const std::pair< const std::string, int >& p) {
-      return std::regex_match(p.first, pattern);
-    });
-
+    FilterByPatternPredicate(pattern));
   dicts_[resultDictName] = std::move(filteredDict);
   return true;
 }
