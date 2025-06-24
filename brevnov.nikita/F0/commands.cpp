@@ -113,10 +113,9 @@ namespace
       std::ostream& out;
       PositionMatcher& matcher;
     };
-    std::vector<std::pair<std::string, brevnov::Player>> freeAgents(
-        league.fa_.begin(), league.fa_.end());
     FreeAgentMatcherPrinter printer{out, matcher};
-    std::any_of(freeAgents.begin(), freeAgents.end(), printer);
+    NullOstreamIterator null_it;
+    std::transform(league.fa_.begin(), league.fa_.end(), null_it, printer);
     return sPos;
   }
 
@@ -158,18 +157,9 @@ namespace
       size_t bestRating = 0;
       decltype(league.fa_.end()) bestPlayer = league.fa_.end();
     };
-    struct PlayerHandler
-    {
-      bool operator()(const std::pair<std::string, brevnov::Player>& player)
-      {
-        return finder(player);
-      }
-      BestPlayerFinder& finder;
-    };
     BestPlayerFinder finder{sPos, bud, league};
-    PlayerHandler handler{finder};
-    std::vector<std::pair<std::string, brevnov::Player>> players(league.fa_.begin(), league.fa_.end());
-    std::any_of(players.begin(), players.end(), handler);
+    NullOstreamIterator null_it;
+    std::transform(league.fa_.begin(), league.fa_.end(), null_it, finder);
     if (finder.bestPlayer != league.fa_.end())
     {
       club.budget_ -= finder.bestPlayer->second.price_;
