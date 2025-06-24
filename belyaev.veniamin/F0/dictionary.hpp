@@ -11,8 +11,10 @@ namespace belyaev
   {
     std::map<std::string, std::string> dict;
   };
-  std::string formPairString(const std::pair<const std::string, const std::string>& pair);
-  std::string accumulatePairString(std::string result, const std::pair<const std::string, const std::string>& pair);
+  using entryPair = std::pair<const std::string, std::string>;
+  using nonConstEntryPair = std::pair<std::string, std::string>;
+  std::string formPairString(const entryPair& pair);
+  std::string accumulatePairString(std::string result, const entryPair& pair);
   std::ostream& operator<<(std::ostream& out, const Dictionary& dictionary);
 
   struct Dictionaries
