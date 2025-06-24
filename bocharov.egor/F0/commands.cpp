@@ -198,7 +198,6 @@ namespace
     }
   };
 
-
   struct EntryIncrementer
   {
     std::map<std::string, int> & freqs_;
@@ -452,17 +451,10 @@ namespace bocharov
     if (!file) throw std::runtime_error("INVALID FILE");
 
     std::vector<std::string> dictNames;
-    std::string name;
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> name;
-      dictNames.push_back(name);
-    }
+    dictNames.reserve(n);
+    std::generate_n(std::back_inserter(dictNames), n, WordReader{ in });
 
-    for (const auto & dictName : dictNames)
-    {
-      FullDictWriter{ file, dictName }(dicts.at(dictName));
-    }
+    std::accumulate(dictNames.begin(), dictNames.end(), Empty{}, FullDictWriterWrapper{ file, dicts });
   }
 
   void rare(std::istream & in, dict_dict_t & dicts)
