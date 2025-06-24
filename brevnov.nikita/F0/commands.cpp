@@ -100,12 +100,23 @@ namespace
     }
     brevnov::Position sPos = brevnov::definePosition(pos);
     PositionMatcher matcher(sPos);
-    auto it = std::find_if(league.fa_.begin(), league.fa_.end(), matcher);
-    while (it != league.fa_.end())
+    struct FreeAgentMatcherPrinter
     {
-      out << "FA " << it->first << " " << it->second << "\n";
-      it = std::find_if(std::next(it), league.fa_.end(), matcher);
-    }
+      bool operator()(const std::pair<std::string, brevnov::Player>& player) const
+      {
+        if (matcher(player))
+        {
+          out << "FA " << player.first << " " << player.second << "\n";
+        }
+        return false;
+      }
+      std::ostream& out;
+      PositionMatcher& matcher;
+    };
+    std::vector<std::pair<std::string, brevnov::Player>> freeAgents(
+        league.fa_.begin(), league.fa_.end());
+    FreeAgentMatcherPrinter printer{out, matcher};
+    std::any_of(freeAgents.begin(), freeAgents.end(), printer);
     return sPos;
   }
 
@@ -128,23 +139,43 @@ namespace
 
   void buyP(std::ostream& out, brevnov::League& league, brevnov::Team& club, size_t bud, brevnov::Position sPos)
   {
-    size_t bestRating = 0;
-    auto bestPlayer = league.fa_.end();
-    for (auto it = league.fa_.begin(); it != league.fa_.end(); ++it)
+    struct BestPlayerFinder
     {
-      SuitablePlayer predicate(sPos, bud, bestRating);
-      if (predicate(*it))
+      bool operator()(const std::pair<std::string, brevnov::Player>& player)
       {
-        bestRating = it->second.raiting_;
-        bestPlayer = it;
+        SuitablePlayer predicate(sPos, bud, bestRating);
+        if (predicate(player))
+        {
+          bestRating = player.second.raiting_;
+          bestPlayer = league.fa_.find(player.first);
+          return true;
+        }
+        return false;
       }
-    }
-    if (bestPlayer != league.fa_.end())
+      brevnov::Position sPos;
+      size_t bud;
+      brevnov::League& league;
+      size_t bestRating = 0;
+      decltype(league.fa_.end()) bestPlayer = league.fa_.end();
+    };
+    struct PlayerHandler
     {
-      club.budget_ -= bestPlayer->second.price_;
-      out << "Bought " << bestPlayer->first << " " << bestPlayer->second << "\n";
-      club.players_.insert(*bestPlayer);
-      league.fa_.erase(bestPlayer);
+      bool operator()(const std::pair<std::string, brevnov::Player>& player)
+      {
+        return finder(player);
+      }
+      BestPlayerFinder& finder;
+    };
+    BestPlayerFinder finder{sPos, bud, league};
+    PlayerHandler handler{finder};
+    std::vector<std::pair<std::string, brevnov::Player>> players(league.fa_.begin(), league.fa_.end());
+    std::any_of(players.begin(), players.end(), handler);
+    if (finder.bestPlayer != league.fa_.end())
+    {
+      club.budget_ -= finder.bestPlayer->second.price_;
+      out << "Bought " << finder.bestPlayer->first << " " << finder.bestPlayer->second << "\n";
+      club.players_.insert(*finder.bestPlayer);
+      league.fa_.erase(finder.bestPlayer);
     }
     else
     {
