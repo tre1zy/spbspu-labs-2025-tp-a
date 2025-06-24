@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <map>
 #include <numeric>
 #include <sstream>
 #include <vector>
