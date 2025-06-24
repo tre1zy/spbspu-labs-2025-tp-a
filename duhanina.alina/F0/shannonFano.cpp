@@ -597,7 +597,7 @@ void duhanina::check_encoding(str_t input_file, str_t encoding_id, std::ostream&
   std::ifstream in(input_file);
   if (!in)
   {
-    throw std::runtime_error("Failed to open file");
+    throw std::runtime_error("FILE_NOT_FOUND");
   }
   std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
   auto missing = find_missing_chars(text, it->second.char_to_code);
@@ -617,7 +617,7 @@ void duhanina::suggest_encodings(str_t input_file, std::ostream& out)
   std::ifstream in(input_file);
   if (!in)
   {
-    throw std::runtime_error("Failed to open file");
+    throw std::runtime_error("FILE_NOT_FOUND");
   }
   std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
   out << "Encoding compatibility report:\n";
