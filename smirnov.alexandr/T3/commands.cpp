@@ -213,10 +213,73 @@ void smirnov::countCommand(const std::vector< Polygon > & polygons, std::istream
 
 void smirnov::inframeCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
 {
-  throw std::logic_error("<INVALID COMMAND>");
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  Polygon test_poly;
+  in >> test_poly;
+  if (!in)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  int min_x = polygons.front().points.front().x;
+  int min_y = polygons.front().points.front().y;
+  int max_x = polygons.front().points.front().x;
+  int max_y = polygons.front().points.front().y;
+  for (const Polygon & poly : polygons)
+  {
+    for (const Point & pt : poly.points)
+    {
+      if (pt.x < min_x) min_x = pt.x;
+      if (pt.y < min_y) min_y = pt.y;
+      if (pt.x > max_x) max_x = pt.x;
+      if (pt.y > max_y) max_y = pt.y;
+    }
+  }
+  bool inside = true;
+  for (const Point & pt : test_poly.points)
+  {
+    if (pt.x < min_x || pt.x > max_x || pt.y < min_y || pt.y > max_y)
+    {
+      inside = false;
+      break;
+    }
+  }
+  if (inside)
+  {
+    out << "<TRUE>\n";
+  }
+  else
+  {
+    out << "<FALSE>\n";
+  }
 }
 
 void smirnov::maxseqCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
 {
-  throw std::logic_error("<INVALID COMMAND>");
+  Polygon pattern;
+  in >> pattern;
+  if (!in)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  size_t max_seq = 0;
+  size_t cur_seq = 0;
+  for (const Polygon & poly : polygons)
+  {
+    if (poly == pattern)
+    {
+      ++cur_seq;
+      if (cur_seq > max_seq)
+      {
+        max_seq = cur_seq;
+      }
+    }
+    else
+    {
+      cur_seq = 0;
+    }
+  }
+  out << max_seq << "\n";
 }
