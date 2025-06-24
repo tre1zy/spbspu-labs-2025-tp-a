@@ -66,7 +66,6 @@ namespace
 
   struct ExactVertexCounter
   {
-  public:
     ExactVertexCounter(size_t n):
       num(n)
     {}
@@ -82,7 +81,6 @@ namespace
 
   struct VertexCountAreaAdder
   {
-  public:
     VertexCountAreaAdder(size_t n):
       num(n)
     {}
@@ -102,7 +100,6 @@ namespace
 
   struct VertexCountAreaSum
   {
-  public:
     explicit VertexCountAreaSum(size_t n):
       num(n)
     {}
@@ -230,7 +227,6 @@ namespace
 
   struct CountIfAreaLess
   {
-  public:
     explicit CountIfAreaLess(double t):
       threshold(t)
     {}
@@ -246,7 +242,6 @@ namespace
 
   struct AdjacentDuplicateFinder
   {
-  public:
     AdjacentDuplicateFinder(const Polygon& p, bool& f):
       ref(p),
       first(f)
@@ -359,7 +354,7 @@ void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& pol
   out << count;
 }
 
-void duhanina::printRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
+void duhanina::eraseRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
 {
   if (polygons.empty())
   {
