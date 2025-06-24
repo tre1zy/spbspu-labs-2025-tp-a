@@ -20,8 +20,7 @@ int main(int argc, char* argv[])
   std::vector< dribas::Polygon > plgs;
   while (!file.eof()) {
     std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(plgs));
-    if (!file)
-    {
+    if (!file) {
       file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }

@@ -21,7 +21,7 @@ namespace
     {}
     std::vector< dribas::Point > operator()(size_t index) const
     {
-      return {firstPolygonPoint, allPolygonPoints[index], allPolygonPoints[index + 1]};
+      return { firstPolygonPoint, allPolygonPoints[index], allPolygonPoints[index + 1] };
     }
   };
 
