@@ -44,7 +44,6 @@ int main(int argc, char * argv[])
   cmds["frequency"] = std::bind(printFrequency, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["wordrange"] = std::bind(createWordRange, std::ref(std::cin), std::ref(dicts));
   cmds["save"] = std::bind(saveDictionaries, std::ref(std::cin), std::cref(dicts));
-  cmds["loadfile"] = std::bind(loadFileCommand, std::ref(std::cin), std::ref(dicts));
   std::string command;
   while (!(std::cin >> command).eof())
   {

@@ -25,7 +25,6 @@ namespace maslov
   void createWordRange(std::istream & in, Dicts & dicts);
   void saveDictionaries(std::istream & in, const Dicts & dicts);
   void loadFile(const std::string & filename, Dicts & dicts);
-  void loadFileCommand(std::istream & file, Dicts & dicts);
   void printHelp(std::ostream & out);
 }
 
