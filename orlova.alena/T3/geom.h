@@ -17,12 +17,6 @@ namespace orlova
     std::vector< Point > points;
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
-  std::istream& operator>>(std::istream&, DelimiterIO&&);
   std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
   std::ostream& operator<<(std::ostream&, const Point&);
