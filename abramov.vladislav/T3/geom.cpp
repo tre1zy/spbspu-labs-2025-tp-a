@@ -11,17 +11,18 @@ namespace
   {
     return p1.x * p2.y - p1.y * p2.x;
   }
-
-  bool isEven(const abramov::Polygon &polygon)
-  {
-    return polygon.points.size() % 2 == 0;
-  }
-
-  bool isOdd(const abramov::Polygon &polygon)
-  {
-    return !isEven(polygon);
-  }
 }
+
+bool abramov::isEven(const Polygon &polygon)
+{
+  return polygon.points.size() % 2 == 0;
+}
+
+bool abramov::isOdd(const Polygon &polygon)
+{
+  return !isEven(polygon);
+}
+
 
 bool abramov::Point::operator==(const Point &p) const
 {
@@ -77,24 +78,6 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
   return in;
 }
 
-double abramov::AreaEvenAcc::operator()(double s, const Polygon &polygon) const
-{
-  if (isEven(polygon))
-  {
-    return s + getArea(polygon);
-  }
-  return s;
-}
-
-double abramov::AreaOddAcc::operator()(double s, const Polygon &polygon) const
-{
-  if (isOdd(polygon))
-  {
-    return s + getArea(polygon);
-  }
-  return s;
-}
-
 double abramov::AreaVertAcc::operator()(double s, const Polygon &polygon) const
 {
   VertexesCmp cmp{ k };
@@ -120,11 +103,10 @@ double abramov::getArea(const Polygon &polygon)
 
 double abramov::areaMean(const std::vector< Polygon > &polygons)
 {
-  AreaEvenAcc acc_even{};
-  AreaOddAcc acc_odd{};
-  double s1 = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc_even);
-  double s2 = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc_odd);
-  return (s1 + s2) / polygons.size();
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+  double res = std::accumulate(areas.begin(), areas.end(), 0.0);
+  return res / polygons.size();
 }
 
 bool abramov::maxArea(const Polygon &p1, const Polygon &p2)

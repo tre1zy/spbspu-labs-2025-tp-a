@@ -10,18 +10,38 @@ namespace
   using namespace abramov;
   using CommandDict = std::map< std::string, std::function< void() > >;
 
+  double getAreaIfEven(const Polygon &p)
+  {
+    if (isEven(p))
+    {
+      return getArea(p);
+    }
+    return 0.0;
+  }
+
   void printAreaEven(const std::vector< Polygon > &polygons, std::ostream &out)
   {
-    AreaEvenAcc acc{};
-    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc);
-    out << res;
+    std::vector< double > areas(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), getAreaIfEven);
+    double area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << area;
+  }
+
+  double getAreaIfOdd(const Polygon &p)
+  {
+    if (isOdd(p))
+    {
+      return getArea(p);
+    }
+    return 0.0;
   }
 
   void printAreaOdd(const std::vector< Polygon > &polygons, std::ostream &out)
   {
-    AreaOddAcc acc{};
-    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc);
-    out << res;
+    std::vector< double > areas(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), getAreaIfOdd);
+    double area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << area;
   }
 
   void printAreaMean(const std::vector< Polygon > &polygons, std::ostream &out)
@@ -34,6 +54,16 @@ namespace
     out << res;
   }
 
+  double getAreaIfGoodNumOfVert(const Polygon &p, size_t vert)
+  {
+    VertexesCmp cmp{ vert };
+    if (cmp(p))
+    {
+      return getArea(p);
+    }
+    return 0.0;
+  }
+
   void printAreaVertexes(const std::vector< Polygon > &polygons, std::ostream &out, const std::string &s)
   {
     using namespace std::placeholders;
@@ -43,9 +73,11 @@ namespace
     {
       throw std::logic_error("Too less vertexes\n");
     }
-    AreaVertAcc acc{ vert };
-    double res = std::accumulate(polygons.begin(), polygons.end(), 0.0, acc);
-    out << res;
+    std::vector< double > areas(polygons.size());
+    auto f = std::bind(getAreaIfGoodNumOfVert, _1, vert);
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), f);
+    double area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << area;
   }
 
   void getAreaCommands(CommandDict &commands, const std::vector< Polygon > &polygons, const std::string &s)
@@ -127,15 +159,15 @@ namespace
 
 void abramov::getCommands(std::map< std::string, std::function< void() > > &commands, std::vector< Polygon > &polygons)
 {
-  commands["AREA"] = std::bind(area, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["MAX"] = std::bind(max, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["MIN"] = std::bind(min, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["COUNT"] = std::bind(count, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["RMECHO"] = std::bind(rmecho, std::ref(polygons), std::ref(std::cout), std::ref(std::cin));
-  commands["PERMS"] = std::bind(perms, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["AREA"] = std::bind(doAreaComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MAX"] = std::bind(doMaxComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MIN"] = std::bind(doMinComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["COUNT"] = std::bind(doCountComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["RMECHO"] = std::bind(doRmechoComm, std::ref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["PERMS"] = std::bind(doPermsComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
 }
 
-void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+void abramov::doAreaComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
   StreamGuard guard(out);
   std::string subcommand;
@@ -145,10 +177,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
   out << std::fixed << std::setprecision(1);
   try
   {
-    if (stoull(subcommand) || subcommand == "0")
-    {
-      commands["VERTEXES"]();
-    }
+    commands["VERTEXES"]();
   }
   catch (const std::exception &)
   {
@@ -156,7 +185,7 @@ void abramov::area(const std::vector< Polygon > &polygons, std::ostream &out, st
   }
 }
 
-void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in)
+void abramov::doMaxComm(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in)
 {
   StreamGuard guard(out);
   if (polygons.size() < 1)
@@ -170,7 +199,7 @@ void abramov::max(const std::vector< Polygon> &polygons, std::ostream &out, std:
   commands.at(subcommand)();
 }
 
-void abramov::min(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+void abramov::doMinComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
   StreamGuard guard(out);
   if (polygons.size() < 1)
@@ -184,7 +213,7 @@ void abramov::min(const std::vector< Polygon > &polygons, std::ostream &out, std
   commands.at(subcommand)();
 }
 
-void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+void abramov::doCountComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
   StreamGuard guard(out);
   std::string subcommand;
@@ -193,10 +222,7 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
   getCountCommands(commands, polygons, subcommand);
   try
   {
-    if (stoull(subcommand) || subcommand == "0")
-    {
-      commands["VERTEXES"]();
-    }
+    commands["VERTEXES"]();
   }
   catch (const std::exception &)
   {
@@ -204,7 +230,7 @@ void abramov::count(const std::vector< Polygon > &polygons, std::ostream &out, s
   }
 }
 
-void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+void abramov::doRmechoComm(std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
   using namespace std::placeholders;
 
@@ -222,7 +248,7 @@ void abramov::rmecho(std::vector< Polygon > &polygons, std::ostream &out, std::i
   out << diff;
 }
 
-void abramov::perms(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
+void abramov::doPermsComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in)
 {
   Polygon pattern;
   in >> pattern;
