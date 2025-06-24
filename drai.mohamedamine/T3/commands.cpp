@@ -170,7 +170,10 @@ void CommandProcessor::operator()(const std::string& line) const
   }
 }
 void CommandProcessor::command_area(const std::string& rest) const {
-            if (cmd == "AREA")
+        bool printDouble = false;
+        double dblResult = 0.0;
+        int intResult = 0;
+      if (cmd == "AREA")
       {
         std::string arg;
         std::string::size_type spacePos = rest.find(' ');
