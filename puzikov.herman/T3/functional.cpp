@@ -1,31 +1,41 @@
 #include "functional.hpp"
 #include <algorithm>
 #include <numeric>
-#include <stdexcept>
+
+double puzikov::AreaAccumulator::oddSubcommand(const Polygon &poly)
+{
+  if (poly.points.size() % 2 == 1)
+  {
+    return calcPolygonArea(poly);
+  }
+  return 0;
+}
+
+double puzikov::AreaAccumulator::evenSubcommand(const Polygon &poly)
+{
+  if (poly.points.size() % 2 == 0)
+  {
+    return calcPolygonArea(poly);
+  }
+  return 0;
+}
+
+double puzikov::AreaAccumulator::meanSubcommand(const Polygon &poly)
+{
+  return calcPolygonArea(poly);
+}
 
 puzikov::AreaAccumulator::AreaAccumulator(const std::string &p):
   param(p)
-{}
-
-double puzikov::AreaAccumulator::operator()(double acc, const puzikov::Polygon &poly) const
 {
-  if (param == "ODD")
+  commands = {{"ODD", oddSubcommand}, {"EVEN", evenSubcommand}, {"MEAN", meanSubcommand}};
+}
+
+double puzikov::AreaAccumulator::operator()(double acc, const Polygon &poly) const
+{
+  if (commands.count(param))
   {
-    if (poly.points.size() % 2 == 1)
-    {
-      acc += calcPolygonArea(poly);
-    }
-  }
-  else if (param == "EVEN")
-  {
-    if (poly.points.size() % 2 == 0)
-    {
-      acc += calcPolygonArea(poly);
-    }
-  }
-  else if (param == "MEAN")
-  {
-    acc += calcPolygonArea(poly);
+    acc += commands.at(param)(poly);
   }
   else
   {
@@ -52,23 +62,25 @@ bool puzikov::AreaComparator(const Polygon &p1, const Polygon &p2)
 
 puzikov::ShapesAccumulator::ShapesAccumulator(const std::string &p):
   param(p)
-{}
-
-double puzikov::ShapesAccumulator::operator()(double acc, const puzikov::Polygon &poly) const
 {
-  if (param == "ODD")
+  commands = {{"ODD", oddSubcommand}, {"EVEN", evenSubcommand}};
+}
+
+double puzikov::ShapesAccumulator::evenSubcommand(const Polygon &poly)
+{
+  return (poly.points.size() % 2 == 0);
+}
+
+double puzikov::ShapesAccumulator::oddSubcommand(const Polygon &poly)
+{
+  return (poly.points.size() % 2 == 1);
+}
+
+double puzikov::ShapesAccumulator::operator()(double acc, const Polygon &poly) const
+{
+  if (commands.count(param))
   {
-    if (poly.points.size() % 2 == 1)
-    {
-      acc++;
-    }
-  }
-  else if (param == "EVEN")
-  {
-    if (poly.points.size() % 2 == 0)
-    {
-      acc++;
-    }
+    acc += commands.at(param)(poly);
   }
   else
   {
@@ -144,22 +156,22 @@ bool puzikov::IsTranslationCongruent::operator()(const Polygon &poly) const
   return std::any_of(shifts.begin(), shifts.end(), AnyOfShift(reversed, reference.points));
 }
 
-puzikov::constPolygonVecIt puzikov::maxAreaElement(constPolygonVecIt first, constPolygonVecIt last, AreaComp comp)
+puzikov::constPolygonVecIt puzikov::maxAreaElement(constPolygonVecIt first, constPolygonVecIt last, comparator comp)
 {
   return std::max_element(first, last, comp);
 }
 
-puzikov::constPolygonVecIt puzikov::minAreaElement(constPolygonVecIt first, constPolygonVecIt last, AreaComp comp)
+puzikov::constPolygonVecIt puzikov::minAreaElement(constPolygonVecIt first, constPolygonVecIt last, comparator comp)
 {
   return std::min_element(first, last, comp);
 }
 
-puzikov::constPolygonVecIt puzikov::maxVertElement(constPolygonVecIt first, constPolygonVecIt last, VertComp comp)
+puzikov::constPolygonVecIt puzikov::maxVertElement(constPolygonVecIt first, constPolygonVecIt last, comparator comp)
 {
   return std::max_element(first, last, comp);
 }
 
-puzikov::constPolygonVecIt puzikov::minVertElement(constPolygonVecIt first, constPolygonVecIt last, VertComp comp)
+puzikov::constPolygonVecIt puzikov::minVertElement(constPolygonVecIt first, constPolygonVecIt last, comparator comp)
 {
   return std::min_element(first, last, comp);
 }

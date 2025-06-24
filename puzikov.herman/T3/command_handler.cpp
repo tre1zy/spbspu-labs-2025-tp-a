@@ -7,7 +7,7 @@ using namespace std::placeholders;
 
 namespace puzikov
 {
-  void readCommands(std::istream &in, std::ostream &out, CommandMap &commands)
+  void readCommands(std::istream &in, std::ostream &out, const CommandMap &commands)
   {
     std::string cmd;
     while (!(in >> cmd).eof())

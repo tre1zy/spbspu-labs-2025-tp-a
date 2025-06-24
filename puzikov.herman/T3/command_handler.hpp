@@ -9,7 +9,7 @@ namespace puzikov
 {
   using CommandMap = std::map< std::string, std::function< void(std::istream &, std::ostream &) > >;
 
-  void readCommands(std::istream &, std::ostream &, CommandMap &);
+  void readCommands(std::istream &, std::ostream &, const CommandMap &);
   void restoreInputStream(std::istream &);
 }
 

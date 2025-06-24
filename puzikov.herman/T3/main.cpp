@@ -28,7 +28,7 @@ int main(int argc, char **argv)
   using std::placeholders::_1;
   using std::placeholders::_2;
 
-  CommandMap commands
+  const CommandMap commands
   {
       {"AREA", std::bind(areaCommand, _1, _2, std::cref(polygons))},
       {"MAX", std::bind(maxCommand, _1, _2, std::cref(polygons))},

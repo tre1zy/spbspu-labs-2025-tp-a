@@ -22,10 +22,6 @@ void puzikov::checkVerticesParameter(const std::string &param)
   {
     return;
   }
-  catch (const std::logic_error &)
-  {
-    throw std::runtime_error("<INVALID COMMAND>\n");
-  }
 }
 
 void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -45,15 +41,8 @@ void puzikov::areaCommand(std::istream &in, std::ostream &out, const std::vector
   }
 
   double areaSum;
-  try
-  {
-    checkVerticesParameter(param);
-    areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
-  }
-  catch (const std::logic_error &e)
-  {
-    throw std::runtime_error(e.what());
-  }
+  checkVerticesParameter(param);
+  areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator(param));
 
   if (param == "MEAN")
   {
@@ -157,7 +146,7 @@ void puzikov::rmEchoCommand(std::istream &in, std::ostream &out, std::vector< Po
     throw std::logic_error("Invalid polygon.");
   }
 
-  auto last = std::unique(polygons.begin(), polygons.end(), RmEchoPredicate {reference});
+  auto last = std::unique(polygons.begin(), polygons.end(), RmEchoPredicate{reference});
   unsigned counter = std::distance(last, polygons.end());
   polygons.erase(last, polygons.end());
   out << counter << '\n';
