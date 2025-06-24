@@ -76,10 +76,10 @@ namespace
     return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
   }
 
-  int getMaxSeq(const Polygon& polygon, const Polygon& target)
+  size_t getMaxSeq(const Polygon& polygon, const Polygon& target)
   {
-    int currentSeq = 0;
-    int maxSeq = 0;
+    size_t currentSeq = 0;
+    size_t maxSeq = 0;
     if (polygon == target)
     {
       currentSeq++;
@@ -146,35 +146,27 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
 
-  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds1;
-  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds2;
-  subcmds1["AREA"] = maxArea;
-  subcmds2["VERTEXES"] = maxVertexes;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > subcmds;
+  subcmds["AREA"] = maxArea;
+  subcmds["VERTEXES"] = maxVertexes;
   try
   {
-    out << subcmds1.at(subcommand)(polygons);
+    subcmds.at(subcommand)(polygons, out);
   }
   catch (...)
   {
-    try
-    {
-      out << subcmds2.at(subcommand)(polygons);
-    }
-    catch (...)
-    {
-      throw std::logic_error("<WRONG SUBCOMMAND>");
-    }
+    throw std::logic_error("<WRONG SUBCOMMAND>");
   }
 }
 
-double orlova::maxArea(const std::vector< Polygon >& polygons)
+void orlova::maxArea(const std::vector< Polygon >& polygons, std::ostream& out)
 {
-  return areaPolygon(*std::max_element(polygons.begin(), polygons.end(), areaComparator));
+  out << areaPolygon(*std::max_element(polygons.begin(), polygons.end(), areaComparator));
 }
 
-size_t orlova::maxVertexes(const std::vector< Polygon >& polygons)
+void orlova::maxVertexes(const std::vector< Polygon >& polygons, std::ostream& out)
 {
-  return (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator)).points.size();
+  out << (*std::max_element(polygons.begin(), polygons.end(), vertexesComparator)).points.size();
 }
 
 void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
@@ -187,35 +179,27 @@ void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::
   in >> subcommand;
   out << std::fixed << std::setprecision(1);
 
-  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > subcmds1;
-  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds2;
-  subcmds1["AREA"] = minArea;
-  subcmds2["VERTEXES"] = minVertexes;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > subcmds;
+  subcmds["AREA"] = minArea;
+  subcmds["VERTEXES"] = minVertexes;
   try
   {
-    out << subcmds1.at(subcommand)(polygons);
+    subcmds.at(subcommand)(polygons, out);
   }
   catch (...)
   {
-    try
-    {
-      out << subcmds2.at(subcommand)(polygons);
-    }
-    catch (...)
-    {
-      throw std::logic_error("<WRONG SUBCOMMAND>");
-    }
+    throw std::logic_error("<WRONG SUBCOMMAND>");
   }
 }
 
-double orlova::minArea(const std::vector< Polygon >& polygons)
+void orlova::minArea(const std::vector< Polygon >& polygons, std::ostream& out)
 {
-  return areaPolygon(*std::min_element(polygons.begin(), polygons.end(), areaComparator));
+  out << areaPolygon(*std::min_element(polygons.begin(), polygons.end(), areaComparator));
 }
 
-size_t orlova::minVertexes(const std::vector< Polygon >& polygons)
+void orlova::minVertexes(const std::vector< Polygon >& polygons, std::ostream& out)
 {
-  return (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator)).points.size();
+  out << (*std::min_element(polygons.begin(), polygons.end(), vertexesComparator)).points.size();
 }
 
 void orlova::count(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
@@ -283,7 +267,7 @@ void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, st
   {
     throw std::logic_error("THERE ARE NO IDENTIC POLYGONS");
   }
-  std::vector< int > seqVector(polygons.size());
+  std::vector< size_t > seqVector(polygons.size());
   std::transform(polygons.begin(), polygons.end(), seqVector.begin(), std::bind(getMaxSeq, _1, std::cref(polygon)));
   out << *std::max_element(seqVector.begin(), seqVector.end());
 }

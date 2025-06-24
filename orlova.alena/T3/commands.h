@@ -10,12 +10,12 @@ namespace orlova
   double areaNum(const std::vector< Polygon >&, size_t);
 
   void max(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  double maxArea(const std::vector< Polygon >&);
-  size_t maxVertexes(const std::vector< Polygon >&);
+  void maxArea(const std::vector< Polygon >&, std::ostream&);
+  void maxVertexes(const std::vector< Polygon >&, std::ostream&);
 
   void min(const std::vector< Polygon >&, std::istream&, std::ostream&);
-  double minArea(const std::vector< Polygon >&);
-  size_t minVertexes(const std::vector< Polygon >&);
+  void minArea(const std::vector< Polygon >&, std::ostream&);
+  void minVertexes(const std::vector< Polygon >&, std::ostream&);
 
   void count(const std::vector< Polygon >&, std::istream&, std::ostream&);
   size_t countEven(const std::vector< Polygon >&);
