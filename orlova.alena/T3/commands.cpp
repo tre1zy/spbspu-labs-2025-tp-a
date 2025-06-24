@@ -149,14 +149,7 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > subcmds;
   subcmds["AREA"] = maxArea;
   subcmds["VERTEXES"] = maxVertexes;
-  try
-  {
-    subcmds.at(subcommand)(polygons, out);
-  }
-  catch (...)
-  {
-    throw std::logic_error("<WRONG SUBCOMMAND>");
-  }
+  subcmds.at(subcommand)(polygons, out);
 }
 
 void orlova::maxArea(const std::vector< Polygon >& polygons, std::ostream& out)
@@ -182,14 +175,8 @@ void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::
   std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > subcmds;
   subcmds["AREA"] = minArea;
   subcmds["VERTEXES"] = minVertexes;
-  try
-  {
-    subcmds.at(subcommand)(polygons, out);
-  }
-  catch (...)
-  {
-    throw std::logic_error("<WRONG SUBCOMMAND>");
-  }
+  subcmds.at(subcommand)(polygons, out);
+  throw std::logic_error("<WRONG SUBCOMMAND>");
 }
 
 void orlova::minArea(const std::vector< Polygon >& polygons, std::ostream& out)
