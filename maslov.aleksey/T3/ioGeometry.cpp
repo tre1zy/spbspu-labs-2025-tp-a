@@ -52,6 +52,7 @@ std::istream & maslov::operator>>(std::istream & in, Polygon & dest)
     return in;
   }
   dest.points.clear();
+  dest.points.reserve(num);
   using iIterator = std::istream_iterator< Point >;
   std::copy_n(iIterator(in), num - 1, std::back_inserter(dest.points));
   if (in.peek() != '\n')

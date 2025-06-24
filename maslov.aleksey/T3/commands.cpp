@@ -42,10 +42,9 @@ namespace
       throw std::runtime_error("ERROR: there are no polygons");
     }
     maslov::StreamGuard guard(out);
-    std::vector< double > areas;
-    areas.reserve(polygons.size());
+    std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), maslov::getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
+    double result = std::accumulate(areas.begin(), areas.end(), 0.0) / polygons.size();
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
@@ -200,7 +199,7 @@ void maslov::getEcho(std::istream & in, std::ostream & out, std::vector< Polygon
     throw std::runtime_error("ERROR: wrong input");
   }
   std::vector< Polygon > result;
-  result.reserve(polygons.size());
+  result.reserve(polygons.size() * 2);
   size_t count = 0;
   result = polygons;
   for (auto it = polygons.begin(); it != polygons.end(); ++it)
