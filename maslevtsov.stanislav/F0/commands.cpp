@@ -153,3 +153,29 @@ void maslevtsov::copy_graph(graphs_t& graphs, std::istream& in)
   Graph new_gr(graphs.at(gr_name));
   graphs[new_gr_name] = new_gr;
 }
+
+void maslevtsov::delete_graph(graphs_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  in >> graph_name;
+  if (graphs.find(graph_name) == graphs.end()) {
+    throw std::invalid_argument("invalid graph names");
+  }
+  graphs.erase(graphs.find(graph_name));
+}
+
+void maslevtsov::delete_vertice(graphs_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  unsigned vertice = 0;
+  in >> graph_name >> vertice;
+  graphs.at(graph_name).delete_vertice(vertice);
+}
+
+void maslevtsov::delete_edge(graphs_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  unsigned vertice1 = 0, vertice2 = 0;
+  in >> graph_name >> vertice1 >> vertice2;
+  graphs.at(graph_name).delete_edge(vertice1, vertice2);
+}

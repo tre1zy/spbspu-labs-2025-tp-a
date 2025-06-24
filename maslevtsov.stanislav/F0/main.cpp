@@ -38,6 +38,10 @@ int main(int argc, char** argv)
     fin >> gr;
     graphs[graph_name] = gr;
   }
+  if (fin.fail() && !fin.eof()) {
+    std::cerr << "Error: invalid graphs format\n";
+    return 1;
+  }
 
   std::unordered_map< std::string, std::function< void() > > commands;
   commands["save"] = std::bind(save_graphs, std::cref(graphs), std::ref(std::cin));
@@ -48,9 +52,9 @@ int main(int argc, char** argv)
   commands["add-edge"] = std::bind(add_edge, std::ref(graphs), std::ref(std::cin));
   commands["print-graph"] = std::bind(print_graph, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
   commands["copy-graph"] = std::bind(copy_graph, std::ref(graphs), std::ref(std::cin));
-  // commands["delete-graph"] = std::bind(delete_graph, std::ref(graphs), std::ref(std::cin));
-  // commands["delete-vertice"] = std::bind(delete_vertice, std::ref(graphs), std::ref(std::cin));
-  // commands["delete-edge"] = std::bind(delete_edge, std::ref(graphs), std::ref(std::cin));
+  commands["delete-graph"] = std::bind(delete_graph, std::ref(graphs), std::ref(std::cin));
+  commands["delete-vertice"] = std::bind(delete_vertice, std::ref(graphs), std::ref(std::cin));
+  commands["delete-edge"] = std::bind(delete_edge, std::ref(graphs), std::ref(std::cin));
   // commands["union-graphs"] = std::bind(union_graphs, std::ref(graphs), std::ref(std::cin));
   // commands["create-subgraph"] = std::bind(create_subgraph, std::ref(graphs), std::ref(std::cin));
 

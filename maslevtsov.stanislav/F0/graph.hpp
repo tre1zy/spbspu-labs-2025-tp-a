@@ -24,7 +24,6 @@ namespace maslevtsov {
   private:
     using adjacency_list_t = std::unordered_map< unsigned, std::vector< unsigned > >;
     adjacency_list_t adjacency_list_;
-    std::vector< unsigned > solo_vertices_;
 
     friend std::istream& operator>>(std::istream& in, Graph& gr);
   };

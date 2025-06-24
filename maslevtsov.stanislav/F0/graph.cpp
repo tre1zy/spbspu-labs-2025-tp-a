@@ -2,25 +2,14 @@
 #include <iostream>
 
 namespace {
-  bool find_if_contain(const std::vector< unsigned >& vertices, unsigned vertice)
+  std::vector< unsigned >::const_iterator find_neighbour(const std::vector< unsigned >& vertices, unsigned vertice)
   {
-    for (size_t i = 0; i != vertices.size(); ++i) {
-      if (vertices[i] == vertice) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  void delete_solo_vertice(std::vector< unsigned >& vertices, unsigned vertice)
-  {
-    for (auto i = vertices.begin(); i != vertices.end();) {
+    for (auto i = vertices.cbegin(); i != vertices.cend(); ++i) {
       if (vertice == *i) {
-        i = vertices.erase(i);
-      } else {
-        ++i;
+        return i;
       }
     }
+    return vertices.cend();
   }
 
   struct DelimiterIn
@@ -45,27 +34,54 @@ namespace {
 
 size_t maslevtsov::Graph::get_vertice_count() const
 {
-  return adjacency_list_.size() + solo_vertices_.size();
+  return adjacency_list_.size();
 }
 
 void maslevtsov::Graph::add_vertice(unsigned vertice)
 {
-  if (find_if_contain(solo_vertices_, vertice)) {
+  if (adjacency_list_.find(vertice) != adjacency_list_.end()) {
     throw std::invalid_argument("vertice already exist");
   }
-  solo_vertices_.push_back(vertice);
+  adjacency_list_[vertice];
 }
 
 void maslevtsov::Graph::add_edge(unsigned vertice1, unsigned vertice2)
 {
-  auto it1 = adjacency_list_.find(vertice1);
-  if (it1 != adjacency_list_.end() && find_if_contain(it1->second, vertice2)) {
-    throw std::invalid_argument("edge already exist");
+  auto vertice1_it = adjacency_list_.find(vertice1);
+  if (vertice1_it != adjacency_list_.end()) {
+    if (find_neighbour(vertice1_it->second, vertice2) != vertice1_it->second.cend()) {
+      throw std::invalid_argument("edge already exist");
+    }
   }
   adjacency_list_[vertice1].push_back(vertice2);
   adjacency_list_[vertice2].push_back(vertice1);
-  delete_solo_vertice(solo_vertices_, vertice1);
-  delete_solo_vertice(solo_vertices_, vertice2);
+}
+
+void maslevtsov::Graph::delete_vertice(unsigned vertice)
+{
+  if (adjacency_list_.find(vertice) == adjacency_list_.end()) {
+    throw std::invalid_argument("non-existing vertice");
+  }
+  auto neighbours_it = adjacency_list_.find(vertice)->second;
+  for (auto i = neighbours_it.begin(); i != neighbours_it.end(); ++i) {
+    auto neighbour_it = adjacency_list_.find(*i);
+    neighbour_it->second.erase(find_neighbour(neighbour_it->second, vertice));
+  }
+  adjacency_list_.erase(adjacency_list_.find(vertice));
+}
+
+void maslevtsov::Graph::delete_edge(unsigned vertice1, unsigned vertice2)
+{
+  auto vertice1_it = adjacency_list_.find(vertice1);
+  if (vertice1_it == adjacency_list_.end()) {
+    throw std::invalid_argument("non-existing edge");
+  }
+  if (find_neighbour(vertice1_it->second, vertice2) == vertice1_it->second.cend()) {
+    throw std::invalid_argument("non-existing edge");
+  }
+  vertice1_it->second.erase(find_neighbour(vertice1_it->second, vertice2));
+  auto vertice2_it = adjacency_list_.find(vertice2);
+  vertice2_it->second.erase(find_neighbour(vertice2_it->second, vertice1));
 }
 
 void maslevtsov::Graph::print_adjacency_list(std::ostream& out) const
@@ -79,14 +95,10 @@ void maslevtsov::Graph::print_adjacency_list(std::ostream& out) const
   }
   for (auto i = ++adjacency_list_.cbegin(); i != adjacency_list_.cend(); ++i) {
     out << '\n' << i->first << " :";
-    for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
-      out << ' ' << *j;
-    }
-  }
-  if (!solo_vertices_.empty()) {
-    out << '\n' << solo_vertices_[0] << " :";
-    for (size_t i = 1; i != solo_vertices_.size(); ++i) {
-      out << '\n' << solo_vertices_[i] << " :";
+    if (!i->second.empty()) {
+      for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
+        out << ' ' << *j;
+      }
     }
   }
 }
@@ -103,6 +115,9 @@ std::istream& maslevtsov::operator>>(std::istream& in, Graph& gr)
   for (size_t i = 0; i != vertice_count; ++i) {
     unsigned vertice = 0, neighbour = 0;
     in >> vertice >> DelimiterIn{':'};
+    if (!in) {
+      return in;
+    }
     bool is_neighbour = false;
     while (in.peek() != '\n') {
       in >> neighbour;
