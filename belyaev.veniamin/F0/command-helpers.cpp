@@ -1,6 +1,8 @@
 #include "command-helpers.hpp"
+#include <functional>
+#include <algorithm>
 
-belyaev::Dictionary* belyaev::searchDictByName(Dictionaries& data, const std::string name)
+belyaev::Dictionary* belyaev::searchDictByName(Dictionaries& data, const std::string& name)
 {
   auto result = data.dicts.find(name);
   if (result == data.dicts.end())
@@ -10,7 +12,7 @@ belyaev::Dictionary* belyaev::searchDictByName(Dictionaries& data, const std::st
   return &(result->second);
 }
 
-const belyaev::Dictionary* belyaev::searchDictByName(const Dictionaries& data, const std::string name)
+const belyaev::Dictionary* belyaev::searchDictByName(const Dictionaries& data, const std::string& name)
 {
   auto result = data.dicts.find(name);
   if (result == data.dicts.end())
@@ -20,12 +22,29 @@ const belyaev::Dictionary* belyaev::searchDictByName(const Dictionaries& data, c
   return &(result->second);
 }
 
-bool belyaev::isRuWordInDictionary(Dictionary& dictionary, const std::string word)
+bool belyaev::isTranslationInEntry(const std::pair<const std::string, std::string> entry, const std::string& translation)
 {
-  auto result = dictionary.dict.find(word);
-  if (result == dictionary.dict.end())
-  {
-    return false;
-  }
-  return true;
+  return entry.second == translation;
+}
+
+belyaev::dictionaryIterator belyaev::getItOfWordInDictByRu(const Dictionary& dictionary, const std::string& ruWord)
+{
+  return dictionary.dict.find(ruWord);
+}
+
+belyaev::dictionaryIterator belyaev::getItOfWordInDictByEn(const Dictionary& dictionary, const std::string& enWord)
+{
+  using namespace std::placeholders;
+  auto isTranslationInEntryBind = std::bind(isTranslationInEntry, _1, enWord);
+  return std::find_if(dictionary.dict.begin(), dictionary.dict.end(), isTranslationInEntryBind);
+}
+
+bool belyaev::isRuWordInDictionary(const Dictionary& dictionary, dictionaryIterator itRuWord)
+{
+  return itRuWord != dictionary.dict.end();
+}
+
+bool belyaev::isEnWordInDictionary(const Dictionary& dictionary, dictionaryIterator itEnWord)
+{
+  return itEnWord != dictionary.dict.end();
 }
