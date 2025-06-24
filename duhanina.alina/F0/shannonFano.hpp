@@ -19,18 +19,18 @@ namespace duhanina
   struct Node
   {
     char symbol;
-    int freq;
+    size_t freq;
     Node* left;
     Node* right;
 
-    Node(char s, int f):
+    Node(char s, size_t f):
       symbol(s),
       freq(f),
       left(nullptr),
       right(nullptr)
     {}
 
-    Node(int f, Node* l, Node* r):
+    Node(size_t f, Node* l, Node* r):
       symbol(0),
       freq(f),
       left(l),

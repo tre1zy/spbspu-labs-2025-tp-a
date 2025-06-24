@@ -23,7 +23,7 @@ namespace
     }
   }
 
-  bool compare_nodes(const std::pair< char, int >& a, const std::pair< char, int >& b)
+  bool compare_nodes(const std::pair< char, size_t >& a, const std::pair< char, size_t >& b)
   {
     return a.second > b.second;
   }
@@ -75,12 +75,12 @@ namespace
 
   std::pair< duhanina::Node*, duhanina::Node* > split_nodes(const std::vector< duhanina::Node* >& nodes)
   {
-    int total = 0;
+    size_t total = 0;
     for (duhanina::Node* node: nodes)
     {
       total += node->freq;
     }
-    int sum = 0;
+    size_t sum = 0;
     size_t split_pos = 0;
     for (; split_pos < nodes.size(); split_pos++)
     {
@@ -115,7 +115,7 @@ namespace
     {
       throw std::runtime_error("EMPTY");
     }
-    std::map< char, int > freq_map;
+    std::map< char, size_t > freq_map;
     for (char c: text)
     {
       freq_map[c]++;
@@ -124,13 +124,13 @@ namespace
     {
       throw std::runtime_error("SINGLE_SYMBOL");
     }
-    std::vector< std::pair< char, int > > sorted_freq(freq_map.begin(), freq_map.end());
+    std::vector< std::pair< char, size_t > > sorted_freq(freq_map.begin(), freq_map.end());
     std::sort(sorted_freq.begin(), sorted_freq.end(), compare_nodes);
     std::vector< duhanina::Node* > nodes;
     for (auto& pair: sorted_freq)
     {
       char ch = pair.first;
-      int freq = pair.second;
+      size_t freq = pair.second;
       nodes.push_back(new duhanina::Node(ch, freq));
     }
     while (nodes.size() > 1)
@@ -203,7 +203,7 @@ namespace
       out.put(byte);
     }
     char buffer = 0;
-    int bit_pos = 0;
+    size_t bit_pos = 0;
     for (size_t i = 0; i < bits.size(); i++)
     {
       if (bits[i] == '1')
@@ -246,7 +246,7 @@ namespace
     char byte;
     while (in.get(byte) && bits.size() < bit_count)
     {
-      for (int i = 0; i < 8 && bits.size() < bit_count; i++)
+      for (size_t i = 0; i < 8 && bits.size() < bit_count; i++)
       {
         if (byte & (1 << (7 - i)))
         {
