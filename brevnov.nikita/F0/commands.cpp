@@ -347,6 +347,19 @@ namespace
     brevnov::Team& team;
     brevnov::League& league;
   };
+
+  struct PositionBuyer
+  {
+    bool operator()(brevnov::Position pos) const
+    {
+      buyP(out, league, team, budget, pos);
+      return true;
+    }
+    std::ostream& out;
+    brevnov::League& league;
+    brevnov::Team& team;
+    size_t budget;
+  };
 }
 
 bool brevnov::checkPosition(std::string pos)
@@ -547,10 +560,9 @@ void brevnov::buyTeam(std::istream& in, std::ostream& out, League& league)
   }
   const std::array<Position, 6> positions = {Position::LF, Position::RF,
     Position::CF,Position::LB, Position::RB, Position::G};
-  for (auto it = positions.begin(); it != positions.end(); ++it)
-  {
-    buyP(out, league, teamIt->second, bud / 6, *it);
-  }
+  PositionBuyer buyer{out, league, teamIt->second, bud / 6};
+  std::vector<int> dummy(positions.size());
+  std::transform(positions.begin(), positions.end(), dummy.begin(), buyer);
 }
 
 void brevnov::soldPlayer(std::istream& in, League& league)
