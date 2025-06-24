@@ -13,6 +13,7 @@ namespace orlova
   bool isEven(const Polygon&);
   bool isOdd(const Polygon&);
   bool isNum(const Polygon&, size_t);
+  int isEqual(const Polygon&, const Polygon&);
   double accumulator(double, const Polygon&, std::function < bool(const Polygon&) >);
   double numAreaAccumulator(double, const Polygon&, size_t);
   bool areaComparator(const Polygon&, const Polygon&);
@@ -41,6 +42,7 @@ namespace orlova
   bool isPermutation(const Polygon&, const Polygon&);
 
   void maxseq(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  int getMaxSeq(int, int);
 }
 
 #endif

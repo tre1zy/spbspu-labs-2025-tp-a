@@ -39,6 +39,11 @@ bool orlova::isNum(const Polygon& polygon, size_t numOfVertexes)
   return polygon.points.size() == numOfVertexes;
 }
 
+int orlova::isEqual(const Polygon& a, const Polygon& b)
+{
+  return a == b;
+}
+
 double orlova::accumulator(double sum, const Polygon& polygon, std::function< bool(const Polygon&) > function)
 {
   return function(polygon) ? sum + areaPolygon(polygon) : sum;
@@ -257,6 +262,7 @@ bool orlova::isPermutation(const Polygon& polygon1, const Polygon& polygon2)
 
 void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
+  using namespace std::placeholders;
   Polygon polygon;
   in >> polygon;
   if (polygon.points.size() < 3)
@@ -267,19 +273,17 @@ void orlova::maxseq(const std::vector< Polygon >& polygons, std::istream& in, st
   {
     throw std::logic_error("THERE ARE NO IDENTIC POLYGONS");
   }
-  size_t maxCount = 0;
-  size_t currentCount = 0;
-  for (const auto& poly : polygons)
+  std::vector< int > seqVector(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), seqVector.begin(), std::bind(isEqual, _1, std::cref(polygon)));
+  std::transform(seqVector.begin() + 1, seqVector.end(), seqVector.begin(), seqVector.begin() + 1, getMaxSeq);
+  out << *std::max_element(seqVector.begin(), seqVector.end());
+}
+
+int orlova::getMaxSeq(int a, int b)
+{
+  if (a == 0 || b == 0)
   {
-    if (poly == polygon)
-    {
-      currentCount++;
-      maxCount = std::max(maxCount, currentCount);
-    }
-    else
-    {
-      currentCount = 0;
-    }
+    return a;
   }
-  out << maxCount << "\n";
+  return a + b;
 }
