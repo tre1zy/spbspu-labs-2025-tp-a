@@ -144,9 +144,6 @@ double areaNum(const std::vector<Polygon>& polys, int num)
   }
 
   try {
-    bool printDouble = false;
-    double dblResult = 0.0;
-    int intResult = 0;
 
     std::map<std::string, void (CommandProcessor::*)(const std::string&) const> handlers = {
       {"AREA", &CommandProcessor::command_area},
@@ -163,15 +160,106 @@ double areaNum(const std::vector<Polygon>& polys, int num)
     } else {
       throw std::runtime_error("Unknown command");
     }
-
-    if (printDouble) {
-      std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
-    } else {
-      std::cout << intResult << "\n";
-    }
   }
   catch (const std::exception&) {
     std::cout << "<INVALID COMMAND>\n";
-  };
-};
+  }
+}
+void CommandProcessor::command_area(const std::string& rest) const {
+  double result = 0.0;
+
+  if (rest == "EVEN") {
+    result = areaEven(polygons_);
+  } else if (rest == "ODD") {
+    result = areaOdd(polygons_);
+  } else if (rest == "MEAN") {
+    result = areaMean(polygons_);
+  } else {
+    std::istringstream iss(rest);
+    int num;
+    if (!(iss >> num) || num < 3) {
+      throw std::runtime_error("Invalid argument");
+    }
+    result = areaNum(polygons_, num);
+  }
+
+  std::cout << std::fixed << std::setprecision(1) << result << "\n";
+}
+
+void CommandProcessor::command_count(const std::string& rest) const {
+  std::istringstream iss(rest);
+  int num;
+  if (!(iss >> num) || num < 3) {
+    throw std::runtime_error("Invalid argument");
+  }
+
+  int count = 0;
+  if (polygons_.size() > 0 && static_cast<int>(polygons_[0].points.size()) == num) ++count;
+  if (polygons_.size() > 1 && static_cast<int>(polygons_[1].points.size()) == num) ++count;
+  if (polygons_.size() > 2 && static_cast<int>(polygons_[2].points.size()) == num) ++count;
+  if (polygons_.size() > 3 && static_cast<int>(polygons_[3].points.size()) == num) ++count;
+  if (polygons_.size() > 4 && static_cast<int>(polygons_[4].points.size()) == num) ++count;
+
+  std::cout << count << "\n";
+}
+
+void CommandProcessor::command_max(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+
+  double maxArea = 0.0;
+  if (polygons_.size() > 0) maxArea = compute_area(polygons_[0]);
+  if (polygons_.size() > 1) maxArea = std::max(maxArea, compute_area(polygons_[1]));
+  if (polygons_.size() > 2) maxArea = std::max(maxArea, compute_area(polygons_[2]));
+  if (polygons_.size() > 3) maxArea = std::max(maxArea, compute_area(polygons_[3]));
+  if (polygons_.size() > 4) maxArea = std::max(maxArea, compute_area(polygons_[4]));
+
+  std::cout << std::fixed << std::setprecision(1) << maxArea << "\n";
+}
+
+void CommandProcessor::command_min(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+
+  if (polygons_.empty()) {
+    std::cout << "0.0\n";
+    return;
+  }
+
+  double minArea = compute_area(polygons_[0]);
+  if (polygons_.size() > 1) minArea = std::min(minArea, compute_area(polygons_[1]));
+  if (polygons_.size() > 2) minArea = std::min(minArea, compute_area(polygons_[2]));
+  if (polygons_.size() > 3) minArea = std::min(minArea, compute_area(polygons_[3]));
+  if (polygons_.size() > 4) minArea = std::min(minArea, compute_area(polygons_[4]));
+
+  std::cout << std::fixed << std::setprecision(1) << minArea << "\n";
+}
+
+void CommandProcessor::command_intersections(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+
+  int count = 0;
+  if (polygons_.size() > 1 && intersect(polygons_[0], polygons_[1])) ++count;
+  if (polygons_.size() > 2 && intersect(polygons_[0], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && intersect(polygons_[0], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && intersect(polygons_[0], polygons_[4])) ++count;
+  if (polygons_.size() > 2 && intersect(polygons_[1], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && intersect(polygons_[1], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && intersect(polygons_[1], polygons_[4])) ++count;
+  if (polygons_.size() > 3 && intersect(polygons_[2], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && intersect(polygons_[2], polygons_[4])) ++count;
+  if (polygons_.size() > 4 && intersect(polygons_[3], polygons_[4])) ++count;
+
+  std::cout << count << "\n";
+}
+
+void CommandProcessor::command_rmecho(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+  if (polygons_.empty()) {
+    std::cout << "0\n";
+    return;
+  }
+
+  Polygon last = polygons_.back();
+  std::vector<Polygon> copy = polygons_;
+  process_rmecho(copy, last);
+}
 }
