@@ -8,6 +8,9 @@
 namespace belyaev
 {
   void insertEntry(Dictionaries& data, std::istream& in, std::ostream& out);
+  void removeEntry(Dictionaries& data, std::istream& in, std::ostream& out);
+  void searchEntry(const Dictionaries& data, std::istream& in, std::ostream& out);
+  void searchEntryByEnglish(const Dictionaries& data, std::istream& in, std::ostream& out);
   void printDict(const Dictionaries& data, std::istream& in, std::ostream& out);
 
   using commandMap = std::map<std::string, std::function<void(std::istream&, std::ostream&)>>;
