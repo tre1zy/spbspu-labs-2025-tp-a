@@ -150,6 +150,15 @@ namespace
       return Empty{};
     }
   };
+
+  struct CallPrinter
+  {
+    std::reference_wrapper<TranslationPrinter> operator()(std::reference_wrapper<TranslationPrinter> printerWrapper, const std::string & tr) const
+    {
+      printerWrapper.get()(tr);
+      return printerWrapper;
+    }
+  };
 }
 
 
@@ -203,22 +212,21 @@ namespace bocharov
     std::accumulate(dict.begin(), dict.end(), Empty{}, AccumulatePrinter{ out });
   }
 
-  void getTranslationSln(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
-  {
-    std::string dictname, sln;
-    in >> dictname >> sln;
-    const dict_t & dict = dicts.at(dictname);
-    const list_t & translations = dict.at(sln);
+ void getTranslationSln(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
+ {
+   std::string dictname, sln;
+   in >> dictname >> sln;
+   const dict_t & dict = dicts.at(dictname);
+   const list_t & translations = dict.at(sln);
 
-    out << sln << ":";
-    TranslationPrinter printer{ out };
-    printer.first = true;
-    for (const auto & tr : translations)
-    {
-      printer(tr);
-    }
-    out << "\n";
-  }
+   out << sln << ":";
+
+   TranslationPrinter printer{ out };
+   printer.first = true;
+
+   std::accumulate(translations.begin(), translations.end(), std::ref(printer), CallPrinter{});
+   out << "\n";
+ }
 
   void getTranslationRu(std::istream & in, std::ostream & out, const dict_dict_t & dicts)
   {
