@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <cmath>
-#include "delimetr.hpp"
+#include <delimetr.hpp>
 
 std::istream & smirnov::operator>>(std::istream & in, Point & point)
 {
