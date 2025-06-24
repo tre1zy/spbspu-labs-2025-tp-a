@@ -1,13 +1,9 @@
 #include "commands.h"
-#include <iostream>
-#include <sstream>
 #include <limits>
 #include <algorithm>
 #include <iomanip>
 #include <map>
-#include <functional>
 #include <numeric>
-#include <type_traits>
 #include "geom.h"
 
 double orlova::subArea(const Point& a, const Point& b)
@@ -21,6 +17,11 @@ double orlova::areaPolygon(const Polygon& polygon)
   double sum = std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, subArea);
   sum += subArea (p.back(), p.front());
   return std::abs(sum) / 2.0;
+}
+
+double orlova::sumPolygonAreas(double sum, const Polygon& polygon)
+{
+  return sum + areaPolygon(polygon);
 }
 
 bool orlova::isEven(const Polygon& polygon)
@@ -64,20 +65,11 @@ double orlova::areaOdd(const std::vector< Polygon >& polygons)
 
 double orlova::areaMean(const std::vector< Polygon >& polygons)
 {
-  using namespace std::placeholders;
   if (polygons.size() == 0)
   {
     throw std::logic_error("<THERE ARE NO POLYGONS>");
   }
-  struct AlwaysTrue
-  {
-    bool operator()(const Polygon&) const
-    {
-      return true;
-    }
-  };
-  auto bind = std::bind(accumulator, AlwaysTrue{}, _1, _2);
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, bind) / polygons.size();
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, sumPolygonAreas) / polygons.size();
 }
 
 double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)

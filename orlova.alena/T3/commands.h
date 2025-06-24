@@ -9,6 +9,7 @@ namespace orlova
 {
   double subArea(const Point&, const Point&);
   double areaPolygon(const Polygon&);
+  double sumPolygonAreas(double, const Polygon&);
   bool isEven(const Polygon&);
   bool isOdd(const Polygon&);
   bool isNum(const Polygon&, size_t);
