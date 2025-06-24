@@ -1,5 +1,6 @@
 #include "analyzeAndParseFunctors.hpp"
 #include <algorithm>
+#include <cctype>
 #include <regex>
 #include <cmath>
 
