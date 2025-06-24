@@ -27,27 +27,26 @@ std::istream& averenkov::operator>>(std::istream& in, Point& p)
 
 std::istream& averenkov::operator>>(std::istream& in, averenkov::Polygon& poly)
 {
-  std::istream::sentry sentry(in);
+  std::istream::sentry sentry{ in };
   if (!sentry)
   {
     return in;
   }
   size_t numPoints = 0;
   in >> numPoints;
-  if (numPoints < 3)
+  if (!in || numPoints < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > points(numPoints);
-  poly.points.resize(numPoints);
+  std::vector< Point > points{ numPoints };
   std::copy_n(std::istream_iterator< Point >(in), numPoints, points.begin());
-  if (poly.points.size() != numPoints)
+  if (!in || points.size() != numPoints)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  poly.points = std::move(points);
+  poly.points = points;
   return in;
 }
 
