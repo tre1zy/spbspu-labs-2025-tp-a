@@ -2,10 +2,12 @@
 #define COMMANDS_HPP
 #include <iomanip>
 #include <string>
+#include <functional>
 #include "polygon.hpp"
 
 namespace shak
 {
+  void createCommandHandler(std::map< std::string, std::function< void() > > &cmds, std::vector< Polygon > &polygons);
   void cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);
   void cmdMax(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);
   void cmdMin(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);

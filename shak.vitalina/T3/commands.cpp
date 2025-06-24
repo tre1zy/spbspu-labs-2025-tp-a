@@ -1,11 +1,20 @@
 #include "commands.hpp"
 #include <algorithm>
-#include <functional>
 #include <iterator>
 #include <numeric>
 #include <limits>
 #include <string>
 #include "polygon.hpp"
+
+void shak::createCommandHandler(std::map< std::string, std::function< void() > > &cmds, std::vector< Polygon > &polygons)
+{
+  cmds["AREA"] = std::bind(cmdArea, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["MAX"] = std::bind(cmdMax, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["MIN"] = std::bind(cmdMin, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["COUNT"] = std::bind(cmdCount, std::cref(polygons),std::ref(std::cin), std::ref(std::cout));
+  cmds["MAXSEQ"] = std::bind(cmdMaxSeq, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
+  cmds["RECTS"] = std::bind(cmdRects, std::cref(polygons), std::ref(std::cout));
+}
 
 void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
 {
