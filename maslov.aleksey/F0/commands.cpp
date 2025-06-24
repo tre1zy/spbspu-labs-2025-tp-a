@@ -75,6 +75,19 @@ namespace
     auto it = dict2.find(word.first);
     return {word.first, std::min(word.second, it->second)};
   }
+
+  void mergeWords(maslov::Dict & result, const maslov::Word & word)
+  {
+    auto it = result.find(word.first);
+    if (it != result.end())
+    {
+      it->second += word.second;
+    }
+    else
+    {
+      result.insert(word);
+    }
+  }
 }
 
 void maslov::createDictionary(std::istream & in, Dicts & dicts)
@@ -129,10 +142,10 @@ void maslov::loadText(std::istream & in, Dicts & dicts)
 
 void maslov::unionDictionary(std::istream & in, Dicts & dicts)
 {
-  std::string dict1, dict2, resultName;
-  in >> resultName >> dict1 >> dict2;
-  auto it1 = dicts.find(dict1);
-  auto it2 = dicts.find(dict2);
+  std::string dictName1, dictName2, resultName;
+  in >> resultName >> dictName1 >> dictName2;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
     throw std::runtime_error("<INVALID DICTIONARY>");
@@ -141,12 +154,13 @@ void maslov::unionDictionary(std::istream & in, Dicts & dicts)
   {
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
-  auto & resultDict = dicts[resultName];
-  resultDict = it1->second;
-  for (auto it = it2->second.begin(); it != it2->second.end(); it++)
-  {
-    resultDict[it->first] += it->second;
-  }
+  auto & result = dicts[resultName];
+  const auto & dict1 = dicts[dictName1];
+  const auto & dict2 = dicts[dictName2];
+  std::copy(dict1.begin(), dict1.end(), std::inserter(result, result.begin()));
+  using namespace std::placeholders;
+  auto func = std::bind(mergeWords, std::ref(result), _1);
+  std::for_each(dict2.begin(), dict2.end(), func);
 }
 
 void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
