@@ -31,9 +31,9 @@ void shapkov::cleanWord(std::string& word)
   std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 }
 
-double shapkov::EntropyCalc::operator()(const std::pair< std::string, size_t >& word_pair) const
+double shapkov::EntropyCalc::operator()(const std::pair< std::string, size_t >& wordPair) const
 {
-  double wordProbability = static_cast< double >(word_pair.second) / size;
+  double wordProbability = static_cast< double >(wordPair.second) / size;
   return wordProbability * log2(wordProbability);
 }
 

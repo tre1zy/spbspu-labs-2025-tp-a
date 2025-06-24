@@ -30,7 +30,7 @@ namespace shapkov
   struct EntropyCalc
   {
     size_t size;
-    double operator()(const std::pair< std::string, size_t >& word_pair) const;
+    double operator()(const std::pair< std::string, size_t >& wordPair) const;
   };
   struct ExtractFirst
   {
@@ -74,10 +74,10 @@ namespace shapkov
     size_t& counter_;
   };
   template< class Cond >
-  class DictProc
+  class DictProcessor
   {
   public:
-    DictProc(std::ostream& out, Cond& checker, size_t& counter):
+    DictProcessor(std::ostream& out, Cond& checker, size_t& counter):
       out_(out),
       checker_(checker),
       counter_(counter)
@@ -93,10 +93,10 @@ namespace shapkov
     size_t& counter_;
   };
   template<>
-  class DictProc< FrequencyChecker >
+  class DictProcessor< FrequencyChecker >
   {
   public:
-    DictProc(std::ostream& out, FrequencyChecker& checker, size_t& counter):
+    DictProcessor(std::ostream& out, FrequencyChecker& checker, size_t& counter):
       out_(out),
       checker_(checker),
       counter_(counter)

@@ -72,7 +72,7 @@ void shapkov::anagrams(std::istream& in, std::ostream& out, const FrequencyDicti
   cleanWord(word);
   isAnagram anagramChecker{ word };
   size_t anagramsCnt = 0;
-  DictProc< isAnagram > dictProcessor{ out, anagramChecker, anagramsCnt };
+  DictProcessor< isAnagram > dictProcessor{ out, anagramChecker, anagramsCnt };
   std::for_each(dict.dicts.begin(), dict.dicts.end(), dictProcessor);
   if (anagramsCnt == 0)
   {
@@ -92,7 +92,7 @@ void shapkov::similar_frequency(std::istream& in, std::ostream& out, const Frequ
   cleanWord(word);
   size_t freqCnt = 0;
   FrequencyChecker freqChecker{ word, delta, out, 0 };
-  DictProc< FrequencyChecker > dictProcessor{ out, freqChecker, freqCnt };
+  DictProcessor< FrequencyChecker > dictProcessor{ out, freqChecker, freqCnt };
   std::for_each(dict.dicts.begin(), dict.dicts.end(), dictProcessor);
   if (freqCnt == 0)
   {
