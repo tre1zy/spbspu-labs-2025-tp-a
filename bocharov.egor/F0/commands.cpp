@@ -144,7 +144,7 @@ namespace
   struct AccumulatePrinter
   {
     std::ostream & out;
-    Empty operator()(Empty accum, const std::pair<std::string, std::vector<std::string>> & entry) const
+    Empty operator()([[maybe_unused]] Empty accum, const std::pair<std::string, std::vector<std::string>> & entry) const
     {
       DictPrinter{ out }(entry);
       return Empty{};
