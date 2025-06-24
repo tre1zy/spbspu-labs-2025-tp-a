@@ -26,11 +26,11 @@ void kostyukov::CommandProcessor::process(const std::string& commandName)
 {
   try
   {
-  commands_.at(commandName)();
+    commands_.at(commandName)();
   }
   catch (const std::out_of_range&)
   {
-    throw std::invalid_argument("<INVALID COMMAND>");
+    throw std::out_of_range("<INVALID COMMAND>");
   }
   return;
 }
