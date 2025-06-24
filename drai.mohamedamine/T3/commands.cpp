@@ -89,11 +89,6 @@ namespace amine
       return a.points.size() < b.points.size();
     }
   };
-  std::istream& operator>>(std::istream& is, Line& line)
-  {
-    std::getline(is, line.content);
-    return is;
-  }
 
   struct EqualToQuery
   {
@@ -153,75 +148,146 @@ namespace amine
       polygons(polys)
     {}
 
-    void operator()(const Line& line) const
+    void operator()(const std::string& line) const
     {
-      if (line.content.empty())
-      {
-        return;
+      const std::string& content = line;
+      if (content.empty()) {
+       return;
       }
-      std::istringstream iss(line.content);
+
+      std::string::size_type spacePos = content.find(' ');
       std::string cmd;
-      iss >> cmd;
-      bool invalid = false;
+      std::string rest;
+
+    if (spacePos == std::string::npos) {
+     cmd = content;
+   } else {
+    cmd = content.substr(0, spacePos);
+    rest = content.substr(spacePos + 1);
+   }
+
+try {
       bool printDouble = false;
       double dblResult = 0.0;
       int intResult = 0;
-      if (cmd == "AREA")
+            if (cmd == "AREA")
       {
         std::string arg;
-        iss >> arg;
+        std::string::size_type spacePos = rest.find(' ');
+
+        if (spacePos == std::string::npos) {
+          arg = rest;
+        } else {
+          arg = rest.substr(0, spacePos);
+        }
+
         if (arg == "EVEN")
         {
-          dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
+          dblResult = 0.0;
+          if (polygons.size() > 0 && polygons[0].points.size() % 2 == 0) {
+            dblResult += compute_area(polygons[0]);
+          }
+          if (polygons.size() > 1 && polygons[1].points.size() % 2 == 0) {
+            dblResult += compute_area(polygons[1]);
+          }
+          if (polygons.size() > 2 && polygons[2].points.size() % 2 == 0) {
+            dblResult += compute_area(polygons[2]);
+          }
+          if (polygons.size() > 3 && polygons[3].points.size() % 2 == 0) {
+            dblResult += compute_area(polygons[3]);
+          }
+          if (polygons.size() > 4 && polygons[4].points.size() % 2 == 0) {
+            dblResult += compute_area(polygons[4]);
+          }
           printDouble = true;
         }
         else if (arg == "ODD")
         {
-          dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
+          dblResult = 0.0;
+          if (polygons.size() > 0 && polygons[0].points.size() % 2 != 0) {
+            dblResult += compute_area(polygons[0]);
+          }
+          if (polygons.size() > 1 && polygons[1].points.size() % 2 != 0) {
+            dblResult += compute_area(polygons[1]);
+          }
+          if (polygons.size() > 2 && polygons[2].points.size() % 2 != 0) {
+            dblResult += compute_area(polygons[2]);
+          }
+          if (polygons.size() > 3 && polygons[3].points.size() % 2 != 0) {
+            dblResult += compute_area(polygons[3]);
+          }
+          if (polygons.size() > 4 && polygons[4].points.size() % 2 != 0) {
+            dblResult += compute_area(polygons[4]);
+          }
           printDouble = true;
         }
         else if (arg == "MEAN")
         {
-          if (polygons.empty())
-          {
-            invalid = true;
-          }
-          else
-          {
-            double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
+          if (polygons.empty()) {
+            throw std::runtime_error("Invalid command");
+          } else {
+            double total = 0.0;
+            if (polygons.size() > 0) total += compute_area(polygons[0]);
+            if (polygons.size() > 1) total += compute_area(polygons[1]);
+            if (polygons.size() > 2) total += compute_area(polygons[2]);
+            if (polygons.size() > 3) total += compute_area(polygons[3]);
+            if (polygons.size() > 4) total += compute_area(polygons[4]);
+
             dblResult = total / polygons.size();
             printDouble = true;
           }
         }
         else
         {
-          bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-          if (is_num)
+          bool isNum = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
+          if (isNum)
           {
             int num = std::stoi(arg);
             if (num < 3)
             {
-              invalid = true;
+              throw std::runtime_error("Invalid command");
             }
             else
             {
-              dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num));
+              dblResult = 0.0;
+              if (polygons.size() > 0 && static_cast<int>(polygons[0].points.size()) == num) {
+                dblResult += compute_area(polygons[0]);
+              }
+              if (polygons.size() > 1 && static_cast<int>(polygons[1].points.size()) == num) {
+                dblResult += compute_area(polygons[1]);
+              }
+              if (polygons.size() > 2 && static_cast<int>(polygons[2].points.size()) == num) {
+                dblResult += compute_area(polygons[2]);
+              }
+              if (polygons.size() > 3 && static_cast<int>(polygons[3].points.size()) == num) {
+                dblResult += compute_area(polygons[3]);
+              }
+              if (polygons.size() > 4 && static_cast<int>(polygons[4].points.size()) == num) {
+                dblResult += compute_area(polygons[4]);
+              }
               printDouble = true;
             }
           }
           else
           {
-            invalid = true;
+            throw std::runtime_error("Invalid command");
           }
         }
       }
+
       else if (cmd == "MAX")
       {
         std::string arg;
-        iss >> arg;
+        std::string::size_type argPos = rest.find(' ');
+        if (argPos == std::string::npos) {
+         arg = rest;
+        } else {
+         arg = rest.substr(0, argPos);
+        }
+
         if (polygons.empty())
         {
-          invalid = true;
+          throw std::runtime_error("Invalid command");
         }
         else if (arg == "AREA")
         {
@@ -236,16 +302,22 @@ namespace amine
         }
         else
         {
-          invalid = true;
+          throw std::runtime_error("Invalid command");
         }
       }
       else if (cmd == "MIN")
       {
         std::string arg;
-        iss >> arg;
+        std::string::size_type argPos = rest.find(' ');
+        if (argPos == std::string::npos) {
+          arg = rest;
+        } else {
+          arg = rest.substr(0, argPos);
+        }
+
         if (polygons.empty())
         {
-          invalid = true;
+          throw std::runtime_error("Invalid command");
         }
         else if (arg == "AREA")
         {
@@ -260,13 +332,19 @@ namespace amine
         }
         else
         {
-          invalid = true;
+          throw std::runtime_error("Invalid command");
         }
       }
       else if (cmd == "COUNT")
       {
         std::string arg;
-        iss >> arg;
+        std::string::size_type argPos = rest.find(' ');
+        if (argPos == std::string::npos) {
+          arg = rest;
+        } else {
+          arg = rest.substr(0, argPos);
+        }
+
         if (arg == "EVEN")
         {
           intResult = std::count_if(polygons.begin(), polygons.end(), CountEven());
@@ -283,7 +361,7 @@ namespace amine
             int num = std::stoi(arg);
             if (num < 3)
             {
-              invalid = true;
+              throw std::runtime_error("Invalid command");
             }
             else
             {
@@ -292,17 +370,16 @@ namespace amine
           }
           else
           {
-            invalid = true;
+            throw std::runtime_error("Invalid command");
           }
         }
       }
       else if (cmd == "INTERSECTIONS")
       {
-        std::string rest;
-        std::getline(iss, rest);
+        std::string rest = line.substr(spacePos + 1);
         if (rest.empty())
         {
-          invalid = true;
+          throw std::runtime_error("Invalid command");
         }
         else
         {
@@ -310,7 +387,7 @@ namespace amine
           Polygon query;
           if (!parse_polygon(rest, query) || query.points.size() < 3)
           {
-            invalid = true;
+            throw std::runtime_error("Invalid command");
           }
           else
           {
@@ -331,11 +408,10 @@ namespace amine
       }
       else if (cmd == "RMECHO")
       {
-        std::string rest;
-        std::getline(iss, rest);
+        std::string rest = line.substr(spacePos + 1);
         if (rest.empty())
         {
-          invalid = true;
+          throw std::runtime_error("Invalid command");
         }
         else
         {
@@ -347,7 +423,7 @@ namespace amine
           Polygon query;
           if (!parse_polygon(rest, query))
           {
-            invalid = true;
+            throw std::runtime_error("Invalid command");
           }
           else
           {
@@ -364,24 +440,22 @@ namespace amine
       }
       else
       {
-        invalid = true;
+        throw std::runtime_error("Invalid command");
       }
-      if (invalid)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
-      else if (printDouble)
-      {
-        std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
-      }
-      else
-      {
-        std::cout << intResult << "\n";
-      }
+      if (printDouble) {
+      std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
+    } else {
+      std::cout << intResult << "\n";
+    }
+
+  } catch (const std::exception&) {
+    std::cout << "<INVALID COMMAND>\n";
+     }
     };
   };
-  void process_commands(std::vector< Polygon >& polygons)
-  {
-    std::for_each(std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), CommandProcessor(polygons));
-  }
+  CommandProcessor processor(polygons);
+
+  std::string command;
+  std::getline(std::cin, command);
+  processor(command);
 }
