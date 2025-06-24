@@ -4,11 +4,11 @@
 #include "geometry-utils.hpp"
 
 savintsev::Concave::Concave(point_t p1, point_t p2, point_t p3, point_t p4, std::string name):
+  Shape(std::move(name)),
   p1_(p1),
   p2_(p2),
   p3_(p3),
-  p4_(p4),
-  Shape(std::move(name))
+  p4_(p4)
 {
   if (!isTriangle(p1_, p2_, p3_) || !isPointInTriangle(p1_, p2_, p3_, p4_))
   {
@@ -26,10 +26,16 @@ savintsev::rectangle_t savintsev::Concave::get_frame_rect() const
   return {mostRight - mostLeft, mostHigh - mostLow, center};
 }
 
-savintsev::point_t * savintsev::Concave::get_all_points() const
+size_t savintsev::Concave::get_all_points(point_t * ps) const
 {
-  point_t points[4] = {p1_, p2_, p3_, p4_};
-  return points;
+  if (ps)
+  {
+    ps[0] = p1_;
+    ps[1] = p2_;
+    ps[2] = p3_;
+    ps[3] = p4_;
+  }
+  return 4;
 }
 
 void savintsev::Concave::move(point_t p)

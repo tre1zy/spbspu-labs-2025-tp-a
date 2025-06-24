@@ -80,6 +80,12 @@ void savintsev::write_file_data(std::ostream & out, Project & proj)
 {
   for (auto it = proj.begin(); it != proj.end(); ++it)
   {
-    
+    out << it->first << " " << it->second->get_name();
+    point_t ps[4];
+    for (size_t i = 0; i < it->second->get_all_points(ps); ++i)
+    {
+      out << " " << ps[i].x << " " << ps[i].y;
+    }
+    out << '\n';
   }
 }

@@ -4,11 +4,11 @@
 #include "geometry-utils.hpp"
 
 savintsev::Complexquad::Complexquad(point_t p1, point_t p2, point_t p3, point_t p4, std::string name):
+  Shape(std::move(name)),
   p1_(p1),
   p2_(p2),
   p3_(p3),
-  p4_(p4),
-  Shape(std::move(name))
+  p4_(p4)
 {
   point_t center = {0.0, 0.0};
   if (!findLinesIntersect(p1_, p2_, p3_, p4_, center) || !isTriangle(p1_, p4_, center) || !isTriangle(p2_, p3_, center))
@@ -27,10 +27,16 @@ savintsev::rectangle_t savintsev::Complexquad::get_frame_rect() const
   return {mostRight - mostLeft, mostHigh - mostLow, center};
 }
 
-savintsev::point_t * savintsev::Complexquad::get_all_points() const
+size_t savintsev::Complexquad::get_all_points(point_t * ps) const
 {
-  point_t points[4] = {p1_, p2_, p3_, p4_};
-  return points;
+  if (ps)
+  {
+    ps[0] = p1_;
+    ps[1] = p2_;
+    ps[2] = p3_;
+    ps[3] = p4_;
+  }
+  return 4;
 }
 
 void savintsev::Complexquad::move(point_t p)

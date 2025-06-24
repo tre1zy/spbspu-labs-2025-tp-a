@@ -12,7 +12,7 @@ namespace savintsev
     Shape * clone() const override;
 
     rectangle_t get_frame_rect() const override;
-    point_t * get_all_points() const override;
+    size_t get_all_points(point_t * ps) const override;
 
     void unsafe_scale(double k) noexcept override;
     void move(point_t p) override;

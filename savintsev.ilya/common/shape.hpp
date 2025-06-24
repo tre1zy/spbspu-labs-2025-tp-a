@@ -26,7 +26,7 @@ namespace savintsev
     virtual Shape * clone() const = 0;
 
     virtual rectangle_t get_frame_rect() const = 0;
-    virtual point_t * get_all_points() const = 0;
+    virtual size_t get_all_points(point_t * ps) const = 0;
 
     virtual void move(point_t p) = 0;
     virtual void move(double x, double y) = 0;

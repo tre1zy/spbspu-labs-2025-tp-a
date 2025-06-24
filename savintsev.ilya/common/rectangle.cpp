@@ -3,9 +3,9 @@
 #include <stdexcept>
 
 savintsev::Rectangle::Rectangle(point_t lhs, point_t rhs, std::string name):
+  Shape(std::move(name)),
   l_(lhs),
-  r_(rhs),
-  Shape(std::move(name))
+  r_(rhs)
 {
   if (l_.x >= r_.x || l_.y >= r_.y)
   {
@@ -20,10 +20,14 @@ savintsev::rectangle_t savintsev::Rectangle::get_frame_rect() const
   return {r_.x - l_.x, r_.y - l_.y, {centerByX, centerByY}};
 }
 
-savintsev::point_t * savintsev::Rectangle::get_all_points() const
+size_t savintsev::Rectangle::get_all_points(point_t * ps) const
 {
-  point_t points[2] = {l_, r_};
-  return ;
+  if (ps)
+  {
+    ps[0] = l_;
+    ps[1] = r_;
+  }
+  return 2;
 }
 
 void savintsev::Rectangle::move(point_t p)

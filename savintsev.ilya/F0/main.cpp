@@ -6,6 +6,7 @@
 #include <limits>
 #include <shape-utils.hpp>
 #include "project-body.hpp"
+#include "project-cmds.hpp"
 #include "file-system.hpp"
 
 int main(int argc, char * argv[])
@@ -21,7 +22,7 @@ int main(int argc, char * argv[])
     std::ifstream file(argv[i]);
     if (!validate_savi_file(argv[i]))
     {
-      std::cerr << "ERROR: Can't open file " << get_filename_wext(argv[i]) << '\n';
+      std::cerr << "ERROR: Can't open " << get_filename_wext(argv[i]) << '\n';
       continue;
     }
 
@@ -30,8 +31,7 @@ int main(int argc, char * argv[])
     while (!file.eof())
     {
       std::string figure;
-      std::string name;
-      file >> figure >> name;
+      file >> figure;
       Layer new_pair;
       Shape * new_shape = createShape(file, figure);
       if (!new_shape)
@@ -39,38 +39,23 @@ int main(int argc, char * argv[])
         std::cerr << "ERROR: Unknown error. Invalid file " << get_filename_wext(argv[i]) << '\n';
         return 1;
       }
-      new_pair = {name, new_shape};
+      new_pair = {figure, new_shape};
       project.push_back(new_pair);
     }
 
     projects[get_filename(argv[i])] = project;
   }
 
-  for (auto it = projects.begin(); it != projects.end(); ++it)
-  {
-    std::cout << "Project " << it->first << '\n';
-    for (auto jt = it->second.begin(); jt != it->second.end(); ++jt)
-    {
-      std::cout << jt->first << '\n';
-    }
-  }
-
   std::cout << "Welcome to the CMD-PAINT\n";
 
   std::map< std::string, std::function< void() > > cmds;
 
-  cmds["open"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["close"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["create"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["copy"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["rename"] = std::bind(intersections, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["save"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["save_as"] = std::bind(print, std::ref(std::cout), std::cref(data));
-  cmds["save_all"] = std::bind(print, std::ref(std::cout), std::cref(data));
-  cmds["render"] = std::bind(print, std::ref(std::cout), std::cref(data));
-  cmds["merge"] = std::bind(print, std::ref(std::cout), std::cref(data));
-  cmds["relocate"] = std::bind(print, std::ref(std::cout), std::cref(data));
-  cmds["projects"] = std::bind(print, std::ref(std::cout), std::cref(data));
+  cmds["open"] = std::bind(open, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["close"] = std::bind(close, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["create"] = std::bind(create, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["save"] = std::bind(save, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["save_as"] = std::bind(save_as, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["projects"] = std::bind(print, std::ref(std::cout), std::ref(projects));
 
   for (std::string command; std::cin >> command;)
   {
@@ -78,14 +63,22 @@ int main(int argc, char * argv[])
     {
       cmds.at(command)();
     }
-    catch(...)
+    catch (const std::out_of_range & e)
     {
       if (std::cin.fail())
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>\n";
+      std::cerr << e.what();
+    }
+    catch (...)
+    {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }

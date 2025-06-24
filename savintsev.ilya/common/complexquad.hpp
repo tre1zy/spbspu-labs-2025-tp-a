@@ -11,7 +11,7 @@ namespace savintsev
     Complexquad(point_t p1, point_t p2, point_t p3, point_t p4, std::string name = "");
 
     rectangle_t get_frame_rect() const override;
-    point_t * get_all_points() const override;
+    size_t get_all_points(point_t * ps) const override;
 
     void unsafe_scale(double k) noexcept override;
     void move(point_t p) override;
