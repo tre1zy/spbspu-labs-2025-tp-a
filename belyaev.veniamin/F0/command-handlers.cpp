@@ -1,4 +1,7 @@
 #include "command-handlers.hpp"
+#include <iterator>
+#include <algorithm>
+#include <numeric>
 
 void belyaev::insertEntry(Dictionaries& data, std::istream& in, std::ostream& out)
 {
@@ -48,7 +51,7 @@ void belyaev::removeEntry(Dictionaries& data, std::istream& in, std::ostream& ou
   currentDictionary->dict.erase(russianWord);
 }
 
-void belyaev::searchEntry(const Dictionaries& data, std::istream& in, std::ostream& out)
+void belyaev::searchEntry(const Dictionaries& data, std::istream& in, std::ostream& out) // TODO: FIX DOUBLING BY RU/ENG VIA SUBCOMMS
 {
   std::string dictionaryName, russianWord;
   in >> dictionaryName >> russianWord;
@@ -69,8 +72,7 @@ void belyaev::searchEntry(const Dictionaries& data, std::istream& in, std::ostre
     out << "<THIS ENTRY DOES NOT EXIST>\n";
     return;
   }
-  const std::pair<const std::string, std::string> entryPair = *entry;
-  out << formPairString(entryPair) << '\n';
+  out << formPairString(*entry) << '\n';
 }
 
 void belyaev::searchEntryByEnglish(const Dictionaries& data, std::istream& in, std::ostream& out)
@@ -92,9 +94,46 @@ void belyaev::searchEntryByEnglish(const Dictionaries& data, std::istream& in, s
   if (!isEnWordInDictionary(*currentDictionary, entry))
   {
     out << "<THIS ENTRY DOES NOT EXIST>\n";
+    return;
   }
-  const std::pair<const std::string, std::string> entryPair = *entry;
-  out << formPairString(entryPair) << '\n';
+  out << formPairString(*entry) << '\n';
+}
+
+void belyaev::searchContains(const Dictionaries& data, std::istream& in, std::ostream& out, std::string ruOrEng)
+{
+  using namespace std::placeholders;
+
+  std::string dictionaryName, word;
+  in >> dictionaryName >> word;
+  if (in.fail())
+  {
+    throw std::logic_error("Input failed in REMOVE.");
+  }
+  
+  const Dictionary* currentDictionary = searchDictByName(data, dictionaryName);
+  if (currentDictionary == nullptr)
+  {
+    out << "<THIS DICTIONARY DOES NOT EXIST>\n";
+    return;
+  }
+
+  std::map<std::string, std::function<bool(const entryPair&)>> commandRuOrEng;
+  commandRuOrEng["RU"] = std::bind(pairContainsRuChars, _1, word);
+  commandRuOrEng["ENG"] = std::bind(pairContainsEnChars, _1, word);
+
+  std::vector<nonConstEntryPair> dictCopy;
+  std::copy(currentDictionary->dict.begin(), currentDictionary->dict.end(), std::back_inserter(dictCopy));
+
+  try
+  {
+    auto it = std::stable_partition(dictCopy.begin(), dictCopy.end(), commandRuOrEng[ruOrEng]);
+    std::string result = std::accumulate(dictCopy.begin(), it, std::string{}, accumulatePairString); // govno iz jopi
+    out << result << '\n';
+  }
+  catch (const std::out_of_range& e)
+  {
+    throw std::logic_error("Subcommand in SEARCH_CONTAINS out of confines");
+  }
 }
 
 void belyaev::printDict(const Dictionaries& data, std::istream& in, std::ostream& out)
@@ -125,9 +164,10 @@ belyaev::commandMap belyaev::mapCommandHandlers(Dictionaries& data)
   cmds["REMOVE"] = std::bind(removeEntry, std::ref(data), _1, _2);
   cmds["SEARCH"] = std::bind(searchEntry, std::cref(data), _1, _2);
   cmds["SEARCH_BY_ENGLISH"] = std::bind(searchEntryByEnglish, std::cref(data), _1, _2);
+  cmds["SEARCH_CONTAINS"] = std::bind(searchContains, std::cref(data), _1, _2, "RU");
+  cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(searchContains, std::cref(data), _1, _2, "ENG");
   cmds["PRINT"] = std::bind(printDict, std::cref(data), _1, _2);
   /*
-  cmds["SEARCH_CONTAINS"] = std::bind(area, std::cref(data), _1, _2);
   cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(area, std::cref(data), _1, _2);
   cmds["PRINT_ALL"] = std::bind(area, std::cref(data), _1, _2);
   cmds["CLEAR"] = std::bind(area, std::ref(data), _1, _2);

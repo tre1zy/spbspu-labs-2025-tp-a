@@ -48,3 +48,13 @@ bool belyaev::isEnWordInDictionary(const Dictionary& dictionary, dictionaryItera
 {
   return itEnWord != dictionary.dict.end();
 }
+
+bool belyaev::pairContainsRuChars(const entryPair entry, std::string subStringRu)
+{
+  return entry.first.find(subStringRu) != std::string::npos;
+}
+
+bool belyaev::pairContainsEnChars(const entryPair entry, std::string subStringEn)
+{
+  return entry.second.find(subStringEn) != std::string::npos;
+}
