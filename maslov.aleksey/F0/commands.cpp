@@ -78,15 +78,8 @@ namespace
 
   void mergeWords(maslov::Dict & dict, const maslov::Word & word)
   {
-    auto it = dict.find(word.first);
-    if (it != dict.end())
-    {
-      it->second += word.second;
-    }
-    else
-    {
-      dict.insert(word);
-    }
+    auto & freq = dict[word.first];
+    freq += word.second;
   }
 
   struct PrintNameDicts
@@ -98,10 +91,10 @@ namespace
     }
   };
 
-  void wordReader(maslov::Dict & dict, const std::string & word)
+  void readRawWord(maslov::Dict & dict, const std::string & word)
   {
     std::string realWord;
-    std::copy_if(word.begin(), word.end(), std::back_inserter(realWord), isAlpha);
+    std::copy_if(word.cbegin(), word.cend(), std::back_inserter(realWord), isAlpha);
     std::transform(realWord.begin(), realWord.end(), realWord.begin(), toLowercase);
     if (!realWord.empty())
     {
@@ -109,32 +102,30 @@ namespace
     }
   }
 
-  maslov::Word wordFrequencyReader(std::istream & in)
+  maslov::Word readWordFreq(std::istream & in)
   {
     maslov::Word word;
     in >> word.first >> word.second;
     return word;
   }
 
-  std::istream & operator>>(std::istream & in, maslov::Dict & dict)
+  maslov::Dict readDict(std::istream & in)
   {
     size_t wordCount;
     in >> wordCount;
-    auto func = std::bind(wordFrequencyReader, std::ref(in));
-    std::generate_n(std::inserter(dict, dict.end()), wordCount, func);
-    return in;
+    maslov::Dict dict;
+    auto reader = std::bind(readWordFreq, std::ref(in));
+    std::generate_n(std::inserter(dict, dict.end()), wordCount, reader);
+    return dict;
   }
 
-  struct DictReader
+  std::pair< std::string, maslov::Dict > readNamedDict(std::istream & in)
   {
-    std::istream & in_;
-    std::pair< std::string, maslov::Dict > operator()()
-    {
-      std::pair< std::string, maslov::Dict > dict;
-      in_ >> dict.first >> dict.second;
-      return dict;
-    }
-  };
+    std::pair< std::string, maslov::Dict > namedDict;
+    in >> namedDict.first;
+    namedDict.second = readDict(in);
+    return namedDict;
+  }
 }
 
 void maslov::createDictionary(std::istream & in, Dicts & dicts)
@@ -154,7 +145,7 @@ void maslov::showDictionary(std::ostream & out, const Dicts & dicts)
   {
     out << '\n';
   }
-  for_each(dicts.cbegin(), dicts.cend(), PrintNameDicts{out});
+  std::for_each(dicts.cbegin(), dicts.cend(), PrintNameDicts{out});
 }
 
 void maslov::loadText(std::istream & in, Dicts & dicts)
@@ -174,8 +165,8 @@ void maslov::loadText(std::istream & in, Dicts & dicts)
   std::string word;
   using inputIt = std::istream_iterator< std::string >;
   using namespace std::placeholders;
-  auto func = std::bind(wordReader, std::ref(it->second), _1);
-  std::for_each(inputIt(file), inputIt(), func);
+  auto func = std::bind(readRawWord, std::ref(it->second), _1);
+  std::for_each(inputIt{file}, inputIt{}, func);
 }
 
 void maslov::unionDictionary(std::istream & in, Dicts & dicts)
@@ -195,7 +186,7 @@ void maslov::unionDictionary(std::istream & in, Dicts & dicts)
   auto & result = dicts[resultName];
   const auto & dict1 = it1->second;
   const auto & dict2 = it2->second;
-  std::copy(dict1.begin(), dict1.end(), std::inserter(result, result.begin()));
+  std::copy(dict1.cbegin(), dict1.cend(), std::inserter(result, result.begin()));
   using namespace std::placeholders;
   auto func = std::bind(mergeWords, std::ref(result), _1);
   std::for_each(dict2.begin(), dict2.end(), func);
@@ -216,11 +207,11 @@ void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & result = dicts[resultName];
-  auto & dict1 = it1->second;
-  auto & dict2 = it2->second;
+  const auto & dict1 = it1->second;
+  const auto & dict2 = it2->second;
   using namespace std::placeholders;
   auto func = std::bind(intersectWord, std::cref(dict2), _1);
-  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), func);
+  std::copy_if(dict1.cbegin(), dict1.cend(), std::inserter(result, result.end()), func);
   auto update = std::bind(frequencyUpdate,std::cref(dict2), _1);
   Dict temp;
   std::transform(result.begin(), result.end(), std::inserter(temp, temp.end()), update);
@@ -318,7 +309,7 @@ void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & d
   words.reserve(dictIt->second.size());
   std::copy(dictIt->second.begin(), dictIt->second.end(), std::back_inserter(words));
   sortWords(words, order);
-  for_each(words.begin(), words.begin() + number, PrintWord{out});
+  std::for_each(words.begin(), words.begin() + number, PrintWord{out});
 }
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
@@ -355,7 +346,7 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   auto & result = dicts[resultName];
   using namespace std::placeholders;
   auto cmp = std::bind(comparatorFrequency, _1, freq1, freq2);
-  std::copy_if(dictIt->second.begin(), dictIt->second.end(), std::inserter(result, result.end()), cmp);
+  std::copy_if(dictIt->second.cbegin(), dictIt->second.cend(), std::inserter(result, result.end()), cmp);
   if (result.empty())
   {
     dicts.erase(resultName);
@@ -385,7 +376,8 @@ void maslov::loadFile(const std::string & filename, Dicts & dicts)
   }
   size_t dictCount;
   file >> dictCount;
-  std::generate_n(std::inserter(dicts, dicts.end()), dictCount, DictReader{file});
+  auto func = std::bind(readNamedDict, std::ref(file));
+  std::generate_n(std::inserter(dicts, dicts.end()), dictCount, func);
 }
 
 void maslov::printHelp(std::ostream & out)
