@@ -89,70 +89,100 @@ namespace
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   DataStruct temp;
-  std::string line;
-  if (!std::getline(is, line))
+  char ch;
+
+  is >> std::ws;
+  if (!is.get(ch) || ch != '(')
   {
+    is.setstate(std::ios::failbit);
     return is;
   }
 
-  size_t pos = 0;
+  is >> std::ws;
+  if (!is.get(ch) || ch != ':')
+  {
+    is.setstate(std::ios::failbit);
+    return is;
+  }
+
   bool has_key1 = false;
   bool has_key2 = false;
   bool has_key3 = false;
 
-  while (pos < line.length())
+  while (true)
   {
-    if (line[pos] == ':')
+    std::string key;
+    is >> std::ws;
+
+    while (is.get(ch) && ch != ' ' && ch != ':')
     {
-      size_t key_start = pos + 1;
-      size_t key_end = line.find_first_of(" :", key_start);
-      if (key_end == std::string::npos)
-      {
-        break;
-      }
-
-      std::string key = line.substr(key_start, key_end - key_start);
-      pos = line.find_first_not_of(" ", key_end);
-
-      if (key == "key1" && pos != std::string::npos)
-      {
-        size_t val_end = line.find(':', pos);
-        std::string val_str = line.substr(pos, val_end - pos);
-        std::istringstream iss(val_str);
-        temp.key1 = parseULLBin(iss);
-        if (!iss.fail() || val_str == "0b0")
-        {
-          has_key1 = true;
-          pos = val_end;
-        }
-      }
-      else if (key == "key2" && pos != std::string::npos)
-      {
-        size_t val_end = line.find(':', pos);
-        std::string val_str = line.substr(pos, val_end - pos);
-        std::istringstream iss(val_str);
-        temp.key2 = parseCmpLsp(iss);
-        if (!iss.fail())
-        {
-          has_key2 = true;
-          pos = val_end;
-        }
-      }
-      else if (key == "key3" && pos != std::string::npos && line[pos] == '"')
-      {
-        pos++;
-        size_t quote_end = line.find('"', pos);
-        if (quote_end != std::string::npos)
-        {
-          temp.key3 = line.substr(pos, quote_end - pos);
-          has_key3 = true;
-          pos = quote_end + 1;
-        }
-      }
+      key += ch;
     }
-    else
+
+    if (!is)
     {
-      pos++;
+      is.setstate(std::ios::failbit);
+      return is;
+    }
+
+    if (key == "key1")
+    {
+      is >> std::ws;
+      temp.key1 = parseULLBin(is);
+      if (is.fail())
+      {
+        return is;
+      }
+      has_key1 = true;
+    }
+    else if (key == "key2")
+    {
+      is >> std::ws;
+      temp.key2 = parseCmpLsp(is);
+      if (is.fail())
+      {
+        return is;
+      }
+      has_key2 = true;
+    }
+    else if (key == "key3")
+    {
+      is >> std::ws;
+      if (!is.get(ch) || ch != '"')
+      {
+        is.setstate(std::ios::failbit);
+        return is;
+      }
+
+      temp.key3.clear();
+      while (is.get(ch) && ch != '"')
+      {
+        temp.key3 += ch;
+      }
+
+      if (ch != '"')
+      {
+        is.setstate(std::ios::failbit);
+        return is;
+      }
+      has_key3 = true;
+    }
+
+    is >> std::ws;
+    if (!is.get(ch))
+    {
+      is.setstate(std::ios::failbit);
+      return is;
+    }
+
+    if (ch == ')')
+    {
+      break;
+    }
+    else if (ch != ':')
+    {
+      is.setstate(std::ios::failbit);
+      return is;
     }
   }
 
