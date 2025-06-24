@@ -50,17 +50,7 @@ std::istream &voronina::operator>>(std::istream &in, Polygon &polygon)
   Point point;
   for (int i = 0; i < vertexes; ++i)
   {
-    if (in.peek() == '\n')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
     in >> DelimiterIO{' '};
-    if (in.peek() == '\n')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
     in >> point;
     input.points.push_back(point);
 
@@ -68,10 +58,6 @@ std::istream &voronina::operator>>(std::istream &in, Polygon &polygon)
     {
       return in;
     }
-  }
-  if (in.peek() != EOF)
-  {
-    in >> DelimiterIO{'\n'};
   }
   if (!in.fail())
   {
