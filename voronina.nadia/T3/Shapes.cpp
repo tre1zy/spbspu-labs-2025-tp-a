@@ -1,11 +1,11 @@
 #include "Shapes.h"
 
 #include <iomanip>
+#include <algorithm>
+#include <iterator>
 
 #include "Delimiter.h"
 #include "Iofmtguard.h"
-
-const int MIN_AMOUNT_OF_VERTEXES = 3;
 
 std::istream &voronina::operator>>(std::istream &in, Point &point)
 {
@@ -37,32 +37,24 @@ std::istream &voronina::operator>>(std::istream &in, Polygon &polygon)
     return in;
   }
 
-  iofmtguard fmtguard(in);
-  Polygon input;
   int vertexes = 0;
-  in >> std::noskipws;
+  const int MIN_AMOUNT_OF_VERTEXES = 3;
+
   in >> vertexes;
-  if (vertexes < MIN_AMOUNT_OF_VERTEXES)
+  if (!in || vertexes < MIN_AMOUNT_OF_VERTEXES)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  Point point;
-  for (int i = 0; i < vertexes; ++i)
-  {
-    in >> DelimiterIO{' '};
-    in >> point;
-    input.points.push_back(point);
 
-    if (in.fail() && !in.eof())
-    {
-      return in;
-    }
-  }
-  if (!in.fail())
+  std::vector< Point > points(vertexes);
+  std::copy_n(std::istream_iterator< Point >(in), vertexes, points.begin());
+  if (!in)
   {
-    polygon = input;
+      in.setstate(std::ios::failbit);
+      return in;
   }
+  polygon.points = points;
   return in;
 }
 

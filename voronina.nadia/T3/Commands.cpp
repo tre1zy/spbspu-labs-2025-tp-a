@@ -10,8 +10,6 @@
 #include "Iofmtguard.h"
 #include "Subcommands.h"
 
-const int MIN_AMOUNT_OF_VERTEXES = 3;
-
 void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
   iofmtguard ifmtguard(in);
@@ -46,7 +44,7 @@ void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std:
   }
 }
 
-void voronina::max(const std::vector<Polygon> &shapes, std::istream &in, std::ostream &out)
+void voronina::max(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
   if (shapes.size() == 0)
   {
@@ -68,7 +66,7 @@ void voronina::max(const std::vector<Polygon> &shapes, std::istream &in, std::os
   subcmds.at(parametr)();
 }
 
-void voronina::min(const std::vector<Polygon> &shapes, std::istream &in, std::ostream &out)
+void voronina::min(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
   if (shapes.size() == 0)
   {
@@ -90,7 +88,7 @@ void voronina::min(const std::vector<Polygon> &shapes, std::istream &in, std::os
   subcmds.at(parametr)();
 }
 
-void voronina::count(const std::vector<Polygon> &shapes, std::istream &in, std::ostream &out)
+void voronina::count(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
 
   iofmtguard ifmtguard(in);
@@ -124,7 +122,7 @@ void voronina::count(const std::vector<Polygon> &shapes, std::istream &in, std::
   }
 }
 
-void voronina::maxseq(const std::vector<Polygon> &shapes, std::istream &in, std::ostream &out)
+void voronina::maxseq(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
   iofmtguard ifmtguard(in);
   in >> std::noskipws;
@@ -138,15 +136,15 @@ void voronina::maxseq(const std::vector<Polygon> &shapes, std::istream &in, std:
     throw std::invalid_argument("ERROR: Wrong polygon");
   }
 
-  std::vector<int> supVector(shapes.size());
-  std::vector<int>::iterator subVecBegin = supVector.begin();
+  std::vector< int > supVector(shapes.size());
+  std::vector< int >::iterator subVecBegin = supVector.begin();
   std::transform(shapes.cbegin(), shapes.cend(), subVecBegin, std::bind(isEqual, _1, std::cref(polygon)));
 
   std::transform(subVecBegin + 1, supVector.end(), subVecBegin, subVecBegin + 1, getMaxSeq);
   out << *std::max_element(supVector.cbegin(), supVector.cend());
 }
 
-void voronina::rightshapes(const std::vector<Polygon> &shapes, std::ostream &out)
+void voronina::rightshapes(const std::vector< Polygon > &shapes, std::ostream &out)
 {
   out << std::count_if(shapes.cbegin(), shapes.cend(), isThereRightAngleInPolygon);
 }

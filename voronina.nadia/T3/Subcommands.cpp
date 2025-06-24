@@ -3,11 +3,9 @@
 #include <iomanip>
 #include "Iofmtguard.h"
 
-const int MIN_AMOUNT_OF_VERTEXES = 3;
-
 double voronina::getAreaOfPolygon(const Polygon &shape)
 {
-  std::vector<double> areaOfTriangles(shape.points.size() - 2);
+  std::vector< double > areaOfTriangles(shape.points.size() - 2);
 
   auto shapePBegin = shape.points.cbegin();
   auto shapePEnd = shape.points.cend();
@@ -48,12 +46,12 @@ double voronina::getSumArea(double areaSum, const Polygon &shape)
 
 bool voronina::isDigitBool(char c)
 {
-  return static_cast<bool>(isdigit(c));
+  return static_cast< bool >(isdigit(c));
 }
 
 double voronina::getAreaOfGivenAmountOfVertexes(double areaSum, const Polygon &shape, int vertexes)
 {
-  if (shape.points.size() == static_cast<size_t>(vertexes))
+  if (shape.points.size() == static_cast< size_t >(vertexes))
   {
     return areaSum + getAreaOfPolygon(shape);
   }
@@ -96,7 +94,7 @@ bool voronina::isOdd(const Polygon &shape)
 
 bool voronina::hasGivenAmountOfVertexes(const Polygon &shape, int vertexes)
 {
-  return shape.points.size() == static_cast<size_t>(vertexes);
+  return shape.points.size() == static_cast< size_t >(vertexes);
 }
 
 bool voronina::isRightAngle(const Point &side1, const Point &side2)
@@ -106,12 +104,12 @@ bool voronina::isRightAngle(const Point &side1, const Point &side2)
 
 bool voronina::isThereRightAngleInPolygon(const Polygon &shape)
 {
-  std::vector<Point> sides(shape.points.size());
+  std::vector< Point > sides(shape.points.size());
   auto shapePBegin = shape.points.cbegin();
   std::transform(shapePBegin + 1, shape.points.cend(), shapePBegin, sides.begin(), getSide);
   sides[shape.points.size() - 1] = getSide(shape.points[0], shape.points[shape.points.size() - 1]);
 
-  std::vector<bool> hasRightAngleVector(shape.points.size());
+  std::vector< bool > hasRightAngleVector(shape.points.size());
   std::transform(sides.cbegin() + 1, sides.cend(), sides.cbegin(), hasRightAngleVector.begin(), isRightAngle);
 
   hasRightAngleVector[sides.size() - 1] = isRightAngle(sides[0], sides[sides.size() - 1]);
@@ -153,15 +151,16 @@ void voronina::getMean(const std::vector< Polygon > &shapes, std::ostream &out)
 
 void voronina::getVertexes(const std::vector< Polygon > &shapes, std::ostream &out, int vertexes)
 {
-    if (vertexes >= MIN_AMOUNT_OF_VERTEXES)
-    {
-      auto bindForGetArea = std::bind(getAreaOfGivenAmountOfVertexes, _1, _2, vertexes);
-      out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, bindForGetArea);
-    }
-    else
-    {
-      throw std::invalid_argument("ERROR: Invalid amount of vertexes");
-    }
+  const int MIN_AMOUNT_OF_VERTEXES = 3;
+  if (vertexes >= MIN_AMOUNT_OF_VERTEXES)
+  {
+    auto bindForGetArea = std::bind(getAreaOfGivenAmountOfVertexes, _1, _2, vertexes);
+    out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, bindForGetArea);
+  }
+  else
+  {
+    throw std::invalid_argument("ERROR: Invalid amount of vertexes");
+  }
 }
 
 
@@ -202,6 +201,7 @@ void voronina::getOddCount(const std::vector< Polygon > &shapes, std::ostream &o
 
 void voronina::getVertexesCount(const std::vector< Polygon > &shapes, std::ostream &out, int vertexes)
 {
+  const int MIN_AMOUNT_OF_VERTEXES = 3;
   if (vertexes >= MIN_AMOUNT_OF_VERTEXES)
     {
       out << std::count_if(shapes.cbegin(), shapes.cend(), std::bind(hasGivenAmountOfVertexes, _1, vertexes));

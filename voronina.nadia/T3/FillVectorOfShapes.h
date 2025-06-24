@@ -23,7 +23,7 @@ namespace voronina
       if (fin.fail() && !fin.eof())
       {
         fin.clear();
-        fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        fin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
     }
     fin.close();
