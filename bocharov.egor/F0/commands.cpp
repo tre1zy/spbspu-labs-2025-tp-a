@@ -197,6 +197,52 @@ namespace
       return accum;
     }
   };
+
+
+  struct EntryIncrementer
+  {
+    std::map<std::string, int> & freqs_;
+
+    Empty operator()(Empty accum, const bocharov::dict_t::value_type & entry) const
+    {
+      freqs_[entry.first]++;
+      return accum;
+    }
+  };
+
+  struct DictProcessor
+  {
+    const bocharov::dict_dict_t & dicts;
+    std::map<std::string, int> & freqs;
+
+    Empty operator()(Empty accum, const std::string & dictName) const
+    {
+      const bocharov::dict_t & dict = dicts.at(dictName);
+      return std::accumulate(dict.begin(), dict.end(), accum, EntryIncrementer{ freqs });
+    }
+  };
+
+  struct VectorAccumulator
+  {
+    std::vector<std::pair<std::string, int>> & vec;
+
+    Empty operator()(Empty accum, const std::pair<const std::string, int> & p) const
+    {
+      vec.emplace_back(p.first, p.second);
+      return accum;
+    }
+  };
+
+  struct OutputPrinter
+  {
+    std::ostream & out;
+
+    Empty operator()(Empty accum, const std::pair<std::string, int> & p) const
+    {
+      out << p.first << ' ' << p.second << '\n';
+      return accum;
+    }
+  };
 }
 
 
@@ -379,32 +425,21 @@ namespace bocharov
     if (n <= 0 || k <= 0) throw std::invalid_argument("INVALID COMMAND");
 
     std::vector<std::string> dictNames;
-    std::string name;
-    for (int i = 0; i < k; ++i)
-    {
-      in >> name;
-      dictNames.push_back(name);
-    }
+    dictNames.reserve(k);
+    std::generate_n(std::back_inserter(dictNames), k, WordReader{ in });
 
     std::map<std::string, int> frequencies;
-    for (const auto & dictName : dictNames)
-    {
-      const dict_t & dict = dicts.at(dictName);
-      for (const auto & entry : dict)
-      {
-        frequencies[entry.first]++;
-      }
-    }
 
-    std::vector<std::pair<std::string, int>> sorted(frequencies.begin(), frequencies.end());
+    std::accumulate(dictNames.begin(), dictNames.end(), Empty{}, DictProcessor{ dicts, frequencies });
+
+    std::vector<std::pair<std::string, int>> sorted;
+    sorted.reserve(frequencies.size());
+    std::accumulate(frequencies.begin(), frequencies.end(), Empty{}, VectorAccumulator{ sorted });
+
     std::sort(sorted.begin(), sorted.end(), FreqComparator{});
 
-    int count = n;
-    for (const auto & p : sorted)
-    {
-      if (count-- <= 0) break;
-      out << p.first << " " << p.second << "\n";
-    }
+    int num = std::min(n, static_cast<int>(sorted.size()));
+    std::accumulate(sorted.begin(), sorted.begin() + num, Empty{}, OutputPrinter{ out });
   }
 
   void rewriteFile(std::istream & in, const dict_dict_t & dicts)
