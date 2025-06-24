@@ -1,7 +1,7 @@
+#include "DataStruct.h"
 #include <iostream>
 #include <string>
 #include <limits>
-#include "DataStruct.h"
 
 std::ostream& fedorova::operator<<(std::ostream& os, const ULLBinaryO& dest)
 {
