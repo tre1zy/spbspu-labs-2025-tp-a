@@ -15,6 +15,7 @@ namespace orlova
   bool isNum(const Polygon&, size_t);
   int isEqual(const Polygon&, const Polygon&);
   double accumulator(double, const Polygon&, std::function < bool(const Polygon&) >);
+  double calculateAreaByCondition(const std::vector< Polygon >&, std::function< bool(const Polygon&) >);
   double numAreaAccumulator(double, const Polygon&, size_t);
   bool areaComparator(const Polygon&, const Polygon&);
   bool vertexesComparator(const Polygon&, const Polygon&);
