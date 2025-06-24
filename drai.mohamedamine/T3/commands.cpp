@@ -189,52 +189,132 @@ void CommandProcessor::command_area(const std::string& rest) const {
   std::cout << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-void CommandProcessor::command_count(const std::string& rest) const {
-  std::istringstream iss(rest);
-  int num;
-  if (!(iss >> num) || num < 3) {
-    throw std::runtime_error("Invalid argument");
-  }
-
-  int count = 0;
-  if (polygons_.size() > 0 && static_cast<int>(polygons_[0].points.size()) == num) ++count;
-  if (polygons_.size() > 1 && static_cast<int>(polygons_[1].points.size()) == num) ++count;
-  if (polygons_.size() > 2 && static_cast<int>(polygons_[2].points.size()) == num) ++count;
-  if (polygons_.size() > 3 && static_cast<int>(polygons_[3].points.size()) == num) ++count;
-  if (polygons_.size() > 4 && static_cast<int>(polygons_[4].points.size()) == num) ++count;
-
-  std::cout << count << "\n";
-}
-
-void CommandProcessor::command_max(const std::string& rest) const {
-  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
-
-  double maxArea = 0.0;
-  if (polygons_.size() > 0) maxArea = compute_area(polygons_[0]);
-  if (polygons_.size() > 1) maxArea = std::max(maxArea, compute_area(polygons_[1]));
-  if (polygons_.size() > 2) maxArea = std::max(maxArea, compute_area(polygons_[2]));
-  if (polygons_.size() > 3) maxArea = std::max(maxArea, compute_area(polygons_[3]));
-  if (polygons_.size() > 4) maxArea = std::max(maxArea, compute_area(polygons_[4]));
-
-  std::cout << std::fixed << std::setprecision(1) << maxArea << "\n";
-}
-
-void CommandProcessor::command_min(const std::string& rest) const {
-  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
-
-  if (polygons_.empty()) {
-    std::cout << "0.0\n";
+void CommandProcessor::command_count(const std::string& rest) const
+{
+  if (rest == "EVEN") {
+    int count = 0;
+    if (polygons_.size() > 0 && polygons_[0].points.size() % 2 == 0) ++count;
+    if (polygons_.size() > 1 && polygons_[1].points.size() % 2 == 0) ++count;
+    if (polygons_.size() > 2 && polygons_[2].points.size() % 2 == 0) ++count;
+    if (polygons_.size() > 3 && polygons_[3].points.size() % 2 == 0) ++count;
+    if (polygons_.size() > 4 && polygons_[4].points.size() % 2 == 0) ++count;
+    std::cout << count << "\n";
     return;
   }
 
-  double minArea = compute_area(polygons_[0]);
-  if (polygons_.size() > 1) minArea = std::min(minArea, compute_area(polygons_[1]));
-  if (polygons_.size() > 2) minArea = std::min(minArea, compute_area(polygons_[2]));
-  if (polygons_.size() > 3) minArea = std::min(minArea, compute_area(polygons_[3]));
-  if (polygons_.size() > 4) minArea = std::min(minArea, compute_area(polygons_[4]));
+  if (rest == "ODD") {
+    int count = 0;
+    if (polygons_.size() > 0 && polygons_[0].points.size() % 2 != 0) ++count;
+    if (polygons_.size() > 1 && polygons_[1].points.size() % 2 != 0) ++count;
+    if (polygons_.size() > 2 && polygons_[2].points.size() % 2 != 0) ++count;
+    if (polygons_.size() > 3 && polygons_[3].points.size() % 2 != 0) ++count;
+    if (polygons_.size() > 4 && polygons_[4].points.size() % 2 != 0) ++count;
+    std::cout << count << "\n";
+    return;
+  }
 
-  std::cout << std::fixed << std::setprecision(1) << minArea << "\n";
+  if (rest.empty() || !std::all_of(rest.begin(), rest.end(), ::isdigit)) {
+    throw std::runtime_error("Invalid command");
+  }
+
+  int num = std::stoi(rest);
+  if (num < 3) throw std::runtime_error("Invalid command");
+
+  int count = 0;
+  if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(num)) ++count;
+  if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(num)) ++count;
+  std::cout << count << "\n";
 }
+
+void CommandProcessor::command_max(const std::string& rest) const
+{
+  if (rest == "AREA") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    double max = compute_area(polygons_[0]);
+    if (polygons_.size() > 1) {
+      double area = compute_area(polygons_[1]);
+      if (area > max) max = area;
+    }
+    if (polygons_.size() > 2) {
+      double area = compute_area(polygons_[2]);
+      if (area > max) max = area;
+    }
+    if (polygons_.size() > 3) {
+      double area = compute_area(polygons_[3]);
+      if (area > max) max = area;
+    }
+    if (polygons_.size() > 4) {
+      double area = compute_area(polygons_[4]);
+      if (area > max) max = area;
+    }
+
+    std::cout << std::fixed << std::setprecision(1) << max << "\n";
+    return;
+  }
+
+  if (rest == "VERTEXES") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    size_t max = polygons_[0].points.size();
+    if (polygons_.size() > 1 && polygons_[1].points.size() > max) max = polygons_[1].points.size();
+    if (polygons_.size() > 2 && polygons_[2].points.size() > max) max = polygons_[2].points.size();
+    if (polygons_.size() > 3 && polygons_[3].points.size() > max) max = polygons_[3].points.size();
+    if (polygons_.size() > 4 && polygons_[4].points.size() > max) max = polygons_[4].points.size();
+
+    std::cout << max << "\n";
+    return;
+  }
+
+  throw std::runtime_error("Invalid command");
+}
+
+void CommandProcessor::command_min(const std::string& rest) const
+{
+  if (rest == "AREA") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    double min = compute_area(polygons_[0]);
+    if (polygons_.size() > 1) {
+      double area = compute_area(polygons_[1]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 2) {
+      double area = compute_area(polygons_[2]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 3) {
+      double area = compute_area(polygons_[3]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 4) {
+      double area = compute_area(polygons_[4]);
+      if (area < min) min = area;
+    }
+
+    std::cout << std::fixed << std::setprecision(1) << min << "\n";
+    return;
+  }
+
+  if (rest == "VERTEXES") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    size_t min = polygons_[0].points.size();
+    if (polygons_.size() > 1 && polygons_[1].points.size() < min) min = polygons_[1].points.size();
+    if (polygons_.size() > 2 && polygons_[2].points.size() < min) min = polygons_[2].points.size();
+    if (polygons_.size() > 3 && polygons_[3].points.size() < min) min = polygons_[3].points.size();
+    if (polygons_.size() > 4 && polygons_[4].points.size() < min) min = polygons_[4].points.size();
+
+    std::cout << min << "\n";
+    return;
+  }
+
+  throw std::runtime_error("Invalid command");
+}
+
 
 void CommandProcessor::command_intersections(const std::string& rest) const {
   if (!rest.empty()) throw std::runtime_error("Unexpected argument");
