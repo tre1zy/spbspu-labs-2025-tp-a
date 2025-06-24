@@ -13,6 +13,7 @@ namespace karnauhova
   struct Character
   {
   public:
+    Character();
     Character(std::string name, int hp, int atk1, int atk2);
     int position;
     int attack();
@@ -23,6 +24,7 @@ namespace karnauhova
     void damage(int size_damage);
     int volume_hp();
     int base_hp();
+    std::string get_name() const;
 
   private:
     std::string name_;
@@ -41,5 +43,6 @@ namespace karnauhova
     int attack_leg();
   };
   std::istream& operator>>(std::istream& in, Character& pol);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 #endif

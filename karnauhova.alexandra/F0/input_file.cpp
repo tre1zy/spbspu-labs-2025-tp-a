@@ -5,7 +5,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
-
+#include <filesystem>
 namespace
 {
   struct TransformMap
@@ -23,7 +23,7 @@ namespace
 
 std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< size_t, Character >& characters)
 {
-  setlocale(LC_ALL, "");
+  setlocale(LC_ALL, "ru");
   std::map< std::string, karnauhova::Character > players;
   std::cout << "HELLO!\n" << "Do you wanna continue last game?\n" << "> NEW_GAME\n" << "> CONTINUE\n";
   std::cout << "Please choose answer(If you don't have last version peek continue)\n";
@@ -36,13 +36,20 @@ std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< 
     {
       if (answer == "NEW_GAME")
       {
-        std::ifstream file("game_data.txt");
+        std::ifstream file;
+        file.open("karnauhova.alexandra/F0/game_data.txt");
+        if (!file.is_open()) {
+        char abs_path[1024];
+        realpath("game_data", abs_path);
+        throw std::runtime_error("Не удалось открыть файл. Путь: " + std::string(abs_path));
+    }
         input_new_data(file, characters);
         end_input = true;
       }
       else if (answer == "CONTINUE")
       {
-        std::ifstream file("game_data_save.txt");
+        std::ifstream file;
+        file.open("karnauhova.alexandra/F0/game_data_save.txt");
         players = input_save_data(file, characters);
         end_input = true;
       }
@@ -57,6 +64,7 @@ std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< 
     }
     catch(const std::logic_error& l)
     {
+      std::cin.clear();
       std::cout << "У вас нет доступного сохранения:(\n";
     }
   }
@@ -79,19 +87,22 @@ void karnauhova::input_new_data(std::istream& in, std::map< size_t, Character >&
   size_t index = 1;
   TransformMap trmp(index);
   std::transform(temp.begin(), temp.end(), std::inserter(characters, characters.end()), trmp);
+ /*  std::cout << "Прочитано персонажей: " << characters.size() << std::endl;
+  for (const auto& pair : characters) {
+    std::cout << "Индекс: " << pair.first << ", Имя: " << pair.second.get_name() << std::endl; */
+  //}
 }
 
 std::map< std::string, karnauhova::Character > karnauhova::input_save_data(std::istream& in, std::map< size_t, Character >& characters)
 {
-  if (in.peek() == std::ifstream::traits_type::eof())
-  {
-    throw std::logic_error("File empty");
+  in.seekg(0, std::ios::end);
+  if (in.tellg() == std::streampos(0))
+  { 
+    throw std::logic_error("File is empty");
   }
-  int stage = 0;
-  in >> stage;
+  in.seekg(0);
   std::string name1, name2;
   in >> name1 >> name2;
-  in >> std::ws;
   size_t index_character1 = 0, index_character2 = 0;
   int hp1 = 0, hp2 = 0, position1 = 0, position2 = 0;
   in >> index_character1 >> hp1 >> position1;

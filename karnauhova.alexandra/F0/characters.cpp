@@ -20,6 +20,18 @@ std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
   return in;
 }
 
+karnauhova::Character::Character():
+  name_("defolt"),
+  hp_(0),
+  total_hp_(0),
+  atk1_(0),
+  atk2_(0),
+  story_("defolt"),
+  philosophy_("defolt"),
+  quote_win_("defolt"),
+  quote_lose_("defolt")
+{}
+
 karnauhova::Character::Character(std::string name, int hp, int atk1, int atk2):
   name_(name),
   hp_(hp),
@@ -140,7 +152,7 @@ bool karnauhova::Character::is_lost()
 
 void karnauhova::Character::damage(int size_damage)
 {
-  total_hp_ - size_damage;
+  total_hp_ -= size_damage;
 }    
 
 int karnauhova::Character::volume_hp()
@@ -151,6 +163,11 @@ int karnauhova::Character::volume_hp()
 int karnauhova::Character::base_hp()
 {
   return hp_;
+}
+
+std::string karnauhova::Character::get_name() const
+{
+  return name_;
 }
 
 std::istream& karnauhova::operator>>(std::istream& in, Character& pol)
