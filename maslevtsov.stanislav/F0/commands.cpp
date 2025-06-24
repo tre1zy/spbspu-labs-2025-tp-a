@@ -179,3 +179,32 @@ void maslevtsov::delete_edge(graphs_t& graphs, std::istream& in)
   in >> graph_name >> vertice1 >> vertice2;
   graphs.at(graph_name).delete_edge(vertice1, vertice2);
 }
+
+void maslevtsov::union_graphs(graphs_t& graphs, std::istream& in)
+{
+  std::string new_gr_name, gr_name1, gr_name2;
+  in >> new_gr_name >> gr_name1 >> gr_name2;
+  if (graphs.find(new_gr_name) != graphs.end()) {
+    throw std::invalid_argument("invalid graph names");
+  }
+  Graph new_gr(graphs.at(gr_name1), graphs.at(gr_name2));
+  graphs[new_gr_name] = new_gr;
+}
+
+void maslevtsov::create_subgraph(graphs_t& graphs, std::istream& in)
+{
+  std::string new_gr_name, gr_name;
+  size_t vertice_count = 0;
+  in >> new_gr_name >> gr_name >> vertice_count;
+  if (graphs.find(new_gr_name) != graphs.end()) {
+    throw std::invalid_argument("invalid graph names");
+  }
+  std::vector< unsigned > vertices;
+  unsigned vertice = 0;
+  for (size_t i = 0; i != vertice_count; ++i) {
+    in >> vertice;
+    vertices.push_back(vertice);
+  }
+  Graph new_gr(graphs.at(gr_name), vertices);
+  graphs[new_gr_name] = new_gr;
+}

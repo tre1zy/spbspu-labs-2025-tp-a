@@ -11,7 +11,7 @@ namespace maslevtsov {
   public:
     Graph() = default;
     Graph(const Graph& gr1, const Graph& gr2);
-    Graph(const Graph& gr, const std::vector< unsigned >& vertices);
+    Graph(const Graph& src, const std::vector< unsigned >& vertices);
 
     size_t get_vertice_count() const;
 

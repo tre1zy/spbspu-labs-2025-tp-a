@@ -32,6 +32,46 @@ namespace {
   }
 }
 
+maslevtsov::Graph::Graph(const Graph& gr1, const Graph& gr2):
+  Graph(gr1)
+{
+  for (auto i = gr2.adjacency_list_.begin(); i != gr2.adjacency_list_.end(); ++i) {
+    try {
+      if (i->second.empty()) {
+        add_vertice(i->first);
+      }
+      for (auto j = i->second.begin(); j != i->second.end(); ++j) {
+        add_edge(i->first, *j);
+      }
+    } catch (const std::invalid_argument&) {
+      continue;
+    } catch (...) {
+      adjacency_list_.clear();
+      throw;
+    }
+  }
+}
+
+maslevtsov::Graph::Graph(const Graph& src, const std::vector< unsigned >& vertices):
+  Graph()
+{
+  for (unsigned vertice: vertices) {
+    auto src_it = src.adjacency_list_.find(vertice);
+    if (src_it != src.adjacency_list_.end()) {
+      std::vector< unsigned > filtered_edges;
+      for (unsigned neighbour: src_it->second) {
+        if (find_neighbour(vertices, neighbour) != vertices.cend()) {
+          filtered_edges.push_back(neighbour);
+        }
+      }
+      adjacency_list_[vertice] = filtered_edges;
+    } else {
+      adjacency_list_.clear();
+      throw std::invalid_argument("non-existing vertice");
+    }
+  }
+}
+
 size_t maslevtsov::Graph::get_vertice_count() const
 {
   return adjacency_list_.size();

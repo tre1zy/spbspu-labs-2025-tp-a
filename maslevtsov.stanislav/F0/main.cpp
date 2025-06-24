@@ -44,8 +44,8 @@ int main(int argc, char** argv)
   }
 
   std::unordered_map< std::string, std::function< void() > > commands;
-  commands["save"] = std::bind(save_graphs, std::cref(graphs), std::ref(std::cin));
-  commands["open"] = std::bind(open_graphs, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
+  commands["save-graphs"] = std::bind(save_graphs, std::cref(graphs), std::ref(std::cin));
+  commands["open-graphs"] = std::bind(open_graphs, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
 
   commands["add-graph"] = std::bind(add_graph, std::ref(graphs), std::ref(std::cin));
   commands["add-vertice"] = std::bind(add_vertice, std::ref(graphs), std::ref(std::cin));
@@ -55,8 +55,8 @@ int main(int argc, char** argv)
   commands["delete-graph"] = std::bind(delete_graph, std::ref(graphs), std::ref(std::cin));
   commands["delete-vertice"] = std::bind(delete_vertice, std::ref(graphs), std::ref(std::cin));
   commands["delete-edge"] = std::bind(delete_edge, std::ref(graphs), std::ref(std::cin));
-  // commands["union-graphs"] = std::bind(union_graphs, std::ref(graphs), std::ref(std::cin));
-  // commands["create-subgraph"] = std::bind(create_subgraph, std::ref(graphs), std::ref(std::cin));
+  commands["union-graphs"] = std::bind(union_graphs, std::ref(graphs), std::ref(std::cin));
+  commands["create-subgraph"] = std::bind(create_subgraph, std::ref(graphs), std::ref(std::cin));
 
   // commands["bfs"] = std::bind(traverse_breadth_first, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
   // commands["path"] = std::bind(get_min_path, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
