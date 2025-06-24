@@ -1,4 +1,4 @@
-#include "commands.hpp"
+#include "commends.hpp"
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -141,39 +141,37 @@ namespace amine
     std::cout << (initial_size - polygons.size()) << "\n";
   }
 
-CommandProcessor::CommandProcessor(const std::vector<Polygon>& polygons)
-  : polygons_(polygons)
-{}
+  struct CommandProcessor
+  {
+    std::vector< Polygon >& polygons;
 
-void CommandProcessor::operator()(const std::string& line) const
-{
-  if (line.empty()) return;
+    explicit CommandProcessor(std::vector< Polygon >& polys):
+      polygons(polys)
+    {}
 
-  std::string::size_type spacePos = line.find(' ');
-  std::string cmd = (spacePos == std::string::npos) ? line : line.substr(0, spacePos);
-  std::string rest = (spacePos == std::string::npos) ? "" : line.substr(spacePos + 1);
+    void operator()(const std::string& line) const
+    {
+      const std::string& content = line;
+      if (content.empty()) {
+       return;
+      }
 
-  if (cmd == "AREA") {
-    command_area(rest);
-  } else if (cmd == "MAX") {
-    command_max(rest);
-  } else if (cmd == "MIN") {
-    command_min(rest);
-  } else if (cmd == "COUNT") {
-    command_count(rest);
-  } else if (cmd == "INTERSECTIONS") {
-    command_intersections(rest);
-  } else if (cmd == "RMECHO") {
-    command_rmecho(rest);
-  } else {
-    throw std::runtime_error("INVALID COMMAND");
-  }
-}
-void CommandProcessor::command_area(const std::string& rest) const {
-        bool printDouble = false;
-        double dblResult = 0.0;
-        int intResult = 0;
-      if (cmd == "AREA")
+      std::string::size_type spacePos = content.find(' ');
+      std::string cmd;
+      std::string rest;
+
+    if (spacePos == std::string::npos) {
+     cmd = content;
+   } else {
+    cmd = content.substr(0, spacePos);
+    rest = content.substr(spacePos + 1);
+   }
+
+try {
+      bool printDouble = false;
+      double dblResult = 0.0;
+      int intResult = 0;
+            if (cmd == "AREA")
       {
         std::string arg;
         std::string::size_type spacePos = rest.find(' ');
@@ -277,10 +275,8 @@ void CommandProcessor::command_area(const std::string& rest) const {
           }
         }
       }
-}
 
-void CommandProcessor::command_max(const std::string& rest) const {
-      if (cmd == "MAX")
+      else if (cmd == "MAX")
       {
         std::string arg;
         std::string::size_type argPos = rest.find(' ');
@@ -310,8 +306,7 @@ void CommandProcessor::command_max(const std::string& rest) const {
           throw std::runtime_error("Invalid command");
         }
       }
-void CommandProcessor::command_min(const std::string& rest) const {
-      if (cmd == "MIN")
+      else if (cmd == "MIN")
       {
         std::string arg;
         std::string::size_type argPos = rest.find(' ');
@@ -341,10 +336,7 @@ void CommandProcessor::command_min(const std::string& rest) const {
           throw std::runtime_error("Invalid command");
         }
       }
-      }
-
-void CommandProcessor::command_count(const std::string& rest) const {
-      if (cmd == "COUNT")
+      else if (cmd == "COUNT")
       {
         std::string arg;
         std::string::size_type argPos = rest.find(' ');
@@ -383,10 +375,7 @@ void CommandProcessor::command_count(const std::string& rest) const {
           }
         }
       }
-      }
-
-void CommandProcessor::command_intersections(const std::string& rest) const {
-      if (cmd == "INTERSECTIONS")
+      else if (cmd == "INTERSECTIONS")
       {
         std::string rest = line.substr(spacePos + 1);
         if (rest.empty())
@@ -418,11 +407,7 @@ void CommandProcessor::command_intersections(const std::string& rest) const {
           }
         }
       }
-      }
-
-void CommandProcessor::command_rmecho(const std::string& rest) const {
-  std::cout << rest << '\n';
-      if (cmd == "RMECHO")
+      else if (cmd == "RMECHO")
       {
         std::string rest = line.substr(spacePos + 1);
         if (rest.empty())
@@ -454,7 +439,6 @@ void CommandProcessor::command_rmecho(const std::string& rest) const {
           }
         }
       }
-      }
       else
       {
         throw std::runtime_error("Invalid command");
@@ -469,3 +453,5 @@ void CommandProcessor::command_rmecho(const std::string& rest) const {
     std::cout << "<INVALID COMMAND>\n";
      }
     };
+  };
+}
