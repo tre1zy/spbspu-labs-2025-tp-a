@@ -121,19 +121,26 @@ namespace
   struct DictMergerAccumulator
   {
     const bocharov::dict_dict_t & dicts;
-    bocharov::dict_t operator()(bocharov::dict_t acc, const std::string & dictName) const
+
+    struct InsertIfNotExists
     {
-      const bocharov::dict_t & dict = dicts.at(dictName);
-      for (const auto & entry : dict)
+      bocharov::dict_t operator()(bocharov::dict_t acc, const std::pair<std::string, std::vector<std::string>> & entry) const
       {
         if (acc.find(entry.first) == acc.end())
         {
           acc.insert(entry);
         }
+        return acc;
       }
-      return acc;
+    };
+
+    bocharov::dict_t operator()(bocharov::dict_t acc, const std::string & dictName) const
+    {
+      const bocharov::dict_t & dict = dicts.at(dictName);
+      return std::accumulate(dict.begin(), dict.end(), std::move(acc), InsertIfNotExists{});
     }
   };
+
 }
 
 
