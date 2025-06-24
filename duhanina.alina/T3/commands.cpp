@@ -270,10 +270,6 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  static std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands;
-  commands["EVEN"] = EvenAreaSum();
-  commands["ODD"]  = OddAreaSum();
-  commands["MEAN"] = MeanAreaSum();
   if (std::isdigit(param[0]))
   {
     size_t num = std::stoull(param);
@@ -281,8 +277,12 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
     {
       throw std::invalid_argument("Error in input");
     }
-    commands[param] = VertexCountAreaSum(num);
   }
+  static const std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands =
+  { { "EVEN", EvenAreaSum() },
+  { "ODD"], OddAreaSum() },
+  { "MEAN", MeanAreaSum() },
+  { param, VertexCountAreaSum(num) } };
   out << commands.at(param)(plgs);
 }
 
@@ -295,9 +295,9 @@ void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  static std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
-  commands["AREA"] = MaxArea();
-  commands["VERTEXES"] = MaxVertexCount();
+  static const std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands =
+  { { "AREA", MaxArea() },
+  { "VERTEXES", MaxVertexCount() } };
   commands.at(param)(plgs, out);
 }
 
@@ -310,9 +310,9 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  static std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
-  commands["AREA"] = MinArea();
-  commands["VERTEXES"] = MinVertexCount();
+  static const std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands =
+  { { "AREA", MinArea() },
+  { "VERTEXES", MinVertexCount() } };
   commands.at(param)(plgs, out);
 }
 
@@ -320,9 +320,9 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
 {
   std::string param;
   in >> param;
-  static std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
-  commands["EVEN"] = CountEven();
-  commands["ODD"] = CountOdd();
+  static const std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands =
+  { { "EVEN", CountEven() },
+  { "ODD", CountOdd() } };
   if (std::isdigit(param[0]))
   {
     size_t num = std::stoull(param);
