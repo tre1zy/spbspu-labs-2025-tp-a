@@ -242,6 +242,79 @@ namespace
       return accum;
     }
   };
+
+
+
+
+
+
+  struct DictNameReader
+  {
+    std::istream & in;
+    std::string operator()() const
+    {
+      std::string s;
+      in >> s;
+      return s;
+    }
+  };
+
+  struct CheckDictExists
+  {
+    const bocharov::dict_dict_t & dicts;
+    bool operator()(bool valid, const std::string & dictName) const
+    {
+      return valid && (dicts.find(dictName) != dicts.end());
+    }
+  };
+
+  using TempMap = std::map<std::string, std::pair<int, std::vector<std::string>>>;
+
+  struct TempMapAccumulator
+  {
+    TempMap operator()(TempMap accum, const bocharov::dict_t::value_type & entry) const
+    {
+      const std::string& sln = entry.first;
+      const bocharov::list_t & translations = entry.second;
+      auto it = accum.find(sln);
+      if (it == accum.end())
+      {
+        accum[sln] = std::make_pair(1, translations);
+      }
+      else
+      {
+        it->second.first++;
+        it->second.second.insert(it->second.second.end(), translations.begin(), translations.end());
+      }
+      return accum;
+    }
+  };
+
+  struct DictAccumulator
+  {
+    const bocharov::dict_dict_t & dicts;
+    explicit DictAccumulator(const bocharov::dict_dict_t & dictsRef) : dicts(dictsRef) {}
+    TempMap operator()(TempMap accum, const std::string& dictName) const
+    {
+      const bocharov::dict_t & dict = dicts.at(dictName);
+      return std::accumulate(dict.begin(), dict.end(), std::move(accum), TempMapAccumulator{});
+    }
+  };
+
+  struct BuildNewDict
+  {
+    int K;
+    explicit BuildNewDict(int k) : K(k) {}
+    bocharov::dict_t operator()(bocharov::dict_t acc, const TempMap::value_type & entry) const
+    {
+      if (entry.second.first <= K)
+      {
+        std::set<std::string> s(entry.second.second.begin(), entry.second.second.end());
+        acc[entry.first] = bocharov::list_t(s.begin(), s.end());
+      }
+      return acc;
+    }
+  };
 }
 
 
@@ -472,52 +545,17 @@ namespace bocharov
     }
 
     std::vector<std::string> dictNames;
-    std::string name;
-    for (size_t i = 0; i < n; ++i)
+    std::generate_n(std::back_inserter(dictNames), n, DictNameReader{ in });
+
+    bool allExist = std::accumulate(dictNames.begin(), dictNames.end(), true, CheckDictExists{ dicts });
+    if (!allExist)
     {
-      in >> name;
-      dictNames.push_back(name);
+      throw std::invalid_argument("INVALID COMMAND");
     }
 
-    for (const auto & dictName : dictNames)
-    {
-      if (dicts.find(dictName) == dicts.end())
-      {
-        throw std::invalid_argument("INVALID COMMAND");
-      }
-    }
+    TempMap temp = std::accumulate(dictNames.begin(), dictNames.end(), TempMap{}, DictAccumulator{ dicts });
 
-    using TempMap = std::map<std::string, std::pair<int, std::vector<std::string>>>;
-    TempMap temp;
-    for (const auto & dictName : dictNames)
-    {
-      const dict_t & dict = dicts.at(dictName);
-      for (const auto & entry : dict)
-      {
-        const std::string & sln = entry.first;
-        const list_t & translations = entry.second;
-        auto it = temp.find(sln);
-        if (it == temp.end())
-        {
-          temp[sln] = std::make_pair(1, translations);
-        }
-        else
-        {
-          it->second.first++;
-          it->second.second.insert(it->second.second.end(), translations.begin(), translations.end());
-        }
-      }
-    }
-
-    dict_t newDict;
-    for (const auto & entry : temp)
-    {
-      if (entry.second.first <= K)
-      {
-        std::set<std::string> s(entry.second.second.begin(), entry.second.second.end());
-        newDict[entry.first] = std::vector<std::string>(s.begin(), s.end());
-      }
-    }
+    dict_t newDict = std::accumulate(temp.begin(), temp.end(), dict_t{}, BuildNewDict{ K });
 
     if (dicts.find(newDictName) != dicts.end())
     {
