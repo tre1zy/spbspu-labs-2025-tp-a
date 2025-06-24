@@ -276,8 +276,19 @@ void averenkov::showStats(const Base& base, const std::vector<std::string>& args
     std::cout << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
 }
 
+// 12. reset
+void averenkov::reset(Base& base, const std::vector<std::string>& args)
+{
+  if (args.size() != 1)
+  {
+    throw std::invalid_argument("reset command takes no arguments");
+  }
 
-void averenkov::bruteforce(averenkov::Base& base, const std::vector<std::string>& args)
+  base.kits.clear();
+  base.knapsacks.clear();
+}
+
+/*void averenkov::bruteforce(averenkov::Base& base, const std::vector<std::string>& args)
 {
   if (args.size() != 3)
   {
@@ -334,5 +345,5 @@ void averenkov::generateCombinations(const std::vector<const averenkov::Item*>& 
   }
 
   generateCombinations(items, mask + 1, max_value, best_combination, capacity);
-}
+}*/
 
