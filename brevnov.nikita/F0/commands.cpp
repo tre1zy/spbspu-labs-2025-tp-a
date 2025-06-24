@@ -161,7 +161,7 @@ namespace
     BestPlayerComparator(const SuitablePlayer& pred):
       predicate(pred)
     {}
-    template < class T > 
+    template < class T >
     bool operator()(const T& a, const T& b) const
     {
       bool a_match = predicate(a);
@@ -171,7 +171,7 @@ namespace
         return false;
       }
       if (!a_match && b_match)
-      { 
+      {
         return true;
       }
       return a.second.raiting_ < b.second.raiting_;
