@@ -5,11 +5,30 @@
 
 namespace finaev
 {
-  struct OpenningInfo
+  struct DebutMoves
   {
     std::vector< std::string > moves;
-    std::string name;
-    std::string description;
+  };
+
+  struct DebutName
+  {
+    std::vector< std::string > name;
+  };
+
+  struct DebutDescription
+  {
+    std::vector< std::string > description;
+  };
+
+  std::istream& operator>>(std::istream&, DebutMoves&);
+  std::istream& operator>>(std::istream&, DebutName&);
+  std::istream& operator>>(std::istream&, DebutDescription&);
+  
+  struct OpenningInfo
+  {
+    DebutMoves moves;
+    DebutName name;
+    DebutDescription description;
   };
 }
 
