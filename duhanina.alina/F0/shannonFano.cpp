@@ -1,14 +1,18 @@
 #include "shannonFano.hpp"
 #include <fstream>
+#include <iterator>
 #include <set>
+#include <limits>
 #include <iomanip>
+#include <numeric>
 #include <cmath>
 #include <algorithm>
+#include "functor.hpp"
 
-std::map< std::string, duhanina::CodeTable > encoding_store;
 namespace
 {
   using str_t = const std::string&;
+  using namespace duhanina;
 
   const std::string TEXT_EXT = ".txt";
   const std::string COMPRESSED_EXT = ".sfano";
@@ -59,39 +63,65 @@ namespace
     }
   }
 
- duhanina::Node* build_subtree(const std::vector< duhanina::Node* >& nodes, size_t start, size_t end)
+  duhanina::Node* build_subtree(const std::vector< duhanina::Node* >& nodes, size_t start, size_t end)
   {
-    if (start >= end || nodes.empty() || start >= nodes.size())
+    if (nodes.empty())
     {
-      return nullptr;
+      throw std::invalid_argument("Empty nodes list");
     }
-    duhanina::Node* subtree = nodes[start];
-    for (size_t i = start + 1; i < end; i++)
+    if (start >= end)
     {
-      subtree = new duhanina::Node(subtree->freq + nodes[i]->freq, subtree, nodes[i]);
+      throw std::invalid_argument("Invalid range");
+    }
+    if (start >= nodes.size() || end > nodes.size())
+    {
+      throw std::out_of_range("Range exceeds nodes size");
+    }
+    if (std::any_of(nodes.begin() + start, nodes.begin() + end, NullChecker()))
+    {
+      throw std::invalid_argument("Null node");
+    }
+    duhanina::Node* subtree = nullptr;
+    try
+    {
+      subtree = new duhanina::Node(*nodes[start]);
+      subtree = std::accumulate(nodes.begin() + start + 1, nodes.begin() + end, subtree, NodeMerger());
+    }
+    catch (...)
+    {
+      delete_tree(subtree);
+      throw;
     }
     return subtree;
   }
 
   std::pair< duhanina::Node*, duhanina::Node* > split_nodes(const std::vector< duhanina::Node* >& nodes)
   {
-    size_t total = 0;
-    for (duhanina::Node* node: nodes)
+    if (nodes.empty())
     {
-      total += node->freq;
+      throw std::invalid_argument("Empty nodes vector");
     }
-    size_t sum = 0;
-    size_t split_pos = 0;
-    for (; split_pos < nodes.size(); split_pos++)
+    if (std::any_of(nodes.begin(), nodes.end(), NullChecker()))
     {
-      sum += nodes[split_pos]->freq;
-      if (sum >= total / 2)
-      {
-        break;
-      }
+      throw std::invalid_argument("Null node");
     }
-    duhanina::Node* left = build_subtree(nodes, 0, split_pos);
-    duhanina::Node* right = build_subtree(nodes, split_pos + 1, nodes.size());
+    size_t total = std::accumulate(nodes.begin(), nodes.end(), 0, FreqAccumulator());
+    SplitPositionFinder finder(total / 2);
+    auto split_it = std::find_if(nodes.begin(), nodes.end(), std::ref(finder));
+    size_t split_pos = std::distance(nodes.begin(), split_it);
+    duhanina::Node* left = nullptr;
+    duhanina::Node* right = nullptr;
+    try
+    {
+      left = build_subtree(nodes, 0, split_pos);
+      right = build_subtree(nodes, split_pos, nodes.size());
+    }
+    catch (...)
+    {
+      delete_tree(left);
+      delete_tree(right);
+      throw;
+    }
     return { left, right };
   }
 
@@ -116,10 +146,9 @@ namespace
       throw std::runtime_error("EMPTY");
     }
     std::map< char, size_t > freq_map;
-    for (char c: text)
-    {
-      freq_map[c]++;
-    }
+    FreqTransformer counter(freq_map);
+    std::vector< char > temp(text.begin(), text.end());
+    std::transform(temp.begin(), temp.end(), temp.begin(), counter);
     if (freq_map.size() == 1)
     {
       throw std::runtime_error("SINGLE_SYMBOL");
@@ -127,42 +156,43 @@ namespace
     std::vector< std::pair< char, size_t > > sorted_freq(freq_map.begin(), freq_map.end());
     std::sort(sorted_freq.begin(), sorted_freq.end(), compare_nodes);
     std::vector< duhanina::Node* > nodes;
-    for (auto& pair: sorted_freq)
+    NodeCreator creator;
+    try
     {
-      char ch = pair.first;
-      size_t freq = pair.second;
-      nodes.push_back(new duhanina::Node(ch, freq));
+      std::transform(sorted_freq.begin(), sorted_freq.end(), std::back_inserter(nodes), creator);
+      TreeBuilder builder(nodes);
+      builder();
+      duhanina::CodeTable table;
+      table.total_chars = text.size();
+      build_shannon_fano_codes(nodes[0], "", table.char_to_code);
+      std::vector< std::pair< char, std::string > > temp_vec(table.char_to_code.begin(), table.char_to_code.end());
+      TableTransformer filler(table);
+      std::transform(temp_vec.begin(), temp_vec.end(), temp_vec.begin(), filler);
+      TreeDeleter deleter;
+      deleter(nodes[0]);
+      return table;
     }
-    while (nodes.size() > 1)
+    catch (...)
     {
-      auto node_pair = split_nodes(nodes);
-      nodes = merge_nodes(node_pair.first, node_pair.second);
+      TreeDeleter deleter;
+      std::vector< duhanina::Node* > nodes_to_delete = nodes;
+      std::transform(nodes_to_delete.begin(), nodes_to_delete.end(), nodes_to_delete.begin(), deleter);
+      throw;
     }
-    duhanina::CodeTable table;
-    table.total_chars = text.size();
-    build_shannon_fano_codes(nodes[0], "", table.char_to_code);
-    for (auto& entry: table.char_to_code)
-    {
-      char ch = entry.first;
-      std::string code = entry.second;
-      table.code_to_char[code] = ch;
-    }
-    delete_tree(nodes[0]);
-    return table;
   }
 
   std::string encode_text(str_t text, const duhanina::CodeTable& table)
   {
     std::string encoded;
-    for (size_t i = 0; i < text.size(); i++)
+    CharEncoder encoder(table, encoded);
+    try
     {
-      char c = text[i];
-      auto it = table.char_to_code.find(c);
-      if (it == table.char_to_code.end())
-      {
-        throw std::runtime_error("INVALID_CODES");
-      }
-      encoded += it->second;
+      std::for_each(text.begin(), text.end(), encoder);
+    }
+    catch (const std::runtime_error&)
+    {
+      encoded.clear();
+      throw;
     }
     return encoded;
   }
@@ -171,17 +201,8 @@ namespace
   {
     std::string decoded;
     std::string current_code;
-    for (size_t i = 0; i < encoded.size(); i++)
-    {
-      char bit = encoded[i];
-      current_code += bit;
-      auto it = table.code_to_char.find(current_code);
-      if (it != table.code_to_char.end())
-      {
-        decoded += it->second;
-        current_code.clear();
-      }
-    }
+    CodeAccumulator accumulator(decoded, current_code, table);
+    std::for_each(encoded.begin(), encoded.end(), accumulator);
     if (!current_code.empty())
     {
       throw std::runtime_error("INVALID_CODES");
@@ -189,39 +210,21 @@ namespace
     return decoded;
   }
 
-  void write_bits_to_file(str_t bits, str_t filename)
+  void write_bits_to_file(str_t bits, str_t filename)\
   {
     std::ofstream out(filename, std::ios::binary);
     if (!out)
     {
       throw std::runtime_error("INVALID_FILE");
     }
-    size_t bit_count = bits.size();
-    for (size_t i = 0; i < sizeof(size_t); i++)
-    {
-      char byte = (bit_count >> (8 * i)) & 0xFF;
-      out.put(byte);
-    }
-    char buffer = 0;
-    size_t bit_pos = 0;
-    for (size_t i = 0; i < bits.size(); i++)
-    {
-      if (bits[i] == '1')
-      {
-        buffer |= (1 << (7 - bit_pos));
-      }
-      bit_pos++;
-      if (bit_pos == 8)
-      {
-        out.put(buffer);
-        buffer = 0;
-        bit_pos = 0;
-      }
-    }
-    if (bit_pos > 0)
-    {
-      out.put(buffer);
-    }
+    const size_t bit_count = bits.size();
+    SizeTByteWriter size_writer(out, bit_count);
+    std::vector< size_t > byte_indices(sizeof(size_t));
+    std::iota(byte_indices.begin(), byte_indices.end(), 0);
+    std::for_each(byte_indices.begin(), byte_indices.end(), size_writer);
+    BitWriter bit_writer(out);
+    std::for_each(bits.begin(), bits.end(), bit_writer);
+    bit_writer.flush();
   }
 
   std::string read_bits_from_file(str_t filename)
@@ -232,37 +235,18 @@ namespace
       throw std::runtime_error("FILE_NOT_FOUND");
     }
     size_t bit_count = 0;
-    for (size_t i = 0; i < sizeof(size_t); i++)
-    {
-      char byte;
-      if (!in.get(byte))
-      {
-        throw std::runtime_error("INVALID_HEADER");
-      }
-      bit_count |= static_cast< size_t >(static_cast< unsigned char >(byte)) << (8 * i);
-    }
-    std::string bits;
-    bits.reserve(bit_count);
-    char byte;
-    while (in.get(byte) && bits.size() < bit_count)
-    {
-      for (size_t i = 0; i < 8 && bits.size() < bit_count; i++)
-      {
-        if (byte & (1 << (7 - i)))
-        {
-          bits += '1';
-        }
-        else
-        {
-          bits += '0';
-        }
-      }
-    }
-    if (bits.size() != bit_count)
+    HeaderReader header_reader(in, bit_count);
+    std::vector< int > dummy(sizeof(size_t));
+    std::for_each(dummy.begin(), dummy.end(), header_reader);
+    DataProcessor processor(bit_count);
+    std::istreambuf_iterator< char > begin(in);
+    std::istreambuf_iterator< char > end;
+    std::for_each(begin, end, std::ref(processor));
+    if (!processor.is_complete())
     {
       throw std::runtime_error("TRUNCATED_FILE");
     }
-    return bits;
+    return processor.get_result();
   }
 
   void save_code_table(const duhanina::CodeTable& table, str_t filename)
@@ -273,10 +257,8 @@ namespace
       throw std::runtime_error("INVALID_FILE");
     }
     out << table.total_chars << "\n";
-    for (auto it = table.char_to_code.begin(); it != table.char_to_code.end(); it++)
-    {
-      out << static_cast< int >(it->first) << " " << it->second << "\n";
-    }
+    TableEntryWriter writer(out);
+    std::for_each(table.char_to_code.begin(), table.char_to_code.end(), writer);
   }
 
 
@@ -289,24 +271,11 @@ namespace
     }
     duhanina::CodeTable table;
     in >> table.total_chars;
-    in.ignore();
-    std::string line;
-    while (std::getline(in, line))
-    {
-      if (line.empty())
-      {
-        continue;
-      }
-      size_t space_pos = line.find(' ');
-      if (space_pos == std::string::npos || space_pos == line.length() - 1)
-      {
-        continue;
-      }
-      int char_code = std::stoi(line.substr(0, space_pos));
-      std::string code = line.substr(space_pos + 1);
-      table.char_to_code[static_cast< char >(char_code)] = code;
-      table.code_to_char[code] = static_cast< char >(char_code);
-    }
+    in.ignore(std::numeric_limits< std::streamsize >::std::max(), '\n');
+    std::istream_iterator< std::string > line_begin(in);
+    std::istream_iterator< std::string > line_end;
+    StreamProcessor processor;
+    std::for_each(line_begin, line_end, std::bind(StreamProcessor(), std::placeholders::_1, std::ref(table)));
     return table;
   }
 
@@ -345,13 +314,9 @@ namespace
   std::set< char > find_missing_chars(str_t text, const std::map< char, std::string >& char_to_code)
   {
     std::set< char > missing;
-    for (char c: text)
-    {
-      if (char_to_code.find(c) == char_to_code.end())
-      {
-        missing.insert(c);
-      }
-    }
+    CharChecker checker(char_to_code);
+    CharInserter inserter(missing);
+    auto it = std::copy_if(text.begin(), text.end(), std::inserter(missing, missing.begin()), std::ref(checker));
     return missing;
   }
 
@@ -362,17 +327,8 @@ namespace
       return;
     }
     out << "Missing characters (" << missing.size() << "): ";
-    for (char c: missing)
-    {
-      if (std::isprint(c))
-      {
-        out << "'" << c << "' ";
-      }
-      else
-      {
-        out << "[0x" << std::hex << static_cast< int >(c) << "] ";
-      }
-    }
+    CharPrinter printer(out);
+    std::for_each(missing.begin(), missing.end(), printer);
     out << "\n";
   }
 }
@@ -405,20 +361,10 @@ void duhanina::show_codes(str_t encoding_id, std::ostream& out)
   const CodeTable& table = it->second;
   out << "Code table for " << encoding_id << ":\n";
   out << "Char\tCode\n";
-  for (auto it = table.char_to_code.begin(); it != table.char_to_code.end(); it++)
-  {
-    if (std::isprint(it->first) && !std::isspace(it->first))
-    {
-      out << "'" << it->first << "'\t" << it->second << "\n";
-    }
-    else
-    {
-      out << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast< int >(it->first) << std::dec << "\t" << it->second << "\n";
-    }
-  }
+  CodePairPrinter printer(out);
+  std::for_each(table.char_to_code.begin(), table.char_to_code.end(), printer);
   out << "Total characters: " << table.total_chars << "\n";
 }
-
 
 void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& out)
 {
@@ -432,7 +378,6 @@ void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& ou
   out << "Code table successfully saved to file '" << output_file << "'\n";
 }
 
-
 void duhanina::load_codes(str_t codes_file, str_t encoding_id, std::ostream& out)
 {
   validate_extension(codes_file, CODE_TABLE_EXT);
@@ -444,7 +389,6 @@ void duhanina::load_codes(str_t codes_file, str_t encoding_id, std::ostream& out
   encoding_store[encoding_id] = table;
   out << "Code table successfully loaded from file '" << codes_file << "' with ID '" << encoding_id << "'\n";
 }
-
 
 void duhanina::clear_codes(str_t encoding_id, std::ostream& out)
 {
@@ -561,10 +505,8 @@ void duhanina::list_encodings(std::ostream& out)
     return;
   }
   out << "Available encodings:\n";
-  for (auto it = encoding_store.begin(); it != encoding_store.end(); it++)
-  {
-    out << "  " << it->first << " (" << it->second.char_to_code.size() << " symbols, total " << it->second.total_chars << ")\n";
-  }
+  EncodingInfoPrinter printer(out);
+  std::for_each(encoding_store.begin(), encoding_store.end(), printer);
 }
 
 
@@ -621,18 +563,6 @@ void duhanina::suggest_encodings(str_t input_file, std::ostream& out)
   }
   std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
   out << "Encoding compatibility report:\n";
-  for (const auto& encoding_pair: encoding_store)
-  {
-    str_t id = encoding_pair.first;
-    const CodeTable& table = encoding_pair.second;
-    std::set< char > missing = find_missing_chars(text, table.char_to_code);
-    if (missing.empty())
-    {
-      out << " - " << id << ": " << "FULL" << " support\n";
-    }
-    else
-    {
-      out << " - " << id << ": " << "partial" << " support\n";
-    }
-  }
+  EncodingChecker checker(text, out);
+  std::for_each(encoding_store.begin(), encoding_store.end(), checker);
 }

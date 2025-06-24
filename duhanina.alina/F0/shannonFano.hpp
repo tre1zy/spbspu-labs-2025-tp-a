@@ -40,6 +40,8 @@ namespace duhanina
 
   using str_t = const std::string&;
 
+  std::map< std::string, CodeTable > encoding_store;
+
   void print_help(std::ostream& out);
   void build_codes(str_t input_file, str_t encoding_name, std::ostream& out);
   void show_codes(str_t encoding_name, std::ostream& out);

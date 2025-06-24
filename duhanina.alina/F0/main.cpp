@@ -7,7 +7,6 @@ int main(int argc, char* argv[])
   if (argc == 1 && std::string(argv[0]) == "--help")
   {
     duhanina::print_help(std::cout);
-    return 0;
   }
   auto commands = duhanina::initialize_commands(std::cin, std::cout);
   std::string cmd;
