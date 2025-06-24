@@ -244,7 +244,6 @@ void orlova::perms(const std::vector< Polygon >& polygons, std::istream& in, std
   }
   using namespace std::placeholders;
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, _1, polygon));
-  return;
 }
 
 bool orlova::isPermutation(const Polygon& polygon1, const Polygon& polygon2)
