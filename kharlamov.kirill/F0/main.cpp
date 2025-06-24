@@ -1,54 +1,90 @@
 #include <fstream>
+#include <functional>
 #include <iostream>
+#include <istream>
+#include <iterator>
+#include <limits>
 #include <string>
+#include <utility>
 #include "commands.h"
 
-int main(int argc, char* argv[])
+namespace
 {
-  kharlamov::CommandProcessor processor;
+  void input(std::istream& in, kharlamov::dictionaries& dicts)
+  {
+    std::string dictName;
+    while (in >> dictName)
+    {
+      kharlamov::dictionary dict;
+      std::string eng;
+      while (in >> eng)
+      {
+        std::string rusword;
+        in >> rusword;
+        dict[eng] = rusword;
+        if (in.get() == '\n')
+        {
+            break;
+        }
+        else
+        {
+            in.unget();
+        }
+      }
+      dicts[dictName] = dict;
+    }
+  }
+}
 
+int main(int argc, char** argv)
+{
+  using namespace kharlamov;
+  dictionaries dicts;
   if (argc > 1)
   {
-    std::string option = argv[1];
-    if (option == "--help")
+    std::ifstream file(argv[1]);
+    if (!file)
     {
-      std::cout << processor.help() << std::endl;
-      return 0;
+      std::cout << "FILE ERROR\n";
+      return 1;
     }
-    else if (argc == 3)
-    {
-      std::ifstream inputFile(argv[2]);
-      if (!inputFile.is_open())
-      {
-        std::cerr << "Error opening input file" << std::endl;
-        return 1;
-      }
-
-      std::string line;
-      while (std::getline(inputFile, line))
-      {
-        std::string result = processor.processCommand(line);
-        std::cout << result << std::endl;
-      }
-
-      return 0;
-    }
+    input(file, dicts);
+    file.close();
   }
 
-  std::cout << "English-Russian Dictionary (2-3 tree implementation)" << std::endl;
-  std::cout << "Type 'help' for list of commands or 'exit' to quit" << std::endl;
+  std::map< std::string, std::function< void() > > commands;
+  commands.insert(std::make_pair("download", std::bind(doDownload, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("save", std::bind(doSave, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("add", std::bind(doAdd, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("remove", std::bind(doRemove, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("translate", std::bind(doTranslate, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("find", std::bind(doFind, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("search", std::bind(doSearch, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("count", std::bind(doCount, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("list", std::bind(doList, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("clear", std::bind(doClear, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("createDict", std::bind(doCreatedict, std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("listDicts", std::bind(doListdicts, std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("copy", std::bind(doCopy, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("merge", std::bind(doMerge, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("diff", std::bind(doDiff, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("intersect", std::bind(doIntersect, std::ref(std::cin), std::ref(std::cout), std::ref(dicts))));
+  commands.insert(std::make_pair("globalSearch", std::bind(doGlobalsearch, std::ref(std::cin), std::ref(std::cout), std::cref(dicts))));
+  commands.insert(std::make_pair("globalCount", std::bind(doGlobalcount, std::ref(std::cout), std::cref(dicts))));
 
   std::string command;
-  while (true)
+  while (std::cin >> command)
   {
-    std::cout << "> ";
-    std::getline(std::cin, command);
-
-    if (command == "exit") break;
-
-    std::string result = processor.processCommand(command);
-    std::cout << result << std::endl;
+    try
+    {
+      commands.at(command)();
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
-
-  return 0;
+  return 1;
 }
