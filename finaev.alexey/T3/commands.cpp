@@ -3,6 +3,7 @@
 #include <streamGuard.hpp>
 #include <algorithm>
 #include <functional>
+#include <numeric>
 #include <iterator>
 
 namespace
@@ -38,46 +39,51 @@ namespace
     return std::count_if(shapes.begin(), shapes.end(), compare);
   }
 
+  struct PolygonArea
+  {
+    const std::vector< finaev::Point >& points;
+    size_t size;
+
+    double operator()(double sum, size_t i) const
+    {
+      size_t j = (i + 1) % size;
+      return sum + (points[i].x * points[j].y) - (points[i].y * points[j].x);
+    }
+  };
+
   double areaOnePoly(const finaev::Polygon& poly)
   {
     if (poly.points.size() < 3)
     {
       return 0.0;
     }
-    double res = 0.0;
     size_t s = poly.points.size();
-    for (size_t i = 0; i < s; ++i)
-    {
-      int j = (i + 1) % s;
-      res += (poly.points[i].x * poly.points[j].y) - (poly.points[i].y * poly.points[j].x);
-    }
+    std::vector< size_t > indexes(s);
+    std::iota(indexes.begin(), indexes.end(), 0);
+    double res = std::accumulate(indexes.begin(), indexes.end(), 0.0, PolygonArea{ poly.points, s });
     return std::abs(res) / 2.0;
   }
 
+  struct AreaAccumulator
+  {
+    double operator()(double sum, const finaev::Polygon& poly) const
+    {
+      return sum + areaOnePoly(poly);
+    }
+  };
+
   double areaOdd(const std::vector< finaev::Polygon >& shapes)
   {
-    double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i)
-    {
-      if (isOdd(shapes[i]))
-      {
-        res += areaOnePoly(shapes[i]);
-      }
-    }
-    return res;
+    std::vector< finaev::Polygon > oddShapes;
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(oddShapes), isOdd);
+    return std::accumulate(oddShapes.begin(), oddShapes.end(), 0.0, AreaAccumulator{});
   }
 
   double areaEven(const std::vector< finaev::Polygon >& shapes)
   {
-    double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i)
-    {
-      if (isEven(shapes[i]))
-      {
-        res += areaOnePoly(shapes[i]);
-      }
-    }
-    return res;
+    std::vector< finaev::Polygon > evenShapes;
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(evenShapes), isEven);
+    return std::accumulate(oddShapes.begin(), oddShapes.end(), 0.0, AreaAccumulator{});
   }
 
   double areaMean(const std::vector< finaev::Polygon >& shapes)
@@ -86,25 +92,16 @@ namespace
     {
       throw std::out_of_range("<INVALID COMMAND>");
     }
-    double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i)
-    {
-      res += areaOnePoly(shapes[i]);
-    }
+    double res = std::accumulate(shapes.begin(), shapes.end(), 0.0, AreaAccumulator{});
     return res / shapes.size();
   }
 
   double areaVertexes(const std::vector< finaev::Polygon >& shapes, size_t num)
   {
-    double res = 0.0;
-    for (size_t i = 0; i < shapes.size(); ++i)
-    {
-      if (isNumOfVertex(shapes[i], num))
-      {
-        res += areaOnePoly(shapes[i]);
-      }
-    }
-    return res;
+    std::vector< finaev::Polygon > filteredShapes;
+    auto isVertexNum = std::bind(isNumOfVertex, std::placeholders::_1, num);
+    std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(filteredShapes), isVertexNum);
+    return std::accumulate(filteredShapes.begin(), filteredShapes.end(), 0.0, AreaAccumulator{});
   }
 
   bool compareVertex(const finaev::Polygon& poly1, const finaev::Polygon& poly2)
@@ -148,6 +145,17 @@ namespace
     out << min.points.size();
   }
 
+  struct IsOffsetEqual
+  {
+    int dx;
+    int dy;
+
+    bool operator()(const finaev::Point& a, const finaev::Point& b) const
+    {
+      return b.x == a.x + dx && b.y == a.y + dy;
+    }
+  };
+
   bool isSame(const finaev::Polygon& first, const finaev::Polygon& second)
   {
     if (first.points.size() != second.points.size())
@@ -156,30 +164,14 @@ namespace
     }
     int dx = second.points[0].x - first.points[0].x;
     int dy = second.points[0].y - first.points[0].y;
-    for (size_t i = 1; i < first.points.size(); ++i)
-    {
-      if (second.points[i].x != first.points[i].x + dx || second.points[i].y != first.points[i].y + dy)
-      {
-        return false;
-      }
-    }
-    return true;
+    return std::equal(first.points.begin() + 1, first.points.end(), second.points.begin() + 1, IsOffsetEqual{dx, dy});
   }
 
   bool isExactSame(const finaev::Polygon& first, const finaev::Polygon& second)
   {
-    if (first.points.size() != second.points.size())
-    {
-      return false;
-    }
-    for (size_t i = 0; i < first.points.size(); ++i)
-    {
-      if (first.points[i].x != second.points[i].x || first.points[i].y != second.points[i].y)
-      {
-        return false;
-      }
-    }
-    return true;
+    bool firstCondition = (first.points.size() == second.points.size());
+    bool secondCondition = (std::equal(first.points.begin(), first.points.end(), second.points.begin()));
+    return firstCondition && secondCondition;
   }
 }
 
