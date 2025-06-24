@@ -12,6 +12,8 @@ namespace kushekbaev
 
   void insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
 
+  void print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+
   void remove();
 
   void search();
@@ -41,8 +43,6 @@ namespace kushekbaev
   void delete_all_translations();
 
   void find_words_without_translations();
-
-  void print();
 
   void complement();
 
