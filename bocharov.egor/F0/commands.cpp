@@ -153,7 +153,8 @@ namespace
 
   struct CallPrinter
   {
-    std::reference_wrapper<TranslationPrinter> operator()(std::reference_wrapper<TranslationPrinter> printerWrapper, const std::string & tr) const
+    std::reference_wrapper<TranslationPrinter> operator()(std::reference_wrapper<TranslationPrinter> printerWrapper,
+      const std::string & tr) const
     {
       printerWrapper.get()(tr);
       return printerWrapper;
