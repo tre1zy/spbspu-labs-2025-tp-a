@@ -156,36 +156,40 @@ namespace
     size_t minRating;
   };
 
-  void buyP(std::ostream& out, brevnov::League& league, brevnov::Team& club, size_t bud, brevnov::Position sPos)
+  struct BestPlayerComparator
   {
-    struct BestPlayerFinder
+    BestPlayerComparator(const SuitablePlayer& pred):
+      predicate(pred)
+    {}
+    template < class T > 
+    bool operator()(const T& a, const T& b) const
     {
-      bool operator()(const std::pair<std::string, brevnov::Player>& player)
+      bool a_match = predicate(a);
+      bool b_match = predicate(b);
+      if (a_match && !b_match)
       {
-        SuitablePlayer predicate(sPos, bud, bestRating);
-        if (predicate(player))
-        {
-          bestRating = player.second.raiting_;
-          bestPlayer = league.fa_.find(player.first);
-          return true;
-        }
         return false;
       }
-      brevnov::Position sPos;
-      size_t bud;
-      brevnov::League& league;
-      size_t bestRating = 0;
-      decltype(league.fa_.end()) bestPlayer = league.fa_.end();
-    };
-    BestPlayerFinder finder{sPos, bud, league};
-    NullOstreamIterator null_it;
-    std::transform(league.fa_.begin(), league.fa_.end(), null_it, finder);
-    if (finder.bestPlayer != league.fa_.end())
+      if (!a_match && b_match)
+      { 
+        return true;
+      }
+      return a.second.raiting_ < b.second.raiting_;
+    }
+    const SuitablePlayer& predicate;
+  };
+
+  void buyP(std::ostream& out, brevnov::League& league, brevnov::Team& club, size_t bud, brevnov::Position sPos)
+  {
+    SuitablePlayer predicate(sPos, bud, 0);
+    BestPlayerComparator comp(predicate);
+    auto bestPlayerIt = std::max_element(league.fa_.begin(), league.fa_.end(), comp);
+    if (bestPlayerIt != league.fa_.end() && predicate(*bestPlayerIt))
     {
-      club.budget_ -= finder.bestPlayer->second.price_;
-      out << "Bought " << finder.bestPlayer->first << " " << finder.bestPlayer->second << "\n";
-      club.players_.insert(*finder.bestPlayer);
-      league.fa_.erase(finder.bestPlayer);
+      club.budget_ -= bestPlayerIt->second.price_;
+      out << "Bought " << bestPlayerIt->first << " " << bestPlayerIt->second << "\n";
+      club.players_.insert(*bestPlayerIt);
+      league.fa_.erase(bestPlayerIt);
     }
     else
     {
