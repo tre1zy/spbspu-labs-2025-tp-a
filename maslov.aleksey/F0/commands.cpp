@@ -155,8 +155,8 @@ void maslov::unionDictionary(std::istream & in, Dicts & dicts)
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & result = dicts[resultName];
-  const auto & dict1 = dicts[dictName1];
-  const auto & dict2 = dicts[dictName2];
+  const auto & dict1 = it1->second;
+  const auto & dict2 = it2->second;
   std::copy(dict1.begin(), dict1.end(), std::inserter(result, result.begin()));
   using namespace std::placeholders;
   auto func = std::bind(mergeWords, std::ref(result), _1);
@@ -178,8 +178,8 @@ void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & result = dicts[resultName];
-  auto & dict1 = dicts[dictName1];
-  auto & dict2 = dicts[dictName2];
+  auto & dict1 = it1->second;
+  auto & dict2 = it2->second;
   using namespace std::placeholders;
   auto func = std::bind(intersectWord, std::cref(dict2), _1);
   std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), func);
@@ -314,11 +314,11 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   {
     throw std::runtime_error("<INVALID DICTIONARY>");
   }
-  auto & resultDict = dicts[resultName];
+  auto & result = dicts[resultName];
   using namespace std::placeholders;
   auto cmp = std::bind(comparatorFrequency, _1, freq1, freq2);
-  std::copy_if(dictIt->second.begin(), dictIt->second.end(), std::inserter(resultDict, resultDict.end()), cmp);
-  if (resultDict.empty())
+  std::copy_if(dictIt->second.begin(), dictIt->second.end(), std::inserter(result, result.end()), cmp);
+  if (result.empty())
   {
     dicts.erase(resultName);
     throw std::runtime_error("<EMPTY DICTIONARY>");
@@ -365,14 +365,7 @@ void maslov::loadFile(const std::string & filename, Dicts & dicts)
     for (size_t j = 0; j < wordCount; ++j)
     {
       file >> word >> freq;
-      if (currDict.find(word) != currDict.end())
-      {
-        currDict[word] += freq;
-      }
-      else
-      {
-        currDict[word] = freq;
-      }
+      mergeWords(currDict, {word, freq});
     }
   }
 }
