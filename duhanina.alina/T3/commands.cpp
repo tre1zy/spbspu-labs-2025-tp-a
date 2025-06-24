@@ -270,9 +270,10 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
+  size_t num = 0;
   if (std::isdigit(param[0]))
   {
-    size_t num = std::stoull(param);
+    num = std::stoull(param);
     if (num < 3)
     {
       throw std::invalid_argument("Error in input");
@@ -280,7 +281,7 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
   }
   static const std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands =
   { { "EVEN", EvenAreaSum() },
-  { "ODD"], OddAreaSum() },
+  { "ODD", OddAreaSum() },
   { "MEAN", MeanAreaSum() },
   { param, VertexCountAreaSum(num) } };
   out << commands.at(param)(plgs);
