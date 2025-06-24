@@ -12,6 +12,8 @@ namespace averenkov
     std::string getName() const;
     int getWeight() const;
     int getValue() const;
+    void setWeight(int w);
+    void setValue(int v);
 
   private:
     std::string name_;
@@ -19,27 +21,6 @@ namespace averenkov
     int value_;
   };
 
-}
-
-averenkov::Item::Item(const std::string& n, int w, int v):
-  name_(n),
-  weight_(w),
-  value_(v)
-{}
-
-std::string averenkov::Item::getName() const
-{
-  return name_;
-}
-
-int averenkov::Item::getWeight() const
-{
-  return weight_;
-}
-
-int averenkov::Item::getValue() const
-{
-  return value_;
 }
 
 #endif
