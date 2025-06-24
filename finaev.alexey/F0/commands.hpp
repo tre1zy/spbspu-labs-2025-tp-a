@@ -9,10 +9,11 @@
 namespace finaev
 {
   using globalDebuts = std::unordered_map< std::string, finaev::OpenningInfo >;
-  using debutsBase = std::unordered_map< std::string, std::unordered_map< std::string, bool > >;
+  using debutsBases = std::unordered_map< std::string, std::unordered_map< std::string, bool > >;
   using mapOfCommands = std::map< std::string, std::function< void() > >;
   void create_debut(std::istream&, std::ostream&, globalDebuts&);
-  mapOfCommands createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts&/*, debutsBase&*/);
+  void create_base(std::istream&, std::ostream&, debutsBases&);
+  mapOfCommands createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts&, debutsBases&);
 }
 
 #endif

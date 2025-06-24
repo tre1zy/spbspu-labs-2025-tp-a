@@ -20,22 +20,28 @@ int main(/*int argc, char* argv[]*/)
   }*/
   std::unordered_map< std::string, finaev::OpenningInfo > globalOpenings;
   std::unordered_map< std::string, std::unordered_map< std::string, bool > > bases;
-  auto commands = finaev::createCommandsHandler(std::cin, std::cout, globalOpenings/*, bases*/);
+  auto commands = finaev::createCommandsHandler(std::cin, std::cout, globalOpenings, bases);
   std::string cmd;
   while (std::cin >> cmd)
   {
+    auto it = commands.find(cmd);
+    if (it == commands.end()) 
+    {
+      std::cout << ("<INVALID COMMAND>\n");
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      continue;
+    }
     try
     {
-      commands.at(cmd)();
+      it->second();
     }
-    catch(std::exception& e)
+    catch (const std::exception& e)
     {
       if (std::cin.fail())
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>";
+      std::cout << e.what();
     }
     std::cout << "\n";
   }
