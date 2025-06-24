@@ -125,61 +125,52 @@ double areaNum(const std::vector<Polygon>& polys, int num)
     std::cout << (initial_size - polygons.size()) << "\n";
   }
 
-  struct CommandProcessor
-  {
-    std::vector< Polygon >& polygons;
+  void CommandProcessor::operator()(const std::string& line) const
+{
+  if (line.empty()) {
+    return;
+  }
 
-    explicit CommandProcessor(std::vector< Polygon >& polys):
-      polygons(polys)
-    {}
+  std::string::size_type spacePos = line.find(' ');
+  std::string cmd;
+  std::string rest;
 
-    void operator()(const std::string& line) const
-    {
-      const std::string& content = line;
-      if (content.empty()) {
-       return;
-      }
+  if (spacePos == std::string::npos) {
+    cmd = line;
+  } else {
+    cmd = line.substr(0, spacePos);
+    rest = line.substr(spacePos + 1);
+  }
 
-      std::string::size_type spacePos = content.find(' ');
-      std::string cmd;
-      std::string rest;
+  try {
+    bool printDouble = false;
+    double dblResult = 0.0;
+    int intResult = 0;
 
-    if (spacePos == std::string::npos) {
-     cmd = content;
-   } else {
-    cmd = content.substr(0, spacePos);
-    rest = content.substr(spacePos + 1);
-   }
+    std::map<std::string, void (CommandProcessor::*)(const std::string&) const> handlers = {
+      {"AREA", &CommandProcessor::command_area},
+      {"COUNT", &CommandProcessor::command_count},
+      {"MAX", &CommandProcessor::command_max},
+      {"MIN", &CommandProcessor::command_min},
+      {"INTERSECTIONS", &CommandProcessor::command_intersections},
+      {"RMECHO", &CommandProcessor::command_rmecho}
+    };
 
-try {
-      bool printDouble = false;
-      double dblResult = 0.0;
-      int intResult = 0;
-std::map<std::string, void (CommandProcessor::*)(const std::string&) const> handlers = {
-  {"AREA", &CommandProcessor::command_area},
-  {"COUNT", &CommandProcessor::command_count},
-  {"MAX", &CommandProcessor::command_max},
-  {"MIN", &CommandProcessor::command_min},
-  {"INTERSECTIONS", &CommandProcessor::command_intersections},
-  {"RMECHO", &CommandProcessor::command_rmecho}
-};
+    auto it = handlers.find(cmd);
+    if (it != handlers.end()) {
+      (this->*(it->second))(rest);
+    } else {
+      throw std::runtime_error("Unknown command");
+    }
 
-auto it = handlers.find(cmd);
-if (it != handlers.end()) {
-  (this->*(it->second))(rest);
-} else {
-  throw std::runtime_error("Unknown command");
-}
-
-      if (printDouble) {
+    if (printDouble) {
       std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
     } else {
       std::cout << intResult << "\n";
     }
-
-  } catch (const std::exception&) {
+  }
+  catch (const std::exception&) {
     std::cout << "<INVALID COMMAND>\n";
-     }
-    };
   };
+};
 }
