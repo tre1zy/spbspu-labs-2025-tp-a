@@ -195,11 +195,12 @@ void CommandProcessor::command_area(const std::string& rest) const {
   }else if (rest == "3" || rest == "4" || rest == "8") {
   int target = (rest == "3") ? 3 : (rest == "4") ? 4 : 8;
 
-  if (polygons_.size() > 0 && polygons_[0].points.size() == target) result += compute_area(polygons_[0]);
-  if (polygons_.size() > 1 && polygons_[1].points.size() == target) result += compute_area(polygons_[1]);
-  if (polygons_.size() > 2 && polygons_[2].points.size() == target) result += compute_area(polygons_[2]);
-  if (polygons_.size() > 3 && polygons_[3].points.size() == target) result += compute_area(polygons_[3]);
-  if (polygons_.size() > 4 && polygons_[4].points.size() == target) result += compute_area(polygons_[4]);
+  if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(target)) result += compute_area(polygons_[0]);
+  if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(target)) result += compute_area(polygons_[1]);
+  if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(target)) result += compute_area(polygons_[2]);
+  if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(target)) result += compute_area(polygons_[3]);
+  if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(target)) result += compute_area(polygons_[4]);
+
 }
 else {
   throw std::runtime_error("Invalid command");
