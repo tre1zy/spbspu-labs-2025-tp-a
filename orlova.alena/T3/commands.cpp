@@ -176,7 +176,6 @@ void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::
   subcmds["AREA"] = minArea;
   subcmds["VERTEXES"] = minVertexes;
   subcmds.at(subcommand)(polygons, out);
-  throw std::logic_error("<WRONG SUBCOMMAND>");
 }
 
 void orlova::minArea(const std::vector< Polygon >& polygons, std::ostream& out)
