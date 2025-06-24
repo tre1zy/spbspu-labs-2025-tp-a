@@ -20,6 +20,21 @@ namespace
     }
   };
 
+  struct TranslationFormatter
+  {
+    mutable bool first = true;
+
+    std::string operator()(const std::string & tr) const
+    {
+      if (first)
+      {
+        first = false;
+        return " " + tr;
+      }
+      return ", " + tr;
+    }
+  };
+
   struct DictPrinter
   {
     std::ostream & out;
@@ -27,12 +42,8 @@ namespace
     void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
     {
       out << entry.first << ":";
-      TranslationPrinter printer{ out };
-      printer.first = true;
-      for (const auto & tr : entry.second)
-      {
-        printer(tr);
-      }
+      TranslationFormatter formatter;
+      std::transform(entry.second.begin(), entry.second.end(), std::ostream_iterator<std::string>(out), std::ref(formatter));
       out << "\n";
     }
   };
