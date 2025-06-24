@@ -170,7 +170,7 @@ namespace
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(predicated), predicate);
     std::vector< double > areas;
     std::transform(predicated.begin(), predicated.end(), std::back_inserter(areas), getArea);
-    return std::accumulate(areas.begin(), areas.end(), 0.0);
+    return std::accumulate(areas.begin(), areas.end(), 0);
   }
 
   bool compareArea(const kushekbaev::Polygon& polygon1, const kushekbaev::Polygon& polygon2)
@@ -304,7 +304,7 @@ void kushekbaev::max(std::istream& in, std::ostream& out, const std::vector< Pol
   }
   catch (...)
   {
-    throw;
+    throw std::out_of_range("<UNKNOWN COMMAND>");
   }
 }
 
@@ -321,7 +321,7 @@ void kushekbaev::min(std::istream& in, std::ostream& out, const std::vector< Pol
   }
   catch (...)
   {
-    throw;
+    throw std::out_of_range("<UNKNOWN COMMAND>");
   }
 }
 
@@ -341,7 +341,7 @@ void kushekbaev::count(std::istream& in, std::ostream& out, const std::vector< P
     size_t num_of_vertices = std::stoull(subcommand);
     if (num_of_vertices < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
     {
-      throw;
+      throw std::logic_error("Too few vertices!");
     }
     countNum(polygons, out, num_of_vertices);
   }
@@ -359,7 +359,7 @@ void kushekbaev::same(std::istream& in, std::ostream& out, const std::vector< Po
   if (!in || in.peek() != '\n')
   {
     in.clear();
-    throw;
+    throw std::logic_error("<INVALID COMMAND>");
   }
   auto tmp = std::bind(isCompabitebleByOverlay, std::placeholders::_1, polygon);
   out << std::count_if(polygons.begin(), polygons.end(), tmp) << "\n";
