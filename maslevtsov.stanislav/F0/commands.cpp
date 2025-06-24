@@ -1,5 +1,7 @@
 #include "commands.hpp"
 #include <fstream>
+#include <queue>
+#include <stack>
 #include "graph.hpp"
 
 bool maslevtsov::check_graphs_format(std::istream& in)
@@ -207,4 +209,84 @@ void maslevtsov::create_subgraph(graphs_t& graphs, std::istream& in)
   }
   Graph new_gr(graphs.at(gr_name), vertices);
   graphs[new_gr_name] = new_gr;
+}
+
+void maslevtsov::traverse_breadth_first(const graphs_t& graphs, std::istream& in, std::ostream& out)
+{
+  std::string graph_name;
+  unsigned start_node = 0;
+  in >> graph_name >> start_node;
+  auto gr_it = graphs.find(graph_name);
+  if (gr_it == graphs.cend() || gr_it->second.get_adj_list().find(start_node) == gr_it->second.get_adj_list().cend()) {
+    throw std::invalid_argument("non-existing graph");
+  }
+  const std::unordered_map< unsigned, std::vector< unsigned > >& adj_list = gr_it->second.get_adj_list();
+  std::unordered_map< unsigned, size_t > distances;
+  std::queue< unsigned > to_visit;
+  distances[start_node] = 0;
+  to_visit.push(start_node);
+  while (!to_visit.empty()) {
+    unsigned current_node = to_visit.front();
+    to_visit.pop();
+    auto adj_list_it = adj_list.find(current_node);
+    for (unsigned neighbour: adj_list_it->second) {
+      if (distances.find(neighbour) == distances.end()) {
+        distances[neighbour] = distances[current_node] + 1;
+        to_visit.push(neighbour);
+      }
+    }
+  }
+  for (auto i = distances.cbegin(); i != distances.cend(); ++i) {
+    out << start_node << '-' << i->first << " : " << i->second << '\n';
+  }
+}
+
+void maslevtsov::get_min_path(const graphs_t& graphs, std::istream& in, std::ostream& out)
+{
+  std::string graph_name;
+  unsigned start_node = 0, goal_node = 0;
+  in >> graph_name >> start_node >> goal_node;
+  auto gr_it = graphs.find(graph_name);
+  if (gr_it == graphs.cend() || gr_it->second.get_adj_list().find(start_node) == gr_it->second.get_adj_list().cend()) {
+    throw std::invalid_argument("non-existing graph");
+  }
+  const std::unordered_map< unsigned, std::vector< unsigned > >& adj_list = gr_it->second.get_adj_list();
+  std::unordered_map< unsigned, size_t > distances;
+  std::unordered_map< unsigned, unsigned > parents;
+  std::queue< unsigned > to_visit;
+  distances[start_node] = 0;
+  to_visit.push(start_node);
+  bool is_path_exist = false;
+  while (!to_visit.empty()) {
+    unsigned current_node = to_visit.front();
+    to_visit.pop();
+    if (current_node == goal_node) {
+      is_path_exist = true;
+      break;
+    }
+    auto adj_list_it = adj_list.find(current_node);
+    for (unsigned neighbour: adj_list_it->second) {
+      if (distances.find(neighbour) == distances.end()) {
+        distances[neighbour] = distances[current_node] + 1;
+        parents[neighbour] = current_node;
+        to_visit.push(neighbour);
+      }
+    }
+  }
+  if (!is_path_exist) {
+    throw std::invalid_argument("non-existing path");
+  }
+  std::stack< unsigned > restored_path;
+  unsigned current_node = goal_node;
+  while (current_node != start_node) {
+    restored_path.push(current_node);
+    current_node = parents[current_node];
+  }
+  out << restored_path.top();
+  restored_path.pop();
+  while (!restored_path.empty()) {
+    out << '-' << restored_path.top();
+    restored_path.pop();
+  }
+  out << ' ' << distances[goal_node] << '\n';
 }

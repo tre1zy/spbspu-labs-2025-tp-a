@@ -9,11 +9,14 @@ namespace maslevtsov {
   class Graph
   {
   public:
+    using adjacency_list_t = std::unordered_map< unsigned, std::vector< unsigned > >;
+
     Graph() = default;
     Graph(const Graph& gr1, const Graph& gr2);
     Graph(const Graph& src, const std::vector< unsigned >& vertices);
 
     size_t get_vertice_count() const;
+    const adjacency_list_t& get_adj_list() const;
 
     void add_vertice(unsigned vertice);
     void add_edge(unsigned vertice1, unsigned vertice2);
@@ -22,7 +25,6 @@ namespace maslevtsov {
     void print_adjacency_list(std::ostream& out) const;
 
   private:
-    using adjacency_list_t = std::unordered_map< unsigned, std::vector< unsigned > >;
     adjacency_list_t adjacency_list_;
 
     friend std::istream& operator>>(std::istream& in, Graph& gr);

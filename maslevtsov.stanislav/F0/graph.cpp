@@ -77,6 +77,11 @@ size_t maslevtsov::Graph::get_vertice_count() const
   return adjacency_list_.size();
 }
 
+const maslevtsov::Graph::adjacency_list_t& maslevtsov::Graph::get_adj_list() const
+{
+  return adjacency_list_;
+}
+
 void maslevtsov::Graph::add_vertice(unsigned vertice)
 {
   if (adjacency_list_.find(vertice) != adjacency_list_.end()) {
