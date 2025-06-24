@@ -15,6 +15,7 @@ int main()
   commands["add"] = std::bind(addCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["translate"] = std::bind(translateCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["remove"] = std::bind(removeCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["print"] = std::bind(printCommand, std::ref(dicts), _1, std::ref(std::cout));
   std::string cmd;
   while (std::cin >> cmd)
   {

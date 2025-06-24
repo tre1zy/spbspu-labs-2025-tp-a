@@ -103,3 +103,32 @@ void smirnov::removeCommand(Dicts & dicts, std::istream & in, std::ostream & out
   dict.erase(wordIt);
   out << "The word " << word << " successfully deleted from " << dictName << "\n";
 }
+
+void smirnov::printCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string dictName;
+  in >> dictName;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.end())
+  {
+    out << "The dictionary with name " << dictName << " doesn't exist.\n";
+    return;
+  }
+  const auto & dict = dictIt->second;
+  if (dict.empty())
+  {
+    out << dictName << " is empty.\n";
+    return;
+  }
+  for (const auto & pair : dict)
+  {
+    out << pair.first << " - ";
+    std::copy(pair.second.begin(), pair.second.end(), std::ostream_iterator< std::string >(out, " "));
+    out << "\n";
+  }
+}
