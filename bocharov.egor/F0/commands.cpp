@@ -325,12 +325,7 @@ namespace bocharov
     list_t & translations = dict.at(sln);
 
     std::set<std::string> rusSet;
-    std::string word;
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> word;
-      rusSet.insert(word);
-    }
+    std::generate_n(std::inserter(rusSet, rusSet.begin()), n, WordReader{ in });
 
     auto new_end = std::remove_if(translations.begin(), translations.end(), RusRemover{ rusSet });
     translations.erase(new_end, translations.end());
