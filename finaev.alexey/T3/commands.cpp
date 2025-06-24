@@ -83,7 +83,7 @@ namespace
   {
     std::vector< finaev::Polygon > evenShapes;
     std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(evenShapes), isEven);
-    return std::accumulate(oddShapes.begin(), oddShapes.end(), 0.0, AreaAccumulator{});
+    return std::accumulate(evenShapes.begin(), evenShapes.end(), 0.0, AreaAccumulator{});
   }
 
   double areaMean(const std::vector< finaev::Polygon >& shapes)
