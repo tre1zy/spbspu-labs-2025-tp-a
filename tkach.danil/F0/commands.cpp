@@ -300,7 +300,9 @@ namespace
       {
         if (!findTranslation(it2->second, translation_))
         {
-          it2->second.push_back(translation_);
+          std::list<std::string> new_translations_list;
+          new_translations_list.push_back(translation_);
+          it2->second = mergeTranslations(it2->second, new_translations_list);
         }
       }
     }
@@ -588,16 +590,7 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
         break;
       }
     }
-    auto it = temp.find(name_of_dict);
-    if (it == temp.end())
-    {
-      temp[name_of_dict] = temp_dict;
-    }
-    else
-    {
-      std::map< std::string, std::list< std::string > > merged = mergeDicts({&temp_dict, &temp[name_of_dict]});
-      temp[name_of_dict] = merged;
-    }
+    temp[name_of_dict] = mergeDicts({&temp_dict, &temp[name_of_dict]});
   }
   if (!in2.eof())
   {
@@ -795,7 +788,9 @@ void tkach::addTranslation(std::istream& in, tree_of_dict& avltree)
     }
     if (!findTranslation(it2->second, translation))
     {
-      it2->second.push_back(translation);
+      std::list<std::string> new_translations_list;
+      new_translations_list.push_back(translation);
+      it2->second = mergeTranslations(it2->second, new_translations_list);
     }
   }
   else
