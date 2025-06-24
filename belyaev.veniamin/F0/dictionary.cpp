@@ -4,13 +4,18 @@
 #include <iterator>
 #include <numeric>
 
+std::string belyaev::formPairString(const std::pair<const std::string, const std::string>& pair)
+{
+  return pair.first + " -> " + pair.second;
+}
+
 std::string belyaev::accumulatePairString(std::string result, const std::pair<const std::string, const std::string>& pair)
 {
   if (result.empty())
   {
-    return pair.first + " -> " + pair.second;
+    return formPairString(pair);
   }
-  return std::move(result) + "\n" + pair.first + " -> " + pair.second;
+  return std::move(result) + "\n" + formPairString(pair);
 }
 
 std::ostream& belyaev::operator<<(std::ostream& out, const Dictionary& dictionary)
