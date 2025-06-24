@@ -1,5 +1,5 @@
-#ifndef STRUCTS_HPP
-#define STRUCTS_HPP
+#ifndef POLYGON_HPP
+#define POLYGON_HPP
 
 #include <vector>
 #include <iosfwd>

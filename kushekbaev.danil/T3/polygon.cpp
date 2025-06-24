@@ -1,4 +1,4 @@
-#include "structs.hpp"
+#include "polygon.hpp"
 #include <iostream>
 #include <functional>
 #include <algorithm>

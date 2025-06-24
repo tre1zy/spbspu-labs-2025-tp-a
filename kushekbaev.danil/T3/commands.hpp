@@ -2,7 +2,7 @@
 #define COMMANDS_HPP
 
 #include <iosfwd>
-#include "structs.hpp"
+#include "polygon.hpp"
 
 namespace kushekbaev
 {
