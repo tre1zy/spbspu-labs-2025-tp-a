@@ -50,24 +50,33 @@ namespace
     }
   };
 
-  struct DictWriter
-  {
-    std::ostream & out;
+ struct Empty {};
 
-    void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
-    {
-      out << entry.first;
-      if (!entry.second.empty())
-      {
-        out << " " << entry.second[0];
-        for (size_t i = 1; i < entry.second.size(); ++i)
-        {
-          out << " " << entry.second[i];
-        }
-      }
-      out << "\n";
-    }
-  };
+ struct DictWriter
+ {
+   std::ostream & out;
+
+   struct AddSpace
+   {
+     std::ostream & out;
+     Empty operator()(Empty accum, const std::string & word) const
+     {
+       out << " " << word;
+       return accum;
+     }
+   };
+
+   void operator()(const std::pair<std::string, std::vector<std::string>> & entry)
+   {
+     out << entry.first;
+     if (!entry.second.empty())
+     {
+       out << " " << entry.second[0];
+       std::accumulate(std::next(entry.second.begin()), entry.second.end(), Empty{}, AddSpace{ out });
+     }
+     out << "\n";
+   }
+ };
 
   struct FullDictWriter
   {
