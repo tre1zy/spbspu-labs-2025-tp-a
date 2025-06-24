@@ -222,3 +222,16 @@ void klimova::findLongestPath(const GraphManager& graphs, std::istream& in, std:
   }
 }
 
+void klimova::showGraphs(const GraphManager& graphs, std::ostream& out) {
+  if (graphs.empty()) {
+    out << "No graphs\n";
+    return;
+  }
+  for (auto it = graphs.begin(); it != graphs.end(); ++it) {
+    out << it->first;
+    if (std::next(it) != graphs.end()) {
+      out << " ";
+    }
+  }
+  out << "\n";
+}

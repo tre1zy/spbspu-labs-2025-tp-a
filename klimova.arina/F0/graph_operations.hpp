@@ -24,6 +24,7 @@ namespace klimova {
   void degreeOfVertex(const GraphManager& graphs, std::istream& in, std::ostream& out);
   void findShortestPath(const GraphManager& graphs, std::istream& in, std::ostream& out);
   void findLongestPath(const GraphManager& graphs, std::istream& in, std::ostream& out);
+  void showGraphs(const GraphManager& graphs, std::ostream& out);
 }
 
 #endif

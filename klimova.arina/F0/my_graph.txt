@@ -1,0 +1,13 @@
+MyGraph
+A
+B
+C
+D
+E
+F
+A B
+B C
+B E
+C D
+D E
+

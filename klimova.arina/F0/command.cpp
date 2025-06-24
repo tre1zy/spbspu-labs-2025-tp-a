@@ -1,26 +1,61 @@
 #include "command.hpp"
+#include <fstream>
+#include <limits>
+#include <stdexcept>
+#include <algorithm>
+#include <sstream>
 #include "graph_operations.hpp"
 
 void klimova::loadGraphFromFile(klimova::GraphManager& graphs, const std::string& filename)
 {
-    (void)graphs;
-    (void)filename;
-    throw std::runtime_error(" ");
+  /*std::ifstream file(filename);
+  if (!file) {
+    throw std::runtime_error("Cannot open file: " + filename);
+  }
+
+  std::string graphName;
+  if (!std::getline(file, graphName)) {
+    throw std::runtime_error("Empty file");
+  }
+
+  if (graphs.find(graphName) != graphs.end()) {
+    throw std::runtime_error("Graph with this name already exists");
+  }
+
+  GraphType graph;
+  file >> graph;
+
+  graphs.emplace(graphName, graph);*/
+  (void)graphs;
+  (void)filename;
+  throw std::runtime_error(" ");
 }
 
 bool klimova::checkGraphFile(const std::string& filename)
 {
-    (void)filename;
-    throw std::runtime_error("Function checkGraphFile not implemented yet");
-    return false;
+  /*std::ifstream file(filename);
+    if (!file) {
+      return false;
+    }
+
+    try {
+      GraphType testGraph;
+      file >> testGraph;
+      return true;
+    } catch (...) {
+      return false;
+    }*/
+  (void)filename;
+  throw std::runtime_error("Function checkGraphFile not implemented yet");
+  return false;
 }
 
 void klimova::showHelp(std::ostream& out)
 {
   out << "Graph Program - Available Commands:\n\n";
   out << " - creategraph <graph> - Create graph with name <graph>";
-  out << " - shortestpath <start> <end> - Find shortest path between vertices\n";
-  out << " - longestpath <start> <end> - Find longest path between vertices\n";
+  out << " - shortestpath <graph> <start> <end> - Find shortest path between vertices\n";
+  out << " - longestpath <graph> <start> <end> - Find longest path between vertices\n";
   out << " - checkconnectivity <graph> - Check if graph is connected\n\n";
 
   out << " - addvertex <graph> <vertex> - Add vertex to graph\n";
@@ -29,13 +64,14 @@ void klimova::showHelp(std::ostream& out)
   out << " - removeedge <graph> <v1> <v2> - Remove edge between vertices\n";
   out << " - clear <graph>  - Clear graph\n\n";
 
-  out << " - print <graph> - Print graph structure\n";
+  out << " - printgraph <graph> - Print graph structure\n";
   out << " - countvertices <graph> - Count vertices in graph\n";
   out << " - countedges <graph> - Count edges in graph\n";
   out << " - findneighbors <graph> <vertex> - Find neighbors of vertex\n";
   out << " - degree <graph> <vertex> - Get degree of vertex\n\n";
 
-  out << " - help - Show this help message\n\n";
+  out << " - help - Show this help message\n";
+  out << " - GRAPHS - Show all graphs\n\n";
 }
 
 klimova::CommandHandler klimova::createCommandHandler(klimova::GraphManager& graphs)
@@ -52,9 +88,10 @@ klimova::CommandHandler klimova::createCommandHandler(klimova::GraphManager& gra
   cmdMap["countvertices"] = std::bind(countVertices, std::cref(graphs), _1, _2);
   cmdMap["countedges"] = std::bind(countEdges, std::cref(graphs), _1, _2);
   cmdMap["findneighbors"] = std::bind(findNeighbors, std::cref(graphs), _1, _2);
-  cmdMap["degreeofvertex"] = std::bind(degreeOfVertex, std::cref(graphs), _1, _2);
+  cmdMap["degree"] = std::bind(degreeOfVertex, std::cref(graphs), _1, _2);
   cmdMap["findshortestpath"] = std::bind(findShortestPath, std::cref(graphs), _1, _2);
   cmdMap["findlongestpath"] = std::bind(findLongestPath, std::cref(graphs), _1, _2);
   cmdMap["help"] = std::bind(showHelp, _2);
+  cmdMap["GRAPHS"] = std::bind(showGraphs, std::cref(graphs), _2);
   return cmdMap;
 }

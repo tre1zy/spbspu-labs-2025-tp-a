@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
     else if (argc == 2) {
       try {
         loadGraphFromFile(graphs, argv[1]);
-        std::cout << "[OK] Graph loaded from '" << argv[1] << "'.\n";
+        std::cout << "[OK] Graphs loaded from '" << argv[1] << "'.\n";
       } catch (const std::exception& e) {
         std::cerr << "[ERROR] " << e.what() << "\n";
       }

@@ -6,8 +6,14 @@
 #include <string>
 #include <ostream>
 #include <iostream>
+#include <functional>
+#include <sstream>
 #include <queue>
+#include <numeric>
+
 namespace klimova {
+  using namespace std::placeholders;
+
   template< typename T >
   class Graph {
   public:
@@ -29,8 +35,9 @@ namespace klimova {
   private:
     std::vector< T > vertices;
     std::unordered_map< T, size_t > vertexMap;
-    std::vector< std::vector< bool > > adjMatrix;
-    bool dfsUtil(size_t v, std::vector< bool >& visited) const;
+    std::vector< std::vector< size_t > > adjList;
+
+    void dfsUtil(size_t v, std::vector< bool >& visited) const;
     bool findLongestPathUtil(size_t u, size_t endIdx,
           std::vector< bool >& visited,
           std::vector< T >& path,
@@ -44,10 +51,7 @@ namespace klimova {
     if (vertexMap.find(vertex) == vertexMap.end()) {
       vertexMap[vertex] = vertices.size();
       vertices.push_back(vertex);
-      for (auto& row : adjMatrix) {
-        row.resize(vertices.size(), false);
-      }
-      adjMatrix.resize(vertices.size(), std::vector< bool >(vertices.size(), false));
+      adjList.emplace_back();
     }
   }
 
@@ -66,8 +70,10 @@ namespace klimova {
   {
     size_t srcIdx = getVertexIndex(src);
     size_t destIdx = getVertexIndex(dest);
-    adjMatrix[srcIdx][destIdx] = true;
-    adjMatrix[destIdx][srcIdx] = true;
+    if (std::find(adjList[srcIdx].begin(), adjList[srcIdx].end(), destIdx) == adjList[srcIdx].end()) {
+      adjList[srcIdx].push_back(destIdx);
+      adjList[destIdx].push_back(srcIdx);
+    }
   }
 
   template < typename T >
@@ -75,22 +81,28 @@ namespace klimova {
   {
     size_t srcIdx = getVertexIndex(src);
     size_t destIdx = getVertexIndex(dest);
-    adjMatrix[srcIdx][destIdx] = false;
-    adjMatrix[destIdx][srcIdx] = false;
+    auto& srcNeighbors = adjList[srcIdx];
+    srcNeighbors.erase(std::remove(srcNeighbors.begin(), srcNeighbors.end(), destIdx), srcNeighbors.end());
+
+    auto& destNeighbors = adjList[destIdx];
+    destNeighbors.erase(std::remove(destNeighbors.begin(), destNeighbors.end(), srcIdx), destNeighbors.end());
   }
 
   template < typename T >
   void Graph< T >::removeVertex(const T& vertex)
   {
     size_t idx = getVertexIndex(vertex);
-    vertices.erase(vertices.begin() + idx);
-    vertexMap.erase(vertex);
-    for (size_t i = idx; i < vertices.size(); ++i) {
-      vertexMap[vertices[i]] = i;
+    for (size_t neighbor : adjList[idx]) {
+      auto& neighbors = adjList[neighbor];
+      neighbors.erase(std::remove(neighbors.begin(), neighbors.end(), idx), neighbors.end());
     }
-    adjMatrix.erase(adjMatrix.begin() + idx);
-    for (auto& row : adjMatrix) {
-      row.erase(row.begin() + idx);
+
+    vertices.erase(vertices.begin() + idx);
+    adjList.erase(adjList.begin() + idx);
+    vertexMap.erase(vertex);
+
+    for (size_t i = 0; i < vertices.size(); ++i) {
+      vertexMap[vertices[i]] = i;
     }
   }
 
@@ -102,10 +114,10 @@ namespace klimova {
       std::cout << v << "\n";
     }
     std::cout << "Edges:\n";
-    for (size_t i = 0; i < vertices.size(); ++i) {
-      for (size_t j = i + 1; j < vertices.size(); ++j) {
-        if (adjMatrix[i][j]) {
-          std::cout << vertices[i] << " -- " << vertices[j] << "\n";
+    for (size_t i = 0; i < adjList.size(); ++i) {
+      for (size_t neighbor : adjList[i]) {
+        if (i < neighbor) {
+          std::cout << vertices[i] << " -- " << vertices[neighbor] << "\n";
         }
       }
     }
@@ -119,25 +131,19 @@ namespace klimova {
     }
     std::vector< bool > visited(vertices.size(), false);
     dfsUtil(0, visited);
-    for (bool v : visited) {
-          if (!v) {
-              return false;
-          }
-    }
-    return true;
+    auto binder = std::bind(std::equal_to<bool>{}, _1, true);
+    return std::all_of(visited.begin(), visited.end(), binder);
   }
 
   template < typename T >
-  bool Graph< T >::dfsUtil(size_t v, std::vector< bool >& visited) const
+  void Graph< T >::dfsUtil(size_t v, std::vector< bool >& visited) const
   {
     visited[v] = true;
-
-    for (size_t u = 0; u < vertices.size(); ++u) {
-      if (adjMatrix[v][u] && !visited[u]) {
-        dfsUtil(u, visited);
+    for (size_t neighbor : adjList[v]) {
+      if (!visited[neighbor]) {
+        dfsUtil(neighbor, visited);
       }
     }
-    return true;
   }
 
   template < typename T >
@@ -149,15 +155,13 @@ namespace klimova {
   template < typename T >
   size_t Graph< T >::countEdges() const
   {
-    size_t count = 0;
-    for (size_t i = 0; i < vertices.size(); ++i) {
-      for (size_t j = i + 1; j < vertices.size(); ++j) {
-        if (adjMatrix[i][j]) {
-          ++count;
-        }
+    struct SumNeighbors {
+      size_t operator()(size_t sum, const std::vector<size_t>& neighbors) const {
+        return sum + neighbors.size();
       }
-    }
-    return count;
+    };
+
+    return std::accumulate(adjList.begin(), adjList.end(), 0, SumNeighbors{}) / 2;
   }
 
   template < typename T >
@@ -166,10 +170,8 @@ namespace klimova {
     try {
       size_t idx = getVertexIndex(vertex);
       std::cout << "Neighbors of " << vertex << ": ";
-      for (size_t v = 0; v < vertices.size(); ++v) {
-        if (adjMatrix[idx][v]) {
-          std::cout << vertices[v] << " ";
-        }
+      for (size_t neighbor : adjList[idx]) {
+        std::cout << vertices[neighbor] << " ";
       }
       std::cout << std::endl;
     } catch (const std::out_of_range&) {
@@ -182,13 +184,7 @@ namespace klimova {
   {
     try {
       size_t idx = getVertexIndex(vertex);
-      int degree = 0;
-      for (size_t v = 0; v < vertices.size(); ++v) {
-        if (adjMatrix[idx][v]) {
-          ++degree;
-        }
-      }
-      return degree;
+      return static_cast<int>(adjList[idx].size());
     } catch (const std::out_of_range&) {
       std::cerr << "Vertex not found." << std::endl;
       return -1;
@@ -209,27 +205,23 @@ namespace klimova {
       visited[startIdx] = true;
       queue.push(startIdx);
 
-      bool found = false;
-
       while (!queue.empty()) {
         size_t curr = queue.front();
         queue.pop();
 
         if (curr == endIdx) {
-          found = true;
           break;
         }
-
-        for (size_t v = 0; v < vertices.size(); ++v) {
-          if (adjMatrix[curr][v] && !visited[v]) {
-            visited[v] = true;
-            parent[v] = curr;
-            queue.push(v);
-          }
+        for (size_t neighbor : adjList[curr]) {
+          if (!visited[neighbor]) {
+            visited[neighbor] = true;
+            parent[neighbor] = curr;
+            queue.push(neighbor);
+           }
         }
       }
 
-      if (!found) {
+      if (parent[endIdx] == -1 && startIdx != endIdx) {
         std::cout << "Path from " << startVertex << " to " << endVertex << " not found\n";
         return;
       }
@@ -254,7 +246,7 @@ namespace klimova {
   {
     vertices.clear();
     vertexMap.clear();
-    adjMatrix.clear();
+    adjList.clear();
   }
 
   template < typename T >
@@ -271,9 +263,9 @@ namespace klimova {
         longestPath = path;
       }
     } else {
-      for (size_t v = 0; v < vertices.size(); ++v) {
-        if (adjMatrix[u][v] && !visited[v]) {
-          findLongestPathUtil(v, endIdx, visited, path, longestPath);
+      for (size_t neighbor : adjList[u]) {
+        if (!visited[neighbor]) {
+          findLongestPathUtil(neighbor, endIdx, visited, path, longestPath);
         }
       }
     }
