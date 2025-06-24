@@ -319,6 +319,22 @@ namespace
     std::copy_if(findTeam->second.players_.begin(), findTeam->second.players_.end(), null_iter, adapter);
     out << "\n";
   }
+
+  struct PlayerOutputter
+  {
+    PlayerOutputter(const std::string& name, std::ostream& os):
+      printer{name, os},
+      out(os)
+    {}
+    bool operator()(const std::pair<std::string, brevnov::Player>& player) const
+    {
+      printer(player);
+      out << "\n";
+      return false;
+    }
+    TeamPlayerPrinter printer;
+    std::ostream& out;
+  };
 }
 
 bool brevnov::checkPosition(std::string pos)
@@ -593,14 +609,11 @@ void brevnov::viewTeam(std::istream& in, std::ostream& out, League& league)
   auto findTeam = league.teams_.find(teamName);
   if (findTeam != league.teams_.end())
   {
-    TeamPlayerPrinter printer{teamName, out};
-    auto it = findTeam->second.players_.begin();
-    while (it != findTeam->second.players_.end())
-    {
-      printer(*it);
-      out << "\n";
-      ++it;
-    }
+    PlayerOutputter outputter{teamName, out};
+    std::vector<std::pair<std::string, Player>> players(findTeam->second.players_.begin(), 
+      findTeam->second.players_.end());
+    std::vector<int> dummy(players.size());
+    std::transform(players.begin(), players.end(), dummy.begin(), outputter);
   }
   else
   {
