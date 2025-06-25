@@ -1,5 +1,5 @@
 #include "input_parsers.hpp"
-#include "delimiter.hpp"
+#include <input_delimiter.hpp>
 
 std::istream &fedorov::operator>>(std::istream &input, DoubleKey &&key)
 {
@@ -9,7 +9,7 @@ std::istream &fedorov::operator>>(std::istream &input, DoubleKey &&key)
     return input;
   }
 
-  using del = DelimiterI;
+  using del = DelimiterInput;
   double num = 0;
 
   input >> num >> del{'d'};
@@ -28,7 +28,7 @@ std::istream &fedorov::operator>>(std::istream &input, ComplexKey &&key)
     return input;
   }
 
-  using del = DelimiterI;
+  using del = DelimiterInput;
   using delStr = DelimiterStr;
   double real = 0;
   double imag = 0;
@@ -50,7 +50,7 @@ std::istream &fedorov::operator>>(std::istream &input, StringKey &&key)
     return input;
   }
 
-  using del = DelimiterI;
+  using del = DelimiterInput;
 
   input >> del{'"'};
   std::getline(input, key.string, '\"');
