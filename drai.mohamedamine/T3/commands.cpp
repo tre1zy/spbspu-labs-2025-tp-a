@@ -89,59 +89,6 @@ namespace amine
       return a.points.size() < b.points.size();
     }
   };
-struct CopyAreaIfEven
-{
-  std::vector< double >& result;
-  explicit CopyAreaIfEven(std::vector< double >& r): result(r) {}
-
-  void operator()(const Polygon& p) const
-  {
-    if (p.points.size() % 2 == 0)
-    {
-      result.push_back(compute_area(p));
-    }
-  }
-};
-
-struct CopyAreaIfOdd
-{
-  std::vector< double >& result;
-  explicit CopyAreaIfOdd(std::vector< double >& r): result(r) {}
-
-  void operator()(const Polygon& p) const
-  {
-    if (p.points.size() % 2 != 0)
-    {
-      result.push_back(compute_area(p));
-    }
-  }
-};
-
-struct CopyAreaIfNum
-{
-  int n;
-  std::vector< double >& result;
-
-  CopyAreaIfNum(int count, std::vector< double >& r):
-    n(count), result(r)
-  {}
-
-  void operator()(const Polygon& p) const
-  {
-    if (static_cast< int >(p.points.size()) == n)
-    {
-      result.push_back(compute_area(p));
-    }
-  }
-};
-struct SumDoubles
-{
-  double operator()(double lhs, double rhs) const
-  {
-    return lhs + rhs;
-  }
-};
-
   std::istream& operator>>(std::istream& is, Line& line)
   {
     std::getline(is, line.content);
@@ -209,18 +156,12 @@ struct SumDoubles
     void operator()(const Line& line) const
     {
       try
-  {
+      {
       if (line.content.empty())
       {
         return;
       }
-      std::string_view lineContent = line.content;
-      std::size_t pos = lineContent.find_first_not_of(' ');
-      if (pos == std::string::npos) {
-        return;
-      }
-      lineContent.remove_prefix(pos);
-
+      std::istringstream iss(line.content);
       std::string cmd;
       iss >> cmd;
       bool printDouble = false;
@@ -230,32 +171,29 @@ struct SumDoubles
       {
         std::string arg;
         iss >> arg;
-      else if (arg == "EVEN")
-      {
-        std::vector< double > areas;
-        areas.reserve(polygons.size());
-        std::for_each(polygons.begin(), polygons.end(), CopyAreaIfEven(areas));
-        dblResult = std::inner_product(areas.begin(), areas.end(), std::vector< double >(areas.size(), 1.0).begin(), 0.0);
-        printDouble = true;
-      }
-      else if (arg == "ODD")
-      {
-        std::vector< double > areas;
-        areas.reserve(polygons.size());
-        std::for_each(polygons.begin(), polygons.end(), CopyAreaIfOdd(areas));
-        dblResult = std::inner_product(areas.begin(), areas.end(), std::vector< double >(areas.size(), 1.0).begin(), 0.0);
-        printDouble = true;
-      }
-      else
-      {
-        int num = std::stoi(arg);
-        std::vector< double > areas;
-        areas.reserve(polygons.size());
-        std::for_each(polygons.begin(), polygons.end(), CopyAreaIfNum(num, areas));
-        dblResult = std::inner_product(areas.begin(), areas.end(), std::vector< double >(areas.size(), 1.0).begin(), 0.0);
-        printDouble = true;
-      }
-
+        if (arg == "EVEN")
+        {
+          dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
+          printDouble = true;
+        }
+        else if (arg == "ODD")
+        {
+          dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
+          printDouble = true;
+        }
+        else if (arg == "MEAN")
+        {
+          if (polygons.empty())
+          {
+            throw std::logic_error("INVALID COMMAND");
+          }
+          else
+          {
+            double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
+            dblResult = total / polygons.size();
+            printDouble = true;
+          }
+        }
         else
         {
           bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
@@ -267,19 +205,10 @@ struct SumDoubles
               throw std::logic_error("INVALID COMMAND");
             }
             else
-              {
-                std::vector< double > areas;
-                areas.reserve(polygons.size());
-                std::for_each(polygons.begin(), polygons.end(), CopyAreaIfNum(num, areas));
-
-                dblResult = std::inner_product(
-                  areas.begin(), areas.end(),
-                  std::vector< double >(areas.size(), 1.0).begin(),
-                  0.0
-                );
-
-                printDouble = true;
-              }
+            {
+              dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num));
+              printDouble = true;
+            }
           }
           else
           {
@@ -370,17 +299,17 @@ struct SumDoubles
       }
       else if (cmd == "INTERSECTIONS")
       {
-        std::string_view lineView = line.content;
-        std::size_t pos = lineView.find(' ');
-        if (pos == std::string_view::npos)
+        std::string rest;
+        std::getline(iss, rest);
+        if (rest.empty())
         {
           throw std::logic_error("INVALID COMMAND");
         }
         else
         {
-          lineView.remove_prefix(pos + 1);
+          rest.erase(0, rest.find_first_not_of(' '));
           Polygon query;
-          if (!parse_polygon(std::string(lineView), query) || query.points.size() < 3)
+          if (!parse_polygon(rest, query) || query.points.size() < 3)
           {
             throw std::logic_error("INVALID COMMAND");
           }
@@ -389,7 +318,9 @@ struct SumDoubles
             struct IntersectsWith
             {
               const Polygon& query;
-              explicit IntersectsWith(const Polygon& q): query(q) {}
+              explicit IntersectsWith(const Polygon& q):
+                query(q)
+              {}
               bool operator()(const Polygon& p) const
               {
                 return polygons_intersect(p, query);
@@ -401,17 +332,21 @@ struct SumDoubles
       }
       else if (cmd == "RMECHO")
       {
-        std::string_view lineView = line.content;
-        std::size_t pos = lineView.find(' ');
-        if (pos == std::string_view::npos)
+        std::string rest;
+        std::getline(iss, rest);
+        if (rest.empty())
         {
           throw std::logic_error("INVALID COMMAND");
         }
         else
         {
-          lineView.remove_prefix(pos + 1);
+          size_t pos = rest.find_first_not_of(' ');
+          if (pos != std::string::npos)
+          {
+            rest = rest.substr(pos);
+          }
           Polygon query;
-          if (!parse_polygon(std::string(lineView), query))
+          if (!parse_polygon(rest, query))
           {
             throw std::logic_error("INVALID COMMAND");
           }
@@ -428,7 +363,6 @@ struct SumDoubles
           }
         }
       }
-
       else
       {
         throw std::logic_error("INVALID COMMAND");
@@ -445,11 +379,11 @@ struct SumDoubles
   {
     std::cout << "<INVALID COMMAND>\n";
   }
+}
     };
   };
   void process_commands(std::vector< Polygon >& polygons)
   {
     std::for_each(std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), CommandProcessor(polygons));
   }
-};
 }

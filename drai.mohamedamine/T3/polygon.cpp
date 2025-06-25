@@ -7,6 +7,7 @@
 #include <iostream>
 #include <numeric>
 #include <sstream>
+#include "commands.hpp"
 
 namespace amine
 {
@@ -194,44 +195,46 @@ namespace amine
     }
     return false;
   }
-std::istream& amine::operator>>(std::istream& in, Polygon& poly)
-{
-  int n = 0;
-  in >> n;
-  if (!in || n < 3)
+  struct PointParser
   {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
+    std::istringstream& iss;
 
-  poly.points.clear();
-  poly.points.reserve(n);
-
-  struct PointReader
-  {
-    std::istream& in;
-    PointReader(std::istream& inStream): in(inStream) {}
+    explicit PointParser(std::istringstream& stream):
+      iss(stream)
+    {}
 
     Point operator()() const
     {
-      char c1, c2, sep;
-      int x, y;
-      if (in >> c1 >> x >> sep >> y >> c2 && c1 == '(' && sep == ';' && c2 == ')')
-      {
-        return Point{x, y};
-      }
-      in.setstate(std::ios::failbit);
-      return Point{};
+      Point pt;
+      char c;
+      if (!(iss >> c) || c != '(')
+        return Point{};
+      if (!(iss >> pt.x))
+        return Point{};
+      if (!(iss >> c) || c != ';')
+        return Point{};
+      if (!(iss >> pt.y))
+        return Point{};
+      if (!(iss >> c) || c != ')')
+        return Point{};
+      return pt;
     }
   };
 
-  std::generate_n(std::back_inserter(poly.points), n, PointReader(in));
-
-  if (in.fail() || poly.points.size() != static_cast<std::size_t>(n))
+  bool parse_polygon(const std::string& str, Polygon& poly)
   {
-    in.setstate(std::ios::failbit);
+    std::istringstream iss(str);
+    int n;
+    if (!(iss >> n) || n <= 0)
+      return false;
+
+    poly.points.clear();
+    poly.points.reserve(n);
+
+    std::generate_n(std::back_inserter(poly.points), n, PointParser(iss));
+
+    iss >> std::ws;
+    return !iss.fail() && iss.eof() && poly.points.size() == static_cast< size_t >(n);
   }
 
-  return in;
-}
 }
