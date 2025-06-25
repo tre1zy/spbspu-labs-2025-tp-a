@@ -190,7 +190,7 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
   handlers["VERTEXES"] = std::bind(outputMaxVertices, std::ref(output), std::cref(polygons));
 
   smirnov::Iofmtguard guard(output);
-  handlers.at(param);
+  handlers.at(param)();
 }
 
 void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
