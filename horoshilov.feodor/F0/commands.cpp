@@ -58,7 +58,7 @@ namespace
     std::ostream& out_;
     void operator()(const std::string& word) const
     {
-      out_ << " " << word;  
+      out_ << " " << word;
     }
   };
 
@@ -415,7 +415,7 @@ namespace khoroshilov
     MaxLenFinder finder;
     std::for_each(dict_it->second.begin(), dict_it->second.end(), std::ref(finder));
 
-    out << dict_name << " " << finder.max_entry_->first << " " 
+    out << dict_name << " " << finder.max_entry_->first << " "
         << finder.max_entry_->first.size() << "\n";
   }
 
@@ -652,3 +652,4 @@ namespace khoroshilov
     dicts.insert(std::make_pair(new_name, result));
   }
 }
+
