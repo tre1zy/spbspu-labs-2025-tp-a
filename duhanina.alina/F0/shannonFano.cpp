@@ -9,12 +9,12 @@
 #include <algorithm>
 #include "functor.hpp"
 
-  std::map< std::string, duhanina::CodeTable > encoding_store;
-
 namespace
 {
   using str_t = const std::string&;
   using namespace duhanina;
+
+  std::map< std::string, duhanina::CodeTable > encoding_store;
 
   const std::string TEXT_EXT = ".txt";
   const std::string COMPRESSED_EXT = ".sfano";
