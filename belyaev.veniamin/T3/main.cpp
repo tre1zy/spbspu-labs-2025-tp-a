@@ -21,15 +21,15 @@ int main(int argc, char* argv[])
     std::cerr << "<INVALID FILE>\n";
     return 1;
   }
-  std::vector<Polygon> data;
+  std::vector< Polygon > data;
 
-  using PolyIStream = std::istream_iterator<Polygon>;
+  using PolyIStream = std::istream_iterator< Polygon >;
   while (!file.eof())
   {
     if (file.fail())
     {
       file.clear(file.rdstate() ^ std::ios_base::failbit);
-      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     std::copy(PolyIStream{file}, PolyIStream{}, std::back_inserter(data));
   }
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
   }

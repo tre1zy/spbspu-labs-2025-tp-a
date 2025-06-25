@@ -1,4 +1,5 @@
 #include "command-helpers.hpp"
+#include <iomanip>
 
 size_t belyaev::getVertices(const Polygon& src)
 {
@@ -27,7 +28,7 @@ bool belyaev::isStringNumeric(const std::string& str)
   return std::all_of(str.begin(), str.end(), isNumericBind);
 }
 
-double belyaev::accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n)
+double belyaev::accumulateTerm(double sum, int i, const std::vector< Point >& pnts, int n)
 {
   const int next_i = (i + 1) % n;
   return sum + (pnts[i].y + pnts[next_i].y) * (pnts[i].x - pnts[next_i].x);
@@ -36,7 +37,7 @@ double belyaev::accumulateTerm(double sum, int i, const std::vector<Point>& pnts
 double belyaev::calcArea(const Polygon& src)
 {
   const int amount = getVertices(src);
-  std::vector<int> indices(amount);
+  std::vector< int > indices(amount);
   std::iota(indices.begin(), indices.end(), 0);
 
   using namespace std::placeholders;
@@ -93,12 +94,12 @@ bool belyaev::compareVertices(const Polygon& lhs, const Polygon& rhs)
   return getVertices(lhs) < getVertices(rhs);
 }
 
-belyaev::Polygon belyaev::minElement(const std::vector<Polygon>& data, comparatorFunction comparator)
+belyaev::Polygon belyaev::minElement(const std::vector< Polygon >& data, comparatorFunction comparator)
 {
   return *std::min_element(data.begin(), data.end(), comparator);
 }
 
-belyaev::Polygon belyaev::maxElement(const std::vector<Polygon>& data, comparatorFunction comparator)
+belyaev::Polygon belyaev::maxElement(const std::vector< Polygon >& data, comparatorFunction comparator)
 {
   return *std::max_element(data.begin(), data.end(), comparator);
 }
