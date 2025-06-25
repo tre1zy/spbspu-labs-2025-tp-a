@@ -118,7 +118,8 @@ void amine::CrossRefSystem::buildIndex(const std::string& indexName, const std::
     }
 
     const Index& index = indexIt->second;
-    std::unordered_map<std::string, std::set<Position, positionLess>>::const_iterator wordIt = index.find(word);
+    std::unordered_map<std::string, std::set<Position
+    , positionLess>>::const_iterator wordIt = index.find(word);
     if (wordIt != index.end())
     {
       std::cout << "<YES>\n";
@@ -215,7 +216,8 @@ void amine::CrossRefSystem::mergeTexts(const std::string& newIndex,
   copyIndexWithOffset(result, second, offset);
   indexes_[newIndex] = result;
 }
-void amine::CrossRefSystem::insertText(const std::string& newIndex,const std::string& baseIndex,const std::string& insertIndex,
+void amine::CrossRefSystem::insertText(const std::string& newIndex,const std::string& baseIndex,
+  const std::string& insertIndex,
 size_t afterLine,size_t afterColumn)
 {
   auto baseIt = indexes_.find(baseIndex);
@@ -286,7 +288,8 @@ size_t afterLine,size_t afterColumn)
 
   indexes_[newIndex] = result;
 }
-void amine::CrossRefSystem::extractText(const std::string& newIndex,const std::string& baseIndex,size_t startLine,
+void amine::CrossRefSystem::extractText(const std::string& newIndex,const std::string& baseIndex
+,size_t startLine,
 size_t startCol,size_t endLine,size_t endCol)
 {
   auto baseIt = indexes_.find(baseIndex);
@@ -382,7 +385,8 @@ size_t startCol,size_t endLine,size_t endCol)
       return currentMax;
     }
     size_t maxInWord = currentMax;
-    std::function<size_t(std::set<amine::Position>::const_iterator, std::set<amine::Position>::const_iterator, size_t)>
+    std::function<size_t(std::set<amine::Position>::const_iterator,
+       std::set<amine::Position>::const_iterator,size_t)>
       maxInSet;
 
     maxInSet = [&](std::set<amine::Position>::const_iterator pit,
@@ -397,7 +401,8 @@ size_t startCol,size_t endLine,size_t endCol)
     maxInWord = maxInSet(iter->second.begin(), iter->second.end(), maxInWord);
     return getMaxLineRecursive(std::next(iter), end, maxInWord);
   }
-  void amine::CrossRefSystem::repeatText(const std::string& newIndex, const std::string& baseIndex, size_t N)
+  void amine::CrossRefSystem::repeatText(const std::string& newIndex
+    , const std::string& baseIndex, size_t N)
 {
   if (N == 0)
   {
