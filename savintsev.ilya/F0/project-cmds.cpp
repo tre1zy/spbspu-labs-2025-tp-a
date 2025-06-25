@@ -8,6 +8,7 @@
 #include <boost/gil/extension/io/bmp.hpp>
 #include <shape-utils.hpp>
 #include <scope-guard.hpp>
+#include "renderer.hpp"
 #include "file-system.hpp"
 #include "confirmation-src.hpp"
 
@@ -594,96 +595,6 @@ void savintsev::print_info_about_shape(std::istream & in, std::ostream & out, Pr
   }
 }
 
-namespace gil = boost::gil;
-
-namespace
-{
-  bool point_in_polygon(const savintsev::point_t * pts, size_t count, double x, double y)
-  {
-    bool inside = false;
-    for (size_t i = 0, j = count - 1; i < count; j = i++)
-    {
-      double xi = pts[i].x, yi = pts[i].y;
-      double xj = pts[j].x, yj = pts[j].y;
-
-      bool intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi + 1e-15) + xi);
-      if (intersect)
-      {
-        inside = !inside;
-      }
-    }
-    return inside;
-  }
-
-  void fill_shape_simple(gil::rgb8_view_t & view, const savintsev::point_t * pts, size_t count, gil::rgb8_pixel_t c)
-  {
-    if (count < 3)
-    {
-      return;
-    }
-
-    int width = view.width();
-    int height = view.height();
-
-
-    for (int y = 0; y < height; ++y)
-    {
-      for (int x = 0; x < width; ++x)
-      {
-        double fx = x - width / 2.0;
-        double fy = height / 2.0 - y;
-
-        if (point_in_polygon(pts, count, fx + 0.5, fy + 0.5))
-        {
-          view(x, y) = c;
-        }
-      }
-    }
-  }
-
-  struct RenderShape
-  {
-    RenderShape(gil::rgb8_image_t::view_t & view):
-      view_(view)
-    {}
-
-    void operator()(savintsev::Layer & layer)
-    {
-      std::mt19937 rng(std::random_device{}());
-      std::uniform_int_distribution< int > dist(50, 240);
-
-      savintsev::point_t pts[4];
-      size_t count = layer.second->get_all_points(pts);
-
-      gil::rgb8_pixel_t color
-      (
-        static_cast< uint8_t >(dist(rng)),
-        static_cast< uint8_t >(dist(rng)),
-        static_cast< uint8_t >(dist(rng))
-      );
-
-      if (count == 2)
-      {
-        savintsev::point_t rect_pts[4]
-        {
-          {pts[0].x, pts[0].y},
-          {pts[1].x, pts[0].y},
-          {pts[1].x, pts[1].y},
-          {pts[0].x, pts[1].y}
-        };
-        count = 4;
-        fill_shape_simple(view_, rect_pts, 4, color);
-      }
-      else
-      {
-        fill_shape_simple(view_, pts, count, color);
-      }
-    }
-
-    gil::rgb8_image_t::view_t & view_;
-  };
-}
-
 void savintsev::render(std::istream& in, std::ostream& out, Projects& projs)
 {
   std::string proj_name, image_name;
@@ -698,14 +609,8 @@ void savintsev::render(std::istream& in, std::ostream& out, Projects& projs)
 
   auto & proj = projs.at(proj_name);
 
-  gil::rgb8_image_t image(width, height);
-  auto view = gil::view(image);
-
-  gil::fill_pixels(view, gil::rgb8_pixel_t(255, 255, 255));
-
-  std::for_each(proj.begin(), proj.end(), RenderShape{view});
-
-  gil::write_view(image_name + ".bmp", view, gil::bmp_tag{});
+  Renderer rend;
+  rend.render_project(proj, image_name, width, height);
 
   out << "Project \"" << proj_name << "\" rendered successfully to \"" << image_name << ".bmp\"\n";
 }

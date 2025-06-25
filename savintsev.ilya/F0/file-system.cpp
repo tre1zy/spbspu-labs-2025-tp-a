@@ -69,8 +69,8 @@ bool savintsev::validate_savi_file(const std::string & filename)
       return false;
     }
 
-    int argCount = it->second;
-    for (int i = 0; i < argCount; ++i)
+    int arg_count = it->second;
+    for (int i = 0; i < arg_count; ++i)
     {
       if (!(file >> value))
       {
