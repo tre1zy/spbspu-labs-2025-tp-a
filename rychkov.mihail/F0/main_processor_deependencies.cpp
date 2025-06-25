@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <functional>
 #include <set>
 #include <map>
 #include "print_content.hpp"
@@ -22,6 +23,7 @@ namespace rychkov
     std::set< entities::Variable, NameCompare > result;
     size_t depth = 0;
 
+    bool operator()(const typing::Type& type);
     bool operator()(const entities::Variable& var);
     bool operator()(const entities::Declaration& decl);
     bool operator()(const entities::Literal& literal);
@@ -94,6 +96,19 @@ bool rychkov::DependencyVisitor::operator()(const entities::Variable& var)
   }
   return false;
 }
+bool rychkov::DependencyVisitor::operator()(const typing::Type& type)
+{
+  if (!search_uses)
+  {
+    return false;
+  }
+  if (typing::is_function(&type))
+  {
+    return operator()(*type.base) || std::any_of(type.function_parameters.begin(),
+          type.function_parameters.end(), *this);
+  }
+  return type.base == nullptr ? type.name == symbol : operator()(*type.base);
+}
 bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
 {
   ++depth;
@@ -130,9 +145,17 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
         return false;
       }
     }
-    if (depth > 1)
+    else
     {
       actives.emplace(var.name, depth - 1);
+    }
+    if (search_uses && operator()(var.type))
+    {
+      if (--depth == 0)
+      {
+        out << '\t' << var << '\n';
+      }
+      return true;
     }
   }
   else if (boost::variant2::holds_alternative< entities::Function >(decl.data))
@@ -163,9 +186,48 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
         return false;
       }
     }
-    if (depth > 1)
+    else
     {
       actives.emplace(func.name, depth - 1);
+    }
+    if (search_uses && operator()(func.type))
+    {
+      if (--depth == 0)
+      {
+        out << '\t' << func << '\n';
+      }
+      return true;
+    }
+  }
+  else if (search_uses)
+  {
+    const std::string* name = nullptr;
+    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    {
+      name = &boost::variant2::get< entities::Struct >(decl.data).name;
+    }
+    else if (boost::variant2::holds_alternative< entities::Enum >(decl.data))
+    {
+      name = &boost::variant2::get< entities::Enum >(decl.data).name;
+    }
+    else if (boost::variant2::holds_alternative< entities::Union >(decl.data))
+    {
+      name = &boost::variant2::get< entities::Union >(decl.data).name;
+    }
+    if (name != nullptr)
+    {
+      if (depth == 1)
+      {
+        if (*name == symbol)
+        {
+          out << "struct-like " << *name << '\n';
+          started = true;
+        }
+      }
+      else
+      {
+        actives.emplace(*name, depth - 1);
+      }
     }
   }
   if (operator()(decl.value))
@@ -175,6 +237,7 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
       CParser::clear_scope(actives, --depth);
       return true;
     }
+    const std::string* name = nullptr;
     if (search_uses && boost::variant2::holds_alternative< entities::Variable >(decl.data))
     {
       const entities::Variable& var = boost::variant2::get< entities::Variable >(decl.data);
@@ -184,6 +247,22 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
     {
       const entities::Function& func = boost::variant2::get< entities::Function >(decl.data);
       out << '\t' << func << '\n';
+    }
+    else if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    {
+      name = &boost::variant2::get< entities::Struct >(decl.data).name;
+    }
+    else if (boost::variant2::holds_alternative< entities::Enum >(decl.data))
+    {
+      name = &boost::variant2::get< entities::Enum >(decl.data).name;
+    }
+    else if (boost::variant2::holds_alternative< entities::Union >(decl.data))
+    {
+      name = &boost::variant2::get< entities::Union >(decl.data).name;
+    }
+    if (name != nullptr)
+    {
+      out << "\tstruct-like " << *name << '\n';
     }
   }
   CParser::clear_scope(actives, --depth);

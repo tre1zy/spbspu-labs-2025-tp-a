@@ -28,6 +28,7 @@ namespace rychkov
     CParseContext base_context;
     Preprocessor preproc;
     bool real_file = true;
+    std::string cache;
   };
 
   class MainProcessor
@@ -38,7 +39,7 @@ namespace rychkov
 
     void help(std::ostream& out);
     bool parse(CParseContext file_context, bool overwrite);
-    bool load(std::ostream& err, std::string filename);
+    bool load(std::ostream& out, std::ostream& err, std::string filename);
     bool save(std::ostream& err, std::string filename) const;
 
     bool init(ParserContext& context, int argc, char** argv);
@@ -46,6 +47,7 @@ namespace rychkov
     bool load(ParserContext& context);
     bool reload(ParserContext& context);
     bool parse(ParserContext& context);
+    bool parse_after(ParserContext& context);
 
     bool external(ParserContext& context);
     bool exposition(ParserContext& context);
@@ -64,6 +66,7 @@ namespace rychkov
     std::vector< std::string > include_dirs_;
     std::map< std::string, ParseCell > parsed_;
     std::string save_file_ = "save.json";
+    size_t generated_files = 0;
   };
 }
 

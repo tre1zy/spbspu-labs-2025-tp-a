@@ -27,10 +27,11 @@ namespace rychkov
     Preprocessor();
     Preprocessor(std::unique_ptr< Lexer > lexer, std::vector< std::string > search_dirs);
 
+    static std::string get_name(std::istream& in);
     void parse(CParseContext& context, std::istream& in, bool need_flush = true);
+    void append(CParseContext& context, char c);
     void flush(CParseContext& context);
     void flush(CParseContext& context, char c);
-    void flush_buf(CParseContext& context);
 
   private:
     enum State
@@ -77,10 +78,9 @@ namespace rychkov
     std::string buf_;
     std::stack< IfStage > conditional_pairs_;
 
-    static std::string get_name(std::istream& in);
     static void remove_whitespaces(std::string& str);
     bool skip_all() const noexcept;
-    void append(CParseContext& context, char c);
+    void flush_buf(CParseContext& context);
     void expanse_macro(CParseContext& context);
 
     void include(std::istream& in, CParseContext& context);

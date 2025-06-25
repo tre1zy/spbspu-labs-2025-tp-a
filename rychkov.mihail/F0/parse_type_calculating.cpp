@@ -274,8 +274,8 @@ void rychkov::CParser::require_type(CParseContext& context, entities::Expression
 std::pair< const rychkov::entities::Variable*, rychkov::typing::MatchType > rychkov::CParser::find_overload
     (const std::string& name, const std::vector< typing::Type >& args)
 {
-  using Iter = decltype(defined_functions_)::iterator;
-  std::pair< Iter, Iter > range = defined_functions_.equal_range(name);
+  using Iter = decltype(defined_functions)::iterator;
+  std::pair< Iter, Iter > range = defined_functions.equal_range(name);
   for (; range.first != range.second; ++range.first)
   {
     if (typing::check_overload(range.first->type, args) == typing::EXACT)

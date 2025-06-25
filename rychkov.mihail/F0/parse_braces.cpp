@@ -39,7 +39,7 @@ void rychkov::CParser::parse_open_brace(CParseContext& context)
       }
       else
       {
-        defined_functions_.insert({data.type, data.name});
+        defined_functions.insert({data.type, data.name});
       }
     }
     else

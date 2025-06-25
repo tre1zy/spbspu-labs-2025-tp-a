@@ -26,7 +26,7 @@ Program implements code parsing (semantic analysis) on restricted and not signif
 * parse <files...> - parse files. Replaces existing data only on full success
 * parse-after [<parsed>] - parse input in non-interactive environment in file context. On success
   prints id, which will be equal to filename
-* reload-all - reparse all existing files (with reloading)
+* reload-all - reparse all existing files (with reloading). On success removes unreal files (from parse-after)
 
 * external - print all external symbols
 * exposition <parsed> <class_like_obj> - print struct/union/enum exposition
@@ -38,11 +38,11 @@ Program implements code parsing (semantic analysis) on restricted and not signif
   function/global variable)
 * uses <parsed> (<symbol> || <class_like_obj>) - find and print all places where
   symbol/struct/union/enum is used
-* intersections - find and print identical symbols/macros (functions only in same overloads)
-* diff [<parsed...>] - find and print identical symbols/macros (functions only in same overloads)
-  which are defined and their definition differs
-* unopen-defines <parsed> - print all lines, which contain macro names, but it is not opened
-  (before #define or after #undef)
+* intersections - find and print exactly the same symbols/macros
+* diff [<parsed...>] - find and print symbols/macros with same names, but with different types/different
+  arglists or bodies
+* unopen-defines <parsed> - print all preprocessed lines, which contain macro names, but it is not opened
+  (before #define or after #undef or inside literals)
 
 
 **1 non-interactive environment = before "$EOF" or eof

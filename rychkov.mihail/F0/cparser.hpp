@@ -29,6 +29,7 @@ namespace rychkov
 
     std::set< entities::Alias, NameCompare > aliases;
     std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables;
+    std::multiset< entities::Variable, NameCompare > defined_functions;
 
     std::set< std::pair< entities::Struct, size_t >, NameCompare > structs;
     std::set< std::pair< entities::Union, size_t >, NameCompare > unions;
@@ -84,7 +85,6 @@ namespace rychkov
         };
 
     std::vector< entities::Expression > program_;
-    std::multiset< entities::Variable, NameCompare > defined_functions_;
     std::stack< entities::Expression* > stack_;
     TypeParser type_parser_;
 
