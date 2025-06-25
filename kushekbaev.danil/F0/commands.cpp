@@ -5,6 +5,24 @@
 
 using dictionary_system = std::unordered_map< std::string, std::unordered_map< std::string, std::set < std::string > > >;
 
+namespace
+{
+  std::vector< std::string > split_line(std::string& line)
+  {
+    std::vector< std::string > tokens;
+    size_t start = 0;
+    size_t end = 0;
+    while (end < line.size())
+    {
+      start = line.find_first_not_of(" \t", end);
+      if (start == std::string::npos) break;
+      end = line.find_first_of(" \t", start);
+      if (end == std::string::npos) end = line.size();
+      tokens.push_back(line.substr(start, end - start));
+    }
+    return tokens;
+  }
+}
 void kushekbaev::insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
 {
   std::string dictionary_name, inputed_word, inputed_translation;
@@ -78,10 +96,10 @@ void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& cu
     {
       const std::string& word = word_pair.first;
       const std::set< std::string >& translations = word_pair.second;
-      file << std::string("*") << word << std::string("*");
+      file << word;
       for (const auto& translation: translations)
       {
-        file << " " << std::string("|") << translation << std::string("|");
+        file << " "  << translation;
       }
       file << "\n";
     }
@@ -93,74 +111,63 @@ void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& cu
 void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
 {
   std::string filename;
-    in >> filename;
-    std::ifstream file(filename);
-    if (!file.is_open())
+  in >> filename;
+  std::ifstream file(filename);
+  if (!file.is_open())
+  {
+    throw std::runtime_error("Cannot open your file!");
+  }
+  std::string line;
+  std::string current_dictionary_name;
+  size_t line_count = 0;
+  bool in_dictionary = false;
+  while (std::getline(file, line))
+  {
+    ++line_count;
+    size_t start_pos = line.find_first_not_of(" \r\n");
+    if (start_pos == std::string::npos)
     {
-        throw std::runtime_error("Cannot open your file!");
+      in_dictionary = false;
+      continue;
     }
-
-    std::string line;
-    std::string current_dictionary_name;
-    bool in_dictionary = false;
-
-    while (std::getline(file, line))
+    size_t end_pos = line.find_last_not_of(" \r\n");
+    std::string trimmed_line = line.substr(start_pos, end_pos - start_pos + 1);
+    if (trimmed_line.size() > 2 && trimmed_line[0] == '[' && trimmed_line[trimmed_line.size()-1] == ']')
     {
-        // Удаляем начальные и конечные пробелы
-        size_t start_pos = line.find_first_not_of(" \t\r\n");
-        if (start_pos == std::string::npos) {
-            in_dictionary = false;
-            continue;
-        }
-        size_t end_pos = line.find_last_not_of(" \t\r\n");
-        std::string trimmed_line = line.substr(start_pos, end_pos - start_pos + 1);
-
-        // Обработка заголовка словаря
-        if (trimmed_line.size() > 4 && 
-            trimmed_line[0] == '[' && 
-            trimmed_line[1] == ' ' &&
-            trimmed_line[trimmed_line.size()-2] == ' ' && 
-            trimmed_line[trimmed_line.size()-1] == ']')
-        {
-            current_dictionary_name = trimmed_line.substr(2, trimmed_line.size()-4);
-            in_dictionary = true;
-            continue;
-        }
-
-        // Обработка строки с переводами
-        if (in_dictionary && !current_dictionary_name.empty() && 
-            trimmed_line.size() > 2 && 
-            trimmed_line[0] == '*' && 
-            trimmed_line.find('*', 1) != std::string::npos)
-        {
-            // Извлекаем слово
-            size_t word_end = trimmed_line.find('*', 1);
-            std::string word = trimmed_line.substr(1, word_end-1);
-            
-            // Обрабатываем переводы
-            std::set<std::string> translations;
-            size_t trans_start = word_end + 1;
-            
-            while (true) {
-                size_t pipe_start = trimmed_line.find('|', trans_start);
-                if (pipe_start == std::string::npos) break;
-                
-                size_t pipe_end = trimmed_line.find('|', pipe_start+1);
-                if (pipe_end == std::string::npos) break;
-                
-                std::string translation = trimmed_line.substr(pipe_start+1, pipe_end-pipe_start-1);
-                translations.insert(translation);
-                trans_start = pipe_end + 1;
-            }
-
-            // Добавляем в словарь
-            if (!word.empty() && !translations.empty()) {
-                auto& existing_translations = current_dictionary[current_dictionary_name][word];
-                existing_translations.insert(translations.begin(), translations.end());
-            }
-        }
+      size_t start = 1;
+      size_t end = trimmed_line.size() - 1;
+      current_dictionary_name = trimmed_line.substr(start, end - start);
+      start_pos = current_dictionary_name.find_first_not_of(" ");
+      end_pos = current_dictionary_name.find_last_not_of(" ");
+      if (start_pos != std::string::npos)
+      {
+        current_dictionary_name = current_dictionary_name.substr(start_pos, end_pos - start_pos + 1);
+      }
+      if (current_dictionary_name.empty())
+      {
+        throw std::runtime_error("Empty dictionary name at line " + std::to_string(line_count));
+      }
+      in_dictionary = true;
+      continue;
     }
-    out << "Successfully imported file.\n";
+    if (in_dictionary && !current_dictionary_name.empty())
+    {
+      std::vector< std::string > tokens = split_line(trimmed_line);
+      if (tokens.empty())
+      {
+        continue;
+      }
+      std::string word = tokens[0];
+      std::set< std::string > translations;
+      for (size_t i = 1; i < tokens.size(); i++)
+      {
+        translations.insert(tokens[i]);
+      }
+      auto& existing_translations = current_dictionary[current_dictionary_name][word];
+      existing_translations.insert(translations.begin(), translations.end());
+    }
+  }
+  out << "Successfully imported file.\n";
 }
 
 void kushekbaev::search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
