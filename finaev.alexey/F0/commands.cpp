@@ -80,6 +80,26 @@ namespace
       }
     }
   };
+
+  struct Merge
+  {
+    std::unordered_map< std::string, bool >& target;
+    size_t& add;
+    const finaev::globalDebuts& debuts;
+
+    void operator()(const std::pair< std::string, bool >& base)
+    {
+      if (debuts.find(base.first) == debuts.end())
+      {
+        return;
+      }
+      auto res = target.insert(base);
+      if (res.second) 
+      {
+        ++add;
+      }
+    }
+  };
 }
 
 void finaev::create_debut(std::istream& in, std::ostream& out, globalDebuts& debuts)
@@ -249,6 +269,75 @@ void finaev::print(std::istream& in, std::ostream& out, const globalDebuts& debu
   std::for_each(base->second.begin(), base->second.end(), printer);
 }
 
+void finaev::move(std::istream& in, std::ostream& out, const globalDebuts& debuts, debutsBases& bases)
+{
+  std::string sourceBase, targetBase, key, temp;
+  if (!(in >> sourceBase >> targetBase >> key))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto srcBase = bases.find(sourceBase);
+  if (srcBase == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto trgBase = bases.find(targetBase);
+  if (trgBase == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto debut = srcBase->second.find(key);
+  if (debut == srcBase->second.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  if (debuts.find(key) == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  if (trgBase->second.find(key) != trgBase->second.end())
+  {
+    out << "Debut " << key << " exists in target base";
+    return;
+  }
+  trgBase->second[key] = true;
+  srcBase->second.erase(debut);
+  out << "Debut " << key << " moved from " << sourceBase << " to " << targetBase;
+}
+
+void finaev::merge(std::istream& in, std::ostream& out, const globalDebuts& debuts, debutsBases& bases)
+{
+  std::string targetBase, sourceBase, temp;
+  if (!(in >> targetBase >> sourceBase))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto srcBase = bases.find(sourceBase);
+  if (srcBase == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto trgBase = bases.find(targetBase);
+  if (trgBase == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  size_t add = 0;
+  Merge merger{ trgBase->second, add, debuts };
+  std::for_each(srcBase->second.begin(), srcBase->second.end(), merger);
+  out << "Merged " << sourceBase << " into " << targetBase << ": "<< add << " debuts added";
+}
+
 finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
 {
   mapOfCommands commands;
@@ -258,5 +347,7 @@ finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostre
   commands["exact_find"] = std::bind(finaev::exact_find, std::ref(in), std::ref(out), std::cref(debuts), std::cref(bases));
   commands["find"] = std::bind(finaev::find, std::ref(in), std::ref(out), std::cref(debuts), std::cref(bases));
   commands["print"] = std::bind(finaev::print, std::ref(in), std::ref(out), std::cref(debuts), std::cref(bases));
+  commands["move"] = std::bind(finaev::move, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
+  commands["merge"] = std::bind(finaev::merge, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
   return commands;
 }

@@ -19,6 +19,8 @@ namespace finaev
   void exact_find(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
   void find(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
   void print(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
+  void move(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
+  void merge(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
 
   mapOfCommands createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts&, debutsBases&);
 }
