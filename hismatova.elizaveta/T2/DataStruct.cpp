@@ -1,146 +1,124 @@
 #include "DataStruct.hpp"
-
-int quotesCount(const std::string& str)
+#include <iomanip>
+#include <vector>
+namespace hismatova
 {
-  int count = 0;
-  for (const auto c: str)
+  std::istream& operator>>(std::istream& in, CharIO&& data)
   {
-    if (c == '"')
-    {
-      ++count;
-    }
-  }
-  return count;
-}
-std::istream& operator>>(std::istream& in, DataStruct& data)
-{
-  std::string line;
-  DataStruct tempData;
-  data.key1 = tempData.key1;
-  data.key2 = tempData.key2;
-  data.key3 = tempData.key3;
-  if (!std::getline(in, line))
-  {
-    return in;
-  }
-  if (line.front() != '(' || line.back() != ')')
-  {
-    return in;
-  }
-  try
-  {
-    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-    std::istringstream iss(line.substr(1, line.size() - 2));
-    std::string token;
-    while (std::getline(iss, token, ':'))
-    {
-      if (token.empty()) continue;
-      std::string key = token.substr(0, 4);
-      if (key == "key3")
-      {
-        if (quotesCount(token) < 2)
-        {
-          token += ':';
-        }
-        while (quotesCount(token) < 2)
-        {
-          char c;
-          iss >> c;
-          if (iss.eof())
-          {
-            return in;
-          }
-          token += c;
-        }
-      }
-      std::string value = token.substr(4);
-      std::istringstream val_stream(value);
-      if (key == "key1")
-      {
-        if (hasKey1)
-        {
-          return in;
-        }
-        val_stream >> value;
-        if (value.size() < 4)
-        {
-          return in;
-        }
-        if (value.substr(value.size() - 3) != "ull" && value.substr(value.size() - 3) != "ULL")
-        {
-          return in;
-        }
-        tempData.key1 = std::stoull(value.substr(0, value.size() - 3));
-        hasKey1 = true;
-      }
-      else if (key == "key2")
-      {
-        if (hasKey2)
-        {
-          return in;
-        }
-        char c;
-        val_stream >> c;
-        if (c != '#')
-        {
-          return in;
-        }
-        val_stream >> c;
-        if (c != 'c')
-        {
-          return in;
-        }
-        val_stream >> c;
-        if (c != '(')
-        {
-          return in;
-        }
-        double real, imag;
-        val_stream >> real >> imag;
-        val_stream >> c;
-        if (c != ')')
-        {
-          return in;
-        }
-        tempData.key2 = {real, imag};
-        hasKey2 = true;
-      }
-      else if (key == "key3")
-      {
-        if (hasKey3)
-        {
-          return in;
-        }
-        std::string value = val_stream.str().substr(1);
-        if (value.size() < 2 || value.front() != '"' || value.back() != '"')
-        {
-          return in;
-        }
-        tempData.key3 = value.substr(1, value.size() - 2);
-        hasKey3 = true;
-      }
-    }
-    if (!hasKey1 || !hasKey2 || !hasKey3)
+    std::istream::sentry sen(in);
+    if (!sen)
     {
       return in;
     }
-    data.key1 = tempData.key1;
-    data.key2 = tempData.key2;
-    data.key3 = tempData.key3;
-
+    char c = '0';
+    in >> c;
+    if (in && (c != data.ch))
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
   }
-  catch (...)
+  std::istream& operator>>(std::istream& in, ULLIO&& data)
   {
-    in.setstate(std::ios::failbit);
+    (void)data;
+    std::istream::sentry sen(in);
+    if (!sen)
+    {
+      return in;
+    }
+    char u = '0';
+    char l1 = '0';
+    char l2 = '0';
+    in >> u >> l1 >> l2;
+    if (in && (u == 'u' || u == 'U') && l1 == l2 && (l1 == 'l' || l1 == 'L'))
+    {
+      ;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
   }
-  return in;
-}
-std::ostream& operator<<(std::ostream& out, const DataStruct& data)
-{
-  out << "(:key1 " << data.key1 << "ull"
-      << ":key2 #c(" << std::fixed << std::setprecision(1)
-      << static_cast<double>(data.key2.real()) << " "
-      << static_cast<double>(data.key2.imag()) << ")"
+  std::istream& operator>>(std::istream& in, NumberIO&& data)
+  {
+    std::istream::sentry sen(in);
+    if (!sen)
+    {
+      return in;
+    }
+    in >> data.ref >> ULLIO{};
+    return in;
+  }
+  std::istream& operator>>(std::istream& in, ComplexIO&& data)
+  {
+    std::istream::sentry sen(in);
+    if (!sen)
+    {
+      return in;
+    }
+    double real;
+    double img;
+    in >> CharIO{'#'} >> CharIO{'c'} >> CharIO{'('} >> real >> img >> CharIO{')'};
+    if (in)
+    {
+      data.ref = std::complex< double >(real, img);
+    }
+    return in;
+  }
+  std::istream& operator>>(std::istream& in, StringIO&& data)
+  {
+    std::istream::sentry sen(in);
+    if (!sen)
+    {
+      return in;
+    }
+    return std::getline(in >> CharIO{'"'}, data.ref, '"');
+  }
+  std::istream& operator>>(std::istream& in, DataStruct& data)
+  {
+    std::istream::sentry sen(in);
+    if (!sen)
+    {
+      return in;
+    }
+    DataStruct inp;
+    {
+      in >> CharIO {'('};
+      std::vector< std::string > keys(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        in >> CharIO {':'} >> keys[i];
+        if (keys[i] == "key1")
+        {
+          in >> NumberIO {inp.key1};
+        }
+        else if (keys[i] == "key2")
+        {
+          in >> ComplexIO {inp.key2};
+        }
+        else if (keys[i] == "key3")
+        {
+          in >> StringIO {inp.key3};
+        }
+        else
+        {
+          in.setstate(std::ios::failbit);
+        }
+      }
+      in >> CharIO {':'} >> CharIO{')'};
+    }
+    if (in)
+    {
+      data = inp;
+    }
+    return in;
+  }
+  std::ostream& operator<<(std::ostream& out, const DataStruct& data)
+  {
+    out << "(:key1 " << data.key1 << "ull"
+      << ":key2 #c(" << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.real()) << " " << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.imag()) << ")"
       << ":key3 \"" << data.key3 << "\":)";
-  return out;
+    return out;
+  }
 }
