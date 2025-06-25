@@ -369,34 +369,33 @@ void printIndexRecursive(amine::Index::const_iterator it,
 
     copyRecursive(it);
   }
-
-  size_t getMaxLineRecursive(
-    std::map<std::string, std::set<amine::Position>>::const_iterator iter,
-    std::map<std::string, std::set<amine::Position>>::const_iterator end,
+size_t amine::getMaxLineRecursive(
+    Index::const_iterator iter,
+    Index::const_iterator end,
     size_t currentMax
-  )
-  {
+)
+{
     if (iter == end)
     {
-      return currentMax;
+        return currentMax;
     }
     size_t maxInWord = currentMax;
-    std::function<size_t(std::set<amine::Position>::const_iterator,
-                         std::set<amine::Position>::const_iterator,
+    std::function<size_t(std::set<Position>::const_iterator,
+                         std::set<Position>::const_iterator,
                          size_t)> maxInSet;
 
-    maxInSet = [&](std::set<amine::Position>::const_iterator pit,
-                   std::set<amine::Position>::const_iterator pend,
+    maxInSet = [&](std::set<Position>::const_iterator pit,
+                   std::set<Position>::const_iterator pend,
                    size_t curMax)
     {
-      if (pit == pend) return curMax;
-      size_t nextMax = std::max(curMax, pit->line);
-      return maxInSet(std::next(pit), pend, nextMax);
+        if (pit == pend) return curMax;
+        size_t nextMax = std::max(curMax, pit->line);
+        return maxInSet(std::next(pit), pend, nextMax);
     };
 
     maxInWord = maxInSet(iter->second.begin(), iter->second.end(), maxInWord);
     return getMaxLineRecursive(std::next(iter), end, maxInWord);
-  }
+}
 
   void CrossRefSystem::repeatText(const std::string& newIndex, const std::string& baseIndex, size_t N)
   {
