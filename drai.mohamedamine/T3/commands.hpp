@@ -2,27 +2,14 @@
 #define COMMANDS_HPP
 
 #include "polygon.hpp"
-#include <string>
 #include <vector>
 
-namespace amine {
-
-class CommandProcessor {
-public:
-  CommandProcessor(const std::vector<Polygon>& polygons);
-  void operator()(const std::string& line) const;
-
-private:
-  const std::vector<Polygon>& polygons_;
-
-  void command_area(const std::string& rest) const;
-  void command_max(const std::string& rest) const;
-  void command_min(const std::string& rest) const;
-  void command_count(const std::string& rest) const;
-  void command_intersections(const std::string& rest) const;
-  void command_rmecho(const std::string& rest) const;
-};
-
+namespace amine
+{
+  void process_commands(std::vector< Polygon >& polygons);
+  void process_rmecho(std::vector< Polygon >& polygons, const Polygon& query);
+  int countIntersections(const std::vector< Polygon >& polygons, const Polygon& query);
+  bool isPolygonEqual(const Polygon& a, const Polygon& b);
 }
 
 #endif

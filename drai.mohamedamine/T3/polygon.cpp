@@ -206,8 +206,8 @@ namespace amine
     {
       Point pt;
       char c;
-      if (!(iss >> c) || c != '(') {
-        return Point{}; }
+      if (!(iss >> c) || c != '('){
+        return Point{};}
       if (!(iss >> pt.x)){
         return Point{};}
       if (!(iss >> c) || c != ';'){

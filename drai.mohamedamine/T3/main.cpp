@@ -1,9 +1,12 @@
-#include "commands.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <algorithm>
 #include "polygon.hpp"
+#include "commands.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -20,50 +23,40 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  std::stringstream buffer;
+  buffer << infile;
+  std::string content = buffer.str();
+
+  std::vector< std::string > lines;
+  std::string::size_type prev = 0;
+  std::string::size_type pos = content.find('\n');
+
+  std::generate_n(
+    std::back_inserter(lines),
+    std::count(content.begin(), content.end(), '\n') + (content.back() != '\n' ? 1 : 0),
+    [&]() {
+      std::string line = content.substr(prev, pos - prev);
+      prev = (pos == std::string::npos) ? content.size() : pos + 1;
+      pos = content.find('\n', prev);
+      return line;
+    }
+  );
+
   std::vector< amine::Polygon > polygons;
-  std::string line;
-  amine::Polygon poly;
+  std::transform(lines.begin(), lines.end(), std::back_inserter(polygons),
+    [](const std::string& line)
+    {
+      amine::Polygon poly;
+      if (amine::parse_polygon(line, poly) && poly.points.size() >= 3)
+        return poly;
+      return amine::Polygon{};
+    });
 
-  std::getline(infile, line);
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
+  polygons.erase(
+    std::remove_if(polygons.begin(), polygons.end(),
+      [](const amine::Polygon& p) { return p.points.empty(); }),
+    polygons.end());
 
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-
-  amine::CommandProcessor processor(polygons);
-
-  std::string command;
-  std::getline(std::cin, command);
-  processor(command);
-
-  std::getline(std::cin, command);
-  processor(command);
+  amine::process_commands(polygons);
   return 0;
 }
