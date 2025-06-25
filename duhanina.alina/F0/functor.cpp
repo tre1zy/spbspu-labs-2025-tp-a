@@ -115,31 +115,41 @@ duhanina::LineProcessor::LineProcessor(CodeTable& table):
 
 void duhanina::LineProcessor::operator()(const Line& line) const
 {
-  const std::string& str = line.content_;
-  if (str.empty())
+  const std::string& code = line.content_;
+  const char sumb = line.symbol_;
+  table_ref_.char_to_code[sumb] = code;
+  table_ref_.code_to_char[code] = sumb;
+}
+
+duhanina::CodeLoader::CodeLoader(CodeTable& table, size_t& count):
+  table_ref_(table),
+  loaded_count_(count)
+{}
+
+void duhanina::CodeLoader::operator()(const Line& line) const
+{
+  LineProcessor linepr(table_ref_);
+  linepr(line);
+  loaded_count_++;
+}
+
+bool duhanina::CodeLoader::is_complete() const
+{
+  return loaded_count_ >= table_ref_.total_chars;
+}
+
+void duhanina::CodeLoader::process(std::istream& in, size_t& lines_processed)
+{
+  if (is_complete())
   {
     return;
   }
-  const size_t space_pos = str.find(' ');
-  if (space_pos == std::string::npos || space_pos == str.length() - 1)
+  Line line;
+  if (in >> line)
   {
-    return;
-  }
-  try
-  {
-    const int char_code = std::stoi(str.substr(0, space_pos));
-    const std::string code = str.substr(space_pos + 1);
-    const char character = static_cast< char >(char_code);
-    if (char_code < std::numeric_limits< char >::min() || char_code > std::numeric_limits< char >::max())
-    {
-      throw std::out_of_range("CHAR_CODE_OUT_OF_RANGE");
-    }
-    table_ref_.char_to_code[character] = code;
-    table_ref_.code_to_char[code] = character;
-  }
-  catch (...)
-  {
-    return;
+    (*this)(line);
+    lines_processed++;
+    process(in, lines_processed);
   }
 }
 
@@ -191,7 +201,7 @@ duhanina::Node* duhanina::NodeCreator::operator()(const std::pair< char, size_t 
   return new Node(pair.first, pair.second);
 }
 
-duhanina::FreqCounter::FreqCounter(std::map<char, size_t>& freq_map):
+duhanina::FreqCounter::FreqCounter(std::map< char, size_t >& freq_map):
   freq_map_(freq_map)
 {}
 
@@ -209,7 +219,7 @@ void duhanina::CodeTableFiller::operator()(const std::pair< char, std::string >&
   table_.code_to_char[entry.second] = entry.first;
 }
 
-duhanina::FreqTransformer::FreqTransformer(std::map<char, size_t>& freq_map):
+duhanina::FreqTransformer::FreqTransformer(std::map< char, size_t >& freq_map):
   freq_map_(freq_map)
 {}
 
@@ -223,12 +233,7 @@ duhanina::TableTransformer::TableTransformer(duhanina::CodeTable& table):
   table_(table)
 {}
 
-void duhanina::TableTransformer::operator()(const std::pair< char, std::string >& entry) const
-{
-  table_.code_to_char[entry.second] = entry.first;
-}
-
-duhanina::TreeBuilder::TreeBuilder(std::vector<duhanina::Node*>& nodes):
+duhanina::TreeBuilder::TreeBuilder(std::vector< duhanina::Node* >& nodes):
   nodes_(nodes)
 {}
 
@@ -278,6 +283,11 @@ void duhanina::CodeAccumulator::operator()(char bit)
     decoded_ += it->second;
     current_code_.clear();
   }
+}
+
+void duhanina::TableTransformer::operator()(const std::pair< char, std::string >& entry) const
+{
+  table_.code_to_char[entry.second] = entry.first;
 }
 
 duhanina::SizeTByteWriter::SizeTByteWriter(std::ofstream& out, size_t value):
@@ -346,7 +356,14 @@ void duhanina::BitHandler::operator()(size_t bit_pos)
 {
   if (processed_ < total_bits_)
   {
-    result_ += bits_.test(7 - bit_pos) ? '1' : '0';
+    if (bits_.test(7 - bit_pos))
+    {
+      result_ += '1';
+    }
+    else
+    {
+      result_ += '0';
+    }
     ++processed_;
   }
 }
@@ -393,7 +410,7 @@ duhanina::TableEntryWriter::TableEntryWriter(std::ofstream& output_stream):
 
 void duhanina::TableEntryWriter::operator()(const std::pair< char, std::string >& entry)
 {
-  out_ << static_cast< int >(entry.first) << " " << entry.second << "\n";
+  out_ << entry.first << " " << entry.second << "\n";
 }
 
 void duhanina::StreamProcessor::operator()(std::istream_iterator< std::string > it) const
@@ -433,7 +450,7 @@ duhanina::CharChecker::CharChecker(const std::map< char, std::string >& char_map
 
 bool duhanina::CharChecker::operator()(char c) const
 {
-  return char_to_code_ref_.find(c) != char_to_code_ref_.end();
+  return char_to_code_ref_.find(c) == char_to_code_ref_.end();
 }
 
 duhanina::CharInserter::CharInserter(std::set< char >& missing_set):
@@ -510,4 +527,9 @@ void duhanina::EncodingChecker::operator()(const std::pair< str_t, CodeTable >& 
     out_ << "partial";
   }
   out_ << " support\n";
+}
+
+void duhanina::write_size_t(std::ofstream& out, size_t value)
+{
+  SizeTWriter<>::write(out, value);
 }

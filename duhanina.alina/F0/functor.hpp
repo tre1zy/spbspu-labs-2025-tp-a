@@ -26,6 +26,8 @@ namespace duhanina
     }
     friend struct LineProcessor;
     friend struct StreamProcessor;
+    friend struct CodeLoader;
+
   private:
     char symbol_;
     std::string content_;
@@ -39,6 +41,19 @@ namespace duhanina
 
   private:
     CodeTable& table_ref_;
+  };
+
+  struct CodeLoader
+  {
+  public:
+    bool is_complete() const;
+    void process(std::istream& in, size_t& lines_processed);
+    CodeLoader(CodeTable& table, size_t& count);
+    void operator()(const Line& line) const;
+
+  private:
+    CodeTable& table_ref_;
+    size_t& loaded_count_;
   };
 
   struct NullChecker
@@ -298,6 +313,24 @@ namespace duhanina
     str_t text_ref_;
     std::ostream& out_;
   };
+
+  template < size_t N = sizeof(size_t) >
+  struct SizeTWriter
+  {
+    static void write(std::ofstream& out, size_t value)
+    {
+      out.put(static_cast< char >((value >> (8 * (sizeof(size_t) - N))) & 0xFF));
+      SizeTWriter< N - 1 >::write(out, value);
+    }
+  };
+
+  template <>
+  struct SizeTWriter< 0 >
+  {
+    static void write(std::ofstream&, size_t){}
+  };
+
+  void write_size_t(std::ofstream& out, size_t value);
 }
 
 #endif

@@ -29,27 +29,6 @@ namespace
     }
   }
 
-  template < size_t N = sizeof(size_t) >
-  struct SizeTWriter
-  {
-    static void write(std::ofstream& out, size_t value)
-    {
-      out.put(static_cast< char >((value >> (8 * (sizeof(size_t) - N))) & 0xFF));
-      SizeTWriter< N - 1 >::write(out, value);
-    }
-  };
-
-  template <>
-  struct SizeTWriter< 0 >
-  {
-    static void write(std::ofstream&, size_t){}
-  };
-
-  void write_size_t(std::ofstream& out, size_t value)
-  {
-    SizeTWriter<>::write(out, value);
-  }
-
   bool compare_nodes(const std::pair< char, size_t >& a, const std::pair< char, size_t >& b)
   {
     return a.second > b.second;
@@ -92,7 +71,7 @@ namespace
     }
     std::vector< std::pair< char, size_t > > sorted_freq(freq_map.begin(), freq_map.end());
     std::sort(sorted_freq.begin(), sorted_freq.end(), compare_nodes);
-    std::vector< duhanina::Node* > nodes;
+    std::vector< Node* > nodes;
     NodeCreator creator;
     try
     {
@@ -147,7 +126,7 @@ namespace
     return decoded;
   }
 
-  void write_bits_to_file(str_t bits, str_t filename)\
+  void write_bits_to_file(str_t bits, str_t filename)
   {
     std::ofstream out(filename, std::ios::binary);
     if (!out)
@@ -197,18 +176,17 @@ namespace
 
   duhanina::CodeTable load_code_table(str_t filename)
   {
-    std::ifstream in(filename, std::ios::binary);
+    std::ifstream in(filename);
     if (!in)
     {
       throw std::runtime_error("FILE_NOT_FOUND");
     }
     duhanina::CodeTable table;
+    size_t lines_processed = 0;
     in >> table.total_chars;
     in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    std::istream_iterator< Line > line_begin(in);
-    std::istream_iterator< Line > line_end;
-    StreamProcessor processor(table);
-    std::for_each(line_begin, line_end, processor);
+    CodeLoader loader(table, lines_processed);
+    loader.process(in, lines_processed);
     return table;
   }
 
