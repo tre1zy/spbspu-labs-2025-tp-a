@@ -17,13 +17,11 @@ namespace amine
         return p.points.size() % 2 == 0;
     }
 };
-
 struct IsOddVertexCount {
     bool operator()(const Polygon& p) const {
         return p.points.size() % 2 != 0;
     }
 };
-
 struct HasVertexCount {
     size_t target;
     explicit HasVertexCount(size_t t) : target(t) {}
@@ -31,14 +29,12 @@ struct HasVertexCount {
         return p.points.size() == target;
     }
 };
-
 struct AreaAdder {
     double sum = 0.0;
     void operator()(const Polygon& p) {
         sum += compute_area(p);
     }
 };
-
 struct EvenAreaAdder {
     double sum = 0.0;
     void operator()(const Polygon& p) {
@@ -242,18 +238,17 @@ double areaNum(const std::vector<Polygon>& polys, int num)
     std::cout << "<INVALID COMMAND>\n";
   }
 }
-
 void CommandProcessor::command_area(const std::string& rest) const {
     if (rest == "EVEN") {
         EvenAreaAdder adder;
         std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
         std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
-    } 
+    }
     else if (rest == "ODD") {
         OddAreaAdder adder;
         std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
         std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
-    } 
+    }
     else if (rest == "MEAN") {
         if (polygons_.empty()) {
             std::cout << "<INVALID COMMAND>\n";
@@ -262,7 +257,7 @@ void CommandProcessor::command_area(const std::string& rest) const {
         AreaAdder adder;
         std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
         std::cout << std::fixed << std::setprecision(1) << (adder.sum / polygons_.size()) << "\n";
-    } 
+    }
     else {
         try {
             size_t target = std::stoul(rest);
@@ -284,10 +279,10 @@ void CommandProcessor::command_count(const std::string& rest) const
 {
     if (rest == "EVEN") {
         std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
-    } 
+    }
     else if (rest == "ODD") {
         std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
-    } 
+    }
     else {
         try {
             size_t target = std::stoul(rest);
@@ -302,7 +297,6 @@ void CommandProcessor::command_count(const std::string& rest) const
         }
     }
 }
-
 void CommandProcessor::command_max(const std::string& rest) const
 {
   if (rest == "AREA") {
@@ -443,7 +437,7 @@ void CommandProcessor::command_rmecho(const std::string& rest) const
     EqualToQuery eq(query);
     UniqueChecker checker(query);
     std::unique_copy(polygons_.begin(), polygons_.end(), std::back_inserter(filtered), checker);
-    
+
     size_t removed = initial_count - filtered.size();
     std::cout << removed << "\n";
 }
