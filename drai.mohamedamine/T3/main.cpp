@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::vector< amine::Polygon > polygons;
+  std::vector< Polygon > polygons;
   amine::readPolygons(infile, polygons);
 
   amine::CommandProcessor processor(polygons);
