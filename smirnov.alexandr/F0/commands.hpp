@@ -21,5 +21,7 @@ namespace smirnov
   void differenceCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void uniqueCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void prefixCommand(Dicts & dicts, std::istream & in, std::ostream & out);
+  void loadFile(Dicts & dicts, const std::string & filename);
+  void helpCommand(std::ostream & out);
 }
 #endif

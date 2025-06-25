@@ -1,14 +1,29 @@
 #include <functional>
 #include <limits>
-#include <guard.hpp>
-#include <delimetr.hpp>
 #include "commands.hpp"
 #include "dictionary.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
   using namespace smirnov;
   Dicts dicts;
+  if (argc == 2)
+  {
+    if (std::string(argv[1]) == "--help")
+    {
+      helpCommand(std::cout);
+      return 0;
+    }
+    try
+    {
+      loadFile(dicts, argv[1]);
+    }
+    catch (const std::exception & e)
+    {
+      std::cerr << "Error: " << e.what() << "\n";
+      return 1;
+    }
+  }
   std::unordered_map< std::string, std::function< void(std::istream &) > > commands;
   using namespace std::placeholders;
   commands["create"] = std::bind(createCommand, std::ref(dicts), _1, std::ref(std::cout));

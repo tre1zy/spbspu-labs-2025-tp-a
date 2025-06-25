@@ -488,3 +488,71 @@ void smirnov::prefixCommand(Dicts & dicts, std::istream & in, std::ostream & out
   }
   dicts[newName] = std::move(result);
 }
+
+void smirnov::loadFile(Dicts & dicts, const std::string & filename)
+{
+  std::ifstream file(filename);
+  if (!file)
+  {
+    throw std::runtime_error("Cannot open file\n");
+  }
+  std::string dictName;
+  std::getline(file, dictName);
+  Dict dict;
+  std::string line;
+  while (std::getline(file, line))
+  {
+    if (line.empty())
+    {
+      continue;
+    }
+    size_t dashPos = line.find(" - ");
+    if (dashPos == std::string::npos)
+    {
+      continue;
+    }
+    std::string word = line.substr(0, dashPos);
+    std::string translationsStr = line.substr(dashPos + 3);
+    std::vector< std::string > translations;
+    size_t start = 0;
+    size_t end = translationsStr.find(' ');
+    while (end != std::string::npos)
+    {
+      std::string translation = translationsStr.substr(start, end - start);
+      if (!translation.empty())
+      {
+        translations.push_back(translation);
+      }
+      start = end + 1;
+      end = translationsStr.find(' ', start);
+    }
+    std::string lastTranslation = translationsStr.substr(start);
+    if (!lastTranslation.empty())
+    {
+      translations.push_back(lastTranslation);
+    }
+    dict[word] = translations;
+  }
+  dicts[dictName] = dict;
+}
+
+void smirnov::helpCommand(std::ostream & out)
+{
+  out << "Available commands:\n";
+  out << "1) create <dict> - Create a new dictionary\n";
+  out << "2) add <dict> <key> <translation> - Add word to dictionary\n";
+  out << "3) translate <dict> <key> - Translate a word\n";
+  out << "4) remove <dict> <key> - Remove a word\n";
+  out << "5) print <dict> - Print dictionary contents\n";
+  out << "6) save <dict> <filename> - Save dictionary to file\n";
+  out << "7) merge <resdict> <dict1> <dict2> - Merge two dictionaries\n";
+  out << "8) delete <dict> - Delete a dictionary\n";
+  out << "9) edit <dict> <key> <newtranslation> - Edit word translation\n";
+  out << "10) rename <dict> <newname> - Rename dictionary\n";
+  out << "11) move <dict1> <dict2> <key> - Move word between dictionaries\n";
+  out << "12) copy <dict1> <dict2> <key> - Copy word between dictionaries\n";
+  out << "13) intersect <resdict> <dict1> <dict2> - Intersect two dictionaries\n";
+  out << "14) difference <resdict> <dict1> <dict2> - Difference of dictionaries\n";
+  out << "15) unique <resdict> <dict1> <dict2> - Unique words from dictionaries\n";
+  out << "16) prefix <newdict> <dict> <prefix> - Words with given prefix\n";
+}
