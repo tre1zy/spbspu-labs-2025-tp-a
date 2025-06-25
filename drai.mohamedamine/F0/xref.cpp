@@ -304,7 +304,7 @@ void printIndexRecursive(amine::Index::const_iterator it,
     indexes_[newIndex] = result;
   }
 void CrossRefSystem::replaceWord(const std::string& indexName, 
-                               const std::string& oldWord, 
+                               const std::string& oldWord,
                                const std::string& newWord) {
     auto it = indexes_.find(indexName);
     if (it == indexes_.end()) {
