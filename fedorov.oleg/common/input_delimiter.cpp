@@ -2,13 +2,16 @@
 
 #include <cctype>
 
-std::istream &fedorov::operator>>(std::istream &in, DelimiterStr &&dest)
+std::istream &fedorov::operator>>(std::istream &in, DelimiterStr &&exp)
 {
-  std::istream::sentry sentry(in);
-  if (sentry && dest.exp.find(in.get()) == dest.exp.npos)
+  std::istream::sentry guard(in);
+  if (!guard)
   {
-    in.unget();
-    in.setstate(std::ios::failbit);
+    return in;
+  }
+  for (size_t i = 0; exp.exp[i] != '\0'; ++i)
+  {
+    in >> DelimiterInput{exp.exp[i]};
   }
   return in;
 }

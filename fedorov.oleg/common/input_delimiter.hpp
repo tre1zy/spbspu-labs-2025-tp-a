@@ -13,8 +13,9 @@ namespace fedorov
 
   struct DelimiterStr
   {
-    const std::string &exp;
+    const char *exp;
   };
   std::istream &operator>>(std::istream &in, DelimiterStr &&exp);
+
 }
 #endif
