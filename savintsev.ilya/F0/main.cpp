@@ -71,11 +71,18 @@ int main(int argc, char * argv[])
   cmds["layers"] = std::bind(print_shapes, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["info"] = std::bind(print_info_about_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
 
+  cmds["exit"] = std::bind(exit_program, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
   for (std::string command; std::cin >> command;)
   {
     try
     {
       cmds.at(command)();
+      if (command == "exit")
+      {
+        cleanup_projects_without_backup(projects);
+        return 0;
+      }
     }
     catch (const std::out_of_range &)
     {
@@ -99,15 +106,7 @@ int main(int argc, char * argv[])
     std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 
-  std::cin.clear();
-
-  ConfirmationPrompt prompt(std::cin, std::cout);
-  if (prompt.ask("Save all projects before closing?"))
-  {
-    save_all(std::cout, projects);
-  }
-
+  save_all(std::cout, projects);
   cleanup_projects_without_backup(projects);
-
   return 0;
 }

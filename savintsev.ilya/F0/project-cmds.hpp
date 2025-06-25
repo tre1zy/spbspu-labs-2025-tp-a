@@ -21,7 +21,6 @@ namespace savintsev
   void create_complexquad(std::istream & in, std::ostream & out, Projects & projs);
 
   void delete_shape(std::istream & in, std::ostream & out, Projects & projs);
-  void copy_shape(std::istream & in, std::ostream & out, Projects & projs);
   void insert_shape(std::istream & in, std::ostream & out, Projects & projs);
   void swap_shapes(std::istream & in, std::ostream & out, Projects & projs);
 
@@ -41,6 +40,8 @@ namespace savintsev
   void array_shapes(std::istream & in, std::ostream & out, Projects & projs);
   void reverse_project(std::istream & in, std::ostream & out, Projects & projs);
   void clear_project(std::istream & in, std::ostream & out, Projects & projs);
+
+  void exit_program(std::istream & in, std::ostream & out, Projects & projs);
 }
 
 #endif

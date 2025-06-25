@@ -15,9 +15,7 @@ void savintsev::open(std::istream & in, std::ostream & out, Projects & projs)
 {
   std::string filename;
   in >> filename;
-
   read_savi_file(filename, projs);
-
   out << "Project \"" << get_filename(filename) << "\" was successfully opened\n";
 }
 
@@ -25,15 +23,12 @@ void savintsev::close(std::istream & in, std::ostream & out, Projects & projs)
 {
   std::string filename;
   in >> filename;
-
   projs.at(filename);
-
   ConfirmationPrompt prompt(in, out);
   if (prompt.ask("Save project before closing?"))
   {
     write_savi_file(filename, projs.at(filename));
   }
-
   projs.erase(filename);
   out << "Project \"" << filename << "\" was successfully closed\n";
 }
@@ -104,24 +99,46 @@ void savintsev::save_all(std::ostream & out, Projects & projs)
   out << "All projects were saved successfully\n";
 }
 
+namespace
+{
+  struct CloneLayer
+  {
+    CloneLayer() = default;
+
+    savintsev::Layer operator()(const savintsev::Layer & layer) const
+    {
+      return {layer.first, layer.second->clone()};
+    }
+  };
+  struct MoveLayer
+  {
+    MoveLayer(double dx, double dy):
+      dx_(dx),
+      dy_(dy)
+    {}
+    void operator()(savintsev::Layer & layer) const
+    {
+      layer.second->move(dx_, dy_);
+    }
+  private:
+    double dx_;
+    double dy_;
+  };
+}
+
 void savintsev::merge(std::istream & in, std::ostream & out, Projects & projs)
 {
-  std::string proj, proj1, proj2;
-  in >> proj >> proj1 >> proj2;
-  if (proj == proj1)
-  {
-    projs.at(proj).insert(projs.at(proj).end(), projs.at(proj2).begin(), projs.at(proj2).end());
-  }
-  else if (proj == proj2)
-  {
-    projs.at(proj).insert(projs.at(proj).begin(), projs.at(proj1).begin(), projs.at(proj1).end());
-  }
-  else
-  {
-    projs[proj].insert(projs.at(proj).end(), projs.at(proj2).begin(), projs.at(proj2).end());
-    projs[proj].insert(projs.at(proj).end(), projs.at(proj1).begin(), projs.at(proj1).end());
-  }
-  out << "Project \"" << proj1 << "\" has been successfully merged with project \"" << proj2 << "\"\n";
+  std::string t, src1, src2;
+  in >> t >> src1 >> src2;
+
+  Project & target = projs[t];
+  const Project & first = projs.at(src1);
+  const Project & second = projs.at(src2);
+
+  std::transform(first.begin(), first.end(), std::back_inserter(target), CloneLayer());
+  std::transform(second.begin(), second.end(), std::back_inserter(target), CloneLayer());
+
+  out << "Project \"" << src1 << "\" has been successfully merged with project \"" << src2 << "\"\n";
 }
 
 void savintsev::create_rectangle(std::istream & in, std::ostream & out, Projects & projs)
@@ -146,9 +163,7 @@ void savintsev::delete_shape(std::istream & in, std::ostream & out, Projects & p
 {
   std::string proj, shape_name;
   in >> proj >> shape_name;
-
   Project & pr = projs.at(proj);
-
   auto it = std::find_if(pr.begin(), pr.end(), ShapeNameEquals(shape_name));
   if (it != pr.end())
   {
@@ -157,7 +172,6 @@ void savintsev::delete_shape(std::istream & in, std::ostream & out, Projects & p
     out << "\"" << shape_name << "\" was successfully removed from \"" << proj << "\"\n";
     return;
   }
-
   out << "\"" << proj << "\" does not have a \"" << shape_name << "\"\n";
 }
 
@@ -168,40 +182,22 @@ void savintsev::copy_proj_or_shape(std::istream & in, std::ostream & out, Projec
 
   if (in.peek() == '\n' || !(in >> third))
   {
-    const Project & src_proj = projs.at(proj);
-    Project new_proj;
-
-    struct CloneInserter
-    {
-      Project & new_proj;
-      void operator()(const std::pair< const std::string, Shape * > & layer) const
-      {
-        Shape * cloned_shape = layer.second->clone();
-        cloned_shape->set_name(layer.second->get_name());
-        new_proj.insert(new_proj.end(), std::make_pair(layer.first, cloned_shape));
-      }
-    };
-
-    std::for_each(src_proj.begin(), src_proj.end(), CloneInserter{new_proj});
-
-    projs[second] = std::move(new_proj);
-
+    Project & source = projs.at(proj);
+    Project & target = projs[second];
+    std::transform(source.begin(), source.end(), std::back_inserter(target), CloneLayer());
     out << "Project \"" << proj << "\" was successfully copied to \"" << second << "\"\n";
   }
   else
   {
     Project & pr = projs.at(proj);
-
     auto it = std::find_if(pr.begin(), pr.end(), ShapeNameEquals(second));
     if (it == pr.end())
     {
       out << "\"" << second << "\" not found in project \"" << proj << "\"\n";
       return;
     }
-
     Shape * cloned = it->second->clone();
     cloned->set_name(third);
-
     pr.insert(std::next(it), std::make_pair(it->first, cloned));
     out << "\"" << second << "\" was copied as \"" << third << "\" in project \"" << proj << "\"\n";
   }
@@ -347,7 +343,7 @@ void savintsev::swap_shapes(std::istream & in, std::ostream & out, Projects & pr
 
   if (it1 == pr.end() || it2 == pr.end())
   {
-    out << "One or both shapes not found in project \"" << proj << "\"\n";
+    out << "One or both shapes not found in \"" << proj << "\"\n";
     return;
   }
 
@@ -358,7 +354,7 @@ void savintsev::swap_shapes(std::istream & in, std::ostream & out, Projects & pr
   }
 
   std::iter_swap(it1, it2);
-  out << "\"" << name1 << "\" and \"" << name2 << "\" were swapped in project \"" << proj << "\"\n";
+  out << "\"" << name1 << "\" and \"" << name2 << "\" were swapped in \"" << proj << "\"\n";
 }
 
 void savintsev::move_abs(std::istream & in, std::ostream & out, Projects & projs)
@@ -399,10 +395,7 @@ void savintsev::move_all(std::istream & in, std::ostream & out, Projects & projs
   double dx, dy;
   in >> proj >> dx >> dy;
   auto & pr = projs.at(proj);
-  for (auto & layer : pr)
-  {
-    layer.second->move(dx, dy);
-  }
+  std::for_each(pr.begin(), pr.end(), MoveLayer(dx, dy));
   out << "All shapes moved by (" << dx << ", " << dy << ")\n";
 }
 
@@ -418,33 +411,54 @@ void savintsev::scale_shape(std::istream & in, std::ostream & out, Projects & pr
     out << "\"" << name << "\" not found in project \"" << proj << "\"\n";
     return;
   }
-
   it->second->scale(k);
   out << "\"" << name << "\" was succesfully scaled\n";
 }
 
-void savintsev::array_shapes(std::istream & in, std::ostream & out, Projects & projs)
+namespace
+{
+  struct GenerateLayerArray
+  {
+    GenerateLayerArray(const savintsev::Layer & base, const std::string & name_prefix):
+      base_(base),
+      name_(name_prefix),
+      index_(1)
+    {}
+
+    savintsev::Layer operator()()
+    {
+      savintsev::Shape * clone = base_.second->clone();
+      clone->set_name(name_ + "_" + std::to_string(index_++));
+      return {base_.first, clone};
+    }
+
+  private:
+    savintsev::Layer base_;
+    std::string name_;
+    int index_;
+  };
+}
+
+void savintsev::array_shapes(std::istream& in, std::ostream& out, Projects& projs)
 {
   std::string proj, name;
   int n;
   double dx, dy;
   in >> proj >> name >> n >> dx >> dy;
-  auto & pr = projs.at(proj);
+  auto& pr = projs.at(proj);
+
   auto it = std::find_if(pr.begin(), pr.end(), ShapeNameEquals(name));
   if (it == pr.end())
   {
     out << "\"" << name << "\" not found in project \"" << proj << "\"\n";
     return;
   }
-  Shape * base = it->second;
-  for (int i = 1; i <= n; ++i)
-  {
-    Shape * copy = base->clone();
-    std::string new_name = name + "_" + std::to_string(i);
-    copy->set_name(new_name);
-    copy->move(dx * i, dy * i);
-    pr.insert(std::next(it), {new_name, copy});
-  }
+
+  std::vector< Layer > clones(n);
+  std::generate(clones.begin(), clones.end(), GenerateLayerArray(*it, name));
+  std::for_each(clones.begin(), clones.end(), MoveLayer(dx, dy));
+  pr.insert(std::next(it), clones.begin(), clones.end());
+
   out << n << " copies succesfully created\n";
 }
 
@@ -457,6 +471,17 @@ void savintsev::reverse_project(std::istream & in, std::ostream & out, Projects 
   out << "Layers of \"" << proj << "\" reversed\n";
 }
 
+namespace
+{
+  struct Deleter
+  {
+    void operator()(savintsev::Layer & layer) const
+    {
+      delete layer.second;
+    }
+  };
+}
+
 void savintsev::clear_project(std::istream & in, std::ostream & out, Projects & projs)
 {
   std::string proj;
@@ -466,10 +491,7 @@ void savintsev::clear_project(std::istream & in, std::ostream & out, Projects & 
   ConfirmationPrompt prompt(in, out);
   if (prompt.ask("Are you sure you want to clear the project?"))
   {
-    for (auto & l : pr)
-    {
-      delete l.second;
-    }
+    std::for_each(pr.begin(), pr.end(), Deleter());
     pr.clear();
     out << "Project \"" << proj << "\" was successfully cleared\n";
     return;
@@ -478,14 +500,71 @@ void savintsev::clear_project(std::istream & in, std::ostream & out, Projects & 
   out << "Clear cancelled\n";
 }
 
+void savintsev::exit_program(std::istream & in, std::ostream & out, Projects & projs)
+{
+  ConfirmationPrompt prompt(in, out);
+  if (prompt.ask("Save all projects before closing?"))
+  {
+    save_all(out, projs);
+  }
+  in.setstate(std::ios::eofbit);
+}
+
+namespace
+{
+  struct PrintProjectIndexed
+  {
+    std::ostream & out;
+    size_t index;
+
+    PrintProjectIndexed(std::ostream & o):
+      out(o),
+      index(1)
+    {
+      out << "=== List of open projects ===\n";
+    }
+
+    void operator()(const std::pair< const std::string, savintsev::Project > & p)
+    {
+      out << "[" << index++ << "] " << p.first << '\n';
+    }
+  };
+  struct PrintShapeIndexed
+  {
+    std::ostream & out;
+    size_t index;
+    const std::unordered_map< std::string, std::string > & shape_names;
+
+    PrintShapeIndexed(std::ostream & o, const std::unordered_map< std::string, std::string > & names):
+      out(o),
+      index(1),
+      shape_names(names)
+    {
+      out << "=== Layers from the top ===\n";
+      out << "    Shape  Name\n";
+    }
+
+    void operator()(const savintsev::Layer & layer)
+    {
+      out << "[" << index++ << "] ";
+      auto it = shape_names.find(layer.first);
+      if (it != shape_names.end())
+      {
+        out << it->second << " ";
+      }
+      else
+      {
+        out << "Unknown ";
+      }
+      out << layer.second->get_name() << '\n';
+    }
+  };
+}
+
+
 void savintsev::print(std::ostream & out, Projects & projs)
 {
-  out << "=== List of open projects ===\n";
-  size_t counter = 1;
-  for (auto it = projs.begin(); it != projs.end(); ++it)
-  {
-    out << "[" << counter++ << "] " << it->first << '\n';
-  }
+  std::for_each(projs.begin(), projs.end(), PrintProjectIndexed(out));
 }
 
 void savintsev::print_shapes(std::istream & in, std::ostream & out, Projects & projs)
@@ -493,27 +572,13 @@ void savintsev::print_shapes(std::istream & in, std::ostream & out, Projects & p
   std::string proj;
   in >> proj;
 
+  std::unordered_map< std::string, std::string > shape_type;
+  shape_type["rectangle"] = "Rectan";
+  shape_type["complexquad"] = "Cxquad";
+  shape_type["concave"] = "Concav";
+
   Project & pr = projs.at(proj);
-  size_t counter = 1;
-  out << "=== Layers from the top ===\n";
-  out << "    Shape  Name\n";
-  for (auto it = pr.begin(); it != pr.end(); ++it)
-  {
-    out << "[" << counter++ << "] ";
-    if (it->first == "rectangle")
-    {
-      out << "Rectan ";
-    }
-    else if (it->first == "complexquad")
-    {
-      out << "Cxquad ";
-    }
-    else if (it->first == "concave")
-    {
-      out << "Concav ";
-    }
-    out << it->second->get_name() << '\n';
-  }
+  std::for_each(pr.begin(), pr.end(), PrintShapeIndexed(out, shape_type));
 }
 
 void savintsev::print_info_about_shape(std::istream & in, std::ostream & out, Projects  & projs)
@@ -567,11 +632,7 @@ namespace
     return inside;
   }
 
-  void fill_shape_simple(
-    gil::rgb8_view_t & view,
-    const savintsev::point_t* pts,
-    size_t count,
-    gil::rgb8_pixel_t color)
+  void fill_shape_simple(gil::rgb8_view_t & view, const savintsev::point_t * pts, size_t count, gil::rgb8_pixel_t c)
   {
     if (count < 3)
     {
@@ -591,11 +652,53 @@ namespace
 
         if (point_in_polygon(pts, count, fx + 0.5, fy + 0.5))
         {
-          view(x, y) = color;
+          view(x, y) = c;
         }
       }
     }
   }
+
+  struct RenderShape
+  {
+    RenderShape(gil::rgb8_image_t::view_t & view):
+      view_(view)
+    {}
+
+    void operator()(savintsev::Layer & layer)
+    {
+      std::mt19937 rng(std::random_device{}());
+      std::uniform_int_distribution< int > dist(50, 240);
+
+      savintsev::point_t pts[4];
+      size_t count = layer.second->get_all_points(pts);
+
+      gil::rgb8_pixel_t color
+      (
+        static_cast< uint8_t >(dist(rng)),
+        static_cast< uint8_t >(dist(rng)),
+        static_cast< uint8_t >(dist(rng))
+      );
+
+      if (count == 2)
+      {
+        savintsev::point_t rect_pts[4]
+        {
+          {pts[0].x, pts[0].y},
+          {pts[1].x, pts[0].y},
+          {pts[1].x, pts[1].y},
+          {pts[0].x, pts[1].y}
+        };
+        count = 4;
+        fill_shape_simple(view_, rect_pts, 4, color);
+      }
+      else
+      {
+        fill_shape_simple(view_, pts, count, color);
+      }
+    }
+
+    gil::rgb8_image_t::view_t & view_;
+  };
 }
 
 void savintsev::render(std::istream& in, std::ostream& out, Projects& projs)
@@ -617,23 +720,7 @@ void savintsev::render(std::istream& in, std::ostream& out, Projects& projs)
 
   gil::fill_pixels(view, gil::rgb8_pixel_t(255, 255, 255));
 
-  std::mt19937 rng(std::random_device{}());
-  std::uniform_int_distribution< int > dist(50, 255);
-
-  for (const auto & layer : proj)
-  {
-    savintsev::point_t pts[4];
-    size_t count = layer.second->get_all_points(pts);
-
-    gil::rgb8_pixel_t color
-    (
-      static_cast< uint8_t >(dist(rng)),
-      static_cast< uint8_t >(dist(rng)),
-      static_cast< uint8_t >(dist(rng))
-    );
-
-    fill_shape_simple(view, pts, count, color);
-  }
+  std::for_each(proj.begin(), proj.end(), RenderShape{view});
 
   gil::write_view(image_name + ".bmp", view, gil::bmp_tag{});
 
