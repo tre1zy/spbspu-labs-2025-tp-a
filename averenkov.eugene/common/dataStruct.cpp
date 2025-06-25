@@ -13,19 +13,26 @@ std::istream& averenkov::operator>>(std::istream& in, DataStruct& dest)
   DataStruct tmp;
   in >> DelimiterIO{'('} >> DelimiterIO{':'};
   std::string field;
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
+
   while (in >> field)
   {
-    if (field == "key1")
+    if (field == "key1" && !hasKey1)
     {
       in >> CharIO{tmp.key1} >> DelimiterIO{':'};
+      hasKey1 = true;
     }
-    else if (field == "key2")
+    else if (field == "key2" && !hasKey2)
     {
       in >> RationalIO{tmp.key2} >> DelimiterIO{':'};
+      hasKey2 = true;
     }
-    else if (field == "key3")
+    else if (field == "key3" && !hasKey3)
     {
       in >> StringIO{tmp.key3} >> DelimiterIO{':'};
+      hasKey3 = true;
     }
     else if (field == ")")
     {
