@@ -12,7 +12,7 @@
 namespace
 {
   using namespace bocharov;
-  using Predicate = std::function<bool(const Polygon &)>;
+  using Predicate = std::function< bool(const Polygon &) >;
 
   struct AreaAccumulator
   {
