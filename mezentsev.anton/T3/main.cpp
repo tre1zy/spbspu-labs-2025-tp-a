@@ -4,7 +4,7 @@
 #include <iterator>
 #include <limits>
 #include <map>
-#include "commands.h"
+#include "Commands.h"
 #include "Polygon.h"
 
 namespace

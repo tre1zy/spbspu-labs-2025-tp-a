@@ -1,4 +1,4 @@
-#include "commands.h"
+#include "Commands.h"
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -42,7 +42,7 @@ namespace
   {
     std::vector< mezentsev::Polygon > filted;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filted), p);
-    std::vector< double> areas;
+    std::vector< double > areas;
     std::transform(filted.begin(), filted.end(), std::back_inserter(areas), mezentsev::getArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
