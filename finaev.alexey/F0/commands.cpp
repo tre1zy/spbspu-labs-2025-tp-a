@@ -83,6 +83,7 @@ namespace
     const finaev::globalDebuts& debuts;
     std::vector< std::pair< std::string, std::string > >& results;
     const finaev::DebutMoves& mov;
+
     void operator()(const std::pair< std::string, bool >& baseEntry) const
     {
       auto debut = debuts.find(baseEntry.first);
@@ -104,6 +105,7 @@ namespace
   struct OutputFormatForFind
   {
     std::ostream& out;
+    
     void operator()(const std::pair< std::string, std::string >& pair) const
     {
       static bool first = true;
