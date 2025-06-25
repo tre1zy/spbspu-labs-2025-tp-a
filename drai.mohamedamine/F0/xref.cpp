@@ -272,7 +272,8 @@ void CrossRefSystem::getPositions(const std::string& indexName, const std::strin
 
   printPositions(positions.begin(), positions.end());
 }
-void CrossRefSystem::replaceWord(const std::string& indexName, const std::string& oldWord, const std::string& newWord)
+void CrossRefSystem::replaceWord(const std::string& indexName, 
+const std::string& oldWord,const std::string& newWord)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -303,7 +304,8 @@ void CrossRefSystem::replaceWord(const std::string& indexName, const std::string
 
   insertNewWord(positions.begin(), positions.end());
 }
-void CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& index1, const std::string& index2)
+void CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& index1,
+  const std::string& index2)
 {
   auto it1 = indexes_.find(index1);
   auto it2 = indexes_.find(index2);
@@ -380,7 +382,8 @@ void CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& 
 
   indexes_.insert({ newIndex, merged });
 }
-void CrossRefSystem::insertText(const std::string& newIndex, const std::string& baseIndex, const std::string& insertIndex, size_t afterLine, size_t afterColumn)
+void CrossRefSystem::insertText(const std::string& newIndex, const std::string& baseIndex, 
+  const std::string& insertIndex, size_t afterLine, size_t afterColumn)
 {
   auto baseIt = indexes_.find(baseIndex);
   auto insertIt = indexes_.find(insertIndex);
@@ -657,7 +660,8 @@ void CrossRefSystem::repeatText(const std::string& newIndex, const std::string& 
   repeatCopy(remaining);
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::string& index1, const std::string& index2)
+void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::string& index1, 
+  const std::string& index2)
 {
   auto it1 = indexes_.find(index1);
   auto it2 = indexes_.find(index2);
@@ -675,8 +679,10 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::str
   std::map<size_t, std::vector<std::pair<std::string, size_t>>> lines1;
   std::map<size_t, std::vector<std::pair<std::string, size_t>>> lines2;
 
-  std::function<void(std::map<std::string, std::set<Position>>::const_iterator, std::map<size_t, std::vector<std::pair<std::string, size_t>>>&)> flatten;
-  flatten = [&](std::map<std::string, std::set<Position>>::const_iterator it, std::map<size_t, std::vector<std::pair<std::string, size_t>>>& lines)
+  std::function<void(std::map<std::string, std::set<Position>>::const_iterator, std::map<size_t, 
+    std::vector<std::pair<std::string, size_t>>>&)> flatten;
+  flatten = [&](std::map<std::string, std::set<Position>>::const_iterator it, std::map<size_t, 
+    std::vector<std::pair<std::string, size_t>>>& lines)
   {
     if (it == i1.end() && &lines == &lines1) return flatten(i2.begin(), lines2);
     if (it == i2.end()) return;
@@ -742,7 +748,8 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::str
 
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::swapWords(const std::string& indexName, const std::string& word1, const std::string& word2)
+void CrossRefSystem::swapWords(const std::string& indexName, const std::string& word1, 
+  const std::string& word2)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
