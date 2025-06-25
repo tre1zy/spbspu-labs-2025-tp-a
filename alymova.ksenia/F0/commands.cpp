@@ -1,10 +1,10 @@
 #include "commands.hpp"
 #include <algorithm>
-#include <iostream>
-#include <exception>
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 #include <iomanip>
+#include <iostream>
 #include <iterator>
 #include <numeric>
 #include "dict-utils.hpp"
@@ -21,13 +21,13 @@ namespace
   {
     return word.find(subword) != std::string::npos;
   }
-  bool hasTranslate(WordSet& list, const std::string& word)
+  bool hasWord(const WordSet& list, const std::string& word)
   {
     return std::find(list.begin(), list.end(), word) != list.end();
   }
-  bool hasAnyTranslates(const std::pair< std::string, WordSet >& pair, WordSet& translates)
+  bool hasAnyWords(const WordSet& translates, const std::pair< std::string, WordSet >& pair)
   {
-    return std::any_of(translates.begin(), translates.end(), std::bind(hasTranslate, pair.second, _1));
+    return std::any_of(translates.begin(), translates.end(), std::bind(hasWord, pair.second, _1));
   }
   bool hasKey(const Dictionary& dict, const std::string& key)
   {
@@ -46,7 +46,7 @@ namespace
   {
     return set.at(name);
   }
-  WordSet returnTranslateSet(const Dictionary& dict, const std::string& word)
+  WordSet returnWordSet(const Dictionary& dict, const std::string& word)
   {
     return dict.at(word);
   }
@@ -266,7 +266,7 @@ void alymova::findEnglishEquivalent(std::istream& in, std::ostream& out, const D
   }
   const Dictionary& dict = set.at(name);
   Dictionary equivalents;
-  auto f = std::bind(hasAnyTranslates, _1, translates);
+  auto f = std::bind(hasAnyWords, translates, _1);
   std::copy_if(dict.begin(), dict.end(), std::inserter(equivalents, equivalents.end()), f);
 
   WordSet words;
@@ -335,7 +335,7 @@ void alymova::translate(std::istream& in, std::ostream& out, const DictSet& set)
 
   std::list< WordSet > translate_list;
   auto d_first2 = std::back_inserter(translate_list);
-  std::transform(suitable.begin(), suitable.end(), d_first2, std::bind(returnTranslateSet, _1, word));
+  std::transform(suitable.begin(), suitable.end(), d_first2, std::bind(returnWordSet, _1, word));
 
   WordSet translates;
   translates = std::accumulate(translate_list.begin(), translate_list.end(), translates, unionLists);

@@ -9,8 +9,8 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using TranslateSet = std::list< std::string >;
-  using Dictionary = std::map< std::string, TranslateSet >;
+  using WordSet = std::list< std::string >;
+  using Dictionary = std::map< std::string, WordSet >;
   using DictSet = std::map< std::string, Dictionary >;
   using CommandSet = std::map< std::string, std::function< void() > >;
   std::setlocale(LC_CTYPE, "rus");
