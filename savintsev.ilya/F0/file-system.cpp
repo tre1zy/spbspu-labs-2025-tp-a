@@ -1,5 +1,6 @@
 #include "file-system.hpp"
 #include <fstream>
+#include <algorithm>
 #include <unordered_map>
 #include "shape-utils.hpp"
 
@@ -131,4 +132,51 @@ void savintsev::write_savi_file(const std::string & filename, Project & proj)
     }
     file << '\n';
   }
+}
+
+void savintsev::cleanup_projects_with_backup(Projects & projects)
+{
+  struct Deleter
+  {
+    void operator()(Layer & layer) const
+    {
+      delete layer.second;
+    }
+  };
+
+  struct ProjectProcessor
+  {
+    void operator()(std::pair< const std::string, Project > & proj_pair) const
+    {
+      Project & proj = proj_pair.second;
+      write_savi_file(proj_pair.first + "_backup", proj);
+      std::for_each(proj.begin(), proj.end(), Deleter());
+      proj.clear();
+    }
+  };
+
+  std::for_each(projects.begin(), projects.end(), ProjectProcessor());
+}
+
+void savintsev::cleanup_projects_without_backup(Projects& projects)
+{
+  struct Deleter
+  {
+    void operator()(Layer & layer) const
+    {
+      delete layer.second;
+    }
+  };
+
+  struct ProjectProcessor
+  {
+    void operator()(std::pair< const std::string, Project > & proj_pair) const
+    {
+      Project & proj = proj_pair.second;
+      std::for_each(proj.begin(), proj.end(), Deleter());
+      proj.clear();
+    }
+  };
+
+  std::for_each(projects.begin(), projects.end(), ProjectProcessor());
 }

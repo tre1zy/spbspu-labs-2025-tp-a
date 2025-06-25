@@ -7,6 +7,7 @@
 #include <shape-utils.hpp>
 #include "project-body.hpp"
 #include "project-cmds.hpp"
+#include "confirmation-src.hpp"
 #include "file-system.hpp"
 
 int main(int argc, char * argv[])
@@ -39,49 +40,42 @@ int main(int argc, char * argv[])
   cmds["save"] = std::bind(save, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["save_as"] = std::bind(save_as, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["save_all"] = std::bind(save_all, std::ref(std::cout), std::ref(projects));
-  cmds["copy"] = std::bind(copy, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["copy"] = std::bind(copy_proj_or_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["merge"] = std::bind(merge, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
-  cmds["rename"] = std::bind(rename_project, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
-  cmds["projects"] = std::bind(print, std::ref(std::cout), std::ref(projects));
+  cmds["rename"] = std::bind(rename_proj_or_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
+  cmds["render"] = std::bind(render, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
 
   cmds["rectangle"] = std::bind(create_rectangle, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["complexquad"] = std::bind(create_complexquad, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["concave"] = std::bind(create_concave, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
-  cmds["delete"] = std::bind(delete_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
 
-  cmds["back_up"] = std::bind(make_back);
+  cmds["delete"] = std::bind(delete_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["insert"] = std::bind(insert_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["swap"] = std::bind(swap_shapes, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
+  cmds["sf"] = std::bind(sf, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["sf_above"] = std::bind(sf_above, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["sf_below"] = std::bind(sf_below, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
+  cmds["move_abs"] = std::bind(move_abs, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["move_rel"] = std::bind(move_rel, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["move_all"] = std::bind(move_all, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["scale"] = std::bind(scale_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
+  cmds["array"] = std::bind(array_shapes, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["reverse"] = std::bind(reverse_project, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["clear"] = std::bind(clear_project, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
+  cmds["projects"] = std::bind(print, std::ref(std::cout), std::ref(projects));
+  cmds["layers"] = std::bind(print_shapes, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["info"] = std::bind(print_info_about_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
   for (std::string command; std::cin >> command;)
   {
     try
     {
       cmds.at(command)();
-    }
-    catch (const std::bad_alloc &)
-    {
-
-    struct Deleter
-    {
-      void operator()(Layer & layer) const
-      {
-        delete layer.second;
-      }
-    };
-
-    struct ProjectProcessor
-    {
-      void operator()(std::pair< const std::string, Project > & proj_pair) const
-      {
-        Project & proj = proj_pair.second;
-        write_savi_file(proj_pair.first + "_backup", proj);
-        std::for_each(proj.begin(), proj.end(), Deleter());
-        proj.clear();
-      }
-    };
-
-    std::for_each(projects.begin(), projects.end(), ProjectProcessor());
-
-    std::cerr << "Memory allocation failed. Open data were saved to backup files. Exiting.\n";
-    return 1;
     }
     catch (const std::out_of_range &)
     {
@@ -93,7 +87,8 @@ int main(int argc, char * argv[])
     }
     catch (...)
     {
-      std::cerr << "Unknown error. Exiting\n";
+      cleanup_projects_with_backup(projects);
+      std::cerr << "Unknown Error. Open data were saved to backup files. Exiting.\n";
       return 1;
     }
 
@@ -101,8 +96,18 @@ int main(int argc, char * argv[])
     {
       std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
     }
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
+
+  std::cin.clear();
+
+  ConfirmationPrompt prompt(std::cin, std::cout);
+  if (prompt.ask("Save all projects before closing?"))
+  {
+    save_all(std::cout, projects);
+  }
+
+  cleanup_projects_without_backup(projects);
 
   return 0;
 }

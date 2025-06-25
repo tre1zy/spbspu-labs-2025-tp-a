@@ -13,6 +13,9 @@ namespace savintsev
 
   void write_savi_file(const std::string & filename, Project & proj);
   void read_savi_file(const std::string & filename, Projects & projs);
+
+  void cleanup_projects_with_backup(Projects & projects);
+  void cleanup_projects_without_backup(Projects & projects);
 }
 
 #endif

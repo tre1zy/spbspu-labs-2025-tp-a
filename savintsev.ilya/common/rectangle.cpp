@@ -25,9 +25,11 @@ size_t savintsev::Rectangle::get_all_points(point_t * ps) const
   if (ps)
   {
     ps[0] = l_;
-    ps[1] = r_;
+    ps[1] = {l_.x, r_.y};
+    ps[2] = r_;
+    ps[3] = {r_.x, l_.y};
   }
-  return 2;
+  return 4;
 }
 
 void savintsev::Rectangle::move(point_t p)

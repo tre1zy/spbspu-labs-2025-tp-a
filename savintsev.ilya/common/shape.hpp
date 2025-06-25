@@ -5,18 +5,6 @@
 
 namespace savintsev
 {
-  struct Color
-  {
-    uint8_t r = 0;
-    uint8_t g = 0;
-    uint8_t b = 0;
-
-    Color() = default;
-    Color(uint8_t red, uint8_t green, uint8_t blue);
-
-    bool operator==(const Color & other) const;
-  };
-
   class Shape
   {
   public:
@@ -36,12 +24,8 @@ namespace savintsev
 
     std::string get_name() const noexcept;
     void set_name(std::string name);
-
-    Color get_color() const noexcept;
-    void set_color(const Color & c) noexcept;
   protected:
     std::string name_;
-    Color c_ = Color(255, 255, 255);
   };
 }
 #endif

@@ -8,8 +8,8 @@ namespace savintsev
   void open(std::istream & in, std::ostream & out, Projects & projs);
   void close(std::istream & in, std::ostream & out, Projects & projs);
   void create(std::istream & in, std::ostream & out, Projects & projs);
-  void copy(std::istream & in, std::ostream & out, Projects & projs);
-  void rename_project(std::istream & in, std::ostream & out, Projects & projs);
+  void copy_proj_or_shape(std::istream & in, std::ostream & out, Projects & projs);
+  void rename_proj_or_shape(std::istream & in, std::ostream & out, Projects & projs);
   void save(std::istream & in, std::ostream & out, Projects & projs);
   void save_as(std::istream & in, std::ostream & out, Projects & projs);
   void render(std::istream & in, std::ostream & out, Projects & projs);
@@ -23,7 +23,6 @@ namespace savintsev
   void delete_shape(std::istream & in, std::ostream & out, Projects & projs);
   void copy_shape(std::istream & in, std::ostream & out, Projects & projs);
   void insert_shape(std::istream & in, std::ostream & out, Projects & projs);
-  void rename_shape(std::istream & in, std::ostream & out, Projects & projs);
   void swap_shapes(std::istream & in, std::ostream & out, Projects & projs);
 
   void sf(std::istream & in, std::ostream & out, Projects & projs);
@@ -34,12 +33,10 @@ namespace savintsev
   void move_rel(std::istream & in, std::ostream & out, Projects & projs);
   void move_all(std::istream & in, std::ostream & out, Projects & projs);
   void scale_shape(std::istream & in, std::ostream & out, Projects & projs);
-  void color_shape(std::istream & in, std::ostream & out, Projects & projs);
 
   void print(std::ostream & out, Projects & projs);
   void print_shapes(std::istream & in, std::ostream & out, Projects & projs);
   void print_info_about_shape(std::istream & in, std::ostream & out, Projects & projs);
-  void make_back();
 
   void array_shapes(std::istream & in, std::ostream & out, Projects & projs);
   void reverse_project(std::istream & in, std::ostream & out, Projects & projs);
