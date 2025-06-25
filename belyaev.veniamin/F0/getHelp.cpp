@@ -96,3 +96,4 @@ void belyaev::getHelp(std::ostream& out)
       << "16. HELP\n"
       << "    Вывод всего списка команд со справкой.\n";
 }
+
