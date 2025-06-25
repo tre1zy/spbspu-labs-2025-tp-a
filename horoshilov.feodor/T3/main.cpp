@@ -20,12 +20,12 @@ int main(int argc, char** argv)
   std::vector<horoshilov::Polygon> polygons;
   while (!file.eof())
   {
-      std::copy(istreamIt(file), istreamIt(), std::back_inserter(polygons));
-      if (!file)
-      {
-          file.clear(file.rdstate() ^ std::ios::failbit);
-          file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      }
+    std::copy(istreamIt(file), istreamIt(), std::back_inserter(polygons));
+    if (!file)
+    {
+     file.clear(file.rdstate() ^ std::ios::failbit);
+     file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+     }
   }
   std::map<std::string, std::function<void()>> commands;
   commands["AREA"] = std::bind(horoshilov::printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));

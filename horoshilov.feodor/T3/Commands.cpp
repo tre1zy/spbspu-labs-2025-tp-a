@@ -15,10 +15,10 @@ namespace
 {
   struct CalcGausTerm
   {
-      double operator()(const horoshilov::Point& p1, const horoshilov::Point& p2)
-      {
-        return p1.x * p2.y - p2.x * p1.y;
-      }
+   double operator()(const horoshilov::Point& p1, const horoshilov::Point& p2)
+   {
+    return p1.x * p2.y - p2.x * p1.y;
+   }
   };
 
   double getArea(const horoshilov::Polygon& polygon)
@@ -98,6 +98,7 @@ namespace
   void maxArea(const std::vector< horoshilov::Polygon >& polygons, std::ostream& out)
   {
     auto max = (*std::max_element(polygons.begin(), polygons.end(), compareArea));
+    horoshilov::Guard streamguard(out);
     out << std::fixed << std::setprecision(1) << getArea(max) << "\n";
   }
 
@@ -110,6 +111,7 @@ namespace
   void minArea(const std::vector< horoshilov::Polygon >& polygons, std::ostream& out)
   {
     auto min = (*std::min_element(polygons.begin(), polygons.end(), compareArea));
+    horoshilov::Guard streamguard(out);
     out << std::fixed << std::setprecision(1) << getArea(min) << "\n";
   }
 
@@ -244,14 +246,7 @@ void horoshilov::printMin(std::istream& in, std::ostream& out, const std::vector
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(minVertex, std::cref(polygons), std::ref(out));
-  try
-  {
-    subcommands.at(subcommand)();
-  }
-  catch (...)
-  {
-    throw std::logic_error("Unknown command");
-  }
+  subcommands.at(subcommand)();
 }
 
 void horoshilov::printCount(std::istream& in, std::ostream& out, const std::vector< horoshilov::Polygon >& polygons)
