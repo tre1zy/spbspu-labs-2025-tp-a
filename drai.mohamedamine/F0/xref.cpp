@@ -1,5 +1,6 @@
 #include "xref.hpp"
 #include <fstream>
+#include <functional>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
@@ -71,7 +72,7 @@ namespace amine
   }
 }
 
-void CrossRefSystem::buildIndex(const std::string& indexName, const std::string& fileName)
+void amine::CrossRefSystem::buildIndex(const std::string& indexName, const std::string& fileName)
 {
   std::ifstream file(fileName);
   if (!file.is_open())
@@ -98,7 +99,7 @@ void CrossRefSystem::buildIndex(const std::string& indexName, const std::string&
   };
   readLines();
 
-  Index index;
+  amine::Index index;
 
   std::function<void(size_t)> processLine;
   processLine = [&](size_t lineIdx)
@@ -145,7 +146,7 @@ void CrossRefSystem::buildIndex(const std::string& indexName, const std::string&
   indexes_.insert(std::make_pair(indexName, index));
 }
 
-void CrossRefSystem::deleteIndex(const std::string& indexName)
+void amine::CrossRefSystem::deleteIndex(const std::string& indexName)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -156,7 +157,7 @@ void CrossRefSystem::deleteIndex(const std::string& indexName)
   indexes_.erase(it);
 }
 
-void CrossRefSystem::containsWord(const std::string& indexName, const std::string& word) const
+void amine::CrossRefSystem::containsWord(const std::string& indexName, const std::string& word) const
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -197,7 +198,7 @@ void CrossRefSystem::containsWord(const std::string& indexName, const std::strin
     printIndexRecursive(std::next(it), end);
   }
 
-void CrossRefSystem::printIndex(const std::string& indexName) const
+void amine::CrossRefSystem::printIndex(const std::string& indexName) const
 {
   auto found = indexes_.find(indexName);
   if (found == indexes_.end() || found->second.empty())
@@ -237,7 +238,7 @@ void CrossRefSystem::printIndex(const std::string& indexName) const
   printRecursive(found->second.begin(), found->second.end());
 }
 
-void CrossRefSystem::getPositions(const std::string& indexName, const std::string& word) const
+void amine::CrossRefSystem::getPositions(const std::string& indexName, const std::string& word) const
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -271,7 +272,7 @@ void CrossRefSystem::getPositions(const std::string& indexName, const std::strin
 
   printPositions(positions.begin(), positions.end());
 }
-void CrossRefSystem::replaceWord(const std::string& indexName,
+void amine::CrossRefSystem::replaceWord(const std::string& indexName,
 const std::string& oldWord,const std::string& newWord)
 {
   auto it = indexes_.find(indexName);
@@ -303,7 +304,7 @@ const std::string& oldWord,const std::string& newWord)
 
   insertNewWord(positions.begin(), positions.end());
 }
-void CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& index1,
+void amine::CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& index1,
   const std::string& index2)
 {
   auto it1 = indexes_.find(index1);
@@ -381,7 +382,7 @@ void CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& 
 
   indexes_.insert({ newIndex, merged });
 }
-void CrossRefSystem::insertText(const std::string& newIndex, const std::string& baseIndex,
+void amine::CrossRefSystem::insertText(const std::string& newIndex, const std::string& baseIndex,
   const std::string& insertIndex, size_t afterLine, size_t afterColumn)
 {
   auto baseIt = indexes_.find(baseIndex);
@@ -518,7 +519,7 @@ void CrossRefSystem::insertText(const std::string& newIndex, const std::string& 
 
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::extractText(const std::string& newIndex, const std::string& baseIndex,
+void amine::CrossRefSystem::extractText(const std::string& newIndex, const std::string& baseIndex,
                                  size_t startLine, size_t startCol, size_t endLine, size_t endCol)
 {
   auto it = indexes_.find(baseIndex);
@@ -571,7 +572,7 @@ void CrossRefSystem::extractText(const std::string& newIndex, const std::string&
 
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::repeatText(const std::string& newIndex,
+void amine::CrossRefSystem::repeatText(const std::string& newIndex,
   const std::string& baseIndex, size_t count)
 {
   if (count == 0)
@@ -660,7 +661,7 @@ void CrossRefSystem::repeatText(const std::string& newIndex,
   repeatCopy(remaining);
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::string& index1,
+void amine::CrossRefSystem::interleaveLines(const std::string& newIndex, const std::string& index1,
   const std::string& index2)
 {
   auto it1 = indexes_.find(index1);
@@ -748,7 +749,7 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::str
 
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::swapWords(const std::string& indexName, const std::string& word1,
+void amine::CrossRefSystem::swapWords(const std::string& indexName, const std::string& word1,
   const std::string& word2)
 {
   auto it = indexes_.find(indexName);
@@ -795,7 +796,7 @@ void CrossRefSystem::swapWords(const std::string& indexName, const std::string& 
   insert2(positions2.begin());
 }
 
-void CrossRefSystem::reverseText(const std::string& newIndex, const std::string& baseIndex)
+void amine::CrossRefSystem::reverseText(const std::string& newIndex, const std::string& baseIndex)
 {
   auto it = indexes_.find(baseIndex);
   if (it == indexes_.end())
@@ -857,7 +858,7 @@ void CrossRefSystem::reverseText(const std::string& newIndex, const std::string&
   indexes_.insert({ newIndex, reversed });
 }
 
-void CrossRefSystem::saveIndex(const std::string& indexName, const std::string& fileName)
+void amine::CrossRefSystem::saveIndex(const std::string& indexName, const std::string& fileName)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -899,7 +900,7 @@ void CrossRefSystem::saveIndex(const std::string& indexName, const std::string& 
   saveWords(index.begin());
 }
 
-void CrossRefSystem::loadIndex(const std::string& indexName, const std::string& fileName)
+void amine::CrossRefSystem::loadIndex(const std::string& indexName, const std::string& fileName)
 {
   std::ifstream file(fileName);
   if (!file.is_open())
@@ -908,7 +909,7 @@ void CrossRefSystem::loadIndex(const std::string& indexName, const std::string& 
     return;
   }
 
-  Index index;
+  amine::Index index;
 
   std::function<void()> readLines;
   readLines = [&]()
@@ -944,7 +945,7 @@ void CrossRefSystem::loadIndex(const std::string& indexName, const std::string& 
   indexes_[indexName] = index;
 }
 
-void CrossRefSystem::reconstructText(const std::string& indexName, const std::string& fileName)
+void amine::CrossRefSystem::reconstructText(const std::string& indexName, const std::string& fileName)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
