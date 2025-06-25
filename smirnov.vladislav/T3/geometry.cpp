@@ -100,7 +100,7 @@ namespace geom
 
   Polygon TrgGenerator::operator()()
   {
-    return createTrg(i++, points);
+    return createTrg(i_++, points_);
   }
 
   std::vector < Polygon > polyToTrg(const Polygon& poly)
