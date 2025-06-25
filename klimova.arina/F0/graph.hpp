@@ -17,6 +17,12 @@ namespace klimova {
   template< typename T >
   class Graph {
   public:
+    using VertexList = std::vector<T>;
+    using AdjacencyList = std::vector<std::vector<size_t>>;
+    using VertexMap = std::unordered_map<T, size_t>;
+    using VisitedList = std::vector<bool>;
+    using Path = std::vector<T>;
+
     Graph() = default;
     void addVertex(const T& vertex);
     void addEdge(const T& src, const T& dest);
@@ -33,15 +39,12 @@ namespace klimova {
     void findShortestPath(const T& startVertex, const T& endVertex) const;
 
   private:
-    std::vector< T > vertices;
-    std::unordered_map< T, size_t > vertexMap;
-    std::vector< std::vector< size_t > > adjList;
+    VertexList vertices;
+    VertexMap vertexMap;
+    AdjacencyList adjList;
 
-    void dfsUtil(size_t v, std::vector< bool >& visited) const;
-    bool findLongestPathUtil(size_t u, size_t endIdx,
-          std::vector< bool >& visited,
-          std::vector< T >& path,
-          std::vector< T >& longestPath) const;
+    void dfsUtil(size_t v, VisitedList& visited) const;
+    bool findLongestPathUtil(size_t u, size_t endIdx, VisitedList& visited, Path& path, Path& longestPath) const;
     size_t getVertexIndex(const T& vertex) const;
   };
 
@@ -141,7 +144,7 @@ namespace klimova {
   }
 
   template < typename T >
-  void Graph< T >::dfsUtil(size_t v, std::vector< bool >& visited) const
+  void Graph< T >::dfsUtil(size_t v, VisitedList& visited) const
   {
     visited[v] = true;
     for (size_t neighbor : adjList[v]) {
@@ -202,7 +205,7 @@ namespace klimova {
       size_t startIdx = getVertexIndex(startVertex);
       size_t endIdx = getVertexIndex(endVertex);
 
-      std::vector< bool > visited(vertices.size(), false);
+      VisitedList visited(vertices.size(), false);
       std::vector< int > parent(vertices.size(), -1);
       std::queue< size_t > queue;
 
@@ -254,10 +257,7 @@ namespace klimova {
   }
 
   template < typename T >
-  bool Graph< T >::findLongestPathUtil(size_t u, size_t endIdx,
-        std::vector< bool >& visited,
-        std::vector< T >& path,
-        std::vector< T >& longestPath) const
+  bool Graph< T >::findLongestPathUtil(size_t u, size_t endIdx, VisitedList& visited, Path& path, Path& longestPath) const
   {
     visited[u] = true;
     path.push_back(vertices[u]);
@@ -286,8 +286,8 @@ namespace klimova {
       size_t startIdx = getVertexIndex(startVertex);
       size_t endIdx = getVertexIndex(endVertex);
 
-      std::vector< bool > visited(vertices.size(), false);
-      std::vector< T > path, longestPath;
+      VisitedList visited(vertices.size(), false);
+      Path path, longestPath;
 
       if (findLongestPathUtil(startIdx, endIdx, visited, path, longestPath)) {
         std::cout << "Longest path from " << startVertex << " to " << endVertex << ": ";
