@@ -21,16 +21,6 @@ namespace abramov
   };
   std::istream &operator>>(std::istream &in, Polygon &polygon);
 
-  struct AreaVertAcc
-  {
-    size_t k;
-
-    explicit AreaVertAcc(size_t vert):
-      k(vert)
-    {}
-    double operator()(double s, const Polygon &polygon) const;
-  };
-
   struct VertexesCmp
   {
     size_t k;

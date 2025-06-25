@@ -78,16 +78,6 @@ std::istream &abramov::operator>>(std::istream &in, Polygon &polygon)
   return in;
 }
 
-double abramov::AreaVertAcc::operator()(double s, const Polygon &polygon) const
-{
-  VertexesCmp cmp{ k };
-  if (cmp(polygon))
-  {
-    return s + getArea(polygon);
-  }
-  return s;
-}
-
 bool abramov::VertexesCmp::operator()(const Polygon &polygon) const
 {
   return polygon.points.size() == k;

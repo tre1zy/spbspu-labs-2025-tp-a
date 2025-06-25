@@ -10,36 +10,22 @@ namespace
   using namespace abramov;
   using CommandDict = std::map< std::string, std::function< void() > >;
 
-  double getAreaIfEven(const Polygon &p)
-  {
-    if (isEven(p))
-    {
-      return getArea(p);
-    }
-    return 0.0;
-  }
-
   void printAreaEven(const std::vector< Polygon > &polygons, std::ostream &out)
   {
+    std::vector< Polygon > even_polygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(even_polygons), isEven);
     std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), getAreaIfEven);
+    std::transform(even_polygons.begin(), even_polygons.end(), areas.begin(), getArea);
     double area = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << area;
   }
 
-  double getAreaIfOdd(const Polygon &p)
-  {
-    if (isOdd(p))
-    {
-      return getArea(p);
-    }
-    return 0.0;
-  }
-
   void printAreaOdd(const std::vector< Polygon > &polygons, std::ostream &out)
   {
+    std::vector< Polygon > odd_polygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(odd_polygons), isOdd);
     std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), getAreaIfOdd);
+    std::transform(odd_polygons.begin(), odd_polygons.end(), areas.begin(), getArea);
     double area = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << area;
   }
