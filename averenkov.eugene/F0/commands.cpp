@@ -82,6 +82,42 @@ void averenkov::KnapsackPrinter::operator()(const std::pair< const std::string, 
   out << ", Capacity: " << knapsack_pair.second.getCapacity() << "\n";
 }
 
+void averenkov::printHelp(std::ostream& out)
+{
+  out << "Knapsack Problem Solver - Help Menu\n\n";
+
+  out << "Basic Item Commands:\n";
+  out << " add <name> <weight> <value> - Add item to database\n";
+  out << " remove <name> - Remove item from database\n";
+  out << " edit <name> <new_w> <new_v> - Edit item parameters\n\n";
+  out << "Kit Management:\n";
+  out << " add_kit <kit_name> - Create new empty kit\n";
+  out << " remove_kit <kit_name> - Delete a kit\n";
+  out << " add_to_kit <kit> <item> - Add item to kit\n";
+  out << " remove_from_kit <kit> <item> - Remove item from kit\n\n";
+
+  out << "Knapsack Operations:\n";
+  out << "  add_knapsack <name> <capacity>  - Create new knapsack\n";
+  out << "  set_knapsack <name>            - Set active knapsack\n\n";
+
+  out << "Solving Methods:\n";
+  out << "  solve <kit> <result_name>       - Auto-select method\n";
+  out << "  bruteforce <kit> <result_name>  - Brute-force solution\n";
+  out << "  dynamic_prog <kit> <result_name> - Dynamic programming\n";
+  out << "  backtracking <kit> <result_name> - Backtracking method\n";
+  out << "  branch_and_bound <kit> <result_name> - Branch and bound\n\n";
+
+  out << "Utility Commands:\n";
+  out << "  stats                           - Show all database contents\n";
+  out << "  reset                           - Clear all kits and knapsacks\n";
+  out << "  save <filename>                - Save database to file\n";
+  out << "  load <filename>                - Load database from file\n\n";
+
+  out << "Launch Options:\n";
+  out << "  knapsack [file]                - Start with database file\n";
+  out << "  --help                         - Show this help message\n";
+}
+
 void averenkov::addItem(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 4)

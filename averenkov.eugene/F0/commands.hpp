@@ -94,6 +94,7 @@ namespace averenkov
     void operator()(const std::pair< const std::string, Knapsack >& knapsack_pair) const;
   };
 
+  void printHelp(std::ostream& out);
   void addItem(Base& base, const std::vector< std::string >& args);
   void removeItem(Base& base, const std::vector< std::string >& args);
   void editItem(Base& base, const std::vector< std::string >& args);

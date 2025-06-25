@@ -3,8 +3,12 @@
 #include "commands.hpp"
 #include "solves.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
+  if (argc == 1 && std::string(argv[0]) == "--help")
+  {
+    averenkov::printHelp(std::cout);
+  }
   std::map< std::string, std::function< void(averenkov::Base& , const std::vector< std::string >&) > > commands;
   commands["add"] = averenkov::addItem;
   commands["remove"] = averenkov::removeItem;
