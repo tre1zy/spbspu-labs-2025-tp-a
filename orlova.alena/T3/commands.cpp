@@ -6,6 +6,7 @@
 #include <map>
 #include <numeric>
 #include "geom.h"
+#include "io-guard.h"
 
 namespace
 {
@@ -20,13 +21,8 @@ namespace
   {
     const auto& p = polygon.points;
     double sum = std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, subArea);
-    sum += subArea (p.back(), p.front());
+    sum += subArea(p.back(), p.front());
     return std::abs(sum) / 2.0;
-  }
-
-  double sumPolygonAreas(double sum, const Polygon& polygon)
-  {
-    return sum + areaPolygon(polygon);
   }
 
   bool isEven(const Polygon& polygon)
@@ -44,6 +40,11 @@ namespace
     return polygon.points.size() == numOfVertexes;
   }
 
+  bool noCondition(const Polygon&)
+  {
+    return true;
+  }
+
   template < typename T >
   double accumulator(double sum, const Polygon& polygon, T function)
   {
@@ -53,8 +54,11 @@ namespace
   template < typename T >
   double calculateAreaByCondition(const std::vector< Polygon >& polygons, T function)
   {
-    using namespace std::placeholders;
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulator< T >, _1, _2, function));
+    std::vector< Polygon > newPolygons;
+    std::vector< double > areas;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(newPolygons), function);
+    std::transform(newPolygons.begin(), newPolygons.end(), std::back_inserter(areas), areaPolygon);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
   bool areaComparator(const Polygon& a, const Polygon& b)
@@ -99,13 +103,13 @@ double orlova::areaMean(const std::vector< Polygon >& polygons)
   {
     throw std::logic_error("<THERE ARE NO POLYGONS>");
   }
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, sumPolygonAreas) / polygons.size();
+  return calculateAreaByCondition(polygons, noCondition) / polygons.size();
 }
 
 double orlova::areaNum(const std::vector< Polygon >& polygons, size_t numOfVertexes)
 {
   using namespace std::placeholders;
-  std::function< bool(const Polygon&) > function = std::bind(isNum, _1, numOfVertexes);
+  auto function = std::bind(isNum, _1, numOfVertexes);
   return calculateAreaByCondition(polygons, function);
 }
 
@@ -113,6 +117,7 @@ void orlova::area(const std::vector< Polygon >& polygons, std::istream& in, std:
 {
   std::string subcommand;
   in >> subcommand;
+  IoGuard guard(out);
   out << std::fixed << std::setprecision(1);
   using namespace std::placeholders;
   using Predicate = std::function< bool(const Polygon&) >;
@@ -144,6 +149,7 @@ void orlova::max(const std::vector< Polygon >& polygons, std::istream& in, std::
   }
   std::string subcommand;
   in >> subcommand;
+  IoGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
   std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > subcmds;
@@ -170,6 +176,7 @@ void orlova::min(const std::vector< Polygon >& polygons, std::istream& in, std::
   }
   std::string subcommand;
   in >> subcommand;
+  IoGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
   std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > subcmds;
@@ -192,6 +199,7 @@ void orlova::count(const std::vector< Polygon >& polygons, std::istream& in, std
 {
   std::string subcommand;
   in >> subcommand;
+  IoGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
   std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > subcmds;
