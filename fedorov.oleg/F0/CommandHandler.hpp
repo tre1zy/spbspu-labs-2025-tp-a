@@ -22,8 +22,6 @@ namespace crossref
     static void handleShowText(TextProcessor &tp, const ArgsType &args);
     static void handleDeleteText(TextProcessor &tp, const ArgsType &args);
 
-    static void handleFindWord(TextProcessor &tp, const ArgsType &args);
-
     static void handleBuildDict(TextProcessor &tp, const ArgsType &args);
     static void handleShowDict(TextProcessor &tp, const ArgsType &args);
     static void handleImportDict(TextProcessor &tp, const ArgsType &args);

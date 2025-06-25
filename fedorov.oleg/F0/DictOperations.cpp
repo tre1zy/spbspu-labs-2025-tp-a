@@ -89,18 +89,43 @@ namespace crossref
       }
     };
 
-    struct XrefFormatter //
+    struct XrefFormatter
     {
-      void operator()(const std::pair< std::string, std::vector< int > > &entry,
-                      std::vector< std::string > &output) const
+      struct RecursiveAppender
+      {
+        std::string &line;
+        std::vector< int >::const_iterator current;
+        std::vector< int >::const_iterator end;
+
+        RecursiveAppender(std::string &l, std::vector< int >::const_iterator c, std::vector< int >::const_iterator e):
+          line(l),
+          current(c),
+          end(e)
+        {}
+
+        void operator()()
+        {
+          if (current == end)
+          {
+            return;
+          }
+          line += ", " + std::to_string(*current);
+          ++current;
+          (*this)();
+        }
+      };
+
+      using entryFunctorType = std::pair< std::string, std::vector< int > >;
+      void operator()(const entryFunctorType &entry, std::vector< std::string > &output) const
       {
         std::string line = entry.first + ": ";
         if (!entry.second.empty())
         {
           line += std::to_string(entry.second[0]);
-          for (auto it = std::next(entry.second.begin()); it != entry.second.end(); ++it)
+          if (entry.second.size() > 1)
           {
-            line += ", " + std::to_string(*it);
+            RecursiveAppender appender(line, std::next(entry.second.begin()), entry.second.end());
+            appender();
           }
         }
         output.push_back(line);

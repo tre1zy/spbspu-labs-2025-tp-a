@@ -51,19 +51,13 @@ namespace crossref
       }
     }
 
-    template void checkIdExists< std::map< std::string, std::vector< std::string > > >(
-        const std::map< std::string, std::vector< std::string > > &, const std::string &, const std::string &);
+    using checkerMapType = std::map< std::string, std::vector< std::string > >;
+    template void checkIdExists< checkerMapType >(const checkerMapType &, const std::string &, const std::string &);
+    template void checkIdNotFound< checkerMapType >(const checkerMapType &, const std::string &, const std::string &);
 
-    template void checkIdNotFound< std::map< std::string, std::vector< std::string > > >(
-        const std::map< std::string, std::vector< std::string > > &, const std::string &, const std::string &);
-
-    template void checkIdExists< std::map< std::string, HashTable > >(const std::map< std::string, HashTable > &,
-                                                                      const std::string &,
-                                                                      const std::string &);
-
-    template void checkIdNotFound< std::map< std::string, HashTable > >(const std::map< std::string, HashTable > &,
-                                                                        const std::string &,
-                                                                        const std::string &);
+    using checkerHashType = std::map< std::string, HashTable >;
+    template void checkIdExists< checkerHashType >(const checkerHashType &, const std::string &, const std::string &);
+    template void checkIdNotFound< checkerHashType >(const checkerHashType &, const std::string &, const std::string &);
   }
 
 }

@@ -9,8 +9,6 @@
 namespace crossref
 {
 
-  void removeWhitespace(std::string &str);
-  std::vector< int > parseNumbers(const std::string &numbers_str);
   void processDictLine(HashTable &table, const std::string &line);
 
 }
