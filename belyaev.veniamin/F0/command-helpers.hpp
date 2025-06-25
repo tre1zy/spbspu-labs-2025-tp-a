@@ -98,6 +98,4 @@ namespace belyaev
     const entryPair& entry, const std::string& currentDict);
 }
 
-
-
 #endif
