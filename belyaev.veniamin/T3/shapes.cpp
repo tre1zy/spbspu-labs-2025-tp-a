@@ -3,7 +3,7 @@
 #include <iterator>
 #include <functional>
 #include <stream-guard.hpp>
-#include "delimiter.hpp"
+#include <delimiter.hpp>
 
 std::istream& belyaev::operator>>(std::istream& in, Point& dest)
 {
