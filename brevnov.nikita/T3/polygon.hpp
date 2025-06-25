@@ -3,7 +3,6 @@
 #include <istream>
 #include <ostream>
 #include <vector>
-
 namespace brevnov
 {
   struct Point

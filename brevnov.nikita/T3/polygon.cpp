@@ -6,8 +6,8 @@
 #include <vector>
 #include <numeric>
 #include <functional>
-#include "streamGuard.hpp"
-#include "delimeters.hpp"
+#include <streamGuard.hpp>
+#include <delimeters.hpp>
 
 namespace
 {

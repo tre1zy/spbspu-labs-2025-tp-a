@@ -10,7 +10,7 @@
 #include <numeric>
 #include <limits>
 #include "polygon.hpp"
-#include "streamGuard.hpp"
+#include <streamGuard.hpp>
 
 namespace
 {

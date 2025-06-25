@@ -1,7 +1,6 @@
 #ifndef DELIMETERS_HPP
 #define DELIMETERS_HPP
 #include <string>
-
 namespace brevnov
 {
   struct DelimeterIO
