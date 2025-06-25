@@ -1,6 +1,7 @@
 #include "graph.hpp"
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 namespace {
   struct DelimiterIn
@@ -20,6 +21,11 @@ namespace {
       in.setstate(std::ios::failbit);
     }
     return in;
+  }
+
+  bool is_neighbour_in_src(const std::vector< unsigned >& src, unsigned neighbour)
+  {
+    return std::find(src.begin(), src.end(), neighbour) != src.end();
   }
 }
 
@@ -50,11 +56,8 @@ maslevtsov::Graph::Graph(const Graph& src, const std::vector< unsigned >& vertic
     auto src_it = src.adjacency_list_.find(vertice);
     if (src_it != src.adjacency_list_.end()) {
       std::vector< unsigned > filtered_edges;
-      for (unsigned neighbour: src_it->second) {
-        if (std::find(vertices.begin(), vertices.end(), neighbour) != vertices.cend()) {
-          filtered_edges.push_back(neighbour);
-        }
-      }
+      auto is_nghbr_in_vrtcs = std::bind(is_neighbour_in_src, std::ref(vertices), std::placeholders::_1);
+      std::copy_if(src_it->second.begin(), src_it->second.end(), std::back_inserter(filtered_edges), is_nghbr_in_vrtcs);
       adjacency_list_[vertice] = filtered_edges;
     } else {
       adjacency_list_.clear();
