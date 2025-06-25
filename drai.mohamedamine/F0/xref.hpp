@@ -36,6 +36,7 @@ namespace amine
                     const std::string &insertIndex, size_t afterLine, size_t afterColumn);
     void extractText(const std::string &newIndex, const std::string &baseIndex,
                      size_t startLine, size_t startCol, size_t endLine, size_t endCol);
+    void replaceWord(const std::string &indexName, const std::string &oldWord, const std::string &newWord);
     void repeatText(const std::string &newIndex, const std::string &baseIndex, size_t count);
     void interleaveLines(const std::string &newIndex, const std::string &index1, const std::string &index2);
     void swapWords(const std::string &indexName, const std::string &word1, const std::string &word2);

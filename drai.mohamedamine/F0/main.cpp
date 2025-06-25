@@ -57,6 +57,8 @@ namespace
     else if (command == "extractText" && count == 7)
       xref.extractText(tokens[1], tokens[2], std::stoul(tokens[3]), std::stoul(tokens[4]),
                        std::stoul(tokens[5]), std::stoul(tokens[6]));
+    else if (command == "replaceWord" && count == 4)
+      xref.replaceWord(tokens[1], tokens[2], tokens[3]);
     else if (command == "repeatText" && count == 4)
       xref.repeatText(tokens[1], tokens[2], std::stoul(tokens[3]));
     else if (command == "interleaveLines" && count == 4)
