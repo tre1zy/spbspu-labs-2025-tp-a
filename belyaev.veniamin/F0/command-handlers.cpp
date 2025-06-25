@@ -56,7 +56,7 @@ void belyaev::searchEntryCmd(const Dictionaries& data, std::istream& in, std::os
   {
     throw std::logic_error("Input failed in REMOVE.");
   }
-  
+
   const Dictionary* currentDictionary = searchDictByName(data, dictionaryName);
   if (currentDictionary == nullptr)
   {
@@ -93,7 +93,7 @@ void belyaev::searchContainsCmd(const Dictionaries& data, std::istream& in, std:
   {
     throw std::logic_error("Input failed in REMOVE.");
   }
-  
+
   const Dictionary* currentDictionary = searchDictByName(data, dictionaryName);
   if (currentDictionary == nullptr)
   {
@@ -247,7 +247,7 @@ void belyaev::mergeDictionariesCmd(Dictionaries& data, std::istream& in, std::os
 
   size_t dictionariesAmount;
   std::string dictionaryNew;
-  
+
   in >> dictionariesAmount >> dictionaryNew;
   using istreamItStr = std::istream_iterator<std::string>;
   std::vector<std::string> dictNamesToMerge;
@@ -256,7 +256,7 @@ void belyaev::mergeDictionariesCmd(Dictionaries& data, std::istream& in, std::os
   {
     throw std::logic_error("Input failed in MERGE.");
   }
-  
+
   areAllNamesInDicts nameDictsTraversal(data, dictNamesToMerge);
   if (!nameDictsTraversal())
   {
@@ -276,7 +276,7 @@ void belyaev::intersectDictionariesCmd(Dictionaries& data, std::istream& in, std
 
   size_t dictionariesAmount;
   std::string dictionaryNew;
-  
+
   in >> dictionariesAmount >> dictionaryNew;
   using istreamItStr = std::istream_iterator<std::string>;
   std::vector<std::string> dictNamesToIntersect;
@@ -285,7 +285,7 @@ void belyaev::intersectDictionariesCmd(Dictionaries& data, std::istream& in, std
   {
     throw std::logic_error("Input failed in INTERSECT.");
   }
-  
+
   areAllNamesInDicts nameDictsTraversal(data, dictNamesToIntersect);
   if (!nameDictsTraversal())
   {
@@ -303,7 +303,7 @@ void belyaev::deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::
 {
   size_t dictionariesAmount;
   std::string dictionaryNew;
-  
+
   in >> dictionariesAmount >> dictionaryNew;
   using istreamItStr = std::istream_iterator<std::string>;
   std::vector<std::string> dictNamesToProcess;
@@ -342,49 +342,49 @@ void belyaev::deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::
 void belyaev::helpCmd(std::ostream& out)
 {
   out << "1. INSERT <dictionary> <russian_word> <translation>\n"
-      << "Добавляет запись с переводом в словарь. Если словаря \"dictionary\" не существует, то такой создается. "
+      << "Добавляет запись с переводом в словарь. Если словаря \"dictionary\" не существует, то такой создается."
       << "Если в словаре такая запись уже существует, то вывести сообщение <THIS ENTRY ALREADY EXISTS>\n"
       << "2. REMOVE <dictionary> <russian_word> <translation>\n"
-      << "Удаляет из словаря запись с переводом слова. Если в словаре таких не существует, то вывести сообщение "
+      << "Удаляет из словаря запись с переводом слова. Если в словаре таких не существует, то вывести сообщение"
       << "<THIS ENTRY DOES NOT EXIST>. Если словаря не существует, вывести <THIS DICTIONARY DOES NOT EXIST>.\n"
       << "3. SEARCH <dictionary> <russian_word>\n"
-      << "Ищет в словаре записи с переводом слова и выводит их. Если поиск неудачен, то вывести сообщение "
+      << "Ищет в словаре записи с переводом слова и выводит их. Если поиск неудачен, то вывести сообщение"
       << "<THIS ENTRY DOES NOT EXIST>.\n"
       << "4. SEARCH_BY_ENGLISH <dictionary> <english_word>\n"
-      << "Ищет в словаре записи, где переводом является указанное слово, и выводит их. Если поиск неудачен, "
+      << "Ищет в словаре записи, где переводом является указанное слово, и выводит их. Если поиск неудачен,"
       << "то вывести сообщение <THIS ENTRY DOES NOT EXIST>.\n"
       << "5. SEARCH_СONTAINS <dictionary> <russian_characters>\n"
-      << "Ищет в словаре записи, где в русском слове содержится указанный порядок символов. Если поиск неудачен, "
+      << "Ищет в словаре записи, где в русском слове содержится указанный порядок символов. Если поиск неудачен,"
       << "то вывести сообщение <NO ENTRIES>.\n"
       << "6. SEARCH_CONTAINS_ENGLISH <dictionary> <english_characters>\n"
-      << "Ищет в словаре записи, где в переводе содержится указанный порядок символов. Если поиск неудачен, "
+      << "Ищет в словаре записи, где в переводе содержится указанный порядок символов. Если поиск неудачен,"
       << "то вывести сообщение <NO ENTRIES>.\n"
       << "7. PRINT <dictionary>\n"
-      << "Выводит все записи из словаря. Если словаря не существует, то вывести сообщение "
+      << "Выводит все записи из словаря. Если словаря не существует, то вывести сообщение"
       << "<THIS DICTIONARY DOES NOT EXIST>.\n"
       << "8. PRINT_ALL\n"
       << "Выводит все записи в системе.\n"
       << "9. CLEAR <dictionary>\n"
-      << "Очищает все записи в словаре, как следствие, удаляя его. Если словаря не существует, то вывести сообщение "
+      << "Очищает все записи в словаре, как следствие, удаляя его. Если словаря не существует, то вывести сообщение"
       << "<THIS DICTIONARY DOES NOT EXIST>.\n"
       << "10. CLEAR_ALL\n"
       << "Очищает все записи в системе.\n"
       << "11. COPY <dictionary_old> <dictionary_new>\n"
-      << "Копирует словарь \"dictionary_old\", присваивая новому имя \"dictionary_new\". Если словаря в первом поле "
+      << "Копирует словарь \"dictionary_old\", присваивая новому имя \"dictionary_new\". Если словаря в первом поле"
       << "не существует, то вывести сообщение <THIS DICTIONARY DOES NOT EXIST>.\n"
       << "12. RENAME <dictionary_old> <dictionary_new>\n"
-      << "Переименовывает словарь \"dictionary_old\", присваивая новому имя \"dictionary_new\". Если словаря в первом "
+      << "Переименовывает словарь \"dictionary_old\", присваивая новому имя \"dictionary_new\". Если словаря в первом"
       << "поле не существует, то вывести сообщение <THIS DICTIONARY DOES NOT EXIST>.\n"
       << "13. MERGE <N> <dictionary_new> <dictionary1> ... <dictionaryN>\n"
-      << "N - натуральное число больше 1. Команда совмещает все записи в словарях с 1 по N в новом словаре "
-      << "\"dictionary_new\". Если одного из словарей не существует, то вывести сообщение "
+      << "N - натуральное число больше 1. Команда совмещает все записи в словарях с 1 по N в новом словаре"
+      << "\"dictionary_new\". Если одного из словарей не существует, то вывести сообщение"
       << "<ONE OF THE DICTIONARIES DOES NOT EXIST>.\n"
       << "14. INTERSECT <N> <dictionary_new> <dictionary1> ... <dictionaryN>\n"
-      << "N - натуральное число больше 1. Сохраняет все пересечения словарей с 1 по N в новый словарь "
-      << "\"dictionary_new\". Если одного из словарей не существует, то вывести сообщение "
+      << "N - натуральное число больше 1. Сохраняет все пересечения словарей с 1 по N в новый словарь"
+      << "\"dictionary_new\". Если одного из словарей не существует, то вывести сообщение"
       << "<ONE OF THE DICTIONARIES DOES NOT EXIST>.\n"
       << "15. DELETE_INTERSECTIONS <N> <dictionary_new> <dictionary1> ... <dictionaryN>\n"
-      << "N - натуральное число больше 1. Удаляет все пересечения в первом словаре с остальными, с 2 по N. "
+      << "N - натуральное число больше 1. Удаляет все пересечения в первом словаре с остальными, с 2 по N."
       << "Если одного из словарей не существует, то вывести сообщение <ONE OF THE DICTIONARIES DOES NOT EXIST>.\n"
       << "16. HELP\n"
       << "Вывод всего списка команд со справкой.\n";

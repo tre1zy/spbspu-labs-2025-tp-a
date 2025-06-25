@@ -8,7 +8,7 @@ namespace belyaev
   const Dictionary* searchDictByName(const Dictionaries& data, const std::string& name); // ¯\_(ツ)_/¯
   bool insertEntry(Dictionary& currentDictionary, std::string russianWord, std::string translation);
   bool removeEntry(Dictionary& currentDictionary, std::string russianWord);
-  
+
   using dictionaryIterator = std::_Rb_tree_const_iterator<entryPair>;
   bool isTranslationInEntry(const std::pair<const std::string, std::string> entry, const std::string& translation);
   dictionaryIterator getItOfWordInDictByRu(const Dictionary& dictionary, const std::string& ruWord);
@@ -32,7 +32,7 @@ namespace belyaev
     Dictionaries& data_;
     const std::vector<std::string> names_;
   };
-  
+
   class mergeDictsIterator
   {
     const Dictionaries& data_;
@@ -53,7 +53,6 @@ namespace belyaev
     Dictionary& dest_;
     std::vector<std::string> dictNames_;
     bool first_;
-  
   public:
     intersectDictsIterator(const Dictionaries& data, Dictionary& dest, const std::vector<std::string>& names):
       data_(data),
@@ -71,8 +70,8 @@ namespace belyaev
   {
     Dictionaries& data_;
     const std::vector<std::string>& dictNames_;
-    removeIntersectionsHelper(Dictionaries& data, const std::vector<std::string>& names): 
-      data_(data), 
+    removeIntersectionsHelper(Dictionaries& data, const std::vector<std::string>& names):
+      data_(data),
       dictNames_(names)
     {}
     bool isEntryInOtherDicts(const entryPair& entry, const std::string& currentDictName) const;

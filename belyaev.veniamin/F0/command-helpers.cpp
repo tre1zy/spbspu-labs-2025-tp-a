@@ -188,7 +188,6 @@ bool belyaev::isDictContainingEntry(const Dictionaries& data, const std::string&
 bool belyaev::removeIntersectionsHelper::isEntryInOtherDicts(const entryPair& entry, const std::string& currentDictName) const
 {
   using namespace std::placeholders;
-  
   auto checker = std::bind(isDictContainingEntry, std::cref(data_), _1, std::cref(entry), std::cref(currentDictName));
   return std::any_of(dictNames_.begin(), dictNames_.end(), checker);
 }
