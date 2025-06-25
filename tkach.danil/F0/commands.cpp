@@ -262,13 +262,13 @@ namespace
     }
     else
     {
-      std::vector< std::string > dict_names(number_of_dictionaries);
-      std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
+      std::vector< std::string > dict_names;
+      std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, std::back_inserter(dict_names));
       if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
       {
         throw std::logic_error("<INVALID ARGUMENTS>");
       }
-      if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+      if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}) || in.eof())
       {
         throw std::logic_error("<INVALID ARGUMENTS>");
       }
@@ -374,10 +374,10 @@ namespace
     tree_of_words* target_dict_;
   };
 
-  class SubtractWordsFromDict
+  class SubstractWordsFromDict
   {
   public:
-    SubtractWordsFromDict(tree_of_words& target_dict):
+    SubstractWordsFromDict(tree_of_words& target_dict):
       target_dict_(&target_dict)
     {}
     void operator()(const tree_of_words* dict_to_subtract) const
@@ -426,8 +426,11 @@ namespace
       if (it2 != it->second.cend())
       {
         std::copy(it2->second.cbegin(), it2->second.cend(), std::inserter(curr_acc_pair.first, curr_acc_pair.first.end()));
-        curr_acc_pair.second = true;
         return curr_acc_pair;
+      }
+      else
+      {
+        curr_acc_pair.second = false;
       }
       return curr_acc_pair;
     }
@@ -695,7 +698,7 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
   {
     std::vector< std::string > main_name_dict(count_of_dict);
     std::copy_n(std::istream_iterator< std::string >{in}, count_of_dict, main_name_dict.begin());
-    if (std::any_of(main_name_dict.begin(), main_name_dict.end(), IsStringEmpty{}))
+    if (std::any_of(main_name_dict.begin(), main_name_dict.end(), IsStringEmpty{}) || in.eof())
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
     }
@@ -730,7 +733,7 @@ void tkach::addWord(std::istream& in, tree_of_dict& avltree)
   }
   std::list< std::string > translations;
   std::copy_n(std::istream_iterator< std::string >{in}, num_translations, std::back_inserter(translations));
-  if (std::any_of(translations.begin(), translations.end(), IsStringEmpty{}))
+  if (std::any_of(translations.begin(), translations.end(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -792,7 +795,7 @@ void tkach::printCommonTranslations(std::istream& in, std::ostream& out, const t
   }
   std::vector< std::string > words_to_process(number_of_words);
   std::copy_n(std::istream_iterator< std::string >{in}, number_of_words, words_to_process.begin());
-  if (std::any_of(words_to_process.begin(), words_to_process.end(), IsStringEmpty{}))
+  if (std::any_of(words_to_process.begin(), words_to_process.end(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -1000,7 +1003,7 @@ void tkach::substructDicts(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -1009,7 +1012,7 @@ void tkach::substructDicts(std::istream& in, tree_of_dict& avltree)
   tree_of_words result_dict(*source_dicts[0]);
   if (source_dicts.size() > 1)
   {
-    std::for_each(source_dicts.begin() + 1, source_dicts.end(), SubtractWordsFromDict{result_dict});
+    std::for_each(source_dicts.begin() + 1, source_dicts.end(), SubstractWordsFromDict{result_dict});
   }
   avltree[new_dict_name] = result_dict;
 }
@@ -1026,13 +1029,13 @@ void tkach::mergeNumberDicts(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
-  std::vector< std::string > dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
+  std::vector< std::string > dict_names;
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, std::back_inserter(dict_names));
   if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -1060,7 +1063,7 @@ void tkach::doCommonPartDicts(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -1102,13 +1105,13 @@ void tkach::copyTranslations(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
-  std::vector< std::string > target_dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, target_dict_names.begin());
+  std::vector< std::string > target_dict_names;
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, std::back_inserter(target_dict_names));
   if (target_dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(target_dict_names.cbegin(), target_dict_names.cend(), IsStringEmpty{}))
+  if (std::any_of(target_dict_names.cbegin(), target_dict_names.cend(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
@@ -1127,20 +1130,20 @@ void tkach::printTranslations(std::istream& in, std::ostream& out, const tree_of
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
-  std::vector< std::string > dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
+  std::vector< std::string > dict_names;
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, std::back_inserter(dict_names));
   if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  CollectTranslations collector(avltree, eng_word);
+  CollectTranslations collector{avltree, eng_word};
   auto it1 = dict_names.cbegin();
   auto it2 = dict_names.cend();
-  auto pair_tree_translations = std::accumulate(it1, it2, std::make_pair(std::set< std::string>{}, false), collector);
+  auto pair_tree_translations = std::accumulate(it1, it2, std::make_pair(std::set< std::string>{}, true), collector);
   std::set< std::string > tree_translations = pair_tree_translations.first;
   if (!pair_tree_translations.second)
   {
@@ -1205,13 +1208,13 @@ void tkach::printEngWordsWithTraslation(std::istream& in, std::ostream& out, con
     throw std::logic_error("<INVALID NUMBER>");
   }
   std::set< std::string > tree_word;
-  std::vector< std::string > dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
+  std::vector< std::string > dict_names;
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, std::back_inserter(dict_names));
   if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}) || in.eof())
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
