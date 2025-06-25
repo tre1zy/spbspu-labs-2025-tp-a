@@ -182,6 +182,10 @@ void abramov::processDicts(DictionaryCollection &collect, std::istream &in, Func
   {
     throw std::logic_error("Expected ')'\n");
   }
+  if (res.empty())
+  {
+    throw std::logic_error("There are no words for dictionary\n");
+  }
   collect.addCompleteDict(new_name, res);
   if (del)
   {
