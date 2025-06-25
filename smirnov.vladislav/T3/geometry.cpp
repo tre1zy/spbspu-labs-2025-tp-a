@@ -108,7 +108,7 @@ namespace geom
     size_t size = poly.points.size() - 2;
     size_t ind;
     std::vector< Polygon > triangles(size);
-    std::generate(triangles.begin(), triagnles.end(), TrgGenerator{ ind, poly.points });
+    std::generate(triangles.begin(), triangles.end(), TrgGenerator{ ind, poly.points });
     return triangles;
   }
 

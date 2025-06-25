@@ -28,9 +28,12 @@ namespace geom
   std::vector< Polygon > polyToTrg(const Polygon& poly);
   struct TrgGenerator
   {
-    const std::vector< Point >& points;
-    size_t& i;
-    smirnov::Polygon operator()();
+    explicit TrgGenerator(size_t& idx, const std::vector< Point >& pts) :
+      points_{ pts }, i_{ idx }
+    {}
+    const std::vector< Point >& points_;
+    size_t& i_;
+    Polygon operator()();
   };
 }
 
