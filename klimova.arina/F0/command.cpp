@@ -3,28 +3,27 @@
 #include <limits>
 #include <stdexcept>
 #include <algorithm>
-#include <sstream>
 #include "graph_operations.hpp"
 
 void klimova::loadGraphFromFile(klimova::GraphManager& graphs, const std::string& filename)
 {
   std::ifstream file(filename);
-    if (!file) {
-        throw std::runtime_error("Cannot open file: " + filename);
-    }
+  if (!file) {
+    throw std::runtime_error("Cannot open file: " + filename);
+  }
 
-    std::string graphName;
-    if (!std::getline(file, graphName)) {
-        throw std::runtime_error("Empty file");
-    }
+  std::string graphName;
+  if (!std::getline(file, graphName)) {
+    throw std::runtime_error("Empty file");
+  }
 
-    if (graphs.find(graphName) != graphs.end()) {
-        throw std::runtime_error("Graph with this name already exists");
-    }
+   if (graphs.find(graphName) != graphs.end()) {
+     throw std::runtime_error("Graph with this name already exists");
+   }
 
     std::string vertexLine;
     if (!std::getline(file, vertexLine)) {
-        throw std::runtime_error("Missing vertices line");
+      throw std::runtime_error("Missing vertices line");
     }
 
     Graph<std::string> graph;
@@ -33,13 +32,13 @@ void klimova::loadGraphFromFile(klimova::GraphManager& graphs, const std::string
     auto next = std::find(start, end, ' ');
 
     while (next != end) {
-        graph.addVertex(std::string(start, next));
-        start = next + 1;
-        next = std::find(start, end, ' ');
+      graph.addVertex(std::string(start, next));
+      start = next + 1;
+      next = std::find(start, end, ' ');
     }
 
     if (start != end) {
-        graph.addVertex(std::string(start, end));
+      graph.addVertex(std::string(start, end));
     }
 
     std::string edgeLine;
@@ -52,14 +51,14 @@ void klimova::loadGraphFromFile(klimova::GraphManager& graphs, const std::string
         throw std::runtime_error("Invalid edge format: " + edgeLine);
       }
 
-        std::string src = edgeLine.substr(0, space_pos);
-        std::string dest = edgeLine.substr(space_pos + 1);
+      std::string src = edgeLine.substr(0, space_pos);
+      std::string dest = edgeLine.substr(space_pos + 1);
 
-        try {
-            graph.addEdge(src, dest);
-        } catch (...) {
-            throw std::runtime_error("Invalid edge vertices: " + edgeLine);
-        }
+      try {
+        graph.addEdge(src, dest);
+      } catch (...) {
+        throw std::runtime_error("Invalid edge vertices: " + edgeLine);
+      }
     }
 
     graphs.emplace(graphName, std::move(graph));
