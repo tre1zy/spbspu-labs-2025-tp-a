@@ -23,7 +23,11 @@ namespace finaev
   void merge(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
   void intersect(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
   void complement(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
-
+  void remove(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
+  void force_delete(std::istream&, std::ostream&, globalDebuts&, debutsBases&);
+  void safe_delete(std::istream&, std::ostream&, globalDebuts&, const debutsBases&);
+  void delete_debut(std::istream&, std::ostream&, globalDebuts&, debutsBases&);
+  
   mapOfCommands createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts&, debutsBases&);
 }
 

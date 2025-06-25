@@ -131,6 +131,43 @@ namespace
     }
   };
 
+  struct RemoveDebut
+  {
+    const std::string& key;
+
+    void operator()(std::pair< const std::string, std::unordered_map< std::string, bool > >& base)
+    {
+      base.second.erase(key);
+    }
+  };
+
+  struct CheckDebut
+  {
+    const std::string& key;
+    bool& inBase;
+
+    void operator()(const std::pair< std::string, std::unordered_map< std::string, bool > >& base)
+    {
+      if (base.second.find(key) != base.second.end())
+      {
+        inBase = true;
+      }
+    }
+  };
+
+  struct CountBasesWithDebut
+  {
+    const std::string& key;
+    size_t& count;
+
+    void operator()(const std::pair< std::string, std::unordered_map< std::string, bool > >& base)
+    {
+      if (base.second.find(key) != base.second.end())
+      {
+        ++count;
+      }
+    }
+  };
 }
 
 void finaev::create_debut(std::istream& in, std::ostream& out, globalDebuts& debuts)
@@ -437,6 +474,122 @@ void finaev::complement(std::istream& in, std::ostream& out, const globalDebuts&
   out << " openings (complemention of " << base2Name << " from " << base1Name << ")";
 }
 
+void finaev::remove(std::istream& in, std::ostream& out, const globalDebuts& debuts, debutsBases& bases)
+{
+  std::string baseName, key, temp;
+  if (!(in >> baseName >> key))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (debuts.find(key) == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  auto base = bases.find(baseName);
+  if (base == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto debut = base->second.find(key);
+  if (debut == base->second.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  base->second.erase(debut);
+  out << "Debut " << key << " removed from base " << baseName;
+}
+
+void finaev::force_delete(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
+{
+  std::string key, temp;
+  if (!(in >> key))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (debuts.find(key) == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  RemoveDebut remover{ key };
+  std::for_each(bases.begin(), bases.end(), remover);
+  debuts.erase(key);
+  out << "Debut " << key << " completely deleted from system debuts";
+}
+
+void finaev::safe_delete(std::istream& in, std::ostream& out, globalDebuts& debuts, const debutsBases& bases)
+{
+  std::string key, temp;
+  if (!(in >> key))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (debuts.find(key) == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  bool inBase = false;
+  CheckDebut checker{ key, inBase };
+  std::for_each(bases.begin(), bases.end(), checker);
+  if (inBase)
+  {
+    out << "Cannot delete " << key << " exists in one or more bases";
+    return;
+  }
+  debuts.erase(key);
+  out << "Debut " << key << " safely deleted from system";
+}
+
+void finaev::delete_debut(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
+{
+  std::string key, temp;
+  if (!(in >> key))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto debut = debuts.find(key);
+  if (debut == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  size_t count = 0;
+  CountBasesWithDebut counter{ key, count };
+  std::for_each(bases.begin(), bases.end(), std::ref(counter));
+  if (counter.count > 0)
+  {
+    out << "Are you sure? The debut is contained in " << count << " bases [y/n]: ";
+    char answer;
+    in >> answer;
+    if (answer != 'y' && answer != 'Y')
+    {
+      throw std::runtime_error("Deletion cancelled");
+    }
+    RemoveDebut remover{ key };
+    std::for_each(bases.begin(), bases.end(), remover);
+  }
+  debuts.erase(debut);
+  out << "Debut " << key << (count > 0 ? " completely deleted from system debuts" : " safely deleted from system");
+}
+
 finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
 {
   mapOfCommands commands;
@@ -450,5 +603,9 @@ finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostre
   commands["merge"] = std::bind(finaev::merge, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
   commands["intersect"] = std::bind(finaev::intersect, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
   commands["complement"] = std::bind(finaev::complement, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
+  commands["remove"] = std::bind(finaev::remove, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
+  commands["force_delete"] = std::bind(finaev::force_delete, std::ref(in), std::ref(out), std::ref(debuts), std::ref(bases));
+  commands["safe_delete"] = std::bind(finaev::safe_delete, std::ref(in), std::ref(out), std::ref(debuts), std::cref(bases));
+  commands["delete"] = std::bind(finaev::delete_debut, std::ref(in), std::ref(out), std::ref(debuts), std::ref(bases));
   return commands;
 }
