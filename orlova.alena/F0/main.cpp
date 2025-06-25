@@ -38,18 +38,18 @@ int main(int argc, char** argv)
     }
     commands cmds;
     cmds["addemptydictionary"] = std::bind(addEmptyDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
-    cmds["addtranslation"] = std::bind(addTranslation, std::ref(std::cout), std::cref(dicts));
-    cmds["adddictionary"] = std::bind(addDictionary, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+    cmds["addtranslation"] = std::bind(addTranslation, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
+    cmds["adddictionary"] = std::bind(addDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
     cmds["find"] = std::bind(find, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
     cmds["merge"] = std::bind(merge, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
     cmds["clear"] = std::bind(clear, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
-    cmds["removeword"] = std::bind(removeword, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
-    cmds["append"] = std::bind(append, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+    cmds["removeword"] = std::bind(removeword, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
+    cmds["append"] = std::bind(append, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
     cmds["dictionarysize"] = std::bind(dictionarySize, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
     cmds["intersectionofdicts"] = std::bind(intersectionOfDicts, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
-    cmds["delete"] = std::bind(delete, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));;
+    cmds["delete"] = std::bind(delete, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));;
     cmds["nonrepeatingwords"] = std::bind(nonrepeatingWords, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
-    cmds["residual"] = std::bind(residual, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+    cmds["residual"] = std::bind(residual, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
 
     std::string command;
     while (!(std::cin >> command).eof())
