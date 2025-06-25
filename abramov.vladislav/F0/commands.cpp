@@ -140,6 +140,10 @@ void abramov::printDict(const DictionaryCollection &collect, std::istream &in, s
     throw std::logic_error("There are no enough arguments\n");
   }
   const Dictionary &dict = collect.cfindDict(name);
+  if (dict.empty())
+  {
+    throw std::logic_error("Dictionary is empty\n");
+  }
   dict.print(out);
 }
 
