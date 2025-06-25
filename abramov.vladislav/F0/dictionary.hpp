@@ -19,10 +19,14 @@ namespace abramov
     Dictionary intersectWithDict(const Dictionary &dict) const;
     Dictionary unionWithDict(const Dictionary &dict) const;
     bool empty() const noexcept;
+
+    friend std::ostream &operator<<(std::ostream &out, const Dictionary &dict);
   private:
     std::unordered_map< std::string, std::string > dict_;
 
     void swap(Dictionary &dict) noexcept;
   };
+
+  std::ostream &operator<<(std::ostream &out, const Dictionary &dict);
 }
 #endif

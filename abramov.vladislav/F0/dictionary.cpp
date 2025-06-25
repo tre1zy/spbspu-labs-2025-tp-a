@@ -1,6 +1,40 @@
 #include "dictionary.hpp"
 #include <ostream>
+#include <iterator>
 #include <stdexcept>
+#include <algorithm>
+#include <functional>
+
+namespace
+{
+  struct KeyInDictChecker
+  {
+    KeyInDictChecker(const std::unordered_map< std::string, std::string > &dict, bool b):
+      d(dict),
+      exist(b)
+    {}
+    bool operator()(const std::pair< std::string, std::string > &p) const
+    {
+      if (exist)
+      {
+        return d.count(p.first) > 0;
+      }
+      return d.count(p.first) == 0;
+    }
+  private:
+    const std::unordered_map< std::string, std::string > &d;
+    bool exist;
+  };
+}
+
+std::ostream &abramov::operator<<(std::ostream &out, const Dictionary &dict)
+{
+  for (const auto &pair : dict.dict_)
+  {
+    out << pair.first << " : " << pair.second << "\n";
+  }
+  return out;
+}
 
 abramov::Dictionary::Dictionary():
   dict_(std::unordered_map< std::string, std::string >{})
@@ -38,100 +72,48 @@ void abramov::Dictionary::deleteWord(const std::string &word)
 
 void abramov::Dictionary::print(std::ostream &out) const noexcept
 {
-  for (auto it = dict_.cbegin(); it != dict_.cend(); ++it)
-  {
-    out << it->first << " : " << it->second << "\n";
-  }
+  out << *this;
 }
 
 abramov::Dictionary abramov::Dictionary::setWithDict(const Dictionary &dict) const
 {
   Dictionary res{};
-  for (auto it = dict_.cbegin(); it != dict_.cend(); ++it)
-  {
-    if (dict.dict_.find(it->first) == dict.dict_.cend())
-    {
-      if (!res.dict_.insert({ it->first, it->second }).second)
-      {
-        throw std::runtime_error("Fail to create dictionary\n");
-      }
-    }
-  }
-  for (auto it = dict.dict_.cbegin(); it != dict.dict_.cend(); ++it)
-  {
-    if (dict_.find(it->first) == dict_.cend())
-    {
-      if (!res.dict_.insert({ it->first, it->second }).second)
-      {
-        throw std::runtime_error("Fail to create dictionary\n");
-      }
-    }
-  }
+  KeyInDictChecker f1(dict.dict_, false);
+  std::copy_if(dict_.begin(), dict_.end(), std::inserter(res.dict_, res.dict_.end()), f1);
+  KeyInDictChecker f2(dict_, false);
+  std::copy_if(dict.dict_.begin(), dict.dict_.end(), std::inserter(res.dict_, res.dict_.end()), f2);
   return res;
 }
 
 abramov::Dictionary abramov::Dictionary::intersectWithDict(const Dictionary &dict) const
 {
   Dictionary res{};
-  for (auto it = dict_.cbegin(); it != dict_.cend(); ++it)
-  {
-    if (dict.dict_.find(it->first) != dict.dict_.cend())
-    {
-      if (!res.dict_.insert({ it->first, it->second }).second)
-      {
-        throw std::runtime_error("Fail to create dictionary\n");
-      }
-    }
-  }
+  KeyInDictChecker f(dict.dict_, true);
+  std::copy_if(dict_.begin(), dict_.end(), std::inserter(res.dict_, res.dict_.end()), f);
   return res;
 }
 
 abramov::Dictionary abramov::Dictionary::unionWithDict(const Dictionary &dict) const
 {
   Dictionary res{};
-  for (auto it = dict_.cbegin(); it != dict_.cend(); ++it)
-  {
-    if (!res.dict_.insert({ it->first, it->second }).second)
-    {
-      throw std::runtime_error("Fail to create dictionary\n");
-    }
-  }
-  for (auto it = dict.dict_.cbegin(); it != dict.dict_.cend(); ++it)
-  {
-    if (res.dict_.find(it->first) == res.dict_.end())
-    {
-      if (!res.dict_.insert({ it->first, it->second }).second)
-      {
-        throw std::runtime_error("Fail to create dictionary\n");
-      }
-    }
-  }
+  std::copy(dict_.begin(), dict_.end(), std::inserter(res.dict_, res.dict_.end()));
+  std::copy(dict.dict_.begin(), dict.dict_.end(), std::inserter(res.dict_, res.dict_.end()));
   return res;
 }
 
 abramov::Dictionary abramov::Dictionary::diffDict(const Dictionary &dict)
 {
   Dictionary res{};
-  for (auto it = dict_.cbegin(); it != dict_.cend(); ++it)
-  {
-    if (dict.dict_.find(it->first) == dict.dict_.cend())
-    {
-      res.dict_.insert({ it->first, it->second });
-    }
-  }
+  KeyInDictChecker f(dict.dict_, false);
+  std::copy_if(dict_.begin(), dict_.end(), std::inserter(res.dict_, res.dict_.end()), f);
   return res;
 }
 
 abramov::Dictionary abramov::Dictionary::mergeDict(const Dictionary &dict)
 {
   Dictionary res(*this);
-  for (auto it = dict.dict_.cbegin(); it != dict.dict_.cend(); ++it)
-  {
-    if (res.dict_.find(it->first) == res.dict_.end())
-    {
-      res.dict_.insert({ it->first, it->second });
-    }
-  }
+  KeyInDictChecker f(res.dict_, false);
+  std::copy_if(dict.dict_.begin(), dict.dict_.end(), std::inserter(res.dict_, res.dict_.end()), f);
   return res;
 }
 
