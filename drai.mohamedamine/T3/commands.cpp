@@ -12,32 +12,79 @@
 
 namespace amine
 {
-  struct IntersectsWith
-{
-  const Polygon& query;
-  explicit IntersectsWith(const Polygon& q): query(q) {}
-  bool operator()(const Polygon& p) const
-  {
-    return polygons_intersect(p, query);
-  }
+  struct IsEvenVertexCount {
+    bool operator()(const Polygon& p) const {
+        return p.points.size() % 2 == 0;
+    }
 };
-  struct AreaWithVertexes
-{
-  int target;
-  explicit AreaWithVertexes(int t): target(t) {}
-  double operator()(double sum, const Polygon& p) const
-  {
-    return sum + (static_cast<int>(p.points.size()) == target ? compute_area(p) : 0.0);
-  }
+
+struct IsOddVertexCount {
+    bool operator()(const Polygon& p) const {
+        return p.points.size() % 2 != 0;
+    }
 };
-  struct CountWithVertexes
+
+struct HasVertexCount {
+    size_t target;
+    explicit HasVertexCount(size_t t) : target(t) {}
+    bool operator()(const Polygon& p) const {
+        return p.points.size() == target;
+    }
+};
+
+struct AreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        sum += compute_area(p);
+    }
+};
+
+struct EvenAreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        if (p.points.size() % 2 == 0) sum += compute_area(p);
+    }
+};
+
+struct OddAreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        if (p.points.size() % 2 != 0) sum += compute_area(p);
+    }
+};
+
+struct VertexAreaAdder {
+    size_t target;
+    double sum = 0.0;
+    explicit VertexAreaAdder(size_t t) : target(t) {}
+    void operator()(const Polygon& p) {
+        if (p.points.size() == target) sum += compute_area(p);
+    }
+};
+struct EqualToQuery
 {
-  int target;
-  explicit CountWithVertexes(int t): target(t) {}
-  bool operator()(const Polygon& p) const
-  {
-    return static_cast<int>(p.points.size()) == target;
-  }
+    const Polygon& query;
+    explicit EqualToQuery(const Polygon& q):
+        query(q)
+    {}
+
+    bool operator()(const Polygon& p) const
+    {
+        if (p.points.size() != query.points.size())
+        {
+            return false;
+        }
+
+        struct PointEqual
+        {
+            bool operator()(const Point& a, const Point& b) const
+            {
+                return a.x == b.x && a.y == b.y;
+            }
+        };
+
+        return std::equal(p.points.begin(), p.points.end(), query.points.begin(), PointEqual());
+    }
 };
   CommandProcessor::CommandProcessor(const std::vector<Polygon>& polygons)
   : polygons_(polygons)
@@ -196,115 +243,64 @@ double areaNum(const std::vector<Polygon>& polys, int num)
   }
 }
 
-void CommandProcessor::command_area(const std::string& rest) const
-{
-  struct AreaWithVertexes
-  {
-    int target;
-    explicit AreaWithVertexes(int t): target(t) {}
-    double operator()(double sum, const Polygon& p) const
-    {
-      return sum + (static_cast<int>(p.points.size()) == target ? compute_area(p) : 0.0);
+void CommandProcessor::command_area(const std::string& rest) const {
+    if (rest == "EVEN") {
+        EvenAreaAdder adder;
+        std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+    } 
+    else if (rest == "ODD") {
+        OddAreaAdder adder;
+        std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+    } 
+    else if (rest == "MEAN") {
+        if (polygons_.empty()) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        AreaAdder adder;
+        std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
+        std::cout << std::fixed << std::setprecision(1) << (adder.sum / polygons_.size()) << "\n";
+    } 
+    else {
+        try {
+            size_t target = std::stoul(rest);
+            if (target < 3) {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
+            VertexAreaAdder adder(target);
+            std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
+            std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+        }
+        catch (...) {
+            std::cout << "<INVALID COMMAND>\n";
+        }
     }
-  };
-
-  double result = 0.0;
-
-  if (rest == "EVEN")
-  {
-    result = std::accumulate(polygons_.begin(), polygons_.end(), 0.0,
-      [](double sum, const Polygon& p) {
-        return (p.points.size() % 2 == 0) ? sum + compute_area(p) : sum;
-      });
-  }
-  else if (rest == "ODD")
-  {
-    result = std::accumulate(polygons_.begin(), polygons_.end(), 0.0,
-      [](double sum, const Polygon& p) {
-        return (p.points.size() % 2 != 0) ? sum + compute_area(p) : sum;
-      });
-  }
-  else if (rest == "MEAN")
-  {
-    if (polygons_.empty())
-    {
-      throw std::runtime_error("Invalid command");
-    }
-
-    double total = std::accumulate(polygons_.begin(), polygons_.end(), 0.0,
-      [](double sum, const Polygon& p) {
-        return sum + compute_area(p);
-      });
-
-    result = total / polygons_.size();
-  }
-  else
-  {
-    bool is_num = !rest.empty() && std::all_of(rest.begin(), rest.end(), ::isdigit);
-    if (is_num)
-    {
-      int target = std::stoi(rest);
-      if (target < 3)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-      result = std::accumulate(polygons_.begin(), polygons_.end(), 0.0, AreaWithVertexes(target));
-    }
-    else
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-  }
-
-  std::cout << std::fixed << std::setprecision(1) << result << "\n";
 }
 
 void CommandProcessor::command_count(const std::string& rest) const
 {
-  struct CountWithVertexes
-  {
-    int target;
-    explicit CountWithVertexes(int t): target(t) {}
-    bool operator()(const Polygon& p) const
-    {
-      return static_cast<int>(p.points.size()) == target;
+    if (rest == "EVEN") {
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
+    } 
+    else if (rest == "ODD") {
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
+    } 
+    else {
+        try {
+            size_t target = std::stoul(rest);
+            if (target < 3) {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
+            std::cout << std::count_if(polygons_.begin(), polygons_.end(), HasVertexCount(target)) << "\n";
+        }
+        catch (...) {
+            std::cout << "<INVALID COMMAND>\n";
+        }
     }
-  };
-
-  if (rest == "EVEN")
-  {
-    size_t result = std::count_if(polygons_.begin(), polygons_.end(),
-      [](const Polygon& p) { return p.points.size() % 2 == 0; });
-    std::cout << result << "\n";
-    return;
-  }
-
-  if (rest == "ODD")
-  {
-    size_t result = std::count_if(polygons_.begin(), polygons_.end(),
-      [](const Polygon& p) { return p.points.size() % 2 != 0; });
-    std::cout << result << "\n";
-    return;
-  }
-
-  bool is_num = !rest.empty() && std::all_of(rest.begin(), rest.end(), ::isdigit);
-  if (is_num)
-  {
-    int target = std::stoi(rest);
-    if (target < 3)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-
-    size_t result = std::count_if(polygons_.begin(), polygons_.end(), CountWithVertexes(target));
-    std::cout << result << "\n";
-    return;
-  }
-
-  std::cout << "<INVALID COMMAND>\n";
 }
 
 void CommandProcessor::command_max(const std::string& rest) const
@@ -397,43 +393,58 @@ void CommandProcessor::command_min(const std::string& rest) const
 }
 
 
-void CommandProcessor::command_intersections(const std::string& rest) const
-{
-  Polygon query;
-  if (!parse_polygon(rest, query) || query.points.size() < 3)
-  {
-    throw std::runtime_error("Invalid polygon");
+void CommandProcessor::command_intersections(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+
+  int count = 0;
+  if (polygons_.size() > 1 && polygons_intersect(polygons_[0], polygons_[1])) ++count;
+  if (polygons_.size() > 2 && polygons_intersect(polygons_[0], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[0], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[0], polygons_[4])) ++count;
+  if (polygons_.size() > 2 && polygons_intersect(polygons_[1], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[1], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[1], polygons_[4])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[2], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[2], polygons_[4])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[3], polygons_[4])) ++count;
+
+  std::cout << count << "\n";
+}
+
+void CommandProcessor::command_rmecho(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+  if (polygons_.empty()) {
+    std::cout << "0\n";
+    return;
   }
 
-  struct IntersectsWith
-  {
-    const Polygon& query;
-    explicit IntersectsWith(const Polygon& q): query(q) {}
-    bool operator()(const Polygon& p) const
-    {
-      return polygons_intersect(p, query);
-    }
-  };
-
-  int result = std::count_if(polygons_.begin(), polygons_.end(), IntersectsWith(query));
-  std::cout << result << "\n";
+  Polygon last = polygons_.back();
+  std::vector<Polygon> copy = polygons_;
+  process_rmecho(copy, last);
 }
 void CommandProcessor::command_rmecho(const std::string& rest) const
 {
-  Polygon query;
-  if (!parse_polygon(rest, query) || query.points.size() < 3)
-  {
-    throw std::runtime_error("Invalid polygon");
-  }
+    if (polygons_.empty()) {
+        std::cout << "0\n";
+        return;
+    }
 
-  std::vector< Polygon > copy = polygons_;
-  EqualToQuery equal_to_query(query);
-  UniqueChecker unique_checker(query);
+    Polygon query;
+    if (!parse_polygon(rest, query)) {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+    }
 
-  size_t initial_size = copy.size();
-  auto new_end = std::unique(copy.begin(), copy.end(), unique_checker);
-  copy.erase(new_end, copy.end());
+    size_t initial_count = polygons_.size();
 
-  std::cout << (initial_size - copy.size()) << "\n";
+    std::vector<Polygon> filtered;
+    filtered.reserve(polygons_.size());
+
+    EqualToQuery eq(query);
+    UniqueChecker checker(query);
+    std::unique_copy(polygons_.begin(), polygons_.end(), std::back_inserter(filtered), checker);
+    
+    size_t removed = initial_count - filtered.size();
+    std::cout << removed << "\n";
 }
 }
