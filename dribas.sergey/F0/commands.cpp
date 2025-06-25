@@ -610,32 +610,32 @@ void dribas::analyze_training_segment(std::istream& in, std::ostream& out, const
 }
 void dribas::delete_training_by_key(std::istream& in, std::ostream& out, suite& trainings)
 {
-    unsigned int year, month, day, hour, minute;
-    in >> year >> DelimiterI{'-'} >> month >> DelimiterI{'-'} >> day;
-    in >> hour >> DelimiterI{':'} >> minute;
-    if (!in) {
-      throw std::invalid_argument("");
-    }
-    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    time_t date_only_time_t;
-    try {
-      date_only_time_t = parse_date(year, month, day);
-    } catch (const std::exception& e) {
-      out << "Error date parsing " << e.what() << "\n";
-      return;
-    }
-    std::tm tm_struct = *std::localtime(&date_only_time_t);
-    if (hour > 23 || minute > 59) {
-      throw std::invalid_argument("");
-    }
-    tm_struct.tm_hour = hour;
-    tm_struct.tm_min = minute;
-    tm_struct.tm_sec = 0;
-    tm_struct.tm_isdst = -1;
-    time_t key_time = std::mktime(&tm_struct);
-    if (key_time == static_cast< time_t >(-1)) {
-      throw std::runtime_error(".");
-    }
-    auto& main_suite = trainings[1];
-    size_t erased_count = main_suite.erase(key_time);
+  unsigned int year, month, day, hour, minute;
+  in >> year >> DelimiterI{'-'} >> month >> DelimiterI{'-'} >> day;
+  in >> hour >> DelimiterI{':'} >> minute;
+  if (!in) {
+    throw std::invalid_argument("");
+  }
+  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  time_t date_only_time_t;
+  try {
+    date_only_time_t = parse_date(year, month, day);
+  } catch (const std::exception& e) {
+    out << "Error date parsing " << e.what() << "\n";
+    return;
+  }
+  std::tm tm_struct = *std::localtime(&date_only_time_t);
+  if (hour > 23 || minute > 59) {
+    throw std::invalid_argument("");
+  }
+  tm_struct.tm_hour = hour;
+  tm_struct.tm_min = minute;
+  tm_struct.tm_sec = 0;
+  tm_struct.tm_isdst = -1;
+  time_t key_time = std::mktime(&tm_struct);
+  if (key_time == static_cast< time_t >(-1)) {
+    throw std::runtime_error(".");
+  }
+  auto& main_suite = trainings[1];
+  main_suite.erase(key_time);
 }
