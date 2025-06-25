@@ -452,3 +452,4 @@ struct SumDoubles
     std::for_each(std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), CommandProcessor(polygons));
   }
 }
+}
