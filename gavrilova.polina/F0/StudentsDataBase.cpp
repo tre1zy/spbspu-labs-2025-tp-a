@@ -22,7 +22,9 @@ namespace gavrilova {
       bool operator()(const std::shared_ptr< const student::Student >& a,
           const std::shared_ptr< const student::Student >& b) const
       {
-        if (a->averageGrade_ == b->averageGrade_) return a->id_ < b->id_;
+        if (a->averageGrade_ == b->averageGrade_) {
+          return a->id_ < b->id_;
+        }
         return a->averageGrade_ > b->averageGrade_;
       }
     };
@@ -31,7 +33,9 @@ namespace gavrilova {
       bool operator()(const std::shared_ptr< const student::Student >& a,
           const std::shared_ptr< const student::Student >& b) const
       {
-        if (a->averageGrade_ == b->averageGrade_) return a->id_ < b->id_;
+        if (a->averageGrade_ == b->averageGrade_) {
+          return a->id_ < b->id_;
+        }
         return a->averageGrade_ < b->averageGrade_;
       }
     };
@@ -77,7 +81,9 @@ namespace gavrilova {
 
       void operator()(const std::pair< std::string, StudentDatabase::Group >& group) const
       {
-        if (group.first == currentGroup) return;
+        if (group.first == currentGroup) {
+          return;
+        }
 
         struct StudentProcessor {
           const DateRange& p;
@@ -135,16 +141,12 @@ namespace gavrilova {
 
       void operator()(const student::Student& stud) const
       {
-        std::cout << "<STUD IN ADDER>\n"
-                  << stud;
         if (!db.groupExists(stud.group_)) {
-          std::cout << "if (!db.groupExists(stud.group_))" << stud.group_ << "\n";
           db.createGroup(stud.group_);
         }
         auto pair = db.addStudent(stud.fullName_, stud.group_);
         bool ok = pair.first;
         StudentID id = pair.second;
-        std::cout << "OK " << ok << " ID " << id << "\n";
         if (ok) {
           auto sp = db.findStudentById(id);
           if (sp) {
@@ -205,7 +207,9 @@ namespace gavrilova {
   bool StudentDatabase::saveToFile(const std::string& filename) const
   {
     std::ofstream out(filename);
-    if (!out) return false;
+    if (!out) {
+      return false;
+    }
 
     std::for_each(students.begin(), students.end(), StudentToFileWriter{out});
     return true;
@@ -213,16 +217,14 @@ namespace gavrilova {
 
   bool StudentDatabase::loadFromFile(const std::string& filename)
   {
-    std::cout << "<LOAD FROM FILE>" << "\n";
     std::ifstream in(filename);
-    if (!in) return false;
-
-    // clear();
+    if (!in) {
+      return false;
+    }
 
     std::vector< student::Student > loadedStudents(std::istream_iterator< student::Student >{in},
         std::istream_iterator< student::Student >{});
     if (loadedStudents.begin() == loadedStudents.end()) {
-      std::cout << "if (loadedStudents.begin() == loadedStudents.end()\n";
     }
     std::for_each(loadedStudents.begin(), loadedStudents.end(), StudentAdder{*this});
 
@@ -459,7 +461,8 @@ namespace gavrilova {
     student->averageGrade_ = sum / student->grades_.size();
   }
 
-  std::vector< std::shared_ptr< const student::Student > > StudentDatabase::getStudentsInGroup(const std::string& groupName) const
+  std::vector< std::shared_ptr< const student::Student > > 
+  StudentDatabase::getStudentsInGroup(const std::string& groupName) const
   {
     if (!groupExists(groupName)) {
       return {};
@@ -492,13 +495,17 @@ namespace gavrilova {
     return true;
   }
 
-  bool StudentDatabase::loadGradesFromFile(const std::string& groupName, const date::Date& date, const std::string& filename)
+  bool StudentDatabase::loadGradesFromFile
+  (const std::string& groupName, const date::Date& date, const std::string& filename)
   {
-    if (!groupExists(groupName)) return false;
+    if (!groupExists(groupName)) {
+      return false;
+    }
 
     std::ifstream in(filename);
-    if (!in) return false;
-
+    if (!in) {
+      return false;
+    }
     std::vector< std::string > lines((std::istream_iterator< std::string >(in)),
         std::istream_iterator< std::string >());
 
@@ -507,7 +514,8 @@ namespace gavrilova {
     return true;
   }
 
-  std::pair< bool, GroupStatistics > StudentDatabase::getGroupStatistics(const std::string& groupName, const DateRange& period) const
+  std::pair< bool, GroupStatistics > 
+  StudentDatabase::getGroupStatistics(const std::string& groupName, const DateRange& period) const
   {
     auto it = groups.find(groupName);
     if (it == groups.end()) return {false, {}};
@@ -581,7 +589,8 @@ namespace gavrilova {
     return result;
   }
 
-  std::vector< std::shared_ptr< const student::Student > > StudentDatabase::getTopStudentsInGroup(const std::string& groupName, size_t n) const
+  std::vector< std::shared_ptr< const student::Student > > 
+  StudentDatabase::getTopStudentsInGroup(const std::string& groupName, size_t n) const
   {
     auto students = getStudentsInGroup(groupName);
     std::vector< std::shared_ptr< const student::Student > > result;
@@ -594,7 +603,8 @@ namespace gavrilova {
     return result;
   }
 
-  std::vector< std::shared_ptr< const student::Student > > StudentDatabase::getRiskStudentsInGroup(const std::string& groupName, double threshold) const
+  std::vector< std::shared_ptr< const student::Student > > 
+  StudentDatabase::getRiskStudentsInGroup(const std::string& groupName, double threshold) const
   {
     auto students = getStudentsInGroup(groupName);
     std::vector< std::shared_ptr< const student::Student > > result;
