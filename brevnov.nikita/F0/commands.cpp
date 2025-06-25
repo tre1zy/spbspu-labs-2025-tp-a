@@ -359,7 +359,6 @@ namespace
     bool operator()(const std::pair<std::string, brevnov::Player>& player) const
     {
       printer(player);
-      out << "\n";
       return false;
     }
     TeamPlayerPrinter printer;
