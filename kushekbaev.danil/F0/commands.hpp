@@ -28,7 +28,7 @@ namespace kushekbaev
 
   void remove_translation(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void remove_translation_at_all();
+  void remove_translation_at_all(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
   void merge();
 

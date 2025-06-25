@@ -219,7 +219,7 @@ void kushekbaev::reverse_search(std::ostream& out, std::istream& in, dictionary_
   for (const auto& word_pair : dict_it->second)
   {
     const std::string& word = word_pair.first;
-    const std::set<std::string>& translations = word_pair.second;
+    const std::set< std::string >& translations = word_pair.second;
     if (translations.find(translation_to_find) != translations.end())
     {
       matching_words.push_back(word);
@@ -263,6 +263,40 @@ void kushekbaev::remove_translation(std::ostream& out, std::istream& in, diction
   }
   translations.erase(translation_it);
   out << std::string("Translation successfully deleted.\n");
+}
+
+void kushekbaev::remove_translation_at_all(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, translation_to_delete;
+  in >> dictionary_name >> translation_to_delete;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  std::vector< std::string > words_to_erase;
+  size_t removed_count = 0;
+  for (auto& word_pair : dict_it->second)
+  {
+    auto& translations = word_pair.second;
+    if (translations.erase(translation_to_delete))
+    {
+      removed_count++;
+      if (translations.empty())
+      {
+        words_to_erase.push_back(word_pair.first);
+      }
+    }
+  }
+  for (const auto& word : words_to_erase)
+  {
+    dict_it->second.erase(word);
+  }
+  if (removed_count == 0)
+  {
+    throw std::out_of_range("<TRANSLATION NOT FOUND>");
+  }
+  out << "Removed " << removed_count << " instances of translation '" << translation_to_delete << ".'\n";
 }
 
 void kushekbaev::print_help(std::ostream& out)
