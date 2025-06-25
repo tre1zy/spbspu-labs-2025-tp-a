@@ -177,12 +177,37 @@ namespace
       }
       return true;
     }
-    bool con1 = ccw1 == 0 && on_segment(A, B, C);
-    bool con2 = ccw2 == 0 && on_segment(A, B, D);
-    bool con3 = ccw3 == 0 && on_segment(C, D, A);
-    bool con4 = ccw4 == 0 && on_segment(C, D, B);
-    return con1 || con2 || con3 || con4;
-}
+    return (ccw1 == 0 && on_segment(A, B, C)) || (ccw2 == 0 && on_segment(A, B, D))
+      || (ccw3 == 0 && on_segment(C, D, A)) || (ccw4 == 0 && on_segment(C, D, B));
+  }
+
+  struct Bounds
+  {
+    int min_x;
+    int max_x;
+    int min_y;
+    int max_y;
+  };
+
+  struct BoundsReducer
+  {
+    Bounds operator()(Bounds acc, const brevnov::Point& point) const
+    {
+      return {std::min(acc.min_x, point.x), std::max(acc.max_x, point.x),
+        std::min(acc.min_y, point.y), std::max(acc.max_y, point.y)};
+    }
+  };
+
+  Bounds calculate_bounds(const brevnov::Polygon& poly)
+  {
+    if (poly.points.empty())
+    {
+      return {std::numeric_limits<int>::max(), std::numeric_limits<int>::min(),
+        std::numeric_limits<int>::max(), std::numeric_limits<int>::min()};
+    }
+    Bounds initial{poly.points[0].x, poly.points[0].x, poly.points[0].y, poly.points[0].y};
+    return std::accumulate(poly.points.begin(), poly.points.end(), initial, BoundsReducer());
+  }
 
   bool check_bounding_box(const brevnov::Polygon& poly1, const brevnov::Polygon& poly2)
   {
@@ -190,49 +215,144 @@ namespace
     {
       return false;
     }
-    int min_x1 = poly1.points[0].x, max_x1 = poly1.points[0].x;
-    int min_y1 = poly1.points[0].y, max_y1 = poly1.points[0].y;
-    for (const auto& point : poly1.points)
-    {
-      min_x1 = std::min(min_x1, point.x);
-      max_x1 = std::max(max_x1, point.x);
-      min_y1 = std::min(min_y1, point.y);
-      max_y1 = std::max(max_y1, point.y);
-    }
-    int min_x2 = poly2.points[0].x, max_x2 = poly2.points[0].x;
-    int min_y2 = poly2.points[0].y, max_y2 = poly2.points[0].y;
-    for (const auto& point : poly2.points)
-    {
-      min_x2 = std::min(min_x2, point.x);
-      max_x2 = std::max(max_x2, point.x);
-      min_y2 = std::min(min_y2, point.y);
-      max_y2 = std::max(max_y2, point.y);
-    }
-    return !(max_x1 < min_x2 || max_x2 < min_x1 || max_y1 < min_y2 || max_y2 < min_y1);
+    const Bounds b1 = calculate_bounds(poly1);
+    const Bounds b2 = calculate_bounds(poly2);
+    return !(b1.max_x < b2.min_x || b2.max_x < b1.min_x || b1.max_y < b2.min_y || b2.max_y < b1.min_y);
   }
 
-  bool point_in_poly(const brevnov::Point& point, const brevnov::Polygon& polygon)
+  struct PointPair
   {
-    int n = polygon.points.size();
-    if (n < 3)
+    const brevnov::Point * current;
+    const brevnov::Point * next;
+  };
+
+  struct PolygonPointPairs
+  {
+    explicit PolygonPointPairs(const brevnov::Polygon& p): 
+      poly(p),
+      i(0),
+      j(p.points.size()-1),
+      initialized(false)
+    {}
+    bool get_next(PointPair& pair)
     {
-      return false;
-    }
-    bool inside = false;
-    for (int i = 0, j = n - 1; i < n; j = i++)
-    {
-      const brevnov::Point& p1 = polygon.points[i];
-      const brevnov::Point& p2 = polygon.points[j];
-      if ((p1.y > point.y) != (p2.y > point.y))
+      if (!initialized)
       {
-        if (point.x < (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x)
+        if (poly.points.empty())
+        {
+          return false;
+        }
+        pair.current = &poly.points[j];
+        pair.next = &poly.points[i];
+        initialized = true;
+        return true;
+      }
+      if (++i >= poly.points.size())
+      {
+        return false;
+      }
+      j = i - 1;
+      pair.current = &poly.points[j];
+      pair.next = &poly.points[i];
+      return true;
+    }
+    const brevnov::Polygon& poly;
+    size_t i, j;
+    bool initialized;
+  };
+
+class PointInPolygonChecker
+  {
+    explicit PointInPolygonChecker(const brevnov::Point& p):
+      test_point(p),
+      inside(false)
+    {}
+    void process_pair(const PointPair& pair)
+    {
+      const brevnov::Point& p1 = *pair.current;
+      const brevnov::Point& p2 = *pair.next;
+      if ((p1.y > test_point.y) != (p2.y > test_point.y))
+      {
+        if (test_point.x < (p2.x - p1.x) * (test_point.y - p1.y) / (p2.y - p1.y) + p1.x)
         {
           inside = !inside;
         }
       }
     }
-    return inside;
+    const brevnov::Point& test_point;
+    bool inside;
+  };
+
+  bool point_in_poly(const brevnov::Point& point, const brevnov::Polygon& polygon)
+  {
+    if (polygon.points.size() < 3)
+    {
+        return false;
+    }
+    struct State
+    {
+      bool inside = false;
+      const brevnov::Point* prev_point = nullptr;
+    };
+    struct RayCrossingChecker
+    {
+      explicit RayCrossingChecker(const brevnov::Point& pt):
+        point(pt)
+      {}
+      State operator()(State state, const brevnov::Point& current_point) const
+      {
+        if (state.prev_point)
+        {
+          const brevnov::Point& p1 = current_point;
+          const brevnov::Point& p2 = *state.prev_point;
+          if ((p1.y > point.y) != (p2.y > point.y))
+          {
+            double x_intersect = (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x;
+            if (point.x < x_intersect)
+            {
+              state.inside = !state.inside;
+            }
+          }
+        }
+        state.prev_point = &current_point;
+        return state;
+      }
+      const brevnov::Point& point;
+    };
+    State init_state;
+    init_state.prev_point = &polygon.points.back();
+    RayCrossingChecker checker(point);
+    State result = std::accumulate(polygon.points.begin(), polygon.points.end(),init_state, checker);
+    return result.inside;
   }
+
+  struct SegmentIntersectionChecker
+  {
+    bool operator()(int i) const
+    {
+      const brevnov::Point& A = poly1.points[i];
+      const brevnov::Point& B = poly1.points[(i + 1) % poly1.points.size()];
+      struct InnerChecker
+      {
+        bool operator()(int j) const
+        {
+          const brevnov::Point& C = poly2.points[j];
+          const brevnov::Point& D = poly2.points[(j + 1) % poly2.points.size()];
+          return segment_insert(A, B, C, D);
+        }
+        const brevnov::Point& A;
+        const brevnov::Point& B;
+        const brevnov::Polygon& poly2;
+      };
+      InnerChecker inner{A, B, poly2};
+      const int n2 = poly2.points.size();
+      std::vector< int > indices(n2);
+      std::iota(indices.begin(), indices.end(), 0);
+      return std::any_of(indices.begin(), indices.end(), inner);
+    }
+    const brevnov::Polygon& poly1;
+    const brevnov::Polygon& poly2;
+  };
 
   bool poly_intersect(const brevnov::Polygon& poly1, const brevnov::Polygon& poly2)
   {
@@ -241,24 +361,16 @@ namespace
       return false;
     }
     int n1 = poly1.points.size();
-    int n2 = poly2.points.size();
-    for (int i = 0; i < n1; i++)
+    std::vector< int > indices(n1);
+    std::iota(indices.begin(), indices.end(), 0);
+    SegmentIntersectionChecker checker{poly1, poly2};
+    bool segments_intersect = std::any_of(indices.begin(), indices.end(), checker);
+    if (segments_intersect)
     {
-      const brevnov::Point& A = poly1.points[i];
-      const brevnov::Point& B = poly2.points[(i + 1) % n1];
-      for (int j = 0; j < n2; j++)
-      {
-        const brevnov::Point& C = poly2.points[j];
-        const brevnov::Point& D = poly2.points[(j + 1) % 2];
-        if (segment_insert(A, B, C, D))
-        {
-          return true;
-        }
-      }
+      return true;
     }
-    bool con1 = !poly1.points.empty() && point_in_poly(poly1.points[0], poly2);
-    bool con2 = !poly2.points.empty() && point_in_poly(poly2.points[0], poly1);
-    return con1 || con2;
+    return (!poly1.points.empty() && point_in_poly(poly1.points[0], poly2))
+      || (!poly2.points.empty() && point_in_poly(poly2.points[0], poly1));
   }
 
   struct Check_intersect

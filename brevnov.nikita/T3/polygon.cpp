@@ -99,7 +99,7 @@ bool brevnov::has_right_angle(const Polygon& polygon)
   {
     return false;
   }
-  std::vector<size_t> indices(polygon.points.size());
+  std::vector< size_t > indices(polygon.points.size());
   std::iota(indices.begin(), indices.end(), 0);
   VertexAngleChecker checker{polygon};
   return std::any_of(indices.begin(), indices.end(), checker);
