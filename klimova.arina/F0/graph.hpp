@@ -92,45 +92,23 @@ namespace klimova {
   void Graph< T >::removeVertex(const T& vertex)
   {
     size_t idx = getVertexIndex(vertex);
-
-    struct NeighborProcessor {
-      std::vector<std::vector<size_t>>& adjList;
-      size_t idx;
-
-      size_t operator()(size_t neighbor) const {
-        auto& neighbors = adjList[neighbor];
-        neighbors.erase(std::remove(neighbors.begin(), neighbors.end(), idx), neighbors.end());
-        return neighbor;
-      }
-    };
-
-    std::vector<size_t> neighbors = adjList[idx];
-    std::transform(neighbors.begin(), neighbors.end(), neighbors.begin(), NeighborProcessor{adjList, idx});
+    for (size_t neighbor : adjList[idx]) {
+      auto& neighbors = adjList[neighbor];
+      neighbors.erase(std::remove(neighbors.begin(), neighbors.end(), idx), neighbors.end());
+    }
 
     vertices.erase(vertices.begin() + idx);
     adjList.erase(adjList.begin() + idx);
     vertexMap.erase(vertex);
 
-    struct IndexMaker {
-      mutable size_t counter = 0;
-
-      std::pair<T, size_t> operator()(const T& vertex) const {
-        return std::make_pair(vertex, counter++);
+    for (size_t i = 0; i < vertices.size(); ++i) {
+      vertexMap[vertices[i]] = i;
+      for (size_t& neighbor : adjList[i]) {
+        if (neighbor > idx) {
+          neighbor--;
+        }
       }
-    };
-
-    std::vector<std::pair<T, size_t>> indexedVertices(vertices.size());
-    std::transform(vertices.begin(), vertices.end(), indexedVertices.begin(), IndexMaker{});
-
-    struct MapAccumulator {
-      std::unordered_map<T, size_t>& vertexMap;
-      const void* operator()(const void*, const std::pair<T, size_t>& pair) const {
-        vertexMap[pair.first] = pair.second;
-        return nullptr;
-      }
-    };
-
-    std::accumulate(indexedVertices.begin(), indexedVertices.end(), nullptr, MapAccumulator{vertexMap});
+    }
   }
 
   template < typename T >
@@ -158,7 +136,7 @@ namespace klimova {
     }
     std::vector< bool > visited(vertices.size(), false);
     dfsUtil(0, visited);
-    auto binder = std::bind(std::equal_to<bool>{}, _1, true);
+    auto binder = std::bind(std::equal_to< bool >{}, _1, true);
     return std::all_of(visited.begin(), visited.end(), binder);
   }
 
@@ -210,7 +188,7 @@ namespace klimova {
   {
     try {
       size_t idx = getVertexIndex(vertex);
-      return static_cast<int>(adjList[idx].size());
+      return static_cast< int >(adjList[idx].size());
     } catch (const std::out_of_range&) {
       std::cerr << "Vertex not found." << std::endl;
       return -1;
