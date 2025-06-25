@@ -21,13 +21,13 @@ int main()
   commands["reverse_search"] = std::bind(reverse_search, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["remove_translation"] = std::bind(remove_translation, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["remove_translation_at_all"] = std::bind(remove_translation_at_all, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["delete_all_translations"] = std::bind(delete_all_translations, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   /*commands["merge"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["split"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["prefix_search"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
   commands["no_prefix_search"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["suffix_search"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["no_suffix_search"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["delete_all_translations"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["find_words_without_translation"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["complement"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["intersect"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));

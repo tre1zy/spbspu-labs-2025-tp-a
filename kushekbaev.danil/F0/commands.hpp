@@ -30,6 +30,8 @@ namespace kushekbaev
 
   void remove_translation_at_all(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
+  void delete_all_translations(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
   void merge();
 
   void split();
@@ -42,7 +44,6 @@ namespace kushekbaev
 
   void no_suffix_search();
 
-  void delete_all_translations();
 
   void find_words_without_translations();
 

@@ -299,6 +299,39 @@ void kushekbaev::remove_translation_at_all(std::ostream& out, std::istream& in, 
   out << "Removed " << removed_count << " instances of translation '" << translation_to_delete << ".'\n";
 }
 
+void kushekbaev::delete_all_translations(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, translation_to_delete;
+  in >> dictionary_name >> translation_to_delete;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  std::vector< std::string > matching_words;
+  for (const auto& word_pair : dict_it->second)
+  {
+    const std::string& word = word_pair.first;
+    const std::set< std::string >& translations = word_pair.second;
+    if (translations.find(translation_to_delete) != translations.end())
+    {
+      matching_words.push_back(word);
+    }
+  }
+  if (matching_words.empty())
+  {
+    throw std::out_of_range("<TRANSLATION NOT FOUND>");
+  }
+  else
+  {
+    for (size_t i = 0; i < matching_words.size(); ++i)
+    {
+      dict_it->second.erase(matching_words[i]);
+    }
+  }
+  out << std::string("Words with this translation deleted successfully.\n");
+}
+
 void kushekbaev::print_help(std::ostream& out)
 {
   out << std::string("Available commands: insert, ...\n");
