@@ -22,11 +22,11 @@ namespace ohantsev
     struct Way;
 
     explicit Graph(std::size_t capacity = 10);
-    ~Graph() noexcept = default;
-    Graph(this_t&& rhs) noexcept = default;
-    this_t& operator=(this_t&& rhs) noexcept = default;
     Graph(const this_t& rhs) = default;
+    Graph(this_t&& rhs) noexcept = default;
+    ~Graph() noexcept = default;
     this_t& operator=(const this_t& rhs) = default;
+    this_t& operator=(this_t&& rhs) noexcept = default;
 
     void clear() noexcept;
     std::size_t size() const noexcept;
@@ -44,20 +44,19 @@ namespace ohantsev
     std::vector< Way > nPaths(const Key& start, const Key& end, std::size_t k) const;
 
   private:
-    GraphMap graph_;
-
     struct DSU;
     struct Edge;
-    class DijkstraPathFinder;
-    template< bool AllowCycles >
-    class NPathsFinder;
-
-    std::vector< Edge > collectEdges() const;
-
     struct MakeEdge;
     struct EdgeCollector;
     struct EdgeProcessor;
     struct ConnectionRemover;
+    class DijkstraPathFinder;
+    template< bool AllowCycles >
+    class NPathsFinder;
+
+    GraphMap graph_;
+
+    std::vector< Edge > collectEdges() const;
   };
 
   template< class Key, class Hash, class KeyEqual >
@@ -172,34 +171,27 @@ namespace ohantsev
     explicit DSU(const Graph& graph);
     Key findRoot(const Key& key);
     void unionSets(const Key& first, const Key& second);
-
-    struct InitParent;
-    struct InitRank;
+    static std::pair< Key, Key > InitParent(const typename GraphMap::value_type& pair);
+    static std::pair< Key, std::size_t > InitRank(const typename GraphMap::value_type& pair);
   };
 
   template< class Key, class Hash, class KeyEqual >
-  struct Graph< Key, Hash, KeyEqual >::DSU::InitRank
+  auto Graph< Key, Hash, KeyEqual >::DSU::InitParent(const typename GraphMap::value_type& pair) -> std::pair< Key, Key >
   {
-    typename decltype(rank)::value_type operator()(const typename GraphMap::value_type& pair) const
-    {
-      return std::make_pair(pair.first, 0);
-    }
-  };
+    return std::make_pair(pair.first, pair.first);
+  }
 
   template< class Key, class Hash, class KeyEqual >
-  struct Graph< Key, Hash, KeyEqual >::DSU::InitParent
+  auto Graph< Key, Hash, KeyEqual >::DSU::InitRank(const typename GraphMap::value_type& pair) -> std::pair< Key, std::size_t >
   {
-    typename decltype(parent)::value_type operator()(const typename GraphMap::value_type& pair) const
-    {
-      return std::make_pair(pair.first, pair.first);
-    }
-  };
+    return std::make_pair(pair.first, 0);
+  }
 
   template< class Key, class Hash, class KeyEqual >
   Graph< Key, Hash, KeyEqual >::DSU::DSU(const Graph& graph)
   {
-    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(parent, parent.end()), InitParent{});
-    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(rank, rank.end()), InitRank{});
+    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(parent, parent.end()), InitParent);
+    std::transform(graph.graph_.cbegin(), graph.graph_.cend(), std::inserter(rank, rank.end()), InitRank);
   }
 
   template< class Key, class Hash, class KeyEqual >
@@ -297,7 +289,8 @@ namespace ohantsev
   auto Graph< Key, Hash, KeyEqual >::collectEdges() const -> std::vector< Edge >
   {
     std::vector< Edge > edges;
-    edges.reserve(graph_.size() * 2);
+    static constexpr std::size_t intuitiveEdgeVertexCoefficient = 2;
+    edges.reserve(graph_.size() * intuitiveEdgeVertexCoefficient);
     std::for_each(graph_.begin(), graph_.end(), EdgeCollector{ edges });
     std::sort(edges.begin(), edges.end());
     return edges;
@@ -377,21 +370,21 @@ namespace ohantsev
     Way operator()();
 
   private:
+    using Step = std::pair< Key, std::size_t >;
+    using Distances = std::pair< std::size_t, Key >;
+    struct InitDistance;
+    struct NeighborProcessor;
+
     const Key& start_;
     const Key& end_;
     const Graph& graph_;
     std::unordered_map< Key, std::size_t > distances_;
-    using Step = std::pair< Key, std::size_t >;
     std::unordered_map< Key, Step > previous_;
-    using Distances = std::pair< std::size_t, Key >;
     std::priority_queue< Distances, std::vector< Distances >, std::greater< Distances > > queue_;
 
     void pushNeighbors(const Key& key);
     Way constructPath();
     Way releasePath();
-
-    struct InitDistance;
-    struct NeighborProcessor;
   };
 
   template< class Key, class Hash, class KeyEqual >
@@ -514,6 +507,8 @@ namespace ohantsev
     std::vector< Way > operator()(std::size_t k);
 
   private:
+    struct NeighborConnector;
+
     const Graph& graph_;
     const Key& start_;
     const Key& end_;
@@ -528,8 +523,6 @@ namespace ohantsev
     std::enable_if_t< AC >
     connectNeighbor(const Way& current, const Key& neighbor, std::size_t weight);
     void processNextPath();
-
-    struct NeighborConnector;
   };
 
   template< class Key, class Hash, class KeyEqual >
