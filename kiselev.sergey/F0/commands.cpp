@@ -10,18 +10,6 @@
 
 namespace
 {
-  using osIt = std::ostream_iterator< std::string >;
-  template < typename Func >
-  struct AccumulateAdapter
-  {
-    Func func;
-    template <typename T>
-    T operator()(T, const kiselev::Dict::value_type& val) const
-    {
-      func(val);
-      return T();
-    }
-  };
   const std::string& extractDict(const kiselev::Dicts::value_type& val)
   {
     return val.first;
@@ -29,7 +17,7 @@ namespace
 
   struct WordPrinter
   {
-    std::ostream& operator()(std::ostream& os, const std::string& word)
+    std::ostream& operator()(std::ostream& os, const std::string& word) const
     {
       return os << " " << word;
     }
@@ -52,19 +40,20 @@ namespace
   {
     const std::string& word;
     std::vector< std::string >& translations;
-    void operator()(const kiselev::Dict::value_type& val) const
+    int operator()(int, const kiselev::Dict::value_type& val) const
     {
       if (std::find(val.second.begin(), val.second.end(), word) != val.second.end())
       {
         translations.push_back(val.first);
       }
+      return 0;
     }
   };
 
   struct TranslationChecker
   {
     const std::string& str;
-    bool operator()(const kiselev::Dict::value_type& val)
+    bool operator()(int, const kiselev::Dict::value_type& val)
     {
       return std::find(val.second.begin(), val.second.end(), str) == val.second.end();
     }
@@ -78,6 +67,7 @@ namespace
       return std::find(vec.begin(), vec.end(), trans) == vec.end();
     }
   };
+
   struct DictMerger
   {
     kiselev::Dict operator()(kiselev::Dict res, const kiselev::Dict::value_type& val)
@@ -122,7 +112,7 @@ namespace
   {
     kiselev::Dict& dict;
     bool& allExist;
-    void operator()(const kiselev::Dict::value_type& val) const
+    int operator()(int, const kiselev::Dict::value_type& val) const
     {
       auto val2 = dict.find(val.first);
       if (val2 == dict.end())
@@ -140,6 +130,7 @@ namespace
           allExist = false;
         }
       }
+      return 0;
     }
   };
 
@@ -269,7 +260,7 @@ void kiselev::doListDict(std::ostream& out, const Dicts& dicts)
     out << "<EMPTY>\n";
     return;
   }
-  std::transform(dicts.begin(), dicts.end(), osIt(out, "\n"), extractDict);
+  std::transform(dicts.begin(), dicts.end(), std::ostream_iterator< std::string >(out, "\n"), extractDict);
 }
 
 void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -308,7 +299,7 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   }
   std::vector< std::string > translations;
   TranslationFinder finder{ word, translations };
-  std::accumulate(dict.begin(), dict.end(), 0, AccumulateAdapter< TranslationFinder >{ finder });
+  std::accumulate(dict.begin(), dict.end(), 0, finder);
   if (!translations.empty())
   {
     out << *translations.begin();
@@ -458,7 +449,7 @@ void kiselev::doLoadDict(std::istream& in, std::ostream& out, Dicts& dicts)
     {
       bool allExist = true;
       TranslationMerger checker{ it->second, allExist };
-      std::accumulate(dict.begin(), dict.end(), 0, AccumulateAdapter< TranslationMerger >{ checker });
+      std::accumulate(dict.begin(), dict.end(), 0, checker);
       if (allExist)
       {
         out << "<DICTIONARY ALREADY EXISTS>\n";
