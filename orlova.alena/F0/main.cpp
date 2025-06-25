@@ -66,7 +66,7 @@ int main(int argc, char** argv)
           std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
         }
         std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-        std::cerr << "<INVALID COMMAND>\n";
+        std::cout << "<INVALID COMMAND>\n";
       }
     }
   }
