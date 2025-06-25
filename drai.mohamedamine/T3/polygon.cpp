@@ -212,7 +212,7 @@ namespace amine
       Point pt;
       char c;
       if (!(iss >> c) || c != '(') {
-        return Point{}; 
+        return Point{};
       }
       if (!(iss >> pt.x)){
         return Point{};
