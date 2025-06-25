@@ -4,11 +4,11 @@
 #include <algorithm>
 #include "dataStruct.hpp"
 
-using i_iterator_t = std::istream_iterator< averenkov::DataStruct >;
-using o_iterator_t = std::ostream_iterator< averenkov::DataStruct >;
-
 int main()
 {
+  using i_iterator_t = std::istream_iterator< averenkov::DataStruct >;
+  using o_iterator_t = std::ostream_iterator< averenkov::DataStruct >;
+
   std::vector< averenkov::DataStruct > data;
   while (!std::cin.eof())
   {
