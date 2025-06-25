@@ -21,9 +21,7 @@ namespace
 
   brevnov::Point get_side(const brevnov::Point &p1, const brevnov::Point &p2)
   {
-    brevnov::Point newSide;
-    newSide.x = p1.x - p2.x;
-    newSide.y = p1.y - p2.y;
+    brevnov::Point newSide{p1.x - p2.x, p1.y - p2.y};
     return newSide;
   }
 
@@ -32,10 +30,21 @@ namespace
     return (side1.x * side2.x + side1.y * side2.y) == 0;
   }
 
-  bool is_true(bool a)
+  struct VertexAngleChecker
   {
-    return a != 0;
-  }
+    bool operator()(size_t vertex_index) const
+    {
+      const auto& points = polygon.points;
+      const size_t size = points.size();
+      const brevnov::Point& prev = points[(vertex_index + size - 1) % size];
+      const brevnov::Point& curr = points[vertex_index];
+      const brevnov::Point& next = points[(vertex_index + 1) % size];
+      const brevnov::Point a = get_side(prev, curr);
+      const brevnov::Point b = get_side(curr, next);
+      return is_right_angle(a, b);
+    }
+    const brevnov::Polygon& polygon;
+  };
 }
 
 std::istream& brevnov::operator>>(std::istream& in, Point& point)
@@ -80,18 +89,18 @@ double brevnov::get_area(const Polygon& polygon)
   const Point first = points.front();
   const Point last = points.back();
   double area = std::inner_product(
-    points.begin(), points.end() - 1, points.begin() + 1, Calc_area_term()(last, first), std::plus< double >(), Calc_area_term());
+    points.begin(), points.end() - 1, points.begin() + 1, Calc_area_term{}(last, first), std::plus< double >{}, Calc_area_term{});
   return std::abs(area) / 2.0;
 }
 
 bool brevnov::has_right_angle(const Polygon& polygon)
 {
-  std::vector<Point> sides(polygon.points.size());
-  auto polygon_begin = polygon.points.cbegin();
-  std::transform(polygon_begin + 1, polygon.points.cend(), polygon_begin, sides.begin(), get_side);
-  sides[polygon.points.size() - 1] = get_side(polygon.points[0], polygon.points[polygon.points.size() - 1]);
-  std::vector<bool> has_right_angle_vector(polygon.points.size());
-  std::transform(sides.cbegin() + 1, sides.cend(), sides.cbegin(), has_right_angle_vector.begin(), is_right_angle);
-  has_right_angle_vector[sides.size() - 1] = is_right_angle(sides[0], sides[sides.size() - 1]);
-  return std::any_of(has_right_angle_vector.cbegin(), has_right_angle_vector.cend(), is_true);
+  if (polygon.points.size() < 3)
+  {
+    return false;
+  }
+  std::vector<size_t> indices(polygon.points.size());
+  std::iota(indices.begin(), indices.end(), 0);
+  VertexAngleChecker checker{polygon};
+  return std::any_of(indices.begin(), indices.end(), checker);
 }

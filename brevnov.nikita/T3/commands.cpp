@@ -131,7 +131,7 @@ namespace
     out << count_if(polygons, VertexPred{ n }) << "\n";
   }
 
-  int ccw(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C)
+  int point_f(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C)
   {
     int cross = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
     if (cross > 0)
@@ -147,8 +147,7 @@ namespace
 
   bool on_segment(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& P)
   {
-    if (P.x >= std::min(A.x, B.x) && P.x <= std::max(A.x, B.x) &&
-      P.y >= std::min(A.y, B.y) && P.y <= std::max(A.y, B.y))
+    if (P.x >= std::min(A.x, B.x) && P.x <= std::max(A.x, B.x) && P.y >= std::min(A.y, B.y) && P.y <= std::max(A.y, B.y))
     {
       int cross = (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x);
       return cross == 0;
@@ -158,10 +157,10 @@ namespace
 
   bool segment_insert(const brevnov::Point& A, const brevnov::Point& B, const brevnov::Point& C, const brevnov::Point& D)
   {
-    int ccw1 = ccw(A, B, C);
-    int ccw2 = ccw(A, B, D);
-    int ccw3 = ccw(C, D, A);
-    int ccw4 = ccw(C, D, B);
+    int ccw1 = point_f(A, B, C);
+    int ccw2 = point_f(A, B, D);
+    int ccw3 = point_f(C, D, A);
+    int ccw4 = point_f(C, D, B);
     if (ccw1 * ccw2 < 0 && ccw3 * ccw4 < 0)
     {
       return true;
@@ -176,25 +175,13 @@ namespace
       {
         return false;
       }
-        return true;
-    }
-    if (ccw1 == 0 && on_segment(A, B, C))
-    {
       return true;
     }
-    if (ccw2 == 0 && on_segment(A, B, D))
-    {
-      return true;
-    }
-    if (ccw3 == 0 && on_segment(C, D, A))
-    {
-      return true;
-    }
-    if (ccw4 == 0 && on_segment(C, D, B))
-    {
-      return true;
-    }
-    return false;
+    bool con1 = ccw1 == 0 && on_segment(A, B, C);
+    bool con2 = ccw2 == 0 && on_segment(A, B, D);
+    bool con3 = ccw3 == 0 && on_segment(C, D, A);
+    bool con4 = ccw4 == 0 && on_segment(C, D, B);
+    return con1 || con2 || con3 || con4;
 }
 
   bool check_bounding_box(const brevnov::Polygon& poly1, const brevnov::Polygon& poly2)
@@ -203,18 +190,25 @@ namespace
     {
       return false;
     }
-    auto minmax_x1 = std::minmax_element(poly1.points.begin(), poly1.points.end(),
-      [](const brevnov::Point& a, const brevnov::Point& b) { return a.x < b.x; });
-    auto minmax_y1 = std::minmax_element(poly1.points.begin(), poly1.points.end(),
-      [](const brevnov::Point& a, const brevnov::Point& b) { return a.y < b.y; });
-    auto minmax_x2 = std::minmax_element(poly2.points.begin(), poly2.points.end(),
-      [](const brevnov::Point& a, const brevnov::Point& b) { return a.x < b.x; });
-    auto minmax_y2 = std::minmax_element(poly2.points.begin(), poly2.points.end(),
-      [](const brevnov::Point& a, const brevnov::Point& b) { return a.y < b.y; });
-    return !(minmax_x1.second->x < minmax_x2.first->x ||
-            minmax_x2.second->x < minmax_x1.first->x ||
-            minmax_y1.second->y < minmax_y2.first->y ||
-            minmax_y2.second->y < minmax_y1.first->y);
+    int min_x1 = poly1.points[0].x, max_x1 = poly1.points[0].x;
+    int min_y1 = poly1.points[0].y, max_y1 = poly1.points[0].y;
+    for (const auto& point : poly1.points)
+    {
+      min_x1 = std::min(min_x1, point.x);
+      max_x1 = std::max(max_x1, point.x);
+      min_y1 = std::min(min_y1, point.y);
+      max_y1 = std::max(max_y1, point.y);
+    }
+    int min_x2 = poly2.points[0].x, max_x2 = poly2.points[0].x;
+    int min_y2 = poly2.points[0].y, max_y2 = poly2.points[0].y;
+    for (const auto& point : poly2.points)
+    {
+      min_x2 = std::min(min_x2, point.x);
+      max_x2 = std::max(max_x2, point.x);
+      min_y2 = std::min(min_y2, point.y);
+      max_y2 = std::max(max_y2, point.y);
+    }
+    return !(max_x1 < min_x2 || max_x2 < min_x1 || max_y1 < min_y2 || max_y2 < min_y1);
   }
 
   bool point_in_poly(const brevnov::Point& point, const brevnov::Polygon& polygon)
@@ -229,10 +223,12 @@ namespace
     {
       const brevnov::Point& p1 = polygon.points[i];
       const brevnov::Point& p2 = polygon.points[j];
-      if (((p1.y > point.y) != (p2.y > point.y)) &&
-        (point.x < (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x))
+      if ((p1.y > point.y) != (p2.y > point.y))
       {
-        inside = !inside;
+        if (point.x < (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x)
+        {
+          inside = !inside;
+        }
       }
     }
     return inside;
@@ -254,24 +250,18 @@ namespace
       {
         const brevnov::Point& C = poly2.points[j];
         const brevnov::Point& D = poly2.points[(j + 1) % 2];
-        if(segment_insert(A, B, C, D))
+        if (segment_insert(A, B, C, D))
         {
           return true;
         }
       }
     }
-    if (!poly1.points.empty() && point_in_poly(poly1.points[0], poly2))
-    {
-      return true;
-    }
-    if (!poly2.points.empty() && point_in_poly(poly2.points[0], poly1))
-    {
-      return true;
-    }
-    return false;
+    bool con1 = !poly1.points.empty() && point_in_poly(poly1.points[0], poly2);
+    bool con2 = !poly2.points.empty() && point_in_poly(poly2.points[0], poly1);
+    return con1 || con2;
   }
 
-    struct Check_intersect
+  struct Check_intersect
   {
     bool operator()(const brevnov::Polygon & a)
     {
