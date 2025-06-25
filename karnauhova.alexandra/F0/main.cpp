@@ -15,7 +15,14 @@ int main()
   using namespace karnauhova;
   std::map< size_t, Character > characters;
   std::map< std::string, Character > players;
-  players = input_data(characters);
+  try
+  {
+    players = input_data(characters);
+  }
+  catch (const std::exception& e)
+  {
+    return 0;
+  }
   if (players.size() != 0)
   {
     auto it = players.begin();
