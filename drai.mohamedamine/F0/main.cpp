@@ -1,12 +1,11 @@
-#include "xref.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include "xref.hpp"
 
 namespace
 {
-  void readTokens(std::istringstream &iss, std::string *tokens, size_t index, size_t max, size_t &count)
+  void readTokens(std::istringstream& iss, std::string* tokens, size_t index, size_t max, size_t& count)
   {
     std::string word;
     if (!(iss >> word) || index >= max)
@@ -18,7 +17,7 @@ namespace
     readTokens(iss, tokens, index + 1, max, count);
   }
 
-  void processInput(amine::CrossRefSystem &xref)
+  void processInput(amine::CrossRefSystem& xref)
   {
     std::string line;
     if (!std::getline(std::cin, line))
@@ -38,7 +37,7 @@ namespace
       return;
     }
 
-    const std::string &command = tokens[0];
+    const std::string& command = tokens[0];
 
     if (command == "buildIndex" && count == 3)
       xref.buildIndex(tokens[1], tokens[2]);
@@ -55,8 +54,8 @@ namespace
     else if (command == "insertText" && count == 6)
       xref.insertText(tokens[1], tokens[2], tokens[3], std::stoul(tokens[4]), std::stoul(tokens[5]));
     else if (command == "extractText" && count == 7)
-      xref.extractText(tokens[1], tokens[2], std::stoul(tokens[3]), std::stoul(tokens[4]),
-                       std::stoul(tokens[5]), std::stoul(tokens[6]));
+      xref.extractText(tokens[1], tokens[2], std::stoul(tokens[3]), std::stoul(tokens[4]), std::stoul(tokens[5]),
+                       std::stoul(tokens[6]));
     else if (command == "replaceWord" && count == 4)
       xref.replaceWord(tokens[1], tokens[2], tokens[3]);
     else if (command == "repeatText" && count == 4)
