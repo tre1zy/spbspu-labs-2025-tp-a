@@ -24,7 +24,7 @@ namespace mozhegova
   void sideMergeTexts(std::istream & in, Texts & texts);
   void splitTexts(std::istream & in, Texts & texts);
   void invertLines(std::istream & in, Texts & texts);
-  // void invertWords(std::istream & in, Texts & texts);
+  void invertWords(std::istream & in, Texts & texts);
   void replaceWord(std::istream & in, Texts & texts);
   void save(std::istream & in, const Texts & texts);
   void loadFile(std::istream & in, Texts & texts);

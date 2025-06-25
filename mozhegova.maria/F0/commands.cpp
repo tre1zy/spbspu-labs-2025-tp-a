@@ -93,13 +93,26 @@ namespace
     return result.result;
   }
 
+  size_t getSizeWord(const std::pair< std::string, VectorWordPos > & word)
+  {
+    return word.second.size();
+  }
+
+  struct AccumulateTextSize
+  {
+    size_t operator()(size_t currentSize, const std::pair< std::string, VectorWordPos > & word) const
+    {
+      return currentSize + getSizeWord(word);
+    }
+  };
+
   struct PrintText
   {
     std::ostream & out;
     void operator()(const std::pair< std::string, mozhegova::Text > & text) const
     {
-      out << text.first << ' ' << text.second.size() << '\n';
-      out << reconstructText(text.second);
+      out << text.first << ' ' << std::accumulate(text.second.cbegin(), text.second.cend(), 0, AccumulateTextSize()) << '\n';
+      out << reconstructText(text.second) << '\n';
     }
   };
 
@@ -124,6 +137,29 @@ namespace
     std::vector< size_t > lineNum;
     std::transform(text.cbegin(), text.cend(), std::back_inserter(lineNum), getMaxLineNumWord);
     return *std::max_element(lineNum.cbegin(), lineNum.cend());
+  }
+
+  bool cmpMaxNumWord(const std::pair< size_t, size_t > & a, const std::pair< size_t, size_t > & b)
+  {
+    return a.second < b.second;
+  }
+
+  size_t getMaxNumWord(const std::pair< std::string, VectorWordPos > & word)
+  {
+    VectorWordPos xrefs = word.second;
+    if (xrefs.empty())
+    {
+      return 0;
+    }
+    auto maxNumIt = std::max_element(xrefs.cbegin(), xrefs.cend(), cmpMaxNumWord);
+    return maxNumIt->second;
+  }
+
+  size_t getMaxNum(const mozhegova::Text & text)
+  {
+    std::vector< size_t > num;
+    std::transform(text.cbegin(), text.cend(), std::back_inserter(num), getMaxNumWord);
+    return *std::max_element(num.cbegin(), num.cend());
   }
 
   bool cmpBetween(const mozhegova::WordPos & pos, size_t begin, size_t end)
@@ -225,6 +261,28 @@ namespace
   {
     return {maxLine - pos.first + 1, pos.second};
   }
+
+  mozhegova::WordPos changeNum(const mozhegova::WordPos & pos, size_t line, size_t maxNum)
+  {
+    if (pos.first == line)
+    {
+      return {pos.first, maxNum - pos.second + 1};
+    }
+    return pos;
+  }
+
+  mozhegova::WordPos uppNum(const mozhegova::WordPos & pos, size_t n)
+  {
+    return {pos.first, pos.second + n};
+  }
+
+  // void sideText(std::pair< std::string, VectorWordPos > & wordEntry, size_t n)
+  // {
+  //   auto b = wordEntry.second.begin();
+  //   auto e = wordEntry.second.end();
+  //   using namespace std::placeholders;
+  //   std::transform(b, e, b, std::bind(uppNum, _1, n));
+  // }
 }
 
 void mozhegova::generateLinks(std::istream & in, Texts & texts)
@@ -240,7 +298,7 @@ void mozhegova::generateLinks(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text temp{};
+  Text text{};
   size_t line = 0;
   while (!file.eof())
   {
@@ -250,11 +308,11 @@ void mozhegova::generateLinks(std::istream & in, Texts & texts)
     while (file.peek() != '\n' && file >> word)
     {
       ++num;
-      temp[word].push_back({line, num});
+      text[word].push_back({line, num});
     }
     file.ignore();
   }
-  texts[textName] = std::move(temp);
+  texts[textName] = std::move(text);
 }
 
 void mozhegova::removeLinks(std::istream & in, Texts & texts)
@@ -277,10 +335,10 @@ void mozhegova::printLinks(std::istream & in, std::ostream & out, const Texts & 
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  const Text & temp = it->second;
-  auto maxWordIt = std::max_element(temp.cbegin(), temp.cend(), cmpMaxWordLen);
+  const Text & text = it->second;
+  auto maxWordIt = std::max_element(text.cbegin(), text.cend(), cmpMaxWordLen);
   size_t maxWordLen = maxWordIt->first.length() + 2;
-  std::for_each(temp.cbegin(), temp.cend(), PrintWords{out, maxWordLen});
+  std::for_each(text.cbegin(), text.cend(), PrintWords{out, maxWordLen});
 }
 
 void mozhegova::printText(std::istream & in, std::ostream & out, const Texts & texts)
@@ -292,8 +350,8 @@ void mozhegova::printText(std::istream & in, std::ostream & out, const Texts & t
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  const Text & temp = it->second;
-  std::string reconstructed = reconstructText(temp);
+  const Text & text = it->second;
+  std::string reconstructed = reconstructText(text);
   out << reconstructed << '\n';
 }
 
@@ -320,11 +378,11 @@ void mozhegova::mergeTexts(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  const Text & temp1 = it1->second;
-  const Text & temp2 = it2->second;
-  Text temp = temp1;
+  const Text & text1 = it1->second;
+  const Text & text2 = it2->second;
+  Text temp = text1;
   size_t num = getMaxLineNum(temp) + 1;
-  insertTextTo(temp, temp2, num, 1, getMaxLineNum(temp2) + 1);
+  insertTextTo(temp, text2, num, 1, getMaxLineNum(text2) + 1);
   texts[newText] = std::move(temp);
 }
 
@@ -339,13 +397,13 @@ void mozhegova::insertText(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text & temp1 = it1->second;
-  const Text & temp2 = it2->second;
-  if ((num > 1 + getMaxLineNum(temp1)) || (begin < 1) || (end > getMaxLineNum(temp2) + 1))
+  Text & text1 = it1->second;
+  const Text & text2 = it2->second;
+  if ((num > 1 + getMaxLineNum(text1)) || (begin < 1) || (end > getMaxLineNum(text2) + 1))
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  insertTextTo(temp1, temp2, num, begin, end);
+  insertTextTo(text1, text2, num, begin, end);
 }
 
 void mozhegova::removeLines(std::istream & in, Texts & texts)
@@ -358,12 +416,12 @@ void mozhegova::removeLines(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text & temp = it->second;
-  if ((begin < 1) || (end > getMaxLineNum(temp) + 1))
+  Text & text = it->second;
+  if ((begin < 1) || (end > getMaxLineNum(text) + 1))
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  removeSubstring(temp, begin, end);
+  removeSubstring(text, begin, end);
 }
 
 void mozhegova::moveText(std::istream & in, Texts & texts)
@@ -377,14 +435,14 @@ void mozhegova::moveText(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text & temp1 = it1->second;
-  Text & temp2 = it2->second;
-  if ((num > 1 + getMaxLineNum(temp1)) || (begin < 1) || (end > getMaxLineNum(temp2) + 1))
+  Text & text1 = it1->second;
+  Text & text2 = it2->second;
+  if ((num > 1 + getMaxLineNum(text1)) || (begin < 1) || (end > getMaxLineNum(text2) + 1))
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  insertTextTo(temp1, temp2, num, begin, end);
-  removeSubstring(temp2, begin, end);
+  insertTextTo(text1, text2, num, begin, end);
+  removeSubstring(text2, begin, end);
 }
 
 void mozhegova::sideMergeTexts(std::istream & in, Texts & texts)
@@ -398,18 +456,24 @@ void mozhegova::sideMergeTexts(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  const Text & temp1 = it1->second;
-  const Text & temp2 = it2->second;
-  Text temp = temp1;
-  size_t maxLines = std::max(getMaxLineNum(temp1), getMaxLineNum(temp2));
+  const Text & text1 = it1->second;
+  const Text & text2 = it2->second;
+  Text temp1 = text1;
+  Text temp2 = text2;
+  size_t maxLines = std::max(getMaxLineNum(text1), getMaxLineNum(text2));
+  size_t maxNum = getMaxNum(text1);
   for (size_t line = 1; line <= maxLines; ++line)
   {
-    for (const auto & wordEntry : temp2)
+    for (auto & wordEntry : temp2)
     {
-      addWordToCombinedText(wordEntry, line, temp);
+      auto b = wordEntry.second.begin();
+      auto e = wordEntry.second.end();
+      using namespace std::placeholders;
+      std::transform(b, e, b, std::bind(uppNum, _1, maxNum));
+      addWordToCombinedText(wordEntry, line, temp1);
     }
   }
-  texts[newText] = std::move(temp);
+  texts[newText] = std::move(temp1);
 }
 
 void mozhegova::splitTexts(std::istream & in, Texts & texts)
@@ -422,16 +486,16 @@ void mozhegova::splitTexts(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text & temp = it->second;
-  size_t end = getMaxLineNum(temp);
+  Text & text = it->second;
+  size_t end = getMaxLineNum(text);
   if (num > end)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text newTemp = extractSubstring(temp, num, end + 1);
-  removeSubstring(temp, num, end + 1);
-  texts[newText1] = std::move(temp);
-  texts[newText2] = std::move(newTemp);
+  Text newText = extractSubstring(text, num, end + 1);
+  removeSubstring(text, num, end + 1);
+  texts[newText1] = std::move(text);
+  texts[newText2] = std::move(newText);
   texts.erase(textName);
 }
 
@@ -444,9 +508,9 @@ void mozhegova::invertLines(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text & temp = it->second;
-  size_t maxLine = getMaxLineNum(temp);
-  for (auto & wordEntry : temp)
+  Text & text = it->second;
+  size_t maxLine = getMaxLineNum(text);
+  for (auto & wordEntry : text)
   {
     auto b = wordEntry.second.begin();
     auto e = wordEntry.second.end();
@@ -455,18 +519,29 @@ void mozhegova::invertLines(std::istream & in, Texts & texts)
   }
 }
 
-// void mozhegova::invertWords(std::istream & in, Texts & texts)
-// {
-//   std::string textName;
-//   in >> textName;
-//   auto it = texts.find(textName);
-//   if (it == texts.end())
-//   {
-//     throw std::runtime_error("<INVALID COMMAND>");
-//   }
-//   Text & temp = it->second;
-//   //??
-// }
+void mozhegova::invertWords(std::istream & in, Texts & texts)
+{
+  std::string textName;
+  in >> textName;
+  auto it = texts.find(textName);
+  if (it == texts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  Text & text = it->second;
+  size_t maxLines = getMaxLineNum(text);
+  size_t maxNum = getMaxNum(text);
+  for (size_t line = 1; line <= maxLines; ++line)
+  {
+    for (auto & wordEntry : text)
+    {
+      auto b = wordEntry.second.begin();
+      auto e = wordEntry.second.end();
+      using namespace std::placeholders;
+      std::transform(b, e, b, std::bind(changeNum, _1, line, maxNum));
+    }
+  }
+}
 
 void mozhegova::replaceWord(std::istream & in, Texts & texts)
 {
@@ -477,14 +552,14 @@ void mozhegova::replaceWord(std::istream & in, Texts & texts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  Text & temp = it->second;
-  auto wordIt = temp.find(oldWord);
-  if (wordIt == temp.end())
+  Text & text = it->second;
+  auto wordIt = text.find(oldWord);
+  if (wordIt == text.end())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  temp[newWord] = std::move(wordIt->second);
-  temp.erase(wordIt);
+  text[newWord] = std::move(wordIt->second);
+  text.erase(wordIt);
 }
 
 void mozhegova::save(std::istream & in, const Texts & texts)

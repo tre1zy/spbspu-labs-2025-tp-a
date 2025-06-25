@@ -31,9 +31,10 @@ int main(int argc, char * argv[])
   cmds["sidemerge"] = std::bind(sideMergeTexts, std::ref(std::cin), std::ref(texts));
   cmds["split"] = std::bind(splitTexts, std::ref(std::cin), std::ref(texts));
   cmds["invertlines"] = std::bind(invertLines, std::ref(std::cin), std::ref(texts));
-  // cmds["invertwords"] = std::bind(invertWords, std::ref(std::cin), std::ref(texts));
+  cmds["invertwords"] = std::bind(invertWords, std::ref(std::cin), std::ref(texts));
   cmds["replaceword"] = std::bind(replaceWord, std::ref(std::cin), std::ref(texts));
   cmds["save"] = std::bind(save, std::ref(std::cin), std::cref(texts));
+  cmds["loadfile"] = std::bind(loadFile, std::ref(std::cin), std::ref(texts));
 
   std::string command;
   while (!(std::cin >> command).eof())
