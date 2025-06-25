@@ -450,7 +450,10 @@ void demehin::makeComplement(std::istream& in, dict_t& dicts)
 void demehin::printMostCommons(std::istream& in, std::ostream& out, const dict_t& dicts)
 {
   int n, k;
-  in >> n >> k;
+  if (!(in >> n >> k))
+  {
+    throw std::logic_error("input error");
+  }
 
   if (n <= 0 || k <= 0)
   {
