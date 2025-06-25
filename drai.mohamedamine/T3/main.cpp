@@ -1,8 +1,8 @@
-#include "commands.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
+#include "commands.hpp"
 #include "polygon.hpp"
 
 namespace amine

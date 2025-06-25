@@ -85,19 +85,24 @@ bool amine::seg_intersect(const Point& p1, const Point& q1, const Point& p2, con
   long long o3 = orient(p2, q2, p1);
   long long o4 = orient(p2, q2, q1);
 
-  if (o1 * o2 < 0 && o3 * o4 < 0){
+  if (o1 * o2 < 0 && o3 * o4 < 0)
+  {
     return true;
   }
-  if (o1 == 0 && on_segment(p1, p2, q1)){
+  if (o1 == 0 && on_segment(p1, p2, q1))
+  {
     return true;
   }
-  if (o2 == 0 && on_segment(p1, q2, q1)){
+  if (o2 == 0 && on_segment(p1, q2, q1))
+  {
     return true;
   }
-  if (o3 == 0 && on_segment(p2, p1, q2)){
+  if (o3 == 0 && on_segment(p2, p1, q2))
+  {
     return true;
   }
-  if (o4 == 0 && on_segment(p2, q1, q2)){
+  if (o4 == 0 && on_segment(p2, q1, q2))
+  {
     return true;
   }
 
@@ -127,8 +132,8 @@ bool amine::point_in_polygon(const Point& pt, const Polygon& poly)
       const Point& prev = acc.first;
       bool cond = (current.y > pt.y) != (prev.y > pt.y);
       bool intersect =
-        cond && (pt.x < static_cast< long double >(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) +
-                          current.x);
+        cond &&
+        (pt.x < static_cast< long double >(prev.x - current.x) * (pt.y - current.y) / (prev.y - current.y) + current.x);
       if (intersect)
         inside = !inside;
       return std::make_pair(current, inside);
@@ -211,19 +216,24 @@ struct PointParser
   {
     Point pt;
     char c;
-    if (!(iss >> c) || c != '(') {
+    if (!(iss >> c) || c != '(')
+    {
       return Point{};
     }
-    if (!(iss >> pt.x)){
+    if (!(iss >> pt.x))
+    {
       return Point{};
     }
-    if (!(iss >> c) || c != ';'){
+    if (!(iss >> c) || c != ';')
+    {
       return Point{};
     }
-    if (!(iss >> pt.y)){
+    if (!(iss >> pt.y))
+    {
       return Point{};
     }
-    if (!(iss >> c) || c != ')'){
+    if (!(iss >> c) || c != ')')
+    {
       return Point{};
     }
     return pt;
