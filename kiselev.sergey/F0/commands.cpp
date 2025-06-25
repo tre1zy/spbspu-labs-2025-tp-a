@@ -37,15 +37,14 @@ namespace
 
   struct DictPrinter
   {
-    std::ostream& out;
-    void operator()(const kiselev::Dict::value_type& val) const
+    std::ostream& operator()(std::ostream& os, const kiselev::Dict::value_type& val) const
     {
-      out << val.first;
+      os << val.first;
       if (!val.second.empty())
       {
-        std::accumulate(val.second.begin(), val.second.end(), std::ref(out), WordPrinter{});
+        std::accumulate(val.second.begin(), val.second.end(), std::ref(os), WordPrinter{});
       }
-      out << "\n";
+      return os << "\n";
     }
   };
 
@@ -112,7 +111,7 @@ namespace
     {
       if (val.first.rfind(letters, 0) == 0)
       {
-        DictPrinter{ out }(val);
+        DictPrinter{}(out, val);
         return true;
       }
       return found;
@@ -284,7 +283,7 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << nameDict << '\n';
-  std::accumulate(dictIt->second.begin(), dictIt->second.end(), 0, AccumulateAdapter< DictPrinter >{ DictPrinter{ out } });
+  std::accumulate(dictIt->second.begin(), dictIt->second.end(), std::ref(out), DictPrinter{});
 }
 
 void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -302,8 +301,8 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   auto engIt = dict.find(word);
   if (engIt != dict.cend())
   {
-    out << *engIt->second.begin() << " ";
-    std::copy(std::next(engIt->second.begin()), engIt->second.end(), std::ostream_iterator< std::string >(out, " "));
+    out << *engIt->second.begin();
+    std::accumulate(std::next(engIt->second.begin()), engIt->second.end(), std::ref(out), WordPrinter{});
     out << "\n";
     return;
   }
@@ -312,8 +311,8 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   std::accumulate(dict.begin(), dict.end(), 0, AccumulateAdapter< TranslationFinder >{ finder });
   if (!translations.empty())
   {
-    out << *translations.begin() << " ";
-    std::copy(std::next(translations.begin()), translations.end(), std::ostream_iterator< std::string >(out, " "));
+    out << *translations.begin();
+    std::accumulate(std::next(engIt->second.begin()), engIt->second.end(), std::ref(out), WordPrinter{});
     out << "\n";
     return;
   }
@@ -379,8 +378,8 @@ void kiselev::doSaveDict(std::istream& in, std::ostream& out, const Dicts& dicts
   }
   file << dictName << "\n";
   Dict dict = dictIt->second;
-  out << dictName << '\n';
-  std::accumulate(dictIt->second.begin(), dictIt->second.end(), 0, AccumulateAdapter< DictPrinter >{ DictPrinter{ file } });
+  std::ostream& fileRef = file;
+  std::accumulate(dictIt->second.begin(), dictIt->second.end(), std::ref(fileRef), DictPrinter{});
   file << "\n";
 }
 
