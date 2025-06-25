@@ -82,15 +82,7 @@ void averenkov::KnapsackPrinter::operator()(const std::pair<const std::string, K
   out << ", Capacity: " << knapsack_pair.second.getCapacity() << "\n";
 }
 
-void averenkov::CombinationBuilder::operator()(int pos) const
-{
-  if (MaskChecker(pos)(pos))
-  {
-    current.push_back(items[pos]);
-  }
-}
-
-
+// 1. add <name> <weight> <value>
 void averenkov::addItem(Base& base, const std::vector<std::string>& args)
 {
   if (args.size() != 4)
@@ -119,6 +111,7 @@ void averenkov::removeItem(Base& base, const std::vector<std::string>& args)
   {
     throw std::invalid_argument("Item not found");
   }
+  std::for_each(base.kits.begin(), base.kits.end(), KitItemRemover{ args[1] });
 
   base.items.erase(it);
 }
@@ -289,68 +282,6 @@ void averenkov::reset(Base& base, const std::vector<std::string>& args)
   base.knapsacks.clear();
 }
 
-/*void averenkov::bruteforce(averenkov::Base& base, const std::vector<std::string>& args)
-{
-  if (args.size() != 3)
-  {
-    throw std::invalid_argument("Usage: bruteforce <source_kit> <result_kit>");
-  }
-
-  const std::string& source_kit = args[1];
-  const std::string& result_kit = args[2];
-  if (base.kits.find(result_kit) != base.kits.end())
-  {
-    throw std::invalid_argument("Result kit exist");
-  }
-  const auto kit_it = base.kits.find(source_kit);
-  if (kit_it == base.kits.end())
-  {
-    throw std::invalid_argument("Source kit not found");
-  }
-
-  std::vector<const Item*> items;
-  const auto& source_items = kit_it->second.getItems();
-  items.resize(source_items.size());
-  std::transform(source_items.begin(), source_items.end(), items.begin(), ItemCopier{});
-
-  int max_value = 0;
-  std::vector<const Item*> best_combination;
-  int capacity = base.current_knapsack.getCapacity();
-
-  generateCombinations(items, 0, max_value, best_combination, capacity);
-
-  Kit result(result_kit);
-  std::for_each(best_combination.begin(), best_combination.end(), ItemAdder{ result });
-  base.kits.emplace(result_kit, std::move(result));
-}
-
-void averenkov::generateCombinations(const std::vector<const averenkov::Item*>& items, int mask, int& max_value, std::vector<const averenkov::Item*>& best_combination, const int capacity)
-{
-  if (mask >= (1 << items.size()))
-  {
-    return;
-  }
-
-  std::vector< const averenkov::Item* > current;
-  std::vector< int > indices(items.size());
-  std::iota(indices.begin(), indices.end(), 0);
-  std::for_each(indices.begin(), indices.end(), CombinationBuilder{ current, items });
-
-  const int current_weight = std::accumulate(current.begin(), current.end(), 0, WeightCalculator{});
-  const int current_value = std::accumulate(current.begin(), current.end(), 0, ValueCalculator{});
-
-  if (current_weight <= capacity && current_value > max_value)
-  {
-    max_value = current_value;
-    best_combination = current;
-  }
-
-  generateCombinations(items, mask + 1, max_value, best_combination, capacity);
-}*/
-
-// 14. dynamic_prog
-
-// 15. backtracking
 
 // 16. branch_and_bound
 

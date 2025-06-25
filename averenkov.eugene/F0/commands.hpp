@@ -94,16 +94,6 @@ namespace averenkov
     void operator()(const std::pair<const std::string, Knapsack>& knapsack_pair) const;
   };
 
-  struct CombinationBuilder
-  {
-    std::vector< const Item* >& current;
-    const std::vector< const Item* >& items;
-    void operator()(int pos) const;
-  };
-
-  void generateCombinations(const std::vector< const Item* >& items, int mask, int& max_value, std::vector< const Item* >& best_combination, const int capacity);
-
-
   void addItem(Base& base, const std::vector< std::string >& args);
   void removeItem(Base& base, const std::vector< std::string >& args);
   void editItem(Base& base, const std::vector< std::string >& args);
@@ -113,13 +103,8 @@ namespace averenkov
   void removeFromKit(Base& base, const std::vector< std::string >& args);
   void addKnapsack(Base& base, const std::vector< std::string >& args);
   void setKnapsack(Base& base, const std::vector< std::string >& args);
-  void solve(Base& base, const std::vector< std::string >& args);
   void showStats(const Base& base, const std::vector< std::string >& args);
   void reset(Base& base, const std::vector< std::string >& args);
-  void bruteforce(Base& base, const std::vector< std::string >& args);
-  void dynamicProgrammingSolve(Base& base, const std::vector< std::string >& args);
-  void backtrackingSolve(Base& base, const std::vector< std::string >& args);
-  void branchAndBoundSolve(Base& base, const std::vector< std::string >& args);
   void saveToFile(const Base& base, const std::vector< std::string >& args);
   void loadFromFile(Base& base, const std::vector< std::string >& args);
 }
