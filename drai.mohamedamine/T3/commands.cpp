@@ -12,6 +12,55 @@
 
 namespace amine
 {
+  struct IsEvenVertexCount {
+    bool operator()(const Polygon& p) const {
+        return p.points.size() % 2 == 0;
+    }
+};
+
+struct IsOddVertexCount {
+    bool operator()(const Polygon& p) const {
+        return p.points.size() % 2 != 0;
+    }
+};
+
+struct HasVertexCount {
+    size_t target;
+    explicit HasVertexCount(size_t t) : target(t) {}
+    bool operator()(const Polygon& p) const {
+        return p.points.size() == target;
+    }
+};
+
+struct AreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        sum += compute_area(p);
+    }
+};
+
+struct EvenAreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        if (p.points.size() % 2 == 0) sum += compute_area(p);
+    }
+};
+
+struct OddAreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        if (p.points.size() % 2 != 0) sum += compute_area(p);
+    }
+};
+
+struct VertexAreaAdder {
+    size_t target;
+    double sum = 0.0;
+    explicit VertexAreaAdder(size_t t) : target(t) {}
+    void operator()(const Polygon& p) {
+        if (p.points.size() == target) sum += compute_area(p);
+    }
+};
   CommandProcessor::CommandProcessor(const std::vector<Polygon>& polygons)
   : polygons_(polygons)
 {}
@@ -172,21 +221,11 @@ double areaNum(const std::vector<Polygon>& polys, int num)
 void CommandProcessor::command_count(const std::string& rest) const
 {
     if (rest == "EVEN") {
-        size_t count = 0;
-        for (const auto& poly : polygons_) {
-            if (poly.points.size() % 2 == 0) ++count;
-        }
-        std::cout << count << "\n";
-        return;
-    }
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
+    } 
     else if (rest == "ODD") {
-        size_t count = 0;
-        for (const auto& poly : polygons_) {
-            if (poly.points.size() % 2 != 0) ++count;
-        }
-        std::cout << count << "\n";
-        return;
-    }
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
+    } 
     else {
         try {
             size_t target = std::stoul(rest);
@@ -194,11 +233,7 @@ void CommandProcessor::command_count(const std::string& rest) const
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            size_t count = 0;
-            for (const auto& poly : polygons_) {
-                if (poly.points.size() == target) ++count;
-            }
-            std::cout << count << "\n";
+            std::cout << std::count_if(polygons_.begin(), polygons_.end(), HasVertexCount(target)) << "\n";
         }
         catch (...) {
             std::cout << "<INVALID COMMAND>\n";
@@ -208,33 +243,23 @@ void CommandProcessor::command_count(const std::string& rest) const
 
 void CommandProcessor::command_area(const std::string& rest) const {
     if (rest == "EVEN") {
-        double sum = 0.0;
-        for (const auto& poly : polygons_) {
-            if (poly.points.size() % 2 == 0) {
-                sum += compute_area(poly);
-            }
-        }
-        std::cout << std::fixed << std::setprecision(1) << sum << "\n";
+        EvenAreaAdder adder;
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
     }
     else if (rest == "ODD") {
-        double sum = 0.0;
-        for (const auto& poly : polygons_) {
-            if (poly.points.size() % 2 != 0) {
-                sum += compute_area(poly);
-            }
-        }
-        std::cout << std::fixed << std::setprecision(1) << sum << "\n";
+        OddAreaAdder adder;
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
     }
     else if (rest == "MEAN") {
         if (polygons_.empty()) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        double sum = 0.0;
-        for (const auto& poly : polygons_) {
-            sum += compute_area(poly);
-        }
-        std::cout << std::fixed << std::setprecision(1) << (sum / polygons_.size()) << "\n";
+        AreaAdder adder;
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << (adder.sum / polygons_.size()) << "\n";
     }
     else {
         try {
@@ -243,13 +268,9 @@ void CommandProcessor::command_area(const std::string& rest) const {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            double sum = 0.0;
-            for (const auto& poly : polygons_) {
-                if (poly.points.size() == target) {
-                    sum += compute_area(poly);
-                }
-            }
-            std::cout << std::fixed << std::setprecision(1) << sum << "\n";
+            VertexAreaAdder adder(target);
+            adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+            std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
         }
         catch (...) {
             std::cout << "<INVALID COMMAND>\n";
