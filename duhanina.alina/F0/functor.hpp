@@ -18,11 +18,16 @@ namespace duhanina
   public:
     friend std::istream& operator>>(std::istream& is, Line& line)
     {
-      return std::getline(is, line.content_);
+      if (!(is >> line.symbol_ >> line.content_))
+      {
+        is.setstate(std::ios::failbit);
+      }
+      return is;
     }
     friend struct LineProcessor;
     friend struct StreamProcessor;
   private:
+    char symbol_;
     std::string content_;
   };
 

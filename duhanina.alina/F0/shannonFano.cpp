@@ -29,6 +29,27 @@ namespace
     }
   }
 
+  template < size_t N = sizeof(size_t) >
+  struct SizeTWriter
+  {
+    static void write(std::ofstream& out, size_t value)
+    {
+      out.put(static_cast< char >((value >> (8 * (sizeof(size_t) - N))) & 0xFF));
+      SizeTWriter< N - 1 >::write(out, value);
+    }
+  };
+
+  template <>
+  struct SizeTWriter< 0 >
+  {
+    static void write(std::ofstream&, size_t){}
+  };
+
+  void write_size_t(std::ofstream& out, size_t value)
+  {
+    SizeTWriter<>::write(out, value);
+  }
+
   bool compare_nodes(const std::pair< char, size_t >& a, const std::pair< char, size_t >& b)
   {
     return a.second > b.second;
@@ -133,11 +154,7 @@ namespace
     {
       throw std::runtime_error("INVALID_FILE");
     }
-    const size_t bit_count = bits.size();
-    SizeTByteWriter size_writer(out, bit_count);
-    std::vector< size_t > byte_indices(sizeof(size_t));
-    std::iota(byte_indices.begin(), byte_indices.end(), 0);
-    std::for_each(byte_indices.begin(), byte_indices.end(), size_writer);
+    write_size_t(out, bits.size());
     BitWriter bit_writer(out);
     std::for_each(bits.begin(), bits.end(), bit_writer);
     bit_writer.flush();
@@ -180,7 +197,7 @@ namespace
 
   duhanina::CodeTable load_code_table(str_t filename)
   {
-    std::ifstream in(filename);
+    std::ifstream in(filename, std::ios::binary);
     if (!in)
     {
       throw std::runtime_error("FILE_NOT_FOUND");
@@ -197,7 +214,7 @@ namespace
 
   void encode_file_impl(str_t input_file, str_t output_file, const duhanina::CodeTable& table, std::ostream& out)
   {
-    std::ifstream in(input_file, , std::ios::binary);
+    std::ifstream in(input_file, std::ios::binary);
     if (!in)
     {
       throw std::runtime_error("FILE_NOT_FOUND");
