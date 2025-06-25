@@ -2,18 +2,32 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <vector>
 #include "polygon.hpp"
 
 namespace amine
 {
-  struct PolygonFilter
+
+  struct LineToPolygonConverter
+  {
+    Polygon operator()(const Line& line) const
+    {
+      Polygon poly;
+      if (!line.content.empty() && parse_polygon(line.content, poly) && poly.points.size() >= 3)
+      {
+        return poly;
+      }
+      return Polygon{};
+    }
+  };
+
+  struct EmptyPolygonChecker
   {
     bool operator()(const Polygon& p) const
     {
-      return p.points.size() >= 3;
+      return p.points.empty();
     }
   };
+
 }
 
 int main(int argc, char* argv[])
@@ -32,13 +46,14 @@ int main(int argc, char* argv[])
   }
 
   std::vector< amine::Polygon > polygons;
+  std::vector< amine::Line > lines;
 
-  std::copy_if(
-    std::istream_iterator< amine::Polygon >(infile),
-    std::istream_iterator< amine::Polygon >(),
-    std::back_inserter(polygons),
-    amine::PolygonFilter{}
-  );
+  std::copy(std::istream_iterator< amine::Line >(infile), std::istream_iterator< amine::Line >(),
+            std::back_inserter(lines));
+
+  std::transform(lines.begin(), lines.end(), std::back_inserter(polygons), amine::LineToPolygonConverter{});
+
+  polygons.erase(std::remove_if(polygons.begin(), polygons.end(), amine::EmptyPolygonChecker{}), polygons.end());
 
   amine::process_commands(polygons);
   return 0;
