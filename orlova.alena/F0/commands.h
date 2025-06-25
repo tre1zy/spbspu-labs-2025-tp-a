@@ -16,14 +16,18 @@ namespace orlova
   void addTranslation(std::istream&, std::ostream&, Dictionaries&);
   void addDictionary(std::istream&, std::ostream&, Dictionaries&);
   void find(std::istream&, std::ostream&, const Dictionaries&);
+  template < typename Pair >
   void merge(std::istream&, std::ostream&, Dictionaries&);
   void clear(std::istream&, std::ostream&, Dictionaries&);
-  void removeword(std::istream&, std::ostream&, Dictionaries&);
+  void removeWord(std::istream&, std::ostream&, Dictionaries&);
   void append(std::istream&, std::ostream&, Dictionaries&);
   void dictionarySize(std::istream&, std::ostream&, const Dictionaries&);
+  template < typename Pair >
   void intersectionOfDicts(std::istream&, std::ostream&, Dictionaries&);
   void delete_(std::istream&, std::ostream&, Dictionaries&);
+  template < typename Pair >
   void nonrepeatingWords(std::istream&, std::ostream&, Dictionaries&);
+  template < typename Pair >
   void residual(std::istream&, std::ostream&, Dictionaries&);
 }
 
