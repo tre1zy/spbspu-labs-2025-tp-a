@@ -42,13 +42,12 @@ namespace
   {
     const std::string& word;
     std::vector< std::string >& translations;
-    int operator()(const kiselev::Dict::value_type& val) const
+    void operator()(const kiselev::Dict::value_type& val) const
     {
       if (std::find(val.second.begin(), val.second.end(), word) != val.second.end())
       {
         translations.push_back(val.first);
       }
-      return 0;
     }
   };
 
@@ -384,7 +383,8 @@ void kiselev::doSearchLetter(std::istream& in, std::ostream& out, const Dicts& d
     return;
   }
   Dict dict = dictIt->second;
-  bool found = std::accumulate(dict.begin(), dict.end(), false, LetterSearcher{ letters, out });
+  LetterSearcher searcher{ letters, out };
+  bool found = std::accumulate(dict.begin(), dict.end(), false, searcher);
   if (!found)
   {
     out << "<WORD NOT FOUND>\n";
@@ -479,6 +479,10 @@ void kiselev::doIntersectDict(std::istream& in, std::ostream& out, Dicts& dicts)
     return;
   }
   Dict res = intersectTwoDict(first->second, second->second);
+  if (res.empty())
+  {
+    out << "NO INTERSECTIONS\n";
+  }
   std::string nextDict;
   if (in.get() != '\n')
   {
