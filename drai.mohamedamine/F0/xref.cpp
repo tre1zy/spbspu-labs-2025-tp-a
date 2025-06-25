@@ -210,68 +210,62 @@ void printIndexRecursive(amine::Index::const_iterator it,
     copyIndexWithOffset(result, second, offset);
     indexes_[newIndex] = result;
   }
-  void CrossRefSystem::insertText(const std::string& newIndex,
-                                 const std::string& baseIndex,
-                                 const std::string& insertIndex,
-                                 size_t afterLine,
-                                 size_t afterColumn)
-  {
+void CrossRefSystem::insertText(const std::string& newIndex,
+                               const std::string& baseIndex,
+                               const std::string& insertIndex,
+                               size_t afterLine,
+                               size_t afterColumn)
+{
     auto baseIt = indexes_.find(baseIndex);
     auto insertIt = indexes_.find(insertIndex);
 
     if (baseIt == indexes_.end() || insertIt == indexes_.end())
     {
-      std::cout << "<WRONG INDEX>\n";
-      return;
+        std::cout << "<WRONG INDEX>\n";
+        return;
     }
     const Index& base = baseIt->second;
     const Index& toInsert = insertIt->second;
     Index result;
 
-    bool validPosition = false;
-    std::function<void(Index::const_iterator)> validatePos;
-    validatePos = [&](Index::const_iterator it)
-    {
-      if (it == base.end()) return;
-      auto posIt = it->second.begin();
-      std::function<void(std::set<Position>::const_iterator)> findMatch;
-      findMatch = [&](std::set<Position>::const_iterator pit)
-      {
-        if (pit == it->second.end()) return;
-        if (pit->line == afterLine && pit->column == afterColumn)
-        {
-          validPosition = true;
-          return;
-        }
-        findMatch(std::next(pit));
-      };
-      findMatch(posIt);
-      if (!validPosition)
-        validatePos(std::next(it));
+    std::function<bool(Index::const_iterator)> validatePosRecursive;
+    validatePosRecursive = [&](Index::const_iterator it) -> bool {
+        if (it == base.end()) return false;
+        std::function<bool(std::set<Position>::const_iterator)> checkPositions;
+        checkPositions = [&](std::set<Position>::const_iterator posIt) -> bool {
+            if (posIt == it->second.end()) return false;
+            if (posIt->line == afterLine && posIt->column == afterColumn) return true;
+            return checkPositions(std::next(posIt));
+        };
+        return checkPositions(it->second.begin()) || validatePosRecursive(std::next(it));
     };
-    validatePos(base.begin());
 
-    if (!validPosition)
+    if (!validatePosRecursive(base.begin()))
     {
-      std::cout << "<INVALID POSITION>\n";
-      return;
+        std::cout << "<INVALID POSITION>\n";
+        return;
     }
+
     Index before, after;
-    std::function<void(Index::const_iterator)> split;
-    split = [&](Index::const_iterator it)
-    {
-      if (it == base.end()) return;
-      const std::string& word = it->first;
-      for (const auto& pos : it->second)
-      {
-        if (pos.line < afterLine || (pos.line == afterLine && pos.column <= afterColumn))
-          before[word].insert(pos);
-        else
-          after[word].insert(pos);
-      }
-      split(std::next(it));
+    std::function<void(Index::const_iterator)> splitRecursive;
+    splitRecursive = [&](Index::const_iterator it) {
+        if (it == base.end()) return;
+        const std::string& word = it->first;
+        std::function<void(std::set<Position>::const_iterator)> processPositions;
+        processPositions = [&](std::set<Position>::const_iterator posIt) {
+            if (posIt == it->second.end()) return;
+            if (posIt->line < afterLine || (posIt->line == afterLine && posIt->column <= afterColumn))
+                before[word].insert(*posIt);
+            else
+                after[word].insert(*posIt);
+            processPositions(std::next(posIt));
+        };
+
+        processPositions(it->second.begin());
+        splitRecursive(std::next(it));
     };
-    split(base.begin());
+
+    splitRecursive(base.begin());
 
     copyIndexWithOffset(result, before, 0);
 
@@ -282,7 +276,7 @@ void printIndexRecursive(amine::Index::const_iterator it,
     copyIndexWithOffset(result, after, finalOffset - insertOffset);
 
     indexes_[newIndex] = result;
-  }
+}
 
   void CrossRefSystem::extractText(const std::string& newIndex,
                                   const std::string& baseIndex,
