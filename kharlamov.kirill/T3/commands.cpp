@@ -10,7 +10,7 @@
 #include <numeric>
 #include <limits>
 #include "polygon.h"
-#include "scopeguard.h"
+#include <guard.h>
 
 namespace
 {

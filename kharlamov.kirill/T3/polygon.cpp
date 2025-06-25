@@ -1,7 +1,7 @@
 #include "polygon.h"
 #include <algorithm>
 #include <iterator>
-#include "scopeguard.h"
+#include <guard.h>
 #include "delimetr.h"
 
 std::istream& kharlamov::operator>>(std::istream& in, Polygon& polygon)
