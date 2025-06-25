@@ -12,76 +12,6 @@
 
 namespace amine
 {
-  struct IsEvenVertexCount {
-    bool operator()(const Polygon& p) const {
-        return p.points.size() % 2 == 0;
-    }
-};
-struct IsOddVertexCount {
-    bool operator()(const Polygon& p) const {
-        return p.points.size() % 2 != 0;
-    }
-};
-struct HasVertexCount {
-    size_t target;
-    explicit HasVertexCount(size_t t) : target(t) {}
-    bool operator()(const Polygon& p) const {
-        return p.points.size() == target;
-    }
-};
-struct AreaAdder {
-    double sum = 0.0;
-    void operator()(const Polygon& p) {
-        sum += compute_area(p);
-    }
-};
-struct EvenAreaAdder {
-    double sum = 0.0;
-    void operator()(const Polygon& p) {
-        if (p.points.size() % 2 == 0) sum += compute_area(p);
-    }
-};
-
-struct OddAreaAdder {
-    double sum = 0.0;
-    void operator()(const Polygon& p) {
-        if (p.points.size() % 2 != 0) sum += compute_area(p);
-    }
-};
-
-struct VertexAreaAdder {
-    size_t target;
-    double sum = 0.0;
-    explicit VertexAreaAdder(size_t t) : target(t) {}
-    void operator()(const Polygon& p) {
-        if (p.points.size() == target) sum += compute_area(p);
-    }
-};
-struct EqualToQuery
-{
-    const Polygon& query;
-    explicit EqualToQuery(const Polygon& q):
-        query(q)
-    {}
-
-    bool operator()(const Polygon& p) const
-    {
-        if (p.points.size() != query.points.size())
-        {
-            return false;
-        }
-
-        struct PointEqual
-        {
-            bool operator()(const Point& a, const Point& b) const
-            {
-                return a.x == b.x && a.y == b.y;
-            }
-        };
-
-        return std::equal(p.points.begin(), p.points.end(), query.points.begin(), PointEqual());
-    }
-};
   CommandProcessor::CommandProcessor(const std::vector<Polygon>& polygons)
   : polygons_(polygons)
 {}
@@ -238,25 +168,24 @@ double areaNum(const std::vector<Polygon>& polys, int num)
     std::cout << "<INVALID COMMAND>\n";
   }
 }
-void CommandProcessor::command_area(const std::string& rest) const {
+
+void CommandProcessor::command_count(const std::string& rest) const
+{
     if (rest == "EVEN") {
-        EvenAreaAdder adder;
-        std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
-        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+        size_t count = 0;
+        for (const auto& poly : polygons_) {
+            if (poly.points.size() % 2 == 0) ++count;
+        }
+        std::cout << count << "\n";
+        return;
     }
     else if (rest == "ODD") {
-        OddAreaAdder adder;
-        std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
-        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
-    }
-    else if (rest == "MEAN") {
-        if (polygons_.empty()) {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+        size_t count = 0;
+        for (const auto& poly : polygons_) {
+            if (poly.points.size() % 2 != 0) ++count;
         }
-        AreaAdder adder;
-        std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
-        std::cout << std::fixed << std::setprecision(1) << (adder.sum / polygons_.size()) << "\n";
+        std::cout << count << "\n";
+        return;
     }
     else {
         try {
@@ -265,9 +194,11 @@ void CommandProcessor::command_area(const std::string& rest) const {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            VertexAreaAdder adder(target);
-            std::for_each(polygons_.begin(), polygons_.end(), std::ref(adder));
-            std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+            size_t count = 0;
+            for (const auto& poly : polygons_) {
+                if (poly.points.size() == target) ++count;
+            }
+            std::cout << count << "\n";
         }
         catch (...) {
             std::cout << "<INVALID COMMAND>\n";
@@ -275,13 +206,35 @@ void CommandProcessor::command_area(const std::string& rest) const {
     }
 }
 
-void CommandProcessor::command_count(const std::string& rest) const
-{
+void CommandProcessor::command_area(const std::string& rest) const {
     if (rest == "EVEN") {
-        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
+        double sum = 0.0;
+        for (const auto& poly : polygons_) {
+            if (poly.points.size() % 2 == 0) {
+                sum += compute_area(poly);
+            }
+        }
+        std::cout << std::fixed << std::setprecision(1) << sum << "\n";
     }
     else if (rest == "ODD") {
-        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
+        double sum = 0.0;
+        for (const auto& poly : polygons_) {
+            if (poly.points.size() % 2 != 0) {
+                sum += compute_area(poly);
+            }
+        }
+        std::cout << std::fixed << std::setprecision(1) << sum << "\n";
+    }
+    else if (rest == "MEAN") {
+        if (polygons_.empty()) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        double sum = 0.0;
+        for (const auto& poly : polygons_) {
+            sum += compute_area(poly);
+        }
+        std::cout << std::fixed << std::setprecision(1) << (sum / polygons_.size()) << "\n";
     }
     else {
         try {
@@ -290,13 +243,20 @@ void CommandProcessor::command_count(const std::string& rest) const
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            std::cout << std::count_if(polygons_.begin(), polygons_.end(), HasVertexCount(target)) << "\n";
+            double sum = 0.0;
+            for (const auto& poly : polygons_) {
+                if (poly.points.size() == target) {
+                    sum += compute_area(poly);
+                }
+            }
+            std::cout << std::fixed << std::setprecision(1) << sum << "\n";
         }
         catch (...) {
             std::cout << "<INVALID COMMAND>\n";
         }
     }
 }
+
 void CommandProcessor::command_max(const std::string& rest) const
 {
   if (rest == "AREA") {
