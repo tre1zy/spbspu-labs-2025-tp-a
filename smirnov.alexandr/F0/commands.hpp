@@ -20,5 +20,6 @@ namespace smirnov
   void intersectCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void differenceCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void uniqueCommand(Dicts & dicts, std::istream & in, std::ostream & out);
+  void prefixCommand(Dicts & dicts, std::istream & in, std::ostream & out);
 }
 #endif

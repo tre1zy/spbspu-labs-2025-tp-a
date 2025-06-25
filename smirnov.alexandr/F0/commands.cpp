@@ -446,3 +446,45 @@ void smirnov::uniqueCommand(Dicts & dicts, std::istream & in, std::ostream & out
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
+
+void smirnov::prefixCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string newName, dictName, prefix;
+  in >> newName >> dictName >> prefix;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.end())
+  {
+    out << "The dictionary with name " << dictName << " doesn't exist.\n";
+    return;
+  }
+  if (dicts.find(newName) != dicts.end())
+  {
+    out << "The dictionary with name " << newName << " already exists.\n";
+    return;
+  }
+  const auto & dict = dictIt->second;
+  if (dict.empty())
+  {
+    out << dictName << " is empty.\n";
+    return;
+  }
+  Dict result;
+  for (const auto & pair : dict)
+  {
+    if (pair.first.substr(0, prefix.size()) == prefix)
+    {
+      result[pair.first] = pair.second;
+    }
+  }
+  if (result.empty())
+  {
+    out << "There aren't any words in " << dictName << " with prefix " << prefix << ".\n";
+    return;
+  }
+  dicts[newName] = std::move(result);
+}
