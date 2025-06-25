@@ -45,7 +45,7 @@ namespace
   }
 }
 
-void karnauhova::choice_characters(map_characters& players, const std::map< size_t, Character >& characters)
+void karnauhova::choice_charact(map_characters& players, const std::map< size_t, Character >& characters)
 {
   while (!std::cin.eof())
   {
@@ -69,7 +69,7 @@ void karnauhova::choice_characters(map_characters& players, const std::map< size
         std::cout << "\033[1;33m" << std::string(100, '=') << "\033[0m" << "\n";
         std::cout << "Доступные персонажи:\n";
         std::for_each(characters.begin(), characters.end(), std::bind(print_info, std::placeholders::_1));
-        std::cout << "\n" << "> GET_STORY <index> - более пожробная информация про персонажа\n"; 
+        std::cout << "\n" << "> GET_STORY <index> - более пожробная информация про персонажа\n";
         std::cout <<"> CHOOSE <index> - выбрать персонажа\n";
         std::string answer;
         if (!(std::cin >> answer))
@@ -200,7 +200,8 @@ void karnauhova::fight(map_characters& players)
     }
     else
     {
-      std::cout << fight_queue.front().first << " успешно защитился от атаки " << fight_queue.back().first << "\n";
+      std::cout << fight_queue.front().first << " успешно защитился от атаки ";
+      std::cout << fight_queue.back().first << "\n";
       delay(2500);
     }
     if (!std::cin.eof())

@@ -45,7 +45,7 @@ int main()
   }
   delay(1200);
   std::map< std::string, std::function< void() > > cmds;
-  cmds["CHARACTERS"] = std::bind(choice_characters, std::ref(players), std::cref(characters));
+  cmds["CHARACTERS"] = std::bind(choice_charact, std::ref(players), std::cref(characters));
   cmds["FIGHT"] = std::bind(fight, std::ref(players));
   while (!std::cin.eof())
   {
