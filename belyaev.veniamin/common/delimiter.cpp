@@ -1,5 +1,4 @@
 #include "delimiter.hpp"
-#include "shapes.hpp"
 
 std::istream& belyaev::operator>>(std::istream& in, const DelimiterIO&& dest)
 {
