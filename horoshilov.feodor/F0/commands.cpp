@@ -64,9 +64,9 @@ namespace
 
   struct LengthComparator
   {
-    bool operator()(const std::string& a, const std::string& b) const
+    bool operator()(const tree_t::value_type& a, const tree_t::value_type& b) const
     {
-      return a.size() < b.size();
+      return a.first.size() < b.first.size();
     }
   };
 
@@ -131,12 +131,46 @@ namespace
     }
   };
 
+  struct ComplementAccumulator
+  {
+    const dict_t& dicts_;
+    tree_t operator()(tree_t result, const std::string& dict_name) const
+    {
+      const tree_t& dict = dicts_.at(dict_name);
+      tree_t temp;
+      std::copy_if(result.begin(), result.end(), 
+                    std::inserter(temp, temp.end()), 
+                    ComplementPredicate{dict});
+      return temp;
+    }
+  };
+
   struct IntersectPredicate
   {
     const tree_t& dict_;
     bool operator()(const tree_t::value_type& entry) const
     {
       return dict_.find(entry.first) != dict_.end();
+    }
+  };
+
+  struct IntersectAccumulator
+  {
+    const dict_t& dicts_;
+    tree_t operator()(tree_t result, const std::string& dict_name) const
+    {
+      const tree_t& dict = dicts_.at(dict_name);
+      tree_t temp;
+      std::copy_if(result.begin(), result.end(),std::inserter(temp, temp.end()), IntersectPredicate{dict});
+      return temp;
+    }
+  };
+
+  struct MaxLenFinder
+  {
+    size_t operator()(size_t max, const tree_t::value_type& entry) const
+    {
+      return std::max(max, entry.first.size());
     }
   };
 
@@ -149,6 +183,33 @@ namespace
     }
   };
 
+  struct LongestAccumulator
+  {
+    const dict_t& dicts_;
+    tree_t operator()(tree_t result, const std::string& dict_name) const
+    {
+      const tree_t& dict = dicts_.at(dict_name);
+      if (dict.empty()) return result;
+      
+      size_t max_len = std::accumulate(dict.begin(), dict.end(), 0, MaxLenFinder{});
+      tree_t temp_dict;
+      std::copy_if(dict.begin(), dict.end(), 
+                    std::inserter(temp_dict, temp_dict.end()), 
+                    LongestPredicate{max_len});
+      
+      result.insert(temp_dict.begin(), temp_dict.end());
+      return result;
+    }
+  };
+
+  struct MaxCountFinder
+  {
+    size_t operator()(size_t max, const tree_t::value_type& entry) const
+    {
+      return std::max(max, entry.second.size());
+    }
+  };
+
   struct MeaningfulPredicate
   {
     size_t max_count_;
@@ -158,29 +219,22 @@ namespace
     }
   };
 
-  struct MaxLenFinder
+  struct MeaningfulAccumulator
   {
-    const tree_t::value_type* max_entry_;
-    MaxLenFinder() : max_entry_(nullptr) {}
-    void operator()(const tree_t::value_type& entry)
+    const dict_t& dicts_;
+    tree_t operator()(tree_t result, const std::string& dict_name) const
     {
-      if (!max_entry_ || entry.first.size() > max_entry_->first.size())
-      {
-        max_entry_ = &entry;
-      }
-    }
-  };
-
-  struct MaxCountFinder
-  {
-    const tree_t::value_type* max_entry_;
-    MaxCountFinder() : max_entry_(nullptr) {}
-    void operator()(const tree_t::value_type& entry)
-    {
-      if (!max_entry_ || entry.second.size() > max_entry_->second.size())
-      {
-        max_entry_ = &entry;
-      }
+      const tree_t& dict = dicts_.at(dict_name);
+      if (dict.empty()) return result;
+      
+      size_t max_count = std::accumulate(dict.begin(), dict.end(), 0, MaxCountFinder{});
+      tree_t temp_dict;
+      std::copy_if(dict.begin(), dict.end(), 
+                    std::inserter(temp_dict, temp_dict.end()), 
+                    MeaningfulPredicate{max_count});
+      
+      result.insert(temp_dict.begin(), temp_dict.end());
+      return result;
     }
   };
 }
@@ -411,12 +465,8 @@ namespace khoroshilov
     {
       throw std::runtime_error("<INVALID COMMAND>");
     }
-
-    MaxLenFinder finder;
-    std::for_each(dict_it->second.begin(), dict_it->second.end(), std::ref(finder));
-
-    out << dict_name << " " << finder.max_entry_->first << " "
-        << finder.max_entry_->first.size() << "\n";
+    auto max_it = std::max_element(dict_it->second.begin(),dict_it->second.end(),LengthComparator{});
+    out << dict_name << " " << max_it->first << " " << max_it->first.size() << "\n";
   }
 
   void alfrange(std::istream& in, std::ostream& out, const dict_t& dicts)
@@ -515,19 +565,14 @@ namespace khoroshilov
     {
       throw std::runtime_error("<ALREADY HAVE>");
     }
-
-    const tree_t& first_dict = dicts.at(dict_names[0]);
-    tree_t result = first_dict;
-
-    for (size_t i = 1; i < dict_names.size(); ++i)
+    if (dict_names.empty())
     {
-      const tree_t& dict = dicts.at(dict_names[i]);
-      std::vector<tree_t::value_type> temp_vec;
-      std::copy_if(result.begin(), result.end(), std::back_inserter(temp_vec), ComplementPredicate{ dict });
-      tree_t temp;
-      temp.insert(temp_vec.begin(), temp_vec.end());
-      result = temp;
+      dicts.insert({new_name, tree_t{}});
+      return;
     }
+    tree_t result = dicts.at(dict_names[0]);
+    ComplementAccumulator op{dicts};
+    result = std::accumulate(std::next(dict_names.begin()), dict_names.end(), result, op);
 
     dicts.insert(std::make_pair(new_name, result));
   }
@@ -548,17 +593,8 @@ namespace khoroshilov
 
     const tree_t& first_dict = dicts.at(dict_names[0]);
     tree_t result = first_dict;
-
-    for (size_t i = 1; i < dict_names.size(); ++i)
-    {
-      const tree_t& dict = dicts.at(dict_names[i]);
-      std::vector<tree_t::value_type> temp_vec;
-      std::copy_if(result.begin(), result.end(),std::back_inserter(temp_vec), IntersectPredicate{ dict });
-      tree_t temp;
-      temp.insert(temp_vec.begin(), temp_vec.end());
-      result = temp;
-    }
-
+    IntersectAccumulator op{dicts};
+    result = std::accumulate(std::next(dict_names.begin()), dict_names.end(), result, op);
     dicts.insert(std::make_pair(new_name, result));
   }
 
@@ -570,29 +606,9 @@ namespace khoroshilov
 
     std::vector<std::string> dict_names(dict_count);
     std::generate(dict_names.begin(), dict_names.end(), NameReader{ in });
-
-    if (dicts.find(new_name) != dicts.end())
-    {
-      throw std::runtime_error("<ALREADY HAVE>");
-    }
-
     tree_t result;
-    for (const auto& name : dict_names)
-    {
-      const tree_t& dict = dicts.at(name);
-      if (dict.empty()) continue;
-
-      MaxLenFinder finder;
-      std::for_each(dict.begin(),dict.end(),std::ref(finder));
-
-      size_t max_len = finder.max_entry_->first.size();
-      std::vector<tree_t::value_type> long_vec;
-      std::copy_if(dict.begin(),  dict.end(),  std::back_inserter(long_vec),  LongestPredicate{ max_len });
-      tree_t longest_words;
-      longest_words.insert(long_vec.begin(), long_vec.end());
-      result.insert(longest_words.begin(), longest_words.end());
-    }
-
+    LongestAccumulator op{dicts};
+    result = std::accumulate(dict_names.begin(),  dict_names.end(), tree_t{}, op);
     dicts.insert(std::make_pair(new_name, result));
   }
 
@@ -633,21 +649,8 @@ namespace khoroshilov
     }
 
     tree_t result;
-    for (const auto& name : dict_names)
-    {
-      const tree_t& dict = dicts.at(name);
-      if (dict.empty()) continue;
-
-      MaxCountFinder finder;
-      std::for_each(dict.begin(),dict.end(),std::ref(finder));
-
-      size_t max_count = finder.max_entry_->second.size();
-      std::vector<tree_t::value_type> meaning_vec;
-      std::copy_if(dict.begin(), dict.end(),std::back_inserter(meaning_vec), MeaningfulPredicate{ max_count });
-      tree_t meaningful_words;
-      meaningful_words.insert(meaning_vec.begin(), meaning_vec.end());
-      result.insert(meaningful_words.begin(), meaningful_words.end());
-    }
+    MeaningfulAccumulator op{dicts};
+    result = std::accumulate(dict_names.begin(), dict_names.end(), tree_t{}, op);
 
     dicts.insert(std::make_pair(new_name, result));
   }

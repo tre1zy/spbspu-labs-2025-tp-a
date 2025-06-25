@@ -11,40 +11,40 @@ namespace khoroshilov
 {
   void inputDict(std::istream& in, dict_t& dicts)
   {
-  std::string dict_name;
-  while (std::getline(in, dict_name))
-  {
-    if (dict_name.empty())
-      {
-        continue;
-      }
+    std::string dict_name;
+    while (std::getline(in, dict_name))
+    {
+      if (dict_name.empty())
+        {
+          continue;
+        }
 
-      tree_t current_dict;
-      std::string key;
-      while (in >> key)
+        tree_t current_dict;
+        std::string key;
+        while (in >> key)
+        {
+          list_t translations;
+          std::string val;
+          while (in >> val)
           {
-            list_t translations;
-            std::string val;
-            while (in >> val)
-              {
-                translations.push_back(val);
-                if (in.get() == '\n')
-                {
-                    break;
-                }
-              }
-            current_dict.insert(std::make_pair(key, translations));
+            translations.push_back(val);
             if (in.get() == '\n')
             {
               break;
             }
-              else
-            {
-              in.unget();
-            }
           }
-          dicts.insert(std::make_pair(dict_name, current_dict));
-      }
+          current_dict.insert(std::make_pair(key, translations));
+          if (in.get() == '\n')
+          {
+            break;
+          }
+          else
+          {
+            in.unget();
+          }
+        }
+      dicts.insert(std::make_pair(dict_name, current_dict));
+    }
   }
 }
 
@@ -113,20 +113,20 @@ int main(int argc, char* argv[])
     {
       auto it = commands.find(command);
       if (it != commands.end())
-        {
-          it->second();
-        }
+      {
+        it->second();
+      }
       else
-        {
-          std::cout << "<INVALID COMMAND>\n";
-        }
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
       }
       catch (...)
       {
         std::cout << "<INVALID COMMAND>\n";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      }
+    }
   }
 
   return 0;
