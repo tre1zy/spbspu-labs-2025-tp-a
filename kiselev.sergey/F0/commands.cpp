@@ -17,22 +17,23 @@ namespace
 
   struct WordPrinter
   {
-    std::ostream& operator()(std::ostream& os, const std::string& word) const
+    std::ostream& out;
+    std::ostream& operator()(const std::string& word) const
     {
-      return os << " " << word;
+      return out << " " << word;
     }
   };
 
   struct DictPrinter
   {
-    std::ostream& operator()(std::ostream& os, const kiselev::Dict::value_type& val) const
+    std::ostream& operator()(std::ostream& out, const kiselev::Dict::value_type& val) const
     {
-      os << val.first;
+      out << val.first;
       if (!val.second.empty())
       {
-        std::accumulate(val.second.begin(), val.second.end(), std::ref(os), WordPrinter{});
+        std::transform(val.second.begin(), val.second.end(), std::ostream_iterator< std::string >(out), WordPrinter{ out });
       }
-      return os << "\n";
+      return out << "\n";
     }
   };
 
@@ -40,22 +41,13 @@ namespace
   {
     const std::string& word;
     std::vector< std::string >& translations;
-    int operator()(int, const kiselev::Dict::value_type& val) const
+    int operator()(const kiselev::Dict::value_type& val) const
     {
       if (std::find(val.second.begin(), val.second.end(), word) != val.second.end())
       {
         translations.push_back(val.first);
       }
       return 0;
-    }
-  };
-
-  struct TranslationChecker
-  {
-    const std::string& str;
-    bool operator()(int, const kiselev::Dict::value_type& val)
-    {
-      return std::find(val.second.begin(), val.second.end(), str) == val.second.end();
     }
   };
 
@@ -112,7 +104,7 @@ namespace
   {
     kiselev::Dict& dict;
     bool& allExist;
-    int operator()(int, const kiselev::Dict::value_type& val) const
+    void operator()(const kiselev::Dict::value_type& val) const
     {
       auto val2 = dict.find(val.first);
       if (val2 == dict.end())
@@ -130,7 +122,6 @@ namespace
           allExist = false;
         }
       }
-      return 0;
     }
   };
 
@@ -155,20 +146,10 @@ namespace
     }
   };
 
-  struct DictIntersectAccumulator
-  {
-    DictIntersector& intersector;
-    kiselev::Dict operator()(kiselev::Dict, const kiselev::Dict::value_type& val) const
-    {
-      intersector(val);
-      return kiselev::Dict{};
-    }
-  };
-
   kiselev::Dict intersectTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
   {
     DictIntersector intersector{ dict2 };
-    std::accumulate(dict1.begin(), dict1.end(), kiselev::Dict{}, DictIntersectAccumulator{ intersector });
+    std::for_each(dict1.begin(), dict1.end(), std::ref(intersector));
     return intersector.res;
   }
 
@@ -293,17 +274,17 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   if (engIt != dict.cend())
   {
     out << *engIt->second.begin();
-    std::accumulate(std::next(engIt->second.begin()), engIt->second.end(), std::ref(out), WordPrinter{});
+    std::transform(std::next(engIt->second.begin()), engIt->second.end(), std::ostream_iterator< std::string >(out), WordPrinter{ out });
     out << "\n";
     return;
   }
   std::vector< std::string > translations;
   TranslationFinder finder{ word, translations };
-  std::accumulate(dict.begin(), dict.end(), 0, finder);
+  std::for_each(dict.begin(), dict.end(), finder);
   if (!translations.empty())
   {
     out << *translations.begin();
-    std::accumulate(std::next(engIt->second.begin()), engIt->second.end(), std::ref(out), WordPrinter{});
+    std::transform(std::next(engIt->second.begin()), engIt->second.end(), std::ostream_iterator< std::string >(out), WordPrinter{ out });
     out << "\n";
     return;
   }
@@ -449,7 +430,7 @@ void kiselev::doLoadDict(std::istream& in, std::ostream& out, Dicts& dicts)
     {
       bool allExist = true;
       TranslationMerger checker{ it->second, allExist };
-      std::accumulate(dict.begin(), dict.end(), 0, checker);
+      std::for_each(dict.begin(), dict.end(), checker);
       if (allExist)
       {
         out << "<DICTIONARY ALREADY EXISTS>\n";
