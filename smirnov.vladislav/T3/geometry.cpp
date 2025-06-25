@@ -106,7 +106,7 @@ namespace geom
   std::vector < Polygon > polyToTrg(const Polygon& poly)
   {
     size_t size = poly.points.size() - 2;
-    size_t ind;
+    size_t ind = 0;
     std::vector< Polygon > triangles(size);
     std::generate(triangles.begin(), triangles.end(), TrgGenerator{ ind, poly.points });
     return triangles;
