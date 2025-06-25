@@ -174,38 +174,43 @@ void CommandProcessor::command_area(const std::string& rest) const
   if (rest == "EVEN" || rest == "ODD") {
     double total = 0.0;
 
-    if (polygons_.size() > 0) {
-      size_t s = polygons_[0].points.size();
-      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0))
-        total += compute_area(polygons_[0]);
-    }
-    if (polygons_.size() > 1) {
-      size_t s = polygons_[1].points.size();
-      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0))
-        total += compute_area(polygons_[1]);
-    }
-    if (polygons_.size() > 2) {
-      size_t s = polygons_[2].points.size();
-      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0))
-        total += compute_area(polygons_[2]);
-    }
-    if (polygons_.size() > 3) {
-      size_t s = polygons_[3].points.size();
-      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0))
-        total += compute_area(polygons_[3]);
-    }
-    if (polygons_.size() > 4) {
-      size_t s = polygons_[4].points.size();
-      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0))
-        total += compute_area(polygons_[4]);
-    }
-    if (polygons_.size() > 5) {
-      size_t s = polygons_[5].points.size();
-      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0))
-        total += compute_area(polygons_[5]);
-    }
+    if (polygons_.size() > 0 && polygons_[0].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[0]);
+    if (polygons_.size() > 1 && polygons_[1].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[1]);
+    if (polygons_.size() > 2 && polygons_[2].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[2]);
+    if (polygons_.size() > 3 && polygons_[3].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[3]);
+    if (polygons_.size() > 4 && polygons_[4].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[4]);
+    if (polygons_.size() > 5 && polygons_[5].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[5]);
+    if (polygons_.size() > 6 && polygons_[6].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[6]);
+    if (polygons_.size() > 7 && polygons_[7].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[7]);
+    if (polygons_.size() > 8 && polygons_[8].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[8]);
+    if (polygons_.size() > 9 && polygons_[9].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) total += compute_area(polygons_[9]);
 
     std::cout << std::fixed << std::setprecision(1) << total << "\n";
+    return;
+  }
+
+  if (rest == "MEAN") {
+    if (polygons_.empty()) {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    double total = 0.0;
+    size_t count = polygons_.size();
+
+    if (count > 0) total += compute_area(polygons_[0]);
+    if (count > 1) total += compute_area(polygons_[1]);
+    if (count > 2) total += compute_area(polygons_[2]);
+    if (count > 3) total += compute_area(polygons_[3]);
+    if (count > 4) total += compute_area(polygons_[4]);
+    if (count > 5) total += compute_area(polygons_[5]);
+    if (count > 6) total += compute_area(polygons_[6]);
+    if (count > 7) total += compute_area(polygons_[7]);
+    if (count > 8) total += compute_area(polygons_[8]);
+    if (count > 9) total += compute_area(polygons_[9]);
+
+    double mean = total / static_cast<double>(count);
+    std::cout << std::fixed << std::setprecision(1) << mean << "\n";
     return;
   }
 
@@ -215,21 +220,19 @@ void CommandProcessor::command_area(const std::string& rest) const
   }
 
   if (rest.size() == 1 && rest[0] >= '3' && rest[0] <= '9') {
-    size_t target = static_cast<size_t>(rest[0] - '0');
+    int target = rest[0] - '0';
     double total = 0.0;
 
-    if (polygons_.size() > 0 && polygons_[0].points.size() == target)
-      total += compute_area(polygons_[0]);
-    if (polygons_.size() > 1 && polygons_[1].points.size() == target)
-      total += compute_area(polygons_[1]);
-    if (polygons_.size() > 2 && polygons_[2].points.size() == target)
-      total += compute_area(polygons_[2]);
-    if (polygons_.size() > 3 && polygons_[3].points.size() == target)
-      total += compute_area(polygons_[3]);
-    if (polygons_.size() > 4 && polygons_[4].points.size() == target)
-      total += compute_area(polygons_[4]);
-    if (polygons_.size() > 5 && polygons_[5].points.size() == target)
-      total += compute_area(polygons_[5]);
+    if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[0]);
+    if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[1]);
+    if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[2]);
+    if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[3]);
+    if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[4]);
+    if (polygons_.size() > 5 && polygons_[5].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[5]);
+    if (polygons_.size() > 6 && polygons_[6].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[6]);
+    if (polygons_.size() > 7 && polygons_[7].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[7]);
+    if (polygons_.size() > 8 && polygons_[8].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[8]);
+    if (polygons_.size() > 9 && polygons_[9].points.size() == static_cast<size_t>(target)) total += compute_area(polygons_[9]);
 
     std::cout << std::fixed << std::setprecision(1) << total << "\n";
     return;
@@ -249,26 +252,34 @@ void CommandProcessor::command_count(const std::string& rest) const
     if (polygons_.size() > 3 && polygons_[3].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
     if (polygons_.size() > 4 && polygons_[4].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
     if (polygons_.size() > 5 && polygons_[5].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
+    if (polygons_.size() > 6 && polygons_[6].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
+    if (polygons_.size() > 7 && polygons_[7].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
+    if (polygons_.size() > 8 && polygons_[8].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
+    if (polygons_.size() > 9 && polygons_[9].points.size() % 2 == (rest == "EVEN" ? 0 : 1)) ++count;
 
     std::cout << count << "\n";
     return;
   }
 
-  if (rest == "0" || rest == "1" || rest == "2") {
+  if (rest.size() == 1 && rest[0] >= '0' && rest[0] <= '2') {
     std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  if (rest == "3" || rest == "4" || rest == "5" || rest == "6" || rest == "7" || rest == "8" || rest == "9") {
+  if (rest.size() == 1 && rest[0] >= '3' && rest[0] <= '9') {
     int target = rest[0] - '0';
     int count = 0;
 
-    if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(target)) ++count;
-    if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(target)) ++count;
-    if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(target)) ++count;
-    if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(target)) ++count;
-    if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(target)) ++count;
-    if (polygons_.size() > 5 && polygons_[5].points.size() == static_cast<size_t>(target)) ++count;
+    if (polygons_.size() > 0 && polygons_[0].points.size() == target) ++count;
+    if (polygons_.size() > 1 && polygons_[1].points.size() == target) ++count;
+    if (polygons_.size() > 2 && polygons_[2].points.size() == target) ++count;
+    if (polygons_.size() > 3 && polygons_[3].points.size() == target) ++count;
+    if (polygons_.size() > 4 && polygons_[4].points.size() == target) ++count;
+    if (polygons_.size() > 5 && polygons_[5].points.size() == target) ++count;
+    if (polygons_.size() > 6 && polygons_[6].points.size() == target) ++count;
+    if (polygons_.size() > 7 && polygons_[7].points.size() == target) ++count;
+    if (polygons_.size() > 8 && polygons_[8].points.size() == target) ++count;
+    if (polygons_.size() > 9 && polygons_[9].points.size() == target) ++count;
 
     std::cout << count << "\n";
     return;
@@ -276,6 +287,7 @@ void CommandProcessor::command_count(const std::string& rest) const
 
   std::cout << "<INVALID COMMAND>\n";
 }
+
 
 void CommandProcessor::command_max(const std::string& rest) const
 {
