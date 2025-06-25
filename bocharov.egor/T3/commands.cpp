@@ -41,16 +41,6 @@ namespace
     out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getAreaEven(std::ostream & out, const std::vector< Polygon > & polygons)
-  {
-    getAreaByPredicate(out, polygons, isEven);
-  }
-
-  void getAreaOdd(std::ostream & out, const std::vector< Polygon > & polygons)
-  {
-    getAreaByPredicate(out, polygons, isOdd);
-  }
-
   void getAreaMean(std::ostream & out, const std::vector< Polygon > & polygons)
   {
     if (polygons.empty())
@@ -159,8 +149,8 @@ namespace
 void bocharov::getArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["EVEN"] = std::bind(getAreaEven, std::ref(out), std::cref(polygons));
-  subcmds["ODD"] = std::bind(getAreaOdd, std::ref(out), std::cref(polygons));
+  subcmds["EVEN"] = std::bind(getAreaByPredicate, std::ref(out), std::cref(polygons), isEven);
+  subcmds["ODD"] = std::bind(getAreaByPredicate, std::ref(out), std::cref(polygons), isOdd);
   subcmds["MEAN"] = std::bind(getAreaMean, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
