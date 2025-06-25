@@ -215,7 +215,6 @@ void CrossRefSystem::printIndex(const std::string& indexName) const
     if (it == end) return;
 
     std::cout << it->first;
-
     std::function<void(std::set<Position>::const_iterator,
                        std::set<Position>::const_iterator)> printPositions;
 
@@ -272,7 +271,7 @@ void CrossRefSystem::getPositions(const std::string& indexName, const std::strin
 
   printPositions(positions.begin(), positions.end());
 }
-void CrossRefSystem::replaceWord(const std::string& indexName, 
+void CrossRefSystem::replaceWord(const std::string& indexName,
 const std::string& oldWord,const std::string& newWord)
 {
   auto it = indexes_.find(indexName);
@@ -382,7 +381,7 @@ void CrossRefSystem::mergeTexts(const std::string& newIndex, const std::string& 
 
   indexes_.insert({ newIndex, merged });
 }
-void CrossRefSystem::insertText(const std::string& newIndex, const std::string& baseIndex, 
+void CrossRefSystem::insertText(const std::string& newIndex, const std::string& baseIndex,
   const std::string& insertIndex, size_t afterLine, size_t afterColumn)
 {
   auto baseIt = indexes_.find(baseIndex);
@@ -572,7 +571,8 @@ void CrossRefSystem::extractText(const std::string& newIndex, const std::string&
 
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::repeatText(const std::string& newIndex, const std::string& baseIndex, size_t count)
+void CrossRefSystem::repeatText(const std::string& newIndex,
+  const std::string& baseIndex, size_t count)
 {
   if (count == 0)
   {
@@ -660,7 +660,7 @@ void CrossRefSystem::repeatText(const std::string& newIndex, const std::string& 
   repeatCopy(remaining);
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::string& index1, 
+void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::string& index1,
   const std::string& index2)
 {
   auto it1 = indexes_.find(index1);
@@ -679,9 +679,9 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::str
   std::map<size_t, std::vector<std::pair<std::string, size_t>>> lines1;
   std::map<size_t, std::vector<std::pair<std::string, size_t>>> lines2;
 
-  std::function<void(std::map<std::string, std::set<Position>>::const_iterator, std::map<size_t, 
+  std::function<void(std::map<std::string, std::set<Position>>::const_iterator, std::map<size_t,
     std::vector<std::pair<std::string, size_t>>>&)> flatten;
-  flatten = [&](std::map<std::string, std::set<Position>>::const_iterator it, std::map<size_t, 
+  flatten = [&](std::map<std::string, std::set<Position>>::const_iterator it, std::map<size_t,
     std::vector<std::pair<std::string, size_t>>>& lines)
   {
     if (it == i1.end() && &lines == &lines1) return flatten(i2.begin(), lines2);
@@ -748,7 +748,7 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex, const std::str
 
   indexes_.insert({ newIndex, result });
 }
-void CrossRefSystem::swapWords(const std::string& indexName, const std::string& word1, 
+void CrossRefSystem::swapWords(const std::string& indexName, const std::string& word1,
   const std::string& word2)
 {
   auto it = indexes_.find(indexName);
