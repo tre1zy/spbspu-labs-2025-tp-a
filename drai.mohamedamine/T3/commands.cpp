@@ -374,7 +374,7 @@ namespace amine
      else
     {
       std::cout << intResult << "\n";
-    } 
+    }
   };
   catch (const std::exception&)
   {
