@@ -5,6 +5,11 @@
 #include <iterator>
 #include <iostream>
 #include <numeric>
+#include <map>
+#include <set>
+#include <vector>
+#include <functional>
+#include <unordered_map>
 
 namespace amine
 {
@@ -208,81 +213,6 @@ void amine::CrossRefSystem::mergeTexts(const std::string& newIndex,
   size_t offset = lastLine + 1;
 
   copyIndexWithOffset(result, second, offset);
-  indexes_[newIndex] = result;
-}
-void amine::CrossRefSystem::insertText(const std::string& newIndex,
-                                       const std::string& baseIndex,
-                                       const std::string& insertIndex,
-                                       size_t afterLine,
-                                       size_t afterColumn)
-{
-  auto baseIt = indexes_.find(baseIndex);
-  auto insertIt = indexes_.find(insertIndex);
-
-  if (baseIt == indexes_.end() || insertIt == indexes_.end())
-  {
-    std::cout << "<WRONG INDEX>\n";
-    return;
-  }
-
-  const Index& base = baseIt->second;
-  const Index& toInsert = insertIt->second;
-  Index result;
-
-  bool validPosition = false;
-  std::function<void(std::map<std::string, std::set<Position>>::const_iterator)> validatePos;
-  validatePos = [&](auto it)
-  {
-    if (it == base.end()) return;
-    auto posIt = it->second.begin();
-    std::function<void(std::set<Position>::const_iterator)> findMatch;
-    findMatch = [&](auto pit)
-    {
-      if (pit == it->second.end()) return;
-      if (pit->line == afterLine && pit->column == afterColumn)
-      {
-        validPosition = true;
-        return;
-      }
-      findMatch(std::next(pit));
-    };
-    findMatch(posIt);
-    if (!validPosition)
-      validatePos(std::next(it));
-  };
-  validatePos(base.begin());
-
-  if (!validPosition)
-  {
-    std::cout << "<INVALID POSITION>\n";
-    return;
-  }
-
-  Index before, after;
-  std::function<void(std::map<std::string, std::set<Position>>::const_iterator)> split;
-  split = [&](auto it)
-  {
-    if (it == base.end()) return;
-    const std::string& word = it->first;
-    for (const auto& pos : it->second)
-    {
-      if (pos.line < afterLine || (pos.line == afterLine && pos.column <= afterColumn))
-        before[word].insert(pos);
-      else
-        after[word].insert(pos);
-    }
-    split(std::next(it));
-  };
-  split(base.begin());
-
-  copyIndexWithOffset(result, before, 0);
-
-  size_t insertOffset = getMaxLineRecursive(before.begin(), before.end(), 0) + 1;
-  copyIndexWithOffset(result, toInsert, insertOffset);
-
-  size_t finalOffset = insertOffset + getMaxLineRecursive(toInsert.begin(), toInsert.end(), 0) + 1;
-  copyIndexWithOffset(result, after, finalOffset - insertOffset);
-
   indexes_[newIndex] = result;
 }
 void amine::CrossRefSystem::insertText(const std::string& newIndex,const std::string& baseIndex,const std::string& insertIndex,
