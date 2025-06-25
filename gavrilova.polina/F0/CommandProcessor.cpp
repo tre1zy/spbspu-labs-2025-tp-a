@@ -34,7 +34,6 @@ namespace gavrilova {
     commandMap_["deletestudent"] = std::bind(&CommandProcessor::handleDeleteStudent, this);
     commandMap_["infostudent"] = std::bind(&CommandProcessor::handleInfoStudent, this);
     commandMap_["listgroup"] = std::bind(&CommandProcessor::handleListGroup, this);
-    commandMap_["listgrades"] = std::bind(&CommandProcessor::handleListGrades, this);
     commandMap_["movegroup"] = std::bind(&CommandProcessor::handleMoveGroup, this);
     commandMap_["addgrade"] = std::bind(&CommandProcessor::handleAddGrade, this);
     commandMap_["changegrade"] = std::bind(&CommandProcessor::handleChangeGrade, this);
