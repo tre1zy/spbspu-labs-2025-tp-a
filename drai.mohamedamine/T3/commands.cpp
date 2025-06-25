@@ -168,90 +168,115 @@ double areaNum(const std::vector<Polygon>& polys, int num)
     std::cout << "<INVALID COMMAND>\n";
   }
 }
-}
-void amine::CommandProcessor::command_area(const std::string& rest) const
-{
+
+void CommandProcessor::command_area(const std::string& rest) const {
+  double result = 0.0;
+
   if (rest == "EVEN") {
-    double result = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return (p.points.size() % 2 == 0) ? acc + getArea(p) : acc;
-      });
-    std::cout << std::fixed << std::setprecision(1) << result << "\n";
-    return;
-  }
-
-  if (rest == "ODD") {
-    double result = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return (p.points.size() % 2 != 0) ? acc + getArea(p) : acc;
-      });
-    std::cout << std::fixed << std::setprecision(1) << result << "\n";
-    return;
-  }
-
-  if (rest == "MEAN") {
+    if (polygons_.size() > 0 && polygons_[0].points.size() % 2 == 0) result += compute_area(polygons_[0]);
+    if (polygons_.size() > 1 && polygons_[1].points.size() % 2 == 0) result += compute_area(polygons_[1]);
+    if (polygons_.size() > 2 && polygons_[2].points.size() % 2 == 0) result += compute_area(polygons_[2]);
+    if (polygons_.size() > 3 && polygons_[3].points.size() % 2 == 0) result += compute_area(polygons_[3]);
+    if (polygons_.size() > 4 && polygons_[4].points.size() % 2 == 0) result += compute_area(polygons_[4]);
+  } else if (rest == "ODD") {
+    if (polygons_.size() > 0 && polygons_[0].points.size() % 2 != 0) result += compute_area(polygons_[0]);
+    if (polygons_.size() > 1 && polygons_[1].points.size() % 2 != 0) result += compute_area(polygons_[1]);
+    if (polygons_.size() > 2 && polygons_[2].points.size() % 2 != 0) result += compute_area(polygons_[2]);
+    if (polygons_.size() > 3 && polygons_[3].points.size() % 2 != 0) result += compute_area(polygons_[3]);
+    if (polygons_.size() > 4 && polygons_[4].points.size() % 2 != 0) result += compute_area(polygons_[4]);
+  } else if (rest == "MEAN") {
     if (polygons_.empty()) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+      throw std::runtime_error("Invalid command");
     }
-    double total = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return acc + getArea(p);
-      });
-    std::cout << std::fixed << std::setprecision(1) << total / polygons_.size() << "\n";
+    if (polygons_.size() > 0) result += compute_area(polygons_[0]);
+    if (polygons_.size() > 1) result += compute_area(polygons_[1]);
+    if (polygons_.size() > 2) result += compute_area(polygons_[2]);
+    if (polygons_.size() > 3) result += compute_area(polygons_[3]);
+    if (polygons_.size() > 4) result += compute_area(polygons_[4]);
+    result /= polygons_.size();
+  } else if (rest.size() == 1 && rest[0] >= '3' && rest[0] <= '9') {
+  int target = rest[0] - '0';
+  result = 0.0;
+
+  if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(target)) {
+    result += compute_area(polygons_[0]);
+  }
+  if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(target)) {
+    result += compute_area(polygons_[1]);
+  }
+  if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(target)) {
+    result += compute_area(polygons_[2]);
+  }
+  if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(target)) {
+    result += compute_area(polygons_[3]);
+  }
+  if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(target)) {
+    result += compute_area(polygons_[4]);
+  }
+
+  } else {
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  try {
-    size_t target = std::stoull(rest);
-    if (target < 3) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    double result = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [target](double acc, const Polygon& p) {
-        return (p.points.size() == target) ? acc + getArea(p) : acc;
-      });
-    std::cout << std::fixed << std::setprecision(1) << result << "\n";
-    return;
-  } catch (...) {
-    std::cout << "<INVALID COMMAND>\n";
-  }
+  std::cout << std::fixed << std::setprecision(1) << result << "\n";
 }
 
-void amine::CommandProcessor::command_count(const std::string& rest) const
+void CommandProcessor::command_count(const std::string& rest) const
 {
-  if (rest == "EVEN") {
-    size_t count = std::count_if(polygons_.begin(), polygons_.end(),
-      [](const Polygon& p) { return p.points.size() % 2 == 0; });
-    std::cout << count << "\n";
-    return;
-  }
+  if (rest == "EVEN" || rest == "ODD") {
+    size_t count = 0;
 
-  if (rest == "ODD") {
-    size_t count = std::count_if(polygons_.begin(), polygons_.end(),
-      [](const Polygon& p) { return p.points.size() % 2 != 0; });
-    std::cout << count << "\n";
-    return;
-  }
-
-  try {
-    size_t target = std::stoull(rest);
-    if (target < 3) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+    if (polygons_.size() > 0) {
+      size_t s = polygons_[0].points.size();
+      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0)) ++count;
     }
-    size_t count = std::count_if(polygons_.begin(), polygons_.end(),
-      [target](const Polygon& p) { return p.points.size() == target; });
+    if (polygons_.size() > 1) {
+      size_t s = polygons_[1].points.size();
+      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0)) ++count;
+    }
+    if (polygons_.size() > 2) {
+      size_t s = polygons_[2].points.size();
+      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0)) ++count;
+    }
+    if (polygons_.size() > 3) {
+      size_t s = polygons_[3].points.size();
+      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0)) ++count;
+    }
+    if (polygons_.size() > 4) {
+      size_t s = polygons_[4].points.size();
+      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0)) ++count;
+    }
+    if (polygons_.size() > 5) {
+      size_t s = polygons_[5].points.size();
+      if ((rest == "EVEN" && s % 2 == 0) || (rest == "ODD" && s % 2 != 0)) ++count;
+    }
+
     std::cout << count << "\n";
     return;
-  } catch (...) {
-    std::cout << "<INVALID COMMAND>\n";
   }
+
+  if (rest.size() == 1 && rest[0] >= '0' && rest[0] <= '2') {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  if (rest.size() == 1 && rest[0] >= '3' && rest[0] <= '9') {
+    int target = rest[0] - '0';
+    int count = 0;
+
+    if (polygons_.size() > 0 && polygons_[0].points.size() == static_cast<size_t>(target)) ++count;
+    if (polygons_.size() > 1 && polygons_[1].points.size() == static_cast<size_t>(target)) ++count;
+    if (polygons_.size() > 2 && polygons_[2].points.size() == static_cast<size_t>(target)) ++count;
+    if (polygons_.size() > 3 && polygons_[3].points.size() == static_cast<size_t>(target)) ++count;
+    if (polygons_.size() > 4 && polygons_[4].points.size() == static_cast<size_t>(target)) ++count;
+    if (polygons_.size() > 5 && polygons_[5].points.size() == static_cast<size_t>(target)) ++count;
+
+    std::cout << count << "\n";
+    return;
+  }
+
+  std::cout << "<INVALID COMMAND>\n";
 }
 
 void CommandProcessor::command_max(const std::string& rest) const
@@ -300,58 +325,47 @@ void CommandProcessor::command_max(const std::string& rest) const
   throw std::runtime_error("Invalid command");
 }
 
-void amine::CommandProcessor::command_area(const std::string& rest) const
+void CommandProcessor::command_min(const std::string& rest) const
 {
-  if (rest == "EVEN") {
-    double result = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return (p.points.size() % 2 == 0) ? acc + getArea(p) : acc;
-      });
-    std::cout << std::fixed << std::setprecision(1) << result << "\n";
-    return;
-  }
+  if (rest == "AREA") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
 
-  if (rest == "ODD") {
-    double result = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return (p.points.size() % 2 != 0) ? acc + getArea(p) : acc;
-      });
-    std::cout << std::fixed << std::setprecision(1) << result << "\n";
-    return;
-  }
-
-  if (rest == "MEAN") {
-    if (polygons_.empty()) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
+    double min = compute_area(polygons_[0]);
+    if (polygons_.size() > 1) {
+      double area = compute_area(polygons_[1]);
+      if (area < min) min = area;
     }
-    double total = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return acc + getArea(p);
-      });
-    std::cout << std::fixed << std::setprecision(1) << total / polygons_.size() << "\n";
+    if (polygons_.size() > 2) {
+      double area = compute_area(polygons_[2]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 3) {
+      double area = compute_area(polygons_[3]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 4) {
+      double area = compute_area(polygons_[4]);
+      if (area < min) min = area;
+    }
+
+    std::cout << std::fixed << std::setprecision(1) << min << "\n";
     return;
   }
 
-  try {
-    size_t target = std::stoull(rest);
-    if (target < 3) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    double result = std::accumulate(
-      polygons_.begin(), polygons_.end(), 0.0,
-      [target](double acc, const Polygon& p) {
-        return (p.points.size() == target) ? acc + getArea(p) : acc;
-      });
-    std::cout << std::fixed << std::setprecision(1) << result << "\n";
+  if (rest == "VERTEXES") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    size_t min = polygons_[0].points.size();
+    if (polygons_.size() > 1 && polygons_[1].points.size() < min) min = polygons_[1].points.size();
+    if (polygons_.size() > 2 && polygons_[2].points.size() < min) min = polygons_[2].points.size();
+    if (polygons_.size() > 3 && polygons_[3].points.size() < min) min = polygons_[3].points.size();
+    if (polygons_.size() > 4 && polygons_[4].points.size() < min) min = polygons_[4].points.size();
+
+    std::cout << min << "\n";
     return;
-  } catch (...) {
-    std::cout << "<INVALID COMMAND>\n";
   }
+
+  throw std::runtime_error("Invalid command");
 }
 
 
@@ -384,4 +398,4 @@ void CommandProcessor::command_rmecho(const std::string& rest) const {
   std::vector<Polygon> copy = polygons_;
   process_rmecho(copy, last);
 }
-
+}
