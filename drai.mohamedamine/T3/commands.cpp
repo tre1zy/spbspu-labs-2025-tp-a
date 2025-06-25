@@ -367,21 +367,21 @@ namespace amine
       {
         throw std::logic_error("INVALID COMMAND");
       }
-      else if (printDouble)
+      if (printDouble)
       {
         std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
       }
-      else
-      {
-        std::cout << intResult << "\n";
-      }
-      catch (const std::exception& e)
+     else
+    {
+      std::cout << intResult << "\n";
+    }
+  }
+};
+  catch (const std::exception&)
   {
     std::cout << "<INVALID COMMAND>\n";
   }
-}
-    };
-  };
+};
   void process_commands(std::vector< Polygon >& polygons)
   {
     std::for_each(std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), CommandProcessor(polygons));
