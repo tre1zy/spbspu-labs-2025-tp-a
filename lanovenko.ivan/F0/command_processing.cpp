@@ -119,24 +119,24 @@ namespace
     return std::max(0.0, std::min(threat, 1.0));
   }
 
-  bool cost_comparator(std::pair < std::string, lanovenko::Target >& lhs, std::pair < std::string, lanovenko::Target >& rhs)
+  bool cost_comparator(std::pair< std::string, lanovenko::Target >& l, std::pair< std::string, lanovenko::Target >& r)
   {
-    double a = get_cost(lhs.second);
-    double b = get_cost(rhs.second);
+    double a = get_cost(l.second);
+    double b = get_cost(r.second);
     return a < b;
   }
 
-  bool score_comparator(std::pair < std::string, lanovenko::Target >& lhs, std::pair < std::string, lanovenko::Target >& rhs)
+  bool score_comparator(std::pair< std::string, lanovenko::Target >& l, std::pair< std::string, lanovenko::Target >& r)
   {
-    double a = get_score(lhs.second);
-    double b = get_score(rhs.second);
+    double a = get_score(l.second);
+    double b = get_score(r.second);
     return a > b;
   }
 
-  bool threat_comparator(std::pair < std::string, lanovenko::Target >& lhs, std::pair < std::string, lanovenko::Target >& rhs)
+  bool threat_comparator(std::pair< std::string, lanovenko::Target >& l, std::pair< std::string, lanovenko::Target >& r)
   {
-    double a = get_threat(lhs.second);
-    double b = get_threat(rhs.second);
+    double a = get_threat(l.second);
+    double b = get_threat(r.second);
     return a > b;
   }
 
@@ -172,9 +172,10 @@ namespace
   class ShotPrinter
   {
   public:
-    ShotPrinter(std::ostream& out, size_t count):
+    ShotPrinter(std::ostream& out, size_t count, size_t total):
       os(out),
-      shot_count(count)
+      shot_count(count),
+      total_shots(total)
     {};
     std::string operator()()
     {
@@ -201,13 +202,12 @@ namespace
       os << counter++ << ". " << rhs.second.unique_code << " (";
       os << rhs.second.type << ") - " << missiles;
       os << (missiles > 1 ? " MISSILES:\n" : " MISSILE:\n");
-      ShotPrinter printer(os, 1);
+      ShotPrinter printer(os, 1, missiles);
       std::generate_n(std::ostream_iterator< std::string >(os), missiles, printer);
     }
   private:
     std::ostream& os;
     size_t& counter;
-    size_t total_shots;
   };
 
   std::string get_id(const std::pair< std::string, lanovenko::Target >& rhs)
@@ -229,7 +229,7 @@ namespace
     return rhs == "UAV" || rhs == "MISSILE" || rhs == "DRONE" || rhs == "FIGHTER";
   }
 
-  bool is_same_line(const std::pair < std::string, lanovenko::Target >& lhs, const std::string& rhs)
+  bool is_same_line(const std::pair< std::string, lanovenko::Target >& lhs, const std::string& rhs)
   {
     return lhs.second.type == rhs;
   }
@@ -305,8 +305,7 @@ void lanovenko::delete_target(std::istream& in, targets& trg, targets_sets& trgs
   delete_targets(id, trg, trgs);
 }
 
-
-void lanovenko::engage_max_targets(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_status_sets& ps)
+void lanovenko::engage_max_targets(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_s& ps)
 {
   std::string current_status, current_name, new_status, new_name;
   in >> current_status >> current_name;
@@ -345,7 +344,7 @@ void lanovenko::engage_max_targets(std::istream& in, std::ostream& out, targets&
   trgs.erase(current_name);
 }
 
-void lanovenko::engage_balanced(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_status_sets& ps)
+void lanovenko::engage_balanced(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_s& ps)
 {
   std::string current_status, current_name, new_status, new_name;
   in >> current_status >> current_name;
@@ -384,7 +383,7 @@ void lanovenko::engage_balanced(std::istream& in, std::ostream& out, targets& tr
   trgs.erase(current_name);
 }
 
-void lanovenko::engage_top_threats(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_status_sets& ps)
+void lanovenko::engage_top_threats(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_s& ps)
 {
   std::string current_status, current_name, new_status, new_name;
   in >> current_status >> current_name;
@@ -423,7 +422,7 @@ void lanovenko::engage_top_threats(std::istream& in, std::ostream& out, targets&
   trgs.erase(current_name);
 }
 
-void lanovenko::engage_manual(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_status_sets& ps)
+void lanovenko::engage_manual(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_s& ps)
 {
   std::string current_status, current_name, new_status, new_name, id;
   in >> current_status >> current_name;
@@ -464,7 +463,7 @@ void lanovenko::engage_manual(std::istream& in, std::ostream& out, targets& trg,
   trgs.erase(current_name);
 }
 
-void lanovenko::solve_threat(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_status_sets& ps)
+void lanovenko::solve_threat(std::istream& in, std::ostream& out, targets& trg, targets_sets& trgs, pantsir_s& ps)
 {
   std::string current_status, current_name, new_status, new_name, type;
   in >> current_status >> current_name;
@@ -520,7 +519,14 @@ void lanovenko::target_list(std::istream& in, std::ostream& out, const targets_s
   std::for_each(curr.begin(), curr.end(), prt_target);
 }
 
-void lanovenko::system_status(std::istream& in, std::ostream& out, const pantsir_status_sets& ps)
+void lanovenko::all_targets(std::ostream &out, const targets &trs)
+{
+  using namespace std::placeholders;
+  auto print_t = std::bind(print_target, _1, std::ref(out));
+  std::for_each(trs.begin(), trs.end(), print_t);
+}
+
+void lanovenko::system_status(std::istream& in, std::ostream& out, const pantsir_s& ps)
 {
   std::string status_name;
   if (!(in >> status_name) || ps.find(status_name) == ps.end())
@@ -554,4 +560,25 @@ void lanovenko::add_target_to_set(std::istream& in, targets_sets& trgs, targets&
   Target current = trg.at(id);
   targets& set = trgs[name];
   set[id] = current;
+}
+
+void lanovenko::help(std::ostream &out)
+{
+  out << "create_target < ID > < TYPE > < DISTANCE > < HEIGHT > < SPEED > < UNIQUE CODE > - Создать цель\n";
+  out << "create_targets < NAME > - Создать набор целей\n";
+  out << "add_target_to_set < NAME > < ID > - Создать набор целей\n";
+  out << "delete_target < ID > - Удалить цель\n";
+  out << "delete_target_name < ID > < NAME > - Удалить цель из набора\n";
+  out << "engage_max_targets < PANTSIR STATUS > < NAME_TARGETST > < NEW PANTSIR STATUS > < NEW_TARGETS > - ";
+  out << "Обстрелять максимум целей\n";
+  out << "engage_balanced < PANTSIR STATUS > < NAME TARGETST > < NEW PANTSIR STATUS > < NEW TARGETS > - ";
+  out << "Сбалансированная атака целей\n";
+  out << "engage_top_threats < PANTSIT STATUS > < NAME_TARGETST > < NEW PANTSIR STATUS > < NEW_TARGETS > - ";
+  out << "Атака самых опасных целей\n";
+  out << "engage_manual < PANTSIR STATUS > < NAME TARGETST > < NEW PANTSIR STATUS > < NEW TARGETS > < ID > - ";
+  out << "Ручная атака цели\n";
+  out << "solve_threat < PANTSIR STATUS > < NAME TARGETST > < NEW PANTSIR STATUS > < NEW TARGETS > < TYPE > - ";
+  out << "Атака целей определенного типа\n";
+  out << "system_status < PANTSIR STATUS NAME > - Вывести данные об установке\n";
+  out << "target_list < TARGETS NAME > - показать весь список целей\n";
 }
