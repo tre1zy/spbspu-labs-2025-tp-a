@@ -58,7 +58,6 @@ namespace rychkov
     void parse_while(CParseContext& context);
     void parse_for(CParseContext& context);
 
-    void print(std::ostream& out) const;
     template< class T >
     static void clear_scope(T& pair_set, size_t scope);
   private:

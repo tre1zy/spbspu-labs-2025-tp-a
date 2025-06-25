@@ -12,6 +12,7 @@ namespace rychkov
     std::ostream& out;
     ContentPrinter(std::ostream& ostream, size_t start_indent = 0);
 
+    void operator()(const std::string& any);
     void operator()(const Macro& macro);
     void operator()(const entities::Variable& var);
     void operator()(const entities::Function& func);

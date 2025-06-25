@@ -14,7 +14,9 @@ rychkov::Parser::map_type< rychkov::ParserContext, rychkov::MainProcessor > rych
       {"exposition", &rychkov::MainProcessor::exposition},
       {"defines", &rychkov::MainProcessor::defines},
       {"dependencies", &rychkov::MainProcessor::dependencies},
-      {"uses", &rychkov::MainProcessor::uses}
+      {"uses", &rychkov::MainProcessor::uses},
+      {"intersections", &rychkov::MainProcessor::intersections},
+      {"diff", &rychkov::MainProcessor::diff}
     };
 
 rychkov::ParseCell::ParseCell(CParseContext context, Stage last_stage,
@@ -41,6 +43,7 @@ bool rychkov::MainProcessor::parse(ParserContext& context)
   if (!in)
   {
     context.err << "failed to open file\n";
+    return true;
   }
   ParseCell cell = {{context.out, context.err, filename}, last_stage_, include_dirs_};
   context.out << "<--PARSE: \"" << filename << "\"-->\n";
@@ -101,6 +104,9 @@ bool rychkov::MainProcessor::save(ParserContext& context)
   {
     result = save_file_;
   }
-  save(context.err, result);
+  if (save(context.err, result))
+  {
+    context.out << "saved to \"" << result << "\"\n";
+  }
   return true;
 }

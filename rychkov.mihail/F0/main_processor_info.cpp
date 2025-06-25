@@ -21,9 +21,10 @@ bool rychkov::MainProcessor::files(ParserContext& context)
   {
     return false;
   }
+  ContentPrinter printer{context.out};
   for (const decltype(parsed_)::value_type& i: parsed_)
   {
-    context.out << i.first << '\n';
+    printer(i.first);
   }
   return true;
 }
@@ -39,7 +40,7 @@ bool rychkov::MainProcessor::tree(ParserContext& context)
   {
     return false;
   }
-  parser.print(context.out);
+  std::for_each(parser.begin(), parser.end(), ContentPrinter{context.out});
   return true;
 }
 bool rychkov::MainProcessor::external(ParserContext& context)
@@ -48,7 +49,7 @@ bool rychkov::MainProcessor::external(ParserContext& context)
   {
     return false;
   }
-  ContentPrinter printer(context.out);
+  ContentPrinter printer{context.out};
   bool no_external = true;
   for (const std::pair< const std::string, ParseCell >& cell: parsed_)
   {
@@ -117,7 +118,7 @@ bool rychkov::MainProcessor::defines(ParserContext& context)
   {
     return false;
   }
-  ContentPrinter printer(context.out);
+  ContentPrinter printer(context.out, 1);
   context.out << "<actual>:\n";
   std::for_each(preproc.macros.begin(), preproc.macros.end(), printer);
   context.out << "<legacy>:\n";

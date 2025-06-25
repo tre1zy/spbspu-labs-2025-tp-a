@@ -60,6 +60,10 @@ void rychkov::ContentPrinter::print_empty()
   indent() << "* [EMPTY]\n";
 }
 
+void rychkov::ContentPrinter::operator()(const std::string& any)
+{
+  indent() << "* " << any << '\n';
+}
 void rychkov::ContentPrinter::operator()(const Macro& macro)
 {
   indent() << "* [macro] " << macro.name;

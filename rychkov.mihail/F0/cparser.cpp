@@ -31,10 +31,6 @@ const rychkov::Operator rychkov::CParser::comma = {Operator::BINARY, Operator::S
 const rychkov::Operator rychkov::CParser::inline_if = {Operator::TERNARY, Operator::SPECIAL,
     "?:", false, false, false, 13};
 
-void rychkov::CParser::print(std::ostream& out) const
-{
-  std::for_each(program_.begin(), program_.end(),  ContentPrinter{out});
-}
 bool rychkov::CParser::global_scope() const noexcept
 {
   return (stack_.size() == 1) && (stack_.top()->empty());
