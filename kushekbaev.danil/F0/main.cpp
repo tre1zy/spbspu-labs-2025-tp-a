@@ -14,12 +14,13 @@ int main()
   commands["insert"] = std::bind(insert, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
   commands["print"] = std::bind(print, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
   commands["remove"] = std::bind(kushekbaev::remove, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
-  /*  commands["search"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["remove_translation_at_all"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["save"] = std::bind(save, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
+  commands["import_dictionary"] = std::bind(import_dictionary, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
+  commands["search"] = std::bind(search, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
+  commands["clear_dictionary"] = std::bind(clear_dictionary, std::ref(std::cout), std::ref(std::cin), std::ref(current_dictionary));
+  /*  commands["remove_translation_at_all"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["remove_translation"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
   commands["reverse_search"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["clear_dictionary"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["import_dictionary"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["merge"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["split"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["prefix_search"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
@@ -30,8 +31,7 @@ int main()
   commands["find_words_without_translation"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["complement"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["intersect"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
-  commands["unification"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["save"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons)); */
+  commands["unification"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons)); */
 
   std::string command;
   while (std::cin >> command)

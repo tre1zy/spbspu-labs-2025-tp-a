@@ -16,17 +16,19 @@ namespace kushekbaev
 
   void remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
 
-  void search();
+  void save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+
+  void import_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+
+  void search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+
+  void clear_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
 
   void remove_translation_at_all();
 
   void remove_translation();
 
   void reverse_search();
-
-  void clear_dictionary();
-
-  void import_dictionary();
 
   void merge();
 
@@ -50,9 +52,7 @@ namespace kushekbaev
 
   void unification();
 
-  void save();
-
-  void print_list_of_commands(std::ostream& out);
+  void print_help(std::ostream& out);
 }
 
 #endif
