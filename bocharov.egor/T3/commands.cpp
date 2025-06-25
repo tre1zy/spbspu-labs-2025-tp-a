@@ -23,6 +23,24 @@ namespace
     }
   };
 
+  struct AreaSumCalculator
+  {
+    Predicate pred;
+    double operator()(const std::vector<Polygon> & polygons) const
+    {
+      AreaAccumulator accumulator{pred};
+      return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+    }
+  };
+
+  struct AlwaysTrue
+  {
+    bool operator()(const Polygon &) const noexcept
+    {
+      return true;
+    }
+  };
+
   struct SequenceCounter
   {
     const Polygon& target;
@@ -67,23 +85,17 @@ namespace
       throw std::runtime_error("ERROR: there are no polygons");
     }
     StreamGuard guard(out);
-    std::vector< double > areas;
-    areas.reserve(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
+    AreaSumCalculator calculator{AlwaysTrue{}};
+    double result = calculator(polygons) / polygons.size();
     out << std::fixed << std::setprecision(1) << result;
   }
 
   void getAreaVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
   {
     StreamGuard guard(out);
-    std::vector< Polygon > filtered;
-    filtered.reserve(polygons.size());
     auto pred = std::bind(hasNVertexes, std::placeholders::_1, num);
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
-    std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
+    AreaSumCalculator calculator{pred};
+    double result = calculator(polygons);
     out << std::fixed << std::setprecision(1) << result;
   }
 
