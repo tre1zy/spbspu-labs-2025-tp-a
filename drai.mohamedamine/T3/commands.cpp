@@ -12,7 +12,7 @@
 
 namespace amine
 {
-  struct IsEvenVertexCount {
+struct IsEvenVertexCount {
     bool operator()(const Polygon& p) const {
         return p.points.size() % 2 == 0;
     }
@@ -221,10 +221,14 @@ double areaNum(const std::vector<Polygon>& polys, int num)
 void CommandProcessor::command_count(const std::string& rest) const
 {
     if (rest == "EVEN") {
-        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
+        IsEvenVertexCount pred;
+        size_t count = std::count_if(polygons_.begin(), polygons_.end(), pred);
+        std::cout << count << "\n";
     }
     else if (rest == "ODD") {
-        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
+        IsOddVertexCount pred;
+        size_t count = std::count_if(polygons_.begin(), polygons_.end(), pred);
+        std::cout << count << "\n";
     }
     else {
         try {
@@ -233,7 +237,9 @@ void CommandProcessor::command_count(const std::string& rest) const
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            std::cout << std::count_if(polygons_.begin(), polygons_.end(), HasVertexCount(target)) << "\n";
+            HasVertexCount pred(target);
+            size_t count = std::count_if(polygons_.begin(), polygons_.end(), pred);
+            std::cout << count << "\n";
         }
         catch (...) {
             std::cout << "<INVALID COMMAND>\n";
@@ -242,17 +248,21 @@ void CommandProcessor::command_count(const std::string& rest) const
 }
 
 void CommandProcessor::command_area(const std::string& rest) const {
-    if (rest == "EVEN") {
+    std::istringstream iss(rest);
+    std::string arg;
+    iss >> arg;
+
+    if (arg == "EVEN") {
         EvenAreaAdder adder;
         adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
         std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
     }
-    else if (rest == "ODD") {
+    else if (arg == "ODD") {
         OddAreaAdder adder;
         adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
         std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
     }
-    else if (rest == "MEAN") {
+    else if (arg == "MEAN") {
         if (polygons_.empty()) {
             std::cout << "<INVALID COMMAND>\n";
             return;
@@ -263,7 +273,7 @@ void CommandProcessor::command_area(const std::string& rest) const {
     }
     else {
         try {
-            size_t target = std::stoul(rest);
+            size_t target = std::stoul(arg);
             if (target < 3) {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
