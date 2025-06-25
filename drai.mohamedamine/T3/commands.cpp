@@ -374,13 +374,13 @@ namespace amine
      else
     {
       std::cout << intResult << "\n";
-    }
-  }
-};
+    } 
+  };
   catch (const std::exception&)
   {
     std::cout << "<INVALID COMMAND>\n";
   }
+}
 };
   void process_commands(std::vector< Polygon >& polygons)
   {
