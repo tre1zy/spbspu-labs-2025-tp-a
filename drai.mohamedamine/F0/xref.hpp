@@ -3,7 +3,7 @@
 
 #include <string>
 #include <set>
-#include <unordered_map>
+#include <map>
 
 namespace amine
 {
@@ -18,7 +18,7 @@ namespace amine
     bool operator()(const Position &a, const Position &b) const;
   };
 
-using Index = std::unordered_map<std::string, std::set<Position, positionLess>>;
+  using Index = std::map<std::string, std::set<Position, positionLess>>;
 
   class CrossRefSystem
   {
