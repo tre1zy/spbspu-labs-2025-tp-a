@@ -69,24 +69,28 @@ namespace averenkov
   class ItemPrinter
   {
   public:
+    std::ostream& out;
     void operator()(const Item& item) const;
   };
 
   class KitItemPrinter
   {
   public:
+    std::ostream& out;
     void operator()(const Item* item) const;
   };
 
   class KitPrinter
   {
   public:
+    std::ostream& out;
     void operator()(const std::pair<const std::string, Kit>& kit_pair) const;
   };
 
   class KnapsackPrinter
   {
   public:
+    std::ostream& out;
     void operator()(const std::pair<const std::string, Knapsack>& knapsack_pair) const;
   };
 

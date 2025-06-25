@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <numeric>
 #include "commands.hpp"
 
@@ -57,28 +58,28 @@ void averenkov::ItemAdder::operator()(const Item* item)
 
 void averenkov::ItemPrinter::operator()(const Item& item) const
 {
-  std::cout << "Item: " << item.getName();
-  std::cout << ", Weight: " << item.getWeight();
-  std::cout << ", Value: " << item.getValue() << "\n";
+  out << "Item: " << item.getName();
+  out << ", Weight: " << item.getWeight();
+  out << ", Value: " << item.getValue() << "\n";
 }
 
 void averenkov::KitItemPrinter::operator()(const Item* item) const
 {
-  std::cout << "    - " << item->getName() << "\n";
+  out << "    - " << item->getName() << "\n";
 }
 
 void averenkov::KitPrinter::operator()(const std::pair<const std::string, Kit>& kit_pair) const
 {
-  std::cout << "Kit: " << kit_pair.first << "\n";
-  std::cout << "  Items:\n";
+  out << "Kit: " << kit_pair.first << "\n";
+  out << "  Items:\n";
   auto its = kit_pair.second.getItems();
-  std::for_each(its.begin(), its.end(), KitItemPrinter());
+  std::for_each(its.begin(), its.end(), KitItemPrinter{ out });
 }
 
 void averenkov::KnapsackPrinter::operator()(const std::pair<const std::string, Knapsack>& knapsack_pair) const
 {
-  std::cout << "Knapsack: " << knapsack_pair.first;
-  std::cout << ", Capacity: " << knapsack_pair.second.getCapacity() << "\n";
+  out << "Knapsack: " << knapsack_pair.first;
+  out << ", Capacity: " << knapsack_pair.second.getCapacity() << "\n";
 }
 
 void averenkov::CombinationBuilder::operator()(int pos) const
@@ -266,14 +267,14 @@ void averenkov::showStats(const Base& base, const std::vector<std::string>& args
   {
     throw std::invalid_argument("stats command takes no arguments");
   }
-    std::cout << "=== Items ===\n";
-    std::for_each(base.items.begin(), base.items.end(), ItemPrinter());
-    std::cout << "\n=== Kits ===\n";
-    std::for_each(base.kits.begin(), base.kits.end(), KitPrinter());
-    std::cout << "\n=== Knapsacks ===\n";
-    std::for_each(base.knapsacks.begin(), base.knapsacks.end(), KnapsackPrinter());
-    std::cout << "\n=== Current Knapsack ===\n";
-    std::cout << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
+  std::cout << "=== Items ===\n";
+  std::for_each(base.items.begin(), base.items.end(), ItemPrinter{ std::cout });
+  std::cout << "\n=== Kits ===\n";
+  std::for_each(base.kits.begin(), base.kits.end(), KitPrinter{ std::cout });
+  std::cout << "\n=== Knapsacks ===\n";
+  std::for_each(base.knapsacks.begin(), base.knapsacks.end(), KnapsackPrinter{ std::cout });
+  std::cout << "\n=== Current Knapsack ===\n";
+  std::cout << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
 }
 
 // 12. reset
@@ -347,3 +348,139 @@ void averenkov::generateCombinations(const std::vector<const averenkov::Item*>& 
   generateCombinations(items, mask + 1, max_value, best_combination, capacity);
 }*/
 
+// 14. dynamic_prog
+
+// 15. backtracking
+
+// 16. branch_and_bound
+
+// 17. save
+void averenkov::saveToFile(const Base& base, const std::vector<std::string>& args)
+{
+  if (args.size() < 2)
+  {
+    throw std::invalid_argument("Usage: save <filename>");
+  }
+
+  const std::string& filename = args[1];
+  std::ofstream out(filename);
+  if (!out)
+  {
+    throw std::runtime_error("Cannot open file for writing: " + filename);
+  }
+  out << "=== Items ===\n";
+  std::for_each(base.items.begin(), base.items.end(), ItemPrinter{ out });
+
+  out << "\n=== Kits ===\n";
+  std::for_each(base.kits.begin(), base.kits.end(), KitPrinter{ out });
+
+  out << "\n=== Knapsacks ===\n";
+  std::for_each(base.knapsacks.begin(), base.knapsacks.end(), KnapsackPrinter{out});
+
+  out << "\n=== Current Knapsack ===\n";
+  out << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
+}
+
+
+// 18. load
+void averenkov::loadFromFile(Base& base, const std::vector<std::string>& args)
+{
+  if (args.size() < 2)
+  {
+    throw std::invalid_argument("Usage: load <filename>");
+  }
+
+  const std::string& filename = args[1];
+  std::ifstream in(filename);
+  if (!in)
+  {
+    throw std::runtime_error("Cannot open file for reading: " + filename);
+  }
+
+  base = Base();
+
+  std::string line;
+
+  if (std::getline(in, line))
+  {
+    size_t pos = 0;
+    while (pos < line.size())
+    {
+      std::string name;
+      int weight, value;
+      size_t space_pos = line.find(' ', pos);
+      if (space_pos == std::string::npos)
+      {
+        break;
+      }
+      name = line.substr(pos, space_pos - pos);
+      pos = space_pos + 1;
+      space_pos = line.find(' ', pos);
+      if (space_pos == std::string::npos)
+      {
+        break;
+      }
+      weight = std::stoi(line.substr(pos, space_pos - pos));
+      pos = space_pos + 1;
+      space_pos = line.find(' ', pos);
+      value = std::stoi(line.substr(pos, (space_pos == std::string::npos) ? line.size() - pos : space_pos - pos));
+      pos = (space_pos == std::string::npos) ? line.size() : space_pos + 1;
+      base.items.emplace_back(name, weight, value);
+    }
+  }
+
+  if (std::getline(in, line))
+  {
+    size_t pos = 0;
+    while (pos < line.size())
+    {
+      size_t space_pos = line.find(' ', pos);
+      std::string kitName = line.substr(pos, (space_pos == std::string::npos) ? line.size() - pos : space_pos - pos);
+      pos = (space_pos == std::string::npos) ? line.size() : space_pos + 1;
+      auto kitIt = base.kits.find(kitName);
+      if (kitIt == base.kits.end())
+      {
+        kitIt = base.kits.emplace(kitName, Kit(kitName)).first;
+      }
+      Kit& kit = kitIt->second;
+      while (pos < line.size())
+      {
+        space_pos = line.find(' ', pos);
+        std::string itemName = line.substr(pos, (space_pos == std::string::npos) ? line.size() - pos : space_pos - pos);
+        pos = (space_pos == std::string::npos) ? line.size() : space_pos + 1;
+        ItemFinder finder{ itemName };
+        auto it = std::find_if(base.items.begin(), base.items.end(), finder);
+        if (it != base.items.end())
+        {
+          kit.addItem(std::addressof(*it));
+        }
+      }
+    }
+  }
+
+  if (std::getline(in, line))
+  {
+    size_t pos = 0;
+    while (pos < line.size())
+    {
+      size_t space_pos = line.find(' ', pos);
+      if (space_pos == std::string::npos)
+      {
+        break;
+      }
+      std::string knapsackName = line.substr(pos, space_pos - pos);
+      pos = space_pos + 1;
+      space_pos = line.find(' ', pos);
+      int capacity = std::stoi(line.substr(pos, (space_pos == std::string::npos) ? line.size() - pos : space_pos - pos));
+      pos = (space_pos == std::string::npos) ? line.size() : space_pos + 1;
+      base.knapsacks.emplace(knapsackName, Knapsack(capacity));
+    }
+  }
+
+  if (std::getline(in, line))
+  {
+    int capacity = std::stoi(line);
+    base.current_knapsack = Knapsack(capacity);
+  }
+
+}

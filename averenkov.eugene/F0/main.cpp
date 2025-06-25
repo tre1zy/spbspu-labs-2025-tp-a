@@ -21,8 +21,8 @@ int main()
 //  commands["dynamic_prog"] = averenkov::dynamicProgrammingSolve;
 //  commands["backtracking"] = averenkov::backtrackingSolve;
 //  commands["branch_and_bound"] = averenkov::branchAndBoundSolve;
-//  commands["save"] = averenkov::saveToFile;
-//  commands["load"] = averenkov::loadFromFile;
+  commands["save"] = averenkov::saveToFile;
+  commands["load"] = averenkov::loadFromFile;
 
   averenkov::Base base;
 
