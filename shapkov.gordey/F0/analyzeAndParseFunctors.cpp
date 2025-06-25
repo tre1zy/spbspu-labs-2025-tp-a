@@ -59,7 +59,7 @@ bool shapkov::CompareByFreq(const std::pair< std::string, size_t >& p1, const st
   return p1.second < p2.second;
 }
 
-std::ostream& shapkov::operator<<(std::ostream& out, const PairIO p)
+std::ostream& shapkov::operator<<(std::ostream& out, const PairIO& p)
 {
   return out << p.pair.first << ": " << p.pair.second;
 }

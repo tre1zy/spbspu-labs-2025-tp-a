@@ -47,7 +47,7 @@ namespace shapkov
   {
     const std::pair< std::string, size_t >& pair;
   };
-  std::ostream& operator<<(std::ostream& out, const PairIO p);
+  std::ostream& operator<<(std::ostream& out, const PairIO& p);
   PairIO makePairIO(const std::pair< std::string, size_t >& p);
   template< class Cond >
   class ConditionPrinter
