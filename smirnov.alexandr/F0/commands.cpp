@@ -174,18 +174,13 @@ void smirnov::printCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "The dictionary with name " << dictName << " doesn't exist.\n";
     return;
   }
-  const auto & dict = dictIt->second;
+  const Dict & dict = dictIt->second;
   if (dict.empty())
   {
     out << dictName << " is empty.\n";
     return;
   }
-  for (const auto & pair : dict)
-  {
-    out << pair.first << " - ";
-    std::copy(pair.second.begin(), pair.second.end(), std::ostream_iterator< std::string >(out, " "));
-    out << "\n";
-  }
+  std::for_each(dict.begin(), dict.end(), EntryFormatter(out));
 }
 
 void smirnov::saveCommand(Dicts & dicts, std::istream & in, std::ostream & out)
@@ -521,25 +516,21 @@ void smirnov::prefixCommand(Dicts & dicts, std::istream & in, std::ostream & out
     out << "The dictionary with name " << newName << " already exists.\n";
     return;
   }
-  const auto & dict = dictIt->second;
+  const Dict & dict = dictIt->second;
   if (dict.empty())
   {
     out << dictName << " is empty.\n";
     return;
   }
   Dict result;
-  for (const auto & pair : dict)
-  {
-    if (pair.first.substr(0, prefix.size()) == prefix)
-    {
-      result[pair.first] = pair.second;
-    }
-  }
+  std::copy_if(dict.begin(), dict.end(), std::inserter(result, result.end()), PrefixMatcher(prefix)
+  );
   if (result.empty())
   {
     out << "There aren't any words in " << dictName << " with prefix " << prefix << ".\n";
     return;
   }
+
   dicts[newName] = std::move(result);
 }
 
