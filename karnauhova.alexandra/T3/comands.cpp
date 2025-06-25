@@ -59,6 +59,23 @@ namespace
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(it), C);
     return it.size();
   }
+
+  struct EchoInserter
+  {
+    karnauhova::Polygon& target;
+    size_t& insert_count;
+    std::vector<karnauhova::Polygon> result;
+    std::vector<karnauhova::Polygon> operator()(std::vector<karnauhova::Polygon> acc, const karnauhova::Polygon& p)
+    {
+      acc.push_back(p);
+      if (p == target)
+      {
+        acc.push_back(p);
+        ++insert_count;
+      }
+      return acc;
+    }
+  };
 }
 
 void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -221,14 +238,7 @@ void karnauhova::echoComand(std::istream& in, std::ostream& out, std::vector< Po
   new_polygons.reserve(polygons.size());
   new_polygons = polygons;
   size_t count = 0;
-  for (auto it = polygons.begin(); it != polygons.end(); it++)
-  {
-    if (*it == pol)
-    {
-      new_polygons.insert(std::find(new_polygons.begin(), new_polygons.end(), *it) + 1, *it);
-      count++;
-    }
-  }
-  polygons = new_polygons;
+  EchoInserter inserter{pol, count, {}};
+  polygons = std::accumulate(polygons.begin(), polygons.end(), std::vector<Polygon>{}, inserter);
   out << count;
 }
