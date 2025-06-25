@@ -216,3 +216,13 @@ std::string karnauhova::Character::get_philosophy() const
 {
   return philosophy_;
 }
+
+std::string karnauhova::Character::get_win_quote() const
+{
+  return quote_win_;
+}
+
+std::string karnauhova::Character::get_lose_quote() const
+{
+  return quote_lose_;
+}

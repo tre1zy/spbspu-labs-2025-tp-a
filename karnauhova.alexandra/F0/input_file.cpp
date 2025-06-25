@@ -6,6 +6,8 @@
 #include <vector>
 #include <algorithm>
 #include <filesystem>
+#include "terminal_text.hpp"
+
 namespace
 {
   struct TransformMap
@@ -25,6 +27,8 @@ std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< 
 {
   setlocale(LC_ALL, "ru");
   std::map< std::string, karnauhova::Character > players;
+  clear_screen();
+  std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
   std::cout << "Привет!\n" << "Хотите продолжить прошлую или начать новую?\n" << "> NEW_GAME\n" << "> CONTINUE\n";
   std::cout << "Пожалуйста выберите ответ(Если у вас нет прошлого сохранения выберите NEW_GAME)\n";
   std::string answer;

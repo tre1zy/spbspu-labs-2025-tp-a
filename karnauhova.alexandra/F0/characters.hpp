@@ -27,6 +27,8 @@ namespace karnauhova
     std::string get_name() const;
     std::string get_story() const;
     std::string get_philosophy() const;
+    std::string get_win_quote() const;
+    std::string get_lose_quote() const;
     void about_character() const;
 
   private:

@@ -43,7 +43,7 @@ int main()
   delay(1200);
   std::map< std::string, std::function< void() > > cmds;
   cmds["CHARACTERS"] = std::bind(choice_characters, std::ref(players), std::cref(characters));
-  //cmds["FIGHT"] = std::bind(fight, std::ref(players), std::cref(characters));
+  cmds["FIGHT"] = std::bind(fight, std::ref(players));
   while (!std::cin.eof())
   {
     clear_screen();
@@ -52,10 +52,8 @@ int main()
     std::cout << ">Чтобы начать бой введите FIGHT\n";
     std::string answer;
     std::cin >> answer;
-    std::cout << answer;
     try
     {
-      std::cout << "meow\n";
       cmds.at(answer)();
     }
     catch (...)
@@ -65,6 +63,8 @@ int main()
         std::cin.clear();
         break;
       }
+      std::cout << "Убедитесь, что вы верно выбрали персонажей(у обоих игроков должны быть персонажи)\n";
+      delay(2000);
     }
     //catch (...)
     //{

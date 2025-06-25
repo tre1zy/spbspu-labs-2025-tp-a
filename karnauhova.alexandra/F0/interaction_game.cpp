@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <queue>
 #include "terminal_text.hpp"
 
 namespace
@@ -12,6 +13,37 @@ namespace
     pair.second.about_character();
     std::cout << "\n";
   }
+
+  struct QueueInserter
+  {
+    std::queue<std::pair<std::string, karnauhova::Character>>& queue;
+    
+    void operator()(const std::pair<const std::string, karnauhova::Character>& pair) const
+    {
+      queue.push(pair);
+    }
+  };
+
+  std::string where_damage(int option)
+  {
+    if (option == 1)
+    {
+      return "удар в голову";
+    }
+    else if (option == 2)
+    {
+      return "удар в туловище";
+    }
+    else if (option == 3)
+    {
+      return "удар в руку";
+    }
+    else if (option == 4)
+    {
+      return "удар в ногу";
+    }
+    return "";
+  }
 }
 
 void karnauhova::choice_characters(std::map< std::string, Character >& players, const std::map< size_t, Character >& characters)
@@ -20,7 +52,7 @@ void karnauhova::choice_characters(std::map< std::string, Character >& players, 
   {
     clear_screen();
     std::cout << "\033[1;33m" << std::string(100, '=') << "\033[0m" << "\n";
-    std::cout << "Чтобы вернуться напишите EXITE\n\n";
+    std::cout << "Чтобы вернуться напишите EXIT\n\n";
     std::cout << "Напишите ник игрока, который будет выбирать персонажа:\n";
     std::string name;
     std::cin >> name;
@@ -92,4 +124,91 @@ void karnauhova::choice_characters(std::map< std::string, Character >& players, 
     }
     
   }
+}
+
+void karnauhova::fight(std::map< std::string, Character >& players)
+{
+  std::queue< std::pair < std::string, Character > > fight_queue;
+  QueueInserter inserter{fight_queue};
+  std::for_each(players.begin(), players.end(), inserter);
+  if (fight_queue.front().second.base_hp() == 0 || fight_queue.back().second.base_hp() == 0)
+  {
+    throw std::logic_error("Incorrect characters");
+  }
+  while (!fight_queue.front().second.is_lost())
+  {
+    clear_screen();
+    std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
+    std::cout << "-Бой-\n\n";
+    std::cout << "Ход " << fight_queue.front().first << "\n";
+    std::cout << "Возможные действия:\n" << "> Ударить в голову(1)\n" << "> Ударить в туловище(2)\n" << "> Ударить в руку(3)\n" << "> Ударить в ногу(4)\n";
+    std::cout << "Номер выбранного удара:\n";
+    int option = 0;
+    if (!(std::cin >> option) || option > 4 || option < 1)
+    {
+      if (std::cin.eof())
+      {
+        std::cin.clear();
+        return;
+      }
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+    fight_queue.front().second.position = option;
+    int protection_option = 0;
+    while (!protection_option)
+    {
+      clear_screen();
+      std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
+      std::cout << "-Бой-\n\n";
+      std::cout << "Защищается " << fight_queue.back().first << "\n";
+      std::cout << "Возможные действия:\n" << "> Защитить голову(1)\n" << "> Защитить туловище(2)\n" << "> Защитить руку(3)\n" << "> Защитить ногу(4)\n";
+      std::cout << "Что будете защищать?(номер):\n";
+      if (!(std::cin >> protection_option) || protection_option > 4 || protection_option < 1)
+      {
+        protection_option = 0;
+        if (std::cin.eof())
+        {
+          std::cin.clear();
+          return;
+        }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        continue;
+      }
+    }
+    clear_screen();
+    std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
+    std::cout << "-Бой-\n\n";
+    fight_queue.push(fight_queue.front());
+    fight_queue.pop();
+    if (option != protection_option)
+    {
+      fight_queue.front().second.damage(fight_queue.back().second.attack());
+      std::cout << fight_queue.front().first << " получает " << where_damage(option) << "\n";
+      if (fight_queue.front().second.is_lost())
+      {
+        std::cout << "Для "<< fight_queue.front().first << " это был последний удар\n";
+      }
+      else
+      {
+        std::cout << "HP: " <<  fight_queue.front().second.volume_hp() << "\n";
+      }
+      delay(2500);
+    }
+    else
+    {
+      std::cout << fight_queue.front().first << " успешно защитился от атаки " << fight_queue.back().first << "\n";
+      delay(2500);
+    }
+    fight_queue.back().second.position = 0;
+  }
+  clear_screen();
+  std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
+  std::cout << fight_queue.back().first << " побеждает!\n\n";
+  std::cout << fight_queue.back().first << ": " << fight_queue.back().second.get_win_quote()<<"\n\n";
+  std::cout << fight_queue.front().first << ": " << fight_queue.front().second.get_lose_quote()<<"\n\n";
+  std::cout << "Выход из боя...\n";
+  delay(10000);
 }
