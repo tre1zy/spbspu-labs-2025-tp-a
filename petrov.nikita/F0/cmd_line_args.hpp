@@ -1,3 +1,6 @@
+#ifndef CMD_LINE_ARGS_HPP
+#define CMD_LINE_ARGS_HPP
+
 #include <iostream>
 
 namespace petrov
@@ -7,3 +10,5 @@ namespace petrov
 
   void processCmdLineAgruments(const int agrc, const char * const * argv);
 }
+
+#endif

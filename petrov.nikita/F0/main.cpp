@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include "cmd_line_args.hpp"
+#include "commands.hpp"
 
 namespace
 {
@@ -26,4 +27,6 @@ int main(const int argc, const char * const * argv)
   {
     processCmdLineAgruments(argc, argv);
   }
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["create_map"] = std::bind(createMap);
 }
