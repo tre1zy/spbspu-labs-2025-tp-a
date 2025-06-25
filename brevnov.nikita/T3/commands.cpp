@@ -161,24 +161,26 @@ namespace
     int ccw2 = point_f(A, B, D);
     int ccw3 = point_f(C, D, A);
     int ccw4 = point_f(C, D, B);
-    if (ccw1 * ccw2 < 0 && ccw3 * ccw4 < 0)
+    bool pred1 = ccw1 * ccw2 < 0;
+    pred1 = pred1 && ccw3 * ccw4 < 0;
+    if (pred1)
     {
       return true;
     }
-    if (ccw1 == 0 && ccw2 == 0 && ccw3 == 0 && ccw4 == 0)
+    pred1 = ccw1 == 0;
+    pred1 = pred1 && ccw2 == 0;
+    pred1 = pred1 && ccw3 == 0;
+    pred1 = pred1 && ccw4 == 0;
+    if (pred1)
     {
-      if (std::max(A.x, B.x) < std::min(C.x, D.x) || std::max(C.x, D.x) < std::min(A.x, B.x))
-      {
-        return false;
-      }
-      if (std::max(A.y, B.y) < std::min(C.y, D.y) || std::max(C.y, D.y) < std::min(A.y, B.y))
-      {
-        return false;
-      }
-      return true;
+      return !((std::max(A.x, B.x) < std::min(C.x, D.x) || std::max(C.x, D.x) < std::min(A.x, B.x))
+        || (std::max(A.y, B.y) < std::min(C.y, D.y) || std::max(C.y, D.y) < std::min(A.y, B.y)))
     }
-    return (ccw1 == 0 && on_segment(A, B, C)) || (ccw2 == 0 && on_segment(A, B, D))
-      || (ccw3 == 0 && on_segment(C, D, A)) || (ccw4 == 0 && on_segment(C, D, B));
+    pred1 = ccw1 == 0 && on_segment(A, B, C);
+    pred1 = pred1 || (ccw2 == 0 && on_segment(A, B, D));
+    pred1 = pred1 || (ccw3 == 0 && on_segment(C, D, A));
+    pred1 = pred1 || (ccw4 == 0 && on_segment(C, D, B));
+    return pred1;
   }
 
   struct Bounds
