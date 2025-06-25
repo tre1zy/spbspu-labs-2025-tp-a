@@ -41,7 +41,6 @@ int main(int arg, char** argv)
   commands["create_target_set"] = std::bind(create_target_set, std::ref(std::cin), std::ref(trgs));
   commands["add_target_to_set"] = std::bind(add_target_to_set, std::ref(std::cin), std::ref(trgs), std::ref(trg));
   commands["all_targets"] = std::bind(all_targets, std::ref(std::cout), std::cref(trg));
-  commands["help"] = std::bind(help, std::ref(std::cout));
   std::string command;
   while (!(std::cin >> command).eof())
   {
