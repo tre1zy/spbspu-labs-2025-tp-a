@@ -12,6 +12,8 @@ namespace kushekbaev
 
   void insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
+  void insert_without_translation(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
   void print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
   void remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
@@ -40,17 +42,17 @@ namespace kushekbaev
 
   void no_suffix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void merge();
+  void merge(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void split();
+  void split(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void find_words_without_translations();
+  void find_words_without_translations(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void complement();
+  void complement(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void intersect();
+  void intersect(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void unification();
+  void unification(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
   void print_help(std::ostream& out);
 }

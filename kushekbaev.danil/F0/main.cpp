@@ -12,6 +12,7 @@ int main()
   dictionary_system curr_ds;
   std::map< std::string, std::function<void() > > commands;
   commands["insert"] = std::bind(insert, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["insert_without_translation"] = std::bind(insert_without_translation, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["print"] = std::bind(print, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["remove"] = std::bind(kushekbaev::remove, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["save"] = std::bind(save, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
@@ -26,12 +27,12 @@ int main()
   commands["no_prefix_search"] = std::bind(no_prefix_search, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["suffix_search"] = std::bind(suffix_search, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["no_suffix_search"] = std::bind(no_suffix_search, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
-  /*commands["merge"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["split"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["find_words_without_translation"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["complement"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["intersect"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
-  commands["unification"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons)); */
+  commands["merge"] = std::bind(merge, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["split"] = std::bind(split, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["find_words_without_translation"] = std::bind(find_words_without_translations, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["complement"] = std::bind(complement, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["intersect"] = std::bind(intersect, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["unification"] = std::bind(unification, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
 
   std::string command;
   while (std::cin >> command)
