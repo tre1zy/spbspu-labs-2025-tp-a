@@ -1,7 +1,145 @@
 #include "functor.hpp"
+#include <algorithm>
+#include <limits>
+#include <iomanip>
+#include <numeric>
 #include "shannonFano.hpp"
 
-bool NullChecker::operator()(const duhanina::Node* node) const
+namespace
+{
+  using namespace duhanina;
+
+  void delete_tree(duhanina::Node* node)
+  {
+    if (node != nullptr)
+    {
+      delete_tree(node->left);
+      delete_tree(node->right);
+      delete node;
+    }
+  }
+
+  Node* build_subtree(const std::vector< Node* >& nodes, size_t start, size_t end)
+  {
+    if (nodes.empty())
+    {
+      throw std::invalid_argument("Empty nodes list");
+    }
+    if (start >= end)
+    {
+      throw std::invalid_argument("Invalid range");
+    }
+    if (start >= nodes.size() || end > nodes.size())
+    {
+      throw std::out_of_range("Range exceeds nodes size");
+    }
+    if (std::any_of(nodes.begin() + start, nodes.begin() + end, NullChecker()))
+    {
+      throw std::invalid_argument("Null node");
+    }
+    Node* subtree = nullptr;
+    try
+    {
+      subtree = new Node(*nodes[start]);
+      subtree = std::accumulate(nodes.begin() + start + 1, nodes.begin() + end, subtree, NodeMerger());
+    }
+    catch (...)
+    {
+      delete_tree(subtree);
+      throw;
+    }
+    return subtree;
+  }
+
+  std::pair< Node*, Node* > split_nodes(const std::vector< Node* >& nodes)
+  {
+    if (nodes.empty())
+    {
+      throw std::invalid_argument("Empty nodes vector");
+    }
+    if (std::any_of(nodes.begin(), nodes.end(), NullChecker()))
+    {
+      throw std::invalid_argument("Null node");
+    }
+    size_t total = std::accumulate(nodes.begin(), nodes.end(), 0, FreqAccumulator());
+    SplitPositionFinder finder(total / 2);
+    auto split_it = std::find_if(nodes.begin(), nodes.end(), std::ref(finder));
+    size_t split_pos = std::distance(nodes.begin(), split_it);
+    Node* left = nullptr;
+    Node* right = nullptr;
+    try
+    {
+      left = build_subtree(nodes, 0, split_pos);
+      right = build_subtree(nodes, split_pos, nodes.size());
+    }
+    catch (...)
+    {
+      delete_tree(left);
+      delete_tree(right);
+      throw;
+    }
+    return { left, right };
+  }
+
+  std::vector< Node* > merge_nodes(Node* left, Node* right)
+  {
+    std::vector< Node* > new_nodes;
+    if (left)
+    {
+      new_nodes.push_back(left);
+    }
+    if (right)
+    {
+      new_nodes.push_back(right);
+    }
+    return new_nodes;
+  }
+}
+
+std::set< char > duhanina::find_missing_chars(str_t text, const std::map< char, std::string >& char_to_code)
+{
+  std::set< char > missing;
+  CharChecker checker(char_to_code);
+  CharInserter inserter(missing);
+  std::copy_if(text.begin(), text.end(), std::inserter(missing, missing.begin()), std::ref(checker));
+  return missing;
+}
+
+duhanina::LineProcessor::LineProcessor(CodeTable& table):
+  table_ref_(table)
+{}
+
+void duhanina::LineProcessor::operator()(const Line& line) const
+{
+  const std::string& str = line.content_;
+  if (str.empty())
+  {
+    return;
+  }
+  const size_t space_pos = str.find(' ');
+  if (space_pos == std::string::npos || space_pos == str.length() - 1)
+  {
+    return;
+  }
+  try
+  {
+    const int char_code = std::stoi(str.substr(0, space_pos));
+    const std::string code = str.substr(space_pos + 1);
+    const char character = static_cast< char >(char_code);
+    if (char_code < std::numeric_limits< char >::min() || char_code > std::numeric_limits< char >::max())
+    {
+      throw std::out_of_range("CHAR_CODE_OUT_OF_RANGE");
+    }
+    table_ref_.char_to_code[character] = code;
+    table_ref_.code_to_char[code] = character;
+  }
+  catch (...)
+  {
+    return;
+  }
+}
+
+bool duhanina::NullChecker::operator()(const duhanina::Node* node) const
 {
   return node == nullptr;
 }
@@ -12,12 +150,12 @@ duhanina::Node* duhanina::NodeMerger::operator()(duhanina::Node* subtree, duhani
   {
     throw std::invalid_argument("Null node");
   }
-  duhanina::Node* new_node = nullptr;
-  duhanina::Node* new_subtree = nullptr;
+  Node* new_node = nullptr;
+  Node* new_subtree = nullptr;
   try
   {
-    new_node = new duhanina::Node(*node);
-    new_subtree = new duhanina::Node(subtree->freq + new_node->freq, subtree, new_node);
+    new_node = new Node(*node);
+    new_subtree = new Node(subtree->freq + new_node->freq, subtree, new_node);
   }
   catch (...)
   {
@@ -46,7 +184,7 @@ bool duhanina::SplitPositionFinder::operator()(duhanina::Node* node)
 
 duhanina::Node* duhanina::NodeCreator::operator()(const std::pair< char, size_t >& pair) const
 {
-  return new duhanina::Node(pair.first, pair.second);
+  return new Node(pair.first, pair.second);
 }
 
 duhanina::FreqCounter::FreqCounter(std::map<char, size_t>& freq_map):
@@ -67,6 +205,25 @@ void duhanina::CodeTableFiller::operator()(const std::pair< char, std::string >&
   table_.code_to_char[entry.second] = entry.first;
 }
 
+duhanina::FreqTransformer::FreqTransformer(std::map<char, size_t>& freq_map):
+  freq_map_(freq_map)
+{}
+
+char duhanina::FreqTransformer::operator()(char c) const
+{
+  freq_map_[c]++;
+  return c;
+}
+
+duhanina::TableTransformer::TableTransformer(duhanina::CodeTable& table):
+  table_(table)
+{}
+
+void duhanina::TableTransformer::operator()(const std::pair< char, std::string >& entry) const
+{
+  table_.code_to_char[entry.second] = entry.first;
+}
+
 duhanina::TreeBuilder::TreeBuilder(std::vector<duhanina::Node*>& nodes):
   nodes_(nodes)
 {}
@@ -77,14 +234,14 @@ void duhanina::TreeBuilder::operator()() const
   {
     return;
   }
-  auto node_pair = duhanina::split_nodes(nodes_);
-  nodes_ = duhanina::merge_nodes(node_pair.first, node_pair.second);
+  auto node_pair = split_nodes(nodes_);
+  nodes_ = merge_nodes(node_pair.first, node_pair.second);
   (*this)();
 }
 
 void duhanina::TreeDeleter::operator()(duhanina::Node* node) const
 {
-  duhanina::delete_tree(node);
+  delete_tree(node);
 }
 
 duhanina::CharEncoder::CharEncoder(const duhanina::CodeTable& table, std::string& result):
@@ -188,6 +345,11 @@ void duhanina::BitHandler::operator()(size_t bit_pos)
   }
 }
 
+void duhanina::BitHandler::set_bits(const std::bitset< 8 >& bits)
+{
+  bits_ = bits;
+}
+
 duhanina::DataProcessor::DataProcessor(size_t total_bits):
   total_bits_(total_bits),
   processed_(0)
@@ -203,7 +365,7 @@ void duhanina::DataProcessor::operator()(char byte)
   }
   std::bitset< 8 > bits(byte);
   BitHandler handler(result_, processed_, total_bits_);
-  handler.bits_ = bits;
+  handler.set_bits(std::bitset< 8 >(bits));
   std::vector< size_t > bit_positions(8);
   std::iota(bit_positions.begin(), bit_positions.end(), 0);
   std::for_each(bit_positions.begin(), bit_positions.end(), handler);
@@ -228,41 +390,35 @@ void duhanina::TableEntryWriter::operator()(const std::pair< char, std::string >
   out_ << static_cast< int >(entry.first) << " " << entry.second << "\n";
 }
 
-void duhanina::LineProcessor::operator()(const std::string& line, duhanina::CodeTable& table) const
-{
-  if (line.empty())
-  {
-    return;
-  }
-  const size_t space_pos = line.find(' ');
-  if (space_pos == std::string::npos || space_pos == line.length() - 1)
-  {
-    return;
-  }
-  try
-  {
-    const int char_code = std::stoi(line.substr(0, space_pos));
-    const std::string code = line.substr(space_pos + 1);
-    const char character = static_cast< char >(char_code);
-    if (char_code < std::numeric_limits< char >::min() || char_code > std::numeric_limits< char >::max())
-    {
-      throw std::out_of_range("CHAR_CODE_OUT_OF_RANGE");
-    }
-    table.char_to_code[character] = code;
-    table.code_to_char[code] = character;
-  }
-  catch (...)
-  {
-    return;
-  }
-}
-
-void duhanina::StreamProcessor::operator()(std::istream_iterator< std::string > it, duhanina::CodeTable& table) const
+void duhanina::StreamProcessor::operator()(std::istream_iterator< std::string > it) const
 {
   if (it != std::istream_iterator< std::string >())
   {
-    line_processor_(*it, table);
+    process_element(*it);
+    ++it;
   }
+}
+
+void duhanina::StreamProcessor::process_element(const std::string& str) const
+{
+  Line line;
+  line.content_ = str;
+  line_processor_(line);
+}
+
+duhanina::StreamProcessor::StreamProcessor(CodeTable& table):
+  table_ref(table),
+  line_processor_(table)
+{}
+
+void duhanina::StreamProcessor::operator()(const std::string& str)
+{
+  process_element(str);
+}
+
+void duhanina::StreamProcessor::operator()(const Line& line) const
+{
+  line_processor_(line);
 }
 
 duhanina::CharChecker::CharChecker(const std::map< char, std::string >& char_map):

@@ -2,11 +2,39 @@
 #define FUNCTOR_HPP
 
 #include <bitset>
+#include <fstream>
+#include <set>
+#include <iterator>
 #include "shannonFano.hpp"
 
 namespace duhanina
 {
   using str_t = const std::string&;
+
+  std::set< char > find_missing_chars(str_t text, const std::map< char, std::string >& char_to_code);
+
+  struct Line
+  {
+  public:
+    friend std::istream& operator>>(std::istream& is, Line& line)
+    {
+      return std::getline(is, line.content_);
+    }
+    friend struct LineProcessor;
+    friend struct StreamProcessor;
+  private:
+    std::string content_;
+  };
+
+  struct LineProcessor
+  {
+  public:
+    explicit LineProcessor(CodeTable& table);
+    void operator()(const struct Line& line) const;
+
+  private:
+    CodeTable& table_ref_;
+  };
 
   struct NullChecker
   {
@@ -53,6 +81,26 @@ namespace duhanina
   {
   public:
     explicit CodeTableFiller(CodeTable& table);
+    void operator()(const std::pair< char, std::string >& entry) const;
+
+  private:
+    CodeTable& table_;
+  };
+
+  struct FreqTransformer
+  {
+  public:
+    explicit FreqTransformer(std::map< char, size_t >& freq_map);
+    char operator()(char c) const;
+
+  private:
+    std::map< char, size_t >& freq_map_;
+  };
+
+  struct TableTransformer
+  {
+  public:
+    explicit TableTransformer(CodeTable& table);
     void operator()(const std::pair< char, std::string >& entry) const;
 
   private:
@@ -152,6 +200,7 @@ namespace duhanina
   public:
     BitHandler(std::string& result, size_t& processed, size_t total_bits);
     void operator()(size_t bit_pos);
+    void set_bits(const std::bitset< 8 >& bits);
 
   private:
     std::string& result_;
@@ -170,18 +219,18 @@ namespace duhanina
     std::ofstream& out_;
   };
 
-  struct LineProcessor
-  {
-    void operator()(const std::string& line, CodeTable& table) const;
-  };
-
   struct StreamProcessor
   {
   public:
-    void operator()(std::istream_iterator< std::string > it, CodeTable& table) const;
+    void operator()(std::istream_iterator< std::string > it) const;
+    explicit StreamProcessor(CodeTable& table);
+    void operator()(const std::string& str);
+    void operator()(const Line& line) const;
 
   private:
-    static LineProcessor line_processor_;
+    CodeTable& table_ref;
+    LineProcessor line_processor_;
+    void process_element(const std::string& str) const;
   };
 
   struct CharChecker

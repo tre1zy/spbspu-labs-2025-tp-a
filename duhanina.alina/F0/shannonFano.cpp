@@ -9,6 +9,8 @@
 #include <algorithm>
 #include "functor.hpp"
 
+  std::map< std::string, duhanina::CodeTable > encoding_store;
+
 namespace
 {
   using str_t = const std::string&;
@@ -53,92 +55,6 @@ namespace
     }
   }
 
-  void delete_tree(duhanina::Node* node)
-  {
-    if (node != nullptr)
-    {
-      delete_tree(node->left);
-      delete_tree(node->right);
-      delete node;
-    }
-  }
-
-  duhanina::Node* build_subtree(const std::vector< duhanina::Node* >& nodes, size_t start, size_t end)
-  {
-    if (nodes.empty())
-    {
-      throw std::invalid_argument("Empty nodes list");
-    }
-    if (start >= end)
-    {
-      throw std::invalid_argument("Invalid range");
-    }
-    if (start >= nodes.size() || end > nodes.size())
-    {
-      throw std::out_of_range("Range exceeds nodes size");
-    }
-    if (std::any_of(nodes.begin() + start, nodes.begin() + end, NullChecker()))
-    {
-      throw std::invalid_argument("Null node");
-    }
-    duhanina::Node* subtree = nullptr;
-    try
-    {
-      subtree = new duhanina::Node(*nodes[start]);
-      subtree = std::accumulate(nodes.begin() + start + 1, nodes.begin() + end, subtree, NodeMerger());
-    }
-    catch (...)
-    {
-      delete_tree(subtree);
-      throw;
-    }
-    return subtree;
-  }
-
-  std::pair< duhanina::Node*, duhanina::Node* > split_nodes(const std::vector< duhanina::Node* >& nodes)
-  {
-    if (nodes.empty())
-    {
-      throw std::invalid_argument("Empty nodes vector");
-    }
-    if (std::any_of(nodes.begin(), nodes.end(), NullChecker()))
-    {
-      throw std::invalid_argument("Null node");
-    }
-    size_t total = std::accumulate(nodes.begin(), nodes.end(), 0, FreqAccumulator());
-    SplitPositionFinder finder(total / 2);
-    auto split_it = std::find_if(nodes.begin(), nodes.end(), std::ref(finder));
-    size_t split_pos = std::distance(nodes.begin(), split_it);
-    duhanina::Node* left = nullptr;
-    duhanina::Node* right = nullptr;
-    try
-    {
-      left = build_subtree(nodes, 0, split_pos);
-      right = build_subtree(nodes, split_pos, nodes.size());
-    }
-    catch (...)
-    {
-      delete_tree(left);
-      delete_tree(right);
-      throw;
-    }
-    return { left, right };
-  }
-
-  std::vector< duhanina::Node* > merge_nodes(duhanina::Node* left, duhanina::Node* right)
-  {
-    std::vector< duhanina::Node* > new_nodes;
-    if (left)
-    {
-      new_nodes.push_back(left);
-    }
-    if (right)
-    {
-      new_nodes.push_back(right);
-    }
-    return new_nodes;
-  }
-
   duhanina::CodeTable build_code_table(str_t text)
   {
     if (text.empty())
@@ -167,7 +83,7 @@ namespace
       build_shannon_fano_codes(nodes[0], "", table.char_to_code);
       std::vector< std::pair< char, std::string > > temp_vec(table.char_to_code.begin(), table.char_to_code.end());
       TableTransformer filler(table);
-      std::transform(temp_vec.begin(), temp_vec.end(), temp_vec.begin(), filler);
+      std::for_each(temp_vec.begin(), temp_vec.end(), filler);
       TreeDeleter deleter;
       deleter(nodes[0]);
       return table;
@@ -176,7 +92,7 @@ namespace
     {
       TreeDeleter deleter;
       std::vector< duhanina::Node* > nodes_to_delete = nodes;
-      std::transform(nodes_to_delete.begin(), nodes_to_delete.end(), nodes_to_delete.begin(), deleter);
+      std::for_each(nodes_to_delete.begin(), nodes_to_delete.end(), deleter);
       throw;
     }
   }
@@ -271,11 +187,11 @@ namespace
     }
     duhanina::CodeTable table;
     in >> table.total_chars;
-    in.ignore(std::numeric_limits< std::streamsize >::std::max(), '\n');
-    std::istream_iterator< std::string > line_begin(in);
-    std::istream_iterator< std::string > line_end;
-    StreamProcessor processor;
-    std::for_each(line_begin, line_end, std::bind(StreamProcessor(), std::placeholders::_1, std::ref(table)));
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    std::istream_iterator< Line > line_begin(in);
+    std::istream_iterator< Line > line_end;
+    StreamProcessor processor(table);
+    std::for_each(line_begin, line_end, processor);
     return table;
   }
 
@@ -309,15 +225,6 @@ namespace
     }
     out_file << decoded;
     out << "File successfully decompressed to '" << output_file << "'\n";
-  }
-
-  std::set< char > find_missing_chars(str_t text, const std::map< char, std::string >& char_to_code)
-  {
-    std::set< char > missing;
-    CharChecker checker(char_to_code);
-    CharInserter inserter(missing);
-    auto it = std::copy_if(text.begin(), text.end(), std::inserter(missing, missing.begin()), std::ref(checker));
-    return missing;
   }
 
   void print_missing_chars(const std::set< char >& missing, std::ostream& out)
@@ -368,7 +275,7 @@ void duhanina::show_codes(str_t encoding_id, std::ostream& out)
 
 void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& out)
 {
-  validate_extension(output_file, COMPRESSED_EXT);
+  validate_extension(output_file, CODE_TABLE_EXT);
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
   {
@@ -531,6 +438,7 @@ void duhanina::print_help(std::ostream& out)
 
 void duhanina::check_encoding(str_t input_file, str_t encoding_id, std::ostream& out)
 {
+  validate_extension(input_file, TEXT_EXT);
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
   {
@@ -556,6 +464,7 @@ void duhanina::check_encoding(str_t input_file, str_t encoding_id, std::ostream&
 
 void duhanina::suggest_encodings(str_t input_file, std::ostream& out)
 {
+  validate_extension(input_file, TEXT_EXT);
   std::ifstream in(input_file);
   if (!in)
   {
