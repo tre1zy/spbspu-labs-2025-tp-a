@@ -73,7 +73,6 @@ namespace amine
     insertWordsRecursive(index, words, lineNum, 0);
     processLinesRecursive(index, lines, lineNum + 1);
   }
-}
 
 void amine::CrossRefSystem::buildIndex(const std::string& indexName
   , const std::string& fileName)
@@ -752,4 +751,5 @@ void amine::CrossRefSystem::reconstructText(const std::string& indexName,
   };
 
   writeLines(0);
+}
 }
