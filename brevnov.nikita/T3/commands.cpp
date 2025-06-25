@@ -228,7 +228,7 @@ namespace
 
   struct PolygonPointPairs
   {
-    explicit PolygonPointPairs(const brevnov::Polygon& p): 
+    explicit PolygonPointPairs(const brevnov::Polygon& p):
       poly(p),
       i(0),
       j(p.points.size()-1),
@@ -287,7 +287,7 @@ class PointInPolygonChecker
   {
     if (polygon.points.size() < 3)
     {
-        return false;
+      return false;
     }
     struct State
     {
