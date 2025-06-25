@@ -11,13 +11,25 @@
 int main(int argc, char * argv[])
 {
   using namespace mozhegova;
+  std::unordered_map< std::string, std::unordered_map< std::string, std::vector< std::pair< size_t, size_t > > > > texts;
   if (argc == 2 && std::string(argv[1]) == "--help")
   {
     printHelp(std::cout);
     return 0;
   }
+  else if (argc == 3 && std::string(argv[1]) == "--continue")
+  {
+    try
+    {
+      loadFile(std::string(argv[2]), texts);
+    }
+    catch (const std::exception & e)
+    {
+      std::cerr << e.what() << '\n';
+      return 1;
+    }
+  }
 
-  std::unordered_map< std::string, std::unordered_map< std::string, std::vector< std::pair< size_t, size_t > > > > texts;
   std::map< std::string, std::function< void() > > cmds;
   cmds["generatelinks"] = std::bind(generateLinks, std::ref(std::cin), std::ref(texts));
   cmds["removelinks"] = std::bind(removeLinks, std::ref(std::cin), std::ref(texts));
@@ -34,7 +46,7 @@ int main(int argc, char * argv[])
   cmds["invertwords"] = std::bind(invertWords, std::ref(std::cin), std::ref(texts));
   cmds["replaceword"] = std::bind(replaceWord, std::ref(std::cin), std::ref(texts));
   cmds["save"] = std::bind(save, std::ref(std::cin), std::cref(texts));
-  cmds["loadfile"] = std::bind(loadFile, std::ref(std::cin), std::ref(texts));
+  cmds["loadfile"] = std::bind(loadFileCmd, std::ref(std::cin), std::ref(texts));
 
   std::string command;
   while (!(std::cin >> command).eof())

@@ -27,7 +27,8 @@ namespace mozhegova
   void invertWords(std::istream & in, Texts & texts);
   void replaceWord(std::istream & in, Texts & texts);
   void save(std::istream & in, const Texts & texts);
-  void loadFile(std::istream & in, Texts & texts);
+  void loadFileCmd(std::istream & in, Texts & texts);
+  void loadFile(const std::string & fileName, Texts & texts);
   void printHelp(std::ostream & out);
 }
 

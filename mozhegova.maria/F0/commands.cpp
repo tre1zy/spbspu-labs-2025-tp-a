@@ -583,10 +583,15 @@ void mozhegova::save(std::istream & in, const Texts & texts)
   std::for_each(texts.cbegin(), texts.cend(), PrintText{file});
 }
 
-void mozhegova::loadFile(std::istream & in, Texts & texts)
+void mozhegova::loadFileCmd(std::istream & in, Texts & texts)
 {
   std::string fileName;
   in >> fileName;
+  loadFile(fileName, texts);
+}
+
+void mozhegova::loadFile(const std::string & fileName, Texts & texts)
+{
   std::ifstream file(fileName);
   if (!file.is_open())
   {
@@ -636,5 +641,7 @@ void mozhegova::printHelp(std::ostream & out)
   out << "invertwords <text name> - reverse the order of words in each line in the text\n";
   out << "replaceword <text name> <old word> <new word> - replace a word in the text with a new one \n";
   out << "save <file name> - save all texts\n";
+  out << "loadfile <file name> - load the file\n";
+  out << "--continue - load the saves\n";
   out << "--help - show this help\n";
 }
