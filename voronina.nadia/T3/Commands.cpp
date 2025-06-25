@@ -6,8 +6,8 @@
 #include <string>
 #include <map>
 
-#include "Delimiter.h"
-#include "Iofmtguard.h"
+#include <IOFmtguard.h>
+#include <Delimiter.h>
 #include "Subcommands.h"
 
 void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)

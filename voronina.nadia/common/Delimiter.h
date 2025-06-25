@@ -10,6 +10,6 @@ namespace voronina
     char exp;
   };
 
-  inline std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream &in, DelimiterIO &&dest);
 }
 #endif

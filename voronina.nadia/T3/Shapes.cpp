@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include "Delimiter.h"
-#include "Iofmtguard.h"
+#include <Delimiter.h>
+#include <IOFmtguard.h>
 
 std::istream &voronina::operator>>(std::istream &in, Point &point)
 {

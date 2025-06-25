@@ -1,4 +1,4 @@
-#include <Delimiter.h>
+#include "Delimiter.h"
 
 std::istream& voronina::operator>>(std::istream &in, DelimiterIO &&dest)
 {
