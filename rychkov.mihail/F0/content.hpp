@@ -272,6 +272,13 @@ namespace rychkov
     const typing::Type* get_type(const Expression::operand& expr);
     bool is_lvalue(const Expression::operand& operand);
     bool is_lvalue(const Expression* expr);
+
+    template< class T >
+    const std::string& get_name(const T& entity)
+    {
+      return entity.name;
+    }
+    const std::string& get_name(const std::string& identity);
   }
 }
 

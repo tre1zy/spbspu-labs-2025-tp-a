@@ -46,6 +46,11 @@ rychkov::entities::Body::Body():
   data{{}}
 {}
 
+const std::string& rychkov::entities::get_name(const std::string& identity)
+{
+  return identity;
+}
+
 bool rychkov::entities::Expression::empty() const noexcept
 {
   return (operation == nullptr) && operands.empty();

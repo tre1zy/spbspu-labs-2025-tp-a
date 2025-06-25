@@ -4,23 +4,23 @@
 #include <string>
 #include <algorithm>
 
-std::ostream& rychkov::operator<<(std::ostream& out, const entities::Variable& var)
+std::ostream& rychkov::entities::operator<<(std::ostream& out, const Variable& var)
 {
-  print_left(out, var.type);
+  typing::print_left(out, var.type);
   out << ' ' << var.name;
-  print_right(out, var.type);
+  typing::print_right(out, var.type);
   return out;
 }
-std::ostream& rychkov::operator<<(std::ostream& out, const entities::Function& func)
+std::ostream& rychkov::entities::operator<<(std::ostream& out, const Function& func)
 {
-  print_left(out, func.type);
+  typing::print_left(out, func.type);
   out << ' ' << func.name;
   out << '(';
   char comma[3] = "\0 ";
   for (size_t i = 0; i < func.type.function_parameters.size(); i++)
   {
     out << comma;
-    print_left(out, func.type.function_parameters[i]);
+    typing::print_left(out, func.type.function_parameters[i]);
     out << ' ' << func.parameters[i];
     print_right(out, func.type.function_parameters[i]);
     comma[0] = ',';
@@ -30,7 +30,7 @@ std::ostream& rychkov::operator<<(std::ostream& out, const entities::Function& f
   print_right(out, *func.type.base);
   return out;
 }
-std::ostream& rychkov::operator<<(std::ostream& out, const entities::Literal& literal)
+std::ostream& rychkov::entities::operator<<(std::ostream& out, const Literal& literal)
 {
   switch (literal.type)
   {
@@ -47,6 +47,10 @@ std::ostream& rychkov::operator<<(std::ostream& out, const entities::Literal& li
   return out << literal.suffix;
 }
 
+rychkov::ContentPrinter::ContentPrinter(std::ostream& ostream, size_t start_indent):
+  out(ostream),
+  indent_(start_indent)
+{}
 std::ostream& rychkov::ContentPrinter::indent()
 {
   return out << std::string(indent_, '\t');
@@ -55,6 +59,7 @@ void rychkov::ContentPrinter::print_empty()
 {
   indent() << "* [EMPTY]\n";
 }
+
 void rychkov::ContentPrinter::operator()(const Macro& macro)
 {
   indent() << "* [macro] " << macro.name;

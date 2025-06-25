@@ -59,6 +59,8 @@ namespace rychkov
     void parse_for(CParseContext& context);
 
     void print(std::ostream& out) const;
+    template< class T >
+    static void clear_scope(T& pair_set, size_t scope);
   private:
     static constexpr int min_priority = -1;
 
@@ -96,8 +98,6 @@ namespace rychkov
     void move_up_down();
     void fold(CParseContext& context, const Operator* reference = nullptr);
     void clear_scope();
-    template< class T >
-    void clear_scope(T& pair_set);
     void calculate_type(CParseContext& context, entities::Expression& expr);
     void require_type(CParseContext& context, entities::Expression::operand& expr, const typing::Type& type);
     void require_type(CParseContext& context, entities::Expression& expr, const typing::Type& type);
@@ -120,6 +120,27 @@ namespace rychkov
     bool parse_unary(CParseContext& context, const Operator& oper);
     bool parse_binary(CParseContext& context, const Operator& oper);
   };
+}
+
+template< class T >
+void rychkov::CParser::clear_scope(T& pair_set, size_t scope)
+{
+  typename T::iterator pos = pair_set.begin();
+  while (pos != pair_set.end())
+  {
+    if (pos->second <= scope)
+    {
+      pos = pair_set.upper_bound(entities::get_name(pos->first));
+      continue;
+    }
+    typename T::iterator to = pair_set.lower_bound({pos->first, scope});
+    if (pos == to)
+    {
+      ++pos;
+      continue;
+    }
+    pos = pair_set.erase(pos, to);
+  }
 }
 
 #endif

@@ -12,7 +12,9 @@ rychkov::Parser::map_type< rychkov::ParserContext, rychkov::MainProcessor > rych
       {"files", &rychkov::MainProcessor::files},
       {"external", &rychkov::MainProcessor::external},
       {"exposition", &rychkov::MainProcessor::exposition},
-      {"defines", &rychkov::MainProcessor::defines}
+      {"defines", &rychkov::MainProcessor::defines},
+      {"dependencies", &rychkov::MainProcessor::dependencies},
+      {"uses", &rychkov::MainProcessor::uses}
     };
 
 rychkov::ParseCell::ParseCell(CParseContext context, Stage last_stage,

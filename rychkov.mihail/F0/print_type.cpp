@@ -34,7 +34,7 @@ std::ostream& rychkov::details::print_right_parenthesis(std::ostream& out, const
   }
   return out;
 }
-std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
+std::ostream& rychkov::typing::print_left(std::ostream& out, const typing::Type& type)
 {
   if (type.base != nullptr)
   {
@@ -109,7 +109,7 @@ std::ostream& rychkov::print_left(std::ostream& out, const typing::Type& type)
   }
   return out;
 }
-std::ostream& rychkov::print_right(std::ostream& out, const typing::Type& type)
+std::ostream& rychkov::typing::print_right(std::ostream& out, const typing::Type& type)
 {
   if (type.category == typing::FUNCTION)
   {
@@ -144,7 +144,7 @@ std::ostream& rychkov::print_right(std::ostream& out, const typing::Type& type)
   }
   return out;
 }
-std::ostream& rychkov::operator<<(std::ostream& out, const typing::Type& type)
+std::ostream& rychkov::typing::operator<<(std::ostream& out, const typing::Type& type)
 {
   print_left(out, type);
   print_right(out, type);

@@ -2,6 +2,11 @@
 
 #include "content.hpp"
 
+bool rychkov::NameCompare::operator()(const std::string& lhs, const std::string& rhs) const
+{
+  return lhs < rhs;
+}
+
 bool rychkov::NameCompare::operator()(const operator_value& lhs, const operator_value& rhs) const
 {
   return operator()(lhs[0], rhs[0]);

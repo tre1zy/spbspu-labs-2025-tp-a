@@ -10,10 +10,7 @@ namespace rychkov
   {
   public:
     std::ostream& out;
-    ContentPrinter(std::ostream& ostream):
-      out(ostream),
-      indent_(0)
-    {}
+    ContentPrinter(std::ostream& ostream, size_t start_indent = 0);
 
     void operator()(const Macro& macro);
     void operator()(const entities::Variable& var);
@@ -44,13 +41,18 @@ namespace rychkov
     std::ostream& print_left_parenthesis(std::ostream& out, const typing::Type& parent);
     std::ostream& print_right_parenthesis(std::ostream& out, const typing::Type& parent);
   }
-  std::ostream& print_left(std::ostream& out, const typing::Type& type);
-  std::ostream& print_right(std::ostream& out, const typing::Type& type);
-  std::ostream& operator<<(std::ostream& out, const typing::Type& type);
-
-  std::ostream& operator<<(std::ostream& out, const entities::Variable& var);
-  std::ostream& operator<<(std::ostream& out, const entities::Function& func);
-  std::ostream& operator<<(std::ostream& out, const entities::Literal& literal);
+  namespace typing
+  {
+    std::ostream& print_left(std::ostream& out, const Type& type);
+    std::ostream& print_right(std::ostream& out, const Type& type);
+    std::ostream& operator<<(std::ostream& out, const Type& type);
+  }
+  namespace entities
+  {
+    std::ostream& operator<<(std::ostream& out, const Variable& var);
+    std::ostream& operator<<(std::ostream& out, const Function& func);
+    std::ostream& operator<<(std::ostream& out, const Literal& literal);
+  }
 }
 
 #endif
