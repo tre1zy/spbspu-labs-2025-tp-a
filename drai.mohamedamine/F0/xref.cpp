@@ -471,16 +471,16 @@ void CrossRefSystem::swapWords(const std::string& indexName,
     index[word1] = word2It->second;
     index[word2] = temp;
 }
-  void CrossRefSystem::interleaveLines(const std::string& newIndex,
-                                      const std::string& index1,
-                                      const std::string& index2)
-  {
+void CrossRefSystem::interleaveLines(const std::string& newIndex,
+                                   const std::string& index1,
+                                   const std::string& index2)
+{
     auto it1 = indexes_.find(index1);
     auto it2 = indexes_.find(index2);
     if (it1 == indexes_.end() || it2 == indexes_.end())
     {
-      std::cout << "<WRONG INDEX>\n";
-      return;
+        std::cout << "<WRONG INDEX>\n";
+        return;
     }
 
     const Index& a = it1->second;
@@ -489,59 +489,70 @@ void CrossRefSystem::swapWords(const std::string& indexName,
 
     std::map<size_t, std::vector<std::pair<std::string, size_t>>> linesA;
     std::map<size_t, std::vector<std::pair<std::string, size_t>>> linesB;
-
-    std::function<void(Index::const_iterator)> collectLinesA;
-    collectLinesA = [&](Index::const_iterator it)
-    {
-      if (it == a.end()) return;
-      for (const auto& pos : it->second)
-        linesA[pos.line].emplace_back(it->first, pos.column);
-      collectLinesA(std::next(it));
+    std::function<void(Index::const_iterator)> collectLinesARecursive;
+    collectLinesARecursive = [&](Index::const_iterator it) {
+        if (it == a.end()) return;
+        const std::string& word = it->first;
+        std::function<void(std::set<Position>::const_iterator)> processPositionsA;
+        processPositionsA = [&](std::set<Position>::const_iterator posIt) {
+            if (posIt == it->second.end()) return;
+            linesA[posIt->line].emplace_back(word, posIt->column);
+            processPositionsA(std::next(posIt));
+        };
+        processPositionsA(it->second.begin());
+        collectLinesARecursive(std::next(it));
     };
 
-    std::function<void(Index::const_iterator)> collectLinesB;
-    collectLinesB = [&](Index::const_iterator it)
-    {
-      if (it == b.end()) return;
-      for (const auto& pos : it->second)
-        linesB[pos.line].emplace_back(it->first, pos.column);
-      collectLinesB(std::next(it));
+    std::function<void(Index::const_iterator)> collectLinesBRecursive;
+    collectLinesBRecursive = [&](Index::const_iterator it) {
+        if (it == b.end()) return;
+        const std::string& word = it->first;
+        std::function<void(std::set<Position>::const_iterator)> processPositionsB;
+        processPositionsB = [&](std::set<Position>::const_iterator posIt) {
+            if (posIt == it->second.end()) return;
+            linesB[posIt->line].emplace_back(word, posIt->column);
+            processPositionsB(std::next(posIt));
+        };
+        processPositionsB(it->second.begin());
+        collectLinesBRecursive(std::next(it));
     };
 
-    collectLinesA(a.begin());
-    collectLinesB(b.begin());
+    collectLinesARecursive(a.begin());
+    collectLinesBRecursive(b.begin());
 
     size_t maxLines = std::max(linesA.size(), linesB.size());
     size_t outLine = 0;
 
-    std::function<void(size_t)> writeInterleaved;
-    writeInterleaved = [&](size_t lineIdx)
-    {
-      if (lineIdx >= maxLines) return;
+    std::function<void(size_t)> writeInterleavedRecursive;
+    writeInterleavedRecursive = [&](size_t lineIdx) {
+        if (lineIdx >= maxLines) return;
 
-      auto insertLine = [&](const auto& src, size_t srcLine)
-      {
-        auto found = src.find(srcLine);
-        if (found != src.end())
-        {
-          for (const auto& wordCol : found->second)
-          {
-            result[wordCol.first].insert({ outLine, wordCol.second });
-          }
-        }
-      };
+        auto insertLineRecursive = [&](const auto& src, size_t srcLine) {
+            auto found = src.find(srcLine);
+            if (found != src.end()) {
+                const auto& wordCols = found->second;
+                std::function<void(size_t)> processWordCols;
+                processWordCols = [&](size_t idx) {
+                    if (idx >= wordCols.size()) return;
+                    const auto& wordCol = wordCols[idx];
+                    result[wordCol.first].insert({outLine, wordCol.second});
+                    processWordCols(idx + 1);
+                };
+                processWordCols(0);
+            }
+        };
 
-      insertLine(linesA, lineIdx);
-      ++outLine;
-      insertLine(linesB, lineIdx);
-      ++outLine;
+        insertLineRecursive(linesA, lineIdx);
+        ++outLine;
+        insertLineRecursive(linesB, lineIdx);
+        ++outLine;
 
-      writeInterleaved(lineIdx + 1);
+        writeInterleavedRecursive(lineIdx + 1);
     };
 
-    writeInterleaved(0);
+    writeInterleavedRecursive(0);
     indexes_[newIndex] = result;
-  }
+}
 
   void CrossRefSystem::reverseText(const std::string& newIndex,
                                   const std::string& baseIndex)
