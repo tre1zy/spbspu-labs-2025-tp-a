@@ -265,7 +265,6 @@ void duhanina::show_codes(str_t encoding_id, std::ostream& out)
   out << "Char\tCode\n";
   CodePairPrinter printer(out);
   std::for_each(table.char_to_code.begin(), table.char_to_code.end(), printer);
-  out << "Total characters: " << table.total_chars << "\n";
 }
 
 void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& out)
