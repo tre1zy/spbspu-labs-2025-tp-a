@@ -263,7 +263,7 @@ namespace
     }
   };
 
-  struct DictProcessor
+  struct DictFreqProcessor
   {
     const dict_t& dicts;
     std::map< std::string, int >& freq;
@@ -464,7 +464,7 @@ void demehin::printMostCommons(std::istream& in, std::ostream& out, const dict_t
   std::generate(names.begin(), names.end(), NameReader{ in });
 
   std::map< std::string, int > freq;
-  std::for_each(names.begin(), names.end(), DictProcessor{ dicts, freq });
+  std::for_each(names.begin(), names.end(), DictFreqProcessor{ dicts, freq });
 
   std::vector< std::pair< std::string, int > > sorted(freq.begin(), freq.end());
   std::sort(sorted.begin(), sorted.end(), FreqComparator{ });
