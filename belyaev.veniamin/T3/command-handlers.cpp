@@ -38,7 +38,7 @@ void belyaev::areaVertices(const std::vector< Polygon >& data, std::ostream& out
   auto isPolyOfSizeBind = std::bind(isPolygonOfSize, _1, std::ref(vertices));
   std::copy_if(data.begin(), data.end(), std::back_inserter(matchingPolygons), isPolyOfSizeBind);
   std::transform(matchingPolygons.begin(), matchingPolygons.end(), std::back_inserter(areas), calcArea);
-  
+
   double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
   areaOut(totalArea, out);
 }
