@@ -178,7 +178,7 @@ namespace
     ExportDictToFile(std::ostream& os):
       out_(os)
     {}
-    void operator()(const std::pair<const std::string, tree_of_words>& pair) const
+    void operator()(const std::pair< const std::string, const tree_of_words >& pair) const
     {
       writeDictToFile(out_, pair.first, pair.second);
       out_ << "\n";
@@ -289,7 +289,7 @@ namespace
     PrintDictEntry(std::ostream& os):
       out_(os)
     {}
-    void operator()(const std::pair< const std::string, tree_of_words >& dict_pair) const
+    void operator()(const std::pair< const std::string, const tree_of_words >& dict_pair) const
     {
       out_ << dict_pair.first << "\n";
       if (!dict_pair.second.empty())
@@ -350,7 +350,7 @@ namespace
     EraseWordFromTargetDict(tree_of_words& target_dict):
       target_dict_(&target_dict)
     {}
-    void operator()(const std::pair< const std::string, std::list< std::string > >& pair) const
+    void operator()(const std::pair< const std::string, const std::list< std::string > >& pair) const
     {
       target_dict_->erase(pair.first);
     }
@@ -437,7 +437,7 @@ namespace
         other_dict_(other_dict),
         common_dict_(&common)
       {}
-      void operator()(const std::pair< const std::string, std::list< std::string > >& entry) const
+      void operator()(const std::pair< const std::string, const std::list< std::string > >& entry) const
       {
         auto it_find = other_dict_->find(entry.first);
         if (it_find != other_dict_->cend())
@@ -510,7 +510,7 @@ namespace
       translation_(translation),
       words_set_(words_set)
     {}
-    void operator()(const std::pair< const std::string, std::list< std::string > >& word_entry) const
+    void operator()(const std::pair< const std::string, const std::list< std::string > >& word_entry) const
     {
       if (findTranslation(word_entry.second, translation_))
       {
@@ -612,7 +612,7 @@ namespace
     }
     block.dictionary.clear();
     std::vector< WordEntry > temp_word_entries;
-    std::copy_n(std::istream_iterator< WordEntry >(in), count_words, std::back_inserter(temp_word_entries));
+    std::copy_n(std::istream_iterator< WordEntry >{in}, count_words, std::back_inserter(temp_word_entries));
     if (temp_word_entries.size() != static_cast< size_t >(count_words))
     {
       in.setstate(std::ios::failbit);
@@ -642,7 +642,7 @@ namespace
     explicit ApplyAllDicts(tree_of_dict& dicts):
       target_dicts_(&dicts)
     {}
-    void operator()(const std::pair< const std::string, tree_of_words >& pair) const
+    void operator()(const std::pair< const std::string, const tree_of_words >& pair) const
     {
       (*target_dicts_)[pair.first] = mergeDicts({&pair.second, &(*target_dicts_)[pair.first]});
     }
@@ -1008,7 +1008,7 @@ void tkach::mergeNumberDicts(std::istream& in, tree_of_dict& avltree)
     throw std::logic_error("<INVALID NUMBER>");
   }
   std::vector< std::string > dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >(in), number_of_dictionaries, dict_names.begin());
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
   if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
@@ -1082,7 +1082,7 @@ void tkach::copyTranslations(std::istream& in, tree_of_dict& avltree)
     throw std::logic_error("<INVALID NUMBER>");
   }
   std::vector< std::string > target_dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >(in), number_of_dictionaries, target_dict_names.begin());
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, target_dict_names.begin());
   if (target_dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
