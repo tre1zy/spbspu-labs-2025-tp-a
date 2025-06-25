@@ -25,8 +25,8 @@ std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< 
 {
   setlocale(LC_ALL, "ru");
   std::map< std::string, karnauhova::Character > players;
-  std::cout << "HELLO!\n" << "Do you wanna continue last game?\n" << "> NEW_GAME\n" << "> CONTINUE\n";
-  std::cout << "Please choose answer(If you don't have last version peek continue)\n";
+  std::cout << "Привет!\n" << "Хотите продолжить прошлую или начать новую?\n" << "> NEW_GAME\n" << "> CONTINUE\n";
+  std::cout << "Пожалуйста выберите ответ(Если у вас нет прошлого сохранения выберите NEW_GAME)\n";
   std::string answer;
   bool end_input = false;
   while(!end_input)
@@ -38,11 +38,6 @@ std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< 
       {
         std::ifstream file;
         file.open("karnauhova.alexandra/F0/game_data.txt");
-        if (!file.is_open()) {
-        char abs_path[1024];
-        realpath("game_data", abs_path);
-        throw std::runtime_error("Не удалось открыть файл. Путь: " + std::string(abs_path));
-    }
         input_new_data(file, characters);
         end_input = true;
       }
@@ -87,10 +82,6 @@ void karnauhova::input_new_data(std::istream& in, std::map< size_t, Character >&
   size_t index = 1;
   TransformMap trmp(index);
   std::transform(temp.begin(), temp.end(), std::inserter(characters, characters.end()), trmp);
- /*  std::cout << "Прочитано персонажей: " << characters.size() << std::endl;
-  for (const auto& pair : characters) {
-    std::cout << "Индекс: " << pair.first << ", Имя: " << pair.second.get_name() << std::endl; */
-  //}
 }
 
 std::map< std::string, karnauhova::Character > karnauhova::input_save_data(std::istream& in, std::map< size_t, Character >& characters)

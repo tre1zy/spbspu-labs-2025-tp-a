@@ -8,6 +8,6 @@ namespace karnauhova
 {
   void clear_screen();
   void hello_world(std::map< std::string, Character >& players);
-
+  void delay(int milliseconds);
 }
 #endif

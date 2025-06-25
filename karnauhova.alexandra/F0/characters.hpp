@@ -25,6 +25,7 @@ namespace karnauhova
     int volume_hp();
     int base_hp();
     std::string get_name() const;
+    void about_character() const;
 
   private:
     std::string name_;

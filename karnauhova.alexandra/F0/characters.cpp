@@ -3,6 +3,7 @@
 #include <map>
 #include <random>
 #include <iterator>
+#include <iostream>
 
 std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
 {
@@ -199,4 +200,9 @@ std::istream& karnauhova::operator>>(std::istream& in, Character& pol)
   temp.take_quotes(quote_win, quote_lose);
   pol = std::move(temp);
   return in;
+}
+
+void karnauhova::Character::about_character() const
+{
+  std::cout << name_ << " " << hp_ << " hp  " << atk1_ << "-" << atk2_ << " atk"; 
 }
