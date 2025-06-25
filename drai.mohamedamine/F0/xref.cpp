@@ -191,7 +191,6 @@ void printIndexRecursive(amine::Index::const_iterator it,
     }
 
     const std::set<Position, positionLess>& positions = wordIt->second;
-
     std::function<void(std::set<Position>::const_iterator)> printRecursive;
     printRecursive = [&](std::set<Position>::const_iterator posIt)
     {
@@ -303,7 +302,7 @@ void printIndexRecursive(amine::Index::const_iterator it,
 
     indexes_[newIndex] = result;
   }
-void CrossRefSystem::replaceWord(const std::string& indexName, 
+void CrossRefSystem::replaceWord(const std::string& indexName,
                                const std::string& oldWord,
                                const std::string& newWord) {
     auto it = indexes_.find(indexName);
