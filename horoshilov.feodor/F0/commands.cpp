@@ -25,7 +25,10 @@ namespace
     mutable bool first_ = true;
     int operator()(const std::string& tr) const
     {
-      if (!first_) out_ << ", ";
+      if (!first_)
+      {
+        out_ << ", ";
+      }
       out_ << tr;
       first_ = false;
       return 0;
@@ -138,9 +141,7 @@ namespace
     {
       const tree_t& dict = dicts_.at(dict_name);
       tree_t temp;
-      std::copy_if(result.begin(), result.end(), 
-                    std::inserter(temp, temp.end()), 
-                    ComplementPredicate{dict});
+      std::copy_if(result.begin(), result.end(), std::inserter(temp, temp.end()),ComplementPredicate{dict});
       return temp;
     }
   };
@@ -189,14 +190,13 @@ namespace
     tree_t operator()(tree_t result, const std::string& dict_name) const
     {
       const tree_t& dict = dicts_.at(dict_name);
-      if (dict.empty()) return result;
-      
+      if (dict.empty())
+      {
+        return result;
+      }
       size_t max_len = std::accumulate(dict.begin(), dict.end(), 0, MaxLenFinder{});
       tree_t temp_dict;
-      std::copy_if(dict.begin(), dict.end(), 
-                    std::inserter(temp_dict, temp_dict.end()), 
-                    LongestPredicate{max_len});
-      
+      std::copy_if(dict.begin(), dict.end(),std::inserter(temp_dict, temp_dict.end()),LongestPredicate{max_len});
       result.insert(temp_dict.begin(), temp_dict.end());
       return result;
     }
@@ -225,14 +225,13 @@ namespace
     tree_t operator()(tree_t result, const std::string& dict_name) const
     {
       const tree_t& dict = dicts_.at(dict_name);
-      if (dict.empty()) return result;
-      
+      if (dict.empty())
+      {
+        return result;
+      }
       size_t max_count = std::accumulate(dict.begin(), dict.end(), 0, MaxCountFinder{});
       tree_t temp_dict;
-      std::copy_if(dict.begin(), dict.end(), 
-                    std::inserter(temp_dict, temp_dict.end()), 
-                    MeaningfulPredicate{max_count});
-      
+      std::copy_if(dict.begin(), dict.end(),std::inserter(temp_dict, temp_dict.end()), MeaningfulPredicate{max_count});
       result.insert(temp_dict.begin(), temp_dict.end());
       return result;
     }
@@ -272,8 +271,10 @@ namespace khoroshilov
     std::string filename;
     in >> filename;
     std::ifstream file(filename);
-    if (!file) throw std::runtime_error("<FILE ERROR>");
-
+    if (!file)
+    {
+      throw std::runtime_error("<FILE ERROR>");
+    }
     std::string line;
     std::string current_dict;
     tree_t current_tree;
@@ -331,8 +332,10 @@ namespace khoroshilov
     std::string filename;
     in >> filename;
     std::ofstream file(filename);
-    if (!file) throw std::runtime_error("<FILE ERROR>");
-
+    if (!file)
+    {
+      throw std::runtime_error("<FILE ERROR>");
+    }
     std::vector<int> dummy;
     std::transform(dicts.begin(),dicts.end(), std::back_inserter(dummy), DictSaver{ file });
   }
@@ -474,8 +477,10 @@ namespace khoroshilov
     std::string dict_name, start, end;
     in >> dict_name >> start >> end;
 
-    if (start > end) std::swap(start, end);
-
+    if (start > end)
+    {
+    std::swap(start, end);
+    }
     auto dict_it = dicts.find(dict_name);
     if (dict_it == dicts.end())
     {
