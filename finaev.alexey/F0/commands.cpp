@@ -3,6 +3,26 @@
 #include <streamGuard.hpp>
 #include <limits>
 
+namespace
+{
+  bool isExactMoves(const finaev::DebutMoves& f, const finaev::DebutMoves& s)
+  {
+    return f.moves == s.moves;
+  }
+
+  struct СompareMoves
+  {
+    const finaev::DebutMoves& mov;
+    const finaev::globalDebuts& globalOpenings;
+
+    bool operator()(const std::pair< std::string, bool >& base)
+    {
+      auto it = globalOpenings.find(base.first);
+      return it != globalOpenings.end() && isExactMoves(it->second.moves, mov);
+    }
+  };
+}
+
 void finaev::create_debut(std::istream& in, std::ostream& out, globalDebuts& debuts)
 {
   std::string key;
@@ -52,11 +72,76 @@ void finaev::create_base(std::istream& in, std::ostream& out, debutsBases& db)
   out << "Base " << baseName << " successfully added";
 }
 
-using mapOfCommands = std::map< std::string, std::function< void() > >;
-mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
+void finaev::add(std::istream& in, std::ostream& out, const globalDebuts& debuts, debutsBases& bases)
+{
+  std::string baseName, debut;
+  if (!(in >> baseName >> debut))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::string temp;
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (debuts.find(debut) == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  if (bases.find(baseName) == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto& base = bases[baseName];
+  if (base.find(debut) != base.end())
+  {
+    throw std::runtime_error("<DUPLICATE>");
+  }
+  base[debut] = true;
+  out << "Debut " << debut <<  " successfully added in base " << baseName;
+} 
+
+void finaev::exact_find(std::istream& in, std::ostream& out, const globalDebuts& debuts, const debutsBases& bases)
+{
+  std::string baseName;
+  if (!(in >> baseName))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  DebutMoves mov;
+  in >> mov;
+  std::string temp;
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (bases.find(baseName) == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  const auto& base = bases.at(baseName);
+  СompareMoves pred{ mov, debuts };
+  auto found = std::find_if(base.begin(), base.end(), pred);
+  if (found != base.end())
+  {
+    const auto& opening = debuts.at(found->first);
+    out << "Key: " << found->first << "\n";
+    out << "Name: " << opening.name;
+  }
+  else
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+}
+
+finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
 {
   mapOfCommands commands;
   commands["create_debut"] = std::bind(finaev::create_debut, std::ref(in), std::ref(out), std::ref(debuts));
   commands["create_base"] = std::bind(finaev::create_base, std::ref(in), std::ref(out), std::ref(bases));
+  commands["add"] = std::bind(finaev::add, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
+  commands["exact_find"] = std::bind(finaev::exact_find, std::ref(in), std::ref(out), std::cref(debuts), std::cref(bases));
   return commands;
 }
