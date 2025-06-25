@@ -156,36 +156,34 @@ void printIndexRecursive(amine::Index::const_iterator it,
     printIndexRecursive(index.begin(), index.end());
   }
 
-void CrossRefSystem::getPositions(const std::string& indexName, const std::string& word)
-{
-  auto it = indexes_.find(indexName);
-  if (it == indexes_.end())
+  void CrossRefSystem::getPositions(const std::string& indexName, const std::string& word)
   {
-    std::cout << "<WRONG INDEX>\n";
-    return;
-  }
+    auto it = indexes_.find(indexName);
+    if (it == indexes_.end())
+    {
+      std::cout << "<WRONG INDEX>\n";
+      return;
+    }
 
-  const Index& index = it->second;
-  auto wordIt = index.find(word);
-  if (wordIt == index.end())
-  {
-    std::cout << "<NOT FOUND>\n";
-    return;
-  }
-
-  const std::set<Position, positionLess>& positions = wordIt->second;
-
-  printPositionsSetRecursive(positions.begin(), positions.end());
-}
+    const Index& index = it->second;
+    auto wordIt = index.find(word);
+    if (wordIt == index.end())
+    {
+      std::cout << "<NOT FOUND>\n";
+      return;
+    }
 
     const std::set<Position, positionLess>& positions = wordIt->second;
-void printPositionsSetRecursive(std::set<amine::Position>::const_iterator it,
-                                std::set<amine::Position>::const_iterator end)
-{
-  if (it == end) return;
-  std::cout << it->line << ":" << it->column << "\n";
-  printPositionsSetRecursive(std::next(it), end);
-}
+
+    std::function<void(std::set<Position>::const_iterator)> printRecursive;
+    printRecursive = [&](std::set<Position>::const_iterator posIt)
+    {
+      if (posIt == positions.end()) return;
+      std::cout << posIt->line << ":" << posIt->column << "\n";
+      printRecursive(std::next(posIt));
+    };
+
+    printRecursive(positions.begin());
   }
 
   void CrossRefSystem::mergeTexts(const std::string& newIndex,
