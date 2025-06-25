@@ -15,8 +15,10 @@ namespace finaev
 
   void create_debut(std::istream&, std::ostream&, globalDebuts&);
   void create_base(std::istream&, std::ostream&, debutsBases&);
-  void add(std::istream&, std::ostream&, const globalDebuts&, debutsBases&); 
+  void add(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
   void exact_find(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
+  void find(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
+  void print(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
 
   mapOfCommands createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts&, debutsBases&);
 }

@@ -22,7 +22,7 @@ namespace
           res.vect.push_back(res.current);
           res.current.clear();
         }
-      } 
+      }
       else
       {
         res.current += c;
@@ -33,12 +33,12 @@ namespace
 
   struct AccumulatorProc
   {
-    Accumulator operator()(Accumulator a, char c) const 
+    Accumulator operator()(Accumulator a, char c) const
     {
       return a.process(c);
     }
   };
-  
+
   std::vector< std::string > parsStr(std::string s)
   {
     Accumulator temp;
@@ -69,4 +69,14 @@ std::istream& finaev::operator>>(std::istream& in, DebutMoves& m)
     m.moves = std::move(temp);
   }
   return in;
+}
+
+bool finaev::DebutMoves::containsSequence(const std::vector< std::string >& sequence) const
+{
+  if (sequence.empty())
+  {
+    return false;
+  }
+  auto it = std::search( moves.begin(), moves.end(), sequence.begin(), sequence.end());
+  return it != moves.end();
 }
