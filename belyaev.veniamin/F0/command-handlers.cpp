@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 
-void belyaev::insertEntry(Dictionaries& data, std::istream& in, std::ostream& out)
+void belyaev::insertEntryCmd(Dictionaries& data, std::istream& in, std::ostream& out)
 {
   std::string dictionaryName, russianWord, translation;
   in >> dictionaryName >> russianWord >> translation;
@@ -18,17 +18,13 @@ void belyaev::insertEntry(Dictionaries& data, std::istream& in, std::ostream& ou
     data.dicts[dictionaryName] = Dictionary();
     currentDictionary = &data.dicts[dictionaryName];
   }
-  if (!isRuWordInDictionary(*currentDictionary, getItOfWordInDictByRu(*currentDictionary, russianWord)))
-  {
-    currentDictionary->dict[russianWord] = translation;
-  }
-  else
+  if (!insertEntry(*currentDictionary, russianWord, translation))
   {
     out << "<THIS ENTRY ALREADY EXISTS>\n";
   }
 }
 
-void belyaev::removeEntry(Dictionaries& data, std::istream& in, std::ostream& out)
+void belyaev::removeEntryCmd(Dictionaries& data, std::istream& in, std::ostream& out)
 {
   std::string dictionaryName, russianWord;
   in >> dictionaryName >> russianWord;
@@ -43,15 +39,14 @@ void belyaev::removeEntry(Dictionaries& data, std::istream& in, std::ostream& ou
     out << "<THIS DICTIONARY DOES NOT EXIST>\n";
     return;
   }
-  if (!isRuWordInDictionary(*currentDictionary, getItOfWordInDictByRu(*currentDictionary, russianWord)))
+  if (!removeEntry(*currentDictionary, russianWord))
   {
     out << "<THIS ENTRY DOES NOT EXIST>\n";
     return;
   }
-  currentDictionary->dict.erase(russianWord);
 }
 
-void belyaev::searchEntry(const Dictionaries& data, std::istream& in, std::ostream& out) // TODO: FIX DOUBLING BY RU/ENG VIA SUBCOMMS
+void belyaev::searchEntryCmd(const Dictionaries& data, std::istream& in, std::ostream& out) // TODO: FIX DOUBLING BY RU/ENG VIA SUBCOMMS
 {
   std::string dictionaryName, russianWord;
   in >> dictionaryName >> russianWord;
@@ -75,7 +70,7 @@ void belyaev::searchEntry(const Dictionaries& data, std::istream& in, std::ostre
   out << formPairString(*entry) << '\n';
 }
 
-void belyaev::searchEntryByEnglish(const Dictionaries& data, std::istream& in, std::ostream& out)
+void belyaev::searchEntryByEnglishCmd(const Dictionaries& data, std::istream& in, std::ostream& out)
 {
   std::string dictionaryName, translation;
   in >> dictionaryName >> translation;
@@ -99,7 +94,7 @@ void belyaev::searchEntryByEnglish(const Dictionaries& data, std::istream& in, s
   out << formPairString(*entry) << '\n';
 }
 
-void belyaev::searchContains(const Dictionaries& data, std::istream& in, std::ostream& out, std::string ruOrEng)
+void belyaev::searchContainsCmd(const Dictionaries& data, std::istream& in, std::ostream& out, std::string ruOrEng)
 {
   using namespace std::placeholders;
 
@@ -136,7 +131,7 @@ void belyaev::searchContains(const Dictionaries& data, std::istream& in, std::os
   }
 }
 
-void belyaev::printDict(const Dictionaries& data, std::istream& in, std::ostream& out)
+void belyaev::printDictCmd(const Dictionaries& data, std::istream& in, std::ostream& out)
 {
   std::string dictionaryName;
   in >> dictionaryName;
@@ -156,7 +151,7 @@ void belyaev::printDict(const Dictionaries& data, std::istream& in, std::ostream
   }
 }
 
-void belyaev::printAllDict(const Dictionaries& data, std::ostream& out)
+void belyaev::printAllDictCmd(const Dictionaries& data, std::ostream& out)
 {
   if (data.dicts.size() == 0)
   {
@@ -167,22 +162,78 @@ void belyaev::printAllDict(const Dictionaries& data, std::ostream& out)
   std::transform(data.dicts.begin(), data.dicts.end(), std::ostream_iterator<Dictionary>{out, "\n"}, printAllHelperBind);
 }
 
+void belyaev::clearDictionaryCmd(Dictionaries& data, std::istream& in, std::ostream& out)
+{
+  std::string dictionaryName;
+  in >> dictionaryName;
+  if (in.fail())
+  {
+    throw std::logic_error("Input failed in CLEAR.");
+  }
+
+  Dictionary* currentDictionary = searchDictByName(data, dictionaryName);
+  if (currentDictionary == nullptr)
+  {
+    out << "<THIS DICTIONARY DOES NOT EXIST>\n";
+    return;
+  }
+  data.dicts.erase(dictionaryName);
+}
+
+void belyaev::clearAllDictionariesCmd(Dictionaries& data)
+{
+  data.dicts.clear(); // я думал сложнее будет
+}
+
+void belyaev::copyDictionaryCmd(Dictionaries& data, std::istream& in, std::ostream& out)
+{
+  std::string dictionaryOld, dictionaryNew;
+  in >> dictionaryOld >> dictionaryNew;
+  if (in.fail())
+  {
+    throw std::logic_error("Input failed in COPY.");
+  }
+  if (dictionaryOld == dictionaryNew)
+  {
+    out << "<DICTIONARY_OLD EQUALS DICTIONARY_NEW>\n";
+    return;
+  }
+
+  Dictionary* currentDict = searchDictByName(data, dictionaryOld);
+  if (currentDict == nullptr)
+  {
+    out << "<DICTIONARY_OLD DOES NOT EXIST>\n";
+    return;
+  }
+  Dictionary* newDict = searchDictByName(data, dictionaryNew);
+  if (newDict != nullptr)
+  {
+    out << "<DICTIONARY_NEW ALREADY EXISTS>\n";
+    return;
+  }
+  newDict = new Dictionary;
+  std::copy(currentDict->dict.begin(), currentDict->dict.end(), std::inserter(newDict->dict, newDict->dict.begin()));
+  data.dicts[dictionaryNew] = *newDict;
+  delete newDict;
+}
+
 belyaev::commandMap belyaev::mapCommandHandlers(Dictionaries& data)
 {
   using namespace std::placeholders;
   commandMap cmds;
-  cmds["INSERT"] = std::bind(insertEntry, std::ref(data), _1, _2);
-  cmds["REMOVE"] = std::bind(removeEntry, std::ref(data), _1, _2);
-  cmds["SEARCH"] = std::bind(searchEntry, std::cref(data), _1, _2);
-  cmds["SEARCH_BY_ENGLISH"] = std::bind(searchEntryByEnglish, std::cref(data), _1, _2);
-  cmds["SEARCH_CONTAINS"] = std::bind(searchContains, std::cref(data), _1, _2, "RU");
-  cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(searchContains, std::cref(data), _1, _2, "ENG");
-  cmds["PRINT"] = std::bind(printDict, std::cref(data), _1, _2);
-  cmds["PRINT_ALL"] = std::bind(printAllDict, std::cref(data), _2);
+  cmds["INSERT"] = std::bind(insertEntryCmd, std::ref(data), _1, _2);
+  cmds["REMOVE"] = std::bind(removeEntryCmd, std::ref(data), _1, _2);
+  cmds["SEARCH"] = std::bind(searchEntryCmd, std::cref(data), _1, _2);
+  cmds["SEARCH_BY_ENGLISH"] = std::bind(searchEntryByEnglishCmd, std::cref(data), _1, _2);
+  cmds["SEARCH_CONTAINS"] = std::bind(searchContainsCmd, std::cref(data), _1, _2, "RU");
+  cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(searchContainsCmd, std::cref(data), _1, _2, "ENG");
+  cmds["PRINT"] = std::bind(printDictCmd, std::cref(data), _1, _2);
+  cmds["PRINT_ALL"] = std::bind(printAllDictCmd, std::cref(data), _2);
+  cmds["CLEAR"] = std::bind(clearDictionaryCmd, std::ref(data), _1, _2);
+  cmds["CLEAR_ALL"] = std::bind(clearAllDictionariesCmd, std::ref(data));
+  cmds["COPY"] = std::bind(copyDictionaryCmd, std::ref(data), _1, _2);
+  cmds["RENAME"] = std::bind(renameDictionaryCmd, std::ref(data), _1, _2);
   /*
-  cmds["CLEAR"] = std::bind(area, std::ref(data), _1, _2);
-  cmds["COPY"] = std::bind(area, std::ref(data), _1, _2);
-  cmds["RENAME"] = std::bind(area, std::ref(data), _1, _2);
   cmds["MERGE"] = std::bind(area, std::ref(data), _1, _2);
   cmds["INTERSECT"] = std::bind(area, std::ref(data), _1, _2);
   cmds["DELETE_INTERSECTIONS"] = std::bind(area, std::ref(data), _1, _2);

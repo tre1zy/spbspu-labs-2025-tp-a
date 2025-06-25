@@ -22,6 +22,27 @@ const belyaev::Dictionary* belyaev::searchDictByName(const Dictionaries& data, c
   return &(result->second);
 }
 
+bool belyaev::insertEntry(Dictionary& currentDictionary, std::string russianWord, std::string translation)
+{
+  if (isRuWordInDictionary(currentDictionary, getItOfWordInDictByRu(currentDictionary, russianWord)))
+  {
+    return false;
+  }
+  currentDictionary.dict[russianWord] = translation;
+  return true;
+}
+
+bool belyaev::removeEntry(Dictionary& currentDictionary, std::string russianWord)
+{
+  if (!isRuWordInDictionary(currentDictionary, getItOfWordInDictByRu(currentDictionary, russianWord)))
+  {
+    return false;
+  }
+  currentDictionary.dict.erase(russianWord);
+  return true;
+}
+
+
 bool belyaev::isTranslationInEntry(const std::pair<const std::string, std::string> entry, const std::string& translation)
 {
   return entry.second == translation;

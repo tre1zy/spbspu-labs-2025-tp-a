@@ -6,6 +6,8 @@ namespace belyaev
 {
   Dictionary* searchDictByName(Dictionaries& data, const std::string& name);
   const Dictionary* searchDictByName(const Dictionaries& data, const std::string& name); // ¯\_(ツ)_/¯
+  bool insertEntry(Dictionary& currentDictionary, std::string russianWord, std::string translation);
+  bool removeEntry(Dictionary& currentDictionary, std::string russianWord);
 
   using dictionaryIterator = std::_Rb_tree_const_iterator<entryPair>;
   bool isTranslationInEntry(const std::pair<const std::string, std::string> entry, const std::string& translation);

@@ -7,13 +7,17 @@
 
 namespace belyaev
 {
-  void insertEntry(Dictionaries& data, std::istream& in, std::ostream& out);
-  void removeEntry(Dictionaries& data, std::istream& in, std::ostream& out);
-  void searchEntry(const Dictionaries& data, std::istream& in, std::ostream& out);
-  void searchEntryByEnglish(const Dictionaries& data, std::istream& in, std::ostream& out);
-  void searchContains(const Dictionaries& data, std::istream& in, std::ostream& out, std::string ruOrEng);
-  void printDict(const Dictionaries& data, std::istream& in, std::ostream& out);
-  void printAllDict(const Dictionaries& data, std::ostream& out);
+  void insertEntryCmd(Dictionaries& data, std::istream& in, std::ostream& out);
+  void removeEntryCmd(Dictionaries& data, std::istream& in, std::ostream& out);
+  void searchEntryCmd(const Dictionaries& data, std::istream& in, std::ostream& out);
+  void searchEntryByEnglishCmd(const Dictionaries& data, std::istream& in, std::ostream& out);
+  void searchContainsCmd(const Dictionaries& data, std::istream& in, std::ostream& out, std::string ruOrEng);
+  void printDictCmd(const Dictionaries& data, std::istream& in, std::ostream& out);
+  void printAllDictCmd(const Dictionaries& data, std::ostream& out);
+  void clearDictionaryCmd(Dictionaries& data, std::istream& in, std::ostream& out);
+  void clearAllDictionariesCmd(Dictionaries& data);
+  void copyDictionaryCmd(Dictionaries& data, std::istream& in, std::ostream& out);
+  void renameDictionaryCmd(Dictionaries& data, std::istream& in, std::ostream& out);
 
   using commandMap = std::map<std::string, std::function<void(std::istream&, std::ostream&)>>;
   commandMap mapCommandHandlers(Dictionaries& data);
