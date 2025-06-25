@@ -22,6 +22,16 @@ namespace geom
   std::istream& operator>>(std::istream& in, Point& p);
   std::istream& operator>>(std::istream& in, Polygon& poly);
   double getPolygonArea(const Polygon& poly);
+  double getDist(const Point& a, const Point& b);
+  double getAreaOfTrg(const Polygon& poly);
+  Polygon createTrg(size_t i, const std::vector< Point >& points);
+  std::vector< Polygon > polyToTrg(const Polygon& poly);
+  struct TrgGenerator
+  {
+    const std::vector< Point >& points;
+    size_t& i;
+    smirnov::Polygon operator()();
+  };
 }
 
 #endif

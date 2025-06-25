@@ -190,17 +190,7 @@ void smirnov::printMaxValueOf(std::istream& input, const std::vector< Polygon >&
   handlers["VERTEXES"] = std::bind(outputMaxVertices, std::ref(output), std::cref(polygons));
 
   smirnov::Iofmtguard guard(output);
-
-  try
-  {
-    handlers.at(param)();
-  }
-  catch (const std::out_of_range& e)
-  {
-    input.setstate(std::ios::failbit);
-    input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    return;
-  }
+  handlers.at(param);
 }
 
 void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
@@ -218,17 +208,7 @@ void smirnov::printMinValueOf(std::istream& input, const std::vector< Polygon >&
   handlers["VERTEXES"] = std::bind(outputMinVertices, std::ref(output), std::cref(polygons));
 
   smirnov::Iofmtguard guard(output);
-
-  try
-  {
-    handlers.at(param)();
-  }
-  catch (const std::out_of_range& e)
-  {
-    input.setstate(std::ios::failbit);
-    input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    return;
-  }
+  handlers.at(param)();
 }
 
 void smirnov::printCountOf(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
