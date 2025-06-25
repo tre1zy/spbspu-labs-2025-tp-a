@@ -1,5 +1,5 @@
 #ifndef COMMAND_HPP
-#define COMMNAD_HPP
+#define COMMAND_HPP
 #include <map>
 #include <string>
 #include <functional>
