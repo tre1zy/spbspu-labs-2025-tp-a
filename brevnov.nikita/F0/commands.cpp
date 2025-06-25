@@ -599,7 +599,7 @@ void brevnov::buyTeam(std::istream& in, std::ostream& out, League& league)
   std::string teamName;
   int budg = 0;
   in >> budg >> teamName;
-  if (budg == 0)
+  if (budg <= 0)
   {
     std::cerr << "Not correct budget!\n";
     return;
