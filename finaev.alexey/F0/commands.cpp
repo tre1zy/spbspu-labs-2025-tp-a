@@ -2,9 +2,65 @@
 #include <delimiter.hpp>
 #include <streamGuard.hpp>
 #include <limits>
+#include <random>
+#include <fstream>
+#include <iterator>
 
 namespace
 {
+  struct FileStrProcessor
+  {
+    std::istream& in;
+    std::unordered_map< std::string, finaev::OpenningInfo >& debuts;
+    std::ostream& out;
+
+    void operator()(const std::string&)
+    {
+      std::string key;
+      if (!(in >> key))
+      {
+        return;
+      }
+      if (debuts.find(key) != debuts.end())
+      {
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        return;
+      }
+      finaev::StreamGuard guard(in);
+      finaev::OpenningInfo inf;
+      if (!(in >> inf.moves))
+      {
+        return;
+      }
+      in >> std::ws;
+      in >> finaev::DelimiterIO{'"'};
+      std::getline(in, inf.name, '"');
+      in >> std::ws;
+      in >> finaev::DelimiterIO{'"'};
+      std::getline(in, inf.description, '"');
+      debuts[key] = inf;
+      out << "Opening " << key << " successfully added\n";
+    }
+  };
+
+  struct Str
+  {
+    std::string content;
+  };
+
+  std::istream& operator>>(std::istream& is, Str& str)
+  {
+    return std::getline(is, str.content);
+  }
+
+  struct StrConvert
+  {
+    std::string operator()(const Str& s) const
+    {
+      return s.content;
+    }
+  };
+
   bool isExactMoves(const finaev::DebutMoves& f, const finaev::DebutMoves& s)
   {
     return f.moves == s.moves;
@@ -168,6 +224,92 @@ namespace
       }
     }
   };
+
+  struct IsChessSquare
+  {
+    bool operator()(const std::string& sq) const
+    {
+      if (sq.length() != 2)
+      {
+        return false;
+      }
+      char file = tolower(sq[0]);
+      char rank = sq[1];
+      return file >= 'a' && file <= 'h' && rank >= '1' && rank <= '8';
+    }
+  };
+
+  struct IsChessMove
+  {
+    IsChessSquare squareValid;
+
+    bool operator()(const std::string& move) const
+    {
+      if (move.length() != 5 || move[2] != '-')
+      {
+        return false;
+      }
+      std::string from = move.substr(0, 2);
+      std::string to = move.substr(3, 2);
+      return squareValid(from) && squareValid(to);
+    }
+  };
+
+  struct IsAllMovesValid
+  {
+    IsChessMove moveValid;
+    bool& allValid;
+
+    void operator()(const finaev::DebutMoves& moves)
+    {
+      allValid = (std::all_of(moves.moves.begin(), moves.moves.end(), moveValid));
+    }
+  };
+
+  struct KeyExtract
+  {
+    std::vector<std::string>& keys;
+
+    void operator()(const std::pair< std::string, bool >& pair) const
+    {
+      keys.push_back(pair.first);
+    }
+  };
+
+  struct MovesPrint
+  {
+    std::ostream& out;
+
+    void operator()(const std::string& move) const
+    {
+      out << move << " ";
+    }
+  };
+
+  struct DebutPrint
+  {
+    std::ostream& out;
+    const finaev::globalDebuts& debuts;
+    size_t index = 1;
+
+    void operator()(const std::string& key)
+    {
+      out << (index++) << ") " << debuts.at(key).name << "\n";
+    }
+  };
+}
+
+void finaev::loadDebutsFromFile(const std::string& filename, globalDebuts& debuts, std::ostream& out)
+{
+  std::ifstream file(filename);
+  if (!file)
+  {
+    throw std::runtime_error("Error opening file");
+  }
+  std::vector< std::string > lines;
+  std::transform(std::istream_iterator<Str>(file), std::istream_iterator< Str >(),std::back_inserter(lines), StrConvert{});
+  FileStrProcessor processor{ file, debuts, out };
+  std::for_each(lines.begin(), lines.end(), std::ref(processor));
 }
 
 void finaev::create_debut(std::istream& in, std::ostream& out, globalDebuts& debuts)
@@ -590,6 +732,85 @@ void finaev::delete_debut(std::istream& in, std::ostream& out, globalDebuts& deb
   out << "Debut " << key << (count > 0 ? " completely deleted from system debuts" : " safely deleted from system");
 }
 
+void finaev::validate(std::istream& in, std::ostream& out, const globalDebuts& debuts)
+{
+  std::string key, temp;
+  if (!(in >> key))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto debut = debuts.find(key);
+  if (debut == debuts.end())
+  {
+    throw std::runtime_error("<OPENNING_NOT_FOUND>");
+  }
+  IsChessSquare squareValid;
+  IsChessMove moveValid{ squareValid };
+  bool isValidate = false;
+  IsAllMovesValid validator{ moveValid, isValidate };
+  validator(debut->second.moves);
+  out << key << (isValidate ? " - ok" : " - uncorrect");
+}
+
+void finaev::guess(std::istream& in, std::ostream& out, const globalDebuts& debuts, const debutsBases& bases)
+{
+  std::string baseName, temp;
+  if (!(in >> baseName))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto base = bases.find(baseName);
+  if (base == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  std::vector< std::string > debutsInBase;
+  KeyExtract extractor{ debutsInBase };
+  std::for_each(base->second.begin(), base->second.end(), extractor);
+  if (debutsInBase.size() < 4)
+  {
+    throw std::runtime_error("Not enough debuts in base");
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::shuffle(debutsInBase.begin(), debutsInBase.end(), gen);
+  debutsInBase.resize(4);
+  std::uniform_int_distribution<> distr(0, 3);
+  const size_t correctIndex = distr(gen);
+  const std::string& correctKey = debutsInBase[correctIndex];
+  const auto& correctDebut = debuts.at(correctKey);
+  out << "Guess debut:\n";
+  std::for_each(correctDebut.moves.moves.begin(), correctDebut.moves.moves.end(), MovesPrint{ out });
+  out << "\n";
+  std::for_each(debutsInBase.begin(), debutsInBase.end(), DebutPrint{out, debuts});
+  out << "Choise 1-4: ";
+  out.flush();
+  int choice;
+  if (!(in >> choice) || choice < 1 || choice > 4)
+  {
+    throw std::runtime_error("Invalid choice");
+  }
+  const std::string& selectedKey = debutsInBase[choice - 1];
+  if (selectedKey == correctKey)
+  {
+    out << "True! is " << correctDebut.name << ". " << correctDebut.description;
+  }
+  else
+  {
+    out << "Not true! is " << correctDebut.name << ". " << correctDebut.description;
+  }
+}
+
 finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
 {
   mapOfCommands commands;
@@ -607,5 +828,7 @@ finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostre
   commands["force_delete"] = std::bind(finaev::force_delete, std::ref(in), std::ref(out), std::ref(debuts), std::ref(bases));
   commands["safe_delete"] = std::bind(finaev::safe_delete, std::ref(in), std::ref(out), std::ref(debuts), std::cref(bases));
   commands["delete"] = std::bind(finaev::delete_debut, std::ref(in), std::ref(out), std::ref(debuts), std::ref(bases));
+  commands["validate"] = std::bind(finaev::validate, std::ref(in), std::ref(out), std::cref(debuts));
+  commands["guess"] = std::bind(finaev::guess, std::ref(in), std::ref(out), std::cref(debuts), std::cref(bases));
   return commands;
 }

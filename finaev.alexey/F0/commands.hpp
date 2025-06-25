@@ -13,6 +13,8 @@ namespace finaev
   using debutsBases = std::unordered_map< std::string, std::unordered_map< std::string, bool > >;
   using mapOfCommands = std::map< std::string, std::function< void() > >;
 
+  void loadDebutsFromFile(const std::string& filename, globalDebuts& debuts, std::ostream& out);
+
   void create_debut(std::istream&, std::ostream&, globalDebuts&);
   void create_base(std::istream&, std::ostream&, debutsBases&);
   void add(std::istream&, std::ostream&, const globalDebuts&, debutsBases&);
@@ -27,7 +29,9 @@ namespace finaev
   void force_delete(std::istream&, std::ostream&, globalDebuts&, debutsBases&);
   void safe_delete(std::istream&, std::ostream&, globalDebuts&, const debutsBases&);
   void delete_debut(std::istream&, std::ostream&, globalDebuts&, debutsBases&);
-  
+  void validate(std::istream&, std::ostream&, const globalDebuts&);
+  void guess(std::istream&, std::ostream&, const globalDebuts&, const debutsBases&);
+
   mapOfCommands createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts&, debutsBases&);
 }
 
