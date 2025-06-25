@@ -16,6 +16,11 @@ int main()
   commands["translate"] = std::bind(translateCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["remove"] = std::bind(removeCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["print"] = std::bind(printCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["save"] = std::bind(saveCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["merge"] = std::bind(mergeCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["delete"] = std::bind(deleteCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["edit"] = std::bind(editCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["rename"] = std::bind(renameCommand, std::ref(dicts), _1, std::ref(std::cout));
   std::string cmd;
   while (std::cin >> cmd)
   {
