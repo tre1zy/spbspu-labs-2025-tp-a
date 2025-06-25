@@ -3,6 +3,60 @@
 #include <iterator>
 #include <fstream>
 
+namespace smirnov
+{
+  struct EntryFormatter
+  {
+    std::ostream & out;
+    explicit EntryFormatter(std::ostream & o):
+      out(o)
+    {}
+    void operator()(const std::pair< const std::string,
+      std::vector< std::string > > & entry) const
+    {
+      out << entry.first << " - ";
+      std::copy(entry.second.begin(), entry.second.end(), std::ostream_iterator< std::string >(out, " "));
+      out << "\n";
+    }
+  };
+
+  struct PrefixMatcher
+  {
+    const std::string & prefix;
+    explicit PrefixMatcher(const std::string & p):
+      prefix(p)
+    {}
+    bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      return entry.first.compare(0, prefix.size(), prefix) == 0;
+    }
+  };
+
+  struct TranslationFinder
+  {
+    const std::string & translation;
+    explicit TranslationFinder(const std::string & t):
+      translation(t)
+    {}
+    bool operator()(const std::string & tr) const
+    {
+      return tr == translation;
+    }
+  };
+
+  struct WordFinder
+  {
+    const std::string & word;
+    explicit WordFinder(const std::string & w):
+      word(w)
+    {}
+    bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      return entry.first == word;
+    }
+  };
+}
+
 void smirnov::createCommand(Dicts & dicts, std::istream & in, std::ostream & out)
 {
   std::string name;
