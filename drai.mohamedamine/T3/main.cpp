@@ -5,6 +5,13 @@
 #include <vector>
 #include "polygon.hpp"
 
+void readAndProcess(std::istream& in, amine::CommandProcessor& processor)
+{
+  std::string line;
+  if (!std::getline(in, line)) return;
+  processor(line);
+  readAndProcess(in, processor);
+}
 int main(int argc, char* argv[])
 {
   if (argc < 2)
@@ -59,11 +66,6 @@ int main(int argc, char* argv[])
 
   amine::CommandProcessor processor(polygons);
 
-  std::string command;
-  std::getline(std::cin, command);
-  processor(command);
-
-  std::getline(std::cin, command);
-  processor(command);
+readAndProcess(std::cin, processor);
   return 0;
 }
