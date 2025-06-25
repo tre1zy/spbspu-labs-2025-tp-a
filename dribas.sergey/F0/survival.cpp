@@ -14,7 +14,7 @@ Accum dribas::accumulate_workout_data(Accum acc, const std::pair< time_t, dribas
 
 std::string dribas::RecommendationGenerator::operator()(const std::pair< double, std::string >& rule) const
 {
-  if ((rule.first == 50.0 && score.enduranceScore < rule.first) || 
+  if ((rule.first == 50.0 && score.enduranceScore < rule.first) ||
     (rule.first == 30.0 && score.strengthScore < rule.first)) {
     return rule.second;
   }

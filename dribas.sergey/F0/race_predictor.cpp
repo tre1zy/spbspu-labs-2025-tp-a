@@ -31,8 +31,8 @@ namespace
     double min_pace;
 
     WorkoutStats():
-      count(0), 
-      max_distance(0.0), 
+      count(0),
+      max_distance(0.0),
       min_pace(std::numeric_limits< double >::max())
     {}
     WorkoutStats operator()(WorkoutStats stats, const std::pair<time_t, dribas::workout>& entry) const

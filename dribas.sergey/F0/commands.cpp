@@ -13,7 +13,7 @@
 
 namespace
 {
-  class TimeRangeFilter 
+  class TimeRangeFilter
   {
     time_t start;
     time_t end;
@@ -51,11 +51,11 @@ namespace
   template< class T >
   bool compareStrings(const T& field_val, const std::string& op, const T& value)
   {
-    if (op == "==") { 
+    if (op == "==") {
       return field_val == value;}
     if (op == "!=") {
       return field_val != value;}
-    if (op == ">") { 
+    if (op == ">") {
       return field_val > value;}
     if (op == "<") {
       return field_val < value;}
@@ -111,7 +111,7 @@ namespace
     int param_id_;
     std::string op_;
     std::string value_str_;
-    std::string param_name_for_errors_; 
+    std::string param_name_for_errors_;
   public:
     WorkoutFilter(int param_id, const std::string& op, const std::string& value_str, const std::string& param_name):
       param_id_(param_id),
@@ -529,7 +529,6 @@ void dribas::show_rest(std::istream& in, std::ostream& out, const suite& suites)
 
   StreamGuard guard(out);
   struct tm* date_info = localtime(&date);
-  
   out << "\n=== Recovery Time Estimation ===\n";
   out << "  Date: " << std::put_time(date_info, "%Y-%m-%d") << "\n";
   out << "  Number of workouts: " << std::distance(range_start, range_end) << "\n";

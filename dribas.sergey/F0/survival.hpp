@@ -35,7 +35,7 @@ namespace dribas
 
   WorkoutAccumulator accumulate_workout_data
   (
-    WorkoutAccumulator acc, 
+    WorkoutAccumulator acc,
     const std::pair< time_t, workout >& entry);
 
   struct RecommendationGenerator
