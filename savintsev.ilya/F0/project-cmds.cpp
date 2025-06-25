@@ -251,7 +251,6 @@ void savintsev::rename_proj_or_shape(std::istream & in, std::ostream & out, Proj
       return;
     }
 
-    it->first = new_name;
     it->second->set_name(new_name);
     out << "\"" << old_name << "\" was renamed to \"" << new_name << "\" in project \"" << proj << "\"\n";
   }
@@ -415,38 +414,15 @@ void savintsev::scale_shape(std::istream & in, std::ostream & out, Projects & pr
   out << "\"" << name << "\" was succesfully scaled\n";
 }
 
-namespace
-{
-  struct GenerateLayerArray
-  {
-    GenerateLayerArray(const savintsev::Layer & base, const std::string & name_prefix):
-      base_(base),
-      name_(name_prefix),
-      index_(1)
-    {}
 
-    savintsev::Layer operator()()
-    {
-      savintsev::Shape * clone = base_.second->clone();
-      clone->set_name(name_ + "_" + std::to_string(index_++));
-      return {base_.first, clone};
-    }
-
-  private:
-    savintsev::Layer base_;
-    std::string name_;
-    int index_;
-  };
-}
-
-void savintsev::array_shapes(std::istream& in, std::ostream& out, Projects& projs)
+void savintsev::array_shapes(std::istream & in, std::ostream & out, Projects & projs)
 {
   std::string proj, name;
   int n;
   double dx, dy;
   in >> proj >> name >> n >> dx >> dy;
-  auto& pr = projs.at(proj);
 
+  auto & pr = projs.at(proj);
   auto it = std::find_if(pr.begin(), pr.end(), ShapeNameEquals(name));
   if (it == pr.end())
   {
@@ -454,10 +430,18 @@ void savintsev::array_shapes(std::istream& in, std::ostream& out, Projects& proj
     return;
   }
 
-  std::vector< Layer > clones(n);
-  std::generate(clones.begin(), clones.end(), GenerateLayerArray(*it, name));
-  std::for_each(clones.begin(), clones.end(), MoveLayer(dx, dy));
-  pr.insert(std::next(it), clones.begin(), clones.end());
+  auto pos = std::next(it);
+  const std::string type = it->first;
+  const Shape* base = it->second;
+
+  for (int i = 1; i <= n; ++i)
+  {
+    Shape* clone = base->clone();
+    clone->set_name(name + "_" + std::to_string(i));
+    clone->move(dx * i, dy * i);
+    pos = pr.insert(pos, {type, clone});
+    ++pos;
+  }
 
   out << n << " copies succesfully created\n";
 }
@@ -540,7 +524,7 @@ namespace
       index(1),
       shape_names(names)
     {
-      out << "=== Layers from the top ===\n";
+      out << "=== Layers from the bottom ===\n";
       out << "    Shape  Name\n";
     }
 
@@ -560,7 +544,6 @@ namespace
     }
   };
 }
-
 
 void savintsev::print(std::ostream & out, Projects & projs)
 {

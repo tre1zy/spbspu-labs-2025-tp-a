@@ -134,16 +134,19 @@ void savintsev::write_savi_file(const std::string & filename, Project & proj)
   }
 }
 
-void savintsev::cleanup_projects_with_backup(Projects & projects)
+namespace
 {
   struct Deleter
   {
-    void operator()(Layer & layer) const
+    void operator()(savintsev::Layer & layer) const
     {
       delete layer.second;
     }
   };
+}
 
+void savintsev::cleanup_projects_with_backup(Projects & projects)
+{
   struct ProjectProcessor
   {
     void operator()(std::pair< const std::string, Project > & proj_pair) const
@@ -160,14 +163,6 @@ void savintsev::cleanup_projects_with_backup(Projects & projects)
 
 void savintsev::cleanup_projects_without_backup(Projects& projects)
 {
-  struct Deleter
-  {
-    void operator()(Layer & layer) const
-    {
-      delete layer.second;
-    }
-  };
-
   struct ProjectProcessor
   {
     void operator()(std::pair< const std::string, Project > & proj_pair) const
