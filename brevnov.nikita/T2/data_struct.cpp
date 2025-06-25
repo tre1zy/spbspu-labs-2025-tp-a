@@ -15,7 +15,7 @@ std::istream& brevnov::operator>>(std::istream& input, UnLongLongIO&& dest)
     return input;
   }
   std::string num;
-  std::getline(input >> DelimiterIO{ '0' }, num, ':');
+  std::getline(input >> DelimeterIO{ '0' }, num, ':');
   if (num.empty())
   {
     input.setstate(std::ios::failbit);
@@ -42,11 +42,11 @@ std::istream& brevnov::operator>>(std::istream& in, ComplexIO&& dest)
   double real = 0.0;
   double imag = 0.0;
   std::string str = "#c(";
-  in >> DelimitersIO{ str };
+  in >> DelimetersIO{ str };
   str = "):";
   in >> real;
   in >> imag;
-  in >> DelimitersIO{ str };
+  in >> DelimetersIO{ str };
   if (in)
   {
     dest.ref = std::complex< double >(real, imag);
@@ -61,8 +61,8 @@ std::istream& brevnov::operator>>(std::istream& input, StringIO&& dest)
   {
     return input;
   }
-  std::getline(input >> DelimiterIO{ '"' }, dest.ref, '"');
-  return input >> DelimiterIO{ ':' };
+  std::getline(input >> DelimeterIO{ '"' }, dest.ref, '"');
+  return input >> DelimeterIO{ ':' };
 }
 
 std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
@@ -73,7 +73,7 @@ std::istream& brevnov::operator>>(std::istream& input, KeyIO&& dest)
     return input;
   }
   std::string str = "key";
-  input >> DelimitersIO{ str };
+  input >> DelimetersIO{ str };
   int key;
   input >> key;
   if (std::find(dest.keys.begin(), dest.keys.end(), key) != dest.keys.end())
@@ -116,11 +116,11 @@ std::istream& brevnov::operator>>(std::istream& input, DataStruct& dest)
   StreamGuard scope(input);
   {
     std::string str = "(:";
-    input >> DelimitersIO{ str };
+    input >> DelimetersIO{ str };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
     input >> KeyIO{ temp };
-    input >> DelimiterIO{ ')' };
+    input >> DelimeterIO{ ')' };
   }
   if (input)
   {
