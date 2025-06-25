@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   }
   std::vector< Polygon > polygons;
   using istr_iterator = std::istream_iterator< Polygon >;
-  while(!file.eof())
+  while (!file.eof())
   {
     std::copy(istr_iterator(file), istr_iterator(), std::back_inserter(polygons));
     if (!file)

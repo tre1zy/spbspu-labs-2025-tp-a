@@ -13,7 +13,7 @@ namespace karnauhova
 
   struct CalcAreaPoint
   {
-  double operator()(const Point& p1, const Point& p2);
+    double operator()(const Point& p1, const Point& p2);
   };
 
   struct Polygon
@@ -22,7 +22,6 @@ namespace karnauhova
     bool operator==(const Polygon& rhs) const;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& pol);
   double getArea(const Polygon& polygon);

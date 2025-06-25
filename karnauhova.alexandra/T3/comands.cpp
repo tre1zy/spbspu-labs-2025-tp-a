@@ -64,8 +64,8 @@ namespace
 void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::map< std::string, std::function< double() > > comands;
-  comands["EVEN"] = std::bind(evenArea, std::cref(polygons));
-  comands["ODD"] = std::bind(oddArea, std::cref(polygons));
+  comands["EVEN"] = std::bind(sumAreas<decltype(isEven)>, std::cref(polygons), isEven);
+  comands["ODD"] = std::bind(sumAreas<decltype(isOdd)>, std::cref(polygons), isOdd);
   comands["MEAN"] = std::bind(meanArea, std::cref(polygons));
   std::string comand;
   in >> comand;
@@ -74,14 +74,14 @@ void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vec
   {
     sum = comands.at(comand)();
   }
-  catch(...)
+  catch (...)
   {
     size_t count = std::stoull(comand);
     if (count < 3)
     {
       throw std::logic_error("Error: few vertices");
     }
-    sum = countArea(polygons, count);
+    sum = sumAreas(polygons, CountCompare{ count });
   }
   ScopeGuard scope(out);
   out << std::fixed << std::setprecision(1) << sum << "\n";
@@ -104,11 +104,6 @@ double karnauhova::meanArea(const std::vector< Polygon >& polygons)
     throw std::logic_error("Not enough polygons");
   }
   return sumAreas(polygons, allAreas) / polygons.size();
-}
-
-double karnauhova::countArea(const std::vector< Polygon >& polygons, size_t count)
-{
-  return sumAreas(polygons, CountCompare{ count });
 }
 
 void karnauhova::maxComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -184,8 +179,8 @@ void karnauhova::minVert(const std::vector< Polygon >& polygons, std::ostream& o
 void karnauhova::countComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::map< std::string, std::function< size_t() > > comands;
-  comands["EVEN"] = std::bind(evenCount, std::cref(polygons));
-  comands["ODD"] = std::bind(oddCount, std::cref(polygons));
+  comands["EVEN"] = std::bind(sumPol<decltype(isEven)>, std::cref(polygons), isEven);
+  comands["ODD"] = std::bind(sumPol<decltype(isOdd)>, std::cref(polygons), isOdd);
   std::string comand;
   in >> comand;
   size_t size = 0;
@@ -200,7 +195,7 @@ void karnauhova::countComands(std::istream& in, std::ostream& out, const std::ve
     {
       throw std::logic_error("Error: few vertices");
     }
-    size = countPol(polygons, count);
+    size = sumPol(polygons, CountCompare{ count });
   }
   ScopeGuard scope(out);
   out << std::fixed << std::setprecision(1) << size << "\n";
@@ -214,11 +209,6 @@ size_t karnauhova::evenCount(const std::vector< Polygon >& polygons)
 size_t karnauhova::oddCount(const std::vector< Polygon >& polygons)
 {
   return sumPol(polygons, isOdd);
-}
-
-double karnauhova::countPol(const std::vector< Polygon >& polygons, size_t count)
-{
-  return sumPol(polygons, CountCompare{ count });
 }
 
 void karnauhova::lessareaComand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -259,6 +249,6 @@ void karnauhova::echoComand(std::istream& in, std::ostream& out, std::vector< Po
       count++;
     }
   }
-  polygons = std::move(new_polygons);
+  polygons = new_polygons;
   out << count << '\n';
 }
