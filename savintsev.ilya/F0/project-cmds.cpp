@@ -2,12 +2,7 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
-#include <cmath>
-#include <random>
-#include <boost/gil.hpp>
-#include <boost/gil/extension/io/bmp.hpp>
 #include <shape-utils.hpp>
-#include <scope-guard.hpp>
 #include "renderer.hpp"
 #include "file-system.hpp"
 #include "confirmation-src.hpp"
@@ -92,16 +87,6 @@ namespace
     projs[proj].push_back({shape_name, shape});
     return proj;
   }
-}
-
-void savintsev::save_all(std::ostream & out, Projects & projs)
-{
-  std::for_each(projs.begin(), projs.end(), SaveProject());
-  out << "All projects were saved successfully\n";
-}
-
-namespace
-{
   struct CloneLayer
   {
     CloneLayer() = default;
@@ -125,6 +110,19 @@ namespace
     double dx_;
     double dy_;
   };
+  struct Deleter
+  {
+    void operator()(savintsev::Layer & layer) const
+    {
+      delete layer.second;
+    }
+  };
+}
+
+void savintsev::save_all(std::ostream & out, Projects & projs)
+{
+  std::for_each(projs.begin(), projs.end(), SaveProject());
+  out << "All projects were saved successfully\n";
 }
 
 void savintsev::merge(std::istream & in, std::ostream & out, Projects & projs)
@@ -456,17 +454,6 @@ void savintsev::reverse_project(std::istream & in, std::ostream & out, Projects 
   out << "Layers of \"" << proj << "\" reversed\n";
 }
 
-namespace
-{
-  struct Deleter
-  {
-    void operator()(savintsev::Layer & layer) const
-    {
-      delete layer.second;
-    }
-  };
-}
-
 void savintsev::clear_project(std::istream & in, std::ostream & out, Projects & projs)
 {
   std::string proj;
@@ -525,7 +512,7 @@ namespace
       index(1),
       shape_names(names)
     {
-      out << "=== Layers from the bottom ===\n";
+      out << "=== Layers from the top ===\n";
       out << "    Shape  Name\n";
     }
 
@@ -562,7 +549,9 @@ void savintsev::print_shapes(std::istream & in, std::ostream & out, Projects & p
   shape_type["concave"] = "Concav";
 
   Project & pr = projs.at(proj);
+  pr.reverse();
   std::for_each(pr.begin(), pr.end(), PrintShapeIndexed(out, shape_type));
+  pr.reverse();
 }
 
 void savintsev::print_info_about_shape(std::istream & in, std::ostream & out, Projects  & projs)
@@ -577,25 +566,15 @@ void savintsev::print_info_about_shape(std::istream & in, std::ostream & out, Pr
     out << "Figure \"" << name << "\" not found in project \"" << proj << "\"\n";
     return;
   }
-  ScopeGuard scope(in);
-  in.precision(2);
   out << "=== Info about shape ===\n";
   out << "Type " << it->first << '\n';
   out << "Name " << it->second->get_name() << '\n';
-  out << "Layr " << std::distance(pr.begin(), it) + 1 << '\n';
   const rectangle_t & frame = it->second->get_frame_rect();
   out << "Cent (x: " << frame.pos.x << ", y: " << frame.pos.y << ")\n";
   out << "Size (W: " << frame.width << ", H: " << frame.height << ")\n";
-  out << "=== Coordinates of points ===\n";
-  point_t ps[4];
-  size_t counter = it->second->get_all_points(ps);
-  for (size_t i = 1; i < counter + 1; ++i)
-  {
-    out << "[" << i << "] " << "(x: " << ps[i].x << ", y: " << ps[i].y << ")\n";
-  }
 }
 
-void savintsev::render(std::istream& in, std::ostream& out, Projects& projs)
+void savintsev::render(std::istream & in, std::ostream & out, Projects & projs)
 {
   std::string proj_name, image_name;
   int width, height;
