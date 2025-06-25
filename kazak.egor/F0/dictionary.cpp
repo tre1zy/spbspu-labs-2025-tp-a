@@ -36,6 +36,7 @@ struct TranslationFragmentChecker {
   }
 
   bool operator()(const std::string &word) const {
+    (void)word;
     return false;
   }
 };
@@ -153,7 +154,6 @@ std::vector<std::pair<std::string, std::string>> Dictionary::getAllWords() const
   return std::vector<std::pair<std::string, std::string>>(data_.begin(), data_.end());
 }
 
-KZaque, [25.06.2025 20:50]
 std::size_t Dictionary::getWordCount() const
 {
   return data_.size();
@@ -224,6 +224,7 @@ std::vector<std::string> Dictionary::getWordsByTranslationFragment(const std::st
     const TranslationFragmentChecker &checker;
     NotTranslationChecker(const TranslationFragmentChecker &c) : checker(c) {}
     bool operator()(const std::string &word) const {
+      (void)word;
       return true;
     }
   };

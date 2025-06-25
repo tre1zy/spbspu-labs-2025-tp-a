@@ -150,7 +150,6 @@ void CommandHandler::handleCommand(const std::string &line)
     iss >> fragment;
     std::vector<std::string> results = dict.getWordsByTranslationFragment(fragment);
 
-KZaque, [25.06.2025 20:51]
 struct RecursivePrintWord {
       const std::vector<std::string> &words;
       std::size_t index;
@@ -247,7 +246,6 @@ struct RecursivePrintWord {
   }
 }
 
-KZaque, [25.06.2025 20:51]
 void CommandHandler::printHelp() const
 {
   std::cout << "Available commands:\n";
@@ -353,7 +351,6 @@ void CommandHandler::quiz(const Dictionary &dict, std::size_t count) const
   qr.run();
 }
 
-KZaque, [25.06.2025 20:51]
 void CommandHandler::exportDict(const Dictionary &dict, const std::string &filename) const
 {
   std::ofstream out(filename);
