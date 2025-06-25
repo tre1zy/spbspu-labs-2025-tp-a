@@ -461,7 +461,7 @@ namespace gavrilova {
     student->averageGrade_ = sum / student->grades_.size();
   }
 
-  std::vector< std::shared_ptr< const student::Student > > 
+  std::vector< std::shared_ptr< const student::Student > >
   StudentDatabase::getStudentsInGroup(const std::string& groupName) const
   {
     if (!groupExists(groupName)) {
@@ -514,7 +514,7 @@ namespace gavrilova {
     return true;
   }
 
-  std::pair< bool, GroupStatistics > 
+  std::pair< bool, GroupStatistics >
   StudentDatabase::getGroupStatistics(const std::string& groupName, const DateRange& period) const
   {
     auto it = groups.find(groupName);
@@ -589,7 +589,7 @@ namespace gavrilova {
     return result;
   }
 
-  std::vector< std::shared_ptr< const student::Student > > 
+  std::vector< std::shared_ptr< const student::Student > >
   StudentDatabase::getTopStudentsInGroup(const std::string& groupName, size_t n) const
   {
     auto students = getStudentsInGroup(groupName);
@@ -603,7 +603,7 @@ namespace gavrilova {
     return result;
   }
 
-  std::vector< std::shared_ptr< const student::Student > > 
+  std::vector< std::shared_ptr< const student::Student > >
   StudentDatabase::getRiskStudentsInGroup(const std::string& groupName, double threshold) const
   {
     auto students = getStudentsInGroup(groupName);
