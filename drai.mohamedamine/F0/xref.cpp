@@ -173,7 +173,7 @@ void printIndexRecursive(amine::Index::const_iterator it,
       return;
     }
 
-    const std::set<Position>& positions = wordIt->second;
+    const std::set<Position, positionLess>& positions = wordIt->second;
 
     std::function<void(std::set<Position>::const_iterator)> printRecursive;
     printRecursive = [&](std::set<Position>::const_iterator posIt)
@@ -358,7 +358,7 @@ void printIndexRecursive(amine::Index::const_iterator it,
       if (iter == source.end()) return;
 
       const std::string& word = iter->first;
-      const std::set<amine::Position>& positions = iter->second;
+      const std::set<amine::Position, amine::positionLess>& positions = iter->second;
 
       std::function<void(std::set<amine::Position>::const_iterator)> insertPositions;
       insertPositions = [&](std::set<amine::Position>::const_iterator posIt)
