@@ -9,6 +9,7 @@
 #include <functional>
 #include <queue>
 #include <numeric>
+#include <algorithm>
 
 namespace klimova {
   using namespace std::placeholders;
