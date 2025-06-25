@@ -1,7 +1,6 @@
 #include "commandProcessor.hpp"
 
 #include "commands.hpp"
-#include <stdexcept>
 
 kostyukov::CommandProcessor::CommandProcessor(PolygonContainer& polygons, std::istream& in, std::ostream& out):
   polygons_(polygons),
@@ -24,13 +23,6 @@ void kostyukov::CommandProcessor::add(const std::string& commandName, CommandFun
 
 void kostyukov::CommandProcessor::process(const std::string& commandName)
 {
-  try
-  {
-    commands_.at(commandName)();
-  }
-  catch (const std::out_of_range&)
-  {
-    throw std::out_of_range("<INVALID COMMAND>");
-  }
+  commands_.at(commandName)();
   return;
 }
