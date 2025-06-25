@@ -36,7 +36,6 @@ struct TranslationFragmentChecker {
   }
 
   bool operator()(const std::string &word) const {
-    (void)word;
     return false;
   }
 };
@@ -212,32 +211,33 @@ Dictionary Dictionary::extractRange(const std::string &start, const std::string 
 
 std::vector<std::string> Dictionary::getWordsByTranslationFragment(const std::string &fragment) const
 {
-  std::vector<std::string> result;
+  std::vector<std::pair<std::string, std::string>> allWords = getAllWords();
   TranslationFragmentChecker checker(fragment);
 
-  std::vector<std::pair<std::string, std::string>> allWords = getAllWords();
-
-  result.reserve(allWords.size());
-  std::transform(allWords.begin(), allWords.end(), std::back_inserter(result), GetFirst());
-
-  struct NotTranslationChecker {
+  struct CheckAndKeepFirst {
     const TranslationFragmentChecker &checker;
-    NotTranslationChecker(const TranslationFragmentChecker &c) : checker(c) {}
-    bool operator()(const std::string &word) const {
-      (void)word;
-      return true;
+    explicit CheckAndKeepFirst(const TranslationFragmentChecker &chk) : checker(chk) {}
+
+    bool operator()(const std::pair<std::string, std::string> &entry) const {
+      return checker(entry);
     }
   };
 
-  result.clear();
-  for (std::vector<std::pair<std::string, std::string>>::const_iterator it = allWords.begin(); it != allWords.end(); ++it) {
-    if (checker(*it)) {
-      result.push_back(it->first);
+  struct ExtractFirst {
+    std::string operator()(const std::pair<std::string, std::string> &entry) const {
+      return entry.first;
     }
-  }
+  };
+
+  std::vector<std::pair<std::string, std::string>> filtered;
+  std::copy_if(allWords.begin(), allWords.end(), std::back_inserter(filtered), CheckAndKeepFirst(checker));
+
+  std::vector<std::string> result;
+  std::transform(filtered.begin(), filtered.end(), std::back_inserter(result), ExtractFirst());
 
   return result;
 }
+
 
 std::pair<std::string, std::string> Dictionary::getRandomPair() const
 {
