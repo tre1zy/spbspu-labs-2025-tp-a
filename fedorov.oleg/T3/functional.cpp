@@ -9,16 +9,10 @@
 
 namespace fedorov
 {
-  struct PointArea
-  {
-    double operator()(const Point &a, const Point &b) const
-    {
-      return a.x * b.y - b.x * a.y;
-    }
-  };
-
   double calcPolygonArea(const Polygon &poly)
   {
+    using namespace std::placeholders;
+
     if (poly.points.size() < 3)
     {
       return 0.0;
@@ -32,14 +26,19 @@ namespace fedorov
     {
       auto begin = poly.points.begin();
       auto end = poly.points.end();
-      sum = std::inner_product(begin, end - 1, begin + 1, 0.0, std::plus<>{}, PointArea{});
+
+      auto multXYFirst = std::bind(std::multiplies< double >(), std::bind(&Point::x, _1), std::bind(&Point::y, _2));
+      auto multXYSecond = std::bind(std::multiplies< double >(), std::bind(&Point::x, _2), std::bind(&Point::y, _1));
+      auto crossProduct = std::bind(std::minus< double >(), multXYFirst, multXYSecond);
+
+      sum = std::inner_product(begin, end - 1, begin + 1, 0.0, std::plus<>{}, crossProduct);
     }
 
     sum += (last.x * first.y - first.x * last.y);
     return std::abs(sum) / 2.0;
   }
 
-  bool PolygonValidator::operator()(const Polygon &poly) const
+  bool validatePolygon(const Polygon &poly)
   {
     return poly.points.size() >= 3;
   }
@@ -56,67 +55,5 @@ namespace fedorov
       }
       std::copy(inputIt(in), inputIt(), std::back_inserter(polygons));
     }
-  }
-
-  bool AreaComparator::operator()(const Polygon &p1, const Polygon &p2) const
-  {
-    return calcPolygonArea(p1) < calcPolygonArea(p2);
-  }
-
-  bool VerticesComparator::operator()(const Polygon &p1, const Polygon &p2) const
-  {
-    return p1.points.size() < p2.points.size();
-  }
-
-  double AreaOddAccumulator::operator()(double acc, const Polygon &poly) const
-  {
-    return (poly.points.size() % 2 != 0) ? acc + calcPolygonArea(poly) : acc;
-  }
-
-  double AreaEvenAccumulator::operator()(double acc, const Polygon &poly) const
-  {
-    return (poly.points.size() % 2 == 0) ? acc + calcPolygonArea(poly) : acc;
-  }
-
-  double AreaMeanAccumulator::operator()(double acc, const Polygon &poly) const
-  {
-    return acc + calcPolygonArea(poly);
-  }
-
-  AreaNumAccumulator::AreaNumAccumulator(size_t num):
-    num(num)
-  {}
-
-  double AreaNumAccumulator::operator()(double acc, const Polygon &poly) const
-  {
-    return (poly.points.size() == num) ? acc + calcPolygonArea(poly) : acc;
-  }
-
-  bool CountOddPredicate::operator()(const Polygon &poly) const
-  {
-    return poly.points.size() % 2 != 0;
-  }
-
-  bool CountEvenPredicate::operator()(const Polygon &poly) const
-  {
-    return poly.points.size() % 2 == 0;
-  }
-
-  CountNumPredicate::CountNumPredicate(size_t num):
-    num(num)
-  {}
-
-  bool CountNumPredicate::operator()(const Polygon &poly) const
-  {
-    return poly.points.size() == num;
-  }
-
-  LessAreaPredicate::LessAreaPredicate(double threshold):
-    threshold(threshold)
-  {}
-
-  bool LessAreaPredicate::operator()(const Polygon &poly) const
-  {
-    return calcPolygonArea(poly) < threshold;
   }
 }

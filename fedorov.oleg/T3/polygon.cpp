@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "input_delimiter.hpp"
+#include <input_delimiter.hpp>
 
 namespace fedorov
 {

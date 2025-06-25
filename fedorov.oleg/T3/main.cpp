@@ -1,12 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <iterator>
-#include <string>
-#include <vector>
 #include <map>
 #include <functional>
+#include <stdexcept>
 #include <limits>
-
 #include "polygon.hpp"
 #include "commands.hpp"
 #include "functional.hpp"
@@ -30,15 +27,24 @@ int main(int argc, char *argv[])
     std::cerr << "Error: file not read" << '\n';
     return 2;
   }
-  readPolygons(file, polygons);
+
+  try
+  {
+    readPolygons(file, polygons);
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error reading polygons: " << e.what() << '\n';
+    return 3;
+  }
 
   std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
   commands["AREA"] = std::bind(areaCommand, _1, _2, std::cref(polygons));
-  commands["LESSAREA"] = std::bind(lessAreaCommand, _1, _2, std::cref(polygons));
   commands["MAX"] = std::bind(maxCommand, _1, _2, std::cref(polygons));
   commands["MIN"] = std::bind(minCommand, _1, _2, std::cref(polygons));
-  commands["ECHO"] = std::bind(echoCommand, _1, _2, std::ref(polygons));
   commands["COUNT"] = std::bind(countCommand, _1, _2, std::cref(polygons));
+  commands["LESSAREA"] = std::bind(lessAreaCommand, _1, _2, std::cref(polygons));
+  commands["ECHO"] = std::bind(echoCommand, _1, _2, std::ref(polygons));
 
   std::string command;
   while (std::cin >> command)
@@ -54,14 +60,13 @@ int main(int argc, char *argv[])
       {
         throw std::invalid_argument("Unknown command");
       }
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    catch (const std::invalid_argument &)
+    catch (const std::exception &e)
     {
       std::cout << "<INVALID COMMAND>\n";
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }

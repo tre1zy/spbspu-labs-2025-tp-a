@@ -2,12 +2,6 @@
 
 #include <cctype>
 
-std::istream &fedorov::operator>>(std::istream &in, Line &line)
-{
-  std::getline(in, line.data);
-  return in;
-}
-
 std::istream &fedorov::operator>>(std::istream &in, DelimiterInput &&dest)
 {
   std::istream::sentry sentry(in);
@@ -24,3 +18,4 @@ std::istream &fedorov::operator>>(std::istream &in, DelimiterInput &&dest)
   }
   return in;
 }
+
