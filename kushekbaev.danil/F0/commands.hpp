@@ -26,9 +26,9 @@ namespace kushekbaev
 
   void reverse_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void remove_translation_at_all();
+  void remove_translation(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void remove_translation();
+  void remove_translation_at_all();
 
   void merge();
 
@@ -56,4 +56,3 @@ namespace kushekbaev
 }
 
 #endif
-

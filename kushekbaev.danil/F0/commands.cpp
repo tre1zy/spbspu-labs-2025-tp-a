@@ -132,7 +132,7 @@ void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictiona
     }
     size_t end_pos = line.find_last_not_of(" \r\n");
     std::string trimmed_line = line.substr(start_pos, end_pos - start_pos + 1);
-    if (trimmed_line.size() > 2 && trimmed_line[0] == '[' && trimmed_line[trimmed_line.size()-1] == ']')
+    if (trimmed_line.size() > 2 && trimmed_line[0] == '[' && trimmed_line[trimmed_line.size() - 1] == ']')
     {
       size_t start = 1;
       size_t end = trimmed_line.size() - 1;
@@ -238,6 +238,31 @@ void kushekbaev::reverse_search(std::ostream& out, std::istream& in, dictionary_
     }
     out << "\n";
   }
+}
+
+void kushekbaev::remove_translation(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, word_to_find, translation_to_delete;
+  in >> dictionary_name >> word_to_find >> translation_to_delete;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  auto& word_map = dict_it->second;
+  auto word_it = word_map.find(word_to_find);
+  if (word_it == word_map.end())
+  {
+    throw std::out_of_range("<WORD NOT FOUND>");
+  }
+  auto& translations = word_it->second;
+  auto translation_it = translations.find(translation_to_delete);
+  if (translation_it == translations.end())
+  {
+    throw std::out_of_range("<TRANSLATION NOT FOUND>");
+  }
+  translations.erase(translation_it);
+  out << std::string("Translation successfully deleted.\n");
 }
 
 void kushekbaev::print_help(std::ostream& out)

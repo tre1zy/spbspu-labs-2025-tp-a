@@ -19,8 +19,8 @@ int main()
   commands["search"] = std::bind(search, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["clear_dictionary"] = std::bind(clear_dictionary, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   commands["reverse_search"] = std::bind(reverse_search, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
+  commands["remove_translation"] = std::bind(remove_translation, std::ref(std::cout), std::ref(std::cin), std::ref(curr_ds));
   /*  commands["remove_translation_at_all"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["remove_translation"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
   commands["merge"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["split"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["prefix_search"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
