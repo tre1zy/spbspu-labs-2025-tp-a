@@ -174,7 +174,7 @@ namespace
     if (pred1)
     {
       return !((std::max(A.x, B.x) < std::min(C.x, D.x) || std::max(C.x, D.x) < std::min(A.x, B.x))
-        || (std::max(A.y, B.y) < std::min(C.y, D.y) || std::max(C.y, D.y) < std::min(A.y, B.y)))
+        || (std::max(A.y, B.y) < std::min(C.y, D.y) || std::max(C.y, D.y) < std::min(A.y, B.y)));
     }
     pred1 = ccw1 == 0 && on_segment(A, B, C);
     pred1 = pred1 || (ccw2 == 0 && on_segment(A, B, D));
