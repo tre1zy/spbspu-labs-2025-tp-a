@@ -75,7 +75,8 @@ namespace amine
   }
 }
 
-void amine::CrossRefSystem::buildIndex(const std::string& indexName, const std::string& fileName)
+void amine::CrossRefSystem::buildIndex(const std::string& indexName
+  , const std::string& fileName)
 {
   std::ifstream file(fileName);
   if (!file.is_open())
@@ -137,8 +138,9 @@ void amine::CrossRefSystem::buildIndex(const std::string& indexName, const std::
     printPositionsRecursive(std::next(it), end);
   }
 
-  void printIndexRecursive(std::map<std::string, std::set<amine::Position>>::const_iterator it,
-                           std::map<std::string, std::set<amine::Position>>::const_iterator end)
+  void printIndexRecursive(std::map<std::string
+    , std::set<amine::Position>>::const_iterator it,
+    std::map<std::string, std::set<amine::Position>>::const_iterator end)
   {
     if (it == end) return;
 
@@ -162,7 +164,8 @@ void amine::CrossRefSystem::buildIndex(const std::string& indexName, const std::
   printIndexRecursive(index.begin(), index.end());
 }
 
-void amine::CrossRefSystem::getPositions(const std::string& indexName, const std::string& word) const
+void amine::CrossRefSystem::getPositions(const std::string& indexName
+  , const std::string& word) const
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -283,12 +286,14 @@ size_t afterLine,size_t afterColumn)
   size_t insertOffset = getMaxLineRecursive(before.begin(), before.end(), 0) + 1;
   copyIndexWithOffset(result, toInsert, insertOffset);
 
-  size_t finalOffset = insertOffset + getMaxLineRecursive(toInsert.begin(), toInsert.end(), 0) + 1;
+  size_t finalOffset = insertOffset + getMaxLineRecursive(toInsert.begin()
+  , toInsert.end(), 0) + 1;
   copyIndexWithOffset(result, after, finalOffset - insertOffset);
 
   indexes_[newIndex] = result;
 }
-void amine::CrossRefSystem::extractText(const std::string& newIndex,const std::string& baseIndex
+void amine::CrossRefSystem::extractText(const std::string& newIndex
+  ,const std::string& baseIndex
 ,size_t startLine,
 size_t startCol,size_t endLine,size_t endCol)
 {
@@ -349,8 +354,10 @@ size_t startCol,size_t endLine,size_t endCol)
 
     auto it = source.begin();
 
-    std::function<void(std::map<std::string, std::set<amine::Position>>::const_iterator)> copyRecursive;
-    copyRecursive = [&](std::map<std::string, std::set<amine::Position>>::const_iterator iter)
+    std::function<void(std::map<std::string
+      , std::set<amine::Position>>::const_iterator)> copyRecursive;
+    copyRecursive = [&](std::map<std::string
+      , std::set<amine::Position>>::const_iterator iter)
     {
       if (iter == source.end()) return;
 
@@ -637,7 +644,8 @@ void amine::CrossRefSystem::saveIndex(const std::string& indexName,
     }
   }
 
-void amine::CrossRefSystem::loadIndex(const std::string& indexName, const std::string& fileName)
+void amine::CrossRefSystem::loadIndex(const std::string& indexName
+  , const std::string& fileName)
 {
   std::ifstream in(fileName);
   if (!in.is_open())
@@ -681,7 +689,8 @@ void amine::CrossRefSystem::reconstructText(const std::string& indexName,
     {
       if (pit == wordIt->second.end()) return;
       if (pit->line > maxLine) maxLine = pit->line;
-      if (pit->column > maxCol) maxCol = std::max(maxCol, wordIt->first.length() + pit->column);
+      if (pit->column > maxCol) maxCol = std::max(maxCol
+        , wordIt->first.length() + pit->column);
       checkPositions(std::next(pit));
     };
 
