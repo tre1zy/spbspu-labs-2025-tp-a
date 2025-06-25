@@ -329,7 +329,7 @@ void alymova::translate(std::istream& in, std::ostream& out, const DictSet& set)
   }
   std::list< Dictionary > dicts, suitable;
   std::transform(names.begin(), names.end(), std::back_inserter(dicts), std::bind(returnDictionary, set, _1));
-  
+
   auto d_first1 = std::inserter(suitable, suitable.end());
   std::copy_if(dicts.begin(), dicts.end(), d_first1, std::bind(hasKey, _1, word));
 
