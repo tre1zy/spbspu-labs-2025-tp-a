@@ -87,16 +87,21 @@ namespace amine
     long long o3 = orient(p2, q2, p1);
     long long o4 = orient(p2, q2, q1);
 
-    if (o1 * o2 < 0 && o3 * o4 < 0)
+    if (o1 * o2 < 0 && o3 * o4 < 0){
       return true;
-    if (o1 == 0 && on_segment(p1, p2, q1))
+    }
+    if (o1 == 0 && on_segment(p1, p2, q1)){
       return true;
-    if (o2 == 0 && on_segment(p1, q2, q1))
+    }
+    if (o2 == 0 && on_segment(p1, q2, q1)){
       return true;
-    if (o3 == 0 && on_segment(p2, p1, q2))
+    }
+    if (o3 == 0 && on_segment(p2, p1, q2)){
       return true;
-    if (o4 == 0 && on_segment(p2, q1, q2))
+    }
+    if (o4 == 0 && on_segment(p2, q1, q2)){
       return true;
+    }
 
     return false;
   }
@@ -207,15 +212,20 @@ namespace amine
       Point pt;
       char c;
       if (!(iss >> c) || c != '(') {
-        return Point{}; }
+        return Point{}; 
+      }
       if (!(iss >> pt.x)){
-        return Point{};}
+        return Point{};
+      }
       if (!(iss >> c) || c != ';'){
-        return Point{};}
+        return Point{};
+      }
       if (!(iss >> pt.y)){
-        return Point{};}
+        return Point{};
+      }
       if (!(iss >> c) || c != ')'){
-        return Point{};}
+        return Point{};
+      }
       return pt;
     }
   };
