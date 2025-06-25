@@ -419,9 +419,9 @@ void shapkov::save(std::istream& in, std::ostream& out, const FrequencyDictionar
   {
     save << "[" << pair.first << "]\n";
     save << "size=" << pair.second.size << '\n';
-    for (const auto& word_pair: pair.second.dictionary)
+    for (const auto& wordPair: pair.second.dictionary)
     {
-      save << word_pair.first << '\t' << word_pair.second << '\n';
+      save << wordPair.first << '\t' << wordPair.second << '\n';
     }
   }
   out << "<SAVED SUCCESSFULLY>\n";
