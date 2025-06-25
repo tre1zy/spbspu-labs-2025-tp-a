@@ -84,17 +84,7 @@ void karnauhova::areaComands(std::istream& in, std::ostream& out, const std::vec
     sum = sumAreas(polygons, CountCompare{ count });
   }
   ScopeGuard scope(out);
-  out << std::fixed << std::setprecision(1) << sum << "\n";
-}
-
-double karnauhova::evenArea(const std::vector< Polygon >& polygons)
-{
-  return sumAreas(polygons, isEven);
-}
-
-double karnauhova::oddArea(const std::vector< Polygon >& polygons)
-{
-  return sumAreas(polygons, isOdd);
+  out << std::fixed << std::setprecision(1) << sum;
 }
 
 double karnauhova::meanArea(const std::vector< Polygon >& polygons)
@@ -131,14 +121,14 @@ void karnauhova::maxArea(const std::vector< Polygon >& polygons, std::ostream& o
 {
   auto max = (*std::max_element(polygons.begin(), polygons.end(), compArea));
   ScopeGuard scope(out);
-  out << std::fixed << std::setprecision(1) << karnauhova::getArea(max) << "\n";
+  out << std::fixed << std::setprecision(1) << karnauhova::getArea(max);
 }
 
 void karnauhova::maxVert(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   auto max = (*std::max_element(polygons.begin(), polygons.end(), compVert));
   ScopeGuard scope(out);
-  out << std::fixed << std::setprecision(1) << max.points.size() << "\n";
+  out << std::fixed << std::setprecision(1) << max.points.size();
 }
 
 void karnauhova::minComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -166,14 +156,14 @@ void karnauhova::minArea(const std::vector< Polygon >& polygons, std::ostream& o
 {
   auto min = (*std::min_element(polygons.begin(), polygons.end(), compArea));
   ScopeGuard scope(out);
-  out << std::fixed << std::setprecision(1) << karnauhova::getArea(min) << "\n";
+  out << std::fixed << std::setprecision(1) << karnauhova::getArea(min);
 }
 
 void karnauhova::minVert(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   auto min = (*std::min_element(polygons.begin(), polygons.end(), compVert));
   ScopeGuard scope(out);
-  out << std::fixed << std::setprecision(1) << min.points.size() << "\n";
+  out << std::fixed << std::setprecision(1) << min.points.size();
 }
 
 void karnauhova::countComands(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -198,17 +188,7 @@ void karnauhova::countComands(std::istream& in, std::ostream& out, const std::ve
     size = sumPol(polygons, CountCompare{ count });
   }
   ScopeGuard scope(out);
-  out << std::fixed << std::setprecision(1) << size << "\n";
-}
-
-size_t karnauhova::evenCount(const std::vector< Polygon >& polygons)
-{
-  return sumPol(polygons, isEven);
-}
-
-size_t karnauhova::oddCount(const std::vector< Polygon >& polygons)
-{
-  return sumPol(polygons, isOdd);
+  out << std::fixed << std::setprecision(1) << size;
 }
 
 void karnauhova::lessareaComand(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -221,7 +201,7 @@ void karnauhova::lessareaComand(std::istream& in, std::ostream& out, const std::
     throw std::logic_error("<INVALID COMMAND>");
   }
   size_t count = std::count_if(polygons.begin(), polygons.end(), std::bind(compArea, std::placeholders::_1, it));
-  out << count << "\n";
+  out << count;
 }
 
 void karnauhova::echoComand(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons)
@@ -250,5 +230,5 @@ void karnauhova::echoComand(std::istream& in, std::ostream& out, std::vector< Po
     }
   }
   polygons = new_polygons;
-  out << count << '\n';
+  out << count;
 }
