@@ -33,7 +33,7 @@ int main()
       clear_screen();
       std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
       std::cout << "Возвращение в прошлый бой:\n";
-      //boy fight
+      fight(players);
     }
     clear_screen();
     std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
