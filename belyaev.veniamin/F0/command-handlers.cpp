@@ -156,6 +156,17 @@ void belyaev::printDict(const Dictionaries& data, std::istream& in, std::ostream
   }
 }
 
+void belyaev::printAllDict(const Dictionaries& data, std::ostream& out)
+{
+  if (data.dicts.size() == 0)
+  {
+    out << "<NO DICTIONARIES>\n";
+    return;
+  }
+  auto printAllHelperBind = std::bind(printAllHelper, std::placeholders::_1, std::ref(out));
+  std::transform(data.dicts.begin(), data.dicts.end(), std::ostream_iterator<Dictionary>{out, "\n"}, printAllHelperBind);
+}
+
 belyaev::commandMap belyaev::mapCommandHandlers(Dictionaries& data)
 {
   using namespace std::placeholders;
@@ -167,8 +178,8 @@ belyaev::commandMap belyaev::mapCommandHandlers(Dictionaries& data)
   cmds["SEARCH_CONTAINS"] = std::bind(searchContains, std::cref(data), _1, _2, "RU");
   cmds["SEARCH_CONTAINS_ENGLISH"] = std::bind(searchContains, std::cref(data), _1, _2, "ENG");
   cmds["PRINT"] = std::bind(printDict, std::cref(data), _1, _2);
+  cmds["PRINT_ALL"] = std::bind(printAllDict, std::cref(data), _2);
   /*
-  cmds["PRINT_ALL"] = std::bind(area, std::cref(data), _1, _2);
   cmds["CLEAR"] = std::bind(area, std::ref(data), _1, _2);
   cmds["COPY"] = std::bind(area, std::ref(data), _1, _2);
   cmds["RENAME"] = std::bind(area, std::ref(data), _1, _2);

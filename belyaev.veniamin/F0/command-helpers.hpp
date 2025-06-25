@@ -16,6 +16,8 @@ namespace belyaev
 
   bool pairContainsRuChars(const entryPair entry, std::string subStringRu);
   bool pairContainsEnChars(const entryPair entry, std::string subStringEn);
+
+  const Dictionary& printAllHelper(const std::pair<const std::string, Dictionary>& dictsEntry, std::ostream& out);
 }
 
 #endif

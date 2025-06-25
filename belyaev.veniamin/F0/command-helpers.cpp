@@ -58,3 +58,9 @@ bool belyaev::pairContainsEnChars(const entryPair entry, std::string subStringEn
 {
   return entry.second.find(subStringEn) != std::string::npos;
 }
+
+const belyaev::Dictionary& belyaev::printAllHelper(const std::pair<const std::string, Dictionary>& dictsEntry, std::ostream& out)
+{
+  out << "Dictionary " << dictsEntry.first << ":\n";
+  return dictsEntry.second;
+}

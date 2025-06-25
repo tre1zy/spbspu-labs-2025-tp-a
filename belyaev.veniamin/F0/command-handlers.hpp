@@ -13,6 +13,7 @@ namespace belyaev
   void searchEntryByEnglish(const Dictionaries& data, std::istream& in, std::ostream& out);
   void searchContains(const Dictionaries& data, std::istream& in, std::ostream& out, std::string ruOrEng);
   void printDict(const Dictionaries& data, std::istream& in, std::ostream& out);
+  void printAllDict(const Dictionaries& data, std::ostream& out);
 
   using commandMap = std::map<std::string, std::function<void(std::istream&, std::ostream&)>>;
   commandMap mapCommandHandlers(Dictionaries& data);
