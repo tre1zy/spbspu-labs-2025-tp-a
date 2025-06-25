@@ -105,7 +105,7 @@ namespace
   struct OutputFormatForFind
   {
     std::ostream& out;
-    
+
     void operator()(const std::pair< std::string, std::string >& pair) const
     {
       static bool first = true;
