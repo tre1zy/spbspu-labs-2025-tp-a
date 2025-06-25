@@ -1,10 +1,12 @@
 #include "xref.hpp"
-#include <fstream>
-#include <sstream>
 #include <algorithm>
+#include <fstream>
+#include <map>
 #include <iterator>
 #include <iostream>
 #include <numeric>
+#include <sstream>
+#include <vector>
 
 namespace amine
 {
