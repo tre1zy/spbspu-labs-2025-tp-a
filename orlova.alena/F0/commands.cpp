@@ -21,7 +21,7 @@ namespace
     return line;
   }
 
-  bool dictionaryExists(const orlova::Dictionaries& dicts, const std::string& name) 
+  bool dictionaryExists(const orlova::Dictionaries& dicts, const std::string& name)
   {
     return dicts.find(name) != dicts.end();
   }
