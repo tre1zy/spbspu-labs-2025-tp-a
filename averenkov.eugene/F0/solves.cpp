@@ -10,14 +10,14 @@ void averenkov::CombinationBuilder::operator()(int pos) const
   }
 }
 
-averenkov::CombinationEvaluator::CombinationEvaluator(int cap, std::vector<const Item*>& best, int& maxVal, int& bestWgt):
+averenkov::CombinationEvaluator::CombinationEvaluator(int cap, vec_it& best, int& maxVal, int& bestWgt):
   capacity(cap),
   bestCombination(best),
   maxValue(maxVal),
   bestWeight(bestWgt)
 {}
 
-void averenkov::CombinationEvaluator::operator()(const std::vector<const Item*>& combination)
+void averenkov::CombinationEvaluator::operator()(const vec_it& combination)
 {
   int totalWeight = calculateTotalWeight(combination);
   int totalValue = calculateTotalValue(combination);
@@ -67,7 +67,7 @@ void averenkov::DPRowProcessor::operator()()
   }
 }
 
-void averenkov::SolutionBuilder::operator()()
+void averenkov::DPSolutionBuilder::operator()()
 {
   if (current_index > 0 && remaining_weight > 0)
   {
@@ -76,40 +76,207 @@ void averenkov::SolutionBuilder::operator()()
       result.push_back(items[current_index-1]);
       remaining_weight -= items[current_index-1]->getWeight();
     }
-    SolutionBuilder next{items, dp, result, remaining_weight, current_index - 1};
+    DPSolutionBuilder next{items, dp, result, remaining_weight, current_index - 1};
     next();
   }
 }
 
-void averenkov::generateCombinations(const std::vector<const Item*>& items,
-      std::vector<std::vector<const Item*>>& allCombinations,
-      std::vector<const Item*> currentCombination,
-      size_t index)
+void averenkov::generateCombinations(const vec_it& items, std::vector< vec_it >& allCom, vec_it curCom, size_t index)
 {
   if (index == items.size())
   {
-    allCombinations.push_back(currentCombination);
+    allCom.push_back(curCom);
     return;
   }
-  generateCombinations(items, allCombinations, currentCombination, index + 1);
+  generateCombinations(items, allCom, curCom, index + 1);
 
-  currentCombination.push_back(items[index]);
-  generateCombinations(items, allCombinations, currentCombination, index + 1);
+  curCom.push_back(items[index]);
+  generateCombinations(items, allCom, curCom, index + 1);
 }
 
-int averenkov::calculateTotalWeight(const std::vector<const Item*>& combination)
+int averenkov::calculateTotalWeight(const vec_it& combination)
 {
   return std::accumulate(combination.begin(), combination.end(), 0, WeightCalculator());
 }
 
-int averenkov::calculateTotalValue(const std::vector<const Item*>& combination)
+int averenkov::calculateTotalValue(const vec_it& combination)
 {
   return std::accumulate(combination.begin(), combination.end(), 0, ValueCalculator());
 }
 
+averenkov::ItemCollector::ItemCollector(vec_it& r, const std::vector< bool >& inc, const vec_it& it):
+  result(r),
+  included(inc),
+  items(it),
+  current_index(0)
+{}
+
+void averenkov::ItemCollector::operator()(bool is_included)
+{
+  if (is_included)
+  {
+    result.push_back(items[current_index]);
+  }
+  current_index++;
+}
+
+void averenkov::BestSolutionUpdater::operator()()
+{
+  int best_weight = 0;
+  WeightCalculator calc;
+  best_weight = std::accumulate(state.best_items.begin(), state.best_items.end(), 0, calc);
+  auto cond = (state.current_value == state.best_value && state.current_weight < best_weight);
+  if (state.current_value > state.best_value || cond)
+  {
+    state.best_value = state.current_value;
+    state.best_items.clear();
+    ItemCollector collector(state.best_items, state.included, state.items);
+    std::for_each(state.included.begin(), state.included.end(), collector);
+  }
+}
+
+void averenkov::BacktrackStep::operator()()
+{
+  if (state.index >= state.items.size())
+  {
+    BestSolutionUpdater updater{state};
+    updater();
+    return;
+  }
+  state.included[state.index] = false;
+  BacktrackState next_state = state;
+  next_state.index++;
+  BacktrackStep step{next_state};
+  step();
+  if (state.current_weight + state.items[state.index]->getWeight() <= state.capacity)
+  {
+    state.included[state.index] = true;
+    state.current_weight += state.items[state.index]->getWeight();
+    state.current_value += state.items[state.index]->getValue();
+    BacktrackState include_state = state;
+    include_state.index++;
+    BacktrackStep include_step{include_state};
+    include_step();
+    state.included[state.index] = false;
+    state.current_weight -= state.items[state.index]->getWeight();
+    state.current_value -= state.items[state.index]->getValue();
+  }
+}
+
+bool averenkov::ItemSorter::operator()(const Item* a, const Item* b) const
+{
+  return a->getValue() * b->getWeight() > b->getValue() * a->getWeight();
+}
+
+int averenkov::BoundCalculator::operator()(const Node* node) const
+{
+  if (node->weight >= capacity)
+  {
+    return 0;
+  }
+
+  auto cond = (node->level == 0 && node->weight == 0 && node->value == 0);
+  size_t start_level = cond ? 0 : node->level + 1;
+  BoundCalculatorHelper helper{ items, capacity, node->value, node->weight, start_level };
+  helper();
+  return helper.bound;
+}
+
+void averenkov::BoundCalculatorHelper::operator()()
+{
+  if (j < items.size() && total_weight + items[j]->getWeight() <= capacity)
+  {
+    total_weight += items[j]->getWeight();
+    bound += items[j]->getValue();
+    j++;
+    (*this)();
+  }
+  else if (j < items.size())
+  {
+    bound += (capacity - total_weight) * items[j]->getValue() / items[j]->getWeight();
+  }
+}
+
+void averenkov::NodeExpander::operator()(Node* node) const
+{
+  if (node->bound > max_value)
+  {
+    auto w = node->weight + items[node->level]->getWeight();
+    auto v = node->value + items[node->level]->getValue();
+    Node* left = new Node{ node->level + 1, w, v, 0, node->included };
+    left->included[node->level] = true;
+    left->bound = BoundCalculator{items, capacity}(left);
+
+    if (left->weight <= capacity && left->value > max_value)
+    {
+      max_value = left->value;
+      best_included = left->included;
+    }
+
+    if (left->bound > max_value)
+    {
+      queue.push(left);
+    }
+    else
+    {
+      delete left;
+    }
+    Node* right = new Node{ node->level + 1, node->weight, node->value, 0, node->included };
+    right->bound = BoundCalculator{items, capacity}(right);
+    if (right->bound > max_value)
+    {
+      queue.push(right);
+    }
+    else
+    {
+      delete right;
+    }
+  }
+  delete node;
+}
+
+void averenkov::QueueProcessor::operator()() const
+{
+  if (!queue.empty())
+  {
+    Node* node = queue.front();
+    queue.pop();
+    expander(node);
+    QueueProcessor next{queue, expander};
+    next();
+  }
+}
+
+void averenkov::BBSolutionBuilder::operator()() const
+{
+  if (current_index < items.size())
+  {
+    if (included[current_index])
+    {
+      resultKit.addItem(items[current_index]);
+    }
+    BBSolutionBuilder next{items, included, resultKit, current_index + 1};
+    next();
+  }
+}
+
+void averenkov::solve(Base& base, vec_st args)
+{
+  auto kitIt = base.kits.find(args[1]);
+  if (kitIt == base.kits.end())
+  {
+    throw std::invalid_argument("Source kit not found");
+  }
+  if (kitIt->second.getItems().size() < 4)
+  {
+    bruteforce(base, args);
+    return;
+  }
+  dynamicProgrammingSolve(base, args);
+}
 
 
-void averenkov::bruteforce(Base& base, const std::vector<std::string>& args)
+void averenkov::bruteforce(Base& base, vec_st args)
 {
   if (args.size() < 3)
   {
@@ -127,12 +294,12 @@ void averenkov::bruteforce(Base& base, const std::vector<std::string>& args)
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  std::vector<const Item*> items = sourceKit.getItems();
+  std::vector< const Item* > items = sourceKit.getItems();
 
-  std::vector<std::vector<const Item*>> allCombinations;
+  std::vector< std::vector< const Item* > > allCombinations;
   generateCombinations(items, allCombinations, {}, 0);
 
-  std::vector<const Item*> bestCombination;
+  std::vector< const Item* > bestCombination;
   int maxValue = 0;
   int bestWeight = 0;
   CombinationEvaluator evaluator(capacity, bestCombination, maxValue, bestWeight);
@@ -149,7 +316,7 @@ void averenkov::bruteforce(Base& base, const std::vector<std::string>& args)
   std::for_each(bestCombination.begin(), bestCombination.end(), adder);
 }
 
-void averenkov::dynamicProgrammingSolve(Base& base, const std::vector<std::string>& args)
+void averenkov::dynamicProgrammingSolve(Base& base, vec_st args)
 {
   if (args.size() < 3)
   {
@@ -172,21 +339,104 @@ void averenkov::dynamicProgrammingSolve(Base& base, const std::vector<std::strin
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  const std::vector<const Item*>& items = sourceKit.getItems();
+  std::vector< const Item* > items = sourceKit.getItems();
 
-  std::vector<std::vector<int>> dp(items.size() + 1);
+  std::vector< std::vector< int > > dp(items.size() + 1);
   DPTableInitializer init{dp, capacity};
   std::for_each(dp.begin(), dp.end(), init);
 
   DPRowProcessor processor{items, dp, 1};
   processor();
 
-  std::vector<const Item*> selectedItems;
+  std::vector< const Item* > selectedItems;
   int remaining_weight = capacity;
-  SolutionBuilder builder{items, dp, selectedItems, remaining_weight, items.size()};
+  DPSolutionBuilder builder{items, dp, selectedItems, remaining_weight, items.size()};
   builder();
 
   Kit& resultKit = base.kits.emplace(resultKitName, Kit(resultKitName)).first->second;
   ItemAdder adder(resultKit);
   std::for_each(selectedItems.begin(), selectedItems.end(), adder);
+}
+
+
+void averenkov::backtrackingSolve(Base& base, vec_st args)
+{
+  if (args.size() < 3)
+  {
+    throw std::invalid_argument("Not enough arguments for backtrack command");
+  }
+  const std::string& sourceKitName = args[1];
+  const std::string& resultKitName = args[2];
+  auto kitIt = base.kits.find(sourceKitName);
+  if (kitIt == base.kits.end())
+  {
+    throw std::invalid_argument("Source kit not found");
+  }
+
+  if (base.kits.find(resultKitName) != base.kits.end())
+  {
+    throw std::invalid_argument("Result kit already exists");
+  }
+
+  const Kit& sourceKit = kitIt->second;
+  int capacity = base.current_knapsack.getCapacity();
+  const vec_it& items = sourceKit.getItems();
+
+  vec_it best_items;
+  int best_value = 0;
+  std::vector< bool > included(items.size(), false);
+
+  BacktrackState initial_state{ items, capacity, best_items, best_value, 0, 0, included, 0 };
+
+  BacktrackStep step{initial_state};
+  step();
+
+  Kit& resultKit = base.kits.emplace(resultKitName, Kit(resultKitName)).first->second;
+  ItemAdder adder(resultKit);
+  std::for_each(best_items.begin(), best_items.end(), adder);
+}
+
+void averenkov::branchAndBoundSolve(Base& base, const std::vector<std::string>& args)
+{
+  if (args.size() < 3)
+  {
+    throw std::invalid_argument("Not enough arguments for branch and bound command");
+  }
+
+  const std::string& sourceKitName = args[1];
+  const std::string& resultKitName = args[2];
+
+  auto kitIt = base.kits.find(sourceKitName);
+  if (kitIt == base.kits.end())
+  {
+    throw std::invalid_argument("Source kit not found");
+  }
+
+  if (base.kits.find(resultKitName) != base.kits.end())
+  {
+    throw std::invalid_argument("Result kit already exists");
+  }
+
+  const Kit& sourceKit = kitIt->second;
+  int capacity = base.current_knapsack.getCapacity();
+  std::vector< const Item* > items = sourceKit.getItems();
+
+  ItemSorter sorter;
+  std::sort(items.begin(), items.end(), sorter);
+
+  std::queue< Node* > queue;
+  std::vector< bool > best_included(items.size(), false);
+  int max_value = 0;
+
+  Node* root = new Node{ 0, 0, 0, 0, std::vector< bool >(items.size(), false) };
+  root->bound = BoundCalculator{ items, capacity }(root);
+  queue.push(root);
+
+  NodeExpander expander{ queue, items, capacity, max_value, best_included };
+  QueueProcessor processor{ queue, expander };
+  processor();
+
+  Kit& resultKit = base.kits.emplace(resultKitName, Kit(resultKitName)).first->second;
+  BBSolutionBuilder builder{ items, best_included, resultKit, 0 };
+  builder();
 }

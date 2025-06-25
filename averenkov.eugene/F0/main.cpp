@@ -15,13 +15,13 @@ int main()
   commands["remove_from_kit"] = averenkov::removeFromKit;
   commands["add_knapsack"] = averenkov::addKnapsack;
   commands["set_knapsack"] = averenkov::setKnapsack;
-//  commands["solve"] = averenkov::solve;
+  commands["solve"] = averenkov::solve;
   commands["stats"] = averenkov::showStats;
   commands["reset"] = averenkov::reset;
   commands["bruteforce"] = averenkov::bruteforce;
   commands["dynamic_prog"] = averenkov::dynamicProgrammingSolve;
-//  commands["backtracking"] = averenkov::backtrackingSolve;
-//  commands["branch_and_bound"] = averenkov::branchAndBoundSolve;
+  commands["backtracking"] = averenkov::backtrackingSolve;
+  commands["branch_and_bound"] = averenkov::branchAndBoundSolve;
   commands["save"] = averenkov::saveToFile;
   commands["load"] = averenkov::loadFromFile;
 
