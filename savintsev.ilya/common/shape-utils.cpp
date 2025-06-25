@@ -1,5 +1,5 @@
 #include "shape-utils.hpp"
-#include <map>
+#include <limits>
 #include <iterator>
 #include <algorithm>
 #include "rectangle.hpp"
@@ -13,7 +13,7 @@ namespace
     if (!std::copy_n(std::istream_iterator< double >(in), count, out))
     {
       in.clear(in.rdstate() ^ std::ios::failbit);
-      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      in.ignore(std::numeric_limits <std::streamsize >::max(), '\n');
       return false;
     }
     return true;
