@@ -7,7 +7,7 @@ Accum dribas::accumulate_workout_data(Accum acc, const std::pair< time_t, dribas
   const auto& w = entry.second;
   acc.totalDistance += w.distance;
   acc.totalDuration += (w.timeEnd - w.timeStart) / 3600.0;
-  acc.strengthSum += (w.maxHeart - w.avgHeart) * w.cadence;
+  acc.strengthSum += (w.maxHeart - w.avgHeart) + w.cadence;
   acc.workoutCount++;
   return acc;
 }

@@ -4,6 +4,7 @@
 #include <numeric>
 #include <vector>
 #include <functional>
+#include <limits>
 #include <delimiter.hpp>
 
 #include "survival.hpp"
@@ -12,6 +13,41 @@
 
 namespace
 {
+  class TimeRangeFilter 
+  {
+    time_t start;
+    time_t end;
+  public:
+    TimeRangeFilter(time_t s, time_t e):
+      start(s),
+      end(e)
+    {}
+      bool operator()(const std::pair< time_t, dribas::workout >& session) const
+      {
+        return session.first >= start && session.first <= end;
+      }
+  };
+  struct HeartRateExtractor
+  {
+    int operator()(const std::pair<time_t, dribas:: workout >& session) const
+    {
+      return session.second.avgHeart;
+    }
+  };
+  struct CadenceExtractor {
+    int operator()(const std::pair< time_t, dribas::workout >& session) const
+    {
+      return session.second.cadence;
+    }
+  };
+  struct DistanceExtractor
+  {
+    double operator()(const std::pair< time_t, dribas::workout >& session) const
+    {
+      return session.second.distance;
+    }
+  };
+
   template< class T >
   bool compareStrings(const T& field_val, const std::string& op, const T& value)
   {
@@ -38,17 +74,18 @@ namespace
     return static_cast< long long >(hours) * 3600 + static_cast< long long >(minutes) * 60 + static_cast< long long>(seconds);
   }
 
-  long long get_workout_numeric_param(const dribas::workout& w, int param_id) {
+  double get_workout_numeric_param(const dribas::workout& w, int param_id)
+  {
     long long value;
     switch (param_id) {
       case 2:
-        value = static_cast< long long >(w.avgHeart);
+        value = w.avgHeart;
         break;
       case 3:
-        value = static_cast< long long >(w.maxHeart);
+        value = w.maxHeart;
         break;
       case 4:
-        value = static_cast< long long>(w.cadence);
+        value = w.cadence;
         break;
       case 5:
         value = w.distance;
@@ -57,16 +94,17 @@ namespace
         value = w.avgPaceMinPerKm;
         break;
       case 7:
-        value = static_cast< long long >(w.timeStart);
+        value = w.timeStart;
         break;
       case 8:
-        value = static_cast< long long >(w.timeEnd);
+        value = w.timeEnd;
         break;
       default:
         throw std::runtime_error("unsupported parameter ID: ");
     }
     return value;
   }
+
   class WorkoutFilter
   {
   private:
@@ -88,7 +126,7 @@ namespace
       if (param_id_ == 1) {
         match = compareStrings(w.name, op_, value_str_);
       } else if (param_id_ >= 2 && param_id_ <= 8) {
-        match = compareStrings(get_workout_numeric_param(w, param_id_), op_,std::stoll(value_str_));
+        match = compareStrings(get_workout_numeric_param(w, param_id_), op_,std::stod(value_str_));
       } else {
         throw std::runtime_error("Unsupported parameter type for comparison: " + param_name_for_errors_);
       }
@@ -100,7 +138,8 @@ namespace
     return entry.second;
   }
 
-  time_t parse_date(int year, int month, int day) {
+  time_t parse_date(int year, int month, int day)
+  {
     if (year < 1900) {
       throw std::runtime_error("Year must be 1900 or later");
     }
@@ -129,7 +168,8 @@ namespace
     return result;
   }
 
-  int get_param(const std::string& str) {
+  int get_param(const std::string& str)
+  {
     std::map< std::string, int > param_map =
     {
       {"name", 1},
@@ -191,7 +231,7 @@ void dribas::add_training_from_file(std::istream& in, std::ostream& out, suite& 
   }
   auto& main_suite = trainng.at(1);
   main_suite.emplace(training.timeStart, training);
-  out << "Trainings: " << training << " added" << '\n';
+  out << "Trainings: " << training;
 }
 
 void dribas::show_all_trainings(std::ostream& out, const suite& trainings)
@@ -308,7 +348,7 @@ void dribas::add_training_manual(std::istream& in, std::ostream& out, std::map< 
   long long calculated_duration_seconds = 0;
 
   out << "Enter workout name (string): ";
-  std::getline(in, new_workout.name);
+  in >> new_workout.name;
   if (new_workout.name.empty()) {
     throw std::invalid_argument("Workout name cannot be empty.");
   }
@@ -323,7 +363,7 @@ void dribas::add_training_manual(std::istream& in, std::ostream& out, std::map< 
   std::tm tm_start_struct = *std::localtime(&date_only_time_t);
 
   if (hour > 23 || minute > 59) {
-      throw std::invalid_argument("Invalid hour or minute for workout time.");
+    throw std::invalid_argument("Invalid hour or minute for workout time.");
   }
   tm_start_struct.tm_hour = hour;
   tm_start_struct.tm_min = minute;
@@ -333,7 +373,7 @@ void dribas::add_training_manual(std::istream& in, std::ostream& out, std::map< 
   if (new_workout.timeStart == static_cast<time_t>(-1)) {
     throw std::runtime_error("Failed to convert entered date/time to system time. Possible invalid date/time values.");
   }
-  out << "Enter distance (m): ";
+  out << "Enter distance (km): ";
   in >> new_workout.distance;
   if (!in || new_workout.distance < 0) {
     throw std::invalid_argument("Invalid distance. Must be a non-negative number.");
@@ -360,7 +400,7 @@ void dribas::add_training_manual(std::istream& in, std::ostream& out, std::map< 
   }
   new_workout.maxHeart = new_workout.avgHeart;
   if (new_workout.distance > 0) {
-    new_workout.avgPaceMinPerKm = (static_cast<double>(calculated_duration_seconds) / 60.0) / (new_workout.distance / 1000.0);
+    new_workout.avgPaceMinPerKm = (static_cast< double >(calculated_duration_seconds) / 60.0) / (new_workout.distance);
   } else {
     new_workout.avgPaceMinPerKm = 0.0;
   }
@@ -520,3 +560,83 @@ void dribas::predict_result(std::ostream& out, const suite& tren)
   out << prediction << '\n';
 }
 
+void dribas::analyze_training_segment(std::istream& in, std::ostream& out, const suite& trainings)
+{
+  size_t training_id;
+  time_t start_time, end_time;
+  if (!(in >> training_id >> start_time >> end_time)) {
+    throw std::invalid_argument("Invalid arguments for analyze_training_segment");
+  }
+  if (start_time >= end_time) {
+    throw std::invalid_argument("Start time must be before end time");
+  }
+  auto training_it = trainings.find(training_id);
+  if (training_it == trainings.end()) {
+    throw std::out_of_range("Training not found");
+  }
+  const auto& sessions = training_it->second;
+  std::vector< std::pair< time_t, workout > > filtered_sessions;
+  TimeRangeFilter filter(start_time, end_time);
+  std::copy_if(sessions.begin(), sessions.end(), std::back_inserter(filtered_sessions), filter);
+  if (filtered_sessions.empty()) {
+    throw std::runtime_error("No data found in specified time segment");
+  }
+  std::vector< int > heart_rates;
+  HeartRateExtractor hr_extractor;
+  std::transform(filtered_sessions.begin(), filtered_sessions.end(), std::back_inserter(heart_rates), hr_extractor);
+  std::vector< int > cadences;
+  CadenceExtractor cad_extractor;
+  std::transform(filtered_sessions.begin(), filtered_sessions.end(), std::back_inserter(cadences), cad_extractor);
+
+  std::vector< double > distances;
+  DistanceExtractor dist_extractor;
+  std::transform(filtered_sessions.begin(), filtered_sessions.end(), std::back_inserter(distances), dist_extractor);
+
+  double avg_heart = std::accumulate(heart_rates.begin(), heart_rates.end(), 0.0) / heart_rates.size();
+  double avg_cadence = std::accumulate(cadences.begin(), cadences.end(), 0.0) / cadences.size();
+  double avg_distance = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
+
+  auto hr_minmax = std::minmax_element(heart_rates.begin(), heart_rates.end());
+  auto cad_minmax = std::minmax_element(cadences.begin(), cadences.end());
+
+  out << "Training Segment Analysis (ID: " << training_id << ")\n";
+  out << "Time range: " << std::asctime(std::localtime(&start_time));
+  out << " - " << std::asctime(std::localtime(&end_time));
+  out << "Sessions analyzed: " << filtered_sessions.size() << "\n";
+  out << "Average Heart Rate: " << std::fixed << std::setprecision(1) << avg_heart << " bpm\n";
+  out << "Min/Max Heart Rate: " << *hr_minmax.first << "/" << *hr_minmax.second << " bpm\n";
+  out << "Average Cadence: " << std::fixed << std::setprecision(1) << avg_cadence << " rpm\n";
+  out << "Min/Max Cadence: " << *cad_minmax.first << "/" << *cad_minmax.second << " rpm\n";
+  out << "Average Distance: " << std::fixed << std::setprecision(2) << avg_distance << " km\n";
+}
+void dribas::delete_training_by_key(std::istream& in, std::ostream& out, suite& trainings)
+{
+    unsigned int year, month, day, hour, minute;
+    in >> year >> DelimiterI{'-'} >> month >> DelimiterI{'-'} >> day;
+    in >> hour >> DelimiterI{':'} >> minute;
+    if (!in) {
+      throw std::invalid_argument("");
+    }
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    time_t date_only_time_t;
+    try {
+      date_only_time_t = parse_date(year, month, day);
+    } catch (const std::exception& e) {
+      out << "Error date parsing " << e.what() << "\n";
+      return;
+    }
+    std::tm tm_struct = *std::localtime(&date_only_time_t);
+    if (hour > 23 || minute > 59) {
+      throw std::invalid_argument("");
+    }
+    tm_struct.tm_hour = hour;
+    tm_struct.tm_min = minute;
+    tm_struct.tm_sec = 0;
+    tm_struct.tm_isdst = -1;
+    time_t key_time = std::mktime(&tm_struct);
+    if (key_time == static_cast< time_t >(-1)) {
+      throw std::runtime_error(".");
+    }
+    auto& main_suite = trainings[1];
+    size_t erased_count = main_suite.erase(key_time);
+}

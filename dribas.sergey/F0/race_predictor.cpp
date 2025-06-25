@@ -10,6 +10,20 @@
 
 namespace
 {
+  std::string formatTime(double totalMinutes)
+  {
+    if (totalMinutes < 0) {
+      return "--:--";
+    }
+    long long totalSeconds = static_cast<long long>(std::round(totalMinutes * 60.0));
+    long long minutes = totalSeconds / 60;
+    long long seconds = totalSeconds % 60;
+
+    std::stringstream ss;
+    ss << std::setfill('0') << std::setw(2) << minutes << ":" << std::setfill('0') << std::setw(2) << seconds;
+    return ss.str();
+  }
+
   struct WorkoutStats
   {
     size_t count;
@@ -36,7 +50,7 @@ namespace
 
 dribas::RacePrediction dribas::predict_result(const std::map<time_t, workout>& workouts)
 {
-  RacePrediction prediction = {0.0, 0.0, 0.0, 0.0};
+  RacePrediction prediction = { 0.0, 0.0, 0.0, 0.0 };
   WorkoutStats stats = std::accumulate(workouts.begin(), workouts.end(), WorkoutStats{}, WorkoutStats());
 
   if (stats.count == 0) {
@@ -64,10 +78,19 @@ dribas::RacePrediction dribas::predict_result(const std::map<time_t, workout>& w
 std::ostream& dribas::operator<<(std::ostream& os, const RacePrediction& prediction)
 {
   StreamGuard guard(os);
+  const double DIST_5K = 5.0;
+  const double DIST_10K = 10.0;
+  const double DIST_HALF_MARATHON = 21.0975;
+  const double DIST_MARATHON = 42.195;
+  double time5K = prediction.fiveKm * DIST_5K;
+  double time10K = prediction.tenKm * DIST_10K;
+  double timeHalfMarathon = prediction.halfMarathon * DIST_HALF_MARATHON;
+  double timeMarathon = prediction.marathon * DIST_MARATHON;
+
   os << "=== Race Time Predictions ===\n";
-  os << "  5K:    " << std::fixed << std::setprecision(2) << prediction.fiveKm << " min/km\n";
-  os << "  10K:   " << prediction.tenKm << " min/km\n";
-  os << "  21.1K: " << prediction.halfMarathon << " min/km\n";
-  os << "  42.2K: " << prediction.marathon << " min/km\n";
+  os << "  5K:       " << formatTime(time5K) << " (min:sec)\n";
+  os << "  10K:      " << formatTime(time10K) << " (min:sec)\n";
+  os << "  21.1K:    " << formatTime(timeHalfMarathon) << " (min:sec)\n";
+  os << "  42.2K:    " << formatTime(timeMarathon) << " (min:sec)\n";
   return os;
 }

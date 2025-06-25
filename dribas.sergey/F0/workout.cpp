@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <cmath>
 #include <numbers>
-#include <sstream>
 #include <streamGuard.hpp>
 #include <iomanip>
 
@@ -43,13 +42,12 @@ namespace
 
 namespace dribas
 {
-  workout parseGpx(const std::string& gpxContent)
+  workout parseGpx(std::istream& gpxStream)
   {
     workout result;
     boost::property_tree::ptree pt;
-    std::stringstream ss(gpxContent);
     try {
-      boost::property_tree::read_xml(ss, pt);
+      boost::property_tree::read_xml(gpxStream, pt);
     } catch (const boost::property_tree::xml_parser_error& e) {
       std::cerr << "XML error: " << e.what() << '\n';
       return result;
@@ -185,8 +183,7 @@ namespace dribas
     }
     dribas::StreamGuard guard(is);
     is.unsetf(std::ios_base::skipws);
-    std::string gpxContent;
-    w = parseGpx(gpxContent);
+    w = parseGpx(is);
     return is;
   }
 
