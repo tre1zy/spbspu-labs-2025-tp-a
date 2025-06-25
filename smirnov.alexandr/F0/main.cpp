@@ -21,6 +21,8 @@ int main()
   commands["delete"] = std::bind(deleteCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["edit"] = std::bind(editCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["rename"] = std::bind(renameCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["move"] = std::bind(moveCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["copy"] = std::bind(copyCommand, std::ref(dicts), _1, std::ref(std::cout));
   std::string cmd;
   while (std::cin >> cmd)
   {

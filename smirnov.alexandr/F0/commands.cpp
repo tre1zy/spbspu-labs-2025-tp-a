@@ -273,3 +273,70 @@ void smirnov::renameCommand(Dicts & dicts, std::istream & in, std::ostream & out
   dicts[newName] = std::move(oldIt->second);
   dicts.erase(oldIt);
 }
+
+void smirnov::moveCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string fromDict, toDict, word;
+  in >> fromDict >> toDict >> word;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto fromIt = dicts.find(fromDict);
+  auto toIt = dicts.find(toDict);
+  if (fromIt == dicts.end() || toIt == dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto & from = fromIt->second;
+  auto & to = toIt->second;
+  auto wordIt = from.find(word);
+  if (wordIt == from.end())
+  {
+    out << "The word " << word << " doesn't exist in " << fromDict << "\n";
+    return;
+  }
+  if (to.find(word) != to.end())
+  {
+    out << "The word " << word << " already exists in " << toDict << "\n";
+    return;
+  }
+  to[word] = std::move(wordIt->second);
+  from.erase(wordIt);
+  out << "The word " << word << " moved from " << fromDict << " to " << toDict << "\n";
+}
+
+void smirnov::copyCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string fromDict, toDict, word;
+  in >> fromDict >> toDict >> word;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto fromIt = dicts.find(fromDict);
+  auto toIt = dicts.find(toDict);
+  if (fromIt == dicts.end() || toIt == dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto & from = fromIt->second;
+  auto & to = toIt->second;
+  auto wordIt = from.find(word);
+  if (wordIt == from.end())
+  {
+    out << "The word " << word << " doesn't exist in " << fromDict << "\n";
+    return;
+  }
+  if (to.find(word) != to.end())
+  {
+    out << "The word " << word << " already exists in " << toDict << "\n";
+    return;
+  }
+  to[word] = wordIt->second;
+  out << "The word " << word << " copied from " << fromDict << " to " << toDict << "\n";
+}

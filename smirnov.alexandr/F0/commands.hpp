@@ -15,5 +15,7 @@ namespace smirnov
   void deleteCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void editCommand(Dicts & dicts, std::istream & in, std::ostream & out);
   void renameCommand(Dicts & dicts, std::istream & in, std::ostream & out);
+  void moveCommand(Dicts & dicts, std::istream & in, std::ostream & out);
+  void copyCommand(Dicts & dicts, std::istream & in, std::ostream & out);
 }
 #endif
