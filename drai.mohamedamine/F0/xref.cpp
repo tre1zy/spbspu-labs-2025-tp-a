@@ -643,13 +643,19 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex,
     std::ifstream& in,
     amine::Index& index,
     std::string& word
-  )
-  {
+)
+{
     size_t line = 0;
     size_t col = 0;
 
     if (!(in >> word)) return;
-    while (in.peek() == ' ') in.get();
+    std::function<void()> skipSpaces;
+    skipSpaces = [&]() {
+        if (in.peek() != ' ') return;
+        in.get();
+        skipSpaces();
+    };
+    skipSpaces();
 
     std::string position;
     if (!(in >> position)) return;
@@ -665,14 +671,14 @@ void CrossRefSystem::interleaveLines(const std::string& newIndex,
     char next = in.peek();
     if (next == '\n' || next == EOF)
     {
-      std::string nextWord;
-      loadRecursive(in, index, nextWord);
+        std::string nextWord;
+        loadRecursive(in, index, nextWord);
     }
     else
     {
-      loadRecursive(in, index, word);
+        loadRecursive(in, index, word);
     }
-  }
+}
 
   void CrossRefSystem::loadIndex(const std::string& indexName, const std::string& fileName)
   {
