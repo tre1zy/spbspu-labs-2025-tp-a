@@ -205,7 +205,7 @@ std::istream& karnauhova::operator>>(std::istream& in, Character& pol)
 
 void karnauhova::Character::about_character() const
 {
-  std::cout << name_ << " " << hp_ << " hp  " << atk1_ << "-" << atk2_ << " atk"; 
+  std::cout << name_ << " " << hp_ << " hp  " << atk1_ << "-" << atk2_ << " atk";
 }
 
 std::string karnauhova::Character::get_story() const

@@ -51,7 +51,7 @@ int main()
   {
     clear_screen();
     std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
-    std::cout << "-Лобби-\n\n"; 
+    std::cout << "-Лобби-\n\n";
     std::cout << ">Чтобы взять нового персонажа или поменять старого введите CHARACTERS\n";
     std::cout << ">Чтобы начать бой введите FIGHT\n";
     std::string answer;
