@@ -7,6 +7,7 @@
 #include "input_file.hpp"
 #include "terminal_text.hpp"
 #include "interaction_game.hpp"
+#include "output_save.hpp"
 
 int main()
 {
@@ -18,7 +19,9 @@ int main()
   if (players.size() != 0)
   {
     auto it = players.begin();
-    if (it->second.position != 0 || (++it)->second.position != 0)
+    auto one = it;
+    auto two = ++it;
+    if (one->second.position != 0 || two->second.position != 0)
     {
       clear_screen();
       std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
@@ -27,7 +30,7 @@ int main()
     }
     clear_screen();
     std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
-    std::cout << "С возвращением " << it->first << ", " << (++it)->first << "!\n";
+    std::cout << "С возвращением " << one->first << ", " << two->first << "!\n";
   }
   else
   {
@@ -66,11 +69,9 @@ int main()
       std::cout << "Убедитесь, что вы верно выбрали персонажей(у обоих игроков должны быть персонажи)\n";
       delay(2000);
     }
-    //catch (...)
-    //{
-     // return 1;
-    //}
-    
   }
-//сохраить данные
+  clear_screen();
+  std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
+  std::cout << "Пока)\n";
+  save_data(players, characters);
 }

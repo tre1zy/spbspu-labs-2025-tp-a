@@ -186,6 +186,7 @@ void karnauhova::fight(std::map< std::string, Character >& players)
     if (option != protection_option)
     {
       fight_queue.front().second.damage(fight_queue.back().second.attack());
+      players[fight_queue.front().first].damage(fight_queue.back().second.attack());
       std::cout << fight_queue.front().first << " получает " << where_damage(option) << "\n";
       if (fight_queue.front().second.is_lost())
       {
@@ -202,8 +203,13 @@ void karnauhova::fight(std::map< std::string, Character >& players)
       std::cout << fight_queue.front().first << " успешно защитился от атаки " << fight_queue.back().first << "\n";
       delay(2500);
     }
-    fight_queue.back().second.position = 0;
+    if (!std::cin.eof())
+    {
+      fight_queue.back().second.position = 0;
+    }
   }
+  players[fight_queue.back().first].recovery_hp();
+  players[fight_queue.front().first].recovery_hp();
   clear_screen();
   std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
   std::cout << fight_queue.back().first << " побеждает!\n\n";

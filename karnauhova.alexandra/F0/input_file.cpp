@@ -5,7 +5,6 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
-#include <filesystem>
 #include "terminal_text.hpp"
 
 namespace

@@ -22,6 +22,7 @@ std::istream& karnauhova::operator>>(std::istream& in, DelimiterIO&& dest)
 }
 
 karnauhova::Character::Character():
+  position(0),
   name_("defolt"),
   hp_(0),
   total_hp_(0),
@@ -34,6 +35,7 @@ karnauhova::Character::Character():
 {}
 
 karnauhova::Character::Character(std::string name, int hp, int atk1, int atk2):
+  position(0),
   name_(name),
   hp_(hp),
   total_hp_(hp),
@@ -156,12 +158,12 @@ void karnauhova::Character::damage(int size_damage)
   total_hp_ -= size_damage;
 }    
 
-int karnauhova::Character::volume_hp()
+int karnauhova::Character::volume_hp() const
 {
   return total_hp_;
 }
 
-int karnauhova::Character::base_hp()
+int karnauhova::Character::base_hp() const
 {
   return hp_;
 }
@@ -191,7 +193,6 @@ std::istream& karnauhova::operator>>(std::istream& in, Character& pol)
   std::getline(in, quote_lose);
   if (!in)
   {
-    throw std::logic_error("Error: break file");
     return in;
   }
   Character temp(name, hp, atk1, atk2);
@@ -225,4 +226,29 @@ std::string karnauhova::Character::get_win_quote() const
 std::string karnauhova::Character::get_lose_quote() const
 {
   return quote_lose_;
+}
+
+void karnauhova::Character::recovery_hp()
+{
+  total_hp_ = hp_;
+}
+
+bool karnauhova::Character::operator==(const Character& other) const
+{
+  return name_ == other.name_ && hp_ == other.hp_ && atk1_ == other.atk1_ && atk2_ == other.atk2_;
+}
+
+std::string karnauhova::Character::get_atk() const
+{
+  return std::to_string(atk1_)+"-"+std::to_string(atk2_);
+}
+
+std::ostream& karnauhova::operator<<(std::ostream& out, const Character& character)
+{
+  out << character.get_name() << " " << character.base_hp() << " " << character.get_atk() << "\n";
+  out << character.get_story() << "\n";
+  out << character.get_philosophy() << "\n";
+  out << character.get_win_quote() << "\n";
+  out << character.get_lose_quote();
+  return out;
 }
