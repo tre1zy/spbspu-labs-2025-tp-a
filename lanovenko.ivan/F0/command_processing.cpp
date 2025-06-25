@@ -215,7 +215,7 @@ namespace
     return rhs.first;
   }
 
-  struct EraseFromMap 
+  struct EraseFromMap
   {
     void operator()(std::pair< const std::string, lanovenko::targets >& rhs) const
     {
