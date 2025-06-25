@@ -9,7 +9,7 @@ savintsev::Rectangle::Rectangle(point_t lhs, point_t rhs, std::string name):
 {
   if (l_.x >= r_.x || l_.y >= r_.y)
   {
-    throw std::invalid_argument("ERROR: Invalid argumets for Rectangle");
+    throw std::runtime_error("Invalid argumets for Rectangle");
   }
 }
 

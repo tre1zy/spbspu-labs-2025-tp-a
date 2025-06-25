@@ -39,6 +39,7 @@ namespace savintsev
   void print(std::ostream & out, Projects & projs);
   void print_shapes(std::istream & in, std::ostream & out, Projects & projs);
   void print_info_about_shape(std::istream & in, std::ostream & out, Projects & projs);
+  void make_back();
 
   void array_shapes(std::istream & in, std::ostream & out, Projects & projs);
   void reverse_project(std::istream & in, std::ostream & out, Projects & projs);

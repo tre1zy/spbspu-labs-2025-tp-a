@@ -6,8 +6,8 @@ namespace savintsev
 {
   struct point_t
   {
-    short int x;
-    short int y;
+    double x;
+    double y;
   };
 
   std::istream & operator>>(std::istream & in, point_t & dest);
@@ -15,8 +15,8 @@ namespace savintsev
 
   struct rectangle_t
   {
-    short int width;
-    short int height;
+    double width;
+    double height;
     point_t pos;
   };
 }

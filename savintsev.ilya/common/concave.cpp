@@ -12,7 +12,7 @@ savintsev::Concave::Concave(point_t p1, point_t p2, point_t p3, point_t p4, std:
 {
   if (!isTriangle(p1_, p2_, p3_) || !isPointInTriangle(p1_, p2_, p3_, p4_))
   {
-    throw std::invalid_argument("ERROR: Invalid argumets for Concave");
+    throw std::runtime_error("Invalid argumets for Concave");
   }
 }
 

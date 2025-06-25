@@ -44,38 +44,65 @@ int main(int argc, char * argv[])
   cmds["rename"] = std::bind(rename_project, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["projects"] = std::bind(print, std::ref(std::cout), std::ref(projects));
 
+  cmds["rectangle"] = std::bind(create_rectangle, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["complexquad"] = std::bind(create_complexquad, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["concave"] = std::bind(create_concave, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+  cmds["delete"] = std::bind(delete_shape, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
+
+  cmds["back_up"] = std::bind(make_back);
   for (std::string command; std::cin >> command;)
   {
     try
     {
       cmds.at(command)();
     }
+    catch (const std::bad_alloc &)
+    {
+
+    struct Deleter
+    {
+      void operator()(Layer & layer) const
+      {
+        delete layer.second;
+      }
+    };
+
+    struct ProjectProcessor
+    {
+      void operator()(std::pair< const std::string, Project > & proj_pair) const
+      {
+        Project & proj = proj_pair.second;
+        write_savi_file(proj_pair.first + "_backup", proj);
+        std::for_each(proj.begin(), proj.end(), Deleter());
+        proj.clear();
+      }
+    };
+
+    std::for_each(projects.begin(), projects.end(), ProjectProcessor());
+
+    std::cerr << "Memory allocation failed. Open data were saved to backup files. Exiting.\n";
+    return 1;
+    }
+    catch (const std::out_of_range &)
+    {
+      std::cout << "There is no such command or project\n";
+    }
     catch (const std::runtime_error & e)
     {
-      if (std::cin.fail())
-      {
-        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
-      }
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << e.what() << '\n';
-    }
-    catch (const std::out_of_range & e)
-    {
-      if (std::cin.fail())
-      {
-        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
-      }
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << e.what() << '\n';
+      std::cout << e.what() << '\n';
     }
     catch (...)
     {
-      if (std::cin.fail())
-      {
-        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
-      }
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cerr << "Unknown error\n";
+      std::cerr << "Unknown error. Exiting\n";
+      return 1;
     }
+
+    if (std::cin.fail())
+    {
+      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+    }
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
+
+  return 0;
 }
