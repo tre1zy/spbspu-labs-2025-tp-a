@@ -30,12 +30,14 @@ namespace amine
     void printIndex(const std::string& indexName) const;
     void getPositions(const std::string& indexName, const std::string& word) const;
     void mergeTexts(const std::string& newIndex, const std::string& index1, const std::string& index2);
-    void insertText(const std::string& newIndex, const std::string& baseIndex, const std::string& insertIndex, size_t afterLine, size_t afterColumn);
-    void extractText(const std::string& newIndex, const std::string& baseIndex, size_t startLine, size_t startCol, size_t endLine, size_t endCol);
-    void replaceWord(const std::string& indexName, const std::string& oldWord, const std::string& newWord); // if implemented
+    void insertText(const std::string& newIndex, const std::string& baseIndex, const std::string& insertIndex
+      , size_t afterLine, size_t afterColumn);
+    void extractText(const std::string& newIndex, const std::string& baseIndex
+      , size_t startLine, size_t startCol, size_t endLine, size_t endCol);
+    void replaceWord(const std::string& indexName, const std::string& oldWord, const std::string& newWord);
     void repeatText(const std::string& newIndex, const std::string& baseIndex, size_t N);
     void interleaveLines(const std::string& newIndex, const std::string& index1, const std::string& index2);
-    void swapWords(const std::string& indexName, const std::string& word1, const std::string& word2); // if implemented
+    void swapWords(const std::string& indexName, const std::string& word1, const std::string& word2);
     void reverseText(const std::string& newIndex, const std::string& baseIndex);
     void saveIndex(const std::string& indexName, const std::string& filename) const;
     void loadIndex(const std::string& indexName, const std::string& fileName);
