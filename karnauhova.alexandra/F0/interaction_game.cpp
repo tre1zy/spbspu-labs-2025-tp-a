@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <queue>
+#include <limits>
 #include "terminal_text.hpp"
 using map_characters = std::map< std::string, karnauhova::Character >;
 namespace
