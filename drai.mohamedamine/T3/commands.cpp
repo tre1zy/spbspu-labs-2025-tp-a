@@ -416,29 +416,4 @@ void CommandProcessor::command_rmecho(const std::string& rest) const {
   std::vector<Polygon> copy = polygons_;
   process_rmecho(copy, last);
 }
-void CommandProcessor::command_rmecho(const std::string& rest) const
-{
-    if (polygons_.empty()) {
-        std::cout << "0\n";
-        return;
-    }
-
-    Polygon query;
-    if (!parse_polygon(rest, query)) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-    }
-
-    size_t initial_count = polygons_.size();
-
-    std::vector<Polygon> filtered;
-    filtered.reserve(polygons_.size());
-
-    EqualToQuery eq(query);
-    UniqueChecker checker(query);
-    std::unique_copy(polygons_.begin(), polygons_.end(), std::back_inserter(filtered), checker);
-
-    size_t removed = initial_count - filtered.size();
-    std::cout << removed << "\n";
-}
 }
