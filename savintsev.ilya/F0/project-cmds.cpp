@@ -122,6 +122,14 @@ void savintsev::merge(std::istream & in, std::ostream & out, Projects & projs)
   out << "Project \"" << proj1 << "\" has been successfully merged with project \"" << proj2 << "\"\n";
 }
 
+void savintsev::create_rectangle(std::istream & in, std::ostream & out, Projects & projs)
+{
+  std::string proj, name;
+  short int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+  in >> proj >> name >> x1 >> y1 >> x2 >> y2;
+  projs.
+}
+
 void savintsev::print(std::ostream & out, Projects & projs)
 {
   out << "== List of open projects ==\n";
