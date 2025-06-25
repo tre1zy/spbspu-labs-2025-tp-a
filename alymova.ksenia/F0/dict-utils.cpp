@@ -40,6 +40,14 @@ std::istream& alymova::operator>>(std::istream& in, std::list< std::string >& li
   auto begin = std::istream_iterator< std::string >(in);
   auto end = std::istream_iterator< std::string >();
   std::copy_n(begin, size, std::back_inserter(tested));
+  if (in.get() != '\n')
+  {
+    if (in.eof())
+    {
+      in.clear(in.rdstate() ^ std::ios::eofbit);
+    }
+    in.setstate(std::ios::failbit);
+  }
   if (in && tested.size() == size)
   {
     list = tested;

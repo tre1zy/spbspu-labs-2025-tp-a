@@ -21,46 +21,44 @@ namespace
   {
     return word.find(subword) != std::string::npos;
   }
-  bool hasTranslate(const WordSet& list, const std::string& word)
+  bool hasTranslate(WordSet& list, const std::string& word)
   {
     return std::find(list.begin(), list.end(), word) != list.end();
   }
-  bool hasAnyTranslates(const std::pair< std::string, WordSet >& p, WordSet& translates)
+  bool hasAnyTranslates(const std::pair< std::string, WordSet >& pair, WordSet& translates)
   {
-    return std::any_of(translates.begin(), translates.end(), std::bind(hasTranslate, p.second, _1));
+    return std::any_of(translates.begin(), translates.end(), std::bind(hasTranslate, pair.second, _1));
+  }
+  bool compareKeys(const std::pair< std::string, WordSet>& pair1, const std::pair< std::string, WordSet>& pair2)
+  {
+    return pair1.first < pair2.first;
   }
   template< class T >
   std::string returnName(const std::pair< std::string, T >& p)
   {
     return p.first;
   }
-  void unionLists(WordSet& list, const WordSet& unioned)
+  std::pair< std::string, WordSet > unionLists(const std::pair< std::string, WordSet >& pair,
+    const Dictionary& unioned)
   {
-    WordSet copy(unioned);
-    list.sort();
-    copy.sort();
-    list.merge(copy);
-    list.unique();
+    WordSet list1 = pair.second;
+    WordSet list2 = unioned.at(pair.first);
+    list1.sort();
+    list2.sort();
+    WordSet res;
+    std::set_union(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
+    return {pair.first, res};
   }
-  void intersectLists(WordSet& list, const WordSet& intersected)
+  std::pair< std::string, WordSet > intersectLists(const std::pair< std::string, WordSet >& pair,
+    const Dictionary& intersected)
   {
-    WordSet copy(intersected);
-    list.sort();
-    copy.sort();
-    //std::list< std::string > res;
-    //std::set_intersection(list.begin(), list.end(), intersected.begin(), intersected.end(), std::back_inserter(res));
-    for (auto it = list.begin(); it != list.end();)
-    {
-      auto it1 = findTranslate(intersected, *it);
-      if (it1 == intersected.cend())
-      {
-        it = list.erase(it);
-      }
-      else
-      {
-        it++;
-      }
-    }
+    WordSet list1 = pair.second;
+    WordSet list2 = intersected.at(pair.first);
+    list1.sort();
+    list2.sort();
+    WordSet res;
+    std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
+    return {pair.first, res};
   }
 }
 
@@ -342,22 +340,20 @@ void alymova::unionDicts(std::istream& in, std::ostream& out, DictSet& set)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  Dictionary dict1 = set.at(name1);
-  Dictionary dict2 = set.at(name2);
-  for (auto it = dict2.begin(); it != dict2.end(); it++)
-  {
-    auto it1 = dict1.find(it->first);
-    if (it1 == dict1.end())
-    {
-      dict1.insert({it->first, it->second});
-    }
-    else
-    {
-      unionLists(it1->second, it->second);
-    }
-  }
-  set[newname] = dict1;
-  out << "<SUCCESSFULLY UNIONED>";
+  const Dictionary& dict1 = set.at(name1);
+  const Dictionary& dict2 = set.at(name2);
+  Dictionary difference, tmp, unioned;
+
+  auto d_first = std::inserter(difference, difference.end());
+  std::set_difference(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), d_first, compareKeys);
+
+  d_first = std::inserter(tmp, tmp.end());
+  std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), d_first, compareKeys);
+  std::transform(tmp.begin(), tmp.end(), std::inserter(unioned, unioned.end()), std::bind(unionLists, _1, dict2));
+
+  unioned.insert(difference.begin(), difference.end());
+  set[newname] = unioned;
+  out << "<SUCCESSFULLY INTERSECTED>";
 }
 
 void alymova::intersectDicts(std::istream& in, std::ostream& out, DictSet& set)
@@ -368,22 +364,17 @@ void alymova::intersectDicts(std::istream& in, std::ostream& out, DictSet& set)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  Dictionary dict1 = set.at(name1);
-  Dictionary dict2 = set.at(name2);
-  for (auto it = dict2.begin(); it != dict2.end();)
-  {
-    auto it1 = dict1.find(it->first);
-    if (it1 == dict1.end())
-    {
-      it = dict2.erase(it);
-    }
-    else
-    {
-      intersectLists(it->second, it1->second);
-      it++;
-    }
-  }
-  set[newname] = dict2;
+  const Dictionary& dict1 = set.at(name1);
+  const Dictionary& dict2 = set.at(name2);
+  Dictionary tmp, intersected;
+
+  auto d_first = std::inserter(tmp, tmp.end());
+  std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), d_first, compareKeys);
+
+  d_first = std::inserter(intersected, intersected.end());
+  std::transform(tmp.begin(), tmp.end(), d_first, std::bind(intersectLists, _1, dict2));
+
+  set[newname] = intersected;
   out << "<SUCCESSFULLY INTERSECTED>";
 }
 
