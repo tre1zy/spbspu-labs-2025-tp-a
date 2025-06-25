@@ -11,6 +11,23 @@
 
 namespace amine
 {
+      size_t getMaxLineRecursive(
+        std::map<std::string, std::set<Position, positionLess>>::const_iterator iter,
+        std::map<std::string, std::set<Position, positionLess>>::const_iterator end,
+        size_t currentMax
+    ) {
+        if (iter == end) {
+            return currentMax;
+        }
+        size_t maxInWord = currentMax;
+        for (const auto& pos : iter->second) {
+            if (pos.line > maxInWord) {
+                maxInWord = pos.line;
+            }
+        }
+        return getMaxLineRecursive(std::next(iter), end, maxInWord);
+    }
+}
   bool positionLess::operator()(const Position& a, const Position& b) const
   {
     return (a.line < b.line) || (a.line == b.line && a.column < b.column);
@@ -286,7 +303,47 @@ void printIndexRecursive(amine::Index::const_iterator it,
 
     indexes_[newIndex] = result;
   }
+void CrossRefSystem::replaceWord(const std::string& indexName, 
+                               const std::string& oldWord, 
+                               const std::string& newWord) {
+    auto it = indexes_.find(indexName);
+    if (it == indexes_.end()) {
+        std::cout << "<WRONG INDEX>\n";
+        return;
+    }
 
+    Index& index = it->second;
+    auto wordIt = index.find(oldWord);
+    if (wordIt == index.end()) {
+        std::cout << "<NOT FOUND>\n";
+        return;
+    }
+
+    index[newWord] = wordIt->second;
+
+    index.erase(wordIt);
+}
+
+void CrossRefSystem::swapWords(const std::string& indexName,
+                             const std::string& word1,
+                             const std::string& word2) {
+    auto it = indexes_.find(indexName);
+    if (it == indexes_.end()) {
+        std::cout << "<WRONG INDEX>\n";
+        return;
+    }
+
+    Index& index = it->second;
+    auto it1 = index.find(word1);
+    auto it2 = index.find(word2);
+
+    if (it1 == index.end() || it2 == index.end()) {
+        std::cout << "<NOT FOUND>\n";
+        return;
+    }
+
+    std::swap(it1->second, it2->second);
+}
   void CrossRefSystem::extractText(const std::string& newIndex,
                                   const std::string& baseIndex,
                                   size_t startLine,
