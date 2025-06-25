@@ -172,6 +172,24 @@ namespace
     return std::accumulate(source_dicts.cbegin(), source_dicts.cend(), tree_of_words{}, AccumulateDicts{});
   }
 
+  class CheckDictExists
+  {
+  public:
+    explicit CheckDictExists(const tree_of_dict& dict_tree):
+      dict_tree_(&dict_tree)
+    {}
+    bool operator()(const std::string& dict_name) const
+    {
+      if (dict_name.empty())
+      {
+        throw std::logic_error("<INVALID ARGUMENTS>");
+      }
+      return dict_tree_->count(dict_name) > 0;
+    }
+  private:
+    const tree_of_dict* dict_tree_;
+  };
+
   class ExportDictToFile
   {
   public:
@@ -201,10 +219,6 @@ namespace
         throw std::logic_error("<INVALID ARGUMENTS>");
       }
       auto it = dict_tree_.find(dict_name);
-      if (it == dict_tree_.cend())
-      {
-        throw std::logic_error("<INVALID DICTIONARY>");
-      }
       writeDictToFile(out_, it->first, it->second);
       out_ << "\n";
     }
@@ -258,6 +272,10 @@ namespace
       {
         throw std::logic_error("<INVALID ARGUMENTS>");
       }
+      if (!std::all_of(dict_names.cbegin(), dict_names.cend(), CheckDictExists{avltree}))
+      {
+        throw std::logic_error("<INVALID DICTIONARY>");
+      }
       std::for_each(dict_names.cbegin(), dict_names.cend(), ExportSpecificDicts{outFile, avltree});
     }
   }
@@ -274,7 +292,7 @@ namespace
       auto it = source_dict_.find(dict_name);
       if (it == source_dict_.end())
       {
-        throw std::logic_error("<INVALID IMPORT3>");
+        throw std::logic_error("<INVALID IMPORT>");
       }
       target_avltree_[dict_name] = mergeDicts({&source_dict_.at(dict_name), &target_avltree_[dict_name]});
     }
@@ -313,9 +331,7 @@ namespace
       auto it2 = dict_pair.second.find(eng_word_);
       if (it2 != dict_pair.second.end())
       {
-        std::list< std::string > new_translations_list;
-        new_translations_list.push_back(translation_);
-        it2->second = mergeTranslations(it2->second, new_translations_list);
+        it2->second = mergeTranslations(it2->second, {translation_});
       }
     }
   private:
@@ -662,7 +678,7 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
   std::fstream in2(file_name);
   if (!in2.is_open())
   {
-    throw std::logic_error("<INVALID IMPORT1>");
+    throw std::logic_error("<INVALID IMPORT>");
   }
   if (!(in >> count_of_dict) || count_of_dict < 0)
   {
@@ -673,7 +689,7 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
   std::for_each(istreamIt{in2}, istreamIt{}, CollectAndMergeFileDictionaries(imported_dictionaries));
   if (!in2.eof() && in2.fail())
   {
-    throw std::logic_error("<INVALID IMPORT2>");
+    throw std::logic_error("<INVALID IMPORT>");
   }
   if (count_of_dict != 0)
   {
@@ -682,6 +698,10 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
     if (std::any_of(main_name_dict.begin(), main_name_dict.end(), IsStringEmpty{}))
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    if (!std::all_of(main_name_dict.cbegin(), main_name_dict.cend(), CheckDictExists{avltree}))
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
     }
     std::for_each(main_name_dict.cbegin(), main_name_dict.cend(), ImportDictProcessor{avltree, imported_dictionaries});
   }
@@ -709,7 +729,6 @@ void tkach::addWord(std::istream& in, tree_of_dict& avltree)
     throw std::logic_error("<INVALID NUMBER>");
   }
   std::list< std::string > translations;
-  std::string translation;
   std::copy_n(std::istream_iterator< std::string >{in}, num_translations, std::back_inserter(translations));
   if (std::any_of(translations.begin(), translations.end(), IsStringEmpty{}))
   {
@@ -844,11 +863,17 @@ void tkach::addTranslation(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
+  auto it = avltree.end();
   if (dict_name_specified)
   {
     if (!(in >> dict_name) || dict_name.empty())
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    it = avltree.find(dict_name);
+    if (it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
     }
   }
   if (!(in >> eng_word) || eng_word.empty())
@@ -861,19 +886,12 @@ void tkach::addTranslation(std::istream& in, tree_of_dict& avltree)
   }
   if (dict_name_specified)
   {
-    auto it = avltree.find(dict_name);
-    if (it == avltree.end())
-    {
-      throw std::logic_error("<INVALID DICTIONARY>");
-    }
     auto it2 = it->second.find(eng_word);
     if (it2 == it->second.end())
     {
       throw std::logic_error("<INVALID WORD>");
     }
-    std::list< std::string > new_translations_list;
-    new_translations_list.push_back(translation);
-    it2->second = mergeTranslations(it2->second, new_translations_list);
+    it2->second = mergeTranslations(it2->second, {translation});
   }
   else
   {
@@ -891,11 +909,17 @@ void tkach::removeTranslation(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
+  auto it = avltree.end();
   if (dict_name_specified)
   {
     if (!(in >> dict_name) || dict_name.empty())
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    it = avltree.find(dict_name);
+    if (it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
     }
   }
   if (!(in >> eng_word) || eng_word.empty())
@@ -908,11 +932,6 @@ void tkach::removeTranslation(std::istream& in, tree_of_dict& avltree)
   }
   if (dict_name_specified)
   {
-    auto it = avltree.find(dict_name);
-    if (it == avltree.end())
-    {
-      throw std::logic_error("<INVALID DICTIONARY>");
-    }
     auto it2 = it->second.find(eng_word);
     if (it2 == it->second.end())
     {
@@ -920,7 +939,7 @@ void tkach::removeTranslation(std::istream& in, tree_of_dict& avltree)
     }
     if (findTranslation(it2->second, translation))
     {
-      it2->second.remove(translation);
+      it2->second.erase(std::remove(it2->second.begin(), it2->second.end(), translation), it2->second.end());
     }
     else
     {
@@ -1013,8 +1032,9 @@ void tkach::mergeNumberDicts(std::istream& in, tree_of_dict& avltree)
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
   }
-  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{})) {
-      throw std::logic_error("<INVALID ARGUMENTS>");
+  if (std::any_of(dict_names.cbegin(), dict_names.cend(), IsStringEmpty{}))
+  {
+    throw std::logic_error("<INVALID ARGUMENTS>");
   }
   std::list< const tree_of_words* > source_dicts;
   std::transform(dict_names.cbegin(), dict_names.cend(), std::back_inserter(source_dicts), FindDictAndGetPtr{avltree});
@@ -1047,8 +1067,9 @@ void tkach::doCommonPartDicts(std::istream& in, tree_of_dict& avltree)
   std::vector< tree_of_words* > source_dicts;
   std::transform(dict_names.cbegin(), dict_names.cend(), std::back_inserter(source_dicts), FindDictAndGetPtr{avltree});
   tree_of_words result_dict(*source_dicts[0]);
-  if (source_dicts.size() > 1) {
-      result_dict = std::accumulate(std::next(source_dicts.cbegin()), source_dicts.cend(), result_dict, FindCommonPart{});
+  if (source_dicts.size() > 1)
+  {
+    result_dict = std::accumulate(std::next(source_dicts.cbegin()), source_dicts.cend(), result_dict, FindCommonPart{});
   }
   avltree[new_dict_name] = result_dict;
 }
