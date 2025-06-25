@@ -220,7 +220,7 @@ namespace klimova {
             visited[neighbor] = true;
             parent[neighbor] = curr;
             queue.push(neighbor);
-           }
+          }
         }
       }
 
@@ -266,19 +266,11 @@ namespace klimova {
         longestPath = path;
       }
     } else {
-      struct NeighborExplorer {
-        const Graph< T >* graph;
-        size_t endIdx;
-        std::vector<bool>& visited;
-        std::vector< T >& path;
-        std::vector< T >& longestPath;
-        void operator()(size_t neighbor) const {
-          if (!visited[neighbor]) {
-            graph->findLongestPathUtil(neighbor, endIdx, visited, path, longestPath);
-          }
+      for (size_t neighbor : adjList[u]) {
+        if (!visited[neighbor]) {
+          findLongestPathUtil(neighbor, endIdx, visited, path, longestPath);
         }
-      };
-      std::transform(adjList[u].begin(), adjList[u].end(), adjList[u].begin(), NeighborExplorer{this, endIdx, visited, path, longestPath});
+      }
     }
 
     path.pop_back();
@@ -298,10 +290,9 @@ namespace klimova {
 
       if (findLongestPathUtil(startIdx, endIdx, visited, path, longestPath)) {
         std::cout << "Longest path from " << startVertex << " to " << endVertex << ": ";
-        struct PathPrinter {
-          void operator()(const T& vertex) const { std::cout << vertex << " "; }
-        };
-        std::transform(longestPath.begin(), longestPath.end(), longestPath.begin(), PathPrinter{});
+        for (const auto& vertex : longestPath) {
+          std::cout << vertex << " ";
+        }
         std::cout << std::endl;
       } else {
         std::cout << "Path from " << startVertex << " to " << endVertex << " not found\n";
