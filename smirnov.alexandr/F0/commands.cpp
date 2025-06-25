@@ -340,3 +340,109 @@ void smirnov::copyCommand(Dicts & dicts, std::istream & in, std::ostream & out)
   to[word] = wordIt->second;
   out << "The word " << word << " copied from " << fromDict << " to " << toDict << "\n";
 }
+
+void smirnov::intersectCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string newName, dict1Name, dict2Name;
+  in >> newName >> dict1Name >> dict2Name;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (dicts.find(newName) != dicts.end())
+  {
+    out << "The dictionary with name " << newName << " already exists.\n";
+    return;
+  }
+  auto it1 = dicts.find(dict1Name);
+  auto it2 = dicts.find(dict2Name);
+  if (it1 == dicts.end() || it2 == dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  Dict result;
+  for (const auto & pair : it1->second)
+  {
+    if (it2->second.find(pair.first) != it2->second.end())
+    {
+      result[pair.first] = pair.second;
+    }
+  }
+  dicts[newName] = std::move(result);
+  out << "Dictionary " << newName << " is successfully created\n";
+}
+
+void smirnov::differenceCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string newName, dict1Name, dict2Name;
+  in >> newName >> dict1Name >> dict2Name;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (dicts.find(newName) != dicts.end())
+  {
+    out << "The dictionary with name " << newName << " already exists.\n";
+    return;
+  }
+  auto it1 = dicts.find(dict1Name);
+  auto it2 = dicts.find(dict2Name);
+  if (it1 == dicts.end() || it2 == dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  Dict result;
+  for (const auto & pair : it1->second)
+  {
+    if (it2->second.find(pair.first) == it2->second.end())
+    {
+      result[pair.first] = pair.second;
+    }
+  }
+  dicts[newName] = std::move(result);
+  out << "Dictionary " << newName << " is successfully created\n";
+}
+
+void smirnov::uniqueCommand(Dicts & dicts, std::istream & in, std::ostream & out)
+{
+  std::string newName, dict1Name, dict2Name;
+  in >> newName >> dict1Name >> dict2Name;
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (dicts.find(newName) != dicts.end())
+  {
+    out << "The dictionary with name " << newName << " already exists.\n";
+    return;
+  }
+  auto it1 = dicts.find(dict1Name);
+  auto it2 = dicts.find(dict2Name);
+  if (it1 == dicts.end() || it2 == dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  Dict result;
+  for (const auto & pair : it1->second)
+  {
+    if (it2->second.find(pair.first) == it2->second.end())
+    {
+      result[pair.first] = pair.second;
+    }
+  }
+  for (const auto & pair : it2->second)
+  {
+    if (it1->second.find(pair.first) == it1->second.end())
+    {
+      result[pair.first] = pair.second;
+    }
+  }
+  dicts[newName] = std::move(result);
+  out << "Dictionary " << newName << " is successfully created\n";
+}

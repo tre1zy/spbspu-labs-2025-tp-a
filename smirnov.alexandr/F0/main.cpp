@@ -23,6 +23,9 @@ int main()
   commands["rename"] = std::bind(renameCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["move"] = std::bind(moveCommand, std::ref(dicts), _1, std::ref(std::cout));
   commands["copy"] = std::bind(copyCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["intersect"] = std::bind(intersectCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["difference"] = std::bind(differenceCommand, std::ref(dicts), _1, std::ref(std::cout));
+  commands["unique"] = std::bind(uniqueCommand, std::ref(dicts), _1, std::ref(std::cout));
   std::string cmd;
   while (std::cin >> cmd)
   {
