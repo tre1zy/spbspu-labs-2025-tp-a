@@ -92,18 +92,45 @@ namespace klimova {
   void Graph< T >::removeVertex(const T& vertex)
   {
     size_t idx = getVertexIndex(vertex);
-    for (size_t neighbor : adjList[idx]) {
-      auto& neighbors = adjList[neighbor];
-      neighbors.erase(std::remove(neighbors.begin(), neighbors.end(), idx), neighbors.end());
-    }
+
+    struct NeighborProcessor {
+      std::vector<std::vector<size_t>>& adjList;
+      size_t idx;
+
+      size_t operator()(size_t neighbor) const {
+        auto& neighbors = adjList[neighbor];
+        neighbors.erase(std::remove(neighbors.begin(), neighbors.end(), idx), neighbors.end());
+        return neighbor;
+      }
+    };
+
+    std::vector<size_t> neighbors = adjList[idx];
+    std::transform(neighbors.begin(), neighbors.end(), neighbors.begin(), NeighborProcessor{adjList, idx});
 
     vertices.erase(vertices.begin() + idx);
     adjList.erase(adjList.begin() + idx);
     vertexMap.erase(vertex);
 
-    for (size_t i = 0; i < vertices.size(); ++i) {
-      vertexMap[vertices[i]] = i;
-    }
+    struct IndexMaker {
+      mutable size_t counter = 0;
+
+      std::pair<T, size_t> operator()(const T& vertex) const {
+        return std::make_pair(vertex, counter++);
+      }
+    };
+
+    std::vector<std::pair<T, size_t>> indexedVertices(vertices.size());
+    std::transform(vertices.begin(), vertices.end(), indexedVertices.begin(), IndexMaker{});
+
+    struct MapAccumulator {
+      std::unordered_map<T, size_t>& vertexMap;
+      const void* operator()(const void*, const std::pair<T, size_t>& pair) const {
+        vertexMap[pair.first] = pair.second;
+        return nullptr;
+      }
+    };
+
+    std::accumulate(indexedVertices.begin(), indexedVertices.end(), nullptr, MapAccumulator{vertexMap});
   }
 
   template < typename T >
