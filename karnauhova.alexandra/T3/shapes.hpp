@@ -22,11 +22,6 @@ namespace karnauhova
     bool operator==(const Polygon& rhs) const;
   };
 
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& pol);
