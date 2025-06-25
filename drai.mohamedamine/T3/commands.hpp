@@ -1,18 +1,28 @@
-#ifndef AMINE_COMMANDS_HPP
-#define AMINE_COMMANDS_HPP
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
 
-#include <vector>
+#include "polygon.hpp"
 #include <string>
-#include <istream>
+#include <vector>
 
-namespace amine
-{
+namespace amine {
 
-  bool parse_polygon(const std::string& str, Polygon& poly);
-  double compute_area(const Polygon& poly);
-  bool polygons_intersect(const Polygon& a, const Polygon& b);
-  void process_rmecho(std::vector< Polygon >& polygons, const Polygon& query);
-  void process_commands(std::vector< Polygon >& polygons);
+class CommandProcessor {
+public:
+  CommandProcessor(const std::vector<Polygon>& polygons);
+  void operator()(const std::string& line) const;
+
+private:
+  const std::vector<Polygon>& polygons_;
+
+  void command_area(const std::string& rest) const;
+  void command_max(const std::string& rest) const;
+  void command_min(const std::string& rest) const;
+  void command_count(const std::string& rest) const;
+  void command_intersections(const std::string& rest) const;
+  void command_rmecho(const std::string& rest) const;
+};
+
 }
 
 #endif
