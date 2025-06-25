@@ -2,6 +2,9 @@
 #include <iomanip>
 #include <stdexcept>
 
+#include <Delimiter.h>
+#include <IOFmtguard.h>
+
 bool voronina::compare(const DataStruct &left, const DataStruct &right)
 {
   if (left.key1 == right.key1 && left.key2 == right.key2)
@@ -144,27 +147,11 @@ std::ostream& voronina::operator<<(std::ostream &out, const DataStruct &src)
   {
     return out;
   }
-  StreamGuard fmtguard(out);
+  iofmtguard fmtguard(out);
   out << "(";
   out << ":key1 " << std::fixed << std::setprecision(1) << src.key1 << "d";
   out << ":key2 " << "0" << std::oct << src.key2;
   out << ":key3 " << std::quoted(src.key3);
   out << ":)";
   return out;
-}
-
-voronina::StreamGuard::StreamGuard(std::basic_ios< char > &s) : s_(s),
-  width_(s.width()),
-  fill_(s.fill()),
-  precision_(s.precision()),
-  fmt_(s.flags())
-{
-}
-
-voronina::StreamGuard::~StreamGuard()
-{
-  s_.width(width_);
-  s_.fill(fill_);
-  s_.precision(precision_);
-  s_.flags(fmt_);
 }
