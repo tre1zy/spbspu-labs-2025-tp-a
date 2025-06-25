@@ -17,13 +17,11 @@ namespace amine
         return p.points.size() % 2 == 0;
     }
 };
-
 struct IsOddVertexCount {
     bool operator()(const Polygon& p) const {
         return p.points.size() % 2 != 0;
     }
 };
-
 struct HasVertexCount {
     size_t target;
     explicit HasVertexCount(size_t t) : target(t) {}
@@ -31,28 +29,24 @@ struct HasVertexCount {
         return p.points.size() == target;
     }
 };
-
 struct AreaAdder {
     double sum = 0.0;
     void operator()(const Polygon& p) {
         sum += compute_area(p);
     }
 };
-
 struct EvenAreaAdder {
     double sum = 0.0;
     void operator()(const Polygon& p) {
         if (p.points.size() % 2 == 0) sum += compute_area(p);
     }
 };
-
 struct OddAreaAdder {
     double sum = 0.0;
     void operator()(const Polygon& p) {
         if (p.points.size() % 2 != 0) sum += compute_area(p);
     }
 };
-
 struct VertexAreaAdder {
     size_t target;
     double sum = 0.0;
@@ -222,10 +216,10 @@ void CommandProcessor::command_count(const std::string& rest) const
 {
     if (rest == "EVEN") {
         std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
-    } 
+    }
     else if (rest == "ODD") {
         std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
-    } 
+    }
     else {
         try {
             size_t target = std::stoul(rest);
