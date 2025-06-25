@@ -9,6 +9,6 @@ namespace kharlamov
     char exp;
   };
 
-std::istream& operator>>(std::istream& input, DelimeterIO&& dest);
+  std::istream& operator>>(std::istream& input, DelimeterIO&& dest);
 }
 #endif

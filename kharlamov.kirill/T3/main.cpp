@@ -1,5 +1,3 @@
-#include "commands.h"
-#include "polygon.h"
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -7,6 +5,8 @@
 #include <limits>
 #include <map>
 #include <vector>
+#include "commands.h"
+#include "polygon.h"
 
 int main(int argc, char** argv)
 {
@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     return 1;
   }
   std::ifstream file(argv[1]);
-  std::vector<kharlamov::Polygon> polygons;
+  std::vector< kharlamov::Polygon > polygons;
   while (!file.eof())
   {
     std::copy(istreamIt(file), istreamIt(), std::back_inserter(polygons));

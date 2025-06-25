@@ -287,7 +287,7 @@ void kharlamov::doMaxSeqCommand(std::istream& in, std::ostream& out, const Polyg
       currentCount = 0;
     }
   }
-    out << maxCount << "\n";
+  out << maxCount << "\n";
 }
 
 void kharlamov::doSameCommand(std::istream& in, std::ostream& out, const PolygonVec& polygons)
