@@ -4,7 +4,6 @@
 #include <functional>
 #include <numeric>
 #include <limits>
-#include <stream-guard.hpp>
 #include "shapes.hpp"
 
 namespace belyaev

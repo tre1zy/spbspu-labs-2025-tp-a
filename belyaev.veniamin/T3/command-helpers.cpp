@@ -1,5 +1,6 @@
 #include "command-helpers.hpp"
 #include <iomanip>
+#include <stream-guard.hpp>
 
 size_t belyaev::getVertices(const Polygon& src)
 {
