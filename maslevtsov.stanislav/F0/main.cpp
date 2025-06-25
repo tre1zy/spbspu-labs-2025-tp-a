@@ -60,9 +60,8 @@ int main(int argc, char** argv)
 
   commands["bfs"] = std::bind(traverse_breadth_first, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
   commands["path"] = std::bind(get_min_path, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
-  // commands["width"] = std::bind(get_graph_width, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
-  // commands["components"] = std::bind(get_graph_components, std::cref(graphs), std::ref(std::cin),
-  // std::ref(std::cout));
+  commands["width"] = std::bind(get_graph_width, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
+  commands["components"] = std::bind(get_graph_components, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
 
   std::string command;
   while ((std::cin >> command) && !std::cin.eof()) {
