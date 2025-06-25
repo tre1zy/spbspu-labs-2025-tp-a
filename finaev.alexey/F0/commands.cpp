@@ -94,12 +94,43 @@ namespace
         return;
       }
       auto res = target.insert(base);
-      if (res.second) 
+      if (res.second)
       {
         ++add;
       }
     }
   };
+
+  struct Intersect
+  {
+    const std::unordered_map< std::string, bool >& base1;
+    const finaev::globalDebuts& debuts;
+    std::unordered_map< std::string, bool >& res;
+
+    void operator()(const std::pair< std::string, bool >& base2)
+    {
+      if ((base1.find(base2.first) != base1.end()) && (debuts.find(base2.first) != debuts.end()))
+      {
+        res.insert(base2);
+      }
+    }
+  };
+
+  struct Complement
+  {
+    const std::unordered_map< std::string, bool >& base1;
+    const finaev::globalDebuts& debuts;
+    std::unordered_map< std::string, bool >& res;
+
+    void operator()(const std::pair< std::string, bool >& base2)
+    {
+      if ((base1.find(base2.first) == base1.end()) && (debuts.find(base2.first) != debuts.end()))
+      {
+        res.insert(base2);
+      }
+    }
+  };
+
 }
 
 void finaev::create_debut(std::istream& in, std::ostream& out, globalDebuts& debuts)
@@ -338,6 +369,74 @@ void finaev::merge(std::istream& in, std::ostream& out, const globalDebuts& debu
   out << "Merged " << sourceBase << " into " << targetBase << ": "<< add << " debuts added";
 }
 
+void finaev::intersect(std::istream& in, std::ostream& out, const globalDebuts& debuts, debutsBases& bases)
+{
+  std::string newBaseName, base1Name, base2Name, temp;
+  if (!(in >> newBaseName >> base1Name >> base2Name))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (bases.find(newBaseName) != bases.end())
+  {
+    throw std::runtime_error("<DUPLICATE>");
+  }
+  auto base1 = bases.find(base1Name);
+  if (base1 == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto base2 = bases.find(base2Name);
+  if (base2 == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  std::unordered_map< std::string, bool > intersectionBase;
+  Intersect inter{ base1->second, debuts, intersectionBase };
+  std::for_each(base2->second.begin(), base2->second.end(), inter);
+  bases[newBaseName] = std::move(intersectionBase);
+  out << "Created base " << newBaseName << " with " << bases[newBaseName].size();
+  out << " openings (intersection of " << base1Name << " and " << base2Name << ")";
+}
+
+void finaev::complement(std::istream& in, std::ostream& out, const globalDebuts& debuts, debutsBases& bases)
+{
+  std::string newBaseName, base1Name, base2Name, temp;
+  if (!(in >> newBaseName >> base1Name >> base2Name))
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  std::getline(in, temp);
+  if (!temp.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (bases.find(newBaseName) != bases.end())
+  {
+    throw std::runtime_error("<DUPLICATE>");
+  }
+  auto base1 = bases.find(base1Name);
+  if (base1 == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  auto base2 = bases.find(base2Name);
+  if (base2 == bases.end())
+  {
+    throw std::runtime_error("<NO_DEBUT_BASE>");
+  }
+  std::unordered_map< std::string, bool > complementionBase;
+  Complement comp{ base2->second, debuts, complementionBase };
+  std::for_each(base1->second.begin(), base1->second.end(), comp);
+  bases[newBaseName] = std::move(complementionBase);
+  out << "Created base " << newBaseName << " with " << bases[newBaseName].size();
+  out << " openings (complemention of " << base2Name << " from " << base1Name << ")";
+}
+
 finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostream& out, globalDebuts& debuts, debutsBases& bases)
 {
   mapOfCommands commands;
@@ -349,5 +448,7 @@ finaev::mapOfCommands finaev::createCommandsHandler(std::istream& in, std::ostre
   commands["print"] = std::bind(finaev::print, std::ref(in), std::ref(out), std::cref(debuts), std::cref(bases));
   commands["move"] = std::bind(finaev::move, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
   commands["merge"] = std::bind(finaev::merge, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
+  commands["intersect"] = std::bind(finaev::intersect, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
+  commands["complement"] = std::bind(finaev::complement, std::ref(in), std::ref(out), std::cref(debuts), std::ref(bases));
   return commands;
 }
