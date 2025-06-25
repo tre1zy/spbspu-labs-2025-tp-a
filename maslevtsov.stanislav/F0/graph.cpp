@@ -1,17 +1,8 @@
 #include "graph.hpp"
 #include <iostream>
+#include <algorithm>
 
 namespace {
-  std::vector< unsigned >::const_iterator find_neighbour(const std::vector< unsigned >& vertices, unsigned vertice)
-  {
-    for (auto i = vertices.cbegin(); i != vertices.cend(); ++i) {
-      if (vertice == *i) {
-        return i;
-      }
-    }
-    return vertices.cend();
-  }
-
   struct DelimiterIn
   {
     char exp;
@@ -60,7 +51,7 @@ maslevtsov::Graph::Graph(const Graph& src, const std::vector< unsigned >& vertic
     if (src_it != src.adjacency_list_.end()) {
       std::vector< unsigned > filtered_edges;
       for (unsigned neighbour: src_it->second) {
-        if (find_neighbour(vertices, neighbour) != vertices.cend()) {
+        if (std::find(vertices.begin(), vertices.end(), neighbour) != vertices.cend()) {
           filtered_edges.push_back(neighbour);
         }
       }
@@ -70,11 +61,6 @@ maslevtsov::Graph::Graph(const Graph& src, const std::vector< unsigned >& vertic
       throw std::invalid_argument("non-existing vertice");
     }
   }
-}
-
-size_t maslevtsov::Graph::get_vertice_count() const
-{
-  return adjacency_list_.size();
 }
 
 const maslevtsov::Graph::adjacency_list_t& maslevtsov::Graph::get_adj_list() const
@@ -94,7 +80,7 @@ void maslevtsov::Graph::add_edge(unsigned vertice1, unsigned vertice2)
 {
   auto vertice1_it = adjacency_list_.find(vertice1);
   if (vertice1_it != adjacency_list_.end()) {
-    if (find_neighbour(vertice1_it->second, vertice2) != vertice1_it->second.cend()) {
+    if (std::find(vertice1_it->second.begin(), vertice1_it->second.end(), vertice2) != vertice1_it->second.cend()) {
       throw std::invalid_argument("edge already exist");
     }
   }
@@ -110,7 +96,7 @@ void maslevtsov::Graph::delete_vertice(unsigned vertice)
   auto neighbours_it = adjacency_list_.find(vertice)->second;
   for (auto i = neighbours_it.begin(); i != neighbours_it.end(); ++i) {
     auto neighbour_it = adjacency_list_.find(*i);
-    neighbour_it->second.erase(find_neighbour(neighbour_it->second, vertice));
+    neighbour_it->second.erase(std::find(neighbour_it->second.begin(), neighbour_it->second.end(), vertice));
   }
   adjacency_list_.erase(adjacency_list_.find(vertice));
 }
@@ -121,31 +107,12 @@ void maslevtsov::Graph::delete_edge(unsigned vertice1, unsigned vertice2)
   if (vertice1_it == adjacency_list_.end()) {
     throw std::invalid_argument("non-existing edge");
   }
-  if (find_neighbour(vertice1_it->second, vertice2) == vertice1_it->second.cend()) {
+  if (std::find(vertice1_it->second.begin(), vertice1_it->second.end(), vertice2) == vertice1_it->second.cend()) {
     throw std::invalid_argument("non-existing edge");
   }
-  vertice1_it->second.erase(find_neighbour(vertice1_it->second, vertice2));
+  vertice1_it->second.erase(std::find(vertice1_it->second.begin(), vertice1_it->second.end(), vertice2));
   auto vertice2_it = adjacency_list_.find(vertice2);
-  vertice2_it->second.erase(find_neighbour(vertice2_it->second, vertice1));
-}
-
-void maslevtsov::Graph::print_adjacency_list(std::ostream& out) const
-{
-  if (adjacency_list_.empty()) {
-    return;
-  }
-  out << adjacency_list_.cbegin()->first << " :";
-  for (auto i = adjacency_list_.cbegin()->second.cbegin(); i != adjacency_list_.cbegin()->second.cend(); ++i) {
-    out << ' ' << *i;
-  }
-  for (auto i = ++adjacency_list_.cbegin(); i != adjacency_list_.cend(); ++i) {
-    out << '\n' << i->first << " :";
-    if (!i->second.empty()) {
-      for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
-        out << ' ' << *j;
-      }
-    }
-  }
+  vertice2_it->second.erase(std::find(vertice2_it->second.begin(), vertice2_it->second.end(), vertice1));
 }
 
 std::istream& maslevtsov::operator>>(std::istream& in, Graph& gr)
@@ -195,4 +162,29 @@ std::istream& maslevtsov::operator>>(std::istream& in, Graph& gr)
     }
   }
   return in;
+}
+
+std::ostream& maslevtsov::operator<<(std::ostream& out, const Graph& gr)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry) {
+    return out;
+  }
+  if (gr.adjacency_list_.empty()) {
+    return out;
+  }
+  out << gr.adjacency_list_.size() << '\n';
+  out << gr.adjacency_list_.cbegin()->first << " :";
+  for (auto i = gr.adjacency_list_.cbegin()->second.cbegin(); i != gr.adjacency_list_.cbegin()->second.cend(); ++i) {
+    out << ' ' << *i;
+  }
+  for (auto i = ++gr.adjacency_list_.cbegin(); i != gr.adjacency_list_.cend(); ++i) {
+    out << '\n' << i->first << " :";
+    if (!i->second.empty()) {
+      for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
+        out << ' ' << *j;
+      }
+    }
+  }
+  return out;
 }

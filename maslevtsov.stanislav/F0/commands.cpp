@@ -4,6 +4,7 @@
 #include <stack>
 #include <algorithm>
 #include <functional>
+#include <iterator>
 #include "graph.hpp"
 
 namespace {
@@ -169,9 +170,7 @@ void maslevtsov::save_graphs(const graphs_t& graphs, std::istream& in)
   }
   for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
     save_file << i->first << '\n';
-    save_file << i->second.get_vertice_count() << '\n';
-    i->second.print_adjacency_list(save_file);
-    save_file << '\n';
+    save_file << i->second << '\n';
   }
 }
 
@@ -244,7 +243,7 @@ void maslevtsov::print_graph(const graphs_t& graphs, std::istream& in, std::ostr
 {
   std::string graph_name;
   in >> graph_name;
-  graphs.at(graph_name).print_adjacency_list(out);
+  out << graphs.at(graph_name);
   out << '\n';
 }
 
@@ -304,12 +303,8 @@ void maslevtsov::create_subgraph(graphs_t& graphs, std::istream& in)
   if (graphs.find(new_gr_name) != graphs.end()) {
     throw std::invalid_argument("invalid graph names");
   }
-  std::vector< unsigned > vertices;
-  unsigned vertice = 0;
-  for (size_t i = 0; i != vertice_count; ++i) {
-    in >> vertice;
-    vertices.push_back(vertice);
-  }
+  std::vector< unsigned > vertices(vertice_count);
+  std::copy_n(std::istream_iterator< unsigned >(in), vertice_count, vertices.begin());
   Graph new_gr(graphs.at(gr_name), vertices);
   graphs[new_gr_name] = new_gr;
 }
