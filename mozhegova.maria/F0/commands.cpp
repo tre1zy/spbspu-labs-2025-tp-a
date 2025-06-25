@@ -8,8 +8,7 @@
 
 namespace
 {
-  using VectorWordPos = std::vector< std::pair< size_t, size_t > >;
-  bool cmpMaxWordLen(const std::pair< std::string, VectorWordPos > & a, const std::pair< std::string, VectorWordPos > & b)
+  bool cmpMaxWordLen(const std::pair< std::string, mozhegova::Xrefs > & a, const std::pair< std::string, mozhegova::Xrefs > & b)
   {
     return a.first.size() < b.first.size();
   }
@@ -27,7 +26,7 @@ namespace
   {
     std::ostream & out;
     size_t width;
-    void operator()(const std::pair< std::string, VectorWordPos > & word) const
+    void operator()(const std::pair< std::string, mozhegova::Xrefs > & word) const
     {
       out << std::left << std::setw(width) << word.first;
       std::for_each(word.second.cbegin(), word.second.cend(), PrintWordPos{out});
@@ -73,16 +72,19 @@ namespace
     return acc;
   }
 
+  void supRecText(const std::pair< std::string, mozhegova::Xrefs > & word, std::vector< std::pair< mozhegova::WordPos, std::string > > & sortedWords)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, std::back_inserter(sortedWords), std::bind(createWordPair, _1, word.first));
+  }
+
   std::string reconstructText(const mozhegova::Text & text)
   {
     std::vector< std::pair< mozhegova::WordPos, std::string > > sortedWords;
-    for (const auto & wordEntry : text)
-    {
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::transform(b, e, std::back_inserter(sortedWords), std::bind(createWordPair, _1, wordEntry.first));
-    }
+    using namespace std::placeholders;
+    std::for_each(text.cbegin(), text.cend(), std::bind(supRecText, _1, std::ref(sortedWords)));
     std::sort(sortedWords.begin(), sortedWords.end());
     if (sortedWords.empty())
     {
@@ -93,14 +95,14 @@ namespace
     return result.result;
   }
 
-  size_t getSizeWord(const std::pair< std::string, VectorWordPos > & word)
+  size_t getSizeWord(const std::pair< std::string, mozhegova::Xrefs > & word)
   {
     return word.second.size();
   }
 
   struct AccumulateTextSize
   {
-    size_t operator()(size_t currentSize, const std::pair< std::string, VectorWordPos > & word) const
+    size_t operator()(size_t currentSize, const std::pair< std::string, mozhegova::Xrefs > & word) const
     {
       return currentSize + getSizeWord(word);
     }
@@ -121,9 +123,9 @@ namespace
     return a.first < b.first;
   }
 
-  size_t getMaxLineNumWord(const std::pair< std::string, VectorWordPos > & word)
+  size_t getMaxLineNumWord(const std::pair< std::string, mozhegova::Xrefs > & word)
   {
-    VectorWordPos xrefs = word.second;
+    mozhegova::Xrefs xrefs = word.second;
     if (xrefs.empty())
     {
       return 0;
@@ -144,9 +146,9 @@ namespace
     return a.second < b.second;
   }
 
-  size_t getMaxNumWord(const std::pair< std::string, VectorWordPos > & word)
+  size_t getMaxNumWord(const std::pair< std::string, mozhegova::Xrefs > & word)
   {
-    VectorWordPos xrefs = word.second;
+    mozhegova::Xrefs xrefs = word.second;
     if (xrefs.empty())
     {
       return 0;
@@ -167,21 +169,24 @@ namespace
     return pos.first >= begin && pos.first < end;
   }
 
+  void subExtrSubstr(const std::pair< std::string, mozhegova::Xrefs > & word, mozhegova::Text & result, size_t begin, size_t end)
+  {
+    mozhegova::Xrefs newXrefs;
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::copy_if(b, e, std::back_inserter(newXrefs), std::bind(cmpBetween, _1, begin, end));
+    if (!newXrefs.empty())
+    {
+      result[word.first] = newXrefs;
+    }
+  }
+
   mozhegova::Text extractSubstring(const mozhegova::Text & text, size_t begin, size_t end)
   {
     mozhegova::Text result;
-    for (const auto & wordEntry : text)
-    {
-      VectorWordPos newXrefs;
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::copy_if(b, e, std::back_inserter(newXrefs), std::bind(cmpBetween, _1, begin, end));
-      if (!newXrefs.empty())
-      {
-        result[wordEntry.first] = newXrefs;
-      }
-    }
+    using namespace std::placeholders;
+    std::for_each(text.cbegin(), text.cend(), std::bind(subExtrSubstr, _1, std::ref(result), begin, end));
     return result;
   }
 
@@ -192,23 +197,6 @@ namespace
       return {pos.first - (end - begin), pos.second};
     }
     return pos;
-  }
-
-  void removeSubstring(mozhegova::Text & text, size_t begin, size_t end)
-  {
-    for (auto & wordEntry : text)
-    {
-      using namespace std::placeholders;
-      auto iter = std::remove_if(wordEntry.second.begin(), wordEntry.second.end(), std::bind(cmpBetween, _1, begin, end));
-      wordEntry.second.erase(iter, wordEntry.second.end());
-    }
-    for (auto & wordEntry : text)
-    {
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::transform(b, e, b, std::bind(downLenNum, _1, begin, end));
-    }
   }
 
   mozhegova::WordPos uppLenNum(const mozhegova::WordPos & pos, size_t n, size_t add)
@@ -223,38 +211,6 @@ namespace
   mozhegova::WordPos changeLenNum(const mozhegova::WordPos & pos, size_t n, size_t begin)
   {
     return {pos.first + n - begin, pos.second};
-  }
-
-  void insertTextTo(mozhegova::Text & text1, const mozhegova::Text & text2, size_t n, size_t begin, size_t end)
-  {
-    mozhegova::Text temp = extractSubstring(text2, begin, end);
-    for (auto & wordEntry : text1)
-    {
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::transform(b, e, b, std::bind(uppLenNum, _1, n, end - begin));
-    }
-    for (auto & wordEntry : temp)
-    {
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::transform(b, e, std::back_inserter(text1[wordEntry.first]), std::bind(changeLenNum, _1, n, begin));
-    }
-  }
-
-  bool isWordOnLine(const mozhegova::WordPos & pos, size_t line)
-  {
-    return pos.first == line;
-  }
-
-  void addWordToCombinedText(const std::pair< std::string, VectorWordPos > & wordEntry, size_t line, mozhegova::Text & combinedText)
-  {
-    auto b = wordEntry.second.begin();
-    auto e = wordEntry.second.end();
-    using namespace std::placeholders;
-    std::copy_if(b, e, std::back_inserter(combinedText[wordEntry.first]), std::bind(isWordOnLine, _1, line));
   }
 
   mozhegova::WordPos reverseLenNum(const mozhegova::WordPos & pos, size_t maxLine)
@@ -276,13 +232,81 @@ namespace
     return {pos.first, pos.second + n};
   }
 
-  // void sideText(std::pair< std::string, VectorWordPos > & wordEntry, size_t n)
-  // {
-  //   auto b = wordEntry.second.begin();
-  //   auto e = wordEntry.second.end();
-  //   using namespace std::placeholders;
-  //   std::transform(b, e, b, std::bind(uppNum, _1, n));
-  // }
+  void subRemoveSubstr(std::pair< const std::string, mozhegova::Xrefs > & word, size_t begin, size_t end)
+  {
+    using namespace std::placeholders;
+    auto iter = std::remove_if(word.second.begin(), word.second.end(), std::bind(cmpBetween, _1, begin, end));
+    word.second.erase(iter, word.second.end());
+  }
+
+  void subDownLenNum(std::pair< const std::string, mozhegova::Xrefs > & word, size_t begin, size_t end)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, b, std::bind(downLenNum, _1, begin, end));
+  }
+
+  void removeSubstring(mozhegova::Text & text, size_t begin, size_t end)
+  {
+    using namespace std::placeholders;
+    std::for_each(text.begin(), text.end(), std::bind(subRemoveSubstr, _1, begin, end));
+    std::for_each(text.begin(), text.end(), std::bind(subDownLenNum, _1, begin, end));
+  }
+
+  void subUppLenNum(std::pair< const std::string, mozhegova::Xrefs > & word, size_t n, size_t begin, size_t end)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, b, std::bind(uppLenNum, _1, n, end - begin));
+  }
+
+  void subChangeLenNum(std::pair< const std::string, mozhegova::Xrefs > & word, mozhegova::Text & text1, size_t n, size_t begin)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, std::back_inserter(text1[word.first]), std::bind(changeLenNum, _1, n, begin));
+  }
+
+  void insertTextTo(mozhegova::Text & text1, const mozhegova::Text & text2, size_t n, size_t begin, size_t end)
+  {
+    mozhegova::Text temp = extractSubstring(text2, begin, end);
+    using namespace std::placeholders;
+    std::for_each(text1.begin(), text1.end(), std::bind(subUppLenNum, _1, n, begin, end));
+    std::for_each(text1.begin(), text1.end(), std::bind(subChangeLenNum, _1, std::ref(text1), n, begin));
+  }
+
+  bool isWordOnLine(const mozhegova::WordPos & pos, size_t line)
+  {
+    return pos.first == line;
+  }
+
+  void subSideMerge(std::pair< const std::string, mozhegova::Xrefs > & word, size_t line, size_t num, mozhegova::Text & combinedText)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, b, std::bind(uppNum, _1, num));
+    std::copy_if(b, e, std::back_inserter(combinedText[word.first]), std::bind(isWordOnLine, _1, line));
+  }
+
+  void subInvertLines(std::pair< const std::string, mozhegova::Xrefs > & word, size_t lineNum)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, b, std::bind(reverseLenNum, _1, lineNum));
+  }
+
+  void subInvertWords(std::pair< const std::string, mozhegova::Xrefs > & word, size_t line, size_t maxNum)
+  {
+    auto b = word.second.begin();
+    auto e = word.second.end();
+    using namespace std::placeholders;
+    std::transform(b, e, b, std::bind(changeNum, _1, line, maxNum));
+  }
 }
 
 void mozhegova::generateLinks(std::istream & in, Texts & texts)
@@ -464,14 +488,8 @@ void mozhegova::sideMergeTexts(std::istream & in, Texts & texts)
   size_t maxNum = getMaxNum(text1);
   for (size_t line = 1; line <= maxLines; ++line)
   {
-    for (auto & wordEntry : temp2)
-    {
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::transform(b, e, b, std::bind(uppNum, _1, maxNum));
-      addWordToCombinedText(wordEntry, line, temp1);
-    }
+    using namespace std::placeholders;
+    std::for_each(temp2.begin(), temp2.end(), std::bind(subSideMerge, _1, line, maxNum, std::ref(temp1)));
   }
   texts[newText] = std::move(temp1);
 }
@@ -510,13 +528,8 @@ void mozhegova::invertLines(std::istream & in, Texts & texts)
   }
   Text & text = it->second;
   size_t maxLine = getMaxLineNum(text);
-  for (auto & wordEntry : text)
-  {
-    auto b = wordEntry.second.begin();
-    auto e = wordEntry.second.end();
-    using namespace std::placeholders;
-    std::transform(b, e, b, std::bind(reverseLenNum, _1, maxLine));
-  }
+  using namespace std::placeholders;
+  std::for_each(text.begin(), text.end(), std::bind(subInvertLines, _1, maxLine));
 }
 
 void mozhegova::invertWords(std::istream & in, Texts & texts)
@@ -533,13 +546,8 @@ void mozhegova::invertWords(std::istream & in, Texts & texts)
   size_t maxNum = getMaxNum(text);
   for (size_t line = 1; line <= maxLines; ++line)
   {
-    for (auto & wordEntry : text)
-    {
-      auto b = wordEntry.second.begin();
-      auto e = wordEntry.second.end();
-      using namespace std::placeholders;
-      std::transform(b, e, b, std::bind(changeNum, _1, line, maxNum));
-    }
+    using namespace std::placeholders;
+    std::for_each(text.begin(), text.end(), std::bind(subInvertWords, _1, line, maxNum));
   }
 }
 
