@@ -173,6 +173,10 @@ void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
     out << "<DICTIONARY ALREADY EXISTS>\n";
     return;
   }
+  if (newDict.empty())
+  {
+    out << "Incorrect dict\n";
+  }
   dicts[newDict];
 }
 
