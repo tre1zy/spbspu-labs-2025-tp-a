@@ -214,9 +214,6 @@ void CommandProcessor::command_area(const std::string& rest) const {
     result += compute_area(polygons_[4]);
   }
 
-    if (!found) {
-      result = 0.0;
-    }
   } else {
     std::cout << "<INVALID COMMAND>\n";
     return;
