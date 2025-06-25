@@ -117,7 +117,8 @@ namespace hismatova
   std::ostream& operator<<(std::ostream& out, const DataStruct& data)
   {
     out << "(:key1 " << data.key1 << "ull"
-      << ":key2 #c(" << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.real()) << " " << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.imag()) << ")"
+      << ":key2 #c(" << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.real()) << " "
+      << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.imag()) << ")"
       << ":key3 \"" << data.key3 << "\":)";
     return out;
   }
