@@ -253,7 +253,7 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std
 
   SequenceCounter counter{ target };
   recursiveMaxSeq(polygons.begin(), polygons.end(), counter);
-  out << counter.maxCount << "\n";
+  out << counter.maxCount;
 }
 
 void bocharov::getRightsCnt(std::ostream & out, const std::vector< Polygon > & polygons)
