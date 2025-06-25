@@ -32,18 +32,17 @@ namespace kushekbaev
 
   void delete_all_translations(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
+  void prefix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
+  void no_prefix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
+  void suffix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
+  void no_suffix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
   void merge();
 
   void split();
-
-  void prefix_search();
-
-  void no_prefix_search();
-
-  void suffix_search();
-
-  void no_suffix_search();
-
 
   void find_words_without_translations();
 

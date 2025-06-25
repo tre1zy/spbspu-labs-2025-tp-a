@@ -332,6 +332,138 @@ void kushekbaev::delete_all_translations(std::ostream& out, std::istream& in, di
   out << std::string("Words with this translation deleted successfully.\n");
 }
 
+void kushekbaev::prefix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, prefix;
+  in >> dictionary_name >> prefix;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  bool found = false;
+  out << "Words with prefix '" << prefix << "':\n";
+  for (const auto& word_pair: dict_it->second)
+  {
+    const std::string& word = word_pair.first;
+    if (word.rfind(prefix, 0) == 0)
+    {
+      out << "-> " << word << " : ";
+      const auto& translations = word_pair.second;
+      for (auto it = translations.begin(); it != translations.end(); ++it)
+      {
+        if (it != translations.begin()) out << ", ";
+        out << *it;
+      }
+      out << "\n";
+      found = true;
+    }
+  }
+  if (!found)
+  {
+    out << "<NO WORDS FOUND>\n";
+  }
+}
+
+void kushekbaev::no_prefix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, prefix;
+  in >> dictionary_name >> prefix;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  bool found = false;
+  out << "Words without prefix '" << prefix << "':\n";
+  for (const auto& word_pair: dict_it->second)
+  {
+    const std::string& word = word_pair.first;
+    if (word.rfind(prefix, 0) != 0)
+    {
+      out << "-> " << word << " : ";
+      const auto& translations = word_pair.second;
+      for (auto it = translations.begin(); it != translations.end(); ++it)
+      {
+        if (it != translations.begin()) out << ", ";
+        out << *it;
+      }
+      out << "\n";
+      found = true;
+    }
+  }
+  if (!found)
+  {
+    out << "<NO WORDS FOUND>\n";
+  }
+}
+
+void kushekbaev::suffix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, suffix;
+  in >> dictionary_name >> suffix;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  bool found = false;
+  out << "Words with suffix '" << suffix << "':\n";
+  for (const auto& word_pair: dict_it->second)
+  {
+    const std::string& word = word_pair.first;
+    if (word.size() >= suffix.size() && word.compare(word.size() - suffix.size(), suffix.size(), suffix) == 0)
+    {
+      out << "-> " << word << " : ";
+      const auto& translations = word_pair.second;
+      for (auto it = translations.begin(); it != translations.end(); ++it)
+      {
+        if (it != translations.begin()) out << ", ";
+        out << *it;
+      }
+      out << "\n";
+      found = true;
+    }
+  }
+  if (!found)
+  {
+    out << "<NO WORDS FOUND>\n";
+  }
+}
+
+void kushekbaev::no_suffix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, suffix;
+  in >> dictionary_name >> suffix;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  bool found = false;
+  out << "Words with bo suffix '" << suffix << "':\n";
+  for (const auto& word_pair: dict_it->second)
+  {
+    const std::string& word = word_pair.first;
+    if (word.size() >= suffix.size() && word.compare(word.size() - suffix.size(), suffix.size(), suffix) != 0)
+    {
+      out << "-> " << word << " : ";
+      const auto& translations = word_pair.second;
+      for (auto it = translations.begin(); it != translations.end(); ++it)
+      {
+        if (it != translations.begin()) out << ", ";
+        out << *it;
+      }
+      out << "\n";
+      found = true;
+    }
+  }
+  if (!found)
+  {
+    out << "<NO WORDS FOUND>\n";
+  }
+}
+
 void kushekbaev::print_help(std::ostream& out)
 {
   out << std::string("Available commands: insert, ...\n");
