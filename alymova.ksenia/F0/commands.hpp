@@ -11,6 +11,7 @@ namespace alymova
   using WordSet = std::list< std::string >;
   using Dictionary = std::map< std::string, WordSet >;
   using DictSet = std::map< std::string, Dictionary >;
+  using ContentDict = std::map< char, std::list< std::string > >;
 
   void create(std::istream& in, std::ostream& out, DictSet& set);
   void dicts(std::ostream& out, const DictSet& set);

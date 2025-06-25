@@ -8,6 +8,7 @@ namespace alymova
 {
   using Dictionary = std::map< std::string, std::list< std::string > >;
   using DictSet = std::map< std::string, Dictionary >;
+  using ContentDict = std::map< char, std::list< std::string > >;
 
   struct DictPairWrapper
   {
@@ -16,6 +17,10 @@ namespace alymova
   struct DictSetPairWrapper
   {
     std::pair< std::string, Dictionary > p;
+  };
+  struct ContentPairWrapper
+  {
+    std::pair< char, std::list< std::string > > p;
   };
   std::istream& operator>>(std::istream& in, std::list< std::string >& list);
   std::istream& operator>>(std::istream& in, Dictionary& dict);
@@ -27,5 +32,7 @@ namespace alymova
   std::ostream& operator<<(std::ostream& out, const DictSet& set);
   std::ostream& operator<<(std::ostream& out, const DictPairWrapper& pair);
   std::ostream& operator<<(std::ostream& out, const DictSetPairWrapper& pair);
+  std::ostream& operator<<(std::ostream& out, const ContentPairWrapper& pair);
+  std::ostream& operator<<(std::ostream& out, const ContentDict& dict);
 }
 #endif

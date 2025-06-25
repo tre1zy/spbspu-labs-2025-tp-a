@@ -14,13 +14,17 @@ namespace
   {
     return pair.p;
   }
-  alymova::DictPairWrapper returnDictPairWrapper(std::pair< std::string, std::list< std::string > > pair)
+  DictPairWrapper returnDictPairWrapper(std::pair< std::string, std::list< std::string > > pair)
   {
     return DictPairWrapper{pair};
   }
-  alymova::DictSetPairWrapper returnDictSetPairWrapper(std::pair< std::string, Dictionary > pair)
+  DictSetPairWrapper returnDictSetPairWrapper(std::pair< std::string, Dictionary > pair)
   {
     return DictSetPairWrapper{pair};
+  }
+  ContentPairWrapper returnContentPairWrapper(std::pair< char, std::list< std::string > > pair)
+  {
+    return ContentPairWrapper{pair};
   }
 }
 std::istream& alymova::operator>>(std::istream& in, std::list< std::string >& list)
@@ -136,7 +140,7 @@ std::ostream& alymova::operator<<(std::ostream& out, const std::list< std::strin
   }
   std::list< std::string > copy(list);
   copy.sort();
-  std::copy_n(copy.begin(), copy.size() - 1, std::ostream_iterator< std::string >(out, " "));
+  std::copy(copy.begin(), --copy.end(), std::ostream_iterator< std::string >(out, " "));
   out << *(--copy.end());
   return out;
 }
@@ -147,7 +151,8 @@ std::ostream& alymova::operator<<(std::ostream& out, const Dictionary& dict)
   {
     return out;
   }
-  std::transform(dict.begin(), --dict.end(), std::ostream_iterator< DictPairWrapper >(out, "\n"), returnDictPairWrapper);
+  auto it_output = std::ostream_iterator< DictPairWrapper >(out, "\n");
+  std::transform(dict.begin(), --dict.end(), it_output, returnDictPairWrapper);
   out << returnDictPairWrapper(*(--dict.end()));
   return out;
 }
@@ -158,7 +163,8 @@ std::ostream& alymova::operator<<(std::ostream& out, const DictSet& set)
   {
     return out;
   }
-  std::transform(set.begin(), --set.end(), std::ostream_iterator< DictSetPairWrapper >(out, "\n"), returnDictSetPairWrapper);
+  auto it_output = std::ostream_iterator< DictSetPairWrapper >(out, "\n");
+  std::transform(set.begin(), --set.end(), it_output, returnDictSetPairWrapper);
   out << returnDictSetPairWrapper(*(--set.end()));
   return out;
 }
@@ -188,5 +194,27 @@ std::ostream& alymova::operator<<(std::ostream& out, const DictSetPairWrapper& p
   {
     out << '\n' << pair.p.second;
   }
+  return out;
+}
+std::ostream& alymova::operator<<(std::ostream& out, const ContentPairWrapper& pair)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+  out << pair.p.first << ' ' << pair.p.second;
+  return out;
+}
+std::ostream& alymova::operator<<(std::ostream& out, const ContentDict& dict)
+{
+  std::ostream::sentry s(out);
+  if (!s || dict.empty())
+  {
+    return out;
+  }
+  auto it_output = std::ostream_iterator< ContentPairWrapper >(out, "\n");
+  std::transform(dict.begin(), --dict.end(), it_output, returnContentPairWrapper);
+  out << returnContentPairWrapper(*(--dict.end()));
   return out;
 }
