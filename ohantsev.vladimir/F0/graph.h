@@ -18,7 +18,6 @@ namespace ohantsev
     using this_t = Graph;
     using ConnectionMap = std::unordered_map< Key, std::size_t, Hash, KeyEqual >;
     using GraphMap = std::unordered_map< Key, ConnectionMap >;
-
     struct Way;
 
     explicit Graph(std::size_t capacity = 10);

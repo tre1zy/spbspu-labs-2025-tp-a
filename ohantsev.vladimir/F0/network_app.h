@@ -21,6 +21,15 @@ namespace ohantsev
     void input(const std::string& filename);
 
   private:
+    struct DeviceConnectionsPrinter;
+    struct ConnectionPrinter;
+    struct ConnectionAdder;
+    struct NetworkMerger;
+    struct NetworkSaver;
+    struct ConnectionSaver;
+    struct DeviceSaver;
+    struct ConnectionCounter;
+
     map_type& networks_;
 
     static void create(map_type& networks, std::istream& in);
@@ -42,17 +51,7 @@ namespace ohantsev
     static void topPathsNoCycles(const map_type& networks, std::istream& in, std::ostream& out);
     static void merge(map_type& networks, std::istream& in);
     static void save(const map_type& networks, std::istream& in);
-
     static std::string getName(const map_type::value_type& pair);
-
-    struct DeviceConnectionsPrinter;
-    struct ConnectionPrinter;
-    struct ConnectionAdder;
-    struct NetworkMerger;
-    struct NetworkSaver;
-    struct ConnectionSaver;
-    struct DeviceSaver;
-    struct ConnectionCounter;
   };
 
   std::istream& operator>>(std::istream& in, Graph< std::string >& graph);
