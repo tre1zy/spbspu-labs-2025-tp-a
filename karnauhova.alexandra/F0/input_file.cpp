@@ -6,7 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include "terminal_text.hpp"
-
+using map_characters = std::map< std::string, karnauhova::Character >;
 namespace
 {
   struct TransformMap
@@ -22,10 +22,10 @@ namespace
   };
 }
 
-std::map< std::string, karnauhova::Character > karnauhova::input_data(std::map< size_t, Character >& characters)
+map_characters karnauhova::input_data(std::map< size_t, Character >& characters)
 {
   setlocale(LC_ALL, "ru");
-  std::map< std::string, karnauhova::Character > players;
+  map_characters players;
   clear_screen();
   std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
   std::cout << "Привет!\n" << "Хотите продолжить прошлую или начать новую?\n" << "> NEW_GAME\n" << "> CONTINUE\n";
@@ -87,11 +87,11 @@ void karnauhova::input_new_data(std::istream& in, std::map< size_t, Character >&
   std::transform(temp.begin(), temp.end(), std::inserter(characters, characters.end()), trmp);
 }
 
-std::map< std::string, karnauhova::Character > karnauhova::input_save_data(std::istream& in, std::map< size_t, Character >& characters)
+map_characters karnauhova::input_save_data(std::istream& in, std::map< size_t, Character >& characters)
 {
   in.seekg(0, std::ios::end);
   if (in.tellg() == std::streampos(0))
-  { 
+  {
     throw std::logic_error("File is empty");
   }
   in.seekg(0);

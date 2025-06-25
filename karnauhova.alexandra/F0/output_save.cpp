@@ -25,9 +25,11 @@ void karnauhova::save_data(std::map< std::string, Character >& players, std::map
   file.open("karnauhova.alexandra/F0/game_data_save.txt");
   auto it = players.begin();
   file << it->first << " " << (++it)->first << "\n";
-  auto character = std::find_if(characters.begin(), characters.end(), std::bind(compare_characters, std::placeholders::_1, std::cref((--it)->second)));
+  auto a = std::bind(compare_characters, std::placeholders::_1, std::cref((--it)->second));
+  auto character = std::find_if(characters.begin(), characters.end(), a);
   file << character->first << " " << it->second.volume_hp() << " " << it->second.position << "\n";
-  character = std::find_if(characters.begin(), characters.end(), std::bind(compare_characters, std::placeholders::_1, std::cref((++it)->second)));
+  auto b = std::bind(compare_characters, std::placeholders::_1, std::cref((++it)->second));
+  character = std::find_if(characters.begin(), characters.end(), b);
   file << character->first << " " << it->second.volume_hp() << " " << it->second.position << "\n";
 
   using ostr_iter = std::ostream_iterator< Character >;

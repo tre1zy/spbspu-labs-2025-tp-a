@@ -4,7 +4,7 @@
 #include <functional>
 #include <queue>
 #include "terminal_text.hpp"
-
+using map_characters = std::map< std::string, karnauhova::Character >;
 namespace
 {
   void print_info(const std::pair<size_t, karnauhova::Character>& pair)
@@ -17,7 +17,6 @@ namespace
   struct QueueInserter
   {
     std::queue<std::pair<std::string, karnauhova::Character>>& queue;
-    
     void operator()(const std::pair<const std::string, karnauhova::Character>& pair) const
     {
       queue.push(pair);
@@ -46,7 +45,7 @@ namespace
   }
 }
 
-void karnauhova::choice_characters(std::map< std::string, Character >& players, const std::map< size_t, Character >& characters)
+void karnauhova::choice_characters(map_characters& players, const std::map< size_t, Character >& characters)
 {
   while (!std::cin.eof())
   {
@@ -114,7 +113,6 @@ void karnauhova::choice_characters(std::map< std::string, Character >& players, 
           delay(2400);
           input_end = true;
         }
-      
       }
     }
     catch (const std::exception& e)
@@ -122,11 +120,10 @@ void karnauhova::choice_characters(std::map< std::string, Character >& players, 
       std::cout << "Сложно ввести существующий ник?:(\n";
       delay(1200);
     }
-    
   }
 }
 
-void karnauhova::fight(std::map< std::string, Character >& players)
+void karnauhova::fight(map_characters& players)
 {
   std::queue< std::pair < std::string, Character > > fight_queue;
   QueueInserter inserter{fight_queue};

@@ -156,7 +156,7 @@ bool karnauhova::Character::is_lost()
 void karnauhova::Character::damage(int size_damage)
 {
   total_hp_ -= size_damage;
-}    
+}
 
 int karnauhova::Character::volume_hp() const
 {
