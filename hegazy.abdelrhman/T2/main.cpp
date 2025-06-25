@@ -1,21 +1,29 @@
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
-#include "DataStruct.hpp"
+#include <limits>
+#include <vector>
+#include "data_struct.hpp"
 
-int main() {
+int main()
+{
+    using pilugina::DataStruct;
+    using input_it = std::istream_iterator<DataStruct>;
+    using output_it = std::ostream_iterator<DataStruct>;
+
     std::vector<DataStruct> data;
-    using istream_it = std::istream_iterator<DataStruct>;
-    using ostream_it = std::ostream_iterator<DataStruct>;
-    
-    std::copy(istream_it{ std::cin },
-        istream_it{},
-        std::back_inserter(data));
 
-    std::sort(data.begin(), data.end(), compareDataStruct);
-    std::copy(data.begin(), data.end(),
-        ostream_it{ std::cout, "\n" });
+    while (!std::cin.eof())
+    {
+        std::copy(input_it{ std::cin }, input_it{}, std::back_inserter(data));
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
 
+    std::sort(data.begin(), data.end());
+    std::copy(data.begin(), data.end(), output_it{ std::cout, "\n" });
     return 0;
 }
