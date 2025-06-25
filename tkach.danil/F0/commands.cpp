@@ -686,7 +686,7 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
     std::for_each(main_name_dict.cbegin(), main_name_dict.cend(), ImportDictProcessor{avltree, imported_dictionaries});
   }
   else
-  { 
+  {
     std::for_each(imported_dictionaries.cbegin(), imported_dictionaries.cend(), ApplyAllDicts{avltree});
   }
 }
