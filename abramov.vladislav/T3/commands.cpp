@@ -12,8 +12,8 @@ namespace
 
   void printAreaEven(const std::vector< Polygon > &polygons, std::ostream &out)
   {
-    std::vector< Polygon > even_polygons(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), even_polygons.begin(), isEven);
+    std::vector< Polygon > even_polygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(even_polygons), isEven);
     std::vector< double > areas(polygons.size());
     std::transform(even_polygons.begin(), even_polygons.end(), areas.begin(), getArea);
     double area = std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -22,8 +22,8 @@ namespace
 
   void printAreaOdd(const std::vector< Polygon > &polygons, std::ostream &out)
   {
-    std::vector< Polygon > odd_polygons(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), odd_polygons.begin(), isOdd);
+    std::vector< Polygon > odd_polygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(odd_polygons), isOdd);
     std::vector< double > areas(polygons.size());
     std::transform(odd_polygons.begin(), odd_polygons.end(), areas.begin(), getArea);
     double area = std::accumulate(areas.begin(), areas.end(), 0.0);
