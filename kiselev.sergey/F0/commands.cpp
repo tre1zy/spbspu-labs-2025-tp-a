@@ -26,7 +26,8 @@ namespace
 
   struct DictPrinter
   {
-    std::ostream& operator()(std::ostream& out, const kiselev::Dict::value_type& val) const
+    std::ostream& out;
+    std::ostream& operator()(const kiselev::Dict::value_type& val) const
     {
       out << val.first;
       if (!val.second.empty())
@@ -93,7 +94,7 @@ namespace
     {
       if (val.first.rfind(letters, 0) == 0)
       {
-        DictPrinter{}(out, val);
+        DictPrinter{ out }(val);
         return true;
       }
       return found;
@@ -255,7 +256,7 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << nameDict << '\n';
-  std::accumulate(dictIt->second.begin(), dictIt->second.end(), std::ref(out), DictPrinter{});
+  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator< std::string >(out), DictPrinter{ out });
 }
 
 void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -350,8 +351,7 @@ void kiselev::doSaveDict(std::istream& in, std::ostream& out, const Dicts& dicts
   }
   file << dictName << "\n";
   Dict dict = dictIt->second;
-  std::ostream& fileRef = file;
-  std::accumulate(dictIt->second.begin(), dictIt->second.end(), std::ref(fileRef), DictPrinter{});
+  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator< std::string >(file), DictPrinter{ file });
   file << "\n";
 }
 
