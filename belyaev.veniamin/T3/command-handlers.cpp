@@ -1,4 +1,5 @@
 #include "command-handlers.hpp"
+#include <stream-guard.hpp>
 
 void belyaev::areaOdd(const std::vector< Polygon >& data, std::ostream& out)
 {
