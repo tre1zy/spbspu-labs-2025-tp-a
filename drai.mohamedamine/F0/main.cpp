@@ -61,6 +61,8 @@ namespace
       xref.repeatText(tokens[1], tokens[2], std::stoul(tokens[3]));
     else if (command == "interleaveLines" && count == 4)
       xref.interleaveLines(tokens[1], tokens[2], tokens[3]);
+    else if (command == "swapWords" && count == 4)
+      xref.swapWords(tokens[1], tokens[2], tokens[3]);
     else if (command == "reverseText" && count == 3)
       xref.reverseText(tokens[1], tokens[2]);
     else if (command == "saveIndex" && count == 3)

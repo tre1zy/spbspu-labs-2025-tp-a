@@ -431,7 +431,31 @@ size_t getMaxLineRecursive(
     repeatRecursive(N);
     indexes_[newIndex] = result;
   }
+void CrossRefSystem::swapWords(const std::string& indexName,
+                              const std::string& word1,
+                              const std::string& word2)
+{
+    auto it = indexes_.find(indexName);
+    if (it == indexes_.end())
+    {
+        std::cout << "<WRONG INDEX>\n";
+        return;
+    }
 
+    Index& index = it->second;
+    auto word1It = index.find(word1);
+    auto word2It = index.find(word2);
+
+    if (word1It == index.end() || word2It == index.end())
+    {
+        std::cout << "<NOT FOUND>\n";
+        return;
+    }
+
+    std::set<Position, positionLess> temp = word1It->second;
+    index[word1] = word2It->second;
+    index[word2] = temp;
+}
   void CrossRefSystem::interleaveLines(const std::string& newIndex,
                                       const std::string& index1,
                                       const std::string& index2)
