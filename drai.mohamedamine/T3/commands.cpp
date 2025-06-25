@@ -1,8 +1,10 @@
+#include "commands.hpp"
 #include <algorithm>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <map>
 #include <numeric>
 #include <sstream>
 #include <vector>
@@ -10,69 +12,105 @@
 
 namespace amine
 {
-  struct AreaEvenAccumulator
-  {
-    double operator()(double acc, const Polygon& p) const
-    {
-      return acc + ((p.points.size() % 2 == 0) ? compute_area(p) : 0.0);
+struct IsEvenVertexCount {
+    bool operator()(const Polygon& p) const {
+        return p.points.size() % 2 == 0;
     }
-  };
+};
 
-  struct AreaOddAccumulator
-  {
-    double operator()(double acc, const Polygon& p) const
-    {
-      return acc + ((p.points.size() % 2 != 0) ? compute_area(p) : 0.0);
+struct IsOddVertexCount {
+    bool operator()(const Polygon& p) const {
+        return p.points.size() % 2 != 0;
     }
-  };
+};
 
-  struct AreaMeanAccumulator
-  {
-    double operator()(double acc, const Polygon& p) const
-    {
-      return acc + compute_area(p);
+struct HasVertexCount {
+    size_t target;
+    explicit HasVertexCount(size_t t) : target(t) {}
+    bool operator()(const Polygon& p) const {
+        return p.points.size() == target;
     }
-  };
+};
 
-  struct AreaNumAccumulator
-  {
-    int num;
-    explicit AreaNumAccumulator(int n):
-      num(n)
-    {}
-    double operator()(double acc, const Polygon& p) const
-    {
-      return acc + (static_cast< int >(p.points.size()) == num ? compute_area(p) : 0.0);
+struct AreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        sum += compute_area(p);
     }
-  };
+};
 
-  struct CountEven
-  {
-    bool operator()(const Polygon& p) const
-    {
-      return p.points.size() % 2 == 0;
+struct EvenAreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        if (p.points.size() % 2 == 0) sum += compute_area(p);
     }
-  };
+};
 
-  struct CountOdd
-  {
-    bool operator()(const Polygon& p) const
-    {
-      return p.points.size() % 2 != 0;
+struct OddAreaAdder {
+    double sum = 0.0;
+    void operator()(const Polygon& p) {
+        if (p.points.size() % 2 != 0) sum += compute_area(p);
     }
-  };
+};
 
-  struct CountNum
-  {
-    int num;
-    explicit CountNum(int n):
-      num(n)
-    {}
-    bool operator()(const Polygon& p) const
-    {
-      return static_cast< int >(p.points.size()) == num;
+struct VertexAreaAdder {
+    size_t target;
+    double sum = 0.0;
+    explicit VertexAreaAdder(size_t t) : target(t) {}
+    void operator()(const Polygon& p) {
+        if (p.points.size() == target) sum += compute_area(p);
     }
-  };
+};
+  CommandProcessor::CommandProcessor(const std::vector<Polygon>& polygons)
+  : polygons_(polygons)
+{}
+double areaEven(const std::vector<Polygon>& polys)
+{
+  double result = 0.0;
+  if (polys.size() > 0 && polys[0].points.size() % 2 == 0) result += compute_area(polys[0]);
+  if (polys.size() > 1 && polys[1].points.size() % 2 == 0) result += compute_area(polys[1]);
+  if (polys.size() > 2 && polys[2].points.size() % 2 == 0) result += compute_area(polys[2]);
+  if (polys.size() > 3 && polys[3].points.size() % 2 == 0) result += compute_area(polys[3]);
+  if (polys.size() > 4 && polys[4].points.size() % 2 == 0) result += compute_area(polys[4]);
+  return result;
+}
+
+double areaOdd(const std::vector<Polygon>& polys)
+{
+  double result = 0.0;
+  if (polys.size() > 0 && polys[0].points.size() % 2 != 0) result += compute_area(polys[0]);
+  if (polys.size() > 1 && polys[1].points.size() % 2 != 0) result += compute_area(polys[1]);
+  if (polys.size() > 2 && polys[2].points.size() % 2 != 0) result += compute_area(polys[2]);
+  if (polys.size() > 3 && polys[3].points.size() % 2 != 0) result += compute_area(polys[3]);
+  if (polys.size() > 4 && polys[4].points.size() % 2 != 0) result += compute_area(polys[4]);
+  return result;
+}
+double areaMean(const std::vector<Polygon>& polys)
+{
+  double total = 0.0;
+  std::size_t count = polys.size();
+  if (count > 0) total += compute_area(polys[0]);
+  if (count > 1) total += compute_area(polys[1]);
+  if (count > 2) total += compute_area(polys[2]);
+  if (count > 3) total += compute_area(polys[3]);
+  if (count > 4) total += compute_area(polys[4]);
+  return (count > 0) ? total / count : 0.0;
+}
+double areaNum(const std::vector<Polygon>& polys, int num)
+{
+  double result = 0.0;
+  if (polys.size() > 0 && static_cast<int>(polys[0].points.size()) == num)
+    result += compute_area(polys[0]);
+  if (polys.size() > 1 && static_cast<int>(polys[1].points.size()) == num)
+    result += compute_area(polys[1]);
+  if (polys.size() > 2 && static_cast<int>(polys[2].points.size()) == num)
+    result += compute_area(polys[2]);
+  if (polys.size() > 3 && static_cast<int>(polys[3].points.size()) == num)
+    result += compute_area(polys[3]);
+  if (polys.size() > 4 && static_cast<int>(polys[4].points.size()) == num)
+    result += compute_area(polys[4]);
+  return result;
+}
 
   struct AreaComparator
   {
@@ -89,11 +127,6 @@ namespace amine
       return a.points.size() < b.points.size();
     }
   };
-  std::istream& operator>>(std::istream& is, Line& line)
-  {
-    std::getline(is, line.content);
-    return is;
-  }
 
   struct EqualToQuery
   {
@@ -145,243 +178,222 @@ namespace amine
     std::cout << (initial_size - polygons.size()) << "\n";
   }
 
-  struct CommandProcessor
-  {
-    std::vector< Polygon >& polygons;
-
-    explicit CommandProcessor(std::vector< Polygon >& polys):
-      polygons(polys)
-    {}
-
-    void operator()(const Line& line) const
-    {
-      if (line.content.empty())
-      {
-        return;
-      }
-      std::istringstream iss(line.content);
-      std::string cmd;
-      iss >> cmd;
-      bool invalid = false;
-      bool printDouble = false;
-      double dblResult = 0.0;
-      int intResult = 0;
-      if (cmd == "AREA")
-      {
-        std::string arg;
-        iss >> arg;
-        if (arg == "EVEN")
-        {
-          dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaEvenAccumulator());
-          printDouble = true;
-        }
-        else if (arg == "ODD")
-        {
-          dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaOddAccumulator());
-          printDouble = true;
-        }
-        else if (arg == "MEAN")
-        {
-          if (polygons.empty())
-          {
-            invalid = true;
-          }
-          else
-          {
-            double total = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaMeanAccumulator());
-            dblResult = total / polygons.size();
-            printDouble = true;
-          }
-        }
-        else
-        {
-          bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-          if (is_num)
-          {
-            int num = std::stoi(arg);
-            if (num < 3)
-            {
-              invalid = true;
-            }
-            else
-            {
-              dblResult = std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num));
-              printDouble = true;
-            }
-          }
-          else
-          {
-            invalid = true;
-          }
-        }
-      }
-      else if (cmd == "MAX")
-      {
-        std::string arg;
-        iss >> arg;
-        if (polygons.empty())
-        {
-          invalid = true;
-        }
-        else if (arg == "AREA")
-        {
-          auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator());
-          dblResult = compute_area(*it);
-          printDouble = true;
-        }
-        else if (arg == "VERTEXES")
-        {
-          auto it = std::max_element(polygons.begin(), polygons.end(), VertexesComparator());
-          intResult = it->points.size();
-        }
-        else
-        {
-          invalid = true;
-        }
-      }
-      else if (cmd == "MIN")
-      {
-        std::string arg;
-        iss >> arg;
-        if (polygons.empty())
-        {
-          invalid = true;
-        }
-        else if (arg == "AREA")
-        {
-          auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator());
-          dblResult = compute_area(*it);
-          printDouble = true;
-        }
-        else if (arg == "VERTEXES")
-        {
-          auto it = std::min_element(polygons.begin(), polygons.end(), VertexesComparator());
-          intResult = it->points.size();
-        }
-        else
-        {
-          invalid = true;
-        }
-      }
-      else if (cmd == "COUNT")
-      {
-        std::string arg;
-        iss >> arg;
-        if (arg == "EVEN")
-        {
-          intResult = std::count_if(polygons.begin(), polygons.end(), CountEven());
-        }
-        else if (arg == "ODD")
-        {
-          intResult = std::count_if(polygons.begin(), polygons.end(), CountOdd());
-        }
-        else
-        {
-          bool is_num = !arg.empty() && std::all_of(arg.begin(), arg.end(), ::isdigit);
-          if (is_num)
-          {
-            int num = std::stoi(arg);
-            if (num < 3)
-            {
-              invalid = true;
-            }
-            else
-            {
-              intResult = std::count_if(polygons.begin(), polygons.end(), CountNum(num));
-            }
-          }
-          else
-          {
-            invalid = true;
-          }
-        }
-      }
-      else if (cmd == "INTERSECTIONS")
-      {
-        std::string rest;
-        std::getline(iss, rest);
-        if (rest.empty())
-        {
-          invalid = true;
-        }
-        else
-        {
-          rest.erase(0, rest.find_first_not_of(' '));
-          Polygon query;
-          if (!parse_polygon(rest, query) || query.points.size() < 3)
-          {
-            invalid = true;
-          }
-          else
-          {
-            struct IntersectsWith
-            {
-              const Polygon& query;
-              explicit IntersectsWith(const Polygon& q):
-                query(q)
-              {}
-              bool operator()(const Polygon& p) const
-              {
-                return polygons_intersect(p, query);
-              }
-            };
-            intResult = polygons.empty() ? 0 : std::count_if(polygons.begin(), polygons.end(), IntersectsWith(query));
-          }
-        }
-      }
-      else if (cmd == "RMECHO")
-      {
-        std::string rest;
-        std::getline(iss, rest);
-        if (rest.empty())
-        {
-          invalid = true;
-        }
-        else
-        {
-          size_t pos = rest.find_first_not_of(' ');
-          if (pos != std::string::npos)
-          {
-            rest = rest.substr(pos);
-          }
-          Polygon query;
-          if (!parse_polygon(rest, query))
-          {
-            invalid = true;
-          }
-          else
-          {
-            EqualToQuery equal_to_query(query);
-            UniqueChecker unique_checker(query);
-
-            size_t initial_size = polygons.size();
-            auto new_end = std::unique(polygons.begin(), polygons.end(), unique_checker);
-            polygons.erase(new_end, polygons.end());
-            std::cout << (initial_size - polygons.size()) << "\n";
-            return;
-          }
-        }
-      }
-      else
-      {
-        invalid = true;
-      }
-      if (invalid)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
-      else if (printDouble)
-      {
-        std::cout << std::fixed << std::setprecision(1) << dblResult << "\n";
-      }
-      else
-      {
-        std::cout << intResult << "\n";
-      }
-    };
-  };
-  void process_commands(std::vector< Polygon >& polygons)
-  {
-    std::for_each(std::istream_iterator< Line >(std::cin), std::istream_iterator< Line >(), CommandProcessor(polygons));
+  void CommandProcessor::operator()(const std::string& line) const
+{
+  if (line.empty()) {
+    return;
   }
+
+  std::string::size_type spacePos = line.find(' ');
+  std::string cmd;
+  std::string rest;
+
+  if (spacePos == std::string::npos) {
+    cmd = line;
+  } else {
+    cmd = line.substr(0, spacePos);
+    rest = line.substr(spacePos + 1);
+  }
+
+  try {
+
+    std::map<std::string, void (CommandProcessor::*)(const std::string&) const> handlers = {
+      {"AREA", &CommandProcessor::command_area},
+      {"COUNT", &CommandProcessor::command_count},
+      {"MAX", &CommandProcessor::command_max},
+      {"MIN", &CommandProcessor::command_min},
+      {"INTERSECTIONS", &CommandProcessor::command_intersections},
+      {"RMECHO", &CommandProcessor::command_rmecho}
+    };
+
+    auto it = handlers.find(cmd);
+    if (it != handlers.end()) {
+      (this->*(it->second))(rest);
+    } else {
+      throw std::runtime_error("Unknown command");
+    }
+  }
+  catch (const std::exception&) {
+    std::cout << "<INVALID COMMAND>\n";
+  }
+}
+
+void CommandProcessor::command_count(const std::string& rest) const
+{
+    if (rest == "EVEN") {
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsEvenVertexCount()) << "\n";
+    }
+    else if (rest == "ODD") {
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), IsOddVertexCount()) << "\n";
+    }
+    else {
+        std::istringstream iss(rest);
+        size_t target;
+        if (!(iss >> target) || !iss.eof()) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        if (target < 3) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        std::cout << std::count_if(polygons_.begin(), polygons_.end(), HasVertexCount(target)) << "\n";
+    }
+}
+void CommandProcessor::command_area(const std::string& rest) const {
+    if (rest == "EVEN") {
+        EvenAreaAdder adder;
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+    }
+    else if (rest == "ODD") {
+        OddAreaAdder adder;
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+    }
+    else if (rest == "MEAN") {
+        if (polygons_.empty()) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        AreaAdder adder;
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << (adder.sum / polygons_.size()) << "\n";
+    }
+    else {
+        std::istringstream iss(rest);
+        size_t target;
+        if (!(iss >> target) || !iss.eof()) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        if (target < 3) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        VertexAreaAdder adder(target);
+        adder = std::for_each(polygons_.begin(), polygons_.end(), adder);
+        std::cout << std::fixed << std::setprecision(1) << adder.sum << "\n";
+    }
+}
+
+void CommandProcessor::command_max(const std::string& rest) const
+{
+  if (rest == "AREA") {
+  if (polygons_.empty()) {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
+    double max = compute_area(polygons_[0]);
+    if (polygons_.size() > 1) {
+      double area = compute_area(polygons_[1]);
+      if (area > max) max = area;
+    }
+    if (polygons_.size() > 2) {
+      double area = compute_area(polygons_[2]);
+      if (area > max) max = area;
+    }
+    if (polygons_.size() > 3) {
+      double area = compute_area(polygons_[3]);
+      if (area > max) max = area;
+    }
+    if (polygons_.size() > 4) {
+      double area = compute_area(polygons_[4]);
+      if (area > max) max = area;
+    }
+
+    std::cout << std::fixed << std::setprecision(1) << max << "\n";
+    return;
+  }
+
+  if (rest == "VERTEXES") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    size_t max = polygons_[0].points.size();
+    if (polygons_.size() > 1 && polygons_[1].points.size() > max) max = polygons_[1].points.size();
+    if (polygons_.size() > 2 && polygons_[2].points.size() > max) max = polygons_[2].points.size();
+    if (polygons_.size() > 3 && polygons_[3].points.size() > max) max = polygons_[3].points.size();
+    if (polygons_.size() > 4 && polygons_[4].points.size() > max) max = polygons_[4].points.size();
+
+    std::cout << max << "\n";
+    return;
+  }
+
+  throw std::runtime_error("Invalid command");
+}
+
+void CommandProcessor::command_min(const std::string& rest) const
+{
+  if (rest == "AREA") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    double min = compute_area(polygons_[0]);
+    if (polygons_.size() > 1) {
+      double area = compute_area(polygons_[1]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 2) {
+      double area = compute_area(polygons_[2]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 3) {
+      double area = compute_area(polygons_[3]);
+      if (area < min) min = area;
+    }
+    if (polygons_.size() > 4) {
+      double area = compute_area(polygons_[4]);
+      if (area < min) min = area;
+    }
+
+    std::cout << std::fixed << std::setprecision(1) << min << "\n";
+    return;
+  }
+
+  if (rest == "VERTEXES") {
+    if (polygons_.empty()) throw std::runtime_error("Invalid command");
+
+    size_t min = polygons_[0].points.size();
+    if (polygons_.size() > 1 && polygons_[1].points.size() < min) min = polygons_[1].points.size();
+    if (polygons_.size() > 2 && polygons_[2].points.size() < min) min = polygons_[2].points.size();
+    if (polygons_.size() > 3 && polygons_[3].points.size() < min) min = polygons_[3].points.size();
+    if (polygons_.size() > 4 && polygons_[4].points.size() < min) min = polygons_[4].points.size();
+
+    std::cout << min << "\n";
+    return;
+  }
+
+  throw std::runtime_error("Invalid command");
+}
+
+
+void CommandProcessor::command_intersections(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+
+  int count = 0;
+  if (polygons_.size() > 1 && polygons_intersect(polygons_[0], polygons_[1])) ++count;
+  if (polygons_.size() > 2 && polygons_intersect(polygons_[0], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[0], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[0], polygons_[4])) ++count;
+  if (polygons_.size() > 2 && polygons_intersect(polygons_[1], polygons_[2])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[1], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[1], polygons_[4])) ++count;
+  if (polygons_.size() > 3 && polygons_intersect(polygons_[2], polygons_[3])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[2], polygons_[4])) ++count;
+  if (polygons_.size() > 4 && polygons_intersect(polygons_[3], polygons_[4])) ++count;
+
+  std::cout << count << "\n";
+}
+
+void CommandProcessor::command_rmecho(const std::string& rest) const {
+  if (!rest.empty()) throw std::runtime_error("Unexpected argument");
+  if (polygons_.empty()) {
+    std::cout << "0\n";
+    return;
+  }
+
+  Polygon last = polygons_.back();
+  std::vector<Polygon> copy = polygons_;
+  process_rmecho(copy, last);
+}
 }
