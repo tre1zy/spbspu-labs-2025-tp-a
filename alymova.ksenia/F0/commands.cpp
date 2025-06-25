@@ -34,10 +34,6 @@ namespace
   {
     return p.first;
   }
-  WordSet returnTranslateSet(const std::pair< std::string, WordSet >& p)
-  {
-    return p.second;
-  }
   void unionLists(WordSet& list, const WordSet& unioned)
   {
     WordSet copy(unioned);
