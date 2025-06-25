@@ -197,7 +197,7 @@ namespace
 
   void encode_file_impl(str_t input_file, str_t output_file, const duhanina::CodeTable& table, std::ostream& out)
   {
-    std::ifstream in(input_file);
+    std::ifstream in(input_file, , std::ios::binary);
     if (!in)
     {
       throw std::runtime_error("FILE_NOT_FOUND");
@@ -323,8 +323,8 @@ void duhanina::encode_file_with_codes(str_t input_file, str_t output_file, str_t
 void duhanina::decode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
   validate_extension(codes_file, CODE_TABLE_EXT);
-  validate_extension(input_file, TEXT_EXT);
-  validate_extension(output_file, COMPRESSED_EXT);
+  validate_extension(input_file, COMPRESSED_EXT);
+  validate_extension(output_file, TEXT_EXT);
   CodeTable table = load_code_table(codes_file);
   decode_file_impl(input_file, output_file, table, out);
 }
@@ -345,8 +345,8 @@ void duhanina::encode_file(str_t input_file, str_t output_file, str_t encoding_i
 
 void duhanina::decode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
-  validate_extension(input_file, TEXT_EXT);
-  validate_extension(output_file, COMPRESSED_EXT);
+  validate_extension(input_file, COMPRESSED_EXT);
+  validate_extension(output_file, TEXT_EXT);
   auto it = encoding_store.find(encoding_id);
   if (it == encoding_store.end())
   {

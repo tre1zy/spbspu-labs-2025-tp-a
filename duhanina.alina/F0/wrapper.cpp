@@ -151,7 +151,7 @@ std::map< std::string, std::function< void() > > duhanina::initialize_commands(s
   commands["decode_file"] = std::bind(decode_file_wrapper, std::ref(in), std::ref(out));
   commands["compare"] = std::bind(compare_wrapper, std::ref(in), std::ref(out));
   commands["list_encodings"] = std::bind(list_encodings, std::ref(out));
-  commands["suggest_encodings"] = std::bind(suggest_encodings_wrapper, std::ref(in), std::ref(out));
-  commands["check_encoding"] = std::bind(check_encoding_wrapper, std::ref(in), std::ref(out));
+  commands["suggest"] = std::bind(suggest_encodings_wrapper, std::ref(in), std::ref(out));
+  commands["check"] = std::bind(check_encoding_wrapper, std::ref(in), std::ref(out));
   return commands;
 }

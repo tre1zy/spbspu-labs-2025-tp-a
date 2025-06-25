@@ -9,7 +9,7 @@ namespace
 {
   using namespace duhanina;
 
-  void delete_tree(duhanina::Node* node)
+  void delete_tree(Node* node)
   {
     if (node != nullptr)
     {
@@ -83,16 +83,20 @@ namespace
 
   std::vector< Node* > merge_nodes(Node* left, Node* right)
   {
-    std::vector< Node* > new_nodes;
-    if (left)
+    if (!left && !right)
     {
-      new_nodes.push_back(left);
+      return {};
     }
-    if (right)
+    if (!left)
     {
-      new_nodes.push_back(right);
+      return { right };
     }
-    return new_nodes;
+    if (!right)
+    {
+      return { left };
+    }
+    Node* root = new Node(left->freq + right->freq, left, right);
+    return { root };
   }
 }
 
@@ -311,6 +315,8 @@ void duhanina::BitWriter::flush()
   if (bit_pos_ > 0)
   {
     out_.put(buffer_);
+    buffer_ = 0;
+    bit_pos_ = 0;
   }
 }
 
@@ -427,7 +433,7 @@ duhanina::CharChecker::CharChecker(const std::map< char, std::string >& char_map
 
 bool duhanina::CharChecker::operator()(char c) const
 {
-  return char_to_code_ref_.find(c) == char_to_code_ref_.end();
+  return char_to_code_ref_.find(c) != char_to_code_ref_.end();
 }
 
 duhanina::CharInserter::CharInserter(std::set< char >& missing_set):
