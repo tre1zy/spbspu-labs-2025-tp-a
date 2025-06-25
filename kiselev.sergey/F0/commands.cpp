@@ -1,6 +1,7 @@
 #include "commands.hpp"
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <iterator>
 #include <numeric>
 #include <ostream>
@@ -10,6 +11,17 @@
 namespace
 {
   using osIt = std::ostream_iterator< std::string >;
+  template < typename Func >
+  struct AccumulateAdapter
+  {
+    Func func;
+    template <typename T>
+    T operator()(T, const kiselev::Dict::value_type& val) const
+    {
+      func(val);
+      return T();
+    }
+  };
   const std::string& extractDict(const kiselev::Dicts::value_type& val)
   {
     return val.first;
@@ -17,24 +29,23 @@ namespace
 
   struct WordPrinter
   {
-    std::ostream& out;
-    void operator()(const std::string& word)
+    std::ostream& operator()(std::ostream& os, const std::string& word)
     {
-      out << " " << word;
+      return os << " " << word;
     }
   };
 
   struct DictPrinter
   {
     std::ostream& out;
-    std::ostream& operator()(const kiselev::Dict::value_type& val) const
+    void operator()(const kiselev::Dict::value_type& val) const
     {
       out << val.first;
       if (!val.second.empty())
       {
-        std::copy(val.second.begin(), val.second.end(), std::ostream_iterator< std::string >(out, " "));
+        std::accumulate(val.second.begin(), val.second.end(), std::ref(out), WordPrinter{});
       }
-      return out << "\n";
+      out << "\n";
     }
   };
 
@@ -93,7 +104,8 @@ namespace
     return std::accumulate(dict2.begin(), dict2.end(), dict1, DictMerger{});
   }
 
-  struct LetterSearcher {
+  struct LetterSearcher
+  {
     const std::string& letters;
     std::ostream& out;
     bool operator()(bool found, const kiselev::Dict::value_type& val)
@@ -179,17 +191,6 @@ namespace
     }
   };
 
-  template <typename Func>
-  struct AccumulateAdapter
-  {
-    Func func;
-    template <typename T>
-    T operator()(T, const kiselev::Dict::value_type& val) const
-    {
-      func(val);
-      return T();
-    }
-  };
 }
 void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
 {
@@ -227,7 +228,7 @@ void kiselev::doAddElement(std::istream& in, std::ostream& out, Dicts& dicts)
     out << "<DICTIONARY NOT FOUND>\n";
     return;
   }
-  Dict dict = dictIt->second;
+  Dict& dict = dictIt->second;
   auto engIt = dict.find(eng);
   if (engIt == dict.end())
   {
@@ -252,7 +253,7 @@ void kiselev::doDeleteElement(std::istream& in, std::ostream& out, Dicts& dicts)
     out << "<DICTIONARY NOT FOUND>\n";
     return;
   }
-  Dict dict = dictIt->second;
+  Dict& dict = dictIt->second;
   auto engIt = dict.find(eng);
   if (engIt == dict.end())
   {
@@ -283,7 +284,7 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
     return;
   }
   out << nameDict << '\n';
-  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator< std::string >(out), DictPrinter{ out });
+  std::accumulate(dictIt->second.begin(), dictIt->second.end(), 0, AccumulateAdapter< DictPrinter >{ DictPrinter{ out } });
 }
 
 void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& dicts)
@@ -301,7 +302,7 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   auto engIt = dict.find(word);
   if (engIt != dict.cend())
   {
-    out << *engIt->second.begin();
+    out << *engIt->second.begin() << " ";
     std::copy(std::next(engIt->second.begin()), engIt->second.end(), std::ostream_iterator< std::string >(out, " "));
     out << "\n";
     return;
@@ -311,7 +312,7 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   std::accumulate(dict.begin(), dict.end(), 0, AccumulateAdapter< TranslationFinder >{ finder });
   if (!translations.empty())
   {
-    out << *translations.begin();
+    out << *translations.begin() << " ";
     std::copy(std::next(translations.begin()), translations.end(), std::ostream_iterator< std::string >(out, " "));
     out << "\n";
     return;
@@ -339,18 +340,21 @@ void kiselev::doUnionDict(std::istream& in, std::ostream& out, Dicts& dicts)
   }
   Dict res = unionTwoDict(first->second, second->second);
   std::string nextDict;
-  while (in >> nextDict)
+  if (in.get() != '\n')
   {
-    auto it = dicts.find(nextDict);
-    if (it == dicts.end())
+    while (in >> nextDict)
     {
-      out << "<DICTIONARY NOT FOUND>\n";
-      return;
-    }
-    res = unionTwoDict(res, it->second);
-    if (in.get() == '\n')
-    {
-      break;
+      if (in.get() == '\n')
+      {
+        break;
+      }
+      auto it = dicts.find(nextDict);
+      if (it == dicts.end())
+      {
+        out << "<DICTIONARY NOT FOUND>\n";
+        return;
+      }
+      res = unionTwoDict(res, it->second);
     }
   }
   dicts[nameNewDict] = res;
@@ -376,7 +380,7 @@ void kiselev::doSaveDict(std::istream& in, std::ostream& out, const Dicts& dicts
   file << dictName << "\n";
   Dict dict = dictIt->second;
   out << dictName << '\n';
-  std::transform(dictIt->second.begin(), dictIt->second.end(), std::ostream_iterator< std::string >(out), DictPrinter{ out });
+  std::accumulate(dictIt->second.begin(), dictIt->second.end(), 0, AccumulateAdapter< DictPrinter >{ DictPrinter{ file } });
   file << "\n";
 }
 
@@ -430,11 +434,15 @@ void kiselev::doLoadDict(std::istream& in, std::ostream& out, Dicts& dicts)
     std::string eng;
     while (file >> eng)
     {
-      std::vector<std::string> ruswords;
-      std::copy(std::istream_iterator<std::string>(file), std::istream_iterator<std::string>(), std::back_inserter(ruswords));
-      if (!ruswords.empty() && ruswords.back().back() == '\n')
+      std::vector< std::string > ruswords;
+      std::string rusword;
+      while (file >> rusword)
       {
-        ruswords.back().pop_back();
+        ruswords.push_back(rusword);
+        if (file.get() == '\n')
+        {
+          break;
+        }
       }
       dict[eng] = ruswords;
       if (file.get() == '\n')
@@ -497,18 +505,21 @@ void kiselev::doIntersectDict(std::istream& in, std::ostream& out, Dicts& dicts)
   }
   Dict res = intersectTwoDict(first->second, second->second);
   std::string nextDict;
-  while (in >> nextDict)
+  if (in.get() != '\n')
   {
-    auto it = dicts.find(nextDict);
-    if (it == dicts.end())
+    while (in >> nextDict)
     {
-      out << "<DICTIONARY NOT FOUND>\n";
-      return;
-    }
-    res = intersectTwoDict(res, it->second);
-    if (in.get() == '\n')
-    {
-      break;
+      if (in.get() == '\n')
+      {
+        break;
+      }
+      auto it = dicts.find(nextDict);
+      if (it == dicts.end())
+      {
+        out << "<DICTIONARY NOT FOUND>\n";
+        return;
+      }
+      res = intersectTwoDict(res, it->second);
     }
   }
   dicts[nameNewDict] = res;
