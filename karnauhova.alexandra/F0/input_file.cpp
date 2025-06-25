@@ -28,7 +28,8 @@ map_characters karnauhova::input_data(std::map< size_t, Character >& characters)
   map_characters players;
   clear_screen();
   std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
-  std::cout << "Привет!\n" << "Хотите продолжить прошлую или начать новую?\n" << "> NEW_GAME\n" << "> CONTINUE\n";
+  std::cout << "Привет!\n" << "Хотите продолжить прошлую или начать новую?\n"; 
+  std::cout << "> NEW_GAME\n" << "> CONTINUE\n";
   std::cout << "Пожалуйста выберите ответ(Если у вас нет прошлого сохранения выберите NEW_GAME)\n";
   std::string answer;
   bool end_input = false;

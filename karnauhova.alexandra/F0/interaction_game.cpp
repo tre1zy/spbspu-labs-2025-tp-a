@@ -69,7 +69,8 @@ void karnauhova::choice_characters(map_characters& players, const std::map< size
         std::cout << "\033[1;33m" << std::string(100, '=') << "\033[0m" << "\n";
         std::cout << "Доступные персонажи:\n";
         std::for_each(characters.begin(), characters.end(), std::bind(print_info, std::placeholders::_1));
-        std::cout << "\n" << "> GET_STORY <index> - более пожробная информация про персонажа\n" <<"> CHOOSE <index> - выбрать персонажа\n";
+        std::cout << "\n" << "> GET_STORY <index> - более пожробная информация про персонажа\n"; 
+        std::cout <<"> CHOOSE <index> - выбрать персонажа\n";
         std::string answer;
         if (!(std::cin >> answer))
         {
@@ -138,7 +139,8 @@ void karnauhova::fight(map_characters& players)
     std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
     std::cout << "-Бой-\n\n";
     std::cout << "Ход " << fight_queue.front().first << "\n";
-    std::cout << "Возможные действия:\n" << "> Ударить в голову(1)\n" << "> Ударить в туловище(2)\n" << "> Ударить в руку(3)\n" << "> Ударить в ногу(4)\n";
+    std::cout << "Возможные действия:\n" << "> Ударить в голову(1)\n" << "> Ударить в туловище(2)\n";
+    std::cout << "> Ударить в руку(3)\n" << "> Ударить в ногу(4)\n";
     std::cout << "Номер выбранного удара:\n";
     int option = 0;
     if (!(std::cin >> option) || option > 4 || option < 1)
@@ -160,7 +162,8 @@ void karnauhova::fight(map_characters& players)
       std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
       std::cout << "-Бой-\n\n";
       std::cout << "Защищается " << fight_queue.back().first << "\n";
-      std::cout << "Возможные действия:\n" << "> Защитить голову(1)\n" << "> Защитить туловище(2)\n" << "> Защитить руку(3)\n" << "> Защитить ногу(4)\n";
+      std::cout << "Возможные действия:\n" << "> Защитить голову(1)\n" << "> Защитить туловище(2)\n";
+      std::cout << "> Защитить руку(3)\n" << "> Защитить ногу(4)\n";
       std::cout << "Что будете защищать?(номер):\n";
       if (!(std::cin >> protection_option) || protection_option > 4 || protection_option < 1)
       {

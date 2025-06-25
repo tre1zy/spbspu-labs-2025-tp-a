@@ -34,5 +34,6 @@ void karnauhova::hello_world(std::map< std::string, Character >& players)
     throw std::logic_error("debils in play");
   }
   players[name2] = Character();
-  std::cout << "\n" << "Приятно познакомиться " <<  name1 << " и " << name2 << " ^^\n";
+  std::cout << "\n" << "Приятно познакомиться "; 
+  std::cout <<  name1 << " и " << name2 << " ^^\n";
 }
