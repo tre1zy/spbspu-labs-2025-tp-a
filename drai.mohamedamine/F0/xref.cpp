@@ -173,7 +173,7 @@ void printIndexRecursive(amine::Index::const_iterator it,
       return;
     }
 
-    const std::set<Position, positionLess>& positions = wordIt->second; 
+    const std::set<Position, positionLess>& positions = wordIt->second;
 
     std::function<void(std::set<Position>::const_iterator)> printRecursive;
     printRecursive = [&](std::set<Position>::const_iterator posIt)
@@ -210,7 +210,6 @@ void printIndexRecursive(amine::Index::const_iterator it,
     copyIndexWithOffset(result, second, offset);
     indexes_[newIndex] = result;
   }
-
   void CrossRefSystem::insertText(const std::string& newIndex,
                                  const std::string& baseIndex,
                                  const std::string& insertIndex,
@@ -225,7 +224,6 @@ void printIndexRecursive(amine::Index::const_iterator it,
       std::cout << "<WRONG INDEX>\n";
       return;
     }
-
     const Index& base = baseIt->second;
     const Index& toInsert = insertIt->second;
     Index result;
@@ -258,7 +256,6 @@ void printIndexRecursive(amine::Index::const_iterator it,
       std::cout << "<INVALID POSITION>\n";
       return;
     }
-
     Index before, after;
     std::function<void(Index::const_iterator)> split;
     split = [&](Index::const_iterator it)
@@ -300,16 +297,13 @@ void printIndexRecursive(amine::Index::const_iterator it,
       std::cout << "<WRONG INDEX>\n";
       return;
     }
-
     const Index& base = baseIt->second;
     Index result;
-
     if (startLine > endLine || (startLine == endLine && startCol > endCol))
     {
       std::cout << "<INVALID RANGE>\n";
       return;
     }
-
     std::function<void(Index::const_iterator)> extractRecursive;
     extractRecursive = [&](Index::const_iterator it)
     {
@@ -356,7 +350,6 @@ void printIndexRecursive(amine::Index::const_iterator it,
     copyRecursive = [&](Index::const_iterator iter)
     {
       if (iter == source.end()) return;
-
       const std::string& word = iter->first;
       const std::set<amine::Position, amine::positionLess>& positions = iter->second;
 
