@@ -5,11 +5,6 @@
 
 namespace karnauhova
 {
-    struct DelimiterIO
-  {
-    char exp;
-  };
-
   struct Character
   {
   public:
@@ -52,6 +47,5 @@ namespace karnauhova
   };
   std::istream& operator>>(std::istream& in, Character& pol);
   std::ostream& operator<<(std::ostream& out, const Character& character);
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 #endif
