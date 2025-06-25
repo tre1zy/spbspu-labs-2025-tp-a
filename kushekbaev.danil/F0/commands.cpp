@@ -174,193 +174,192 @@ namespace
 
     struct FileImporter
     {
-        std::ifstream& file;
-        dictionary_system& dicts;
-        std::string current_dict_name;
-        bool in_dict = false;
-        size_t line_count = 0;
-        void operator()()
+      std::ifstream& file;
+      dictionary_system& dicts;
+      std::string current_dict_name;
+      bool in_dict = false;
+      size_t line_count = 0;
+      void operator()()
+      {
+        std::string line;
+        while (std::getline(file, line))
         {
-            std::string line;
-            while (std::getline(file, line))
+          ++line_count;
+          auto start = line.find_first_not_of(" \r\n");
+          if (start == std::string::npos)
+          {
+            in_dict = false;
+            continue;
+          }
+          auto end = line.find_last_not_of(" \r\n");
+          std::string trimmed = line.substr(start, end - start + 1);
+          if (trimmed.size() > 2 && trimmed[0] == '[' && trimmed[trimmed.size()-1] == ']')
+          {
+            current_dict_name = trimmed.substr(1, trimmed.size()-2);
+            start = current_dict_name.find_first_not_of(" ");
+            end = current_dict_name.find_last_not_of(" ");
+            if (start != std::string::npos)
             {
-              ++line_count;
-              auto start = line.find_first_not_of(" \r\n");
-              if (start == std::string::npos)
-              {
-                in_dict = false;
-                continue;
-              }
-              auto end = line.find_last_not_of(" \r\n");
-              std::string trimmed = line.substr(start, end - start + 1);
-              if (trimmed.size() > 2 && trimmed[0] == '[' && trimmed[trimmed.size()-1] == ']')
-              {
-                  current_dict_name = trimmed.substr(1, trimmed.size()-2);
-                  start = current_dict_name.find_first_not_of(" ");
-                  end = current_dict_name.find_last_not_of(" ");
-                  if (start != std::string::npos)
-                  {
-                    current_dict_name = current_dict_name.substr(start, end - start + 1);
-                  }
-                  if (current_dict_name.empty())
-                  {
-                    throw std::runtime_error("Empty dictionary name at line " + std::to_string(line_count));
-                  }
-                  in_dict = true;
-                  continue;
-              }
-              if (in_dict && !current_dict_name.empty() && !trimmed.empty())
-              {
-                  auto tokens = split_line(trimmed);
-                  if (!tokens.empty())
-                  {
-                      std::string word = tokens[0];
-                      std::set< std::string > translations;
-                      
-                      if (tokens.size() > 1) {
-                          for (size_t i = 1; i < tokens.size(); ++i)
-                          {
-                            translations.insert(tokens[i]);
-                          }
-                      }
-                      dicts[current_dict_name][word].insert(translations.begin(), translations.end());
-                  }
-              }
+              current_dict_name = current_dict_name.substr(start, end - start + 1);
             }
+            if (current_dict_name.empty())
+            {
+              throw std::runtime_error("Empty dictionary name at line " + std::to_string(line_count));
+            }
+            in_dict = true;
+            continue;
+          }
+          if (in_dict && !current_dict_name.empty() && !trimmed.empty())
+          {
+            auto tokens = split_line(trimmed);
+            if (!tokens.empty())
+            {
+              std::string word = tokens[0];
+              std::set< std::string > translations;
+              if (tokens.size() > 1) {
+                for (size_t i = 1; i < tokens.size(); ++i)
+                {
+                  translations.insert(tokens[i]);
+                }
+              }
+              dicts[current_dict_name][word].insert(translations.begin(), translations.end());
+            }
+          }
         }
+      }
     };
 
     struct WordCollector
     {
-        const std::string& translation_to_find;
-        std::vector< std::string >& matching_words;
-        const dict_type& word_map;
-        void operator()()
+      const std::string& translation_to_find;
+      std::vector< std::string >& matching_words;
+      const dict_type& word_map;
+      void operator()()
+      {
+        for (const auto& entry : word_map)
         {
-            for (const auto& entry : word_map)
-            {
-              const std::string& word = entry.first;
-              const std::set< std::string >& translations = entry.second;
-              if (translations.find(translation_to_find) != translations.end())
-              {
-                  matching_words.push_back(word);
-              }
-            }
+          const std::string& word = entry.first;
+          const std::set< std::string >& translations = entry.second;
+          if (translations.find(translation_to_find) != translations.end())
+          {
+            matching_words.push_back(word);
+          }
         }
+      }
     };
 
     struct WordsPrinter
     {
-        std::ostream& out;
-        const std::vector< std::string >& words;
-        void operator()()
+      std::ostream& out;
+      const std::vector< std::string >& words;
+      void operator()()
+      {
+        for (size_t i = 0; i < words.size(); ++i)
         {
-            for (size_t i = 0; i < words.size(); ++i)
-            {
-              if (i > 0)
-              {
-                  out << ", ";
-              }
-              out << words[i];
-            }
+          if (i > 0)
+          {
+            out << ", ";
+          }
+          out << words[i];
         }
+      }
     };
 
     struct TranslationRemover
     {
-        const std::string& translation_to_delete;
-        std::vector< std::string >& words_to_erase;
-        size_t& removed_count;
-        dict_type& word_map;
-        void operator()()
+      const std::string& translation_to_delete;
+      std::vector< std::string >& words_to_erase;
+      size_t& removed_count;
+      dict_type& word_map;
+      void operator()()
+      {
+        for (auto it = word_map.begin(); it != word_map.end(); )
         {
-            for (auto it = word_map.begin(); it != word_map.end(); )
+          auto& translations = it->second;
+          if (translations.erase(translation_to_delete))
+          {
+            removed_count++;
+            if (translations.empty())
             {
-              auto& translations = it->second;
-              if (translations.erase(translation_to_delete))
-              {
-                  removed_count++;
-                  if (translations.empty())
-                  {
-                      words_to_erase.push_back(it->first);
-                      it = word_map.erase(it);
-                      continue;
-                  }
-              }
-              ++it;
+              words_to_erase.push_back(it->first);
+              it = word_map.erase(it);
+              continue;
             }
+          }
+          ++it;
         }
+      }
     };
 
     struct WordEraser
     {
-        dict_type& word_map;
-        const std::vector< std::string >& words_to_erase;
-        void operator()()
+      dict_type& word_map;
+      const std::vector< std::string >& words_to_erase;
+      void operator()()
+      {
+        for (const auto& word : words_to_erase)
         {
-            for (const auto& word : words_to_erase)
-            {
-              word_map.erase(word);
-            }
+          word_map.erase(word);
         }
+      }
     };
 
     struct WordFinder
     {
-        const std::string& translation_to_delete;
-        std::vector< std::string >& matching_words;
-        const dict_type& word_map;
-        void operator()()
+      const std::string& translation_to_delete;
+      std::vector< std::string >& matching_words;
+      const dict_type& word_map;
+      void operator()()
+      {
+        for (const auto& entry : word_map)
         {
-            for (const auto& entry : word_map)
-            {
-              const std::string& word = entry.first;
-              const std::set< std::string >& translations = entry.second;
-              if (translations.find(translation_to_delete) != translations.end())
-              {
-                  matching_words.push_back(word);
-              }
-            }
+          const std::string& word = entry.first;
+          const std::set< std::string >& translations = entry.second;
+          if (translations.find(translation_to_delete) != translations.end())
+          {
+              matching_words.push_back(word);
+          }
         }
+      }
     };
 
     struct ComplementWorker
     {
-        dict_type& new_dict;
-        const dict_type& dict1;
-        const dict_type& dict2;
-        void operator()()
+      dict_type& new_dict;
+      const dict_type& dict1;
+      const dict_type& dict2;
+      void operator()()
+      {
+        for (const auto& entry : dict1)
         {
-            for (const auto& entry : dict1)
-            {
-              const std::string& word = entry.first;
-              if (dict2.find(word) == dict2.end())
-              {
-                  new_dict.insert(entry);
-              }
-            }
+          const std::string& word = entry.first;
+          if (dict2.find(word) == dict2.end())
+          {
+              new_dict.insert(entry);
+          }
         }
+      }
     };
 
     struct IntersectWorker
     {
-        dict_type& new_dict;
-        const dict_type& dict1;
-        const dict_type& dict2;
-        void operator()()
+      dict_type& new_dict;
+      const dict_type& dict1;
+      const dict_type& dict2;
+      void operator()()
+      {
+        for (const auto& entry : dict1)
         {
-            for (const auto& entry : dict1)
-            {
-              const std::string& word = entry.first;
-              auto dict2_it = dict2.find(word);
-              if (dict2_it != dict2.end())
-              {
-                  auto& new_translations = new_dict[word];
-                  new_translations.insert(entry.second.begin(), entry.second.end());
-                  new_translations.insert(dict2_it->second.begin(), dict2_it->second.end());
-              }
-            }
+          const std::string& word = entry.first;
+          auto dict2_it = dict2.find(word);
+          if (dict2_it != dict2.end())
+          {
+              auto& new_translations = new_dict[word];
+              new_translations.insert(entry.second.begin(), entry.second.end());
+              new_translations.insert(dict2_it->second.begin(), dict2_it->second.end());
+          }
         }
+      }
     };
 }
 
@@ -390,19 +389,19 @@ void kushekbaev::insert_without_translation(std::ostream& out, std::istream& in,
 void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name;
-    in >> dictionary_name;
-    auto dict_it = current_dictionary_system.find(dictionary_name);
-    if (dict_it == current_dictionary_system.end())
-    {
-      throw std::out_of_range("<DICTIONARY NOT FOUND>");
-    }
-    auto& word_map = dict_it->second;
-    out << "In " << dictionary_name << ":\n";
-    if (!word_map.empty())
-    {
-      DictionaryPrinter printer{out, word_map};
-      printer();
-    }
+  in >> dictionary_name;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  auto& word_map = dict_it->second;
+  out << "In " << dictionary_name << ":\n";
+  if (!word_map.empty())
+  {
+    DictionaryPrinter printer{out, word_map};
+    printer();
+  }
 }
 
 void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -426,17 +425,17 @@ void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& 
 void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string filename;
-    in >> filename;
-    std::ofstream file(filename);
-    if (!file.is_open())
-    {
-      throw std::runtime_error("Cannot open/create your file!");
-    }
-    if (!current_dictionary_system.empty())
-    {
-      DictsSaver saver{file, current_dictionary_system};
-      saver();
-    }
+  in >> filename;
+  std::ofstream file(filename);
+  if (!file.is_open())
+  {
+    throw std::runtime_error("Cannot open/create your file!");
+  }
+  if (!current_dictionary_system.empty())
+  {
+    DictsSaver saver{file, current_dictionary_system};
+    saver();
+  }
   out << "Dictionary system successfully saved.\n";
 }
 
@@ -546,27 +545,18 @@ void kushekbaev::remove_translation_at_all(std::ostream& out, std::istream& in, 
 {
   std::string dictionary_name, translation_to_delete;
     in >> dictionary_name >> translation_to_delete;
-    
     auto dict_it = current_dictionary_system.find(dictionary_name);
     if (dict_it == current_dictionary_system.end())
     {
-        throw std::out_of_range("<DICTIONARY NOT FOUND>");
+      throw std::out_of_range("<DICTIONARY NOT FOUND>");
     }
-    
     std::vector< std::string > words_to_erase;
     size_t removed_count = 0;
-    
     if (!dict_it->second.empty())
     {
-        TranslationRemover remover{
-            translation_to_delete,
-            words_to_erase,
-            removed_count,
-            dict_it->second
-        };
-        remover();
+      TranslationRemover remover{ translation_to_delete, words_to_erase, removed_count, dict_it->second };
+      remover();
     }
-    
     if (removed_count == 0)
     {
         throw std::out_of_range("<TRANSLATION NOT FOUND>");
@@ -578,36 +568,27 @@ void kushekbaev::delete_all_translations(std::ostream& out, std::istream& in, di
 {
   std::string dictionary_name, translation_to_delete;
     in >> dictionary_name >> translation_to_delete;
-    
     auto dict_it = current_dictionary_system.find(dictionary_name);
     if (dict_it == current_dictionary_system.end())
     {
         throw std::out_of_range("<DICTIONARY NOT FOUND>");
     }
-    
     std::vector< std::string > matching_words;
-    
     if (!dict_it->second.empty())
     {
-        WordFinder finder{
-            translation_to_delete,
-            matching_words,
-            dict_it->second
-        };
-        finder();
+      WordFinder finder{ translation_to_delete, matching_words, dict_it->second };
+      finder();
     }
-    
     if (matching_words.empty())
     {
         throw std::out_of_range("<TRANSLATION NOT FOUND>");
     }
-    
     if (!matching_words.empty())
     {
-        for (const auto& word : matching_words)
-        {
-          dict_it->second.erase(word);
-        }
+      for (const auto& word : matching_words)
+      {
+        dict_it->second.erase(word);
+      }
     }
   out << std::string("Words with this translation deleted successfully.\n");
 }
@@ -751,16 +732,16 @@ void kushekbaev::merge(std::ostream& out, std::istream& in, dictionary_system& c
   auto first_dict_it = current_dictionary_system.find(first_dictionary);
   if (first_dict_it == current_dictionary_system.end())
   {
-      throw std::out_of_range("<FIRST DICTIONARY NOT FOUND>");
+    throw std::out_of_range("<FIRST DICTIONARY NOT FOUND>");
   }
   auto second_dict_it = current_dictionary_system.find(second_dictionary);
   if (second_dict_it == current_dictionary_system.end())
   {
-      throw std::out_of_range("<SECOND DICTIONARY NOT FOUND>");
+    throw std::out_of_range("<SECOND DICTIONARY NOT FOUND>");
   }
   if (current_dictionary_system.count(new_dictionary))
   {
-      throw std::runtime_error("<NEW DICTIONARY NAME ALREADY EXISTS>");
+    throw std::runtime_error("<NEW DICTIONARY NAME ALREADY EXISTS>");
   }
   auto& new_dict = current_dictionary_system[new_dictionary];
   for (const auto& entry : first_dict_it->second)
@@ -843,13 +824,13 @@ void kushekbaev::complement(std::ostream& out, std::istream& in, dictionary_syst
     auto dict2_it = current_dictionary_system.find(dict2_name);
     if (dict1_it == current_dictionary_system.end() || dict2_it == current_dictionary_system.end())
     {
-        throw std::out_of_range("<DICTIONARY NOT FOUND>");
+      throw std::out_of_range("<DICTIONARY NOT FOUND>");
     }
     if (dict1_name == dict2_name)
     {
-        current_dictionary_system[new_name] = {};
-        out << "Created empty dictionary (same dictionaries complemented)\n";
-        return;
+      current_dictionary_system[new_name] = {};
+      out << "Created empty dictionary (same dictionaries complemented)\n";
+      return;
     }
     auto& new_dict = current_dictionary_system[new_name] = {};
     const auto& dict1 = dict1_it->second;
