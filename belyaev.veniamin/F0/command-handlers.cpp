@@ -302,8 +302,9 @@ void belyaev::intersectDictionariesCmd(Dictionaries& data, std::istream& in, std
 void belyaev::deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::ostream& out)
 {
   size_t dictionariesAmount;
+  std::string dictionaryNew;
   
-  in >> dictionariesAmount;
+  in >> dictionariesAmount >> dictionaryNew;
   using istreamItStr = std::istream_iterator<std::string>;
   std::vector<std::string> dictNamesToProcess;
   std::copy_n(istreamItStr{in}, dictionariesAmount, std::back_inserter(dictNamesToProcess));
@@ -311,16 +312,31 @@ void belyaev::deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::
   {
     throw std::logic_error("Input failed in DELETE_INTERSECTIONS.");
   }
-  
+
   areAllNamesInDicts nameDictsTraversal(data, dictNamesToProcess);
   if (!nameDictsTraversal())
   {
-    out << "<ONE OF THE DICTIONARIES DOESN'T EXIST>\n";
+    out << "<ONE OF THE DICTIONARIES DOES NOT EXIST>\n";
     return;
   }
 
-  removeIntersectionsHelper remover(data, dictNamesToProcess);
-  std::for_each(dictNamesToProcess.begin(), dictNamesToProcess.end(), remover);
+  if (!dictNamesToProcess.empty())
+  {
+    std::string firstDictName = dictNamesToProcess[0];
+    Dictionary* firstDict = searchDictByName(data, firstDictName);
+    if (firstDict == nullptr)
+    {
+      out << "<ONE OF THE DICTIONARIES DOES NOT EXIST>\n";
+      return;
+    }
+
+    std::vector<std::string> otherDictNames(dictNamesToProcess.begin() + 1, dictNamesToProcess.end());
+
+    removeIntersectionsHelper remover(data, dictNamesToProcess);
+    remover(firstDictName);
+
+    data.dicts[dictionaryNew] = *firstDict;
+  }
 }
 
 void belyaev::helpCmd(std::ostream& out)
