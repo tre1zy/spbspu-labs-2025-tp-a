@@ -23,11 +23,11 @@ namespace
     return tokens;
   }
 }
-void kushekbaev::insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name, inputed_word, inputed_translation;
   in >> dictionary_name >> inputed_word >> inputed_translation;
-  auto& word_map = current_dictionary[dictionary_name];
+  auto& word_map = current_dictionary_system[dictionary_name];
   auto& translation_set = word_map[inputed_word];
   if (translation_set.count(inputed_translation))
   {
@@ -37,12 +37,12 @@ void kushekbaev::insert(std::ostream& out, std::istream& in, dictionary_system& 
   out << std::string("Translation inserted successfully.\n");
 }
 
-void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name;
   in >> dictionary_name;
-  auto dict_it = current_dictionary.find(dictionary_name);
-  if (dict_it == current_dictionary.end())
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
@@ -60,12 +60,12 @@ void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& c
   }
 }
 
-void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name, word_to_remove;
   in >> dictionary_name >> word_to_remove;
-  auto dict_it = current_dictionary.find(dictionary_name);
-  if (dict_it == current_dictionary.end())
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
@@ -78,7 +78,7 @@ void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& 
   out << std::string("Word with its translation successfully removed.\n");
 }
 
-void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string filename;
   in >> filename;
@@ -87,7 +87,7 @@ void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& cu
   {
     throw std::runtime_error("Cannot open/create your file!");
   }
-  for (const auto& dict_pair: current_dictionary)
+  for (const auto& dict_pair: current_dictionary_system)
   {
     const std::string& dict_name = dict_pair.first;
     const auto& word_map = dict_pair.second;
@@ -108,7 +108,7 @@ void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& cu
   out << "Dictionary system successfully saved.\n";
 }
 
-void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string filename;
   in >> filename;
@@ -118,7 +118,7 @@ void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictiona
     throw std::runtime_error("Cannot open your file!");
   }
   std::string line;
-  std::string current_dictionary_name;
+  std::string current_dictionary_system_name;
   size_t line_count = 0;
   bool in_dictionary = false;
   while (std::getline(file, line))
@@ -136,21 +136,21 @@ void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictiona
     {
       size_t start = 1;
       size_t end = trimmed_line.size() - 1;
-      current_dictionary_name = trimmed_line.substr(start, end - start);
-      start_pos = current_dictionary_name.find_first_not_of(" ");
-      end_pos = current_dictionary_name.find_last_not_of(" ");
+      current_dictionary_system_name = trimmed_line.substr(start, end - start);
+      start_pos = current_dictionary_system_name.find_first_not_of(" ");
+      end_pos = current_dictionary_system_name.find_last_not_of(" ");
       if (start_pos != std::string::npos)
       {
-        current_dictionary_name = current_dictionary_name.substr(start_pos, end_pos - start_pos + 1);
+        current_dictionary_system_name = current_dictionary_system_name.substr(start_pos, end_pos - start_pos + 1);
       }
-      if (current_dictionary_name.empty())
+      if (current_dictionary_system_name.empty())
       {
         throw std::runtime_error("Empty dictionary name at line " + std::to_string(line_count));
       }
       in_dictionary = true;
       continue;
     }
-    if (in_dictionary && !current_dictionary_name.empty())
+    if (in_dictionary && !current_dictionary_system_name.empty())
     {
       std::vector< std::string > tokens = split_line(trimmed_line);
       if (tokens.empty())
@@ -163,19 +163,19 @@ void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictiona
       {
         translations.insert(tokens[i]);
       }
-      auto& existing_translations = current_dictionary[current_dictionary_name][word];
+      auto& existing_translations = current_dictionary_system[current_dictionary_system_name][word];
       existing_translations.insert(translations.begin(), translations.end());
     }
   }
   out << "Successfully imported file.\n";
 }
 
-void kushekbaev::search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name, word_to_find;
   in >> dictionary_name >> word_to_find;
-  auto dict_it = current_dictionary.find(dictionary_name);
-  if (dict_it == current_dictionary.end())
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
@@ -193,17 +193,51 @@ void kushekbaev::search(std::ostream& out, std::istream& in, dictionary_system& 
   }
 }
 
-void kushekbaev::clear_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary)
+void kushekbaev::clear_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name;
   in >> dictionary_name;
-  auto dict_it = current_dictionary.find(dictionary_name);
-  if (dict_it == current_dictionary.end())
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
-  current_dictionary.erase(dict_it);
+  current_dictionary_system.erase(dict_it);
   out << "Dictionary successfully deleted\n";
+}
+
+void kushekbaev::reverse_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
+{
+  std::string dictionary_name, translation_to_find;
+  in >> dictionary_name >> translation_to_find;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  std::vector< std::string > matching_words;
+  for (const auto& word_pair : dict_it->second)
+  {
+    const std::string& word = word_pair.first;
+    const std::set<std::string>& translations = word_pair.second;
+    if (translations.find(translation_to_find) != translations.end())
+    {
+      matching_words.push_back(word);
+    }
+  }
+  if (matching_words.empty())
+  {
+    throw std::out_of_range("<TRANSLATION NOT FOUND>");
+  }
+  else
+  {
+    out << "Words with translation *" << translation_to_find << "*: " << matching_words[0];
+    for (size_t i = 1; i < matching_words.size(); ++i)
+    {
+      out << std::string(", ") << matching_words[i];
+    }
+    out << "\n";
+  }
 }
 
 void kushekbaev::print_help(std::ostream& out)

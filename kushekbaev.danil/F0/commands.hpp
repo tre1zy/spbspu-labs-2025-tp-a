@@ -10,25 +10,25 @@ namespace kushekbaev
 {
   using dictionary_system = std::unordered_map< std::string, std::unordered_map< std::string, std::set < std::string > > >;
 
-  void insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void print(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void remove(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void import_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void import_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
-  void clear_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary);
+  void clear_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
+
+  void reverse_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system);
 
   void remove_translation_at_all();
 
   void remove_translation();
-
-  void reverse_search();
 
   void merge();
 
@@ -56,3 +56,4 @@ namespace kushekbaev
 }
 
 #endif
+
