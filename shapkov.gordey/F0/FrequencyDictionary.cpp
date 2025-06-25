@@ -427,7 +427,7 @@ void shapkov::save(std::istream& in, std::ostream& out, const FrequencyDictionar
   out << "<SAVED SUCCESSFULLY>\n";
 }
 
-void shapkov::load(std::ostream& out, const std::string fileName, FrequencyDictionary& dict)
+void shapkov::load(std::ostream& out, const std::string& fileName, FrequencyDictionary& dict)
 {
   std::ifstream file(fileName);
   if (!file.is_open())
