@@ -3,16 +3,16 @@
 
 #include <iostream>
 #include <vector>
-#include "poligon.hpp"
+#include "polygon.hpp"
 
 namespace dribas
 {
-  void printArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
-  void printMax(const std::vector< Poligon >&, std::istream&, std::ostream&);
-  void printMin(const std::vector< Poligon >&, std::istream&, std::ostream&);
-  void printCount(const std::vector< Poligon >&, std::istream&, std::ostream&);
-  void printLessArea(const std::vector< Poligon >&, std::istream&, std::ostream&);
-  void printRightShapes(const std::vector< Poligon >&, std::ostream&);
+  void printArea(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void printMax(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void printMin(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void printCount(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void printLessArea(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void printRightShapes(const std::vector< Polygon >&, std::ostream&);
 }
 
 #endif

@@ -6,24 +6,21 @@
 #include <map>
 #include <functional>
 #include "printCmd.hpp"
-#include "poligon.hpp"
+#include "polygon.hpp"
 
 int main(int argc, char* argv[])
 {
   using namespace dribas;
-
   if (argc != 2) {
     std::cerr << "No parametrs found" << '\n';
     return 1;
   }
 
   std::ifstream file(argv[1]);
-  std::vector< dribas::Poligon > plgs;
-  while (!file.eof())
-  {
-    std::copy(std::istream_iterator< Poligon >(file), std::istream_iterator< Poligon >(), std::back_inserter(plgs));
-    if (!file)
-    {
+  std::vector< dribas::Polygon > plgs;
+  while (!file.eof()) {
+    std::copy(std::istream_iterator< Polygon >(file), std::istream_iterator< Polygon >(), std::back_inserter(plgs));
+    if (!file) {
       file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
@@ -42,7 +39,7 @@ int main(int argc, char* argv[])
     try {
       cmds.at(command)();
       std::cout << '\n';
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
