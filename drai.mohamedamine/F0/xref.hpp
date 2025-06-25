@@ -49,6 +49,8 @@ namespace amine
     std::map<std::string, Index> indexes_;
   };
 
+  void copyIndexWithOffset(Index& target, const Index& source, size_t lineOffset);
+  size_t getMaxLineRecursive(Index::const_iterator iter, Index::const_iterator end, size_t currentMax);
   std::ostream &operator<<(std::ostream &out, const Position &pos);
 }
 

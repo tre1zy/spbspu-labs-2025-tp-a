@@ -133,17 +133,15 @@ namespace amine
     printPositionsRecursive(std::next(it), end);
   }
 
-  void printIndexRecursive(std::map<std::string, std::set<amine::Position>>::const_iterator it,
-                           std::map<std::string, std::set<amine::Position>>::const_iterator end)
-  {
-    if (it == end) return;
-
-    std::cout << it->first << ":";
-    printPositionsRecursive(it->second.begin(), it->second.end());
-    std::cout << "\n";
-
-    printIndexRecursive(std::next(it), end);
-  }
+void printIndexRecursive(amine::Index::const_iterator it,
+                        amine::Index::const_iterator end)
+{
+  if (it == end) return;
+  std::cout << it->first << ":";
+  printPositionsRecursive(it->second.begin(), it->second.end());
+  std::cout << "\n";
+  printIndexRecursive(std::next(it), end);
+}
 
   void CrossRefSystem::printIndex(const std::string& indexName)
   {
@@ -158,7 +156,7 @@ namespace amine
     printIndexRecursive(index.begin(), index.end());
   }
 
-  void CrossRefSystem::getPositions(const std::string& indexName, const std::string& word) const
+  void CrossRefSystem::getPositions(const std::string& indexName, const std::string& word)
   {
     auto it = indexes_.find(indexName);
     if (it == indexes_.end())
