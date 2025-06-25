@@ -6,9 +6,8 @@
 #include <vector>
 #include <numeric>
 #include <functional>
-#include "guard.h"
-#include "Delimiter.h"
-
+#include <Delimiter.h>
+#include <guard.h>
 namespace
 {
   struct AreaCalculator

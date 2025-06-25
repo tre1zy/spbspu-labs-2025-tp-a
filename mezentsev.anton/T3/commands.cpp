@@ -8,7 +8,7 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
-#include "guard.h"
+#include <guard.h>
 #include "Polygon.h"
 
 namespace
