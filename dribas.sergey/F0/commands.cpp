@@ -7,6 +7,8 @@
 #include <delimiter.hpp>
 
 #include "survival.hpp"
+#include "rest_time.hpp"
+#include "race_predictor.hpp"
 
 namespace
 {
@@ -179,8 +181,11 @@ namespace
 
 void dribas::add_training_from_file(std::istream& in, std::ostream& out, suite& trainng)
 {
+  std::string name;
+  in >> name;
+  std::ifstream file(name);
   workout training;
-  in >> training;
+  file >> training;
   if (!in && !in.eof()) {
     throw std::invalid_argument("invalid file name");
   }
@@ -464,4 +469,54 @@ void dribas::survival_score(std::ostream& out, const suite& suites) {
   }
 }
 
+void dribas::show_rest(std::istream& in, std::ostream& out, const suite& suites) {
+  out << "Enter date (YYYY-MM-DD): ";
+  unsigned int year, month, day;
+  in >> year >> DelimiterI{'-'} >> month >> DelimiterI{'-'} >> day;
+  if (!in) {
+    throw std::invalid_argument("Invalid date format. Please use YYYY-MM-DD");
+  }
+  time_t date = parse_date(year, month, day);
+  time_t next_day = date + 86400;
+  const auto& main_suite = suites.at(1);
+  auto range_start = main_suite.lower_bound(date);
+  auto range_end = main_suite.lower_bound(next_day);
+  if (range_start == range_end) {
+    out << "  No workouts found for specified date.\n";
+    return;
+  }
+  int total_recovery = std::accumulate(range_start, range_end, 0, calculate_workout_recovery);
+
+  StreamGuard guard(out);
+  struct tm* date_info = localtime(&date);
+  
+  out << "\n=== Recovery Time Estimation ===\n";
+  out << "  Date: " << std::put_time(date_info, "%Y-%m-%d") << "\n";
+  out << "  Number of workouts: " << std::distance(range_start, range_end) << "\n";
+  out << "  Total recovery points: " << total_recovery << "\n";
+  out << "  Estimated recovery time: " << (total_recovery / 60) << " hours ";
+  out << (total_recovery % 60) << " minutes\n\n";
+  out << "  Recovery recommendations:\n";
+
+  if (total_recovery < 1440) {
+    out << "  - Light activity tomorrow\n";
+  } else if (total_recovery < 2880) {
+    out << "  - Rest day or cross-training\n" << "  - Focus on hydration\n";
+  } else {
+    int days = total_recovery / 1440;
+    out << "  - Full rest for " << days << " days\n";
+    out << "  - Protein-rich nutrition\n";
+    out << "  - Consider massage\n";
+  }
+  if (total_recovery > 5000) {
+    out << "  - Warning: Extreme load detected!\n";
+    out << "  - Mandatory rest day\n";
+  }
+}
+
+void dribas::predict_result(std::ostream& out, const suite& tren)
+{
+  auto prediction = predict_result(tren.at(1));
+  out << prediction << '\n';
+}
 

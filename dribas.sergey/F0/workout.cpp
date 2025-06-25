@@ -47,9 +47,7 @@ namespace dribas
   {
     workout result;
     boost::property_tree::ptree pt;
-    
     std::stringstream ss(gpxContent);
-    
     try {
       boost::property_tree::read_xml(ss, pt);
     } catch (const boost::property_tree::xml_parser_error& e) {
@@ -187,7 +185,7 @@ namespace dribas
     }
     dribas::StreamGuard guard(is);
     is.unsetf(std::ios_base::skipws);
-    std::string gpxContent((std::istreambuf_iterator< char >(is)), std::istreambuf_iterator< char >());
+    std::string gpxContent;
     w = parseGpx(gpxContent);
     return is;
   }
