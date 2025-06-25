@@ -5,13 +5,32 @@
 #include <vector>
 #include "polygon.hpp"
 
-void readAndProcess(std::istream& in, amine::CommandProcessor& processor)
+namespace amine
 {
-  std::string line;
-  if (!std::getline(in, line)) return;
-  processor(line);
-  readAndProcess(in, processor);
+  void readAndProcess(std::istream& in, CommandProcessor& processor)
+  {
+    std::string line;
+    if (!std::getline(in, line))
+      return;
+    processor(line);
+    readAndProcess(in, processor);
+  }
+
+  void readPolygons(std::istream& in, std::vector< Polygon >& polygons)
+  {
+    std::string line;
+    if (!std::getline(in, line))
+      return;
+
+    Polygon poly;
+    if (!line.empty() && parse_polygon(line, poly) && poly.points.size() >= 3)
+    {
+      polygons.push_back(poly);
+    }
+    readPolygons(in, polygons);
+  }
 }
+
 int main(int argc, char* argv[])
 {
   if (argc < 2)
@@ -28,44 +47,9 @@ int main(int argc, char* argv[])
   }
 
   std::vector< amine::Polygon > polygons;
-  std::string line;
-  amine::Polygon poly;
-
-  std::getline(infile, line);
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
-  std::getline(infile, line);
-  poly = amine::Polygon{};
-  if (!line.empty() && amine::parse_polygon(line, poly) && poly.points.size() >= 3)
-  {
-    polygons.push_back(poly);
-  }
+  amine::readPolygons(infile, polygons);
 
   amine::CommandProcessor processor(polygons);
-
-readAndProcess(std::cin, processor);
+  amine::readAndProcess(std::cin, processor);
   return 0;
 }
