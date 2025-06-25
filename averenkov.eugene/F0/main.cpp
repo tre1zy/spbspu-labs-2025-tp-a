@@ -5,7 +5,7 @@
 
 int main()
 {
-  std::map<std::string, std::function< void(averenkov::Base& , const std::vector< std::string >&) > > commands;
+  std::map< std::string, std::function< void(averenkov::Base& , const std::vector< std::string >&) > > commands;
   commands["add"] = averenkov::addItem;
   commands["remove"] = averenkov::removeItem;
   commands["edit"] = averenkov::editItem;
@@ -26,35 +26,42 @@ int main()
   commands["load"] = averenkov::loadFromFile;
 
   averenkov::Base base;
-
   std::string line;
-  while(std::getline(std::cin, line))
-  {
-    std::vector<std::string> args;
-    std::istringstream iss(line);
-    std::string arg;
-    while(iss >> arg)
-    {
-      args.push_back(arg);
-    }
 
-    if(args.empty()) continue;
+  while (std::getline(std::cin, line))
+  {
+    if (line.empty())
+    {
+      continue;
+    }
+    std::vector< std::string > args;
+    size_t start = 0;
+    size_t end = line.find(' ');
+
+    args.push_back(line.substr(0, end));
+
+    while (end != std::string::npos)
+    {
+      start = end + 1;
+      end = line.find(' ', start);
+      args.push_back(line.substr(start, end - start));
+    }
 
     try
     {
       auto it = commands.find(args[0]);
-      if(it != commands.end())
+      if (it != commands.end())
       {
         it->second(base, args);
       }
       else
       {
-        std::cerr << "Unknown command: " << args[0] << std::endl;
+        std::cerr << "Unknown command: " << args[0] << "\n";
       }
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
-      std::cerr << "Error: " << e.what() << std::endl;
+      std::cerr << "Error: " << e.what() << "\n";
     }
   }
 

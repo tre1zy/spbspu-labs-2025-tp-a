@@ -1,7 +1,7 @@
+#include "commands.hpp"
 #include <iostream>
 #include <fstream>
 #include <numeric>
-#include "commands.hpp"
 
 bool averenkov::ItemFinder::operator()(const Item& item) const
 {
@@ -13,12 +13,12 @@ bool averenkov::ItemFinderPtr::operator()(const Item* item) const
   return item->getName() == name;
 }
 
-bool averenkov::KitFinder::operator()(const std::pair<const std::string, Kit>& kit) const
+bool averenkov::KitFinder::operator()(const std::pair< const std::string, Kit >& kit) const
 {
   return kit.first == name;
 }
 
-void averenkov::KitItemRemover::operator()(std::pair<const std::string, Kit>& kit) const
+void averenkov::KitItemRemover::operator()(std::pair< const std::string, Kit >& kit) const
 {
   kit.second.removeItem(name);
 }
@@ -68,7 +68,7 @@ void averenkov::KitItemPrinter::operator()(const Item* item) const
   out << "    - " << item->getName() << "\n";
 }
 
-void averenkov::KitPrinter::operator()(const std::pair<const std::string, Kit>& kit_pair) const
+void averenkov::KitPrinter::operator()(const std::pair< const std::string, Kit >& kit_pair) const
 {
   out << "Kit: " << kit_pair.first << "\n";
   out << "  Items:\n";
@@ -76,14 +76,13 @@ void averenkov::KitPrinter::operator()(const std::pair<const std::string, Kit>& 
   std::for_each(its.begin(), its.end(), KitItemPrinter{ out });
 }
 
-void averenkov::KnapsackPrinter::operator()(const std::pair<const std::string, Knapsack>& knapsack_pair) const
+void averenkov::KnapsackPrinter::operator()(const std::pair< const std::string, Knapsack >& knapsack_pair) const
 {
   out << "Knapsack: " << knapsack_pair.first;
   out << ", Capacity: " << knapsack_pair.second.getCapacity() << "\n";
 }
 
-// 1. add <name> <weight> <value>
-void averenkov::addItem(Base& base, const std::vector<std::string>& args)
+void averenkov::addItem(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 4)
   {
@@ -98,8 +97,7 @@ void averenkov::addItem(Base& base, const std::vector<std::string>& args)
   base.items.emplace_back(args[1], std::stoi(args[2]), std::stoi(args[3]));
 }
 
-// 2. remove <name>
-void averenkov::removeItem(Base& base, const std::vector<std::string>& args)
+void averenkov::removeItem(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 2)
   {
@@ -116,8 +114,7 @@ void averenkov::removeItem(Base& base, const std::vector<std::string>& args)
   base.items.erase(it);
 }
 
-// 3. edit <name> <new_weight> <new_value>
-void averenkov::editItem(Base& base, const std::vector<std::string>& args)
+void averenkov::editItem(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 4)
   {
@@ -134,8 +131,7 @@ void averenkov::editItem(Base& base, const std::vector<std::string>& args)
   it->setValue(std::stoi(args[3]));
 }
 
-// 4. add_kit <kit_name>
-void averenkov::addKit(Base& base, const std::vector<std::string>& args)
+void averenkov::addKit(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 2)
   {
@@ -150,8 +146,7 @@ void averenkov::addKit(Base& base, const std::vector<std::string>& args)
   base.kits.emplace(args[1], Kit(args[1]));
 }
 
-// 5. remove_kit <kit_name>
-void averenkov::removeKit(Base& base, const std::vector<std::string>& args)
+void averenkov::removeKit(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 2)
   {
@@ -164,8 +159,7 @@ void averenkov::removeKit(Base& base, const std::vector<std::string>& args)
   }
 }
 
-// 6. add_to_kit <kit_name> <item_name>
-void averenkov::addToKit(Base& base, const std::vector<std::string>& args)
+void averenkov::addToKit(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 3)
   {
@@ -196,8 +190,7 @@ void averenkov::addToKit(Base& base, const std::vector<std::string>& args)
   kit_it->second.addItem(std::addressof(*item_it));
 }
 
-// 7. remove_from_kit <kit_name> <item_name>
-void averenkov::removeFromKit(Base& base, const std::vector<std::string>& args)
+void averenkov::removeFromKit(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 3)
   {
@@ -221,8 +214,7 @@ void averenkov::removeFromKit(Base& base, const std::vector<std::string>& args)
   kit_it->second.removeItem(args[2]);
 }
 
-// 8. add_knapsack <knapsack_name> <capacity>
-void averenkov::addKnapsack(Base& base, const std::vector<std::string>& args)
+void averenkov::addKnapsack(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 3)
   {
@@ -237,8 +229,7 @@ void averenkov::addKnapsack(Base& base, const std::vector<std::string>& args)
   base.knapsacks.emplace(args[1], Knapsack(std::stoi(args[2])));
 }
 
-// 9. set_knapsack <knapsack_name>
-void averenkov::setKnapsack(Base& base, const std::vector<std::string>& args)
+void averenkov::setKnapsack(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 2)
   {
@@ -253,8 +244,7 @@ void averenkov::setKnapsack(Base& base, const std::vector<std::string>& args)
   base.current_knapsack = base.knapsacks.find(args[1])->second;
 }
 
-// 11. stats
-void averenkov::showStats(const Base& base, const std::vector<std::string>& args)
+void averenkov::showStats(const Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 1)
   {
@@ -270,8 +260,7 @@ void averenkov::showStats(const Base& base, const std::vector<std::string>& args
   std::cout << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
 }
 
-// 12. reset
-void averenkov::reset(Base& base, const std::vector<std::string>& args)
+void averenkov::reset(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 1)
   {
@@ -282,11 +271,7 @@ void averenkov::reset(Base& base, const std::vector<std::string>& args)
   base.knapsacks.clear();
 }
 
-
-// 16. branch_and_bound
-
-// 17. save
-void averenkov::saveToFile(const Base& base, const std::vector<std::string>& args)
+void averenkov::saveToFile(const Base& base, const std::vector< std::string >& args)
 {
   if (args.size() < 2)
   {
@@ -312,9 +297,7 @@ void averenkov::saveToFile(const Base& base, const std::vector<std::string>& arg
   out << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
 }
 
-
-// 18. load
-void averenkov::loadFromFile(Base& base, const std::vector<std::string>& args)
+void averenkov::loadFromFile(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() < 2)
   {

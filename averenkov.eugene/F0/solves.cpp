@@ -272,7 +272,7 @@ void averenkov::solve(Base& base, vec_st args)
     bruteforce(base, args);
     return;
   }
-  dynamicProgrammingSolve(base, args);
+  branchAndBoundSolve(base, args);
 }
 
 
