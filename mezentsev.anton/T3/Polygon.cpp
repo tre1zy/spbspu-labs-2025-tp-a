@@ -7,7 +7,7 @@
 #include <numeric>
 #include <functional>
 #include <Delimiter.h>
-#include <guard.h>
+#include <Guard.h>
 namespace
 {
   struct AreaCalculator
