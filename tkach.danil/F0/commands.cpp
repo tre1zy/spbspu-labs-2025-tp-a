@@ -127,6 +127,25 @@ namespace
     {}
     void operator()(const std::pair< const std::string, std::list< std::string > >& pair) const
     {
+      out << pair.first << " " << pair.second.size();
+      if (!pair.second.empty())
+      {
+        std::for_each(pair.second.cbegin(), pair.second.cend(), PrintStringWithLeadingSpace{out});
+      }
+      out << "\n";
+    }
+  private:
+    std::ostream& out;
+  };
+
+  class WriteWordEntryWithoutSize
+  {
+  public:
+    WriteWordEntryWithoutSize(std::ostream& os):
+      out(os)
+    {}
+    void operator()(const std::pair< const std::string, std::list< std::string > >& pair) const
+    {
       out << pair.first;
       if (!pair.second.empty())
       {
@@ -140,7 +159,7 @@ namespace
 
   void writeDictToFile(std::ostream& out, const std::string& dict_name, const tree_of_words& dict)
   {
-    out << dict_name << "\n";
+    out << dict_name << " " << dict.size() << "\n";
     std::for_each(dict.cbegin(), dict.cend(), WriteWordEntry{out});
   }
 
@@ -148,7 +167,7 @@ namespace
   {
     if (source_dicts.empty())
     {
-      throw std::logic_error("EMPTY");
+      return tree_of_words{};
     }
     return std::accumulate(source_dicts.cbegin(), source_dicts.cend(), tree_of_words{}, AccumulateDicts{});
   }
@@ -219,10 +238,6 @@ namespace
     {
       throw std::logic_error("<EXPORT FAILED>");
     }
-    if (mode == std::ios_base::app)
-    {
-      outFile << "\n";
-    }
     if (number_of_dictionaries == 0)
     {
       if (avltree.empty())
@@ -259,9 +274,9 @@ namespace
       auto it = source_dict_.find(dict_name);
       if (it == source_dict_.end())
       {
-        throw std::logic_error("<INVALID IMPORT>");
+        throw std::logic_error("<INVALID IMPORT3>");
       }
-      target_avltree_[dict_name] = source_dict_.at(dict_name);
+      target_avltree_[dict_name] = mergeDicts({&source_dict_.at(dict_name), &target_avltree_[dict_name]});
     }
   private:
     tree_of_dict& target_avltree_;
@@ -279,7 +294,7 @@ namespace
       out_ << dict_pair.first << "\n";
       if (!dict_pair.second.empty())
       {
-        std::for_each(dict_pair.second.cbegin(), dict_pair.second.cend(), WriteWordEntry{out_});
+        std::for_each(dict_pair.second.cbegin(), dict_pair.second.cend(), WriteWordEntryWithoutSize{out_});
       }
     }
   private:
@@ -298,12 +313,9 @@ namespace
       auto it2 = dict_pair.second.find(eng_word_);
       if (it2 != dict_pair.second.end())
       {
-        if (!findTranslation(it2->second, translation_))
-        {
-          std::list<std::string> new_translations_list;
-          new_translations_list.push_back(translation_);
-          it2->second = mergeTranslations(it2->second, new_translations_list);
-        }
+        std::list< std::string > new_translations_list;
+        new_translations_list.push_back(translation_);
+        it2->second = mergeTranslations(it2->second, new_translations_list);
       }
     }
   private:
@@ -532,11 +544,115 @@ namespace
     const std::string& translation_;
     std::set< std::string >& tree_word_;
   };
+
+  struct WordEntry
+  {
+    std::string eng_word;
+    std::list< std::string > translations;
+  };
+
+  std::istream& operator>>(std::istream& in, WordEntry& entry)
+  {
+    std::istream::sentry s(in);
+    if (!s)
+    {
+      return in;
+    }
+    int count = 0;
+    if (!(in >> entry.eng_word))
+    {
+      return in;
+    }
+    if (!(in >> count) || count < 0)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    entry.translations.clear();
+    std::copy_n(std::istream_iterator< std::string >{in}, count, std::back_inserter(entry.translations));
+    return in;
+  }
+
+  struct FileDictionaryBlock
+  {
+    std::string name;
+    tree_of_words dictionary;
+  };
+
+  class InsertAndMergeWordEntry
+  {
+  public:
+    InsertAndMergeWordEntry(tree_of_words& dict):
+      target_map_(&dict)
+    {}
+    void operator()(const WordEntry& entry) const
+    {
+      (*target_map_)[entry.eng_word] = mergeTranslations((*target_map_)[entry.eng_word], entry.translations);
+    }
+  private:
+    tree_of_words* target_map_;
+  };
+
+  std::istream& operator>>(std::istream& in, FileDictionaryBlock& block)
+  {
+    std::istream::sentry s(in);
+    if (!s)
+    {
+      return in;
+    }
+    int count_words = 0;
+    if (!(in >> block.name))
+    {
+      return in;
+    }
+    if (!(in >> count_words) || count_words < 0)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    block.dictionary.clear();
+    std::vector< WordEntry > temp_word_entries;
+    std::copy_n(std::istream_iterator< WordEntry >(in), count_words, std::back_inserter(temp_word_entries));
+    if (temp_word_entries.size() != static_cast< size_t >(count_words))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    std::for_each(temp_word_entries.begin(), temp_word_entries.end(), InsertAndMergeWordEntry{block.dictionary});
+    return in;
+  }
+
+  class CollectAndMergeFileDictionaries
+  {
+  public:
+    explicit CollectAndMergeFileDictionaries(tree_of_dict& dicts):
+      target_dicts_(&dicts)
+    {}
+    void operator()(const FileDictionaryBlock& block) const
+    {
+      (*target_dicts_)[block.name] = mergeDicts({&block.dictionary, &(*target_dicts_)[block.name]});
+    }
+  private:
+    tree_of_dict* target_dicts_;
+  };
+
+  class ApplyAllDicts
+  {
+  public:
+    explicit ApplyAllDicts(tree_of_dict& dicts):
+      target_dicts_(&dicts)
+    {}
+    void operator()(const std::pair< const std::string, tree_of_words >& pair) const
+    {
+      (*target_dicts_)[pair.first] = mergeDicts({&pair.second, &(*target_dicts_)[pair.first]});
+    }
+  private:
+    tree_of_dict* target_dicts_;
+  };
 }
 
 void tkach::import(std::istream& in, tree_of_dict& avltree)
 {
-  tree_of_dict temp(avltree);
   std::string file_name = "";
   int count_of_dict = 0;
   if (!(in >> file_name))
@@ -546,63 +662,32 @@ void tkach::import(std::istream& in, tree_of_dict& avltree)
   std::fstream in2(file_name);
   if (!in2.is_open())
   {
-    throw std::logic_error("<INVALID IMPORT>");
+    throw std::logic_error("<INVALID IMPORT1>");
   }
   if (!(in >> count_of_dict) || count_of_dict < 0)
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
-  std::vector< std::string > main_name_dict(count_of_dict);
-  if (count_of_dict > 0)
+  using istreamIt = std::istream_iterator< FileDictionaryBlock >;
+  tree_of_dict imported_dictionaries;
+  std::for_each(istreamIt{in2}, istreamIt{}, CollectAndMergeFileDictionaries(imported_dictionaries));
+  if (!in2.eof() && in2.fail())
   {
+    throw std::logic_error("<INVALID IMPORT2>");
+  }
+  if (count_of_dict != 0)
+  {
+    std::vector< std::string > main_name_dict(count_of_dict);
     std::copy_n(std::istream_iterator< std::string >{in}, count_of_dict, main_name_dict.begin());
     if (std::any_of(main_name_dict.begin(), main_name_dict.end(), IsStringEmpty{}))
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
     }
-  }
-  std::string name_of_dict = "";
-  while (in2 >> name_of_dict)
-  {
-    if (name_of_dict.empty())
-    {
-      continue;
-    }
-    tree_of_words temp_dict;
-    std::string eng_word;
-    while (in2 >> eng_word)
-    {
-      std::list< std::string > translations;
-      std::string translation;
-      while (in2 >> translation)
-      {
-        translations.push_back(translation);
-        if (in2.peek() == '\n')
-        {
-          in2.get();
-          break;
-        }
-      }
-      temp_dict[eng_word] = mergeTranslations(translations, temp_dict[eng_word]);
-      if (in2.peek() == '\n')
-      {
-        in2.get();
-        break;
-      }
-    }
-    temp[name_of_dict] = mergeDicts({&temp_dict, &temp[name_of_dict]});
-  }
-  if (!in2.eof())
-  {
-    throw std::logic_error("<INVALID IMPORT>");
-  }
-  if (count_of_dict != 0)
-  {
-    std::for_each(main_name_dict.cbegin(), main_name_dict.cend(), ImportDictProcessor{avltree, temp});
+    std::for_each(main_name_dict.cbegin(), main_name_dict.cend(), ImportDictProcessor{avltree, imported_dictionaries});
   }
   else
-  {
-    avltree = std::move(temp);
+  { 
+    std::for_each(imported_dictionaries.cbegin(), imported_dictionaries.cend(), ApplyAllDicts{avltree});
   }
 }
 
@@ -786,12 +871,9 @@ void tkach::addTranslation(std::istream& in, tree_of_dict& avltree)
     {
       throw std::logic_error("<INVALID WORD>");
     }
-    if (!findTranslation(it2->second, translation))
-    {
-      std::list<std::string> new_translations_list;
-      new_translations_list.push_back(translation);
-      it2->second = mergeTranslations(it2->second, new_translations_list);
-    }
+    std::list< std::string > new_translations_list;
+    new_translations_list.push_back(translation);
+    it2->second = mergeTranslations(it2->second, new_translations_list);
   }
   else
   {
@@ -1103,7 +1185,7 @@ void tkach::printEngWordsWithTraslation(std::istream& in, std::ostream& out, con
   }
   std::set< std::string > tree_word;
   std::vector< std::string > dict_names(number_of_dictionaries);
-  std::copy_n(std::istream_iterator< std::string >(in), number_of_dictionaries, dict_names.begin());
+  std::copy_n(std::istream_iterator< std::string >{in}, number_of_dictionaries, dict_names.begin());
   if (dict_names.size() != static_cast< size_t >(number_of_dictionaries))
   {
     throw std::logic_error("<INVALID ARGUMENTS>");
