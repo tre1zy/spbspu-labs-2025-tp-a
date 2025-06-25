@@ -7,8 +7,8 @@
 
 namespace belyaev
 {
-  void areaOdd(const std::vector< Polygon >& data, std::ostream& out);
-  void areaEven(const std::vector< Polygon >& data, std::ostream& out);
+  template< typename Pred >
+  void areaOddEven(const std::vector< Polygon >& data, std::ostream& out, Pred predicate);
   void areaMean(const std::vector< Polygon >& data, std::ostream& out);
   void areaVertices(const std::vector< Polygon >& data, std::ostream& out, size_t vertices);
   void area(const std::vector< Polygon >& data, std::istream& in, std::ostream& out);

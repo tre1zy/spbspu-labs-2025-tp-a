@@ -1,18 +1,16 @@
 #include "command-handlers.hpp"
 #include <stream-guard.hpp>
 
-void belyaev::areaOdd(const std::vector< Polygon >& data, std::ostream& out)
+template< typename Pred >
+void belyaev::areaOddEven(const std::vector< Polygon >& data, std::ostream& out, Pred predicate)
 {
-  using namespace std::placeholders;
-  auto areaOddAccumBind = std::bind(areaOddAccumulate, _1, _2);
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaOddAccumBind), out);
-}
+  std::vector< double > areas;
+  std::vector< Polygon> polysByPredicate;
 
-void belyaev::areaEven(const std::vector< Polygon >& data, std::ostream& out)
-{
-  using namespace std::placeholders;
-  auto areaEvenAccumBind = std::bind(areaEvenAccumulate, _1, _2);
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaEvenAccumBind), out);
+  std::copy_if(data.begin(), data.end(), std::back_inserter(polysByPredicate), predicate);
+  std::transform(polysByPredicate.begin(), polysByPredicate.end(), std::back_inserter(areas), calcArea);
+  double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+  areaOut(totalArea, out);
 }
 
 void belyaev::areaMean(const std::vector< Polygon >& data, std::ostream& out)
@@ -22,16 +20,27 @@ void belyaev::areaMean(const std::vector< Polygon >& data, std::ostream& out)
     throw std::logic_error("Invalid query in AREA MEAN.");
   }
 
-  using namespace std::placeholders;
-  auto areaMeanAccumBind = std::bind(areaMeanAccumulate, _1, _2, data.size());
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaMeanAccumBind), out);
+  std::vector<double> areas;
+  std::transform(data.begin(), data.end(), std::back_inserter(areas), calcArea);
+
+  double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+  double meanArea = totalArea / data.size();
+  areaOut(meanArea, out);
 }
 
 void belyaev::areaVertices(const std::vector< Polygon >& data, std::ostream& out, size_t vertices)
 {
   using namespace std::placeholders;
-  auto areaVerticesAccumBind = std::bind(areaVerticesAccumulate, _1, _2, vertices);
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaVerticesAccumBind), out);
+
+  std::vector<double> areas;
+  std::vector<Polygon> matchingPolygons;
+
+  auto isPolyOfSizeBind = std::bind(isPolygonOfSize, _1, std::ref(vertices));
+  std::copy_if(data.begin(), data.end(), std::back_inserter(matchingPolygons), isPolyOfSizeBind);
+  std::transform(matchingPolygons.begin(), matchingPolygons.end(), std::back_inserter(areas), calcArea);
+  
+  double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+  areaOut(totalArea, out);
 }
 
 void belyaev::area(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
@@ -46,8 +55,9 @@ void belyaev::area(const std::vector< Polygon >& data, std::istream& in, std::os
   }
 
   std::map< std::string, std::function< void() > > subCmds;
-  subCmds["ODD"] = std::bind(areaOdd, std::ref(data), std::ref(out));
-  subCmds["EVEN"] = std::bind(areaEven, std::ref(data), std::ref(out));
+  using functionBoolPoly = std::function< bool(const Polygon&) >;
+  subCmds["ODD"] = std::bind(areaOddEven< functionBoolPoly >, std::ref(data), std::ref(out), isPolygonOdd);
+  subCmds["EVEN"] = std::bind(areaOddEven< functionBoolPoly >, std::ref(data), std::ref(out), isPolygonEven);
   subCmds["MEAN"] = std::bind(areaMean, std::ref(data), std::ref(out));
   try
   {
@@ -220,8 +230,8 @@ void belyaev::inframe(const std::vector< Polygon >& data, std::istream& in, std:
     throw std::logic_error("Input failed in INFRAME.");
   }
 
-  Borders polygonBorders = std::accumulate(data.begin(), data.end(), Borders{}, getPolygonBorders);
-  auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
+  Borders polysBox = getMaxPolygonBox(data);
+  auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polysBox));
   bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
 
   StreamGuard guard(out);
