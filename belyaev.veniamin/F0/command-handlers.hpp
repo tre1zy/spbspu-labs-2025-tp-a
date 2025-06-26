@@ -23,7 +23,7 @@ namespace belyaev
   void deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::ostream& out);
   void helpCmd(std::ostream& out);
 
-  using commandMap = std::map<std::string, std::function<void(std::istream&, std::ostream&)>>;
+  using commandMap = std::map< std::string, std::function< void(std::istream&, std::ostream&) > >;
   commandMap mapCommandHandlers(Dictionaries& data);
 }
 

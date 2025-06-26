@@ -43,7 +43,7 @@ bool belyaev::removeEntry(Dictionary& currentDictionary, std::string russianWord
 }
 
 
-bool belyaev::isTranslationInEntry(const std::pair<const std::string, std::string> entry, const std::string& translation)
+bool belyaev::isTranslationInEntry(const std::pair< const std::string, std::string > entry, const std::string& translation)
 {
   return entry.second == translation;
 }
@@ -80,7 +80,7 @@ bool belyaev::pairContainsEnChars(const entryPair entry, std::string subStringEn
   return entry.second.find(subStringEn) != std::string::npos;
 }
 
-const belyaev::Dictionary& belyaev::printAllHelper(const std::pair<const std::string, Dictionary>& dictsEntry, std::ostream& out)
+const belyaev::Dictionary& belyaev::printAllHelper(const std::pair< const std::string, Dictionary >& dictsEntry, std::ostream& out)
 {
   out << "Dictionary " << dictsEntry.first << ":\n";
   return dictsEntry.second;
@@ -128,7 +128,7 @@ belyaev::intersectDictsIterator& belyaev::intersectDictsIterator::operator=(cons
   }
   else
   {
-    std::vector<nonConstEntryPair> tempDict;
+    std::vector< nonConstEntryPair > tempDict;
     std::copy(dest_.dict.begin(), dest_.dict.end(), std::back_inserter(tempDict));
 
     dest_.dict.clear();
@@ -159,7 +159,7 @@ void belyaev::removeIntersectionsHelper::operator()(const std::string& dictName)
   Dictionary* dict = searchDictByName(data_, dictName);
   if (dict == nullptr) return;
 
-  std::vector<nonConstEntryPair> dictCopy;
+  std::vector< nonConstEntryPair > dictCopy;
   std::copy(dict->dict.begin(), dict->dict.end(), std::back_inserter(dictCopy));
 
   entryNotInOtherDicts keepPredicate(*this, dictName);

@@ -65,7 +65,7 @@ void belyaev::searchEntryCmd(const Dictionaries& data, std::istream& in, std::os
     out << "<THIS DICTIONARY DOES NOT EXIST>\n";
     return;
   }
-  std::map<std::string, std::function<dictionaryIterator(const Dictionary&, const std::string&)>> commandRuOrEng;
+  std::map< std::string, std::function< dictionaryIterator(const Dictionary&, const std::string&) > > commandRuOrEng;
   commandRuOrEng["RU"] = std::bind(getItOfWordInDictByRu, _1, _2);
   commandRuOrEng["ENG"] = std::bind(getItOfWordInDictByEn, _1, _2);
   dictionaryIterator entry;
@@ -103,16 +103,16 @@ void belyaev::searchContainsCmd(const Dictionaries& data, std::istream& in, std:
     return;
   }
 
-  std::map<std::string, std::function<bool(const entryPair&)>> commandRuOrEng;
+  std::map< std::string, std::function< bool(const entryPair&) > > commandRuOrEng;
   commandRuOrEng["RU"] = std::bind(pairContainsRuChars, _1, word);
   commandRuOrEng["ENG"] = std::bind(pairContainsEnChars, _1, word);
 
-  std::vector<nonConstEntryPair> dictCopy;
+  std::vector< nonConstEntryPair > dictCopy;
   std::copy(currentDictionary->dict.begin(), currentDictionary->dict.end(), std::back_inserter(dictCopy));
 
   try
   {
-    using ostreamItStr = std::ostream_iterator<std::string>;
+    using ostreamItStr = std::ostream_iterator< std::string >;
     auto it = std::stable_partition(dictCopy.begin(), dictCopy.end(), commandRuOrEng[ruOrEng]);
     std::transform(dictCopy.begin(), it, ostreamItStr{out, "\n"}, formPairString);
   }
@@ -150,7 +150,7 @@ void belyaev::printAllDictCmd(const Dictionaries& data, std::ostream& out)
     return;
   }
   auto printAllHelperBind = std::bind(printAllHelper, std::placeholders::_1, std::ref(out));
-  std::transform(data.dicts.begin(), data.dicts.end(), std::ostream_iterator<Dictionary>{out, "\n"}, printAllHelperBind);
+  std::transform(data.dicts.begin(), data.dicts.end(), std::ostream_iterator< Dictionary >{out, "\n"}, printAllHelperBind);
 }
 
 void belyaev::clearDictionaryCmd(Dictionaries& data, std::istream& in, std::ostream& out)
@@ -235,7 +235,7 @@ void belyaev::renameDictionaryCmd(Dictionaries& data, std::istream& in, std::ost
     return;
   }
 
-  std::map<std::string, std::string> mapCopy = currentDict->dict;
+  std::map< std::string, std::string > mapCopy = currentDict->dict;
   data.dicts.erase(dictionaryOld);
   newDict = new Dictionary;
   newDict->dict = mapCopy;
@@ -251,8 +251,8 @@ void belyaev::mergeDictionariesCmd(Dictionaries& data, std::istream& in, std::os
   std::string dictionaryNew;
 
   in >> dictionariesAmount >> dictionaryNew;
-  using istreamItStr = std::istream_iterator<std::string>;
-  std::vector<std::string> dictNamesToMerge;
+  using istreamItStr = std::istream_iterator< std::string >;
+  std::vector< std::string > dictNamesToMerge;
   std::copy_n(istreamItStr{in}, dictionariesAmount, std::back_inserter(dictNamesToMerge));
   if (in.fail())
   {
@@ -280,8 +280,8 @@ void belyaev::intersectDictionariesCmd(Dictionaries& data, std::istream& in, std
   std::string dictionaryNew;
 
   in >> dictionariesAmount >> dictionaryNew;
-  using istreamItStr = std::istream_iterator<std::string>;
-  std::vector<std::string> dictNamesToIntersect;
+  using istreamItStr = std::istream_iterator< std::string >;
+  std::vector< std::string > dictNamesToIntersect;
   std::copy_n(istreamItStr{in}, dictionariesAmount, std::back_inserter(dictNamesToIntersect));
   if (in.fail())
   {
@@ -307,8 +307,8 @@ void belyaev::deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::
   std::string dictionaryNew;
 
   in >> dictionariesAmount >> dictionaryNew;
-  using istreamItStr = std::istream_iterator<std::string>;
-  std::vector<std::string> dictNamesToProcess;
+  using istreamItStr = std::istream_iterator< std::string >;
+  std::vector< std::string > dictNamesToProcess;
   std::copy_n(istreamItStr{in}, dictionariesAmount, std::back_inserter(dictNamesToProcess));
   if (in.fail())
   {
@@ -332,7 +332,7 @@ void belyaev::deleteIntersectionsCmd(Dictionaries& data, std::istream& in, std::
       return;
     }
 
-    std::vector<std::string> otherDictNames(dictNamesToProcess.begin() + 1, dictNamesToProcess.end());
+    std::vector< std::string > otherDictNames(dictNamesToProcess.begin() + 1, dictNamesToProcess.end());
 
     removeIntersectionsHelper remover(data, dictNamesToProcess);
     remover(firstDictName);

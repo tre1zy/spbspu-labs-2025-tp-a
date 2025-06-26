@@ -22,7 +22,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Dictionary& dictionar
     out << "<EMPTY>\n";
     return out;
   }
-  using ostreamItStr = std::ostream_iterator<std::string>;
+  using ostreamItStr = std::ostream_iterator< std::string >;
   std::transform(dictionary.dict.begin(), dictionary.dict.end(), ostreamItStr{out, "\n"}, formPairString);
   return out;
 }
