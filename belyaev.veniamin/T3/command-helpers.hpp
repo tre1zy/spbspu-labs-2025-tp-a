@@ -1,12 +1,9 @@
 #ifndef COMMAND_HELPERS_HPP
 #define COMMAND_HELPERS_HPP
 #include <algorithm>
-#include <cmath>
 #include <functional>
-#include <iomanip>
 #include <numeric>
 #include <limits>
-#include <stream-guard.hpp>
 #include "shapes.hpp"
 
 namespace belyaev
@@ -17,30 +14,35 @@ namespace belyaev
   bool isPolygonOfSize(const Polygon& src, const size_t& userSize);
   bool isStringNumeric(const std::string& str);
 
-  double accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n);
+  double areaTermCalculate(const std::vector< Point >& points, size_t index);
   double calcArea(const Polygon& src);
-  double areaOddAccumulate(double value, const Polygon& src);
-  double areaEvenAccumulate(double value, const Polygon& src);
-  double areaMeanAccumulate(double value, const Polygon& src, size_t size);
-  double areaVerticesAccumulate(double value, const Polygon& src, size_t vertices);
   void areaOut(double result, std::ostream& out);
 
-  using comparatorFunction = std::function<bool(const Polygon&, const Polygon&)>;
+  using comparatorFunction = std::function< bool(const Polygon&, const Polygon&) >;
   bool compareAreas(const Polygon& lhs, const Polygon& rhs);
   bool compareVertices(const Polygon& lhs, const Polygon& rhs);
-  Polygon minElement(const std::vector<Polygon>& data, comparatorFunction comparator);
-  Polygon maxElement(const std::vector<Polygon>& data, comparatorFunction comparator);
+  Polygon minElement(const std::vector< Polygon >& data, comparatorFunction comparator);
+  Polygon maxElement(const std::vector< Polygon >& data, comparatorFunction comparator);
 
   bool rmEchoHelper(const Polygon& rmPolygon, const Polygon& lhs, const Polygon& rhs);
   struct Borders
   {
-    int minX = std::numeric_limits<int>::max();
-    int minY = std::numeric_limits<int>::max();
-    int maxX = std::numeric_limits<int>::min();
-    int maxY = std::numeric_limits<int>::min();
+    int minX_, minY_, maxX_, maxY_;
+    Borders(int minX, int minY, int maxX, int maxY):
+      minX_(minX),
+      minY_(minY),
+      maxX_(maxX),
+      maxY_(maxY)
+    {}
   };
-  Borders getPointBorders(Borders box, const Point& pnt);
-  Borders getPolygonBorders(Borders box, const Polygon& src);
+  bool compareX(const Point& lhs, const Point& rhs);
+  bool compareY(const Point& lhs, const Point& rhs);
+  Borders getPolygonBox(const Polygon& src);
+  bool compareMinX(const Polygon& lhs, const Polygon& rhs);
+  bool compareMaxX(const Polygon& lhs, const Polygon& rhs);
+  bool compareMinY(const Polygon& lhs, const Polygon& rhs);
+  bool compareMaxY(const Polygon& lhs, const Polygon& rhs);
+  Borders getMaxPolygonBox(const std::vector< Polygon >& polys);
   bool isPointInBorders(const Point& p, const Borders& box);
 }
 

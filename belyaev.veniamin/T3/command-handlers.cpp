@@ -1,39 +1,49 @@
 #include "command-handlers.hpp"
+#include <stream-guard.hpp>
 
-void belyaev::areaOdd(const std::vector<Polygon>& data, std::ostream& out)
+template< typename Pred >
+void belyaev::areaOddEven(const std::vector< Polygon >& data, std::ostream& out, Pred predicate)
 {
-  using namespace std::placeholders;
-  auto areaOddAccumBind = std::bind(areaOddAccumulate, _1, _2);
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaOddAccumBind), out);
+  std::vector< double > areas;
+  std::vector< Polygon > polysByPredicate;
+
+  std::copy_if(data.begin(), data.end(), std::back_inserter(polysByPredicate), predicate);
+  std::transform(polysByPredicate.begin(), polysByPredicate.end(), std::back_inserter(areas), calcArea);
+  double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+  areaOut(totalArea, out);
 }
 
-void belyaev::areaEven(const std::vector<Polygon>& data, std::ostream& out)
-{
-  using namespace std::placeholders;
-  auto areaEvenAccumBind = std::bind(areaEvenAccumulate, _1, _2);
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaEvenAccumBind), out);
-}
-
-void belyaev::areaMean(const std::vector<Polygon>& data, std::ostream& out)
+void belyaev::areaMean(const std::vector< Polygon >& data, std::ostream& out)
 {
   if (data.size() == 0)
   {
     throw std::logic_error("Invalid query in AREA MEAN.");
   }
 
-  using namespace std::placeholders;
-  auto areaMeanAccumBind = std::bind(areaMeanAccumulate, _1, _2, data.size());
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaMeanAccumBind), out);
+  std::vector< double > areas;
+  std::transform(data.begin(), data.end(), std::back_inserter(areas), calcArea);
+
+  double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+  double meanArea = totalArea / data.size();
+  areaOut(meanArea, out);
 }
 
-void belyaev::areaVertices(const std::vector<Polygon>& data, std::ostream& out, size_t vertices)
+void belyaev::areaVertices(const std::vector< Polygon >& data, std::ostream& out, size_t vertices)
 {
   using namespace std::placeholders;
-  auto areaVerticesAccumBind = std::bind(areaVerticesAccumulate, _1, _2, vertices);
-  areaOut(std::accumulate(data.begin(), data.end(), 0.0, areaVerticesAccumBind), out);
+
+  std::vector< double > areas;
+  std::vector< Polygon > matchingPolygons;
+
+  auto isPolyOfSizeBind = std::bind(isPolygonOfSize, _1, std::ref(vertices));
+  std::copy_if(data.begin(), data.end(), std::back_inserter(matchingPolygons), isPolyOfSizeBind);
+  std::transform(matchingPolygons.begin(), matchingPolygons.end(), std::back_inserter(areas), calcArea);
+
+  double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+  areaOut(totalArea, out);
 }
 
-void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostream& out)
+void belyaev::area(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
 {
   using namespace std::placeholders;
 
@@ -44,9 +54,10 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
     throw std::logic_error("Input failed in AREA.");
   }
 
-  std::map<std::string, std::function<void()>> subCmds;
-  subCmds["ODD"] = std::bind(areaOdd, std::ref(data), std::ref(out));
-  subCmds["EVEN"] = std::bind(areaEven, std::ref(data), std::ref(out));
+  std::map< std::string, std::function< void() > > subCmds;
+  using functionBoolPoly = std::function< bool(const Polygon&) >;
+  subCmds["ODD"] = std::bind(areaOddEven< functionBoolPoly >, std::ref(data), std::ref(out), isPolygonOdd);
+  subCmds["EVEN"] = std::bind(areaOddEven< functionBoolPoly >, std::ref(data), std::ref(out), isPolygonEven);
   subCmds["MEAN"] = std::bind(areaMean, std::ref(data), std::ref(out));
   try
   {
@@ -70,10 +81,10 @@ void belyaev::area(const std::vector<Polygon>& data, std::istream& in, std::ostr
   }
 }
 
-void belyaev::minMaxArea(const std::vector<Polygon>& data, std::ostream& out, const std::string& command)
+void belyaev::minMaxArea(const std::vector< Polygon >& data, std::ostream& out, const std::string& command)
 {
   Polygon resultingPolygon;
-  std::map<std::string, std::function<Polygon()>> minOrMax;
+  std::map< std::string, std::function< Polygon() > > minOrMax;
   minOrMax["min"] = std::bind(minElement, std::cref(data), compareAreas);
   minOrMax["max"] = std::bind(maxElement, std::cref(data), compareAreas);
   try
@@ -88,10 +99,10 @@ void belyaev::minMaxArea(const std::vector<Polygon>& data, std::ostream& out, co
   areaOut(calcArea(resultingPolygon), out);
 }
 
-void belyaev::minMaxVertices(const std::vector<Polygon>& data, std::ostream& out, const std::string& command)
+void belyaev::minMaxVertices(const std::vector< Polygon >& data, std::ostream& out, const std::string& command)
 {
   Polygon resultingPolygon;
-  std::map<std::string, std::function<Polygon()>> minOrMax;
+  std::map< std::string, std::function< Polygon() > > minOrMax;
   minOrMax["min"] = std::bind(minElement, std::cref(data), compareVertices);
   minOrMax["max"] = std::bind(maxElement, std::cref(data), compareVertices);
   try
@@ -107,7 +118,7 @@ void belyaev::minMaxVertices(const std::vector<Polygon>& data, std::ostream& out
   out << getVertices(resultingPolygon) << '\n';
 }
 
-void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::ostream& out, const std::string& command)
+void belyaev::minMax(const std::vector< Polygon >& data, std::istream& in, std::ostream& out, const std::string& command)
 {
   using namespace std::placeholders;
 
@@ -118,7 +129,7 @@ void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::os
     throw std::logic_error("Input failed in MIN/MAX.");
   }
 
-  std::map<std::string, std::function<void()>> subCmds;
+  std::map< std::string, std::function< void() > > subCmds;
   subCmds["AREA"] = std::bind(minMaxArea, std::ref(data), std::ref(out), std::cref(command));
   subCmds["VERTEXES"] = std::bind(minMaxVertices, std::ref(data), std::ref(out), std::cref(command));
   try
@@ -131,30 +142,30 @@ void belyaev::minMax(const std::vector<Polygon>& data, std::istream& in, std::os
   }
 }
 
-void belyaev::countEven(const std::vector<Polygon>& data, std::ostream& out)
+void belyaev::countEven(const std::vector< Polygon >& data, std::ostream& out)
 {
   using namespace std::placeholders;
   auto isPolygonEvenBind = std::bind(isPolygonEven, _1);
   out << std::count_if(data.begin(), data.end(), isPolygonEvenBind) << '\n';
 }
 
-void belyaev::countOdd(const std::vector<Polygon>& data, std::ostream& out)
+void belyaev::countOdd(const std::vector< Polygon >& data, std::ostream& out)
 {
   using namespace std::placeholders;
   auto isPolygonOddBind = std::bind(isPolygonOdd, _1);
   out << std::count_if(data.begin(), data.end(), isPolygonOddBind) << '\n';
 }
 
-void belyaev::countVertices(const std::vector<Polygon>& data, std::ostream& out, size_t givenSize)
+void belyaev::countVertices(const std::vector< Polygon >& data, std::ostream& out, size_t givenSize)
 {
   using namespace std::placeholders;
   auto isPolygonOfSizeBind = std::bind(isPolygonOfSize, _1, givenSize);
   out << std::count_if(data.begin(), data.end(), isPolygonOfSizeBind) << '\n';
 }
 
-void belyaev::count(const std::vector<Polygon>& data, std::istream& in, std::ostream& out)
+void belyaev::count(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
 {
-  std::map<std::string, std::function<void()>> subCmds;
+  std::map< std::string, std::function< void() > > subCmds;
   subCmds["EVEN"] = std::bind(countEven, std::cref(data), std::ref(out));
   subCmds["ODD"] = std::bind(countOdd, std::cref(data), std::ref(out));
 
@@ -187,13 +198,13 @@ void belyaev::count(const std::vector<Polygon>& data, std::istream& in, std::ost
   }
 }
 
-void belyaev::rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream& out)
+void belyaev::rmecho(std::vector< Polygon >& data, std::istream& in, std::ostream& out)
 {
   using namespace std::placeholders;
 
   Polygon rmPolygon;
   in >> rmPolygon;
-  if (in.fail()|| in.peek() != '\n')
+  if (in.fail() || in.peek() != '\n')
   {
     throw std::logic_error("Input failed in RMECHO.");
   }
@@ -208,7 +219,7 @@ void belyaev::rmecho(std::vector<Polygon>& data, std::istream& in, std::ostream&
   out << removed << '\n';
 }
 
-void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::ostream& out)
+void belyaev::inframe(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
 {
   using namespace std::placeholders;
 
@@ -219,8 +230,8 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
     throw std::logic_error("Input failed in INFRAME.");
   }
 
-  Borders polygonBorders = std::accumulate(data.begin(), data.end(), Borders{}, getPolygonBorders);
-  auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polygonBorders));
+  Borders polysBox = getMaxPolygonBox(data);
+  auto isPointInBordersBind = std::bind(isPointInBorders, _1, std::cref(polysBox));
   bool inside = std::all_of(inframePoly.points.begin(), inframePoly.points.end(), isPointInBordersBind);
 
   StreamGuard guard(out);
@@ -234,7 +245,7 @@ void belyaev::inframe(const std::vector<Polygon>& data, std::istream& in, std::o
   }
 }
 
-belyaev::commandMap belyaev::mapCommandHandlers(std::vector<Polygon>& data)
+belyaev::commandMap belyaev::mapCommandHandlers(std::vector< Polygon >& data)
 {
   using namespace std::placeholders;
   commandMap cmds;

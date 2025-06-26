@@ -1,4 +1,6 @@
 #include "command-helpers.hpp"
+#include <iomanip>
+#include <stream-guard.hpp>
 
 size_t belyaev::getVertices(const Polygon& src)
 {
@@ -27,54 +29,30 @@ bool belyaev::isStringNumeric(const std::string& str)
   return std::all_of(str.begin(), str.end(), isNumericBind);
 }
 
-double belyaev::accumulateTerm(double sum, int i, const std::vector<Point>& pnts, int n)
+double belyaev::areaTermCalculate(const std::vector< Point >& points, size_t index)
 {
-  const int next_i = (i + 1) % n;
-  return sum + (pnts[i].y + pnts[next_i].y) * (pnts[i].x - pnts[next_i].x);
+  size_t next = (index + 1) % points.size();
+  double ySum = points[index].y + points[next].y;
+  double xDiff = points[index].x - points[next].x;
+  return ySum * xDiff;
 }
 
 double belyaev::calcArea(const Polygon& src)
 {
-  const int amount = getVertices(src);
-  std::vector<int> indices(amount);
+  using namespace std::placeholders;
+
+  size_t n = src.points.size();
+  std::vector< size_t > indices(n);
   std::iota(indices.begin(), indices.end(), 0);
 
-  using namespace std::placeholders;
-  auto accumTermFunc = std::bind(accumulateTerm, _1, _2, std::cref(src.points), amount);
-  double area = std::accumulate(indices.begin(), indices.end(), 0.0, accumTermFunc);
+  std::vector< double > areaTerms(n);
+  auto termCalcBind = std::bind(areaTermCalculate, std::cref(src.points), _1);
+  std::transform(indices.begin(), indices.end(), std::back_inserter(areaTerms), termCalcBind);
+
+  std::vector< double > ones(areaTerms.size(), 1.0);
+  double area = std::inner_product(areaTerms.begin(), areaTerms.end(), ones.begin(), 0.0);
+
   return std::abs(area) / 2.0;
-}
-
-double belyaev::areaOddAccumulate(double value, const Polygon& src)
-{
-  if (isPolygonOdd(src))
-  {
-    return value + calcArea(src);
-  }
-  return value;
-}
-
-double belyaev::areaEvenAccumulate(double value, const Polygon& src)
-{
-  if (isPolygonEven(src))
-  {
-    return value + calcArea(src);
-  }
-  return value;
-}
-
-double belyaev::areaMeanAccumulate(double value, const Polygon& src, size_t size)
-{
-  return value + calcArea(src) / size;
-}
-
-double belyaev::areaVerticesAccumulate(double value, const Polygon& src, size_t vertices)
-{
-  if (getVertices(src) == vertices)
-  {
-    return value + calcArea(src);
-  }
-  return value;
 }
 
 void belyaev::areaOut(double result, std::ostream& out)
@@ -93,12 +71,12 @@ bool belyaev::compareVertices(const Polygon& lhs, const Polygon& rhs)
   return getVertices(lhs) < getVertices(rhs);
 }
 
-belyaev::Polygon belyaev::minElement(const std::vector<Polygon>& data, comparatorFunction comparator)
+belyaev::Polygon belyaev::minElement(const std::vector< Polygon >& data, comparatorFunction comparator)
 {
   return *std::min_element(data.begin(), data.end(), comparator);
 }
 
-belyaev::Polygon belyaev::maxElement(const std::vector<Polygon>& data, comparatorFunction comparator)
+belyaev::Polygon belyaev::maxElement(const std::vector< Polygon >& data, comparatorFunction comparator)
 {
   return *std::max_element(data.begin(), data.end(), comparator);
 }
@@ -108,29 +86,65 @@ bool belyaev::rmEchoHelper(const Polygon& rmPolygon, const Polygon& lhs, const P
   return (rmPolygon == lhs) && (rmPolygon == rhs);
 }
 
-belyaev::Borders belyaev::getPointBorders(Borders box, const Point& pnt)
+bool belyaev::compareX(const Point& lhs, const Point& rhs)
 {
-  return Borders{
-    std::min(box.minX, pnt.x),
-    std::min(box.minY, pnt.y),
-    std::max(box.maxX, pnt.x),
-    std::max(box.maxY, pnt.y)
-  };
+  return lhs.x < rhs.x;
 }
 
-belyaev::Borders belyaev::getPolygonBorders(Borders box, const Polygon& src)
+bool belyaev::compareY(const Point& lhs, const Point& rhs)
 {
-  using namespace std::placeholders;
-  Borders polyBorders = std::accumulate(src.points.begin(), src.points.end(), Borders{}, getPointBorders);
-  return Borders{
-    std::min(box.minX, polyBorders.minX),
-    std::min(box.minY, polyBorders.minY),
-    std::max(box.maxX, polyBorders.maxX),
-    std::max(box.maxY, polyBorders.maxY)
-  };
+  return lhs.y < rhs.y;
+}
+
+belyaev::Borders belyaev::getPolygonBox(const Polygon& src)
+{
+  auto minX = std::min_element(src.points.begin(), src.points.end(), compareX);
+  auto minY = std::min_element(src.points.begin(), src.points.end(), compareY);
+  auto maxX = std::max_element(src.points.begin(), src.points.end(), compareX);
+  auto maxY = std::max_element(src.points.begin(), src.points.end(), compareY);
+  Borders result = Borders((*minX).x, (*minY).y, (*maxX).x, (*maxY).y);
+  return result;
+}
+
+bool belyaev::compareMinX(const Polygon& lhs, const Polygon& rhs)
+{
+  Borders lhsBox = getPolygonBox(lhs);
+  Borders rhsBox = getPolygonBox(rhs);
+  return lhsBox.minX_ < rhsBox.minX_;
+}
+
+bool belyaev::compareMaxX(const Polygon& lhs, const Polygon& rhs)
+{
+  Borders lhsBox = getPolygonBox(lhs);
+  Borders rhsBox = getPolygonBox(rhs);
+  return lhsBox.maxX_ < rhsBox.maxX_;
+}
+
+bool belyaev::compareMinY(const Polygon& lhs, const Polygon& rhs)
+{
+  Borders lhsBox = getPolygonBox(lhs);
+  Borders rhsBox = getPolygonBox(rhs);
+  return lhsBox.minY_ < rhsBox.minY_;
+}
+
+bool belyaev::compareMaxY(const Polygon& lhs, const Polygon& rhs)
+{
+  Borders lhsBox = getPolygonBox(lhs);
+  Borders rhsBox = getPolygonBox(rhs);
+  return lhsBox.maxY_ < rhsBox.maxY_;
+}
+
+belyaev::Borders belyaev::getMaxPolygonBox(const std::vector< Polygon >& polys)
+{
+  auto minX = getPolygonBox(*std::min_element(polys.begin(), polys.end(), compareMinX));
+  auto minY = getPolygonBox(*std::min_element(polys.begin(), polys.end(), compareMinY));
+  auto maxX = getPolygonBox(*std::max_element(polys.begin(), polys.end(), compareMaxX));
+  auto maxY = getPolygonBox(*std::max_element(polys.begin(), polys.end(), compareMaxY));
+  Borders result = Borders(minX.minX_, minY.minY_, maxX.maxX_, maxY.maxY_);
+  return result;
 }
 
 bool belyaev::isPointInBorders(const belyaev::Point& pnt, const belyaev::Borders& box)
 {
-  return pnt.x >= box.minX && pnt.x <= box.maxX && pnt.y >= box.minY && pnt.y <= box.maxY;
+  return pnt.x >= box.minX_ && pnt.x <= box.maxX_ && pnt.y >= box.minY_ && pnt.y <= box.maxY_;
 }
