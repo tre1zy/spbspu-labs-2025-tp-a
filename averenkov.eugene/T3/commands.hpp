@@ -24,16 +24,6 @@ namespace averenkov
     double operator()(const std::vector<Polygon>& polygons) const;
   };
 
-  struct IsEven
-  {
-    bool operator()(const Polygon& poly) const;
-  };
-
-  struct IsOdd
-  {
-    bool operator()(const Polygon& poly) const;
-  };
-
   struct EvenAreaSumCalculator
   {
     double operator()(const std::vector<Polygon>& polygons) const;
@@ -42,6 +32,16 @@ namespace averenkov
   struct OddAreaSumCalculator
   {
     double operator()(const std::vector<Polygon>& polygons) const;
+  };
+
+  struct IsEven
+  {
+    bool operator()(const Polygon& poly) const;
+  };
+
+  struct IsOdd
+  {
+    bool operator()(const Polygon& poly) const;
   };
 
   struct NumVertexAreaSumCalculator

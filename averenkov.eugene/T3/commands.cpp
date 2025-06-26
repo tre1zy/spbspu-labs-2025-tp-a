@@ -65,7 +65,7 @@ double averenkov::calculateArea(const Polygon& poly)
 double averenkov::AreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
   double sum = 0.0;
-  for (const auto& poly : polygons)
+  for (const auto& poly: polygons)
   {
     sum += calculateArea(poly);
   }
@@ -75,7 +75,7 @@ double averenkov::AreaSumCalculator::operator()(const std::vector< Polygon >& po
 double averenkov::EvenAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
   double sum = 0.0;
-  for (const auto& poly : polygons)
+  for (const auto& poly: polygons)
   {
     if (poly.points.size() % 2 == 0)
     {
@@ -88,7 +88,7 @@ double averenkov::EvenAreaSumCalculator::operator()(const std::vector< Polygon >
 double averenkov::OddAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
   double sum = 0.0;
-  for (const auto& poly : polygons)
+  for (const auto& poly: polygons)
   {
     if (poly.points.size() % 2 != 0)
     {
@@ -98,10 +98,11 @@ double averenkov::OddAreaSumCalculator::operator()(const std::vector< Polygon >&
   return sum;
 }
 
+
 double averenkov::NumVertexAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
   double sum = 0.0;
-  for (const auto& poly : polygons)
+  for (const auto& poly: polygons)
   {
     if (poly.points.size() == num)
     {
@@ -183,7 +184,7 @@ void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& p
     throw std::runtime_error("No polygons for MIN calculation");
   }
   size_t minVertices = polygons[0].points.size();
-  for (const auto& poly : polygons)
+  for (const auto& poly: polygons)
   {
     size_t vertices = poly.points.size();
     if (vertices < minVertices)
