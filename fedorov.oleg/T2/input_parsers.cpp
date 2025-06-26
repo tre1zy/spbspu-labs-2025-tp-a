@@ -1,5 +1,6 @@
 #include "input_parsers.hpp"
 #include <input_delimiter.hpp>
+#include "delimiter.hpp"
 
 std::istream &fedorov::operator>>(std::istream &input, DoubleKey &&key)
 {
