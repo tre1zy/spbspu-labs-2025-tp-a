@@ -196,41 +196,17 @@ void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& p
 
 size_t averenkov::EvenCounter::operator()(const std::vector< Polygon >& polygons) const
 {
-  size_t count = 0;
-  for (const auto& poly : polygons)
-  {
-    if (poly.points.size() % 2 == 0)
-    {
-      ++count;
-    }
-  }
-  return count;
+  return std::count_if(polygons.begin(), polygons.end(), VertexCount(0));
 }
 
 size_t averenkov::OddCounter::operator()(const std::vector< Polygon >& polygons) const
 {
-  size_t count = 0;
-  for (const auto& poly : polygons)
-  {
-    if (poly.points.size() % 2 != 0)
-    {
-      ++count;
-    }
-  }
-  return count;
+  return std::count_if(polygons.begin(), polygons.end(), VertexCount(1));
 }
 
 size_t averenkov::NumVertexCounter::operator()(const std::vector< Polygon >& polygons) const
 {
-  size_t count = 0;
-  for (const auto& poly : polygons)
-  {
-    if (poly.points.size() == num)
-    {
-      ++count;
-    }
-  }
-  return count;
+  return std::count_if(polygons.begin(), polygons.end(), VertexCount(num));
 }
 
 void averenkov::printAreaSum(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)

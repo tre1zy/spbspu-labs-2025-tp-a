@@ -78,16 +78,16 @@ namespace averenkov
   struct NumVertexCounter
   {
     size_t num;
-    size_t operator()(const std::vector<Polygon>& polygons) const;
+    size_t operator()(const std::vector< Polygon >& polygons) const;
   };
 
   struct AngleCheckHelper
   {
     const std::vector< Point >& pts;
     size_t idx;
-    AngleCheckHelper(const std::vector<Point>& points);
+    AngleCheckHelper(const std::vector< Point >& points);
     bool operator()(const Point&);
-  }
+  };
 
   struct RightAngleChecker
   {
