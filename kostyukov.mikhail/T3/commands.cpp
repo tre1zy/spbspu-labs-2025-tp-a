@@ -188,10 +188,6 @@ void kostyukov::area(std::istream& in, std::ostream& out, const std::vector< Pol
   {
     result = subcommands.at(subcommand)();
   }
-  catch (const std::invalid_argument&)
-  {
-    throw std::invalid_argument("invalid subcommand or number format");
-  }
   catch (...)
   {
     size_t countVertexes = std::stoull(subcommand);
@@ -254,10 +250,6 @@ void kostyukov::count(std::istream& in, std::ostream& out, const std::vector< Po
   try
   {
     result = subcommands.at(subcommand)();
-  }
-  catch (const std::invalid_argument&)
-  {
-    throw std::invalid_argument("invalid subcommand or number format");
   }
   catch (...)
   {
