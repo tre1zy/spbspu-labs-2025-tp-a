@@ -194,14 +194,24 @@ void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& p
   out << minVertices;
 }
 
+bool averenkov::IsEven::operator()(const Polygon& poly) const
+{
+  return poly.points.size() % 2 == 0;
+}
+
+bool averenkov::IsOdd::operator()(const Polygon& poly) const
+{
+  return poly.points.size() % 2 != 0;
+}
+
 size_t averenkov::EvenCounter::operator()(const std::vector< Polygon >& polygons) const
 {
-  return std::count_if(polygons.begin(), polygons.end(), VertexCount(0));
+  return std::count_if(polygons.begin(), polygons.end(), IsEven());
 }
 
 size_t averenkov::OddCounter::operator()(const std::vector< Polygon >& polygons) const
 {
-  return std::count_if(polygons.begin(), polygons.end(), VertexCount(1));
+  return std::count_if(polygons.begin(), polygons.end(), IsOdd());
 }
 
 size_t averenkov::NumVertexCounter::operator()(const std::vector< Polygon >& polygons) const
