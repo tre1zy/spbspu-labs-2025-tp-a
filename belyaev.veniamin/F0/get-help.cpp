@@ -1,4 +1,4 @@
-#include "getHelp.hpp"
+#include "get-help.hpp"
 
 void belyaev::getHelp(std::ostream& out)
 {
