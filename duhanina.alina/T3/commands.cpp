@@ -352,9 +352,9 @@ void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  const std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands =
-  { { "AREA", MaxArea() },
-  { "VERTEXES", MaxVertexCount() } };
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
+  commands["AREA"] = MaxArea();
+  commands["VERTEXES"] = MaxVertexCount();
   commands.at(param)(plgs, out);
 }
 
@@ -367,9 +367,9 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  const std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands =
-  { { "AREA", MinArea() },
-  { "VERTEXES", MinVertexCount() } };
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
+  commands["AREA"] = MinArea();
+  commands["VERTEXES"] = MinVertexCount();
   commands.at(param)(plgs, out);
 }
 
