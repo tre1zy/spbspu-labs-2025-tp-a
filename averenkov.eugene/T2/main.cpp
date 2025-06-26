@@ -6,10 +6,13 @@
 
 int main()
 {
-  std::vector< DataStruct > data;
+  using i_iterator_t = std::istream_iterator< averenkov::DataStruct >;
+  using o_iterator_t = std::ostream_iterator< averenkov::DataStruct >;
+
+  std::vector< averenkov::DataStruct > data;
   while (!std::cin.eof())
   {
-    std::copy(std::istream_iterator< DataStruct >(std::cin), std::istream_iterator< DataStruct >(), std::back_inserter(data));
+    std::copy(i_iterator_t(std::cin), i_iterator_t(), std::back_inserter(data));
     if (std::cin.fail() && !std::cin.eof())
     {
       std::cin.clear();
@@ -17,6 +20,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
+  std::copy(data.begin(), data.end(), o_iterator_t(std::cout, "\n"));
   return 0;
 }

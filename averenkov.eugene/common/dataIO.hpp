@@ -1,7 +1,7 @@
 #ifndef DATAIO_HPP
 #define DATAIO_HPP
 
-#include <iostream>
+#include <istream>
 #include <string>
 #include <utility>
 #include "iofmtguard.hpp"
