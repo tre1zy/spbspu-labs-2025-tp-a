@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <fstream>
-#include "getHelp.hpp"
+#include "get-help.hpp"
 
 void belyaev::insertEntryCmd(Dictionaries& data, std::istream& in, std::ostream& out)
 {
