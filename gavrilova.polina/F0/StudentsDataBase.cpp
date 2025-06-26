@@ -247,8 +247,7 @@ bool gavrilova::StudentDatabase::groupExists(const std::string& groupName) const
   return groups.count(groupName) > 0;
 }
 
-std::pair< bool, gavrilova::StudentID > gavrilova::StudentDatabase::addStudent
-(const std::string& fullName, const std::string& groupName)
+std::pair< bool, gavrilova::StudentID > gavrilova::StudentDatabase::addStudent(const std::string& fullName, const std::string& groupName)
 {
   if (!groupExists(groupName)) {
     return {false, 0};
@@ -555,7 +554,8 @@ std::pair< bool, gavrilova::GroupStatistics > gavrilova::StudentDatabase::getGro
   return {true, stats};
 }
 
-std::vector< std::shared_ptr< const gavrilova::student::Student > > gavrilova::StudentDatabase::getTopStudents(size_t n) const
+std::vector< std::shared_ptr< const gavrilova::student::Student > >
+gavrilova::StudentDatabase::getTopStudents(size_t n) const
 {
   std::vector< std::shared_ptr< const student::Student > > allStudents;
   std::transform(students.begin(), students.end(),
@@ -572,7 +572,8 @@ std::vector< std::shared_ptr< const gavrilova::student::Student > > gavrilova::S
   return result;
 }
 
-std::vector< std::shared_ptr< const gavrilova::student::Student > > gavrilova::StudentDatabase::getRiskStudents(double threshold) const
+std::vector< std::shared_ptr< const gavrilova::student::Student > >
+gavrilova::StudentDatabase::getRiskStudents(double threshold) const
 {
   std::vector< std::pair< StudentID, std::shared_ptr< student::Student > > > temp;
   std::copy_if(students.begin(), students.end(),
