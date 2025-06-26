@@ -8,7 +8,7 @@ void karnauhova::delay(int milliseconds)
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-void karnauhova::clear_screen()
+void karnauhova::clearScreen()
 {
   #ifdef _WIN32
   system("cls");
@@ -17,9 +17,9 @@ void karnauhova::clear_screen()
   #endif
 }
 
-void karnauhova::hello_world(std::map< std::string, Character >& players)
+void karnauhova::helloWorld(std::map< std::string, Character >& players)
 {
-  clear_screen();
+  clearScreen();
   std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
   std::cout << "Игрок 1, введите свой ник(в одно слово):\n";
   std::string name1, name2;

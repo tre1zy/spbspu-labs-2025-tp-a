@@ -6,6 +6,6 @@
 
 namespace karnauhova
 {
-  void save_data(std::map< std::string, Character >& players, std::map< size_t, Character >& characters);
+  void saveData(std::map< std::string, Character >& players, std::map< size_t, Character >& characters);
 }
 #endif

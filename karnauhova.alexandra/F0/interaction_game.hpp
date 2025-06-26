@@ -6,7 +6,7 @@
 
 namespace karnauhova
 {
-  void choice_charact(std::map< std::string, Character >& players, const std::map< size_t, Character >& characters);
+  void choiceCharact(std::map< std::string, Character >& players, const std::map< size_t, Character >& characters);
   void fight(std::map< std::string, Character >& players);
 }
 #endif

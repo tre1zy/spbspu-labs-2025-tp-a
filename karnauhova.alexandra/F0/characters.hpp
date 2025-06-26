@@ -13,21 +13,21 @@ namespace karnauhova
     bool operator==(const Character& other) const;
     int position;
     int attack();
-    void take_philosophy(std::string philosophy);
-    void take_story(std::string story);
-    void take_quotes(std::string quote_win, std::string quote_lose);
-    bool is_lost();
+    void takePhilosophy(std::string philosophy);
+    void takeStory(std::string story);
+    void takeQuotes(std::string quote_win, std::string quote_lose);
+    bool isLost();
     void damage(int size_damage);
-    int volume_hp() const;
-    int base_hp() const;
-    std::string get_name() const;
-    std::string get_story() const;
-    std::string get_atk() const;
-    std::string get_philosophy() const;
-    std::string get_win_quote() const;
-    std::string get_lose_quote() const;
-    void about_character() const;
-    void recovery_hp();
+    int volumeHp() const;
+    int baseHp() const;
+    std::string getName() const;
+    std::string getStory() const;
+    std::string getAtk() const;
+    std::string getPhilosophy() const;
+    std::string getWinQuote() const;
+    std::string getLoseQuote() const;
+    void aboutCharacter() const;
+    void recoveryHp();
 
   private:
     std::string name_;
@@ -40,10 +40,10 @@ namespace karnauhova
     std::string quote_win_;
     std::string quote_lose_;
 
-    int attack_head();
-    int attack_body();
-    int attack_arm();
-    int attack_leg();
+    int attackHead();
+    int attackBody();
+    int attackArm();
+    int attackLeg();
   };
   std::istream& operator>>(std::istream& in, Character& pol);
   std::ostream& operator<<(std::ostream& out, const Character& character);

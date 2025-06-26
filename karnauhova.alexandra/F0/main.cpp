@@ -17,7 +17,7 @@ int main()
   std::map< std::string, Character > players;
   try
   {
-    players = input_data(characters);
+    players = inputData(characters);
   }
   catch (const std::exception& e)
   {
@@ -30,12 +30,12 @@ int main()
     auto two = ++it;
     if (one->second.position != 0 || two->second.position != 0)
     {
-      clear_screen();
+      clearScreen();
       std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
       std::cout << "Возвращение в прошлый бой:\n";
       fight(players);
     }
-    clear_screen();
+    clearScreen();
     std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
     std::cout << "С возвращением " << one->first << ", " << two->first << "!\n";
   }
@@ -43,7 +43,7 @@ int main()
   {
     try
     {
-      hello_world(players);
+      helloWorld(players);
     }
     catch (const std::exception& e)
     {
@@ -52,11 +52,11 @@ int main()
   }
   delay(1200);
   std::map< std::string, std::function< void() > > cmds;
-  cmds["CHARACTERS"] = std::bind(choice_charact, std::ref(players), std::cref(characters));
+  cmds["CHARACTERS"] = std::bind(choiceCharact, std::ref(players), std::cref(characters));
   cmds["FIGHT"] = std::bind(fight, std::ref(players));
   while (!std::cin.eof())
   {
-    clear_screen();
+    clearScreen();
     std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
     std::cout << "-Лобби-\n\n";
     std::cout << ">Чтобы взять нового персонажа или поменять старого введите CHARACTERS\n";
@@ -79,8 +79,8 @@ int main()
       delay(2000);
     }
   }
-  clear_screen();
+  clearScreen();
   std::cout << "\033[1;31m" << std::string(100, '=') << "\033[0m" << "\n";
   std::cout << "Пока)\n";
-  save_data(players, characters);
+  saveData(players, characters);
 }

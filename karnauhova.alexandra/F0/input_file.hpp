@@ -6,8 +6,8 @@
 
 namespace karnauhova
 {
-  std::map< std::string, Character > input_data(std::map< size_t, Character >& characters);
-  void input_new_data(std::istream& in, std::map< size_t, Character >& characters);
-  std::map< std::string, Character > input_save_data(std::istream& in, std::map< size_t, Character >& characters);
+  std::map< std::string, Character > inputData(std::map< size_t, Character >& characters);
+  void inputNewData(std::istream& in, std::map< size_t, Character >& characters);
+  std::map< std::string, Character > inputSaveData(std::istream& in, std::map< size_t, Character >& characters);
 }
 #endif

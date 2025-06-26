@@ -7,7 +7,7 @@
 
 namespace
 {
-  bool compare_characters(const std::pair<size_t, karnauhova::Character>& pair, const karnauhova::Character& target)
+  bool compareCharacters(const std::pair<size_t, karnauhova::Character>& pair, const karnauhova::Character& target)
   {
     return pair.second == target;
   }
@@ -19,18 +19,18 @@ namespace
     }
 };
 }
-void karnauhova::save_data(std::map< std::string, Character >& players, std::map< size_t, Character >& characters)
+void karnauhova::saveData(std::map< std::string, Character >& players, std::map< size_t, Character >& characters)
 {
   std::ofstream file;
   file.open("karnauhova.alexandra/F0/game_data_save.txt");
   auto it = players.begin();
   file << it->first << " " << (++it)->first << "\n";
-  auto a = std::bind(compare_characters, std::placeholders::_1, std::cref((--it)->second));
+  auto a = std::bind(compareCharacters, std::placeholders::_1, std::cref((--it)->second));
   auto character = std::find_if(characters.begin(), characters.end(), a);
-  file << character->first << " " << it->second.volume_hp() << " " << it->second.position << "\n";
-  auto b = std::bind(compare_characters, std::placeholders::_1, std::cref((++it)->second));
+  file << character->first << " " << it->second.volumeHp() << " " << it->second.position << "\n";
+  auto b = std::bind(compareCharacters, std::placeholders::_1, std::cref((++it)->second));
   character = std::find_if(characters.begin(), characters.end(), b);
-  file << character->first << " " << it->second.volume_hp() << " " << it->second.position << "\n";
+  file << character->first << " " << it->second.volumeHp() << " " << it->second.position << "\n";
 
   using ostr_iter = std::ostream_iterator< Character >;
   std::vector< Character > data;

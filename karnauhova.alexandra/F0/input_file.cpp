@@ -23,11 +23,11 @@ namespace
   };
 }
 
-map_characters karnauhova::input_data(data_characters& characters)
+map_characters karnauhova::inputData(data_characters& characters)
 {
   setlocale(LC_ALL, "ru");
   map_characters players;
-  clear_screen();
+  clearScreen();
   std::cout << "\033[1;32m" << std::string(100, '=') << "\033[0m" << "\n";
   std::cout << "Привет!\n" << "Хотите продолжить прошлую игру или начать новую?\n";
   std::cout << "> NEW_GAME\n" << "> CONTINUE\n";
@@ -44,14 +44,14 @@ map_characters karnauhova::input_data(data_characters& characters)
       {
         std::ifstream file;
         file.open("karnauhova.alexandra/F0/game_data.txt");
-        input_new_data(file, characters);
+        inputNewData(file, characters);
         end_input = true;
       }
       else if (answer == "CONTINUE")
       {
         std::ifstream file;
         file.open("karnauhova.alexandra/F0/game_data_save.txt");
-        players = input_save_data(file, characters);
+        players = inputSaveData(file, characters);
         end_input = true;
       }
       else if (std::cin.eof())
@@ -59,11 +59,11 @@ map_characters karnauhova::input_data(data_characters& characters)
         throw std::out_of_range("ERROR: EOF");
       }
     }
-    catch(const std::out_of_range& o)
+    catch (const std::out_of_range& o)
     {
       throw;
     }
-    catch(const std::logic_error& l)
+    catch (const std::logic_error& l)
     {
       std::cin.clear();
       std::cout << "У вас нет доступного сохранения:(\n";
@@ -72,7 +72,7 @@ map_characters karnauhova::input_data(data_characters& characters)
   return players;
 }
 
-void karnauhova::input_new_data(std::istream& in, data_characters& characters)
+void karnauhova::inputNewData(std::istream& in, data_characters& characters)
 {
   std::vector<Character> temp;
   while (!in.eof())
@@ -90,7 +90,7 @@ void karnauhova::input_new_data(std::istream& in, data_characters& characters)
   std::transform(temp.begin(), temp.end(), std::inserter(characters, characters.end()), trmp);
 }
 
-map_characters karnauhova::input_save_data(std::istream& in, data_characters& characters)
+map_characters karnauhova::inputSaveData(std::istream& in, data_characters& characters)
 {
   in.seekg(0, std::ios::end);
   if (in.tellg() == std::streampos(0))
@@ -104,14 +104,14 @@ map_characters karnauhova::input_save_data(std::istream& in, data_characters& ch
   int hp1 = 0, hp2 = 0, position1 = 0, position2 = 0;
   in >> index_character1 >> hp1 >> position1;
   in >> index_character2 >> hp2 >> position2;
-  input_new_data(in, characters);
+  inputNewData(in, characters);
   std::map< std::string, karnauhova::Character > players;
   players[name1] = characters.at(index_character1);
   players.at(name1).position = position1;
-  players.at(name1).damage(players.at(name1).volume_hp() - hp1);
+  players.at(name1).damage(players.at(name1).volumeHp() - hp1);
 
   players[name2] = characters.at(index_character2);
   players.at(name2).position = position2;
-  players.at(name2).damage(players.at(name2).volume_hp() - hp2);
+  players.at(name2).damage(players.at(name2).volumeHp() - hp2);
   return players;
 }

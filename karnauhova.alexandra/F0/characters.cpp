@@ -35,10 +35,10 @@ karnauhova::Character::Character(std::string name, int hp, int atk1, int atk2):
 int karnauhova::Character::attack()
 {
     std::map< int, int > cmds;
-    cmds[1] = attack_head();
-    cmds[2] = attack_body();
-    cmds[3] = attack_arm();
-    cmds[4] = attack_leg();
+    cmds[1] = attackHead();
+    cmds[2] = attackBody();
+    cmds[3] = attackArm();
+    cmds[4] = attackLeg();
     try
     {
       return cmds.at(position);
@@ -49,7 +49,7 @@ int karnauhova::Character::attack()
     }
 }
 
-int karnauhova::Character::attack_head()
+int karnauhova::Character::attackHead()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -66,7 +66,7 @@ int karnauhova::Character::attack_head()
   return atk2_ - 2;
 }
 
-int karnauhova::Character::attack_body()
+int karnauhova::Character::attackBody()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -83,7 +83,7 @@ int karnauhova::Character::attack_body()
   return atk1_ + 1;
 }
 
-int karnauhova::Character::attack_arm()
+int karnauhova::Character::attackArm()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -100,7 +100,7 @@ int karnauhova::Character::attack_arm()
   return 0;
 }
 
-int karnauhova::Character::attack_leg()
+int karnauhova::Character::attackLeg()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -117,23 +117,23 @@ int karnauhova::Character::attack_leg()
   return atk1_;
 }
 
-void karnauhova::Character::take_philosophy(std::string philosophy)
+void karnauhova::Character::takePhilosophy(std::string philosophy)
 {
   philosophy_ = philosophy;
 }
 
-void  karnauhova::Character::take_story(std::string story)
+void  karnauhova::Character::takeStory(std::string story)
 {
   story_ = story;
 }
 
-void karnauhova::Character::take_quotes(std::string quote_win, std::string quote_lose)
+void karnauhova::Character::takeQuotes(std::string quote_win, std::string quote_lose)
 {
   quote_win_ = quote_win;
   quote_lose_ = quote_lose;
 }
 
-bool karnauhova::Character::is_lost()
+bool karnauhova::Character::isLost()
 {
   return total_hp_ <= 0;
 }
@@ -143,17 +143,17 @@ void karnauhova::Character::damage(int size_damage)
   total_hp_ -= size_damage;
 }
 
-int karnauhova::Character::volume_hp() const
+int karnauhova::Character::volumeHp() const
 {
   return total_hp_;
 }
 
-int karnauhova::Character::base_hp() const
+int karnauhova::Character::baseHp() const
 {
   return hp_;
 }
 
-std::string karnauhova::Character::get_name() const
+std::string karnauhova::Character::getName() const
 {
   return name_;
 }
@@ -181,39 +181,39 @@ std::istream& karnauhova::operator>>(std::istream& in, Character& pol)
     return in;
   }
   Character temp(name, hp, atk1, atk2);
-  temp.take_story(story);
-  temp.take_philosophy(philosophy);
-  temp.take_quotes(quote_win, quote_lose);
+  temp.takeStory(story);
+  temp.takePhilosophy(philosophy);
+  temp.takeQuotes(quote_win, quote_lose);
   pol = std::move(temp);
   return in;
 }
 
-void karnauhova::Character::about_character() const
+void karnauhova::Character::aboutCharacter() const
 {
   std::cout << name_ << " " << hp_ << " hp  " << atk1_ << "-" << atk2_ << " atk";
 }
 
-std::string karnauhova::Character::get_story() const
+std::string karnauhova::Character::getStory() const
 {
   return story_;
 }
 
-std::string karnauhova::Character::get_philosophy() const
+std::string karnauhova::Character::getPhilosophy() const
 {
   return philosophy_;
 }
 
-std::string karnauhova::Character::get_win_quote() const
+std::string karnauhova::Character::getWinQuote() const
 {
   return quote_win_;
 }
 
-std::string karnauhova::Character::get_lose_quote() const
+std::string karnauhova::Character::getLoseQuote() const
 {
   return quote_lose_;
 }
 
-void karnauhova::Character::recovery_hp()
+void karnauhova::Character::recoveryHp()
 {
   total_hp_ = hp_;
 }
@@ -223,17 +223,17 @@ bool karnauhova::Character::operator==(const Character& other) const
   return name_ == other.name_ && hp_ == other.hp_ && atk1_ == other.atk1_ && atk2_ == other.atk2_;
 }
 
-std::string karnauhova::Character::get_atk() const
+std::string karnauhova::Character::getAtk() const
 {
-  return std::to_string(atk1_)+"-"+std::to_string(atk2_);
+  return std::to_string(atk1_) + "-" + std::to_string(atk2_);
 }
 
 std::ostream& karnauhova::operator<<(std::ostream& out, const Character& character)
 {
-  out << character.get_name() << " " << character.base_hp() << " " << character.get_atk() << "\n";
-  out << character.get_story() << "\n";
-  out << character.get_philosophy() << "\n";
-  out << character.get_win_quote() << "\n";
-  out << character.get_lose_quote();
+  out << character.getName() << " " << character.baseHp() << " " << character.getAtk() << "\n";
+  out << character.getStory() << "\n";
+  out << character.getPhilosophy() << "\n";
+  out << character.getWinQuote() << "\n";
+  out << character.getLoseQuote();
   return out;
 }
