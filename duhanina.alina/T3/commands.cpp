@@ -106,11 +106,25 @@ namespace
 
     double operator()(const std::vector< Polygon >& polygons) const
     {
-      return std::accumulate(polygons.begin(), polygons.end(), 0.0, VertexCountAreaAdder(num));
+      return calculateRecursive(polygons, 0, 0.0);
     }
 
   private:
     size_t num;
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+    {
+      if (index >= polygons.size())
+      {
+        return sum;
+      }
+      const Polygon& poly = polygons[index];
+      double currentSum = sum;
+      if (poly.points.size() == num)
+      {
+        currentSum += calculateArea(poly);
+      }
+      return calculateRecursive(polygons, index + 1, currentSum);
+    }
   };
 
   struct AreaComparator
@@ -133,16 +147,46 @@ namespace
   {
     double operator()(const std::vector< Polygon >& plgs) const
     {
-      return std::accumulate(plgs.begin(), plgs.end(), 0.0, EvenAreaAdder());
+      return calculateRecursive(plgs, 0, 0.0);
     }
+  private:
+     double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+     {
+       if (index >= polygons.size())
+       {
+         return sum;
+       }
+       const Polygon& poly = polygons[index];
+       double currentSum = sum;
+       if (poly.points.size() % 2 == 0)
+       {
+         currentSum += calculateArea(poly);
+       }
+       return calculateRecursive(polygons, index + 1, currentSum);
+     }
   };
 
   struct OddAreaSum
   {
     double operator()(const std::vector< Polygon >& plgs) const
     {
-      return std::accumulate(plgs.begin(), plgs.end(), 0.0, OddAreaAdder());
+      return calculateRecursive(plgs, 0, 0.0);
     }
+  private:
+     double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+     {
+       if (index >= polygons.size())
+       {
+         return sum;
+       }
+       const Polygon& poly = polygons[index];
+       double currentSum = sum;
+       if (poly.points.size() % 2 != 0)
+       {
+         currentSum += calculateArea(poly);
+       }
+       return calculateRecursive(polygons, index + 1, currentSum);
+     }
   };
 
   struct MeanAreaSum
@@ -153,7 +197,17 @@ namespace
       {
         throw std::runtime_error("Error");
       }
-      return std::accumulate(plgs.begin(), plgs.end(), 0.0, AreaAdder()) / plgs.size();
+      double total = calculateRecursive(plgs, 0, 0.0);
+      return total / plgs.size();
+    }
+  private:
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+    {
+      if (index >= polygons.size())
+      {
+        return sum;
+      }
+      return calculateRecursive(polygons, index + 1, sum + calculateArea(polygons[index]));
     }
   };
 
@@ -285,8 +339,7 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
     {
       throw std::invalid_argument("Error in input");
     }
-    VertexCountAreaSum numArea(num);
-    numArea(plgs);
+    out << VertexCountAreaSum(num)(plgs);
   }
 }
 
