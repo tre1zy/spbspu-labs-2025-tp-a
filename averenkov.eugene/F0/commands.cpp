@@ -269,12 +269,12 @@ void averenkov::setKnapsack(Base& base, const std::vector< std::string >& args)
 {
   if (args.size() != 2)
   {
-    throw std::invalid_argument("<INVALID COMMAND>");
+    throw std::invalid_argument("Invalid arguments count for set_knapsack");
   }
 
   if (base.knapsacks.find(args[1]) == base.knapsacks.end())
   {
-    throw std::invalid_argument("<NOT FOUND>");
+    throw std::invalid_argument("Knapsack not found");
   }
 
   base.current_knapsack = base.knapsacks.find(args[1])->second;
