@@ -84,6 +84,11 @@ std::istream& gavrilova::student::operator>>(std::istream& is, Student& s)
   std::string fullName;
   std::string group;
 
+  std::istream::sentry sentry(is);
+  if (!sentry) {
+    return is;
+  }
+
   is >> std::quoted(fullName) >> group;
   s.fullName_ = std::move(fullName);
   s.group_ = group;
@@ -115,11 +120,13 @@ std::istream& gavrilova::student::operator>>(std::istream& is, Student& s)
 
 std::ostream& gavrilova::student::operator<<(std::ostream& os, const Student& s)
 {
+  std::ostream::sentry sentry(os);
+  if (!sentry) {
+    return os;
+  }
   os << std::quoted(s.fullName_) << " " << s.group_ << "\n";
   os << "Средний балл: " << calcAverage(s) << "\n";
-
   os << "Оценки " << s.grades_.size() << "\n";
-
   std::for_each(s.grades_.begin(), s.grades_.end(), DateGradePrinter(os));
   os << "\n";
 

@@ -49,6 +49,11 @@ std::istream& gavrilova::date::operator>>(std::istream& is, Date& d)
 
 std::ostream& gavrilova::date::operator<<(std::ostream& os, const Date& d)
 {
+  std::ostream::sentry sentry(os);
+  if (!sentry) {
+    return os;
+  }
+
   os << to_string(d);
   return os;
 }
