@@ -9,7 +9,7 @@
 #include <scopeGuard.hpp>
 #include "analyzeAndParseFunctors.hpp"
 
-void shapkov::analyze_text(std::istream& in, std::ostream& out, FrequencyDictionary& dict)
+void shapkov::analyzeText(std::istream& in, std::ostream& out, FrequencyDictionary& dict)
 {
   std::string fileName, id;
   in >> fileName >> id;
@@ -43,7 +43,7 @@ void shapkov::analyze_text(std::istream& in, std::ostream& out, FrequencyDiction
   dict.dicts.emplace(std::move(id), std::move(temp));
 }
 
-void shapkov::word_info(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
+void shapkov::wordInfo(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
 {
   std::string word, id;
   in >> word >> id;
@@ -80,7 +80,7 @@ void shapkov::anagrams(std::istream& in, std::ostream& out, const FrequencyDicti
   }
 }
 
-void shapkov::similar_frequency(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
+void shapkov::similarFrequency(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
 {
   std::string word;
   int delta = 0;
@@ -147,7 +147,7 @@ void shapkov::entropy(std::istream& in, std::ostream& out, const FrequencyDictio
   }
 }
 
-void shapkov::total_words(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
+void shapkov::totalWords(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
 {
   std::string id;
   in >> id;
@@ -181,7 +181,7 @@ void shapkov::palindromes(std::istream& in, std::ostream& out, const FrequencyDi
   }
 }
 
-void shapkov::show_with_pattern(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
+void shapkov::showWithPattern(std::istream& in, std::ostream& out, const FrequencyDictionary& dict)
 {
   std::string pattern, id;
   in >> pattern >> id;

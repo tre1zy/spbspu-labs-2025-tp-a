@@ -12,16 +12,16 @@ int main(int argc, char* argv[])
       shapkov::load(std::cout, argv[1], dict);
   }
   std::unordered_map< std::string, std::function< void() > > cmds;
-  cmds["ANALYZETEXT"] = std::bind(shapkov::analyze_text, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
+  cmds["ANALYZETEXT"] = std::bind(shapkov::analyzeText, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
   cmds["PRINT"] = std::bind(shapkov::print, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
-  cmds["WORDINFO"] = std::bind(shapkov::word_info, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
+  cmds["WORDINFO"] = std::bind(shapkov::wordInfo, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
   cmds["ANAGRAMS"] = std::bind(shapkov::anagrams, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
-  cmds["SIMILARFREQ"] = std::bind(shapkov::similar_frequency, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
+  cmds["SIMILARFREQ"] = std::bind(shapkov::similarFrequency, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
   cmds["ENTROPY"] = std::bind(shapkov::entropy, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
-  cmds["TOTALWORDS"] = std::bind(shapkov::total_words, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
+  cmds["TOTALWORDS"] = std::bind(shapkov::totalWords, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
   cmds["PALINDROMES"] = std::bind(shapkov::palindromes, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
   cmds["TOP"] = std::bind(shapkov::top, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
-  cmds["PATTERN"] = std::bind(shapkov::show_with_pattern, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
+  cmds["PATTERN"] = std::bind(shapkov::showWithPattern, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
   cmds["COMPARE"] = std::bind(shapkov::compare, std::ref(std::cin), std::ref(std::cout), std::cref(dict));
   cmds["INTERSECT"] = std::bind(shapkov::intersect, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
   cmds["DIFF"] = std::bind(shapkov::diff, std::ref(std::cin), std::ref(std::cout), std::ref(dict));
