@@ -639,3 +639,21 @@ void dribas::delete_training_by_key(std::istream& in, std::ostream& out, suite& 
   auto& main_suite = trainings[1];
   main_suite.erase(key_time);
 }
+
+void dribas::delete_training_suite(std::istream& in, std::ostream& out, suite& trainings)
+{
+    size_t training_id;
+    in >> training_id;
+    if (!in) {
+      throw std::invalid_argument("Invalid training ID");
+    }
+    if (training_id == 1) {
+      throw std::invalid_argument("Cannot delete the main training suite (ID 1)");
+    }
+    auto it = trainings.find(training_id);
+    size_t removed_count = it->second.size();
+    trainings.erase(it);
+    out << "Deleted training suite ID " << training_id;
+    out<< " containing " << removed_count << " workouts\n";
+    out << "Note: The workouts still exist in the main training suite (ID 1)\n";
+}

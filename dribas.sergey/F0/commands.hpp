@@ -20,6 +20,7 @@ namespace dribas
   void predict_result(std::ostream&, const suite&);
   void analyze_training_segment(std::istream&, std::ostream&, const suite&);
   void delete_training_by_key(std::istream&, std::ostream&, suite&);
+  void delete_training_suite(std::istream&, std::ostream&, suite&);
 }
 
 
