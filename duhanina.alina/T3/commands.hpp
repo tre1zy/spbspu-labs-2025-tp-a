@@ -13,7 +13,7 @@ namespace duhanina
   void printMinValue(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out);
   void printCount(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out);
   void printLessArea(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out);
-  void printRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out);
+  void eraseRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out);
 }
 
 #endif

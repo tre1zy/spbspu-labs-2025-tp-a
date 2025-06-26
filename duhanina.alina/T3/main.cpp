@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   cmds["MAX"] = std::bind(printMaxValue, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
   cmds["MIN"] = std::bind(printMinValue, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
   cmds["COUNT"] = std::bind(printCount, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
-  cmds["RMECHO"] = std::bind(printRmecho, std::ref(std::cin), std::ref(polygons), std::ref(std::cout));
+  cmds["RMECHO"] = std::bind(eraseRmecho, std::ref(std::cin), std::ref(polygons), std::ref(std::cout));
   cmds["LESSAREA"] = std::bind(printLessArea, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
 
   std::string command;
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     {
       if (std::cin.fail())
       {
-        std::cin.clear();
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";

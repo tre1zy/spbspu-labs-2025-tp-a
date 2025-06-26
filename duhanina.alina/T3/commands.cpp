@@ -66,7 +66,6 @@ namespace
 
   struct ExactVertexCounter
   {
-  public:
     ExactVertexCounter(size_t n):
       num(n)
     {}
@@ -82,7 +81,6 @@ namespace
 
   struct VertexCountAreaAdder
   {
-  public:
     VertexCountAreaAdder(size_t n):
       num(n)
     {}
@@ -102,18 +100,31 @@ namespace
 
   struct VertexCountAreaSum
   {
-  public:
     explicit VertexCountAreaSum(size_t n):
       num(n)
     {}
 
     double operator()(const std::vector< Polygon >& polygons) const
     {
-      return std::accumulate(polygons.begin(), polygons.end(), 0.0, VertexCountAreaAdder(num));
+      return calculateRecursive(polygons, 0, 0.0);
     }
 
   private:
     size_t num;
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+    {
+      if (index >= polygons.size())
+      {
+        return sum;
+      }
+      const Polygon& poly = polygons[index];
+      double currentSum = sum;
+      if (poly.points.size() == num)
+      {
+        currentSum += calculateArea(poly);
+      }
+      return calculateRecursive(polygons, index + 1, currentSum);
+    }
   };
 
   struct AreaComparator
@@ -136,16 +147,46 @@ namespace
   {
     double operator()(const std::vector< Polygon >& plgs) const
     {
-      return std::accumulate(plgs.begin(), plgs.end(), 0.0, EvenAreaAdder());
+      return calculateRecursive(plgs, 0, 0.0);
     }
+  private:
+     double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+     {
+       if (index >= polygons.size())
+       {
+         return sum;
+       }
+       const Polygon& poly = polygons[index];
+       double currentSum = sum;
+       if (poly.points.size() % 2 == 0)
+       {
+         currentSum += calculateArea(poly);
+       }
+       return calculateRecursive(polygons, index + 1, currentSum);
+     }
   };
 
   struct OddAreaSum
   {
     double operator()(const std::vector< Polygon >& plgs) const
     {
-      return std::accumulate(plgs.begin(), plgs.end(), 0.0, OddAreaAdder());
+      return calculateRecursive(plgs, 0, 0.0);
     }
+  private:
+     double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+     {
+       if (index >= polygons.size())
+       {
+         return sum;
+       }
+       const Polygon& poly = polygons[index];
+       double currentSum = sum;
+       if (poly.points.size() % 2 != 0)
+       {
+         currentSum += calculateArea(poly);
+       }
+       return calculateRecursive(polygons, index + 1, currentSum);
+     }
   };
 
   struct MeanAreaSum
@@ -156,7 +197,17 @@ namespace
       {
         throw std::runtime_error("Error");
       }
-      return std::accumulate(plgs.begin(), plgs.end(), 0.0, AreaAdder()) / plgs.size();
+      double total = calculateRecursive(plgs, 0, 0.0);
+      return total / plgs.size();
+    }
+  private:
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+    {
+      if (index >= polygons.size())
+      {
+        return sum;
+      }
+      return calculateRecursive(polygons, index + 1, sum + calculateArea(polygons[index]));
     }
   };
 
@@ -230,7 +281,6 @@ namespace
 
   struct CountIfAreaLess
   {
-  public:
     explicit CountIfAreaLess(double t):
       threshold(t)
     {}
@@ -246,7 +296,6 @@ namespace
 
   struct AdjacentDuplicateFinder
   {
-  public:
     AdjacentDuplicateFinder(const Polygon& p, bool& f):
       ref(p),
       first(f)
@@ -275,20 +324,23 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  static std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands;
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands;
   commands["EVEN"] = EvenAreaSum();
   commands["ODD"]  = OddAreaSum();
   commands["MEAN"] = MeanAreaSum();
-  if (std::isdigit(param[0]))
+  try
+  {
+    out << commands.at(param)(plgs);
+  }
+  catch (...)
   {
     size_t num = std::stoull(param);
     if (num < 3)
     {
       throw std::invalid_argument("Error in input");
     }
-    commands[param] = VertexCountAreaSum(num);
+    out << VertexCountAreaSum(num)(plgs);
   }
-  out << commands.at(param)(plgs);
 }
 
 void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
@@ -300,7 +352,7 @@ void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  static std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
   commands["AREA"] = MaxArea();
   commands["VERTEXES"] = MaxVertexCount();
   commands.at(param)(plgs, out);
@@ -315,7 +367,7 @@ void duhanina::printMinValue(std::istream& in, const std::vector< Polygon >& plg
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  static std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream& out) > > commands;
   commands["AREA"] = MinArea();
   commands["VERTEXES"] = MinVertexCount();
   commands.at(param)(plgs, out);
@@ -325,10 +377,14 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
 {
   std::string param;
   in >> param;
-  static std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
+  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
   commands["EVEN"] = CountEven();
   commands["ODD"] = CountOdd();
-  if (std::isdigit(param[0]))
+  try
+  {
+    out << commands.at(param)(plgs);
+  }
+  catch (...)
   {
     size_t num = std::stoull(param);
     if (num < 3)
@@ -336,9 +392,7 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
       throw std::invalid_argument("Error in input");
     }
     out << std::count_if(plgs.begin(), plgs.end(), ExactVertexCounter(num));
-    return;
   }
-  out << commands.at(param)(plgs);
 }
 
 void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
@@ -359,7 +413,7 @@ void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& pol
   out << count;
 }
 
-void duhanina::printRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
+void duhanina::eraseRmecho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
 {
   if (polygons.empty())
   {
