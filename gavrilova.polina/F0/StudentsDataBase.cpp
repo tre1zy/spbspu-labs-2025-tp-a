@@ -200,7 +200,7 @@ namespace {
 
 gavrilova::StudentDatabase::StudentDatabase(int id_digits)
 {
-  nextId = std::pow(10, id_digits - 1);
+  nextId = std::pow(10, id_digits - 1) + 1;
 }
 
 bool gavrilova::StudentDatabase::saveToFile(const std::string& filename) const
@@ -223,8 +223,7 @@ bool gavrilova::StudentDatabase::loadFromFile(const std::string& filename)
 
   std::vector< student::Student > loadedStudents(std::istream_iterator< student::Student >{in},
       std::istream_iterator< student::Student >{});
-  if (loadedStudents.begin() == loadedStudents.end()) {
-  }
+
   std::for_each(loadedStudents.begin(), loadedStudents.end(), StudentAdder{*this});
 
   return true;
