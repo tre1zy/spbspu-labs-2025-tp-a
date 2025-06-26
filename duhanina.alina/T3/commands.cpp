@@ -270,21 +270,24 @@ void duhanina::printAreaSum(std::istream& in, const std::vector< Polygon >& plgs
   std::string param;
   in >> param;
   out << std::fixed << std::setprecision(1);
-  size_t num = 0;
-  if (std::isdigit(param[0]))
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands;
+  commands["EVEN"] = EvenAreaSum();
+  commands["ODD"]  = OddAreaSum();
+  commands["MEAN"] = MeanAreaSum();
+  try
   {
-    num = std::stoull(param);
+    out << commands.at(param)(plgs);
+  }
+  catch (...)
+  {
+    size_t num = std::stoull(param);
     if (num < 3)
     {
       throw std::invalid_argument("Error in input");
     }
+    VertexCountAreaSum numArea(num);
+    numArea(plgs);
   }
-  const std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands =
-  { { "EVEN", EvenAreaSum() },
-  { "ODD", OddAreaSum() },
-  { "MEAN", MeanAreaSum() },
-  { param, VertexCountAreaSum(num) } };
-  out << commands.at(param)(plgs);
 }
 
 void duhanina::printMaxValue(std::istream& in, const std::vector< Polygon >& plgs, std::ostream& out)
@@ -321,10 +324,14 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
 {
   std::string param;
   in >> param;
-  const std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands =
-  { { "EVEN", CountEven() },
-  { "ODD", CountOdd() } };
-  if (std::isdigit(param[0]))
+  std::map< std::string, std::function< size_t(const std::vector< Polygon >&) > > commands;
+  commands["EVEN"] = CountEven();
+  commands["ODD"] = CountOdd();
+  try
+  {
+    out << commands.at(param)(plgs);
+  }
+  catch (...)
   {
     size_t num = std::stoull(param);
     if (num < 3)
@@ -332,9 +339,7 @@ void duhanina::printCount(std::istream& in, const std::vector< Polygon >& plgs, 
       throw std::invalid_argument("Error in input");
     }
     out << std::count_if(plgs.begin(), plgs.end(), ExactVertexCounter(num));
-    return;
   }
-  out << commands.at(param)(plgs);
 }
 
 void duhanina::printLessArea(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
