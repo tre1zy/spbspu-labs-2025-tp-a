@@ -19,15 +19,15 @@ namespace fedorov
     auto getArea = std::bind(&calcPolygonArea, _1);
     auto getVertexCount = std::bind(&std::vector< Point >::size, std::bind(&Polygon::points, _1));
 
-    auto modTwo = std::bind(std::modulus< size_t >(), std::bind(getVertexCount, _1), 2);
-    auto isOdd = std::bind(std::not_equal_to< size_t >(), std::bind(modTwo, _1), 0);
-    auto isEven = std::bind(std::equal_to< size_t >(), std::bind(modTwo, _1), 0);
+    auto modTwo = std::bind(std::modulus< size_t >{}, std::bind(getVertexCount, _1), 2);
+    auto isOdd = std::bind(std::not_equal_to< size_t >{}, std::bind(modTwo, _1), 0);
+    auto isEven = std::bind(std::equal_to< size_t >{}, std::bind(modTwo, _1), 0);
 
-    auto areaLess = std::bind(std::less< double >(), std::bind(getArea, _1), std::bind(getArea, _2));
+    auto areaLess = std::bind(std::less< double >{}, std::bind(getArea, _1), std::bind(getArea, _2));
 
-    auto vertexLess = std::bind(std::less< size_t >(), std::bind(getVertexCount, _1), std::bind(getVertexCount, _2));
+    auto vertexLess = std::bind(std::less< size_t >{}, std::bind(getVertexCount, _1), std::bind(getVertexCount, _2));
 
-    auto areaSummator = std::bind(std::plus< double >(), _1, std::bind(getArea, _2));
+    auto areaSummator = std::bind(std::plus< double >{}, _1, std::bind(getArea, _2));
 
     void outputArea(double value, std::ostream &out)
     {
@@ -68,7 +68,7 @@ namespace fedorov
     {
       throw std::invalid_argument("Invalid vertex count");
     }
-    auto vertexEqual = std::bind(std::equal_to< size_t >(), std::bind(getVertexCount, _1), num);
+    auto vertexEqual = std::bind(std::equal_to< size_t >{}, std::bind(getVertexCount, _1), num);
     std::vector< Polygon > filtered;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), vertexEqual);
     double total = std::accumulate(filtered.begin(), filtered.end(), 0.0, areaSummator);
@@ -131,7 +131,7 @@ namespace fedorov
     {
       throw std::invalid_argument("Invalid vertex count");
     }
-    auto vertexEqual = std::bind(std::equal_to< size_t >(), std::bind(getVertexCount, _1), num);
+    auto vertexEqual = std::bind(std::equal_to< size_t >{}, std::bind(getVertexCount, _1), num);
     out << std::count_if(polygons.begin(), polygons.end(), vertexEqual) << '\n';
   }
 
@@ -245,7 +245,7 @@ namespace fedorov
     }
 
     double threshold = calcPolygonArea(target);
-    auto calcAreaLess = std::bind(std::less< double >(), std::bind(calcPolygonArea, _1), threshold);
+    auto calcAreaLess = std::bind(std::less< double >{}, std::bind(calcPolygonArea, _1), threshold);
     out << std::count_if(polygons.begin(), polygons.end(), calcAreaLess) << '\n';
   }
 

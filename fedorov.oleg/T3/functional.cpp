@@ -27,9 +27,9 @@ namespace fedorov
       auto begin = poly.points.begin();
       auto end = poly.points.end();
 
-      auto multXYFirst = std::bind(std::multiplies< double >(), std::bind(&Point::x, _1), std::bind(&Point::y, _2));
-      auto multXYSecond = std::bind(std::multiplies< double >(), std::bind(&Point::x, _2), std::bind(&Point::y, _1));
-      auto crossProduct = std::bind(std::minus< double >(), multXYFirst, multXYSecond);
+      auto multXYFirst = std::bind(std::multiplies< double >{}, std::bind(&Point::x, _1), std::bind(&Point::y, _2));
+      auto multXYSecond = std::bind(std::multiplies< double >{}, std::bind(&Point::x, _2), std::bind(&Point::y, _1));
+      auto crossProduct = std::bind(std::minus< double >{}, multXYFirst, multXYSecond);
 
       sum = std::inner_product(begin, end - 1, begin + 1, 0.0, std::plus<>{}, crossProduct);
     }
