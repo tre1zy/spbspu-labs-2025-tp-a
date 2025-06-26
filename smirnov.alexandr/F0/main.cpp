@@ -9,14 +9,15 @@ int main(int argc, char* argv[])
   Dicts dicts;
   if (argc == 2)
   {
-    if (std::string(argv[1]) == "--help")
+    std::string arg = argv[1];
+    if (arg == "--help")
     {
       helpCommand(std::cout);
       return 0;
     }
     try
     {
-      loadFile(dicts, argv[1]);
+      importDictfromFile(dicts, arg);
     }
     catch (const std::exception & e)
     {

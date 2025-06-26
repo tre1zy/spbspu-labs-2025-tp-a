@@ -55,6 +55,121 @@ namespace smirnov
       return entry.first == word;
     }
   };
+
+  struct CopyEntryToDict
+  {
+    Dict & result;
+    explicit CopyEntryToDict(Dict & r):
+      result(r)
+    {}
+    void operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      result[entry.first] = entry.second;
+    }
+  };
+
+  struct MergeTranslations
+  {
+    std::vector< std::string > & translations;
+    explicit MergeTranslations(std::vector< std::string > & tr):
+      translations(tr)
+    {}
+    void operator()(const std::string & tr) const
+    {
+      if (std::find(translations.begin(), translations.end(), tr) == translations.end())
+      {
+        translations.push_back(tr);
+      }
+    }
+  };
+
+  struct MergeEntryToDict
+  {
+    Dict & result;
+    explicit MergeEntryToDict(Dict & r):
+      result(r)
+    {}
+    void operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      std::vector< std::string > & translations = result[entry.first];
+      std::for_each(entry.second.begin(), entry.second.end(), MergeTranslations(translations));
+    }
+  };
+
+  struct EntryFileFormatter
+  {
+    std::ofstream & file;
+    explicit EntryFileFormatter(std::ofstream & f):
+      file(f)
+    {}
+    void operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      file << entry.first << " - ";
+      std::copy(entry.second.begin(), entry.second.end(), std::ostream_iterator< std::string >(file, " "));
+      file << "\n";
+    }
+  };
+
+  struct InSecondDict
+  {
+    const Dict & dict2;
+    explicit InSecondDict(const Dict & d):
+      dict2(d)
+    {}
+    bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      return dict2.find(entry.first) != dict2.end();
+    }
+  };
+
+  struct NotInSecondDict
+  {
+    const Dict & dict2;
+    explicit NotInSecondDict(const Dict & d):
+      dict2(d)
+    {}
+    bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
+    {
+      return dict2.find(entry.first) == dict2.end();
+    }
+  };
+
+  struct LineToEntry
+  {
+    Dict & dict;
+    explicit LineToEntry(Dict & d):
+      dict(d)
+    {}
+    void operator()(const std::string & line) const
+    {
+      size_t dashPos = line.find(" - ");
+      if (dashPos == std::string::npos)
+      {
+        return;
+      }
+      std::string word = line.substr(0, dashPos);
+      std::string translationsStr = line.substr(dashPos + 3);
+      std::vector< std::string > translations;
+      size_t start = 0;
+      size_t end = translationsStr.find(' ');
+      while (end != std::string::npos)
+      {
+        std::string translation = translationsStr.substr(start, end - start);
+        if (!translation.empty())
+        {
+          translations.push_back(translation);
+        }
+        start = end + 1;
+        end = translationsStr.find(' ', start);
+      }
+      std::string lastTranslation = translationsStr.substr(start);
+      if (!lastTranslation.empty())
+      {
+        translations.push_back(lastTranslation);
+      }
+      dict[word] = translations;
+    }
+  };
 }
 
 void smirnov::createCommand(Dicts & dicts, std::istream & in, std::ostream & out)
@@ -90,11 +205,11 @@ void smirnov::addCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "The dictionary with name " << dictName << " doesn't exist.\n";
     return;
   }
-  auto & dict = dictIt->second;
-  auto wordIt = dict.find(word);
+  Dict & dict = dictIt->second;
+  auto wordIt = std::find_if(dict.begin(), dict.end(), WordFinder(word));
   if (wordIt != dict.end())
   {
-    if (std::find(wordIt->second.begin(), wordIt->second.end(), translation) != wordIt->second.end())
+    if (std::find_if(wordIt->second.begin(), wordIt->second.end(), TranslationFinder(translation)) != wordIt->second.end())
     {
       out << "The word " << word << " already exists in " << dictName << "\n";
       return;
@@ -122,8 +237,8 @@ void smirnov::translateCommand(Dicts & dicts, std::istream & in, std::ostream & 
     out << "The dictionary with name " << dictName << " doesn't exist.\n";
     return;
   }
-  auto & dict = dictIt->second;
-  auto wordIt = dict.find(word);
+  const Dict & dict = dictIt->second;
+  auto wordIt = std::find_if(dict.begin(), dict.end(), WordFinder(word));
   if (wordIt == dict.end())
   {
     out << "The word " << word << " doesn't exist in " << dictName << "\n";
@@ -148,8 +263,8 @@ void smirnov::removeCommand(Dicts & dicts, std::istream & in, std::ostream & out
     out << "The dictionary with name " << dictName << " doesn't exist.\n";
     return;
   }
-  auto & dict = dictIt->second;
-  auto wordIt = dict.find(word);
+  Dict & dict = dictIt->second;
+  auto wordIt = std::find_if(dict.begin(), dict.end(), WordFinder(word));
   if (wordIt == dict.end())
   {
     out << "The word " << word << " doesn't exist in " << dictName << "\n";
@@ -210,12 +325,7 @@ void smirnov::saveCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     return;
   }
   file << dictName << "\n";
-  for (const auto & pair : dictIt->second)
-  {
-    file << pair.first << " - ";
-    std::copy(pair.second.begin(), pair.second.end(), std::ostream_iterator< std::string >(file, " "));
-    file << "\n";
-  }
+  std::for_each(dictIt->second.begin(), dictIt->second.end(), EntryFileFormatter(file));
 }
 
 void smirnov::mergeCommand(Dicts & dicts, std::istream & in, std::ostream & out)
@@ -239,18 +349,9 @@ void smirnov::mergeCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  Dict result = it1->second;
-  for (const auto & pair : it2->second)
-  {
-    auto & translations = result[pair.first];
-    for (const auto & tr : pair.second)
-    {
-      if (std::find(translations.begin(), translations.end(), tr) == translations.end())
-      {
-        translations.push_back(tr);
-      }
-    }
-  }
+  Dict result;
+  std::for_each(it1->second.begin(), it1->second.end(), CopyEntryToDict(result));
+  std::for_each(it2->second.begin(), it2->second.end(), MergeEntryToDict(result));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
@@ -288,8 +389,8 @@ void smirnov::editCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "The dictionary with name " << dictName << " doesn't exist.\n";
     return;
   }
-  auto & dict = dictIt->second;
-  auto wordIt = dict.find(word);
+  Dict & dict = dictIt->second;
+  auto wordIt = std::find_if(dict.begin(), dict.end(), WordFinder(word));
   if (wordIt == dict.end())
   {
     out << "The word " << word << " doesn't exist in " << dictName << "\n";
@@ -339,15 +440,15 @@ void smirnov::moveCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto & from = fromIt->second;
-  auto & to = toIt->second;
-  auto wordIt = from.find(word);
+  Dict & from = fromIt->second;
+  Dict & to = toIt->second;
+  auto wordIt = std::find_if(from.begin(), from.end(), WordFinder(word));
   if (wordIt == from.end())
   {
     out << "The word " << word << " doesn't exist in " << fromDict << "\n";
     return;
   }
-  if (to.find(word) != to.end())
+  if (std::find_if(to.begin(), to.end(), WordFinder(word)) != to.end())
   {
     out << "The word " << word << " already exists in " << toDict << "\n";
     return;
@@ -373,15 +474,15 @@ void smirnov::copyCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto & from = fromIt->second;
-  auto & to = toIt->second;
-  auto wordIt = from.find(word);
+  const Dict & from = fromIt->second;
+  Dict & to = toIt->second;
+  auto wordIt = std::find_if(from.begin(), from.end(), WordFinder(word));
   if (wordIt == from.end())
   {
     out << "The word " << word << " doesn't exist in " << fromDict << "\n";
     return;
   }
-  if (to.find(word) != to.end())
+  if (std::find_if(to.begin(), to.end(), WordFinder(word)) != to.end())
   {
     out << "The word " << word << " already exists in " << toDict << "\n";
     return;
@@ -411,14 +512,10 @@ void smirnov::intersectCommand(Dicts & dicts, std::istream & in, std::ostream & 
     out << "<INVALID COMMAND>\n";
     return;
   }
+  const Dict & dict1 = it1->second;
+  const Dict & dict2 = it2->second;
   Dict result;
-  for (const auto & pair : it1->second)
-  {
-    if (it2->second.find(pair.first) != it2->second.end())
-    {
-      result[pair.first] = pair.second;
-    }
-  }
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), InSecondDict(dict2));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
@@ -444,14 +541,10 @@ void smirnov::differenceCommand(Dicts & dicts, std::istream & in, std::ostream &
     out << "<INVALID COMMAND>\n";
     return;
   }
+  const Dict & dict1 = it1->second;
+  const Dict & dict2 = it2->second;
   Dict result;
-  for (const auto & pair : it1->second)
-  {
-    if (it2->second.find(pair.first) == it2->second.end())
-    {
-      result[pair.first] = pair.second;
-    }
-  }
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), NotInSecondDict(dict2));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
@@ -477,21 +570,11 @@ void smirnov::uniqueCommand(Dicts & dicts, std::istream & in, std::ostream & out
     out << "<INVALID COMMAND>\n";
     return;
   }
+  const Dict & dict1 = it1->second;
+  const Dict & dict2 = it2->second;
   Dict result;
-  for (const auto & pair : it1->second)
-  {
-    if (it2->second.find(pair.first) == it2->second.end())
-    {
-      result[pair.first] = pair.second;
-    }
-  }
-  for (const auto & pair : it2->second)
-  {
-    if (it1->second.find(pair.first) == it1->second.end())
-    {
-      result[pair.first] = pair.second;
-    }
-  }
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), NotInSecondDict(dict2));
+  std::copy_if(dict2.begin(), dict2.end(), std::inserter(result, result.end()), NotInSecondDict(dict1));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
@@ -523,62 +606,52 @@ void smirnov::prefixCommand(Dicts & dicts, std::istream & in, std::ostream & out
     return;
   }
   Dict result;
-  std::copy_if(dict.begin(), dict.end(), std::inserter(result, result.end()), PrefixMatcher(prefix)
-  );
+  std::copy_if(dict.begin(), dict.end(), std::inserter(result, result.end()), PrefixMatcher(prefix));
   if (result.empty())
   {
     out << "There aren't any words in " << dictName << " with prefix " << prefix << ".\n";
     return;
   }
-
   dicts[newName] = std::move(result);
 }
 
-void smirnov::loadFile(Dicts & dicts, const std::string & filename)
+void smirnov::importDictfromFile(Dicts & dicts, const std::string & filename)
 {
   std::ifstream file(filename);
   if (!file)
   {
     throw std::runtime_error("Cannot open file\n");
   }
-  std::string dictName;
-  std::getline(file, dictName);
-  Dict dict;
   std::string line;
+  std::string dictName;
+  Dict dict;
+  bool hasDict = false;
   while (std::getline(file, line))
   {
     if (line.empty())
     {
       continue;
     }
-    size_t dashPos = line.find(" - ");
-    if (dashPos == std::string::npos)
+    if (line.find(" - ") == std::string::npos)
     {
-      continue;
-    }
-    std::string word = line.substr(0, dashPos);
-    std::string translationsStr = line.substr(dashPos + 3);
-    std::vector< std::string > translations;
-    size_t start = 0;
-    size_t end = translationsStr.find(' ');
-    while (end != std::string::npos)
-    {
-      std::string translation = translationsStr.substr(start, end - start);
-      if (!translation.empty())
+      if (hasDict)
       {
-        translations.push_back(translation);
+        dicts[dictName] = dict;
+        dict.clear();
       }
-      start = end + 1;
-      end = translationsStr.find(' ', start);
+      dictName = line;
+      hasDict = true;
     }
-    std::string lastTranslation = translationsStr.substr(start);
-    if (!lastTranslation.empty())
+    else
     {
-      translations.push_back(lastTranslation);
+      LineToEntry entryParser(dict);
+      entryParser(line);
     }
-    dict[word] = translations;
   }
-  dicts[dictName] = dict;
+  if (hasDict)
+  {
+    dicts[dictName] = dict;
+  }
 }
 
 void smirnov::helpCommand(std::ostream & out)
