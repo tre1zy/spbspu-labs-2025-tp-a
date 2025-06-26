@@ -1,13 +1,13 @@
 #ifndef CONTENT_HPP
 #define CONTENT_HPP
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
 #include <set>
 #include <map>
 #include <boost/variant2.hpp>
-#include <cstddef>
 #include <utility>
 #include "compare.hpp"
 
@@ -248,7 +248,8 @@ namespace rychkov
     };
     struct Expression
     {
-      using operand = boost::variant2::variant< DynMemWrapper< Expression >, Variable, Declaration, Literal, CastOperation, Body >;
+      using operand = boost::variant2::variant< DynMemWrapper< Expression >, Variable,
+            Declaration, Literal, CastOperation, Body >;
 
       const Operator* operation;
       typing::Type result_type;

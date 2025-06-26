@@ -1,8 +1,8 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
-#include <iosfwd>
 #include <cstddef>
+#include <iosfwd>
 #include <string>
 
 namespace rychkov

@@ -1,5 +1,7 @@
 #include "content.hpp"
 
+#include <utility>
+
 bool rychkov::typing::Type::empty() const noexcept
 {
   return (category == COMBINATION) && !is_const && !is_volatile && !is_signed && !is_unsigned;

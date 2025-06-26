@@ -75,7 +75,6 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
           }
         }
       }
-
       stack_.pop();
       append_empty(context);
       return;

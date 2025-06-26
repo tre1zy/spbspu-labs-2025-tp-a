@@ -1,7 +1,6 @@
 #include "print_content.hpp"
 
 #include <iostream>
-#include <string>
 #include <algorithm>
 
 std::ostream& rychkov::entities::operator<<(std::ostream& out, const Variable& var)

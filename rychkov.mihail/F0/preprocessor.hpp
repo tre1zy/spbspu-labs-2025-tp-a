@@ -1,13 +1,14 @@
 #ifndef PREPROCESSOR_HPP
 #define PREPROCESSOR_HPP
 
-#include <iosfwd>
 #include <cstddef>
+#include <iosfwd>
 #include <string>
 #include <vector>
 #include <stack>
 #include <set>
 #include <map>
+#include <memory>
 
 #include "log.hpp"
 #include "content.hpp"

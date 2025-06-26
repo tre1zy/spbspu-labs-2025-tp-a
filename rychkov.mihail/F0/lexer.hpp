@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <memory>
 #include <boost/variant2.hpp>
 
 #include "content.hpp"

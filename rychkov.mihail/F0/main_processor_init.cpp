@@ -24,6 +24,18 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
     {
       sources = true;
     }
+    else if (std::strcmp(argv[i], "--load") == 0)
+    {
+      sources = false;
+      if (++i >= argc)
+      {
+        throw std::invalid_argument("missing save-file name");
+      }
+      if (!load(context.out, context.err, argv[i]))
+      {
+        throw std::runtime_error("failed to load save-file \""s + argv[i] + '"');
+      }
+    }
     else if (std::strcmp(argv[i], "-E") == 0)
     {
       if (last_stage_ != CPARSER)
@@ -100,7 +112,7 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
     }
     CParseContext parse_context{*output, context.err, filename};
     context.out << "<--PARSE: \"" << filename << "\"-->\n";
-    if (!parse(parse_context, false))
+    if (!parse(parse_context, true))
     {
       throw std::runtime_error("failed to parse file \"" + filename + "\" - stopping");
     }
@@ -116,9 +128,13 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
 
 bool rychkov::MainProcessor::parse(CParseContext file_context, bool overwrite)
 {
+  if (overwrite)
+  {
+    parsed_.erase(file_context.file);
+  }
   std::pair< decltype(parsed_)::iterator, bool > cell = parsed_.emplace(file_context.file,
     ParseCell{file_context, last_stage_, include_dirs_});
-  if (!cell.second && !overwrite)
+  if (!cell.second)
   {
     return true;
   }

@@ -1,12 +1,11 @@
 #include "type_parser.hpp"
 
+#include <utility>
 #include <map>
 
 void rychkov::TypeParser::append(CParseContext& context, char c)
 {
-  using append_signature = void(TypeParser::*)(CParseContext&);
-  using append_map = std::map< char, append_signature >;
-  static const append_map dispatch_map = {
+  static const std::map< char, void(TypeParser::*)(CParseContext&) > dispatch_map = {
         {'*', &TypeParser::append_asterisk},
         {'[', &TypeParser::append_open_bracket},
         {']', &TypeParser::append_close_bracket},
@@ -15,7 +14,7 @@ void rychkov::TypeParser::append(CParseContext& context, char c)
         {',', &TypeParser::append_comma}
       };
 
-  append_map::const_iterator found = dispatch_map.find(c);
+  decltype(dispatch_map)::const_iterator found = dispatch_map.find(c);
   if (found != dispatch_map.cend())
   {
     (this->*(found->second))(context);

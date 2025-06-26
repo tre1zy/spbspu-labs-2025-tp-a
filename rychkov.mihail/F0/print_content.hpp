@@ -2,6 +2,7 @@
 #define PRINT_CONTENT_HPP
 
 #include <iosfwd>
+#include <string>
 #include "content.hpp"
 
 namespace rychkov

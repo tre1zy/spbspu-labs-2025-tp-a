@@ -48,6 +48,7 @@ bool rychkov::MainProcessor::load(std::ostream& out, std::ostream& err, std::str
   }
   boost::json::value doc = boost::json::parse(in);
   std::map< std::string, ParseCell > new_parsed;
+  size_t ngenerated = 0;
   for (const boost::json::object::value_type& file: doc.as_object())
   {
     std::pair< decltype(new_parsed)::iterator, bool > cell_p = new_parsed.emplace(file.key(),
@@ -69,6 +70,7 @@ bool rychkov::MainProcessor::load(std::ostream& out, std::ostream& err, std::str
       CParser& parser = *preproc.next->next;
       Loader loader = std::for_each(pgm.begin(), pgm.end(), Loader{parser});
       cell_p.first->second.real_file = obj.at("real").as_bool();
+      ngenerated += !cell_p.first->second.real_file;
       cell_p.first->second.cache = boost::json::value_to< std::string >(obj.at("cache"));
 
       parser.defined_functions = loader.preproc.next->next->defined_functions;
@@ -82,6 +84,7 @@ bool rychkov::MainProcessor::load(std::ostream& out, std::ostream& err, std::str
     }
   }
   parsed_ = std::move(new_parsed);
+  generated_files = ngenerated;
   return true;
 }
 rychkov::Macro rychkov::Loader::as_macro(const boost::json::value& val)

@@ -1,10 +1,8 @@
 #ifndef TYPE_PARSER_HPP
 #define TYPE_PARSER_HPP
 
-#include <stack>
-#include <set>
 #include <string>
-#include <cstddef>
+#include <stack>
 #include "log.hpp"
 #include "content.hpp"
 

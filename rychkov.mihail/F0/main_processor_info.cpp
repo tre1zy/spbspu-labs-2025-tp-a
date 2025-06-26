@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <algorithm>
-#include <iterator>
 #include "print_content.hpp"
 
 void rychkov::MainProcessor::help(std::ostream& out)

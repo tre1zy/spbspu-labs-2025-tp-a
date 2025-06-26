@@ -1,6 +1,6 @@
 #include "type_parser.hpp"
 
-#include <map>
+#include <utility>
 
 void rychkov::TypeParser::append(CParseContext& context, std::string name)
 {

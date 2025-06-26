@@ -4,7 +4,6 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include <iterator>
 #include <utility>
 #include "compare.hpp"
 #include "print_content.hpp"
@@ -13,6 +12,7 @@ namespace rychkov
 {
   struct DiffVisitor
   {
+    std::set< std::string > files;
     std::multimap< entities::Variable, std::vector< std::string >, NameCompare > appearances;
     std::multimap< Macro, std::vector< std::string >, NameCompare > macros;
     std::string current_file;
@@ -20,6 +20,10 @@ namespace rychkov
     void operator()(const std::pair< const std::string, ParseCell >& cell)
     {
       current_file = cell.first;
+      if (!files.empty() && (files.find(current_file) == files.end()))
+      {
+        return;
+      }
       const Preprocessor& preproc = cell.second.preproc;
       const CParser& parser = *preproc.next->next;
       *this = std::for_each(parser.begin(), parser.end(), std::move(*this));
@@ -128,11 +132,18 @@ bool rychkov::MainProcessor::intersections(ParserContext& context)
 }
 bool rychkov::MainProcessor::diff(ParserContext& context)
 {
-  if ((last_stage_ != CPARSER) || !eol(context.in))
+  std::set< std::string > files;
+  if (last_stage_ != CPARSER)
   {
     return false;
   }
-  DiffVisitor visitor = std::for_each(parsed_.begin(), parsed_.end(), DiffVisitor{});
+  while (!eol(context.in))
+  {
+    std::string name;
+    context.in >> name;
+    files.insert(name);
+  }
+  DiffVisitor visitor = std::for_each(parsed_.begin(), parsed_.end(), DiffVisitor{std::move(files)});
   bool empty = true;
   using MacroIter = decltype(visitor.macros)::const_iterator;
   MacroIter i = visitor.macros.begin();

@@ -2,12 +2,10 @@
 
 #include <iostream>
 #include <algorithm>
-#include <iterator>
-#include <functional>
 #include <set>
 #include <map>
-#include "print_content.hpp"
 #include "compare.hpp"
+#include "print_content.hpp"
 
 namespace rychkov
 {

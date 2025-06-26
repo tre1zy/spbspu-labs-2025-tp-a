@@ -10,8 +10,6 @@
 
 #include "log.hpp"
 #include "preprocessor.hpp"
-#include "lexer.hpp"
-#include "cparser.hpp"
 
 namespace rychkov
 {
