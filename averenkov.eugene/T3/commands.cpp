@@ -1,44 +1,47 @@
 #include "commands.hpp"
 
-namespace averenkov
-{
-  bool RightAngleChecker::operator()(const Polygon& poly) const
+  averenkov::AngleCheckHelper::AngleCheckHelper(const std::vector< Point >& points):
+    pts(points),
+    idx(0)
+  {}
+
+  bool averenkov::AngleCheckHelper::operator()(const Point&)
+  {
+    size_t j = (idx + 1) % pts.size();
+    size_t k = (idx + 2) % pts.size();
+
+    int dx1 = pts[j].x - pts[idx].x;
+    int dy1 = pts[j].y - pts[idx].y;
+    int dx2 = pts[k].x - pts[j].x;
+    int dy2 = pts[k].y - pts[j].y;
+
+    bool hasRightAngle = (dx1 * dx2 + dy1 * dy2 == 0);
+    idx++;
+    return hasRightAngle;
+  }
+
+  bool averenkov::RightAngleChecker::operator()(const Polygon& poly) const
   {
     const auto& pts = poly.points;
     if (pts.size() < 3)
     {
       return false;
     }
-
-    for (size_t i = 0; i < pts.size(); ++i)
-    {
-      size_t j = (i + 1) % pts.size();
-      size_t k = (i + 2) % pts.size();
-
-      int dx1 = pts[j].x - pts[i].x;
-      int dy1 = pts[j].y - pts[i].y;
-      int dx2 = pts[k].x - pts[j].x;
-      int dy2 = pts[k].y - pts[j].y;
-
-      if (dx1 * dx2 + dy1 * dy2 == 0)
-      {
-        return true;
-      }
-    }
-    return false;
+    AngleCheckHelper helper(pts);
+    return std::any_of(pts.begin(), pts.end(), helper);
   }
 
-  VertexCount::VertexCount(size_t num):
+  averenkov::VertexCount::VertexCount(size_t num):
     num_(num)
   {
   }
 
-  bool VertexCount::operator()(const Polygon& poly) const
+  bool averenkov::VertexCount::operator()(const Polygon& poly) const
   {
     return poly.points.size() == num_;
   }
 
-  bool PolygonEqual::operator()(const Polygon& a, const Polygon& b) const
+  bool averenkov::PolygonEqual::operator()(const Polygon& a, const Polygon& b) const
   {
     if (a.points.size() != b.points.size())
     {
@@ -47,7 +50,7 @@ namespace averenkov
     return std::is_permutation(a.points.cbegin(), a.points.cend(), b.points.cbegin());
   }
 
-  double calculateArea(const Polygon& poly)
+  double averenkov::calculateArea(const Polygon& poly)
   {
     double area = 0.0;
     const auto& pts = poly.points;
@@ -59,7 +62,7 @@ namespace averenkov
     return std::abs(area) / 2.0;
   }
 
-  double AreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
+  double averenkov::AreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -69,7 +72,7 @@ namespace averenkov
     return sum;
   }
 
-  double EvenAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
+  double averenkov::EvenAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -82,7 +85,7 @@ namespace averenkov
     return sum;
   }
 
-  double OddAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
+  double averenkov::OddAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -95,7 +98,7 @@ namespace averenkov
     return sum;
   }
 
-  double NumVertexAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
+  double averenkov::NumVertexAreaSumCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     double sum = 0.0;
     for (const auto& poly: polygons)
@@ -108,7 +111,7 @@ namespace averenkov
     return sum;
   }
 
-  double MeanAreaCalculator::operator()(const std::vector< Polygon >& polygons) const
+  double averenkov::MeanAreaCalculator::operator()(const std::vector< Polygon >& polygons) const
   {
     if (polygons.empty())
     {
@@ -117,7 +120,7 @@ namespace averenkov
     return AreaSumCalculator()(polygons) / polygons.size();
   }
 
-  void MaxAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
+  void averenkov::MaxAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -132,11 +135,11 @@ namespace averenkov
         maxArea = area;
       }
     }
-    averenkov::iofmtguard guard(out);
+    iofmtguard guard(out);
     out << std::fixed << std::setprecision(1) << maxArea;
   }
 
-  void MaxVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
+  void averenkov::MaxVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -154,7 +157,7 @@ namespace averenkov
     out << maxVertices;
   }
 
-  void MinAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
+  void averenkov::MinAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -173,7 +176,7 @@ namespace averenkov
     out << std::fixed << std::setprecision(1) << minArea;
   }
 
-  void MinVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
+  void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
   {
     if (polygons.empty())
     {
@@ -191,7 +194,7 @@ namespace averenkov
     out << minVertices;
   }
 
-  size_t EvenCounter::operator()(const std::vector< Polygon >& polygons) const
+  size_t averenkov::EvenCounter::operator()(const std::vector< Polygon >& polygons) const
   {
     size_t count = 0;
     for (const auto& poly: polygons)
@@ -204,7 +207,7 @@ namespace averenkov
     return count;
   }
 
-  size_t OddCounter::operator()(const std::vector< Polygon >& polygons) const
+  size_t averenkov::OddCounter::operator()(const std::vector< Polygon >& polygons) const
   {
     size_t count = 0;
     for (const auto& poly: polygons)
@@ -217,7 +220,7 @@ namespace averenkov
     return count;
   }
 
-  size_t NumVertexCounter::operator()(const std::vector< Polygon >& polygons) const
+  size_t averenkov::NumVertexCounter::operator()(const std::vector< Polygon >& polygons) const
   {
     size_t count = 0;
     for (const auto& poly: polygons)
@@ -230,7 +233,7 @@ namespace averenkov
     return count;
   }
 
-  void printAreaSum(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printAreaSum(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
@@ -257,7 +260,7 @@ namespace averenkov
     }
   }
 
-  void printMaxValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printMaxValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
@@ -276,7 +279,7 @@ namespace averenkov
     }
   }
 
-  void printMinValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printMinValueOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
@@ -296,7 +299,7 @@ namespace averenkov
     }
   }
 
-  void printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printCountOf(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     std::string param;
     in >> param;
@@ -316,7 +319,7 @@ namespace averenkov
     out << commands.at(param)(polygons);
   }
 
-  void printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printPermsCnt(std::istream& in, const std::vector< Polygon >& polygons, std::ostream& out)
   {
     Polygon target;
     if (!(in >> target))
@@ -329,13 +332,13 @@ namespace averenkov
     out << count;
   }
 
-  void printRightsCnt(const std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printRightsCnt(const std::vector< Polygon >& polygons, std::ostream& out)
   {
     size_t count = std::count_if(polygons.begin(), polygons.end(), RightAngleChecker());
     out << count;
   }
 
-  void printRmEcho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
+  void averenkov::printRmEcho(std::istream& in, std::vector< Polygon >& polygons, std::ostream& out)
   {
     Polygon target;
     if (!(in >> target))
@@ -352,4 +355,4 @@ namespace averenkov
     polygons.erase(newEnd, polygons.end());
     out << removed;
   }
-}
+
