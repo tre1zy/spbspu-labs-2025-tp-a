@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <utility>
 #include "print_content.hpp"
 
 using namespace std::literals::string_literals;
@@ -20,6 +21,25 @@ std::vector< rychkov::entities::Expression >::const_iterator rychkov::CParser::b
 std::vector< rychkov::entities::Expression >::const_iterator rychkov::CParser::end() const
 {
   return program_.cend();
+}
+const rychkov::TypeParser& rychkov::CParser::next() const
+{
+  return type_parser_;
+}
+void rychkov::CParser::prepare_type()
+{
+  type_parser_.prepare();
+}
+void rychkov::CParser::clear_program()
+{
+  program_ = {{}};
+  stack_ = {};
+  stack_.push(&program_[0]);
+  type_parser_.clear();
+}
+void rychkov::CParser::push_back(entities::Expression expr)
+{
+  program_.push_back(std::move(expr));
 }
 
 const rychkov::Operator rychkov::CParser::parentheses = {Operator::MULTIPLE, Operator::SPECIAL,
@@ -68,8 +88,8 @@ void rychkov::CParser::append(CParseContext& context, TypeKeyword keyword)
 }
 void rychkov::CParser::append(CParseContext& context, std::string name)
 {
-  decltype(base_types_)::const_iterator base_type_p = base_types_.find(name);
-  if (base_type_p != base_types_.cend())
+  decltype(base_types)::const_iterator base_type_p = base_types.find(name);
+  if (base_type_p != base_types.cend())
   {
     type_parser_.append(context, base_type_p->first);
     return;

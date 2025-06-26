@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
 #include <boost/variant2.hpp>
 #include <cstddef>
 #include <utility>
@@ -78,17 +79,17 @@ namespace rychkov
     };
     enum Category
     {
-      ARITHMETIC, // +, -, *, /
-      INCREMENT, // ++, --
-      MODULUS, // %
-      LOGIC, // &&, ||, !
-      COMPARE, // <, >, >=, <=, ==, !=
-      BIT, // &, |, ~, ^, <<, ...
-      DEREFERENCE, // *
-      ADDRESSOF, // &
-      FIELD_ACCESS, // ., ->
-      SPECIAL, // (), [], ?:, sizeof, ','
-      ASSIGN // =
+      ARITHMETIC,
+      INCREMENT,
+      MODULUS,
+      LOGIC,
+      COMPARE,
+      BIT,
+      DEREFERENCE,
+      ADDRESSOF,
+      FIELD_ACCESS,
+      SPECIAL,
+      ASSIGN
     };
 
     Type type;
@@ -192,7 +193,8 @@ namespace rychkov
         WHILE,
         DO,
         RETURN,
-        DO_WHILE
+        DO_WHILE,
+        TYPE_LAST
       };
       Type type;
       std::vector< Expression > conditions;
@@ -205,12 +207,12 @@ namespace rychkov
     struct Enum
     {
       std::string name;
-      std::vector< std::pair< std::string, int > > fields;
+      std::map< std::string, int, NameCompare > fields;
     };
     struct Union
     {
       std::string name;
-      std::vector< Variable > fields;
+      std::set< Variable, NameCompare > fields;
     };
     struct Alias
     {
@@ -219,7 +221,8 @@ namespace rychkov
     };
     struct Declaration
     {
-      boost::variant2::variant< Variable, Struct, Enum, Union, Alias, Function, Statement > data;
+      using declared = boost::variant2::variant< Variable, Struct, Enum, Union, Alias, Function, Statement >;
+      declared data;
       DynMemWrapper< Expression > value = nullptr;
       ScopeType scope = UNSPECIFIED;
     };

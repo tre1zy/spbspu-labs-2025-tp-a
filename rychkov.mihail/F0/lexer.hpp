@@ -17,6 +17,7 @@ namespace rychkov
   class Lexer
   {
   public:
+    static const std::set< std::vector< Operator >, NameCompare > cases;
     std::unique_ptr< CParser > next;
 
     Lexer(std::unique_ptr< CParser > cparser = nullptr);
@@ -31,7 +32,6 @@ namespace rychkov
   private:
     using operator_value = const std::vector< Operator >*;
 
-    static const std::set< std::vector< Operator >, NameCompare > cases_;
     const std::map< std::string, CParser::TypeKeyword > type_keywords_;
     const std::map< std::string, void(CParser::*)(CParseContext&) > keywords_;
 

@@ -107,16 +107,6 @@ void rychkov::ContentPrinter::operator()(const entities::Body& body)
     indent() << "}\n";
   }
 }
-void rychkov::ContentPrinter::operator()(const entities::Struct& structure)
-{
-  indent() << "* [struct] " << structure.name << '\n';
-  indent_++;
-  for (const entities::Variable& i: structure.fields)
-  {
-    indent() << "* [field] " << i << '\n';
-  }
-  indent_--;
-}
 void rychkov::ContentPrinter::operator()(const entities::Statement& statement)
 {
   const char* names[] = {"if", "else", "for", "while", "do", "return", "do-while"};
@@ -133,11 +123,21 @@ void rychkov::ContentPrinter::operator()(const entities::Statement& statement)
     indent_--;
   }
 }
+void rychkov::ContentPrinter::operator()(const entities::Struct& structure)
+{
+  indent() << "* [struct] " << structure.name << '\n';
+  indent_++;
+  for (const entities::Variable& i: structure.fields)
+  {
+    indent() << "* [field] " << i << '\n';
+  }
+  indent_--;
+}
 void rychkov::ContentPrinter::operator()(const entities::Enum& structure)
 {
   indent() << "* [enum] " << structure.name << '\n';
   indent_++;
-  for (const std::pair< std::string, int >& i: structure.fields)
+  for (const std::pair< const std::string, int >& i: structure.fields)
   {
     indent() << i.first << " = " << i.second << '\n';
   }
@@ -147,9 +147,9 @@ void rychkov::ContentPrinter::operator()(const entities::Union& structure)
 {
   indent() << "* [union] " << structure.name << '\n';
   indent_++;
-  for (size_t i = 0; i < structure.fields.size(); i++)
+  for (const entities::Variable& i: structure.fields)
   {
-    indent() << "* [variant] " << structure.fields[i] << '\n';
+    indent() << "* [variant] " << i << '\n';
   }
   indent_--;
 }

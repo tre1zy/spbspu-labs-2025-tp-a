@@ -58,6 +58,7 @@ void rychkov::CParser::move_up_down()
 
 void rychkov::CParser::clear_scope()
 {
+  clear_scope(base_types, stack_.size());
   clear_scope(variables, stack_.size());
   clear_scope(structs, stack_.size());
   clear_scope(unions, stack_.size());

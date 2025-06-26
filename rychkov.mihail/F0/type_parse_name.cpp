@@ -68,3 +68,5 @@ void rychkov::TypeParser::append_signed(CParseContext&)
 {}
 void rychkov::TypeParser::append_unsigned(CParseContext&)
 {}
+void rychkov::TypeParser::append_long(CParseContext&)
+{}

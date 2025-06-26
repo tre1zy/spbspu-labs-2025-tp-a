@@ -34,6 +34,7 @@ namespace rychkov
     void append_volatile(CParseContext& context);
     void append_signed(CParseContext& context);
     void append_unsigned(CParseContext& context);
+    void append_long(CParseContext& context);
 
   private:
     struct ParseCell

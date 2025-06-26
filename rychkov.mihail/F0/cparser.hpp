@@ -24,8 +24,15 @@ namespace rychkov
       CONST,
       VOLATILE,
       SIGNED,
-      UNSIGNED
+      UNSIGNED,
+      LONG
     };
+    using value_type = entities::Expression;
+
+    static const Operator parentheses;
+    static const Operator brackets;
+    static const Operator comma;
+    static const Operator inline_if;
 
     std::set< entities::Alias, NameCompare > aliases;
     std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables;
@@ -34,13 +41,27 @@ namespace rychkov
     std::set< std::pair< entities::Struct, size_t >, NameCompare > structs;
     std::set< std::pair< entities::Union, size_t >, NameCompare > unions;
     std::set< std::pair< entities::Enum, size_t >, NameCompare > enums;
+    std::set< std::pair< typing::Type, size_t >, NameCompare > base_types = {
+          {{"int", typing::BASIC}, 0},
+          {{"char", typing::BASIC}, 0},
+          {{"float", typing::BASIC}, 0},
+          {{"double", typing::BASIC}, 0},
+          {{"void", typing::BASIC}, 0}
+        };
 
     CParser();
     CParser(const CParser&) = delete;
     CParser(CParser&&) = default;
 
+    template< class T >
+    static void clear_scope(T& pair_set, size_t scope);
+
     std::vector< entities::Expression >::const_iterator begin() const;
     std::vector< entities::Expression >::const_iterator end() const;
+    const TypeParser& next() const;
+    void prepare_type();
+    void clear_program();
+    void push_back(entities::Expression expr);
 
     void append(CParseContext& context, char c);
     void append(CParseContext& context, entities::Literal literal);
@@ -59,29 +80,15 @@ namespace rychkov
     void parse_while(CParseContext& context);
     void parse_for(CParseContext& context);
 
-    template< class T >
-    static void clear_scope(T& pair_set, size_t scope);
   private:
     static constexpr int min_priority = -1;
-
-    static const Operator parentheses;
-    static const Operator brackets;
-    static const Operator comma;
-    static const Operator inline_if;
 
     const std::map< TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
           {CONST, &TypeParser::append_const},
           {VOLATILE, &TypeParser::append_volatile},
           {SIGNED, &TypeParser::append_signed},
-          {UNSIGNED, &TypeParser::append_unsigned}
-        };
-
-    std::set< std::pair< typing::Type, size_t >, NameCompare > base_types_ = {
-          {{"int", typing::BASIC}, 0},
-          {{"char", typing::BASIC}, 0},
-          {{"float", typing::BASIC}, 0},
-          {{"double", typing::BASIC}, 0},
-          {{"void", typing::BASIC}, 0}
+          {UNSIGNED, &TypeParser::append_unsigned},
+          {LONG, &TypeParser::append_long}
         };
 
     std::vector< entities::Expression > program_;

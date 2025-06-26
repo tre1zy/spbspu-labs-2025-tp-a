@@ -47,10 +47,14 @@ bool rychkov::MainProcessor::save(std::ostream& err, std::string filename) const
     const CParser& src = *preproc.next->next;
     Serializer serial;
     boost::json::array macros(preproc.macros.size());
+    boost::json::array legacy_macros(preproc.legacy_macros.size());
     boost::json::array program;
     std::transform(preproc.macros.begin(), preproc.macros.end(), macros.begin(), serial);
+    std::transform(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), legacy_macros.begin(), serial);
     std::transform(src.begin(), src.end(), std::back_inserter(program), serial);
-    doc[file.first] = boost::json::object{{"macros", std::move(macros)}, {"pgm", std::move(program)}};
+    doc[file.first] = boost::json::object{{"macros", std::move(macros)},
+          {"old_macro", std::move(legacy_macros)}, {"pgm", std::move(program)},
+          {"real", file.second.real_file}, {"cache", file.second.cache}};
   }
   out << doc << '\n';
   return out.good();
@@ -111,12 +115,12 @@ boost::json::value rychkov::Serializer::operator()(const entities::Union& struct
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Alias& alias)
 {
-  return boost::json::object{{"obj", "alias"}, {"type", operator()(alias.type)}, {"name", alias.name}};
+  return boost::json::object{{"obj", "alias"}, {"sign", operator()(entities::Variable{alias.type, alias.name})}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Declaration& decl)
 {
   return boost::json::object{{"obj", "decl"}, {"data", boost::variant2::visit(*this, decl.data)},
-        {"value", operator()(decl.value)}};
+        {"value", operator()(decl.value)}, {"scope", decl.scope}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Literal& lit)
 {
@@ -142,7 +146,7 @@ boost::json::value rychkov::Serializer::operator()(const entities::Expression& e
   std::transform(expr.operands.begin(), expr.operands.end(), operands.begin(), *this);
   return boost::json::object{{"obj", "expr"}, {"token", expr.operation->token},
         {"rallign", expr.operation->right_align}, {"size", expr.operation->type},
-        {"operands", std::move(operands)}};
+        {"operands", std::move(operands)}, {"res_t", operator()(expr.result_type)}};
 }
 boost::json::value rychkov::Serializer::operator()(const DynMemWrapper< entities::Expression >& ptr)
 {

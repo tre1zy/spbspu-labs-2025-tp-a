@@ -12,7 +12,8 @@ rychkov::Lexer::Lexer(std::unique_ptr< CParser > cparser):
         {"const", CParser::CONST},
         {"volatile", CParser::VOLATILE},
         {"signed", CParser::SIGNED},
-        {"unsigned", CParser::UNSIGNED}
+        {"unsigned", CParser::UNSIGNED},
+        {"long", CParser::LONG}
       },
   keywords_{
         {"typedef", &CParser::parse_typedef},
@@ -23,7 +24,7 @@ rychkov::Lexer::Lexer(std::unique_ptr< CParser > cparser):
       }
 {}
 
-const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases_{
+const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases{
       {
         {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "+", false, true, false, 2},
         {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "+", false, false, false, 4}
@@ -238,8 +239,8 @@ void rychkov::Lexer::append(CParseContext& context, char c)
 }
 void rychkov::Lexer::append_new(CParseContext& context, char c)
 {
-  decltype(cases_)::const_iterator oper_p = cases_.find(std::string{c});
-  if (oper_p != cases_.end())
+  decltype(cases)::const_iterator oper_p = cases.find(std::string{c});
+  if (oper_p != cases.end())
   {
     buf_ = &*oper_p;
   }
@@ -256,8 +257,8 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
 void rychkov::Lexer::append_operator(CParseContext& context, char c)
 {
   operator_value& oper = boost::variant2::get< operator_value >(buf_);
-  decltype(cases_)::const_iterator oper_p = cases_.find((*oper)[0].token + c);
-  if (oper_p != cases_.cend())
+  decltype(cases)::const_iterator oper_p = cases.find((*oper)[0].token + c);
+  if (oper_p != cases.cend())
   {
     buf_ = &*oper_p;
     return;
