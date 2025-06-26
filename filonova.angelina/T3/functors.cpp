@@ -1,12 +1,5 @@
 #include "functors.hpp"
 
-filonova::TriangleAreaAccumulator::TriangleAreaAccumulator(const std::vector< Point > &pts): point(pts[0]), points(pts) {}
-
-double filonova::TriangleAreaAccumulator::operator()(double sum, size_t i) const
-{
-  return sum + filonova::triangleArea(point, points[i], points[i + 1]);
-}
-
 filonova::HasVertexCount::HasVertexCount(size_t count): count_(count) {}
 
 bool filonova::HasVertexCount::operator()(const Polygon &p) const
@@ -26,12 +19,12 @@ bool filonova::CompareByVertexes::operator()(const Polygon &a, const Polygon &b)
 
 bool filonova::ComparePointByX::operator()(const Point &a, const Point &b) const
 {
-  return a.x < b.x;
+  return a.x < b.x || (a.x == b.x && a.y < b.y);
 }
 
 bool filonova::ComparePointByY::operator()(const Point &a, const Point &b) const
 {
-  return a.y < b.y;
+  return a.y < b.y || (a.y == b.y && a.x < b.x);
 }
 
 filonova::IntersectsWith::IntersectsWith(const Polygon &polygon): polygon_(polygon) {}
@@ -95,10 +88,10 @@ bool filonova::IsRectangle::operator()(const Polygon &polygon) const
   std::vector< filonova::AngleCheckPoints > angles_to_check;
   angles_to_check.reserve(RECTANGLE_SIDES);
 
-  angles_to_check.push_back(filonova::AngleCheckPoints{points[3], points[0], points[1]});
-  angles_to_check.push_back(filonova::AngleCheckPoints{points[0], points[1], points[2]});
-  angles_to_check.push_back(filonova::AngleCheckPoints{points[1], points[2], points[3]});
-  angles_to_check.push_back(filonova::AngleCheckPoints{points[2], points[3], points[0]});
+  angles_to_check.push_back({points[3], points[0], points[1]});
+  angles_to_check.push_back({points[0], points[1], points[2]});
+  angles_to_check.push_back({points[1], points[2], points[3]});
+  angles_to_check.push_back({points[2], points[3], points[0]});
 
-  return std::all_of(angles_to_check.begin(), angles_to_check.end(), filonova::IsRightAngle{});
+  return std::all_of(angles_to_check.begin(), angles_to_check.end(), IsRightAngle{});
 }

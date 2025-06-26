@@ -36,7 +36,7 @@ std::istream &filonova::operator>>(std::istream &in, Polygon &polygon)
     return in;
   }
 
-  size_t count = 0;
+  size_t count;
   in >> count;
   if (count < MIN_VERTEX_COUNT)
   {
@@ -96,7 +96,6 @@ double filonova::triangleArea(const Point &a, const Point &b, const Point &c)
   double term1 = static_cast< double >(a.x) * (b.y - c.y);
   double term2 = static_cast< double >(b.x) * (c.y - a.y);
   double term3 = static_cast< double >(c.x) * (a.y - b.y);
-
   return std::abs(term1 + term2 + term3) / 2.0;
 }
 

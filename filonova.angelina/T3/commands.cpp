@@ -145,19 +145,16 @@ void filonova::count(std::istream &in, std::ostream &out, const std::vector< Pol
 
 void filonova::intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
-  Polygon inputPolygon;
+  Polygon polygon;
+  in >> polygon;
 
-  if (!(in >> inputPolygon))
+  if ((polygon.points.empty()) || (!in) || (in.peek() != '\n'))
   {
     out << "<INVALID COMMAND>";
     return;
   }
 
-  IntersectsWith intersects(inputPolygon);
-  auto pred = std::bind(intersects, std::placeholders::_1);
-
-  size_t count = std::count_if(polygons.begin(), polygons.end(), pred);
-  out << count;
+  out << std::count_if(polygons.cbegin(), polygons.cend(), IntersectsWith(polygon));
 }
 
 void filonova::rects(std::ostream &out, const std::vector< Polygon > &polygons)

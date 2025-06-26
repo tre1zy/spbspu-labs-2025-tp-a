@@ -8,14 +8,6 @@ static constexpr double EPS = 1e-9;
 
 namespace filonova
 {
-  struct TriangleAreaAccumulator
-  {
-    const Point &point;
-    const std::vector< Point > &points;
-    TriangleAreaAccumulator(const std::vector< Point > &pts);
-    double operator()(double sum, size_t i) const;
-  };
-
   struct HasVertexCount
   {
     size_t count_;
@@ -68,7 +60,6 @@ namespace filonova
   {
     bool operator()(const AngleCheckPoints &angle) const;
   };
-
 }
 
 #endif
