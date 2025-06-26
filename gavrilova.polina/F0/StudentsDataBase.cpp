@@ -114,7 +114,8 @@ namespace {
 
   struct IsRiskStudentPredicate {
     double threshold;
-    bool operator()(const std::pair< gavrilova::StudentID, std::shared_ptr< gavrilova::student::Student > >& p) const
+    bool operator()(const std::pair< gavrilova::StudentID,
+        std::shared_ptr< gavrilova::student::Student > >& p) const
     {
       return !p.second->grades_.empty() && p.second->averageGrade_ < threshold;
     }
@@ -158,7 +159,8 @@ namespace {
 
   struct StudentToFileWriter {
     std::ostream& out;
-    void operator()(const std::pair< gavrilova::StudentID, std::shared_ptr< gavrilova::student::Student > >& p) const
+    void operator()(const std::pair< gavrilova::StudentID,
+        std::shared_ptr< gavrilova::student::Student > >& p) const
     {
       out << *p.second << '\n';
     }
@@ -188,7 +190,8 @@ namespace {
   struct GroupStudentExporter {
     std::ostream& out;
 
-    void operator()(const std::pair< gavrilova::StudentID, std::shared_ptr< gavrilova::student::Student > >& p) const
+    void operator()(const std::pair< gavrilova::StudentID,
+        std::shared_ptr< gavrilova::student::Student > >& p) const
     {
       const auto& student = p.second;
       out << "ID:" << student->id_ << '\n';
@@ -247,7 +250,8 @@ bool gavrilova::StudentDatabase::groupExists(const std::string& groupName) const
   return groups.count(groupName) > 0;
 }
 
-std::pair< bool, gavrilova::StudentID > gavrilova::StudentDatabase::addStudent(const std::string& fullName, const std::string& groupName)
+std::pair< bool, gavrilova::StudentID > gavrilova::StudentDatabase::addStudent
+(const std::string& fullName, const std::string& groupName)
 {
   if (!groupExists(groupName)) {
     return {false, 0};
@@ -473,7 +477,8 @@ gavrilova::StudentDatabase::getStudentsInGroup(const std::string& groupName) con
   return result;
 }
 
-bool gavrilova::StudentDatabase::exportGroupForGrading(const std::string& groupName, const std::string& filename) const
+bool gavrilova::StudentDatabase::exportGroupForGrading
+    (const std::string& groupName, const std::string& filename) const
 {
   auto it = groups.find(groupName);
   if (it == groups.end()) {
@@ -512,7 +517,8 @@ bool gavrilova::StudentDatabase::loadGradesFromFile(const std::string& groupName
   return true;
 }
 
-std::pair< bool, gavrilova::GroupStatistics > gavrilova::StudentDatabase::getGroupStatistics(const std::string& groupName, const DateRange& period) const
+std::pair< bool, gavrilova::GroupStatistics > gavrilova::StudentDatabase::getGroupStatistics
+    (const std::string& groupName, const DateRange& period) const
 {
   auto it = groups.find(groupName);
   if (it == groups.end()) return {false, {}};
