@@ -5,7 +5,7 @@ template< typename Pred >
 void belyaev::areaOddEven(const std::vector< Polygon >& data, std::ostream& out, Pred predicate)
 {
   std::vector< double > areas;
-  std::vector< Polygon> polysByPredicate;
+  std::vector< Polygon > polysByPredicate;
 
   std::copy_if(data.begin(), data.end(), std::back_inserter(polysByPredicate), predicate);
   std::transform(polysByPredicate.begin(), polysByPredicate.end(), std::back_inserter(areas), calcArea);
@@ -20,7 +20,7 @@ void belyaev::areaMean(const std::vector< Polygon >& data, std::ostream& out)
     throw std::logic_error("Invalid query in AREA MEAN.");
   }
 
-  std::vector<double> areas;
+  std::vector< double > areas;
   std::transform(data.begin(), data.end(), std::back_inserter(areas), calcArea);
 
   double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -32,8 +32,8 @@ void belyaev::areaVertices(const std::vector< Polygon >& data, std::ostream& out
 {
   using namespace std::placeholders;
 
-  std::vector<double> areas;
-  std::vector<Polygon> matchingPolygons;
+  std::vector< double > areas;
+  std::vector< Polygon > matchingPolygons;
 
   auto isPolyOfSizeBind = std::bind(isPolygonOfSize, _1, std::ref(vertices));
   std::copy_if(data.begin(), data.end(), std::back_inserter(matchingPolygons), isPolyOfSizeBind);

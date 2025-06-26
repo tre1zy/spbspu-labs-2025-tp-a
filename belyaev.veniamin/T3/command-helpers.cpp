@@ -42,14 +42,14 @@ double belyaev::calcArea(const Polygon& src)
   using namespace std::placeholders;
 
   size_t n = src.points.size();
-  std::vector<size_t> indices(n);
+  std::vector< size_t > indices(n);
   std::iota(indices.begin(), indices.end(), 0);
 
-  std::vector<double> areaTerms(n);
+  std::vector< double > areaTerms(n);
   auto termCalcBind = std::bind(areaTermCalculate, std::cref(src.points), _1);
   std::transform(indices.begin(), indices.end(), std::back_inserter(areaTerms), termCalcBind);
 
-  std::vector<double> ones(areaTerms.size(), 1.0);
+  std::vector< double > ones(areaTerms.size(), 1.0);
   double area = std::inner_product(areaTerms.begin(), areaTerms.end(), ones.begin(), 0.0);
 
   return std::abs(area) / 2.0;

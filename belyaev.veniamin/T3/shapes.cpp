@@ -57,8 +57,8 @@ std::istream& belyaev::operator>>(std::istream& in, Polygon& dest)
     return in;
   }
 
-  using istreamPnt = std::istream_iterator<Point>;
-  std::vector<Point> newPoints(pointsAmount, Point{0, 0});
+  using istreamPnt = std::istream_iterator< Point >;
+  std::vector< Point > newPoints(pointsAmount, Point{0, 0});
   std::copy_n(istreamPnt(in), pointsAmount, newPoints.begin());
   if (in && pointsAmount == newPoints.size())
   {
@@ -80,7 +80,7 @@ std::ostream& belyaev::operator<<(std::ostream& out, const Polygon& src)
   }
 
   belyaev::StreamGuard guard(out);
-  using ostreamPnt = std::ostream_iterator<Point>;
+  using ostreamPnt = std::ostream_iterator< Point >;
   std::copy(src.points.begin(), src.points.end(), ostreamPnt{out, " "});
   return out;
 }
