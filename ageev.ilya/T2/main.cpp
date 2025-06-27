@@ -3,8 +3,8 @@
 #include <iterator>
 #include <algorithm>
 #include <limits>
-#include "DataStruct.hpp"
 #include <sstream>
+#include "DataStruct.hpp"
 
 int main()
 {
@@ -25,8 +25,8 @@ int main()
   }
   std::sort(data.begin(), data.end());
   std::copy(
-    std::begin(data),
-    std::end(data),
+    data.begin(),
+    data.end(),
     std::ostream_iterator< DataStruct >(std::cout, "\n")
   );
   return 0;

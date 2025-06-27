@@ -7,9 +7,12 @@
 
 namespace ageev
 {
-  bool DataStruct::operator<(const DataStruct& var) const{
-    if(key1 == var.key1){
-      if(key2 == var.key2){
+  bool DataStruct::operator<(const DataStruct& var) const
+  {
+    if(key1 == var.key1)
+    {
+      if(key2 == var.key2)
+      {
         return key3.size() < var.key3.size();
       }
       return key2 < var.key2;
@@ -58,7 +61,8 @@ namespace ageev
       {
         str += c;
       }
-      if (str.empty()) {
+      if (str.empty())
+      {
         in.setstate(std::ios::failbit);
         return in;
       }
@@ -98,8 +102,9 @@ namespace ageev
     }
       std::string data;
     in >> data;
-    if (data != dest.exp) {
-    in.setstate(std::ios::failbit);
+    if (data != dest.exp)
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -224,7 +229,7 @@ namespace ageev
     return out;
   }
 
-  iofmtguard::iofmtguard(std::basic_ios< char >& s) :
+  iofmtguard::iofmtguard(std::basic_ios< char >& s):
     s_(s),
     width_(s.width()),
     fill_(s.fill()),
