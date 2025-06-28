@@ -61,14 +61,25 @@ namespace
     }
   };
 
-  void recursiveMaxSeq(std::vector<Polygon>::const_iterator it,
-    std::vector<Polygon>::const_iterator end, SequenceCounter & counter)
+  class ToFlag
   {
-    if (it == end) return;
+  public:
+    explicit ToFlag(const Polygon & target) : target_(target) {}
+    size_t operator()(const Polygon & poly) const
+    {
+      return poly == target_ ? 1 : 0;
+    }
+  private:
+    const Polygon & target_;
+  };
 
-    counter.process(*it);
-    recursiveMaxSeq(std::next(it), end, counter);
-  }
+  struct ResetableAdder
+  {
+    size_t operator()(size_t prev, size_t x) const
+    {
+      return x ? prev + 1 : 0;
+    }
+  };
 
   void getAreaByPredicate(std::ostream & out, const std::vector<Polygon> & polygons, Predicate pred)
   {
@@ -248,7 +259,7 @@ void bocharov::getCount(std::istream & in, std::ostream & out, const std::vector
   }
 }
 
-void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std::vector<Polygon> & polygons)
 {
   Polygon target;
   in >> target;
@@ -257,9 +268,21 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std
     throw std::logic_error("<INVALID COMMAND>");
   }
 
-  SequenceCounter counter{ target };
-  recursiveMaxSeq(polygons.begin(), polygons.end(), counter);
-  out << counter.maxCount;
+  if (polygons.empty())
+  {
+    out << 0;
+    return;
+  }
+
+  std::vector<size_t> flags;
+  flags.reserve(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(flags), ToFlag(target));
+
+  std::vector<size_t> sequenceLengths(flags.size());
+  std::partial_sum(flags.cbegin(), flags.cend(), sequenceLengths.begin(), ResetableAdder{});
+
+  size_t maxCount = *std::max_element(sequenceLengths.cbegin(), sequenceLengths.cend());
+  out << maxCount;
 }
 
 void bocharov::getRightsCnt(std::ostream & out, const std::vector< Polygon > & polygons)
