@@ -102,17 +102,6 @@ bool bocharov::isOdd(const Polygon & polygon)
   return !isEven(polygon);
 }
 
-bool bocharov::isRectangle(const Polygon & polygon)
-{
-  if (polygon.points.size() != 4)
-  {
-    return false;
-  }
-  const auto & p = polygon.points;
-  bool check = (scalarProduct(p[0], p[1], p[2]) == 0) && (scalarProduct(p[1], p[2], p[3]) == 0);
-  return check && (scalarProduct(p[2], p[3], p[0]) == 0);
-}
-
 bool bocharov::hasNVertexes(const Polygon & polygon, size_t num)
 {
   return polygon.points.size() == num;
