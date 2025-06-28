@@ -8,21 +8,21 @@
 
 namespace
 {
-  int scalarProduct(const bocharov::Point & a, const bocharov::Point & b, const bocharov::Point & c)
-  {
-    int vectorX1 = b.x - a.x;
-    int vectorY1 = b.y - a.y;
-    int vectorX2 = c.x - b.x;
-    int vectorY2 = c.y - b.y;
-    return vectorX1 * vectorX2 + vectorY1 * vectorY2;
-  }
-
   double vectorProduct(const bocharov::Point & p0, const bocharov::Point & p1, const bocharov::Point & p2)
   {
     double d1 = (p1.x - p0.x) * (p2.y - p0.y);
     double d2 = (p2.x - p0.x) * (p1.y - p0.y);
     return 0.5 * std::abs(d1 - d2);
   }
+}
+
+int bocharov::scalarProduct(const Point & a, const Point & b, const Point & c)
+{
+  int vectorX1 = b.x - a.x;
+  int vectorY1 = b.y - a.y;
+  int vectorX2 = c.x - b.x;
+  int vectorY2 = c.y - b.y;
+  return vectorX1 * vectorX2 + vectorY1 * vectorY2;
 }
 
 std::istream & bocharov::operator>>(std::istream & in, Point & dest)

@@ -112,7 +112,7 @@ namespace
   {
     StreamGuard guard(out);
     auto result = *std::max_element(polygons.begin(), polygons.end(), compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size();
+    out << result.points.size();
   }
 
   void getMinArea(std::ostream & out, const std::vector< Polygon > & polygons)
@@ -158,13 +158,7 @@ namespace
       auto curr = plg.points[ind];
       auto next = plg.points[(ind + 1) % n];
 
-      double dx1 = curr.x - prev.x;
-      double dy1 = curr.y - prev.y;
-      double dx2 = next.x - curr.x;
-      double dy2 = next.y - curr.y;
-
-      double scalar = dx1 * dx2 + dy1 * dy2;
-      return scalar == 0;
+      return bocharov::scalarProduct(prev, curr, next) == 0;
     }
   };
 
