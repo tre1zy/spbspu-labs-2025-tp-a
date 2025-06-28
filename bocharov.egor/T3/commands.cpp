@@ -26,7 +26,7 @@ namespace
   struct AreaSumCalculator
   {
     Predicate pred;
-    double operator()(const std::vector<Polygon> & polygons) const
+    double operator()(const std::vector< Polygon > & polygons) const
     {
       AreaAccumulator accumulator{pred};
       return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
@@ -81,7 +81,7 @@ namespace
     }
   };
 
-  void getAreaByPredicate(std::ostream & out, const std::vector<Polygon> & polygons, Predicate pred)
+  void getAreaByPredicate(std::ostream & out, const std::vector< Polygon > & polygons, Predicate pred)
   {
     StreamGuard guard(out);
     AreaAccumulator accumulator{pred};
@@ -259,7 +259,7 @@ void bocharov::getCount(std::istream & in, std::ostream & out, const std::vector
   }
 }
 
-void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std::vector<Polygon> & polygons)
+void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   Polygon target;
   in >> target;
