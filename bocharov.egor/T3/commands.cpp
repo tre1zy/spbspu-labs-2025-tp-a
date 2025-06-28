@@ -43,7 +43,7 @@ namespace
 
   struct SequenceCounter
   {
-    const Polygon& target;
+    const Polygon & target;
     size_t maxCount = 0;
     size_t currentCount = 0;
 
@@ -81,6 +81,22 @@ namespace
     }
   };
 
+  enum class ExtremumType { Min, Max };
+
+  void getExtremumArea(std::ostream & out, const std::vector< Polygon > & polygons, ExtremumType type)
+  {
+    StreamGuard guard(out);
+    std::vector< double > areas;
+    areas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
+
+    auto extremum_it = (type == ExtremumType::Min)
+      ? std::min_element(areas.begin(), areas.end())
+      : std::max_element(areas.begin(), areas.end());
+
+    out << std::fixed << std::setprecision(1) << *extremum_it;
+  }
+
   void getAreaByPredicate(std::ostream & out, const std::vector< Polygon > & polygons, Predicate pred)
   {
     StreamGuard guard(out);
@@ -110,29 +126,11 @@ namespace
     out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getMaxArea(std::ostream & out, const std::vector< Polygon > & polygons)
-  {
-    StreamGuard guard(out);
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
-    double result = *std::max_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result;
-  }
-
   void getMaxVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
     StreamGuard guard(out);
     auto result = *std::max_element(polygons.begin(), polygons.end(), compareVertexes);
     out << result.points.size();
-  }
-
-  void getMinArea(std::ostream & out, const std::vector< Polygon > & polygons)
-  {
-    StreamGuard guard(out);
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
-    double result = *std::min_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result;
   }
 
   void getMinVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
@@ -213,7 +211,7 @@ void bocharov::getMax(std::istream & in, std::ostream & out, const std::vector< 
     throw std::runtime_error("ERROR: there are no polygons");
   }
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(getMaxArea, std::ref(out), std::cref(polygons));
+  subcmds["AREA"] = std::bind(getExtremumArea, std::ref(out), std::cref(polygons), ExtremumType::Max);
   subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
@@ -228,7 +226,7 @@ void bocharov::getMin(std::istream & in, std::ostream & out, const std::vector< 
     throw std::runtime_error("ERROR: there are no polygons");
   }
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(getMinArea, std::ref(out), std::cref(polygons));
+  subcmds["AREA"] = std::bind(getExtremumArea, std::ref(out), std::cref(polygons), ExtremumType::Min);
   subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
@@ -274,11 +272,11 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std
     return;
   }
 
-  std::vector<size_t> flags;
+  std::vector< size_t > flags;
   flags.reserve(polygons.size());
   std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(flags), ToFlag(target));
 
-  std::vector<size_t> sequenceLengths(flags.size());
+  std::vector< size_t > sequenceLengths(flags.size());
   std::partial_sum(flags.cbegin(), flags.cend(), sequenceLengths.begin(), ResetableAdder{});
 
   size_t maxCount = *std::max_element(sequenceLengths.cbegin(), sequenceLengths.cend());
