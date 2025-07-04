@@ -182,6 +182,7 @@ namespace
     auto end = polygons.points.end();
     auto inserter = std::back_inserter(vectors);
     std::transform(begin, end - 1, begin + 1, inserter, calcVectorCoords);
+    vectors.emplace_back(calcVectorCoords(*(end - 1), *begin));
     return vectors;
   }
 
