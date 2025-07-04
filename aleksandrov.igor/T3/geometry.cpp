@@ -3,15 +3,16 @@
 #include <iterator>
 #include <iostream>
 #include <stream-guard.hpp>
+#include <input-struct.hpp>
 
 namespace
 {
-  struct DelimiterIO
+  struct DelimiterI
   {
     char exp;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& rhs)
+  std::istream& operator>>(std::istream& in, DelimiterI&& rhs)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -34,7 +35,7 @@ std::istream& aleksandrov::operator>>(std::istream& in, Point& rhs)
   {
     return in;
   }
-  using sep = DelimiterIO;
+  using sep = DelimiterI;
   return in >> sep{ '(' } >> rhs.x >> sep{ ';' } >> rhs.y >> sep{ ')' };
 }
 
