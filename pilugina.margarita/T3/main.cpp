@@ -1,6 +1,7 @@
 #include <functional>
 #include <iostream>
 #include <fstream>
+#include <istream>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -11,7 +12,7 @@
 int main(int argc, char **argv)
 {
   using pilugina::Polygon;
-
+  using is_it_poly = std::istream_iterator<Polygon>;
   if (argc != 2)
   {
     std::cerr << "<INVALID PARAMETERS NUMBER>\n";
@@ -33,8 +34,7 @@ int main(int argc, char **argv)
       inputFile.clear(inputFile.rdstate() ^ std::ios::failbit);
       inputFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::copy(std::istream_iterator< Polygon >(inputFile), std::istream_iterator< Polygon >(),
-              std::back_inserter(polygons));
+    std::copy(is_it_poly{inputFile}, is_it_poly{}, std::back_inserter(polygons));
   }
   inputFile.close();
 
