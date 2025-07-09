@@ -1,6 +1,7 @@
 #include "polygonUtils.hpp"
 #include <cmath>
 #include <numeric>
+#include <functional>
 #include "polygon.hpp"
 
 double pilugina::getPolygonArea(const Polygon &poly)
