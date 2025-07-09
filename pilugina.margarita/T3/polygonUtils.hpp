@@ -5,16 +5,6 @@
 
 namespace pilugina
 {
-  struct PolygonAreaAccumulator
-  {
-    PolygonAreaAccumulator(const Polygon &p);
-    double operator()(double acc, const Point &p1) const;
-
-  private:
-    const Polygon &poly;
-    size_t n;
-  };
-
   double getPolygonArea(const Polygon &);
   bool isEvenVertexNum(const Polygon &);
   bool isOddVertexNum(const Polygon &);

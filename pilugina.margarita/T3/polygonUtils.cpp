@@ -3,27 +3,31 @@
 #include <numeric>
 #include "polygon.hpp"
 
-pilugina::PolygonAreaAccumulator::PolygonAreaAccumulator(const Polygon &p):
-  poly(p),
-  n(p.points.size())
-{}
-
-double pilugina::PolygonAreaAccumulator::operator()(double acc, const Point &p1) const
-{
-  size_t i = &p1 - &poly.points[0];
-  const Point &p2 = poly.points[(i + 1) % n];
-  return acc + (p1.x * p2.y - p2.x * p1.y);
-}
-
 double pilugina::getPolygonArea(const Polygon &poly)
 {
-  if (poly.points.size() < 3)
-  {
-    throw std::invalid_argument("<INVALID COMMAND>");
+  using namespace std::placeholders;
+
+  if (poly.points.size() < 3) {
+    return 0.0;
   }
 
-  double area = std::accumulate(poly.points.cbegin(), poly.points.cend(), 0.0, PolygonAreaAccumulator(poly)) / 2.0;
-  return std::abs(area);
+  double sum = 0.0;
+  const Point &first = poly.points.front();
+  const Point &last = poly.points.back();
+
+  if (poly.points.size() > 1) {
+    auto begin = poly.points.begin();
+    auto end = poly.points.end();
+
+    auto multXYFirst = std::bind(std::multiplies<double>{}, std::bind(&Point::x, _1), std::bind(&Point::y, _2));
+    auto multXYSecond = std::bind(std::multiplies<double>{}, std::bind(&Point::x, _2), std::bind(&Point::y, _1));
+    auto crossProduct = std::bind(std::minus<double>{}, multXYFirst, multXYSecond);
+
+    sum = std::inner_product(begin, end - 1, begin + 1, 0.0, std::plus<>{}, crossProduct);
+  }
+
+  sum += (last.x * first.y - first.x * last.y);
+  return std::abs(sum) / 2.0;
 }
 
 double pilugina::areaSumOperator(double init, const Polygon &poly)

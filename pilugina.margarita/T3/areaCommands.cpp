@@ -9,7 +9,9 @@
 
 double pilugina::calcAreasSum(const std::vector< Polygon > &polys)
 {
-  return std::accumulate(polys.cbegin(), polys.cend(), 0.0, areaSumOperator);
+  std::vector< double > areas(polys.size());
+  std::transform(polys.cbegin(), polys.cend(), areas.begin(), getPolygonArea);
+  return std::accumulate(areas.cbegin(), areas.cend(), 0.0);
 }
 
 double pilugina::getEvenArea(const std::vector< Polygon > &polys)
@@ -40,9 +42,9 @@ double pilugina::calcAreas(const std::vector< Polygon > &polys, std::istream &in
   using std::placeholders::_1;
   std::map< std::string, std::function< double() > > subcommands
   {
-      {"EVEN", std::bind(getEvenArea, std::cref(polys))},
-      {"ODD", std::bind(getOddArea, std::cref(polys))},
-      {"MEAN", std::bind(getMeanArea, std::cref(polys))}
+    {"EVEN", std::bind(getEvenArea, std::cref(polys))},
+    {"ODD", std::bind(getOddArea, std::cref(polys))},
+    {"MEAN", std::bind(getMeanArea, std::cref(polys))}
   };
 
   std::string subcommand;
