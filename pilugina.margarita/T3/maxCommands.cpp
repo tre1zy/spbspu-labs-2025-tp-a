@@ -1,9 +1,11 @@
 #include "maxCommands.hpp"
+#include <algorithm>
 #include <format_guard.hpp>
 #include <functional>
 #include <map>
 #include <numeric>
 #include <iomanip>
+#include "polygon.hpp"
 #include "polygonUtils.hpp"
 
 double pilugina::updateMaxArea(double currentMax, const Polygon &poly)
@@ -24,7 +26,8 @@ void pilugina::printMaxArea(const std::vector< Polygon > &polys, std::ostream &o
 
 void pilugina::printMaxVertices(const std::vector< Polygon > &polys, std::ostream &out)
 {
-  out << std::accumulate(polys.begin(), polys.end(), 0ull, updateMaxVertices);
+  Polygon maxVPoly = *std::max_element(polys.begin(), polys.end());
+  out << maxVPoly.points.size();
 }
 
 void pilugina::printMax(const std::vector< Polygon > &polys, std::istream &in, std::ostream &out)

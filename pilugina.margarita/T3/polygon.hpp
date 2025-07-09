@@ -21,6 +21,7 @@ namespace pilugina
   };
   bool operator==(const Polygon &lhs, const Polygon &rhs);
   std::istream &operator>>(std::istream &in, Polygon &dest);
+  bool operator<(const Polygon &lhs, const Polygon &rhs);
 }
 
 #endif
