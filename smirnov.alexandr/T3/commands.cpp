@@ -429,28 +429,24 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
 {
   if (polygons.empty())
   {
-    return;
+    throw std::logic_error("<INVALID COMMAND>");
   }
   smirnov::Polygon test_poly;
   if (!(in >> test_poly) || test_poly.points.size() < 3)
   {
-    return;
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  char c = in.peek();
-  while (c == ' ' || c == '\t')
+  char next = '0';
+  in >> std::noskipws >> next >> std::skipws;
+  if (next != '\n' && next != EOF)
   {
-    in.get();
-    c = in.peek();
-  }
-  if (c != '\n' && c != EOF)
-  {
-    return;
+    throw std::logic_error("<INVALID COMMAND>");
   }
   int min_x = getMinX(polygons);
   int max_x = getMaxX(polygons);
   int min_y = getMinY(polygons);
   int max_y = getMaxY(polygons);
-  bool inside = std::all_of( test_poly.points.begin(), test_poly.points.end(), InFrameCheck(min_x, max_x, min_y, max_y));
+  bool inside = std::all_of(test_poly.points.begin(), test_poly.points.end(), InFrameCheck(min_x, max_x, min_y, max_y));
   out << (inside ? "<TRUE>\n" : "<FALSE>\n");
 }
 
@@ -459,17 +455,13 @@ void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vect
   smirnov::Polygon pattern;
   if (!(in >> pattern) || pattern.points.size() < 3)
   {
-    return;
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  char c = in.peek();
-  while (c == ' ' || c == '\t')
+  char next = '0';
+  in >> std::noskipws >> next >> std::skipws;
+  if (next != '\n' && next != EOF)
   {
-    in.get();
-    c = in.peek();
-  }
-  if (c != '\n' && c != EOF)
-  {
-    return;
+    throw std::logic_error("<INVALID COMMAND>");
   }
   MaxSeq seq{pattern, 0, 0};
   std::for_each(polygons.begin(), polygons.end(), std::ref(seq));
