@@ -436,12 +436,9 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  for (const auto & point : test_poly.points)
+  if (in.fail())
   {
-    if (in.fail())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
+    throw std::logic_error("<INVALID COMMAND>");
   }
   char next = 0;
   in >> std::ws;
@@ -465,12 +462,9 @@ void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vect
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  for (const auto & point : pattern.points)
+  if (in.fail())
   {
-    if (in.fail())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
+    throw std::logic_error("<INVALID COMMAND>");
   }
   char next = 0;
   in >> std::ws;
