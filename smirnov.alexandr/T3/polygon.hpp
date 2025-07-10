@@ -19,6 +19,5 @@ namespace smirnov
   bool operator==(const Point & lhs, const Point & rhs);
   std::istream & operator>>(std::istream & in, Polygon & polygon);
   bool operator==(const Polygon & lhs, const Polygon & rhs);
-  double getArea(const Polygon & polygon);
 }
 #endif

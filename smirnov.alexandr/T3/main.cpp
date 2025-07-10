@@ -4,6 +4,7 @@
 #include <iterator>
 #include <limits>
 #include <map>
+#include <functional>
 #include "polygon.hpp"
 #include "commands.hpp"
 
@@ -19,44 +20,42 @@ int main(int argc, char * argv[])
   if (!file)
   {
     std::cerr << "Error: can't open file\n";
-    return 2;
+    return 1;
   }
   std::vector< Polygon > polygons;
   while (!file.eof())
   {
-    using input_it = std::istream_iterator< Polygon >;
-    std::copy(input_it{file}, input_it{}, std::back_inserter(polygons));
-    if (file.fail() && !file.eof())
+    using istream_it = std::istream_iterator< Polygon >;
+    std::copy(istream_it{file}, istream_it{}, std::back_inserter(polygons));
+    if (file.fail())
     {
-      file.clear();
+      file.clear(file.rdstate() ^ std::ios::failbit);
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > cmds;
-  using namespace std::placeholders;
-  cmds["AREA"] = std::bind(areaCommand, std::cref(polygons), _1, _2);
-  cmds["MAX"] = std::bind(maxCommand, std::cref(polygons), _1, _2);
-  cmds["MIN"] = std::bind(minCommand, std::cref(polygons), _1, _2);
-  cmds["COUNT"] = std::bind(countCommand, std::cref(polygons), _1, _2);
-  cmds["INFRAME"] = std::bind(inframeCommand, std::cref(polygons), _1, _2);
-  cmds["MAXSEQ"] = std::bind(maxseqCommand, std::cref(polygons), _1, _2);
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAX"] = std::bind(printMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(printMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COUNT"] = std::bind(printCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["INFRAME"] = std::bind(printInframe, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAXSEQ"] = std::bind(printMaxseq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      cmds.at(cmd)(std::cin, std::cout);
-    }
-    catch (const std::logic_error &)
-    {
-      std::cout << "<INVALID COMMAND>\n";
+      cmds.at(cmd)();
     }
     catch (...)
     {
+      if (std::cin.fail())
+      {
+        std::cin.clear(file.rdstate() ^ std::ios::failbit);
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
 

@@ -12,12 +12,7 @@ std::istream & smirnov::operator>>(std::istream & in, Point & point)
   {
     return in;
   }
-  int x = 0, y = 0;
-  in >> smirnov::DelimiterI{'('} >> x >> smirnov::DelimiterI{';'} >> y >> smirnov::DelimiterI{')'};
-  if (in)
-  {
-    point = {x, y};
-  }
+  in >> DelimiterI{'('} >> point.x >> DelimiterI{';'} >> point.y >> DelimiterI{')'};
   return in;
 }
 
@@ -44,19 +39,18 @@ std::istream & smirnov::operator>>(std::istream & in, Polygon & polygon)
   {
     return in;
   }
-  size_t n = 0;
-  in >> n;
-  if (n < 3)
+  size_t num = 0;
+  if (!(in >> num) || num < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > pts(n);
-  using input_it = std::istream_iterator< Point >;
-  std::copy_n(input_it{in}, n, pts.begin());
-  if (in && pts.size() == n)
+  std::vector< Point > points(num);
+  using istream_it = std::istream_iterator< Point >;
+  std::copy_n(istream_it{in}, num, points.begin());
+  if (in)
   {
-    polygon.points = std::move(pts);
+    polygon.points = std::move(points);
   }
   return in;
 }
@@ -64,21 +58,4 @@ std::istream & smirnov::operator>>(std::istream & in, Polygon & polygon)
 bool smirnov::operator==(const Polygon & lhs, const Polygon & rhs)
 {
   return lhs.points == rhs.points;
-}
-
-double smirnov::getArea(const Polygon & polygon)
-{
-  size_t n = polygon.points.size();
-  if (n < 3)
-  {
-    return 0.0;
-  }
-  int sum = 0;
-  for (size_t i = 0; i < n; ++i)
-  {
-    const Point & p1 = polygon.points[i];
-    const Point & p2 = polygon.points[(i + 1) % n];
-    sum += p1.x * p2.y - p2.x * p1.y;
-  }
-  return std::abs(sum) / 2.0;
 }

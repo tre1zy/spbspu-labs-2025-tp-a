@@ -1,209 +1,343 @@
 #include "commands.hpp"
-#include <map>
 #include <algorithm>
 #include <numeric>
-#include <iomanip>
-#include <limits>
 #include <functional>
+#include <iomanip>
+#include <map>
+#include <stdexcept>
 #include <guard.hpp>
 
-void smirnov::areaCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+namespace
 {
-  std::string arg;
-  in >> arg;
-  StreamGuard guard(out);
-  out << std::fixed << std::setprecision(1);
-  if (arg == "EVEN")
+  double getDeterminant(const smirnov::Point & p1, const smirnov::Point & p2)
   {
-    double sum = 0.0;
-    for (const Polygon & poly : polygons)
+    return static_cast< double >(p1.x) * p2.y - static_cast< double >(p2.x) * p1.y;
+  }
+
+  double getArea(const smirnov::Polygon & poly)
+  {
+    if (poly.points.size() < 3)
     {
-      if (poly.points.size() % 2 == 0)
+      return 0.0;
+    }
+    std::vector< smirnov::Point > rotated = poly.points;
+    std::rotate(rotated.begin(), rotated.begin() + 1, rotated.end());
+    auto currentPoint = poly.points.begin();
+    auto endPoint = poly.points.end();
+    auto nextPoint = rotated.begin();
+    double areaSum = std::inner_product(currentPoint, endPoint, nextPoint, 0.0, std::plus<double>(), getDeterminant);
+    return std::abs(areaSum) / 2.0;
+  }
+
+  bool isEven(const smirnov::Polygon & poly)
+  {
+    return poly.points.size() % 2 == 0;
+  }
+
+  bool isOdd(const smirnov::Polygon & poly)
+  {
+    return poly.points.size() % 2 == 1;
+  }
+
+  struct IsVertexCount
+  {
+    size_t count;
+    IsVertexCount(size_t c):
+      count(c)
+    {}
+    bool operator()(const smirnov::Polygon & poly) const
+    {
+      return poly.points.size() == count;
+    }
+  };
+
+  double sumEvenArea(double acc, const smirnov::Polygon & poly)
+  {
+    if (isEven(poly))
+    {
+      return acc + getArea(poly);
+    }
+    else
+    {
+      return acc + 0.0;
+    }
+  }
+
+  double sumOddArea(double acc, const smirnov::Polygon & poly)
+  {
+    if (isOdd(poly))
+    {
+      return acc + getArea(poly);
+    }
+    else
+    {
+      return acc + 0.0;
+    }
+  }
+
+  double sumAllArea(double acc, const smirnov::Polygon & poly)
+  {
+    return acc + getArea(poly);
+  }
+
+  struct SumAreaByVertex
+  {
+    size_t count;
+    SumAreaByVertex(size_t c):
+      count(c)
+    {}
+    double operator()(double acc, const smirnov::Polygon & poly) const
+    {
+      if (poly.points.size() == count)
       {
-        sum += getArea(poly);
+        return acc + getArea(poly);
+      }
+      else
+      {
+        return acc + 0.0;
       }
     }
-    out << sum << "\n";
-    return;
-  }
-  if (arg == "ODD")
+  };
+
+  struct InFrameCheck
   {
-    double sum = 0.0;
-    for (const Polygon & poly : polygons)
+    int min_x, max_x, min_y, max_y;
+    InFrameCheck(int minx, int maxx, int miny, int maxy):
+      min_x(minx), max_x(maxx), min_y(miny), max_y(maxy)
+    {}
+    bool operator()(const smirnov::Point & pt) const
     {
-      if (poly.points.size() % 2 == 1)
+      return pt.x >= min_x && pt.x <= max_x && pt.y >= min_y && pt.y <= max_y;
+    }
+  };
+
+  bool areaLess(const smirnov::Polygon & a, const smirnov::Polygon & b)
+  {
+    return getArea(a) < getArea(b);
+  }
+
+  bool vertexLess(const smirnov::Polygon & a, const smirnov::Polygon & b)
+  {
+    return a.points.size() < b.points.size();
+  }
+
+  struct CompareX
+  {
+    bool operator()(const smirnov::Point & a, const smirnov::Point & b) const
+    {
+      return a.x < b.x;
+    }
+  };
+
+  struct CompareY
+  {
+    bool operator()(const smirnov::Point & a, const smirnov::Point & b) const
+    {
+      return a.y < b.y;
+    }
+  };
+
+  struct MinXInPolygon
+  {
+    int operator()(int acc, const smirnov::Polygon & poly) const
+    {
+      int local_min = std::min_element(poly.points.begin(), poly.points.end(), CompareX())->x;
+      if (local_min < acc)
       {
-        sum += getArea(poly);
+        return local_min;
+      }
+      else
+      {
+        return acc;
       }
     }
-    out << sum << "\n";
-    return;
+  };
+
+  struct MaxXInPolygon
+  {
+    int operator()(int acc, const smirnov::Polygon & poly) const
+    {
+      int local_max = std::max_element(poly.points.begin(), poly.points.end(), CompareX())->x;
+      if (local_max > acc)
+      {
+        return local_max;
+      }
+      else
+      {
+        return acc;
+      }
+    }
+  };
+
+  struct MinYInPolygon
+  {
+    int operator()(int acc, const smirnov::Polygon & poly) const
+    {
+      int local_min = std::min_element(poly.points.begin(), poly.points.end(), CompareY())->y;
+      if (local_min < acc)
+      {
+        return local_min;
+      }
+      else
+      {
+        return acc;
+      }
+    }
+  };
+
+  struct MaxYInPolygon
+  {
+    int operator()(int acc, const smirnov::Polygon & poly) const
+    {
+      int local_max = std::max_element(poly.points.begin(), poly.points.end(), CompareY())->y;
+      if (local_max > acc)
+      {
+        return local_max;
+      }
+      else
+      {
+        return acc;
+      }
+    }
+  };
+
+  int getMinX(const std::vector< smirnov::Polygon > & polygons)
+  {
+    int first_min = std::min_element(polygons.front().points.begin(), polygons.front().points.end(), CompareX())->x;
+    return std::accumulate(polygons.begin(), polygons.end(), first_min, MinXInPolygon());
   }
-  if (arg == "MEAN")
+
+  int getMaxX(const std::vector< smirnov::Polygon > & polygons)
+  {
+    int first_max = std::max_element(polygons.front().points.begin(), polygons.front().points.end(), CompareX())->x;
+    return std::accumulate(polygons.begin(), polygons.end(), first_max, MaxXInPolygon());
+  }
+
+  int getMinY(const std::vector< smirnov::Polygon > & polygons)
+  {
+    int first_min = std::min_element(polygons.front().points.begin(), polygons.front().points.end(), CompareY())->y;
+    return std::accumulate(polygons.begin(), polygons.end(), first_min, MinYInPolygon());
+  }
+
+  int getMaxY(const std::vector< smirnov::Polygon > & polygons)
+  {
+    int first_max = std::max_element(polygons.front().points.begin(), polygons.front().points.end(), CompareY())->y;
+    return std::accumulate(polygons.begin(), polygons.end(), first_max, MaxYInPolygon());
+  }
+
+  struct MaxSeq
+  {
+    const smirnov::Polygon & pattern;
+    size_t cur_seq;
+    size_t max_seq;
+    void operator()(const smirnov::Polygon & poly)
+    {
+      if (poly == pattern)
+      {
+        ++cur_seq;
+        if (cur_seq > max_seq)
+        {
+          max_seq = cur_seq;
+        }
+      }
+      else
+      {
+        cur_seq = 0;
+      }
+    }
+  };
+
+  void printAreaEven(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, sumEvenArea);
+    out << sum << "\n";
+  }
+
+  void printAreaOdd(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, sumOddArea);
+    out << sum << "\n";
+  }
+
+  void printAreaMean(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
   {
     if (polygons.empty())
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
-    double sum = 0.0;
-    for (const Polygon & poly : polygons)
-    {
-      sum += getArea(poly);
-    }
+    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, sumAllArea);
     out << (sum / polygons.size()) << "\n";
-    return;
   }
-  try
+
+  void printAreaByVertex(const std::vector< smirnov::Polygon > & polygons, std::ostream & out, size_t numVtx)
   {
-    size_t n = std::stoul(arg);
-    if (n < 3)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    double sum = 0.0;
-    for (const Polygon & poly : polygons)
-    {
-      if (poly.points.size() == n)
-      {
-        sum += getArea(poly);
-      }
-    }
+    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, SumAreaByVertex(numVtx));
     out << sum << "\n";
-    return;
   }
-  catch (...)
+
+  void printMaxArea(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    const smirnov::Polygon & maxPoly = *std::max_element(polygons.begin(), polygons.end(), areaLess);
+    out << getArea(maxPoly) << "\n";
+  }
+
+  void printMaxVertexes(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    const smirnov::Polygon & maxPoly = *std::max_element(polygons.begin(), polygons.end(), vertexLess);
+    out << maxPoly.points.size() << "\n";
+  }
+
+  void printMinArea(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    const smirnov::Polygon & minPoly = *std::min_element(polygons.begin(), polygons.end(), areaLess);
+    out << getArea(minPoly) << "\n";
+  }
+
+  void printMinVertexes(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    const smirnov::Polygon & minPoly = *std::min_element(polygons.begin(), polygons.end(), vertexLess);
+    out << minPoly.points.size() << "\n";
+  }
+
+  void printCountEven(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    size_t cnt = std::count_if(polygons.begin(), polygons.end(), isEven);
+    out << cnt << "\n";
+  }
+
+  void printCountOdd(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
+  {
+    size_t cnt = std::count_if(polygons.begin(), polygons.end(), isOdd);
+    out << cnt << "\n";
+  }
+
+  void printCountByVertex(const std::vector< smirnov::Polygon > & polygons, std::ostream & out, size_t numVtx)
+  {
+    size_t cnt = std::count_if(polygons.begin(), polygons.end(), IsVertexCount(numVtx));
+    out << cnt << "\n";
   }
 }
 
-void smirnov::maxCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+void smirnov::printArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  std::string arg;
-  in >> arg;
   StreamGuard guard(out);
   out << std::fixed << std::setprecision(1);
-  if (polygons.empty())
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  if (arg == "AREA")
-  {
-    double max_area = getArea(polygons.front());
-    for (const Polygon & poly : polygons)
-    {
-      double area = getArea(poly);
-      if (area > max_area)
-      {
-        max_area = area;
-      }
-    }
-    out << max_area << "\n";
-    return;
-  }
-  if (arg == "VERTEXES")
-  {
-    size_t max_v = polygons.front().points.size();
-    for (const Polygon & poly : polygons)
-    {
-      if (poly.points.size() > max_v)
-      {
-        max_v = poly.points.size();
-      }
-    }
-    out << max_v << "\n";
-    return;
-  }
-  throw std::logic_error("<INVALID COMMAND>");
-}
-
-void smirnov::minCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
-{
   std::string arg;
   in >> arg;
-  StreamGuard guard(out);
-  out << std::fixed << std::setprecision(1);
-  if (polygons.empty())
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  if (arg == "AREA")
-  {
-    double min_area = getArea(polygons.front());
-    for (const Polygon & poly : polygons)
-    {
-      double area = getArea(poly);
-      if (area < min_area)
-      {
-        min_area = area;
-      }
-    }
-    out << min_area << "\n";
-    return;
-  }
-  if (arg == "VERTEXES")
-  {
-    size_t min_v = polygons.front().points.size();
-    for (const Polygon & poly : polygons)
-    {
-      if (poly.points.size() < min_v)
-      {
-        min_v = poly.points.size();
-      }
-    }
-    out << min_v << "\n";
-    return;
-  }
-  throw std::logic_error("<INVALID COMMAND>");
-}
-
-void smirnov::countCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
-{
-  std::string arg;
-  in >> arg;
-  if (arg == "EVEN")
-  {
-    size_t cnt = 0;
-    for (const Polygon & poly : polygons)
-    {
-      if (poly.points.size() % 2 == 0)
-      {
-        ++cnt;
-      }
-    }
-    out << cnt << "\n";
-    return;
-  }
-  if (arg == "ODD")
-  {
-    size_t cnt = 0;
-    for (const Polygon & poly : polygons)
-    {
-      if (poly.points.size() % 2 == 1)
-      {
-        ++cnt;
-      }
-    }
-    out << cnt << "\n";
-    return;
-  }
+  typedef std::map< std::string, std::function< void() > > sub_map;
+  sub_map sub_cmds;
+  sub_cmds["EVEN"] = std::bind(printAreaEven, std::cref(polygons), std::ref(out));
+  sub_cmds["ODD"] = std::bind(printAreaOdd, std::cref(polygons), std::ref(out));
+  sub_cmds["MEAN"] = std::bind(printAreaMean, std::cref(polygons), std::ref(out));
   try
   {
-    size_t n = std::stoul(arg);
-    if (n < 3)
+    if (sub_cmds.count(arg))
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      sub_cmds.at(arg)();
+      return;
     }
-    size_t cnt = 0;
-    for (const Polygon & poly : polygons)
-    {
-      if (poly.points.size() == n)
-      {
-        ++cnt;
-      }
-    }
-    out << cnt << "\n";
-    return;
+    size_t numVtx = std::stoul(arg);
+    printAreaByVertex(polygons, out, numVtx);
   }
   catch (...)
   {
@@ -211,75 +345,123 @@ void smirnov::countCommand(const std::vector< Polygon > & polygons, std::istream
   }
 }
 
-void smirnov::inframeCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+void smirnov::printMax(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   if (polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  Polygon test_poly;
-  in >> test_poly;
-  if (!in || in.peek() != '\n')
+  StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1);
+  std::string arg;
+  in >> arg;
+  typedef std::map< std::string, std::function< void() > > sub_map;
+  sub_map sub_cmds;
+  sub_cmds["AREA"] = std::bind(printMaxArea, std::cref(polygons), std::ref(out));
+  sub_cmds["VERTEXES"] = std::bind(printMaxVertexes, std::cref(polygons), std::ref(out));
+  try
+  {
+    sub_cmds.at(arg)();
+  }
+  catch (...)
   {
     throw std::logic_error("<INVALID COMMAND>");
-  }
-  int min_x = polygons.front().points.front().x;
-  int min_y = polygons.front().points.front().y;
-  int max_x = polygons.front().points.front().x;
-  int max_y = polygons.front().points.front().y;
-  for (const Polygon & poly : polygons)
-  {
-    for (const Point & pt : poly.points)
-    {
-      if (pt.x < min_x) min_x = pt.x;
-      if (pt.y < min_y) min_y = pt.y;
-      if (pt.x > max_x) max_x = pt.x;
-      if (pt.y > max_y) max_y = pt.y;
-    }
-  }
-  bool inside = true;
-  for (const Point & pt : test_poly.points)
-  {
-    if (pt.x < min_x || pt.x > max_x || pt.y < min_y || pt.y > max_y)
-    {
-      inside = false;
-      break;
-    }
-  }
-  if (inside)
-  {
-    out << "<TRUE>\n";
-  }
-  else
-  {
-    out << "<FALSE>\n";
   }
 }
 
-void smirnov::maxseqCommand(const std::vector< Polygon > & polygons, std::istream & in, std::ostream & out)
+void smirnov::printMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  Polygon pattern;
-  in >> pattern;
-  if (!in || in.peek() != '\n')
+  if (polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  size_t max_seq = 0;
-  size_t cur_seq = 0;
-  for (const Polygon & poly : polygons)
+  StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1);
+  std::string arg;
+  in >> arg;
+  typedef std::map< std::string, std::function< void() > > sub_map;
+  sub_map sub_cmds;
+  sub_cmds["AREA"] = std::bind(printMinArea, std::cref(polygons), std::ref(out));
+  sub_cmds["VERTEXES"] = std::bind(printMinVertexes, std::cref(polygons), std::ref(out));
+  try
   {
-    if (poly == pattern)
-    {
-      ++cur_seq;
-      if (cur_seq > max_seq)
-      {
-        max_seq = cur_seq;
-      }
-    }
-    else
-    {
-      cur_seq = 0;
-    }
+    sub_cmds.at(arg)();
   }
-  out << max_seq << "\n";
+  catch (...)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+}
+
+void smirnov::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  std::string arg;
+  in >> arg;
+  typedef std::map< std::string, std::function< void() > > sub_map;
+  sub_map sub_cmds;
+  sub_cmds["EVEN"] = std::bind(printCountEven, std::cref(polygons), std::ref(out));
+  sub_cmds["ODD"] = std::bind(printCountOdd, std::cref(polygons), std::ref(out));
+  try
+  {
+    if (sub_cmds.count(arg))
+    {
+      sub_cmds.at(arg)();
+      return;
+    }
+    size_t numVtx = std::stoul(arg);
+    printCountByVertex(polygons, out, numVtx);
+  }
+  catch (...)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+}
+
+void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  smirnov::Polygon test_poly;
+  if (!(in >> test_poly) || test_poly.points.size() < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  char c = in.peek();
+  while (c == ' ' || c == '\t')
+  {
+    in.get(); c = in.peek();
+  }
+  if (c != '\n' && c != EOF)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  int min_x = getMinX(polygons);
+  int max_x = getMaxX(polygons);
+  int min_y = getMinY(polygons);
+  int max_y = getMaxY(polygons);
+  bool inside = std::all_of( test_poly.points.begin(), test_poly.points.end(), InFrameCheck(min_x, max_x, min_y, max_y));
+  out << (inside ? "<TRUE>\n" : "<FALSE>\n");
+}
+
+void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+{
+  smirnov::Polygon pattern;
+  if (!(in >> pattern) || pattern.points.size() < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  char c = in.peek();
+  while (c == ' ' || c == '\t')
+  {
+    in.get(); c = in.peek();
+  }
+  if (c != '\n' && c != EOF)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  MaxSeq seq{pattern, 0, 0};
+  std::for_each(polygons.begin(), polygons.end(), std::ref(seq));
+  out << seq.max_seq << "\n";
 }
