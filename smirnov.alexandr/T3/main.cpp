@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
   cmds["INFRAME"] = std::bind(printInframe, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MAXSEQ"] = std::bind(printMaxseq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string cmd;
-  while (std::cin >> cmd)
+  while (!(std::cin >> cmd).eof())
   {
     try
     {

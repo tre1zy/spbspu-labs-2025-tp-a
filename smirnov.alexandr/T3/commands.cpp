@@ -436,10 +436,6 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  if (in.fail())
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
   char next = 0;
   in >> std::ws;
   next = in.peek();
@@ -459,10 +455,6 @@ void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vect
 {
   smirnov::Polygon pattern;
   if (!(in >> pattern) || pattern.points.size() < 3)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  if (in.fail())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
