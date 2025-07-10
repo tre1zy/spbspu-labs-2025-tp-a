@@ -201,7 +201,7 @@ namespace
     }
   };
 
-  int getMinX(const std::vector< smirnov::Polygon > & polygons)
+  /*int getMinX(const std::vector< smirnov::Polygon > & polygons)
   {
     int first_min = std::min_element(polygons.front().points.begin(), polygons.front().points.end(), CompareX())->x;
     return std::accumulate(polygons.begin(), polygons.end(), first_min, MinXInPolygon());
@@ -223,7 +223,7 @@ namespace
   {
     int first_max = std::max_element(polygons.front().points.begin(), polygons.front().points.end(), CompareY())->y;
     return std::accumulate(polygons.begin(), polygons.end(), first_max, MaxYInPolygon());
-  }
+  }*/
 
   struct MaxSeq
   {
@@ -425,7 +425,7 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
   }
 }
 
-void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+/*void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   if (polygons.empty())
   {
@@ -449,9 +449,9 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
   int max_y = getMaxY(polygons);
   bool inside = std::all_of(test_poly.points.begin(), test_poly.points.end(), InFrameCheck(min_x, max_x, min_y, max_y));
   out << (inside ? "<TRUE>\n" : "<FALSE>\n");
-}
+}*/
 
-void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+/*void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   smirnov::Polygon pattern;
   std::streampos pos = in.tellg();
@@ -471,4 +471,4 @@ void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vect
   MaxSeq seq{pattern, 0, 0};
   std::for_each(polygons.begin(), polygons.end(), std::ref(seq));
   out << seq.max_seq << "\n";
-}
+}*/
