@@ -454,8 +454,11 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
 void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   smirnov::Polygon pattern;
+  std::streampos pos = in.tellg();
   if (!(in >> pattern) || pattern.points.size() < 3)
   {
+    in.clear();
+    in.seekg(pos);
     throw std::logic_error("<INVALID COMMAND>");
   }
   char next = 0;
