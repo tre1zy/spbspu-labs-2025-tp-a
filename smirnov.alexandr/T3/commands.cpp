@@ -271,6 +271,10 @@ namespace
 
   void printAreaByVertex(const std::vector< smirnov::Polygon > & polygons, std::ostream & out, size_t numVtx)
   {
+    if (numVtx < 3)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, SumAreaByVertex(numVtx));
     out << sum << "\n";
   }
@@ -313,6 +317,10 @@ namespace
 
   void printCountByVertex(const std::vector< smirnov::Polygon > & polygons, std::ostream & out, size_t numVtx)
   {
+    if (numVtx < 3)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     size_t cnt = std::count_if(polygons.begin(), polygons.end(), IsVertexCount(numVtx));
     out << cnt << "\n";
   }
@@ -431,7 +439,8 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
   char c = in.peek();
   while (c == ' ' || c == '\t')
   {
-    in.get(); c = in.peek();
+    in.get();
+    c = in.peek();
   }
   if (c != '\n' && c != EOF)
   {
@@ -455,7 +464,8 @@ void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vect
   char c = in.peek();
   while (c == ' ' || c == '\t')
   {
-    in.get(); c = in.peek();
+    in.get();
+    c = in.peek();
   }
   if (c != '\n' && c != EOF)
   {

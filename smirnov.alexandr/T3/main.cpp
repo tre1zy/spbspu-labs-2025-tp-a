@@ -29,7 +29,7 @@ int main(int argc, char * argv[])
     std::copy(istream_it{file}, istream_it{}, std::back_inserter(polygons));
     if (file.fail())
     {
-      file.clear(file.rdstate() ^ std::ios::failbit);
+      file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
