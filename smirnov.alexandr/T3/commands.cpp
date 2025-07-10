@@ -436,8 +436,9 @@ void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vec
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  char next = '0';
-  in >> std::noskipws >> next >> std::skipws;
+  char next = 0;
+  in >> std::ws;
+  next = in.peek();
   if (next != '\n' && next != EOF)
   {
     throw std::logic_error("<INVALID COMMAND>");
@@ -457,8 +458,9 @@ void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vect
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  char next = '0';
-  in >> std::noskipws >> next >> std::skipws;
+  char next = 0;
+  in >> std::ws;
+  next = in.peek();
   if (next != '\n' && next != EOF)
   {
     throw std::logic_error("<INVALID COMMAND>");

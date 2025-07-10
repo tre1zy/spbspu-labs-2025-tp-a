@@ -51,7 +51,7 @@ int main(int argc, char * argv[])
     {
       if (std::cin.fail())
       {
-        std::cin.clear(file.rdstate() ^ std::ios::failbit);
+        std::cin.clear();
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
