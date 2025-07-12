@@ -3,6 +3,7 @@
 #include <numeric>
 #include <functional>
 #include <iomanip>
+#include <limits>
 #include <map>
 #include <stdexcept>
 #include <guard.hpp>
@@ -201,35 +202,14 @@ namespace
     }
   };
 
-  /*int getMinX(const std::vector< smirnov::Polygon > & polygons)
-  {
-    int first_min = std::min_element(polygons.front().points.begin(), polygons.front().points.end(), CompareX())->x;
-    return std::accumulate(polygons.begin(), polygons.end(), first_min, MinXInPolygon());
-  }
-
-  int getMaxX(const std::vector< smirnov::Polygon > & polygons)
-  {
-    int first_max = std::max_element(polygons.front().points.begin(), polygons.front().points.end(), CompareX())->x;
-    return std::accumulate(polygons.begin(), polygons.end(), first_max, MaxXInPolygon());
-  }
-
-  int getMinY(const std::vector< smirnov::Polygon > & polygons)
-  {
-    int first_min = std::min_element(polygons.front().points.begin(), polygons.front().points.end(), CompareY())->y;
-    return std::accumulate(polygons.begin(), polygons.end(), first_min, MinYInPolygon());
-  }
-
-  int getMaxY(const std::vector< smirnov::Polygon > & polygons)
-  {
-    int first_max = std::max_element(polygons.front().points.begin(), polygons.front().points.end(), CompareY())->y;
-    return std::accumulate(polygons.begin(), polygons.end(), first_max, MaxYInPolygon());
-  }*/
-
   struct MaxSeq
   {
     const smirnov::Polygon & pattern;
     size_t cur_seq;
     size_t max_seq;
+    MaxSeq(const smirnov::Polygon & p):
+      pattern(p), cur_seq(0), max_seq(0)
+    {}
     void operator()(const smirnov::Polygon & poly)
     {
       if (poly == pattern)
@@ -425,50 +405,34 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
   }
 }
 
-/*void smirnov::printInframe(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
+  Polygon poly;
+  if (!(in >> poly))
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   if (polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  smirnov::Polygon test_poly;
-  if (!(in >> test_poly) || test_poly.points.size() < 3)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  char next = 0;
-  in >> std::ws;
-  next = in.peek();
-  if (next != '\n' && next != EOF)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  int min_x = getMinX(polygons);
-  int max_x = getMaxX(polygons);
-  int min_y = getMinY(polygons);
-  int max_y = getMaxY(polygons);
-  bool inside = std::all_of(test_poly.points.begin(), test_poly.points.end(), InFrameCheck(min_x, max_x, min_y, max_y));
-  out << (inside ? "<TRUE>\n" : "<FALSE>\n");
-}*/
+  int min_x = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::max(), MinXInPolygon());
+  int max_x = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::min(), MaxXInPolygon());
+  int min_y = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::max(), MinYInPolygon());
+  int max_y = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::min(), MaxYInPolygon());
+  InFrameCheck checker(min_x, max_x, min_y, max_y);
+  bool in_frame = std::all_of(poly.points.begin(), poly.points.end(), checker);
+  out << (in_frame ? "YES" : "NO") << "\n";
+}
 
-/*void smirnov::printMaxseq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+void smirnov::printMaxSeq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  smirnov::Polygon pattern;
-  std::streampos pos = in.tellg();
-  if (!(in >> pattern) || pattern.points.size() < 3)
-  {
-    in.clear();
-    in.seekg(pos);
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  char next = 0;
-  in >> std::ws;
-  next = in.peek();
-  if (next != '\n' && next != EOF)
+  Polygon pattern;
+  if (!(in >> pattern))
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  MaxSeq seq{pattern, 0, 0};
-  std::for_each(polygons.begin(), polygons.end(), std::ref(seq));
-  out << seq.max_seq << "\n";
-}*/
+  MaxSeq finder(pattern);
+  std::for_each(polygons.begin(), polygons.end(), std::ref(finder));
+  out << finder.max_seq << "\n";
+}

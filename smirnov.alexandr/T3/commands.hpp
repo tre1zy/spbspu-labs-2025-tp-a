@@ -8,7 +8,7 @@ namespace smirnov
   void printMax(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
   void printMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
   void printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
-  /*void printInframe(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
-  void printMaxseq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);*/
+  void printInFrame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
+  void printMaxSeq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons);
 }
 #endif

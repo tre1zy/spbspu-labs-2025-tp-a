@@ -38,8 +38,8 @@ int main(int argc, char * argv[])
   cmds["MAX"] = std::bind(printMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["MIN"] = std::bind(printMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["COUNT"] = std::bind(printCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  /*cmds["INFRAME"] = std::bind(printInframe, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  cmds["MAXSEQ"] = std::bind(printMaxseq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));*/
+  cmds["INFRAME"] = std::bind(printInFrame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAXSEQ"] = std::bind(printMaxSeq, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   std::string cmd;
   while (!(std::cin >> cmd).eof())
   {
