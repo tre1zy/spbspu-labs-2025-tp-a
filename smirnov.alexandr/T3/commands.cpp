@@ -410,7 +410,7 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
 void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   Polygon poly;
-  if (!(in >> poly) || poly.points.size() < 3)
+  if (!(in >> poly) || poly.points.size() < 3 || in.peek() != '\n')
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -430,7 +430,7 @@ void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vec
 void smirnov::printMaxSeq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   smirnov::Polygon pattern;
-  if (!(in >> pattern))
+  if (!(in >> pattern) || in.peek() != '\n')
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
