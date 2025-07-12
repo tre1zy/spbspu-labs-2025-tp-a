@@ -26,7 +26,7 @@ namespace
     auto currentPoint = poly.points.begin();
     auto endPoint = poly.points.end();
     auto nextPoint = rotated.begin();
-    double areaSum = std::inner_product(currentPoint, endPoint, nextPoint, 0.0, std::plus<double>(), getDeterminant);
+    double areaSum = std::inner_product(currentPoint, endPoint, nextPoint, 0.0, std::plus< double >(), getDeterminant);
     return std::abs(areaSum) / 2.0;
   }
 
@@ -104,7 +104,10 @@ namespace
   {
     int min_x, max_x, min_y, max_y;
     InFrameCheck(int minx, int maxx, int miny, int maxy):
-      min_x(minx), max_x(maxx), min_y(miny), max_y(maxy)
+      min_x(minx),
+      max_x(maxx),
+      min_y(miny),
+      max_y(maxy)
     {}
     bool operator()(const smirnov::Point & pt) const
     {
