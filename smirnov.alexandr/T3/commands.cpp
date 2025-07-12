@@ -208,7 +208,9 @@ namespace
     size_t cur_seq;
     size_t max_seq;
     MaxSeq(const smirnov::Polygon & p):
-      pattern(p), cur_seq(0), max_seq(0)
+      pattern(p),
+      cur_seq(0),
+      max_seq(0)
     {}
     void operator()(const smirnov::Polygon & poly)
     {
@@ -408,7 +410,7 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
 void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   Polygon poly;
-  if (!(in >> poly))
+  if (!(in >> poly) || poly.points.size() < 3)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -422,12 +424,12 @@ void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vec
   int max_y = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::min(), MaxYInPolygon());
   InFrameCheck checker(min_x, max_x, min_y, max_y);
   bool in_frame = std::all_of(poly.points.begin(), poly.points.end(), checker);
-  out << (in_frame ? "YES" : "NO") << "\n";
+  out << (in_frame ? "<TRUE>" : "<FALSE>") << "\n";
 }
 
-void smirnov::printMaxSeq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
+void printMaxSeq(std::istream& in, std::ostream& out, const std::vector<smirnov::Polygon>& polygons)
 {
-  Polygon pattern;
+  smirnov::Polygon pattern;
   if (!(in >> pattern))
   {
     throw std::logic_error("<INVALID COMMAND>");
