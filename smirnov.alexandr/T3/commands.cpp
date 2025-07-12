@@ -427,7 +427,7 @@ void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vec
   out << (in_frame ? "<TRUE>" : "<FALSE>") << "\n";
 }
 
-void printMaxSeq(std::istream& in, std::ostream& out, const std::vector<smirnov::Polygon>& polygons)
+void smirnov::printMaxSeq(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   smirnov::Polygon pattern;
   if (!(in >> pattern))
