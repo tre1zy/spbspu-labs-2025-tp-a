@@ -1,155 +1,191 @@
 #include "datastruct.h"
 #include <cctype>
 #include <algorithm>
-#include <sstream>
+#include <iterator>
 
 namespace
 {
   unsigned long long parseULLBin(std::istream& is)
   {
-    char ch;
-    if (!is.get(ch) || ch != '0')
+    std::istream_iterator<char> it(is);
+    std::istream_iterator<char> end;
+
+    if (it == end || *it != '0')
     {
       is.setstate(std::ios::failbit);
       return 0;
     }
-    if (!is.get(ch) || ch != 'b')
+    ++it;
+    if (it == end || *it != 'b')
     {
       is.setstate(std::ios::failbit);
       return 0;
     }
+    ++it;
 
     unsigned long long result = 0;
-    std::string bits;
-    while (is.get(ch) && (ch == '0' || ch == '1'))
+    bool hasBits = false;
+    while (it != end && (*it == '0' || *it == '1'))
     {
-      bits.push_back(ch);
+      result = (result << 1) | (*it == '1');
+      hasBits = true;
+      ++it;
     }
-    if (bits.empty())
+    if (!hasBits)
     {
       is.setstate(std::ios::failbit);
       return 0;
     }
-    if (is)
+    if (it != end)
     {
-      is.unget();
-    }
-
-    for (char bit: bits)
-    {
-      result = (result << 1) | (bit == '1');
+      is.putback(*it);
     }
     return result;
   }
 
-  std::complex< double > parseCmpLsp(std::istream& is)
+  std::complex<double> parseCmpLsp(std::istream& is)
   {
-    char ch;
-    if (!is.get(ch) || ch != '#')
+    std::istream_iterator<char> it(is);
+    std::istream_iterator<char> end;
+
+    if (it == end || *it != '#')
     {
       is.setstate(std::ios::failbit);
       return {0.0, 0.0};
     }
-    if (!is.get(ch) || ch != 'c')
+    ++it;
+    if (it == end || *it != 'c')
     {
       is.setstate(std::ios::failbit);
       return {0.0, 0.0};
     }
-    if (!is.get(ch) || ch != '(')
+    ++it;
+    if (it == end || *it != '(')
+    {
+      is.setstate(std::ios::failbit);
+      return {0.0, 0.0};
+    }
+    ++it;
+
+    // Parse real part
+    std::string realStr;
+    while (it != end && ((*it >= '0' && *it <= '9') || *it == '.' || *it == '-' || *it == '+'))
+    {
+      realStr.push_back(*it);
+      ++it;
+    }
+    if (realStr.empty())
     {
       is.setstate(std::ios::failbit);
       return {0.0, 0.0};
     }
 
-    double real = 0.0;
+    double real = std::stod(realStr);
     double imag = 0.0;
-    is >> real;
-    if (!is)
-    {
-      return {0.0, 0.0};
-    }
 
-    if (is.get(ch) && ch != ')')
+    // Check if there's an imaginary part
+    if (it != end && *it != ')')
     {
-      is.unget();
-      is >> imag;
-      if (!is)
+      // Parse imaginary part
+      std::string imagStr;
+      while (it != end && ((*it >= '0' && *it <= '9') || *it == '.' || *it == '-' || *it == '+'))
       {
-        return {0.0, 0.0};
+        imagStr.push_back(*it);
+        ++it;
       }
-      if (!is.get(ch) || ch != ')')
+      if (imagStr.empty())
       {
         is.setstate(std::ios::failbit);
         return {0.0, 0.0};
       }
+      imag = std::stod(imagStr);
+    }
+
+    if (it == end || *it != ')')
+    {
+      is.setstate(std::ios::failbit);
+      return {0.0, 0.0};
     }
     return {real, imag};
+  }
+
+  void skipWhitespace(std::istream& is)
+  {
+    while (is.peek() == ' ' || is.peek() == '\t') {
+      is.get();
+    }
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
-  std::string line;
-  while (std::getline(is, line))
+  DataStruct temp;
+  bool has_key1 = false;
+  bool has_key2 = false;
+  bool has_key3 = false;
+
+  std::istream_iterator<char> it(is);
+  std::istream_iterator<char> end;
+
+  while (it != end)
   {
-    std::istringstream iss(line);
-    DataStruct temp;
-    bool has_key1 = false;
-    bool has_key2 = false;
-    bool has_key3 = false;
-    char ch;
-
-    while (iss.get(ch))
+    if (*it == ':')
     {
-      if (ch == ':')
+      ++it;
+      std::string key;
+      while (it != end && *it != ' ' && *it != '\n' && *it != ':')
       {
-        std::string key;
-        while (iss.get(ch) && ch != ' ' && ch != '\n' && ch != ':')
-        {
-          key.push_back(ch);
-        }
-        iss.unget();
+        key.push_back(*it);
+        ++it;
+      }
 
-        if (key == "key1")
+      if (key == "key1")
+      {
+        skipWhitespace(is);
+        unsigned long long val = parseULLBin(is);
+        if (!is.fail())
         {
-          iss >> std::ws;
-          unsigned long long val = parseULLBin(iss);
-          if (!iss.fail())
-          {
-            temp.key1 = val;
-            has_key1 = true;
-          }
+          temp.key1 = val;
+          has_key1 = true;
         }
-        else if (key == "key2")
+      }
+      else if (key == "key2")
+      {
+        skipWhitespace(is);
+        std::complex<double> val = parseCmpLsp(is);
+        if (!is.fail())
         {
-          iss >> std::ws;
-          std::complex< double > val = parseCmpLsp(iss);
-          if (!iss.fail())
-          {
-            temp.key2 = val;
-            has_key2 = true;
-          }
+          temp.key2 = val;
+          has_key2 = true;
         }
-        else if (key == "key3")
+      }
+      else if (key == "key3")
+      {
+        skipWhitespace(is);
+        it = std::istream_iterator<char>(is);
+        if (it != end && *it == '"')
         {
-          iss >> std::ws;
-          if (iss.get(ch) && ch == '"')
+          ++it;
+          std::string str;
+          while (it != end && *it != '"' && *it != '\n')
           {
-            std::string str;
-            while (iss.get(ch) && ch != '"' && ch != '\n')
-            {
-              str.push_back(ch);
-            }
-            if (ch == '"')
-            {
-              temp.key3 = str;
-              has_key3 = true;
-            }
+            str.push_back(*it);
+            ++it;
+          }
+          if (it != end && *it == '"')
+          {
+            temp.key3 = str;
+            has_key3 = true;
           }
         }
       }
     }
+    else
+    {
+      ++it;
+    }
 
+    // Check if we have all keys
     if (has_key1 && has_key2 && has_key3)
     {
       data = temp;

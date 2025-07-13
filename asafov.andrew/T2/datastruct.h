@@ -13,6 +13,7 @@ namespace asafov
   };
 
   bool cmpDataStruct(const DataStruct &a, const DataStruct &b);
+  bool operator<(const DataStruct &a, const DataStruct &b);
   std::istream& operator>>(std::istream& is, DataStruct& data);
   std::ostream& operator<<(std::ostream& os, const DataStruct& data);
 }
