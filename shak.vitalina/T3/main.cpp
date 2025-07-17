@@ -36,11 +36,10 @@ int main(int argc, const char* argv[])
     {
       cmds.at(command)();
     }
-    catch (const std::exception &e)
+    catch (const std::invalid_argument &e)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
     std::cin.clear();
     std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-  }
 }

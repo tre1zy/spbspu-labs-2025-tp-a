@@ -35,8 +35,7 @@ void getAreaMean(std::ostream &out, const std::vector< shak::Polygon > &polygons
 {
   if (polygons.size() == 0)
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("no polygons for area mean command");
   }
   std::vector< double > polygonAreas(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), std::begin(polygonAreas), shak::getArea);
@@ -63,8 +62,7 @@ void getMaxArea(std::ostream &out, const std::vector< shak::Polygon > &polygons)
 {
   if (polygons.empty())
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("no polygons for max area command");
   }
   std::vector< double > polygonAreas(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), polygonAreas.begin(), shak::getArea);
@@ -77,8 +75,7 @@ void getMaxVertexes(std::ostream &out, const std::vector< shak::Polygon > &polyg
 {
   if (polygons.empty())
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("no polygons for max vertexes command");
   }
   std::vector< size_t > currentPolygons(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), currentPolygons.begin(), shak::getVertexes);
@@ -90,8 +87,7 @@ void getMinArea(std::ostream &out, const std::vector< shak::Polygon > &polygons)
 {
   if (polygons.empty())
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("no polygons for min area command");
   }
   std::vector< double > polygonAreas(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), polygonAreas.begin(), shak::getArea);
@@ -104,8 +100,7 @@ void getMinVertexes(std::ostream &out, const std::vector< shak::Polygon > &polyg
 {
   if (polygons.empty())
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("no polygons for min vertexes command");
   }
   std::vector< size_t > polygonVertexes(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), polygonVertexes.begin(), shak::getVertexes);
@@ -140,26 +135,26 @@ void shak::createCommandHandler(std::map< std::string, std::function< void() > >
 
 void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
 {
-  std::string subcmd;
-  in >> subcmd;
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["EVEN"] = std::bind(getAreaEven, std::ref(out), std::cref(polygons));
   subcmds["ODD"] = std::bind(getAreaOdd, std::ref(out), std::cref(polygons));
   subcmds["MEAN"] = std::bind(getAreaMean, std::ref(out), std::cref(polygons));
-  try
-  {
-    subcmds.at(subcmd)();
-  }
-  catch (const std::exception &e)
-  {
-    size_t vertexCount = std::stoull(subcmd);
+  
+  size_t vertexCount = 0;
+  if (in >> vertexCount) {
     if (vertexCount < 3)
     {
-      out << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("vertexes must be at least 3");
     }
     getAreaVertexes(out, polygons, vertexCount);
+    return;
   }
+  in.clear();
+  std::map< std::string, std::function< void() > >::key_type subcmd;
+  if (!(in >> subcmd)) {
+    throw std::logic_error("command failed");
+  }
+  subcmds.at(subcmd)();
 }
 
 void shak::cmdMax(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
@@ -169,15 +164,7 @@ void shak::cmdMax(const std::vector< Polygon > &polygons, std::istream &in, std:
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["AREA"] = std::bind(getMaxArea, std::ref(out), std::cref(polygons));
   subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
-  try
-  {
-    subcmds.at(subcmd)();
-  }
-  catch (const std::exception &e)
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
+  subcmds.at(subcmd)();
 }
 
 void shak::cmdMin(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
@@ -187,15 +174,7 @@ void shak::cmdMin(const std::vector< Polygon > &polygons, std::istream &in, std:
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["AREA"] = std::bind(getMinArea, std::ref(out), std::cref(polygons));
   subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
-  try
-  {
-    subcmds.at(subcmd)();
-  }
-  catch (const std::exception &e)
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
+  subcmds.at(subcmd)();
 }
 
 void shak::cmdCount(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
@@ -209,13 +188,12 @@ void shak::cmdCount(const std::vector< Polygon > &polygons, std::istream &in, st
   {
     subcmds.at(subcmd)();
   }
-  catch (const std::exception &e)
+  catch (const std::out_of_range &e)
   {
     size_t vertexCount = std::stoull(subcmd);
     if (vertexCount < 3)
     {
-      out << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("polygon must have at least 3 vertexes");
     }
     getCountVertexes(out, polygons, vertexCount);
   }
@@ -231,15 +209,13 @@ void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, st
   in >> vertexCount;
   if (vertexCount < 3)
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("polygon must have at least 3 vertexes");
   }
   srcPoints.reserve(vertexCount);
   std::copy_n(inIter{in}, vertexCount, std::back_inserter(srcPoints));
   if (srcPoints.empty() || in.peek() != '\n')
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("polygon is empty");
   }
   matchCount.reserve(polygon.size());
   using namespace std::placeholders;
