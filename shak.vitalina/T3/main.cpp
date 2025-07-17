@@ -36,7 +36,7 @@ int main(int argc, const char* argv[])
     {
       cmds.at(command)();
     }
-    catch (const std::invalid_argument &e)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
