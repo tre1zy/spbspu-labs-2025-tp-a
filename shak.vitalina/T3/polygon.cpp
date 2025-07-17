@@ -108,9 +108,9 @@ bool shak::checkRectangle(const Polygon &polygon)
 
 double shak::getArea(const Polygon &polygon)
 {
-  TriangleArea function{polygon.points[0], polygon.points[1]};
+  TriangleArea triangleAreaCalc{polygon.points[0], polygon.points[1]};
   std::vector< double > areas(polygon.points.size());
-  std::transform(std::begin(polygon.points) + 2, std::end(polygon.points), areas.begin(), function);
+  std::transform(std::begin(polygon.points) + 2, std::end(polygon.points), areas.begin(), triangleAreaCalc);
   return std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >{});
 }
 
@@ -134,14 +134,10 @@ size_t shak::equalCounter(const Polygon &polygon, const std::vector< Point > &ta
 
 double shak::TriangleArea::operator()(const Point & point3)
 {
-  double a = 0.0;
-  double b = 0.0;
-  double c = 0.0;
-  double p = 0.0;
-  a = getDistance(point1, point2);
-  b = getDistance(point2, point3);
-  c = getDistance(point1, point3);
-  p = (a + b + c) / 2;
+  double a = getDistance(point1, point2);
+  double b = getDistance(point2, point3);
+  double c = getDistance(point1, point3);
+  double p = (a + b + c) / 2;
   point2 = point3;
-  return (sqrt(p * (p - a) * (p - b) * (p - c)));
+  return (std::sqrt(p * (p - a) * (p - b) * (p - c)));
 }

@@ -4,6 +4,7 @@
 #include <numeric>
 #include <limits>
 #include <string>
+#include <stream_guard.hpp>
 #include "polygon.hpp"
 
 void getAreaEven(std::ostream &out, const std::vector< shak::Polygon > &polygons)
@@ -12,6 +13,7 @@ void getAreaEven(std::ostream &out, const std::vector< shak::Polygon > &polygons
   std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), shak::isEven);
   std::vector< double > polygonAreas(currentPolygons.size());
   std::transform(std::begin(currentPolygons), std::end(currentPolygons), std::begin(polygonAreas), shak::getArea);
+  shak::StreamGuard guard(out);
   out << std::fixed;
   out.precision(1);
   out << std::accumulate(polygonAreas.begin(), polygonAreas.end(), double{}) << "\n";
@@ -23,6 +25,7 @@ void getAreaOdd(std::ostream &out, const std::vector< shak::Polygon > &polygons)
   std::copy_if(std::begin(polygons), std::end(polygons), std::back_inserter(currentPolygons), shak::isOdd);
   std::vector< double > polygonAreas(currentPolygons.size());
   std::transform(std::begin(currentPolygons), std::end(currentPolygons), std::begin(polygonAreas), shak::getArea);
+  shak::StreamGuard guard(out);
   out << std::fixed;
   out.precision(1);
   out << std::accumulate(polygonAreas.begin(), polygonAreas.end(), double{}) << "\n";
@@ -37,6 +40,7 @@ void getAreaMean(std::ostream &out, const std::vector< shak::Polygon > &polygons
   }
   std::vector< double > polygonAreas(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), std::begin(polygonAreas), shak::getArea);
+  shak::StreamGuard guard(out);
   out << std::fixed;
   out.precision(1);
   out << std::accumulate(polygonAreas.begin(), polygonAreas.end(), double{}) / polygons.size() << "\n";
@@ -49,6 +53,7 @@ void getAreaVertexes(std::ostream &out, const std::vector< shak::Polygon > &poly
   std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(currentPolygons), areEqualVertexCount);
   std::vector< double > polygonAreas(currentPolygons.size());
   std::transform(std::begin(currentPolygons), std::end(currentPolygons), std::begin(polygonAreas), shak::getArea);
+  shak::StreamGuard guard(out);
   out << std::fixed;
   out.precision(1);
   out << std::accumulate(polygonAreas.begin(), polygonAreas.end(), double{}) << "\n";
@@ -64,6 +69,7 @@ void getMaxArea(std::ostream &out, const std::vector< shak::Polygon > &polygons)
   std::vector< double > polygonAreas(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), polygonAreas.begin(), shak::getArea);
   auto maxIter = std::max_element(polygonAreas.begin(), polygonAreas.end());
+  shak::StreamGuard guard(out);
   out << std::fixed << std::setprecision(1) << *maxIter << "\n";
 }
 
@@ -90,6 +96,7 @@ void getMinArea(std::ostream &out, const std::vector< shak::Polygon > &polygons)
   std::vector< double > polygonAreas(polygons.size());
   std::transform(std::begin(polygons), std::end(polygons), polygonAreas.begin(), shak::getArea);
   auto minIter = std::min_element(polygonAreas.begin(), polygonAreas.end());
+  shak::StreamGuard guard(out);
   out << std::fixed << std::setprecision(1) << *minIter << "\n";
 }
 
