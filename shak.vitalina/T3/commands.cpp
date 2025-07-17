@@ -138,7 +138,7 @@ void shak::cmdArea(const std::vector< Polygon > &polygons, std::istream &in, std
   std::map< std::string, std::function< void() > > subcmds;
   subcmds["EVEN"] = std::bind(getAreaEven, std::ref(out), std::cref(polygons));
   subcmds["ODD"] = std::bind(getAreaOdd, std::ref(out), std::cref(polygons));
-  subcmds["MEAN"] = std::bind(getAreaMean, std::ref(out), std::cref(polygons)); 
+  subcmds["MEAN"] = std::bind(getAreaMean, std::ref(out), std::cref(polygons));
   size_t vertexCount = 0;
   if (in >> vertexCount) {
     if (vertexCount < 3)
