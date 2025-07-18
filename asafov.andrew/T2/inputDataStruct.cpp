@@ -4,7 +4,7 @@
 
 namespace
 {
-  void skipSpaces(std::string::const_iterator& it, const std::string::const_iterator& end)
+  void skipSpaces(std::string::iterator& it, const std::string::iterator& end)
   {
     while (it != end && *it == ' ') ++it;
   }
@@ -31,14 +31,18 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
   {
     if (*it == ':')
     {
+      auto key_start = it;
+
+      while (key_start != input.begin() && *(key_start - 1) != ' ') --key_start;
+
+      std::string key_name(key_start, it);
+
       ++it;
-      skipSpaces(it, end);
+      while (it != end && *it == ' ') ++it;
 
-      if (it + 3 <= end && std::string(it, it + 4) == "key1")
+
+      if (key_name == "key1")
       {
-        it += 4;
-        skipSpaces(it, end);
-
         if (it + 1 <= end && *it == '0' && *(it + 1) == 'b')
         {
           it += 2;
@@ -52,11 +56,8 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
           has_key1 = true;
         }
       }
-      else if (it + 3 <= end && std::string(it, it + 4) == "key2")
+      else if (key_name == "key2")
       {
-        it += 4;
-        skipSpaces(it, end);
-
         if (it + 2 <= end && *it == '#' && *(it + 1) == 'c' && *(it + 2) == '(')
         {
           it += 3;
@@ -93,11 +94,8 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
           }
         }
       }
-      else if (it + 3 <= end && std::string(it, it + 4) == "key3")
+      else if (key_name == "key3")
       {
-        it += 4;
-        skipSpaces(it, end);
-
         if (it != end && *it == '"')
         {
           ++it;
