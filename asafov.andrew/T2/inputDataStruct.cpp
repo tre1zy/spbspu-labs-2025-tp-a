@@ -1,162 +1,116 @@
 #include "datastruct.h"
 #include <cctype>
-#include <algorithm>
-#include <sstream>
+#include <string>
 
-namespace
-{
-  unsigned long long parseULLBin(std::istream& is)
-  {
-    char ch;
-    if (!is.get(ch) || ch != '0')
-    {
-      is.setstate(std::ios::failbit);
-      return 0;
+namespace {
+    void skipSpaces(std::string::const_iterator& it, const std::string::const_iterator& end) {
+        while (it != end && *it == ' ') ++it;
     }
-    if (!is.get(ch) || ch != 'b')
-    {
-      is.setstate(std::ios::failbit);
-      return 0;
-    }
-
-    unsigned long long result = 0;
-    std::string bits;
-    while (is.get(ch) && (ch == '0' || ch == '1'))
-    {
-      bits.push_back(ch);
-    }
-    if (bits.empty())
-    {
-      is.setstate(std::ios::failbit);
-      return 0;
-    }
-    if (is)
-    {
-      is.unget();
-    }
-
-    for (char bit: bits)
-    {
-      result = (result << 1) | (bit == '1');
-    }
-    return result;
-  }
-
-  std::complex< double > parseCmpLsp(std::istream& is)
-  {
-    char ch;
-    if (!is.get(ch) || ch != '#')
-    {
-      is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
-    }
-    if (!is.get(ch) || ch != 'c')
-    {
-      is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
-    }
-    if (!is.get(ch) || ch != '(')
-    {
-      is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
-    }
-
-    double real = 0.0;
-    double imag = 0.0;
-    is >> real;
-    if (!is)
-    {
-      return {0.0, 0.0};
-    }
-
-    if (is.get(ch) && ch != ')')
-    {
-      is.unget();
-      is >> imag;
-      if (!is)
-      {
-        return {0.0, 0.0};
-      }
-      if (!is.get(ch) || ch != ')')
-      {
-        is.setstate(std::ios::failbit);
-        return {0.0, 0.0};
-      }
-    }
-    return {real, imag};
-  }
 }
 
-std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
-{
-  std::string line;
-  while (std::getline(is, line))
-  {
-    std::istringstream iss(line);
-    DataStruct temp;
-    bool has_key1 = false;
-    bool has_key2 = false;
-    bool has_key3 = false;
+std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
+    // Читаем посимвольно пока не найдем '\n'
+    std::string input;
     char ch;
-
-    while (iss.get(ch))
-    {
-      if (ch == ':')
-      {
-        std::string key;
-        while (iss.get(ch) && ch != ' ' && ch != '\n' && ch != ':')
-        {
-          key.push_back(ch);
-        }
-        iss.unget();
-
-        if (key == "key1")
-        {
-          iss >> std::ws;
-          unsigned long long val = parseULLBin(iss);
-          if (!iss.fail())
-          {
-            temp.key1 = val;
-            has_key1 = true;
-          }
-        }
-        else if (key == "key2")
-        {
-          iss >> std::ws;
-          std::complex< double > val = parseCmpLsp(iss);
-          if (!iss.fail())
-          {
-            temp.key2 = val;
-            has_key2 = true;
-          }
-        }
-        else if (key == "key3")
-        {
-          iss >> std::ws;
-          if (iss.get(ch) && ch == '"')
-          {
-            std::string str;
-            while (iss.get(ch) && ch != '"' && ch != '\n')
-            {
-              str.push_back(ch);
-            }
-            if (ch == '"')
-            {
-              temp.key3 = str;
-              has_key3 = true;
-            }
-          }
-        }
-      }
+    while (is.get(ch) && ch != '\n') {
+        input += ch;
     }
 
-    if (has_key1 && has_key2 && has_key3)
-    {
-      data = temp;
-      return is;
-    }
-  }
+    auto it = input.begin();
+    const auto end = input.end();
+    
+    unsigned long long key1 = 0;
+    std::complex<double> key2 = {0.0, 0.0};
+    std::string key3;
+    bool has_key1 = false, has_key2 = false, has_key3 = false;
 
-  is.setstate(std::ios::failbit);
-  return is;
+    while (it != end) {
+        // Ищем ключ
+        if (*it == ':') {
+            ++it;
+            skipSpaces(it, end);
+            
+            // Проверяем какой ключ
+            if (it + 3 <= end && std::string(it, it+4) == "key1") {
+                it += 4;
+                skipSpaces(it, end);
+                
+                // Парсим 0b101
+                if (it + 1 <= end && *it == '0' && *(it+1) == 'b') {
+                    it += 2;
+                    unsigned long long num = 0;
+                    while (it != end && (*it == '0' || *it == '1')) {
+                        num = (num << 1) | (*it == '1');
+                        ++it;
+                    }
+                    key1 = num;
+                    has_key1 = true;
+                }
+            }
+            else if (it + 3 <= end && std::string(it, it+4) == "key2") {
+                it += 4;
+                skipSpaces(it, end);
+                
+                // Парсим #c(1.0 2.0)
+                if (it + 2 <= end && *it == '#' && *(it+1) == 'c' && *(it+2) == '(') {
+                    it += 3;
+                    std::string real_str, imag_str;
+                    while (it != end && *it != ' ' && *it != ')') {
+                        real_str += *it;
+                        ++it;
+                    }
+                    
+                    if (it != end && *it == ' ') {
+                        ++it;
+                        while (it != end && *it != ')') {
+                            imag_str += *it;
+                            ++it;
+                        }
+                    }
+                    
+                    if (it != end && *it == ')') {
+                        ++it;
+                        try {
+                            double real = std::stod(real_str);
+                            double imag = imag_str.empty() ? 0.0 : std::stod(imag_str);
+                            key2 = {real, imag};
+                            has_key2 = true;
+                        } catch (...) {}
+                    }
+                }
+            }
+            else if (it + 3 <= end && std::string(it, it+4) == "key3") {
+                it += 4;
+                skipSpaces(it, end);
+                
+                // Парсим "строка"
+                if (it != end && *it == '"') {
+                    ++it;
+                    std::string str;
+                    while (it != end && *it != '"') {
+                        str += *it;
+                        ++it;
+                    }
+                    if (it != end && *it == '"') {
+                        ++it;
+                        key3 = str;
+                        has_key3 = true;
+                    }
+                }
+            }
+        }
+        else {
+            ++it;
+        }
+    }
+
+    if (has_key1 && has_key2 && has_key3) {
+        data.key1 = key1;
+        data.key2 = key2;
+        data.key3 = key3;
+    } else {
+        is.setstate(std::ios::failbit);
+    }
+
+    return is;
 }
