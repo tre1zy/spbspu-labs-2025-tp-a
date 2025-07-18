@@ -91,7 +91,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
   std::string line;
   while (std::getline(is, line))
-	{
+  {
     std::istringstream iss(line);
     DataStruct temp;
     bool has_key1 = false;
