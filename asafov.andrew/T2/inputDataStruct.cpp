@@ -1,166 +1,168 @@
 #include "datastruct.h"
 #include <cctype>
-#include <algorithm>
+#include <complex>
+#include <iterator>
+#include <string>
 
 namespace
 {
-  unsigned long long parseULLBin(const std::string& str, size_t& pos)
-  {
-    if (str.substr(pos, 2) != "0b")
-    {
-      pos = std::string::npos;
-      return 0;
-    }
-    pos += 2;
+  using It = std::istreambuf_iterator<char>;
 
-    unsigned long long result = 0;
-    size_t start = pos;
-    while (pos < str.size() && (str[pos] == '0' || str[pos] == '1'))
+  void skipWhitespace(It& it, const It& end)
+  {
+    while (it != end && std::isspace(*it))
+      ++it;
+  }
+
+  bool matchPrefix(It& it, const It& end, const std::string& prefix)
+  {
+    It temp = it;
+    for (char ch : prefix)
     {
-      result = (result << 1) | (str[pos] - '0');
-      ++pos;
+      if (temp == end || *temp != ch)
+        return false;
+      ++temp;
     }
-    if (pos == start)
+    it = temp;
+    return true;
+  }
+
+  std::string parseIdentifier(It& it, const It& end)
+  {
+    std::string result;
+    while (it != end && std::isalnum(*it))
     {
-      pos = std::string::npos;
-      return 0;
+      result += *it;
+      ++it;
     }
     return result;
   }
 
-  std::complex<double> parseCmpLsp(const std::string& str, size_t& pos)
+  unsigned long long parseBinary(It& it, const It& end)
   {
-    if (str.substr(pos, 3) != "#c(")
-    {
-      pos = std::string::npos;
-      return {0.0, 0.0};
-    }
-    pos += 3;
+    if (!matchPrefix(it, end, "0b"))
+      throw std::ios_base::failure("Expected binary prefix");
 
-    char* end;
-    double real = std::strtod(str.c_str() + pos, &end);
-    if (end == str.c_str() + pos)
-    {
-      pos = std::string::npos;
-      return {0.0, 0.0};
-    }
-    pos = end - str.c_str();
+    unsigned long long result = 0;
+    bool hasDigits = false;
 
-    while (pos < str.size() && std::isspace(str[pos])) ++pos;
-
-    double imag = 0.0;
-    if (pos < str.size() && str[pos] != ')')
+    while (it != end && (*it == '0' || *it == '1'))
     {
-      imag = std::strtod(str.c_str() + pos, &end);
-      if (end == str.c_str() + pos)
-      {
-        pos = std::string::npos;
-        return {0.0, 0.0};
-      }
-      pos = end - str.c_str();
+      result = (result << 1) | (*it - '0');
+      ++it;
+      hasDigits = true;
     }
 
-    if (pos >= str.size() || str[pos] != ')')
+    if (!hasDigits)
+      throw std::ios_base::failure("Empty binary number");
+
+    return result;
+  }
+
+  std::complex<double> parseComplex(It& it, const It& end)
+  {
+    if (!matchPrefix(it, end, "#c("))
+      throw std::ios_base::failure("Expected #c(");
+
+    std::string number;
+    skipWhitespace(it, end);
+    while (it != end && (std::isdigit(*it) || *it == '.' || *it == '-' || *it == '+'))
     {
-      pos = std::string::npos;
-      return {0.0, 0.0};
+      number += *it;
+      ++it;
     }
-    ++pos;
+
+    double real = std::stod(number);
+    skipWhitespace(it, end);
+
+    number.clear();
+    while (it != end && (std::isdigit(*it) || *it == '.' || *it == '-' || *it == '+'))
+    {
+      number += *it;
+      ++it;
+    }
+
+    double imag = std::stod(number);
+    skipWhitespace(it, end);
+
+    if (it == end || *it != ')')
+      throw std::ios_base::failure("Expected ')' in complex");
+    ++it;
+
     return {real, imag};
   }
 
-  std::string parseQuotedString(const std::string& str, size_t& pos)
+  std::string parseQuotedString(It& it, const It& end)
   {
-    if (pos >= str.size() || str[pos] != '"')
-    {
-      pos = std::string::npos;
-      return "";
-    }
-    ++pos;
-    std::string result;
-    while (pos < str.size() && str[pos] != '"')
-    {
-      result.push_back(str[pos++]);
-    }
-    if (pos == str.size() || str[pos] != '"')
-    {
-      pos = std::string::npos;
-      return "";
-    }
-    ++pos;
-    return result;
-  }
+    if (it == end || *it != '"')
+      throw std::ios_base::failure("Expected opening quote");
 
-  void skipWhitespace(const std::string& str, size_t& pos)
-  {
-    while (pos < str.size() && std::isspace(str[pos])) ++pos;
+    ++it;
+    std::string result;
+    while (it != end && *it != '"')
+    {
+      result += *it;
+      ++it;
+    }
+
+    if (it == end || *it != '"')
+      throw std::ios_base::failure("Unterminated string");
+    ++it;
+
+    return result;
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
-  std::string line;
-  while (std::getline(is, line))
+  std::istreambuf_iterator<char> it(is), end;
+  DataStruct temp;
+  bool has_key1 = false, has_key2 = false, has_key3 = false;
+
+  try
   {
-    size_t pos = 0;
-    DataStruct temp;
-    bool has_key1 = false;
-    bool has_key2 = false;
-    bool has_key3 = false;
-
-    while (pos < line.size())
+    while (it != end)
     {
-      if (line[pos] == ':')
-      {
-        ++pos;
-        std::string key;
-        while (pos < line.size() && !std::isspace(line[pos]) && line[pos] != ':')
-        {
-          key.push_back(line[pos++]);
-        }
-        skipWhitespace(line, pos);
+      skipWhitespace(it, end);
+      if (it == end || *it != ':')
+        break;
+      ++it;
 
-        if (key == "key1")
-        {
-          unsigned long long val = parseULLBin(line, pos);
-          if (pos != std::string::npos)
-          {
-            temp.key1 = val;
-            has_key1 = true;
-          }
-        }
-        else if (key == "key2")
-        {
-          std::complex<double> val = parseCmpLsp(line, pos);
-          if (pos != std::string::npos)
-          {
-            temp.key2 = val;
-            has_key2 = true;
-          }
-        }
-        else if (key == "key3")
-        {
-          std::string str = parseQuotedString(line, pos);
-          if (pos != std::string::npos)
-          {
-            temp.key3 = str;
-            has_key3 = true;
-          }
-        }
+      std::string key = parseIdentifier(it, end);
+      skipWhitespace(it, end);
+
+      if (key == "key1")
+      {
+        temp.key1 = parseBinary(it, end);
+        has_key1 = true;
+      }
+      else if (key == "key2")
+      {
+        temp.key2 = parseComplex(it, end);
+        has_key2 = true;
+      }
+      else if (key == "key3")
+      {
+        temp.key3 = parseQuotedString(it, end);
+        has_key3 = true;
       }
       else
       {
-        ++pos;
+        throw std::ios_base::failure("Unknown key");
+      }
+
+      if (has_key1 && has_key2 && has_key3)
+      {
+        data = temp;
+        return is;
       }
     }
 
-    if (has_key1 && has_key2 && has_key3)
-    {
-      data = temp;
-      return is;
-    }
+    throw std::ios_base::failure("Missing required keys");
   }
-
-  is.setstate(std::ios::failbit);
-  return is;
+  catch (...)
+  {
+    is.setstate(std::ios::failbit);
+    return is;
+  }
 }
