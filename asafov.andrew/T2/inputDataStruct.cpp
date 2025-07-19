@@ -143,7 +143,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
     {
       ++it;
       std::string key;
-      while (it != end && !std::isspace(*it) && *it != ':') 
+      while (it != end && !std::isspace(*it) && *it != ':')
       {
         key.push_back(*it);
         ++it;
