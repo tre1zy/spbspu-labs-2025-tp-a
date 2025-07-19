@@ -1,114 +1,179 @@
 #include "datastruct.h"
+#include <iterator>
 #include <cctype>
-#include <string>
+#include <algorithm>
+#include <complex>
 
 namespace
 {
-  void skipSpaces(std::string::iterator& it, const std::string::iterator& end)
+  bool skipWhitespace(std::istream& is)
   {
-    while (it != end && *it == ' ') ++it;
+    std::istream_iterator<char> it(is);
+    while (it != std::istream_iterator<char>() && std::isspace(*it))
+    {
+      ++it;
+    }
+    return is.good();
+  }
+
+  unsigned long long parseULLBin(std::istream& is)
+  {
+    std::istream_iterator<char> it(is);
+    if (it == std::istream_iterator<char>() || *it != '0') 
+    {
+      is.setstate(std::ios::failbit);
+      return 0;
+    }
+    ++it;
+    if (it == std::istream_iterator<char>() || *it != 'b') 
+    {
+      is.setstate(std::ios::failbit);
+      return 0;
+    }
+    ++it;
+
+    unsigned long long result = 0;
+    bool hasBits = false;
+    while (it != std::istream_iterator<char>() && (*it == '0' || *it == '1')) 
+    {
+      result = (result << 1) | (*it == '1');
+      hasBits = true;
+      ++it;
+    }
+
+    if (!hasBits) 
+    {
+      is.setstate(std::ios::failbit);
+      return 0;
+    }
+    return result;
+  }
+
+  double parseDouble(std::istream& is)
+  {
+    double result = 0.0;
+    bool negative = false;
+    bool hasDigits = false;
+
+    std::istream_iterator<char> it(is);
+    if (it != std::istream_iterator<char>() && *it == '-') 
+    {
+      negative = true;
+      ++it;
+    }
+
+    while (it != std::istream_iterator<char>() && std::isdigit(*it)) 
+    {
+      result = result * 10 + (*it - '0');
+      hasDigits = true;
+      ++it;
+    }
+
+    if (it != std::istream_iterator<char>() && *it == '.') 
+    {
+      ++it;
+      double fraction = 0.1;
+      while (it != std::istream_iterator<char>() && std::isdigit(*it)) 
+      {
+        result += (*it - '0') * fraction;
+        fraction *= 0.1;
+        hasDigits = true;
+        ++it;
+      }
+    }
+
+    if (!hasDigits) 
+    {
+      is.setstate(std::ios::failbit);
+      return 0.0;
+    }
+
+    return negative ? -result : result;
+  }
+
+  std::complex<double> parseCmpLsp(std::istream& is)
+  {
+    std::istream_iterator<char> it(is);
+    if (it == std::istream_iterator<char>() || *it != '#')
+    {
+      return {0.0, 0.0};
+    }
+   
+    ++it;
+    if (it == std::istream_iterator<char>() || *it != 'c')
+    {
+      return {0.0, 0.0};
+    }    
+    ++it;
+    if (it == std::istream_iterator<char>() || *it != '(')
+    {
+      return {0.0, 0.0};
+    }    
+    ++it;
+
+    skipWhitespace(is);
+    double real = parseDouble(is);
+    skipWhitespace(is);
+
+    double imag = 0.0;
+    if (is.peek() != ')') 
+    {
+      imag = parseDouble(is);
+      skipWhitespace(is);
+    }
+
+    it = std::istream_iterator<char>(is);
+    if (it == std::istream_iterator<char>() || *it != ')')
+    {
+      return {0.0, 0.0};
+    }
+    return {real, imag};
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
-  std::string input;
-  char ch;
-  while (is.get(ch) && ch != '\n')
-  {
-    input += ch;
-  }
-
-  auto it = input.begin();
-  const auto end = input.end();
-
-  unsigned long long key1 = 0;
-  std::complex<double> key2 = {0.0, 0.0};
-  std::string key3;
+  DataStruct temp;
   bool has_key1 = false, has_key2 = false, has_key3 = false;
 
+  std::istream_iterator<char> it(is), end;
   while (it != end)
   {
     if (*it == ':')
     {
-      auto key_start = it;
-
-      while (key_start != input.begin() && *(key_start - 1) != ' ') --key_start;
-
-      std::string key_name(key_start, it);
-
       ++it;
-      while (it != end && *it == ' ') ++it;
-
-
-      if (key_name == "key1")
+      std::string key;
+      while (it != end && !std::isspace(*it) && *it != ':') 
       {
-        if (it + 1 <= end && *it == '0' && *(it + 1) == 'b')
-        {
-          it += 2;
-          unsigned long long num = 0;
-          while (it != end && (*it == '0' || *it == '1'))
-          {
-            num = (num << 1) | (*it == '1');
-            ++it;
-          }
-          key1 = num;
-          has_key1 = true;
-        }
+        key.push_back(*it);
+        ++it;
       }
-      else if (key_name == "key2")
+
+      skipWhitespace(is);
+
+      if (key == "key1")
       {
-        if (it + 2 <= end && *it == '#' && *(it + 1) == 'c' && *(it + 2) == '(')
-        {
-          it += 3;
-          std::string real_str, imag_str;
-          while (it != end && *it != ' ' && *it != ')')
-          {
-            real_str += *it;
-            ++it;
-          }
-
-          if (it != end && *it == ' ')
-          {
-            ++it;
-            while (it != end && *it != ')')
-            {
-              imag_str += *it;
-              ++it;
-            }
-          }
-
-          if (it != end && *it == ')')
-          {
-            ++it;
-            try
-            {
-              double real = std::stod(real_str);
-              double imag = imag_str.empty() ? 0.0 : std::stod(imag_str);
-              key2 = {real, imag};
-              has_key2 = true;
-            }
-            catch (...)
-            {
-            }
-          }
-        }
+        temp.key1 = parseULLBin(is);
+        has_key1 = !is.fail();
       }
-      else if (key_name == "key3")
+      else if (key == "key2")
       {
-        if (it != end && *it == '"')
+        temp.key2 = parseCmpLsp(is);
+        has_key2 = !is.fail();
+      }
+      else if (key == "key3")
+      {
+        if (is.peek() == '"')
         {
-          ++it;
+          is.get();
           std::string str;
-          while (it != end && *it != '"')
+          while (is.peek() != '"' && is.peek() != EOF)
           {
-            str += *it;
-            ++it;
+            str.push_back(is.get());
           }
-          if (it != end && *it == '"')
+          if (is.get() == '"') 
           {
-            ++it;
-            key3 = str;
+            temp.key3 = str;
             has_key3 = true;
           }
         }
@@ -122,9 +187,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 
   if (has_key1 && has_key2 && has_key3)
   {
-    data.key1 = key1;
-    data.key2 = key2;
-    data.key3 = key3;
+    data = temp;
   }
   else
   {
