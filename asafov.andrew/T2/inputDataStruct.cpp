@@ -19,13 +19,13 @@ namespace
   unsigned long long parseULLBin(std::istream& is)
   {
     std::istream_iterator<char> it(is);
-    if (it == std::istream_iterator<char>() || *it != '0') 
+    if (it == std::istream_iterator<char>() || *it != '0')
     {
       is.setstate(std::ios::failbit);
       return 0;
     }
     ++it;
-    if (it == std::istream_iterator<char>() || *it != 'b') 
+    if (it == std::istream_iterator<char>() || *it != 'b')
     {
       is.setstate(std::ios::failbit);
       return 0;
@@ -34,14 +34,14 @@ namespace
 
     unsigned long long result = 0;
     bool hasBits = false;
-    while (it != std::istream_iterator<char>() && (*it == '0' || *it == '1')) 
+    while (it != std::istream_iterator<char>() && (*it == '0' || *it == '1'))
     {
       result = (result << 1) | (*it == '1');
       hasBits = true;
       ++it;
     }
 
-    if (!hasBits) 
+    if (!hasBits)
     {
       is.setstate(std::ios::failbit);
       return 0;
@@ -56,24 +56,24 @@ namespace
     bool hasDigits = false;
 
     std::istream_iterator<char> it(is);
-    if (it != std::istream_iterator<char>() && *it == '-') 
+    if (it != std::istream_iterator<char>() && *it == '-')
     {
       negative = true;
       ++it;
     }
 
-    while (it != std::istream_iterator<char>() && std::isdigit(*it)) 
+    while (it != std::istream_iterator<char>() && std::isdigit(*it))
     {
       result = result * 10 + (*it - '0');
       hasDigits = true;
       ++it;
     }
 
-    if (it != std::istream_iterator<char>() && *it == '.') 
+    if (it != std::istream_iterator<char>() && *it == '.')
     {
       ++it;
       double fraction = 0.1;
-      while (it != std::istream_iterator<char>() && std::isdigit(*it)) 
+      while (it != std::istream_iterator<char>() && std::isdigit(*it))
       {
         result += (*it - '0') * fraction;
         fraction *= 0.1;
@@ -82,7 +82,7 @@ namespace
       }
     }
 
-    if (!hasDigits) 
+    if (!hasDigits)
     {
       is.setstate(std::ios::failbit);
       return 0.0;
@@ -98,17 +98,17 @@ namespace
     {
       return {0.0, 0.0};
     }
-   
+
     ++it;
     if (it == std::istream_iterator<char>() || *it != 'c')
     {
       return {0.0, 0.0};
-    }    
+    }
     ++it;
     if (it == std::istream_iterator<char>() || *it != '(')
     {
       return {0.0, 0.0};
-    }    
+    }
     ++it;
 
     skipWhitespace(is);
@@ -116,7 +116,7 @@ namespace
     skipWhitespace(is);
 
     double imag = 0.0;
-    if (is.peek() != ')') 
+    if (is.peek() != ')')
     {
       imag = parseDouble(is);
       skipWhitespace(is);
@@ -171,7 +171,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
           {
             str.push_back(is.get());
           }
-          if (is.get() == '"') 
+          if (is.get() == '"')
           {
             temp.key3 = str;
             has_key3 = true;
