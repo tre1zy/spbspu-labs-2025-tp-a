@@ -124,44 +124,63 @@ namespace {
     ++it;
     return str;
   }
+
+  void skipToNextLine(It& it, const It& end)
+  {
+    while (it != end)
+    {
+      char ch = *it;
+      ++it;
+      if (ch == '\n') break;
+    }
+  }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
   std::istreambuf_iterator<char> it(is), end;
-  DataStruct temp;
-  bool has_key1 = false, has_key2 = false, has_key3 = false;
 
-  while (it != end && !is.fail()) {
-    skipWhitespace(it, end);
-    if (it == end || *it != ':') break;
-    ++it;
+  while (it != end) {
+    DataStruct temp;
+    bool has_key1 = false, has_key2 = false, has_key3 = false;
 
     skipWhitespace(it, end);
-    std::string key = parseIdentifier(it, end);
+    while (it != end && *it == ':') {
+      ++it;
+      skipWhitespace(it, end);
+      std::string key = parseIdentifier(it, end);
+      skipWhitespace(it, end);
 
-    skipWhitespace(it, end);
+      if (key == "key1") {
+        temp.key1 = parseBinary(it, end, is);
+        has_key1 = !is.fail();
+      } else if (key == "key2") {
+        temp.key2 = parseComplex(it, end, is);
+        has_key2 = !is.fail();
+      } else if (key == "key3") {
+        temp.key3 = parseQuotedString(it, end, is);
+        has_key3 = !is.fail();
+      } else {
+        is.setstate(std::ios::failbit);
+      }
 
-    if (key == "key1") {
-      temp.key1 = parseBinary(it, end, is);
-      has_key1 = !is.fail();
-    } else if (key == "key2") {
-      temp.key2 = parseComplex(it, end, is);
-      has_key2 = !is.fail();
-    } else if (key == "key3") {
-      temp.key3 = parseQuotedString(it, end, is);
-      has_key3 = !is.fail();
-    } else {
-      is.setstate(std::ios::failbit);
+      if (is.fail()) {
+        skipToNextLine(it, end);
+        is.clear(); // сбрасываем флаг ошибки
+        break;
+      }
+
+      skipWhitespace(it, end);
     }
 
-    skipWhitespace(it, end);
+    if (has_key1 && has_key2 && has_key3) {
+      data = temp;
+      return is;
+    }
+
+    skipToNextLine(it, end);
+    is.clear();
   }
 
-  if (has_key1 && has_key2 && has_key3) {
-    data = temp;
-  } else {
-    is.setstate(std::ios::failbit);
-  }
-
+  is.setstate(std::ios::failbit);
   return is;
 }
