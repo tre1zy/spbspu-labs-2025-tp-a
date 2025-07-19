@@ -1,198 +1,176 @@
 #include "datastruct.h"
-#include <iterator>
 #include <cctype>
 #include <algorithm>
-#include <complex>
 
 namespace
 {
-  bool skipWhitespace(std::istream& is)
+  unsigned long long parseULLBin(const std::string& str, size_t& pos)
   {
-    std::istream_iterator<char> it(is);
-    while (it != std::istream_iterator<char>() && std::isspace(*it))
+    if (str.substr(pos, 2) != "0b")
     {
-      ++it;
-    }
-    return is.good();
-  }
-
-  unsigned long long parseULLBin(std::istream& is)
-  {
-    std::istream_iterator<char> it(is);
-    if (it == std::istream_iterator<char>() || *it != '0')
-    {
-      is.setstate(std::ios::failbit);
+      pos = std::string::npos;
       return 0;
     }
-    ++it;
-    if (it == std::istream_iterator<char>() || *it != 'b')
-    {
-      is.setstate(std::ios::failbit);
-      return 0;
-    }
-    ++it;
+    pos += 2;
 
     unsigned long long result = 0;
-    bool hasBits = false;
-    while (it != std::istream_iterator<char>() && (*it == '0' || *it == '1'))
+    size_t start = pos;
+    while (pos < str.size() && (str[pos] == '0' || str[pos] == '1'))
     {
-      result = (result << 1) | (*it == '1');
-      hasBits = true;
-      ++it;
+      result = (result << 1) | (str[pos] - '0');
+      ++pos;
     }
-
-    if (!hasBits)
+    if (pos == start)
     {
-      is.setstate(std::ios::failbit);
+      pos = std::string::npos;
       return 0;
     }
     return result;
   }
 
-  double parseDouble(std::istream& is)
+  std::complex<double> parseCmpLsp(const std::string& str, size_t& pos)
   {
-    double result = 0.0;
-    bool negative = false;
-    bool hasDigits = false;
-
-    std::istream_iterator<char> it(is);
-    if (it != std::istream_iterator<char>() && *it == '-')
+    if (str.substr(pos, 3) != "#c(")
     {
-      negative = true;
-      ++it;
-    }
-
-    while (it != std::istream_iterator<char>() && std::isdigit(*it))
-    {
-      result = result * 10 + (*it - '0');
-      hasDigits = true;
-      ++it;
-    }
-
-    if (it != std::istream_iterator<char>() && *it == '.')
-    {
-      ++it;
-      double fraction = 0.1;
-      while (it != std::istream_iterator<char>() && std::isdigit(*it))
-      {
-        result += (*it - '0') * fraction;
-        fraction *= 0.1;
-        hasDigits = true;
-        ++it;
-      }
-    }
-
-    if (!hasDigits)
-    {
-      is.setstate(std::ios::failbit);
-      return 0.0;
-    }
-
-    return negative ? -result : result;
-  }
-
-  std::complex<double> parseCmpLsp(std::istream& is)
-  {
-    std::istream_iterator<char> it(is);
-    if (it == std::istream_iterator<char>() || *it != '#')
-    {
+      pos = std::string::npos;
       return {0.0, 0.0};
     }
+    pos += 3;
 
-    ++it;
-    if (it == std::istream_iterator<char>() || *it != 'c')
+    char* end;
+    double real = std::strtod(str.c_str() + pos, &end);
+    if (end == str.c_str() + pos)
     {
+      pos = std::string::npos;
       return {0.0, 0.0};
     }
-    ++it;
-    if (it == std::istream_iterator<char>() || *it != '(')
-    {
-      return {0.0, 0.0};
-    }
-    ++it;
+    pos = end - str.c_str();
 
-    skipWhitespace(is);
-    double real = parseDouble(is);
-    skipWhitespace(is);
+    while (pos < str.size() && std::isspace(str[pos])) ++pos;
 
     double imag = 0.0;
-    if (is.peek() != ')')
+    if (pos < str.size() && str[pos] != ')')
     {
-      imag = parseDouble(is);
-      skipWhitespace(is);
+      imag = std::strtod(str.c_str() + pos, &end);
+      if (end == str.c_str() + pos)
+      {
+        pos = std::string::npos;
+        return {0.0, 0.0};
+      }
+      pos = end - str.c_str();
     }
 
-    it = std::istream_iterator<char>(is);
-    if (it == std::istream_iterator<char>() || *it != ')')
+    if (pos >= str.size() || str[pos] != ')')
     {
+      pos = std::string::npos;
       return {0.0, 0.0};
     }
+    ++pos;
     return {real, imag};
+  }
+
+  std::string parseQuotedString(const std::string& str, size_t& pos)
+  {
+    if (pos >= str.size() || str[pos] != '"')
+    {
+      pos = std::string::npos;
+      return "";
+    }
+    ++pos;
+    std::string result;
+    while (pos < str.size() && str[pos] != '"')
+    {
+      result.push_back(str[pos++]);
+    }
+    if (pos == str.size() || str[pos] != '"')
+    {
+      pos = std::string::npos;
+      return "";
+    }
+    ++pos;
+    return result;
+  }
+
+  void skipWhitespace(const std::string& str, size_t& pos)
+  {
+    while (pos < str.size() && std::isspace(str[pos])) ++pos;
+  }
+
+  bool matchKey(const std::string& str, size_t& pos, const std::string& key)
+  {
+    if (str.substr(pos, key.size()) == key)
+    {
+      pos += key.size();
+      return true;
+    }
+    return false;
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
 {
-  DataStruct temp;
-  bool has_key1 = false, has_key2 = false, has_key3 = false;
-
-  std::istream_iterator<char> it(is), end;
-  while (it != end)
+  std::string line;
+  while (std::getline(is, line))
   {
-    if (*it == ':')
+    size_t pos = 0;
+    DataStruct temp;
+    bool has_key1 = false;
+    bool has_key2 = false;
+    bool has_key3 = false;
+
+    while (pos < line.size())
     {
-      ++it;
-      std::string key;
-      while (it != end && !std::isspace(*it) && *it != ':')
+      if (line[pos] == ':')
       {
-        key.push_back(*it);
-        ++it;
-      }
-
-      skipWhitespace(is);
-
-      if (key == "key1")
-      {
-        temp.key1 = parseULLBin(is);
-        has_key1 = !is.fail();
-      }
-      else if (key == "key2")
-      {
-        temp.key2 = parseCmpLsp(is);
-        has_key2 = !is.fail();
-      }
-      else if (key == "key3")
-      {
-        if (is.peek() == '"')
+        ++pos;
+        std::string key;
+        while (pos < line.size() && !std::isspace(line[pos]) && line[pos] != ':')
         {
-          is.get();
-          std::string str;
-          while (is.peek() != '"' && is.peek() != EOF)
+          key.push_back(line[pos++]);
+        }
+        skipWhitespace(line, pos);
+
+        if (key == "key1")
+        {
+          unsigned long long val = parseULLBin(line, pos);
+          if (pos != std::string::npos)
           {
-            str.push_back(is.get());
+            temp.key1 = val;
+            has_key1 = true;
           }
-          if (is.get() == '"')
+        }
+        else if (key == "key2")
+        {
+          std::complex<double> val = parseCmpLsp(line, pos);
+          if (pos != std::string::npos)
+          {
+            temp.key2 = val;
+            has_key2 = true;
+          }
+        }
+        else if (key == "key3")
+        {
+          std::string str = parseQuotedString(line, pos);
+          if (pos != std::string::npos)
           {
             temp.key3 = str;
             has_key3 = true;
           }
         }
       }
+      else
+      {
+        ++pos;
+      }
     }
-    else
+
+    if (has_key1 && has_key2 && has_key3)
     {
-      ++it;
+      data = temp;
+      return is;
     }
   }
 
-  if (has_key1 && has_key2 && has_key3)
-  {
-    data = temp;
-  }
-  else
-  {
-    is.setstate(std::ios::failbit);
-  }
-
+  is.setstate(std::ios::failbit);
   return is;
 }
