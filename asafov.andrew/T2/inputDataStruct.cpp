@@ -95,16 +95,6 @@ namespace
   {
     while (pos < str.size() && std::isspace(str[pos])) ++pos;
   }
-
-  bool matchKey(const std::string& str, size_t& pos, const std::string& key)
-  {
-    if (str.substr(pos, key.size()) == key)
-    {
-      pos += key.size();
-      return true;
-    }
-    return false;
-  }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data)
