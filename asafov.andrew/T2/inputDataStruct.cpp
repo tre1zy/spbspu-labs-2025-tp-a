@@ -164,11 +164,14 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
         is.setstate(std::ios::failbit);
       }
 
-      if (is.fail()) {
+      if (is.fail())
+      {
         skipToNextLine(it, end);
         is.clear();
-        break;
+        it = std::istreambuf_iterator<char>(is);
+        continue;
       }
+
 
       skipWhitespace(it, end);
     }
@@ -180,6 +183,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
 
     skipToNextLine(it, end);
     is.clear();
+    it = std::istreambuf_iterator<char>(is);
   }
 
   is.setstate(std::ios::failbit);
