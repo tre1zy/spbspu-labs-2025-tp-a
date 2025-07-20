@@ -1,13 +1,12 @@
 #include "datastruct.h"
-#include <iterator>
 #include <istream>
 #include <complex>
+#include <cctype>
 #include <string>
 #include <cstdlib>
-#include <cctype>
 
 namespace {
-  using It = std::istream_iterator<char>;
+  using It = std::istreambuf_iterator<char>;
 
   void skipWhitespace(It& it, const It& end) {
     while (it != end && std::isspace(static_cast<unsigned char>(*it))) {
@@ -15,8 +14,8 @@ namespace {
     }
   }
 
-  bool match(It& it, const It& end, const std::string& prefix) {
-    It tmp = it;
+  bool matchPrefix(It& it, const It& end, const std::string& prefix) {
+    auto tmp = it;
     for (char ch : prefix) {
       if (tmp == end || *tmp != ch) return false;
       ++tmp;
@@ -35,7 +34,7 @@ namespace {
   }
 
   unsigned long long parseBinary(It& it, const It& end, std::istream& is) {
-    if (!match(it, end, "0b")) {
+    if (!matchPrefix(it, end, "0b")) {
       is.setstate(std::ios::failbit);
       return 0;
     }
@@ -59,7 +58,7 @@ namespace {
   }
 
   std::complex<double> parseComplex(It& it, const It& end, std::istream& is) {
-    if (!match(it, end, "#c(")) {
+    if (!matchPrefix(it, end, "#c(")) {
       is.setstate(std::ios::failbit);
       return {};
     }
@@ -103,16 +102,16 @@ namespace {
     return {re, im};
   }
 
-  std::string parseString(It& it, const It& end, std::istream& is) {
+  std::string parseQuotedString(It& it, const It& end, std::istream& is) {
     if (it == end || *it != '"') {
       is.setstate(std::ios::failbit);
       return {};
     }
     ++it;
 
-    std::string result;
+    std::string str;
     while (it != end && *it != '"') {
-      result += *it;
+      str += *it;
       ++it;
     }
 
@@ -121,7 +120,7 @@ namespace {
       return {};
     }
     ++it;
-    return result;
+    return str;
   }
 
   void skipToNextLine(It& it, const It& end) {
@@ -136,7 +135,7 @@ namespace {
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
-  std::istream_iterator<char> it(is), end;
+  std::istreambuf_iterator<char> it(is), end;
 
   while (it != end) {
     DataStruct temp;
@@ -156,16 +155,20 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
         temp.key2 = parseComplex(it, end, is);
         has_key2 = !is.fail();
       } else if (key == "key3") {
-        temp.key3 = parseString(it, end, is);
+        temp.key3 = parseQuotedString(it, end, is);
         has_key3 = !is.fail();
       } else {
         is.setstate(std::ios::failbit);
       }
 
       if (is.fail()) {
+        auto prev = it;
         skipToNextLine(it, end);
         is.clear();
-        it = std::istream_iterator<char>(is);
+        if (it == prev) {
+          ++it;
+        }
+        it = std::istreambuf_iterator<char>(is);
         continue;
       }
 
@@ -177,9 +180,13 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
       return is;
     }
 
+    auto prev = it;
     skipToNextLine(it, end);
     is.clear();
-    it = std::istream_iterator<char>(is);
+    if (it == prev) {
+      ++it;
+    }
+    it = std::istreambuf_iterator<char>(is);
   }
 
   is.setstate(std::ios::failbit);
