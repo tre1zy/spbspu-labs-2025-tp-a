@@ -133,6 +133,7 @@ namespace {
       ++it;
       if (ch == '\n') break;
     }
+    ++it;
   }
 }
 
@@ -165,7 +166,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
 
       if (is.fail()) {
         skipToNextLine(it, end);
-        is.clear(); // сбрасываем флаг ошибки
+        is.clear();
         break;
       }
 
