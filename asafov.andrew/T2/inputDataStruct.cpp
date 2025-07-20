@@ -1,12 +1,13 @@
 #include "datastruct.h"
+#include <iterator>
 #include <istream>
 #include <complex>
-#include <cctype>
 #include <string>
 #include <cstdlib>
+#include <cctype>
 
 namespace {
-  using It = std::istreambuf_iterator<char>;
+  using It = std::istream_iterator<char>;
 
   void skipWhitespace(It& it, const It& end) {
     while (it != end && std::isspace(static_cast<unsigned char>(*it))) {
@@ -14,8 +15,8 @@ namespace {
     }
   }
 
-  bool matchPrefix(It& it, const It& end, const std::string& prefix) {
-    auto tmp = it;
+  bool match(It& it, const It& end, const std::string& prefix) {
+    It tmp = it;
     for (char ch : prefix) {
       if (tmp == end || *tmp != ch) return false;
       ++tmp;
@@ -34,7 +35,7 @@ namespace {
   }
 
   unsigned long long parseBinary(It& it, const It& end, std::istream& is) {
-    if (!matchPrefix(it, end, "0b")) {
+    if (!match(it, end, "0b")) {
       is.setstate(std::ios::failbit);
       return 0;
     }
@@ -54,20 +55,19 @@ namespace {
     for (char b : bits) {
       value = (value << 1) | (b - '0');
     }
-
     return value;
   }
 
   std::complex<double> parseComplex(It& it, const It& end, std::istream& is) {
-    if (!matchPrefix(it, end, "#c(")) {
+    if (!match(it, end, "#c(")) {
       is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
+      return {};
     }
 
     skipWhitespace(it, end);
     std::string num1, num2;
 
-    while (it != end && (std::isdigit(static_cast<unsigned char>(*it)) || *it == '.' || *it == '-' || *it == '+')) {
+    while (it != end && (std::isdigit(*it) || *it == '.' || *it == '-' || *it == '+')) {
       num1 += *it;
       ++it;
     }
@@ -80,7 +80,7 @@ namespace {
 
     if (it == end || *it != ')') {
       is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
+      return {};
     }
     ++it;
 
@@ -88,7 +88,7 @@ namespace {
     double re = std::strtod(num1.c_str(), &ptr);
     if (ptr == num1.c_str()) {
       is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
+      return {};
     }
 
     double im = 0.0;
@@ -96,14 +96,14 @@ namespace {
       im = std::strtod(num2.c_str(), &ptr);
       if (ptr == num2.c_str()) {
         is.setstate(std::ios::failbit);
-        return {0.0, 0.0};
+        return {};
       }
     }
 
     return {re, im};
   }
 
-  std::string parseQuotedString(It& it, const It& end, std::istream& is) {
+  std::string parseString(It& it, const It& end, std::istream& is) {
     if (it == end || *it != '"') {
       is.setstate(std::ios::failbit);
       return {};
@@ -121,20 +121,22 @@ namespace {
       return {};
     }
     ++it;
-
     return result;
   }
 
   void skipToNextLine(It& it, const It& end) {
     while (it != end) {
-      char ch = *it++;
-      if (ch == '\n') break;
+      if (*it == '\n') {
+        ++it;
+        break;
+      }
+      ++it;
     }
   }
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
-  std::istreambuf_iterator<char> it(is), end;
+  std::istream_iterator<char> it(is), end;
 
   while (it != end) {
     DataStruct temp;
@@ -144,7 +146,6 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
     while (it != end && *it == ':') {
       ++it;
       skipWhitespace(it, end);
-
       std::string key = parseIdentifier(it, end);
       skipWhitespace(it, end);
 
@@ -155,7 +156,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
         temp.key2 = parseComplex(it, end, is);
         has_key2 = !is.fail();
       } else if (key == "key3") {
-        temp.key3 = parseQuotedString(it, end, is);
+        temp.key3 = parseString(it, end, is);
         has_key3 = !is.fail();
       } else {
         is.setstate(std::ios::failbit);
@@ -164,7 +165,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
       if (is.fail()) {
         skipToNextLine(it, end);
         is.clear();
-        it = std::istreambuf_iterator<char>(is);
+        it = std::istream_iterator<char>(is);
         continue;
       }
 
@@ -178,7 +179,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
 
     skipToNextLine(it, end);
     is.clear();
-    it = std::istreambuf_iterator<char>(is);
+    it = std::istream_iterator<char>(is);
   }
 
   is.setstate(std::ios::failbit);
