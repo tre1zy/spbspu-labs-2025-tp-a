@@ -1,5 +1,6 @@
 #include "datastruct.h"
 #include <istream>
+#include <iterator>
 #include <complex>
 #include <cctype>
 #include <string>
