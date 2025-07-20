@@ -3,6 +3,7 @@
 #include <complex>
 #include <cctype>
 #include <string>
+#include <cstdlib>
 
 namespace {
   using It = std::istreambuf_iterator<char>;
@@ -16,9 +17,7 @@ namespace {
   bool matchPrefix(It& it, const It& end, const std::string& prefix) {
     auto tmp = it;
     for (char ch : prefix) {
-      if (tmp == end || *tmp != ch) {
-        return false;
-      }
+      if (tmp == end || *tmp != ch) return false;
       ++tmp;
     }
     it = tmp;
@@ -26,12 +25,12 @@ namespace {
   }
 
   std::string parseIdentifier(It& it, const It& end) {
-    std::string id;
+    std::string result;
     while (it != end && std::isalpha(static_cast<unsigned char>(*it))) {
-      id += *it;
+      result += *it;
       ++it;
     }
-    return id;
+    return result;
   }
 
   unsigned long long parseBinary(It& it, const It& end, std::istream& is) {
@@ -40,17 +39,20 @@ namespace {
       return 0;
     }
 
-    unsigned long long value = 0;
-    bool hasDigits = false;
-
+    std::string bits;
     while (it != end && (*it == '0' || *it == '1')) {
-      value = (value << 1) | (*it - '0');
+      bits += *it;
       ++it;
-      hasDigits = true;
     }
 
-    if (!hasDigits) {
+    if (bits.empty()) {
       is.setstate(std::ios::failbit);
+      return 0;
+    }
+
+    unsigned long long value = 0;
+    for (char b : bits) {
+      value = (value << 1) | (b - '0');
     }
 
     return value;
@@ -62,45 +64,43 @@ namespace {
       return {0.0, 0.0};
     }
 
-    std::string token;
-    while (it != end && !std::isspace(static_cast<unsigned char>(*it)) && *it != ')') {
-      token += *it;
-      ++it;
-    }
+    skipWhitespace(it, end);
+    std::string num1, num2;
 
-    std::istringstream re_stream(token);
-    double real = 0.0;
-    re_stream >> real;
-    if (re_stream.fail()) {
-      is.setstate(std::ios::failbit);
-      return {0.0, 0.0};
+    while (it != end && (std::isdigit(static_cast<unsigned char>(*it)) || *it == '.' || *it == '-' || *it == '+')) {
+      num1 += *it;
+      ++it;
     }
 
     skipWhitespace(it, end);
-
-    token.clear();
     while (it != end && *it != ')') {
-      token += *it;
+      num2 += *it;
       ++it;
-    }
-
-    double imag = 0.0;
-    if (!token.empty()) {
-      std::istringstream im_stream(token);
-      im_stream >> imag;
-      if (im_stream.fail()) {
-        is.setstate(std::ios::failbit);
-        return {0.0, 0.0};
-      }
     }
 
     if (it == end || *it != ')') {
       is.setstate(std::ios::failbit);
       return {0.0, 0.0};
     }
-
     ++it;
-    return {real, imag};
+
+    char* ptr = nullptr;
+    double re = std::strtod(num1.c_str(), &ptr);
+    if (ptr == num1.c_str()) {
+      is.setstate(std::ios::failbit);
+      return {0.0, 0.0};
+    }
+
+    double im = 0.0;
+    if (!num2.empty()) {
+      im = std::strtod(num2.c_str(), &ptr);
+      if (ptr == num2.c_str()) {
+        is.setstate(std::ios::failbit);
+        return {0.0, 0.0};
+      }
+    }
+
+    return {re, im};
   }
 
   std::string parseQuotedString(It& it, const It& end, std::istream& is) {
@@ -110,9 +110,9 @@ namespace {
     }
     ++it;
 
-    std::string str;
+    std::string result;
     while (it != end && *it != '"') {
-      str += *it;
+      result += *it;
       ++it;
     }
 
@@ -120,20 +120,16 @@ namespace {
       is.setstate(std::ios::failbit);
       return {};
     }
-
     ++it;
-    return str;
+
+    return result;
   }
 
-  void skipToNextLine(It& it, const It& end)
-  {
-    while (it != end)
-    {
-      char ch = *it;
-      ++it;
+  void skipToNextLine(It& it, const It& end) {
+    while (it != end) {
+      char ch = *it++;
       if (ch == '\n') break;
     }
-    ++it;
   }
 }
 
@@ -148,6 +144,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
     while (it != end && *it == ':') {
       ++it;
       skipWhitespace(it, end);
+
       std::string key = parseIdentifier(it, end);
       skipWhitespace(it, end);
 
@@ -164,14 +161,12 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
         is.setstate(std::ios::failbit);
       }
 
-      if (is.fail())
-      {
+      if (is.fail()) {
         skipToNextLine(it, end);
         is.clear();
         it = std::istreambuf_iterator<char>(is);
         continue;
       }
-
 
       skipWhitespace(it, end);
     }
