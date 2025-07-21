@@ -58,8 +58,8 @@ namespace asafov
         hasKey3 = true;
       }
       else {
-        std::string dummy;
-        in >> dummy;
+        std::string skip;
+        in >> skip;
       }
 
       in >> std::ws >> ch;
