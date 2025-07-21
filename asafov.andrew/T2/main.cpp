@@ -1,6 +1,8 @@
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <limits>
 #include "datastruct.h"
 
 int main()
@@ -8,21 +10,28 @@ int main()
   using asafov::DataStruct;
 
   std::vector<DataStruct> data;
-  DataStruct record;
 
-  while (true)
+  while (!std::cin.eof())
   {
-    std::streampos pos = std::cin.tellg();
-    if (!(std::cin >> record))
+    std::copy(
+      std::istream_iterator<DataStruct>(std::cin),
+      std::istream_iterator<DataStruct>(),
+      std::back_inserter(data)
+    );
+
+    if (std::cin.eof()) break;
+
+    if (!std::cin)
     {
-      if (std::cin.eof()) break;
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    else
-    {
-      data.push_back(record);
-    }
+  }
+
+  if (data.empty())
+  {
+    std::cerr << "Atleast one supported record type\n";
+    return 1;
   }
 
   std::sort(data.begin(), data.end(), asafov::cmpDataStruct);
