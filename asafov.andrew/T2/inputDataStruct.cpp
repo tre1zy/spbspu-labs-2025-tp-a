@@ -4,10 +4,9 @@
 #include <cctype>
 #include <string>
 #include <cstdlib>
-#include <iterator>
 
 namespace {
-  using It = std::istream_iterator<char>;
+  using It = std::istreambuf_iterator<char>;
 
   void skipWhitespace(It& it, const It& end) {
     while (it != end && std::isspace(static_cast<unsigned char>(*it))) {
@@ -15,7 +14,7 @@ namespace {
     }
   }
 
-  bool match(It& it, const It& end, const std::string& prefix) {
+  bool matchPrefix(It& it, const It& end, const std::string& prefix) {
     auto tmp = it;
     for (char ch : prefix) {
       if (tmp == end || *tmp != ch) return false;
@@ -35,22 +34,19 @@ namespace {
   }
 
   unsigned long long parseBinary(It& it, const It& end, std::istream& is) {
-    if (!match(it, end, "0b")) {
+    if (!matchPrefix(it, end, "0b")) {
       is.setstate(std::ios::failbit);
       return 0;
     }
-
     std::string bits;
     while (it != end && (*it == '0' || *it == '1')) {
       bits += *it;
       ++it;
     }
-
     if (bits.empty()) {
       is.setstate(std::ios::failbit);
       return 0;
     }
-
     unsigned long long value = 0;
     for (char b : bits) {
       value = (value << 1) | (b - '0');
@@ -59,46 +55,40 @@ namespace {
   }
 
   std::complex<double> parseComplex(It& it, const It& end, std::istream& is) {
-    if (!match(it, end, "#c(")) {
+    if (!matchPrefix(it, end, "#c(")) {
       is.setstate(std::ios::failbit);
       return {};
     }
-
     skipWhitespace(it, end);
-    std::string num1, num2;
+    std::string rePart, imPart;
     while (it != end && (std::isdigit(*it) || *it == '.' || *it == '-' || *it == '+')) {
-      num1 += *it;
+      rePart += *it;
       ++it;
     }
-
     skipWhitespace(it, end);
     while (it != end && *it != ')') {
-      num2 += *it;
+      imPart += *it;
       ++it;
     }
-
     if (it == end || *it != ')') {
       is.setstate(std::ios::failbit);
       return {};
     }
     ++it;
-
     char* ptr = nullptr;
-    double re = std::strtod(num1.c_str(), &ptr);
-    if (ptr == num1.c_str()) {
+    double re = std::strtod(rePart.c_str(), &ptr);
+    if (ptr == rePart.c_str()) {
       is.setstate(std::ios::failbit);
       return {};
     }
-
     double im = 0.0;
-    if (!num2.empty()) {
-      im = std::strtod(num2.c_str(), &ptr);
-      if (ptr == num2.c_str()) {
+    if (!imPart.empty()) {
+      im = std::strtod(imPart.c_str(), &ptr);
+      if (ptr == imPart.c_str()) {
         is.setstate(std::ios::failbit);
         return {};
       }
     }
-
     return {re, im};
   }
 
@@ -108,19 +98,17 @@ namespace {
       return {};
     }
     ++it;
-
-    std::string result;
+    std::string str;
     while (it != end && *it != '"') {
-      result += *it;
+      str += *it;
       ++it;
     }
-
     if (it == end || *it != '"') {
       is.setstate(std::ios::failbit);
       return {};
     }
     ++it;
-    return result;
+    return str;
   }
 
   void skipToNextLine(It& it, const It& end) {
@@ -141,10 +129,9 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
     return is;
   }
 
-  It it(is), end;
-  bool accepted = false;
+  std::istreambuf_iterator<char> it(is), end;
 
-  while (is && it != end && !is.eof()) {
+  while (it != end) {
     DataStruct temp;
     bool has_key1 = false, has_key2 = false, has_key3 = false;
 
@@ -172,7 +159,7 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
         skipToNextLine(it, end);
         is.clear();
         if (is.eof()) break;
-        it = It(is);
+        it = std::istreambuf_iterator<char>(is);
         continue;
       }
 
@@ -181,18 +168,15 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
 
     if (has_key1 && has_key2 && has_key3) {
       data = temp;
-      accepted = true;
-      break;
+      return is;
     }
 
     skipToNextLine(it, end);
     is.clear();
     if (is.eof()) break;
-    it = It(is);
+    it = std::istreambuf_iterator<char>(is);
   }
 
-  if (!accepted) {
-    is.setstate(std::ios::failbit);
-  }
+  is.setstate(std::ios::failbit);
   return is;
 }
