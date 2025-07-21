@@ -111,14 +111,9 @@ namespace {
     return str;
   }
 
-  void skipToNextLine(It& it, const It& end) {
-    while (it != end) {
-      if (*it == '\n') {
-        ++it;
-        break;
-      }
-      ++it;
-    }
+  void skipToNextLine(istream& is) {
+    std::string line;
+    line.getline(is);
   }
 }
 
