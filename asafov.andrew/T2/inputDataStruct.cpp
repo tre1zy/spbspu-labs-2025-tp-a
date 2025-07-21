@@ -133,6 +133,12 @@ namespace {
 }
 
 std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
+  std::istream::sentry guard(is);
+  if (!guard) {
+    is.setstate(std::ios::failbit);
+    return is;
+  }
+
   std::istream_iterator<char> it(is), end;
 
   while (is && it != end) {
