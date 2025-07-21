@@ -1,10 +1,10 @@
 #include "datastruct.h"
 #include <istream>
-#include <iterator>
 #include <complex>
 #include <cctype>
 #include <string>
 #include <cstdlib>
+#include <iterator>
 
 namespace {
   using It = std::istream_iterator<char>;
@@ -66,7 +66,6 @@ namespace {
 
     skipWhitespace(it, end);
     std::string num1, num2;
-
     while (it != end && (std::isdigit(*it) || *it == '.' || *it == '-' || *it == '+')) {
       num1 += *it;
       ++it;
@@ -110,9 +109,9 @@ namespace {
     }
     ++it;
 
-    std::string str;
+    std::string result;
     while (it != end && *it != '"') {
-      str += *it;
+      result += *it;
       ++it;
     }
 
@@ -121,13 +120,16 @@ namespace {
       return {};
     }
     ++it;
-    return str;
+    return result;
   }
 
   void skipToNextLine(It& it, const It& end) {
     while (it != end) {
-      char c = *it++;
-      if (c == '\n') break;
+      if (*it == '\n') {
+        ++it;
+        break;
+      }
+      ++it;
     }
   }
 }
@@ -139,9 +141,10 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
     return is;
   }
 
-  std::istream_iterator<char> it(is), end;
+  It it(is), end;
+  bool accepted = false;
 
-  while (is && it != end) {
+  while (is && it != end && !is.eof()) {
     DataStruct temp;
     bool has_key1 = false, has_key2 = false, has_key3 = false;
 
@@ -166,14 +169,10 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
       }
 
       if (is.fail()) {
-        auto prev = it;
         skipToNextLine(it, end);
         is.clear();
-        if (it == prev) {
-          if (!is.eof()) ++it;
-          else break;
-        }
-        it = std::istream_iterator<char>(is);
+        if (is.eof()) break;
+        it = It(is);
         continue;
       }
 
@@ -182,19 +181,18 @@ std::istream& asafov::operator>>(std::istream& is, DataStruct& data) {
 
     if (has_key1 && has_key2 && has_key3) {
       data = temp;
-      return is;
+      accepted = true;
+      break;
     }
 
-    auto prev = it;
     skipToNextLine(it, end);
     is.clear();
-    if (it == prev) {
-      if (!is.eof()) ++it;
-      else break;
-    }
-    it = std::istream_iterator<char>(is);
+    if (is.eof()) break;
+    it = It(is);
   }
 
-  is.setstate(std::ios::failbit);
+  if (!accepted) {
+    is.setstate(std::ios::failbit);
+  }
   return is;
 }
