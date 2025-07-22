@@ -61,9 +61,9 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      t2 &= ch;
+      t2 += ch;
     }
-    temp.key1 = std::stoull(t2;)
+    temp.key1 = std::stoull(t2)
   }
   else if (ch == '2')
   {
@@ -123,7 +123,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      t2 &= ch;
+      t2 += ch;
     }
     t2.pop_back();
     temp.key3 = t2;
@@ -175,9 +175,9 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      t2 &= ch;
+      t2 += ch;
     }
-    temp.key1 = std::stoull(t2;)
+    temp.key1 = std::stoull(t2)
   }
   else if (ch == '2')
   {
@@ -237,7 +237,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      t2 &= ch;
+      t2 += ch;
     }
     t2.pop_back();
     temp.key3 = t2;
@@ -289,9 +289,9 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      t2 &= ch;
+      t2 += ch;
     }
-    temp.key1 = std::stoull(t2;)
+    temp.key1 = std::stoull(t2)
   }
   else if (ch == '2')
   {
@@ -351,7 +351,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      t2 &= ch;
+      t2 += ch;
     }
     t2.pop_back();
     temp.key3 = t2;
