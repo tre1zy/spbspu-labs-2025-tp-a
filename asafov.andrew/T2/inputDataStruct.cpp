@@ -5,7 +5,7 @@
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
   DataStruct temp;
-  in << std::noskipws;
+  in >> std::noskipws;
   char ch;
   in >> ch;
   if (ch != '(')
