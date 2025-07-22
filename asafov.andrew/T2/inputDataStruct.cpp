@@ -10,31 +10,31 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   in >> ch;
   if (ch != '(')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != ':')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'k')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'e')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'y')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
@@ -43,19 +43,19 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '0')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != 'b')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     std::string t2;
@@ -63,7 +63,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     {
       t2 += ch;
     }
-    temp.key1 = std::stoull(t2)
+    temp.key1 = std::stoull(t2);
   }
   else if (ch == '2')
   {
@@ -71,39 +71,39 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '#')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != 'c')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '(')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> t3;
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> t4;
     in >> ch;
     if (ch != ')')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     temp.key2 = std::complex<double>(t3, t4);
@@ -113,13 +113,13 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '"')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     std::string t2;
@@ -132,25 +132,25 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   }
   else
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'k')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'e')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'y')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
@@ -159,19 +159,19 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '0')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != 'b')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     std::string t2;
@@ -179,7 +179,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     {
       t2 += ch;
     }
-    temp.key1 = std::stoull(t2)
+    temp.key1 = std::stoull(t2);
   }
 else if (ch == '2')
   {
@@ -187,39 +187,39 @@ else if (ch == '2')
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '#')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != 'c')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '(')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> t3;
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> t4;
     in >> ch;
     if (ch != ')')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     temp.key2 = std::complex<double>(t3, t4);
@@ -229,13 +229,13 @@ else if (ch == '2')
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '"')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     std::string t2;
@@ -248,25 +248,25 @@ else if (ch == '2')
   }
   else
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'k')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'e')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != 'y')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
@@ -275,19 +275,19 @@ else if (ch == '2')
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '0')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != 'b')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     std::string t2;
@@ -295,7 +295,7 @@ else if (ch == '2')
     {
       t2 += ch;
     }
-    temp.key1 = std::stoull(t2)
+    temp.key1 = std::stoull(t2);
   }
   else if (ch == '2')
   {
@@ -303,39 +303,39 @@ else if (ch == '2')
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '#')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != 'c')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '(')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> t3;
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> t4;
     in >> ch;
     if (ch != ')')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     temp.key2 = std::complex<double>(t3, t4);
@@ -345,13 +345,13 @@ else if (ch == '2')
     in >> ch;
     if (ch != ' ')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     in >> ch;
     if (ch != '"')
     {
-      in.setstate(ios::std::failbit);
+      in.setstate(std::ios::failbit);
       return in;
     }
     std::string t2;
@@ -364,13 +364,13 @@ else if (ch == '2')
   }
   else
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   in >> ch;
   if (ch != ')')
   {
-    in.setstate(ios::std::failbit);
+    in.setstate(std::ios::failbit);
     return in;
   }
   data = temp;
