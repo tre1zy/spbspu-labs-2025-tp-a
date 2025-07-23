@@ -374,5 +374,7 @@ else if (ch == '2')
     return in;
   }
   data = temp;
+  std::string line;
+  getline(in, line);
   return in;
 }
