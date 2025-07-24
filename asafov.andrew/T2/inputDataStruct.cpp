@@ -37,7 +37,7 @@ namespace
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
       in >> t4;
       if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      temp.key2 = std::complex<double>(t3, t4);
+      data.key2 = std::complex<double>(t3, t4);
       if (!(in >> ch) || ch != ':') throw std::logic_error("err");
     }
     else if (ch == '3')
@@ -47,7 +47,7 @@ namespace
 
       std::string t2;
       while (ch != ':') !(in >> ch) ? t2 += ch; in >> ch : throw std::logic_error("err");
-      temp.key3 = t2;
+      data.key3 = t2;
     }
     else throw std::logic_error("err");
     if (!(in >> ch) || ch != 'k') throw std::logic_error("err");
@@ -81,7 +81,7 @@ namespace
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
       in >> t4;
       if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      temp.key2 = std::complex<double>(t3, t4);
+      data.key2 = std::complex<double>(t3, t4);
       if (!(in >> ch) || ch != ':') throw std::logic_error("err");
     }
     else if (ch == '3')
@@ -96,7 +96,7 @@ namespace
         if (ch == ':') break;
         t2 += ch;
       }
-      temp.key3 = t2;
+      data.key3 = t2;
     }
     else throw std::logic_error("err");
     if (!(in >> ch) || ch != 'k') throw std::logic_error("err");
@@ -125,7 +125,7 @@ namespace
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
       in >> t4;
       if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      temp.key2 = std::complex<double>(t3, t4);
+      data.key2 = std::complex<double>(t3, t4);
       if (!(in >> ch) || ch != ':') throw std::logic_error("err");
     }
     else if (ch == '3')
@@ -140,7 +140,7 @@ namespace
         if (ch == ':') break;
         t2 += ch;
       }
-      temp.key3 = t2;
+      data.key3 = t2;
     }
     else throw std::logic_error("err");
     if (!(in >> ch) || ch != ')') throw std::logic_error("err");
