@@ -57,6 +57,7 @@ namespace
         if (ch == ':') break;
         t2 += ch;
       }
+      t2.pop_back();
       data.key3 = t2;
     }
     else throw std::logic_error("err");
@@ -106,6 +107,7 @@ namespace
         if (ch == ':') break;
         t2 += ch;
       }
+      t2.pop_back();
       data.key3 = t2;
     }
     else throw std::logic_error("err");
@@ -155,6 +157,7 @@ namespace
         if (ch == ':') break;
         t2 += ch;
       }
+      t2.pop_back();
       data.key3 = t2;
     }
     else throw std::logic_error("err");
