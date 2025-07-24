@@ -59,13 +59,52 @@ namespace
     return std::stoull(t2);
   }
 
+  std::string read_string(std::istream& in)
+  {
+    char ch;
+    for (char expected : {' ', '"'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+
+    std::string t2;
+    bool inside_quotes = true;
+    while (inside_quotes)
+    {
+      if (!(in >> ch))
+      {
+        throw std::logic_error("err");
+      }
+      if (ch == '"')
+      {
+        inside_quotes = false;
+      }
+      else
+      {
+        t2 += ch;
+      }
+    }
+    if (!(in >> ch) || ch != ':')
+    {
+      throw std::logic_error("err");
+    }
+    return t2;
+  }
+
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
 
-    for (char expected : {'(', ':', 'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    for (char expected : {'(', ':', 'k', 'e', 'y'})
+    {
+      if (!(in >> ch) || ch != expected)
+      {
+        throw std::logic_error("err");
+      }
+    }
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
+    {
+      throw std::logic_error("err");
+    }
+
     if (ch == '1')
     {
       data.key1 = read_binary(in);
@@ -76,31 +115,21 @@ namespace
     }
     else if (ch == '3')
     {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
-
-      std::string t2;
-      bool inside_quotes = true;
-      while (inside_quotes)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == '"')
-        {
-          inside_quotes = false;
-        }
-        else
-        {
-          t2 += ch;
-        }
-      }
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-      data.key3 = t2;
+      data.key3 = read_string(in);
     }
-    else throw std::logic_error("err");
 
-    for (char expected : {'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    for (char expected : {'k', 'e', 'y'})
+    {
+      if (!(in >> ch) || ch != expected)
+      {
+        throw std::logic_error("err");
+      }
+    }
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
+    {
+      throw std::logic_error("err");
+    }
     if (ch == '1')
     {
       data.key1 = read_binary(in);
@@ -111,31 +140,21 @@ namespace
     }
     else if (ch == '3')
     {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
-
-      std::string t2;
-      bool inside_quotes = true;
-      while (inside_quotes)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == '"')
-        {
-          inside_quotes = false;
-        }
-        else
-        {
-          t2 += ch;
-        }
-      }
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-      data.key3 = t2;
+      data.key3 = read_string(in);
     }
-    else throw std::logic_error("err");
 
-    for (char expected : {'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    for (char expected : {'k', 'e', 'y'})
+    {
+      if (!(in >> ch) || ch != expected)
+      {
+        throw std::logic_error("err");
+      }
+    }
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
+    {
+      throw std::logic_error("err");
+    }
     if (ch == '1')
     {
       data.key1 = read_binary(in);
@@ -146,29 +165,13 @@ namespace
     }
     else if (ch == '3')
     {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
-
-      std::string t2;
-      bool inside_quotes = true;
-      while (inside_quotes)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == '"')
-        {
-          inside_quotes = false;
-        }
-        else
-        {
-          t2 += ch;
-        }
-      }
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-      data.key3 = t2;
+      data.key3 = read_string(in);
     }
-    else throw std::logic_error("err");
 
-    if (!(in >> ch) || ch != ')') throw std::logic_error("err");
+    if (!(in >> ch) || ch != ')')
+    {
+      throw std::logic_error("err");
+    }
   }
 }
 
