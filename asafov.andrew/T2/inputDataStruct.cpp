@@ -20,7 +20,6 @@ namespace
 
   std::complex<double> read_complex(std::istream& in)
   {
-    char ch;
     double real, imag;
     expect(in, {' ', '#', 'c', '('});
     in >> real;
@@ -103,14 +102,10 @@ namespace
 
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
-    char ch;
-
     expect(in, {'(', ':'});
-
     read_key(in, data);
     read_key(in, data);
     read_key(in, data);
-
     expect(in, {')'});
   }
 }
