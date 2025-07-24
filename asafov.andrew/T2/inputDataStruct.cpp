@@ -5,6 +5,17 @@
 
 namespace
 {
+  std::complex<double> read_complex(std::istream& in)
+  {
+    double t3, t4;
+    for (char expected : {' ', '#', 'c', '('}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    in >> t3;
+    if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
+    in >> t4;
+    for (char expected : {')', ':'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    return std::complex<double>(t3, t4);
+  }
+
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
@@ -29,17 +40,7 @@ namespace
     }
     else if (ch == '2')
     {
-      double t3, t4;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-      in >> t3;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      in >> t4;
-      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      data.key2 = std::complex<double>(t3, t4);
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
+      data.key2 = read_complex(in);
     }
     else if (ch == '3')
     {
@@ -85,17 +86,7 @@ namespace
     }
     else if (ch == '2')
     {
-      double t3, t4;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-      in >> t3;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      in >> t4;
-      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      data.key2 = std::complex<double>(t3, t4);
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
+      data.key2 = read_complex(in);
     }
     else if (ch == '3')
     {
@@ -141,17 +132,7 @@ namespace
     }
     else if (ch == '2')
     {
-      double t3, t4;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-      in >> t3;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      in >> t4;
-      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      data.key2 = std::complex<double>(t3, t4);
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
+      data.key2 = read_complex(in);
     }
     else if (ch == '3')
     {
