@@ -32,6 +32,33 @@ namespace
     return {real, imag};
   }
 
+  unsigned long long read_binary(std::istream& in)
+  {
+    char ch;
+    for (char expected : {' ', '0', 'b'})
+    {
+      if (!(in >> ch) || ch != expected)
+      {
+        throw std::logic_error("err");
+      }
+    }
+
+    std::string t2;
+    while (true)
+    {
+      if (!(in >> ch))
+      {
+        throw std::logic_error("err");
+      }
+      if (ch == ':')
+      {
+        break;
+      }
+      t2 += ch;
+    }
+    return std::stoull(t2);
+  }
+
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
@@ -41,18 +68,7 @@ namespace
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
-
-      std::string t2;
-      while (true)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
-      }
-      data.key1 = std::stoull(t2);
+      data.key1 = read_binary(in);
     }
     else if (ch == '2')
     {
@@ -87,18 +103,7 @@ namespace
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
-
-      std::string t2;
-      while (true)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
-      }
-      data.key1 = std::stoull(t2);
+      data.key1 = read_binary(in);
     }
     else if (ch == '2')
     {
@@ -133,18 +138,7 @@ namespace
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
-
-      std::string t2;
-      while (true)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
-      }
-      data.key1 = std::stoull(t2);
+      data.key1 = read_binary(in);
     }
     else if (ch == '2')
     {
