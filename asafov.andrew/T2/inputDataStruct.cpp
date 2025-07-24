@@ -5,183 +5,81 @@
 
 namespace
 {
+  void read_key(std::istream& in, asafov::DataStruct& data)
+  {
+    if (ch == '1')
+    {
+      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
+      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
+      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
+
+      std::string t2;
+      while (true)
+      {
+        if (!(in >> ch)) throw std::logic_error("err");
+        if (ch == ':') break;
+        t2 += ch;
+      }
+      data.key1 = std::stoull(t2);
+    }
+    else if (ch == '2')
+    {
+      double t3, t4;
+      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
+      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
+      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
+      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
+      in >> t3;
+      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
+      in >> t4;
+      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
+      data.key2 = std::complex<double>(t3, t4);
+      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
+    }
+    else if (ch == '3')
+    {
+      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
+      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
+
+      std::string t2;
+      bool inside_quotes = true;
+      while (inside_quotes)
+      {
+        if (!(in >> ch)) throw std::logic_error("err");
+        if (ch == '"')
+        {
+          inside_quotes = false;
+        }
+        else
+        {
+          t2 += ch;
+        }
+      }
+      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
+      data.key3 = t2;
+    }
+    else throw std::logic_error("err");
+  }
+
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
 
-    if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-    if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'k') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
+    for (char expected : {'(', ':', 'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
-    if (ch == '1')
-    {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
+    read_key(in, data);
 
-      std::string t2;
-      while (true)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
-      }
-      data.key1 = std::stoull(t2);
-    }
-    else if (ch == '2')
-    {
-      double t3, t4;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-      in >> t3;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      in >> t4;
-      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      data.key2 = std::complex<double>(t3, t4);
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-    }
-    else if (ch == '3')
-    {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
-
-      std::string t2;
-      bool inside_quotes = true;
-      while (inside_quotes)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == '"')
-        {
-          inside_quotes = false;
-        }
-        else
-        {
-          t2 += ch;
-        }
-      }
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-      data.key3 = t2;
-    }
-    else throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'k') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
+    for (char expected : {'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
-    if (ch == '1')
-    {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
+    read_key(in, data);
 
-      std::string t2;
-      while (true)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
-      }
-      data.key1 = std::stoull(t2);
-    }
-    else if (ch == '2')
-    {
-      double t3, t4;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-      in >> t3;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      in >> t4;
-      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      data.key2 = std::complex<double>(t3, t4);
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-    }
-    else if (ch == '3')
-    {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
-
-      std::string t2;
-      bool inside_quotes = true;
-      while (inside_quotes)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == '"')
-        {
-          inside_quotes = false;
-        }
-        else
-        {
-          t2 += ch;
-        }
-      }
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-      data.key3 = t2;
-    }
-    else throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'k') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
-    if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
+    for (char expected : {'(', ':', 'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
-    if (ch == '1')
-    {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '0') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
+    read_key(in, data);
 
-      std::string t2;
-      while (true)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
-      }
-      data.key1 = std::stoull(t2);
-    }
-    else if (ch == '2')
-    {
-      double t3, t4;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '#') throw std::logic_error("err");
-      if (!(in >> ch) || ch != 'c') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '(') throw std::logic_error("err");
-      in >> t3;
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      in >> t4;
-      if (!(in >> ch) || ch != ')') throw std::logic_error("err");
-      data.key2 = std::complex<double>(t3, t4);
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-    }
-    else if (ch == '3')
-    {
-      if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-      if (!(in >> ch) || ch != '"') throw std::logic_error("err");
-
-      std::string t2;
-      bool inside_quotes = true;
-      while (inside_quotes)
-      {
-        if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == '"')
-        {
-          inside_quotes = false;
-        }
-        else
-        {
-          t2 += ch;
-        }
-      }
-      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
-      data.key3 = t2;
-    }
-    else throw std::logic_error("err");
     if (!(in >> ch) || ch != ')') throw std::logic_error("err");
   }
 }
