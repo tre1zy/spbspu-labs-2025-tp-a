@@ -61,6 +61,10 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
+      if (ch != 0 || ch != 1){
+        in.setstate(std::ios::failbit); std::string line; getline(in, line);
+        return in;
+      }
       t2 += ch; in >> ch;
     }
     temp.key1 = std::stoull(t2);
@@ -177,6 +181,10 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
+      if (ch != 0 || ch != 1){
+        in.setstate(std::ios::failbit); std::string line; getline(in, line);
+        return in;
+      }
       t2 += ch; in >> ch;
     }
     temp.key1 = std::stoull(t2);
@@ -293,6 +301,10 @@ else if (ch == '2')
     std::string t2;
     while (ch != ':')
     {
+      if (ch != 0 || ch != 1){
+        in.setstate(std::ios::failbit); std::string line; getline(in, line);
+        return in;
+      }
       t2 += ch; in >> ch;
     }
     temp.key1 = std::stoull(t2);
