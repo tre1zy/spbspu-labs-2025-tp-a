@@ -121,7 +121,7 @@ namespace
     }
     else throw std::logic_error("err");
 
-    for (char expected : {'(', ':', 'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    for (char expected : {'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
