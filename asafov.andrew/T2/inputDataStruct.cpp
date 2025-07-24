@@ -7,6 +7,8 @@ namespace
 {
   void read_key(std::istream& in, asafov::DataStruct& data)
   {
+    char ch;
+
     if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
