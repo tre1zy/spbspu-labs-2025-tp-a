@@ -9,6 +9,7 @@ namespace
   {
     char ch;
 
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
@@ -69,17 +70,14 @@ namespace
 
     for (char expected : {'(', ':', 'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     read_key(in, data);
 
     for (char expected : {'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     read_key(in, data);
 
     for (char expected : {'(', ':', 'k', 'e', 'y'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     read_key(in, data);
 
     if (!(in >> ch) || ch != ')') throw std::logic_error("err");
