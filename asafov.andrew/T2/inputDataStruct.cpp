@@ -8,10 +8,9 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   in >> std::noskipws;
   char ch;
   in >> ch;
-  if (ch != '(')
-  {
-    in.setstate(std::ios::failbit); std::string line; getline(in, line);
-    return in;
+  if (!(in >> ch) || ch != '(') {
+  in.setstate(std::ios::failbit); std::string line; getline(in, line);
+  return in;
   }
   in >> ch;
   if (ch != ':')
@@ -61,7 +60,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      if (ch != 0 || ch != 1){
+      if (ch != '0' || ch != '1'){
         in.setstate(std::ios::failbit); std::string line; getline(in, line);
         return in;
       }
@@ -181,7 +180,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
     std::string t2;
     while (ch != ':')
     {
-      if (ch != 0 || ch != 1){
+      if (ch != '0' || ch != '1'){
         in.setstate(std::ios::failbit); std::string line; getline(in, line);
         return in;
       }
@@ -301,7 +300,7 @@ else if (ch == '2')
     std::string t2;
     while (ch != ':')
     {
-      if (ch != 0 || ch != 1){
+      if (ch != '0' && ch != '1'){
         in.setstate(std::ios::failbit); std::string line; getline(in, line);
         return in;
       }
