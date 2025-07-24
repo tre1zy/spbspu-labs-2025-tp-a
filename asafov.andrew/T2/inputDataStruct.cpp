@@ -51,13 +51,20 @@ namespace
       if (!(in >> ch) || ch != '"') throw std::logic_error("err");
 
       std::string t2;
-      while (true)
+      bool inside_quotes = true;
+      while (inside_quotes)
       {
         if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
+        if (ch == '"')
+        {
+          inside_quotes = false;
+        }
+        else
+        {
+          t2 += ch;
+        }
       }
-      t2.pop_back();
+      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
       data.key3 = t2;
     }
     else throw std::logic_error("err");
@@ -101,13 +108,20 @@ namespace
       if (!(in >> ch) || ch != '"') throw std::logic_error("err");
 
       std::string t2;
-      while (true)
+      bool inside_quotes = true;
+      while (inside_quotes)
       {
         if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
+        if (ch == '"')
+        {
+          inside_quotes = false;
+        }
+        else
+        {
+          t2 += ch;
+        }
       }
-      t2.pop_back();
+      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
       data.key3 = t2;
     }
     else throw std::logic_error("err");
@@ -151,13 +165,20 @@ namespace
       if (!(in >> ch) || ch != '"') throw std::logic_error("err");
 
       std::string t2;
-      while (true)
+      bool inside_quotes = true;
+      while (inside_quotes)
       {
         if (!(in >> ch)) throw std::logic_error("err");
-        if (ch == ':') break;
-        t2 += ch;
+        if (ch == '"')
+        {
+          inside_quotes = false;
+        }
+        else
+        {
+          t2 += ch;
+        }
       }
-      t2.pop_back();
+      if (!(in >> ch) || ch != ':') throw std::logic_error("err");
       data.key3 = t2;
     }
     else throw std::logic_error("err");
