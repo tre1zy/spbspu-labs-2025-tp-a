@@ -15,7 +15,7 @@ namespace
     if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
     if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != 3)) throw std::logic_error("err");
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
@@ -54,7 +54,7 @@ namespace
     if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
     if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != 3)) throw std::logic_error("err");
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
@@ -103,7 +103,7 @@ namespace
     if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
     if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != 3)) throw std::logic_error("err");
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3')) throw std::logic_error("err");
     if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
