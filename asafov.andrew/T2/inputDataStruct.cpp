@@ -7,13 +7,29 @@ namespace
 {
   std::complex<double> read_complex(std::istream& in)
   {
-    double t3, t4;
-    for (char expected : {' ', '#', 'c', '('}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
-    in >> t3;
-    if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
-    in >> t4;
-    for (char expected : {')', ':'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
-    return std::complex<double>(t3, t4);
+    char ch;
+    double real, imag;
+    for (char expected : {' ', '#', 'c', '('})
+    {
+      if (!(in >> ch) || ch != expected)
+      {
+        throw std::logic_error("err");
+      }
+    }
+    in >> real;
+    if (!(in >> ch) || ch != ' ')
+    {
+      throw std::logic_error("err");
+    }
+    in >> imag;
+    for (char expected : {')', ':'})
+    {
+      if (!(in >> ch) || ch != expected)
+      {
+        throw std::logic_error("err");
+      }
+    }
+    return {real, imag};
   }
 
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
