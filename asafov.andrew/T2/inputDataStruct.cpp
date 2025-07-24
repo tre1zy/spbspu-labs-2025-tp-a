@@ -15,7 +15,8 @@ namespace
     if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
     if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
 
-    if (!(in >> ch) || ch == '1')
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != 3)) throw std::logic_error("err");
+    if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
       if (!(in >> ch) || ch != '0') throw std::logic_error("err");
@@ -53,14 +54,20 @@ namespace
     if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
     if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
 
-    if (!(in >> ch) || ch == '1')
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != 3)) throw std::logic_error("err");
+    if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
       if (!(in >> ch) || ch != '0') throw std::logic_error("err");
       if (!(in >> ch) || ch != 'b') throw std::logic_error("err");
 
       std::string t2;
-      while (ch != ':') !(in >> ch) ? t2 += ch; in >> ch : throw std::logic_error("err");
+      while (true)
+      {
+        if (!(in >> ch)) throw std::logic_error("err");
+        if (ch == ':') break;
+        t2 += ch;
+      }
       data.key1 = std::stoull(t2);
     }
     else if (ch == '2')
@@ -83,7 +90,12 @@ namespace
       if (!(in >> ch) || ch != '"') throw std::logic_error("err");
 
       std::string t2;
-      while (ch != ':') !(in >> ch) ? t2 += ch; in >> ch : throw std::logic_error("err");
+      while (true)
+      {
+        if (!(in >> ch)) throw std::logic_error("err");
+        if (ch == ':') break;
+        t2 += ch;
+      }
       temp.key3 = t2;
     }
     else throw std::logic_error("err");
@@ -91,7 +103,8 @@ namespace
     if (!(in >> ch) || ch != 'e') throw std::logic_error("err");
     if (!(in >> ch) || ch != 'y') throw std::logic_error("err");
 
-    if (!(in >> ch) || ch == '1')
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != 3)) throw std::logic_error("err");
+    if (ch == '1')
     {
       if (!(in >> ch) || ch != ' ') throw std::logic_error("err");
       if (!(in >> ch) || ch != '0') throw std::logic_error("err");
@@ -121,7 +134,12 @@ namespace
       if (!(in >> ch) || ch != '"') throw std::logic_error("err");
 
       std::string t2;
-      while (ch != ':') !(in >> ch) ? t2 += ch; in >> ch : throw std::logic_error("err");
+      while (true)
+      {
+        if (!(in >> ch)) throw std::logic_error("err");
+        if (ch == ':') break;
+        t2 += ch;
+      }
       temp.key3 = t2;
     }
     else throw std::logic_error("err");
