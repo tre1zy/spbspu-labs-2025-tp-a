@@ -2,46 +2,38 @@
 #include <iomanip>
 #include <string>
 #include <stdexcept>
+#include <initializer_list>
 
 namespace
 {
+  void expect(std::istream& in, std::initializer_list<char> expected)
+  {
+    char ch;
+    for (char e : expected)
+    {
+      if (!(in >> ch) || ch != e)
+      {
+        throw std::logic_error("reading err");
+      }
+    }
+  }
+
   std::complex<double> read_complex(std::istream& in)
   {
     char ch;
     double real, imag;
-    for (char expected : {' ', '#', 'c', '('})
-    {
-      if (!(in >> ch) || ch != expected)
-      {
-        throw std::logic_error("err");
-      }
-    }
+    expect(in, {' ', '#', 'c', '('});
     in >> real;
-    if (!(in >> ch) || ch != ' ')
-    {
-      throw std::logic_error("err");
-    }
+    expect(in, {' '});
     in >> imag;
-    for (char expected : {')', ':'})
-    {
-      if (!(in >> ch) || ch != expected)
-      {
-        throw std::logic_error("err");
-      }
-    }
+    expect(in, {')', ':'});
     return {real, imag};
   }
 
   unsigned long long read_binary(std::istream& in)
   {
     char ch;
-    for (char expected : {' ', '0', 'b'})
-    {
-      if (!(in >> ch) || ch != expected)
-      {
-        throw std::logic_error("err");
-      }
-    }
+    expect(in, {' ', '0', 'b'});
 
     std::string t2;
     while (true)
@@ -62,7 +54,7 @@ namespace
   std::string read_string(std::istream& in)
   {
     char ch;
-    for (char expected : {' ', '"'}) if (!(in >> ch) || ch != expected) throw std::logic_error("err");
+    expect(in, {' ', '"'});
 
     std::string t2;
     bool inside_quotes = true;
@@ -81,97 +73,45 @@ namespace
         t2 += ch;
       }
     }
-    if (!(in >> ch) || ch != ':')
+    expect(in, {':'});
+    return t2;
+  }
+
+  void read_key(std::istream& in, asafov::DataStruct& data)
+  {
+    char ch;
+    expect(in, {'k', 'e', 'y'});
+
+    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
       throw std::logic_error("err");
     }
-    return t2;
+
+    if (ch == '1')
+    {
+      data.key1 = read_binary(in);
+    }
+    else if (ch == '2')
+    {
+      data.key2 = read_complex(in);
+    }
+    else if (ch == '3')
+    {
+      data.key3 = read_string(in);
+    }
   }
 
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
 
-    for (char expected : {'(', ':', 'k', 'e', 'y'})
-    {
-      if (!(in >> ch) || ch != expected)
-      {
-        throw std::logic_error("err");
-      }
-    }
+    expect(in, {'(', ':'});
 
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
-    {
-      throw std::logic_error("err");
-    }
+    read_key(in, data);
+    read_key(in, data);
+    read_key(in, data);
 
-    if (ch == '1')
-    {
-      data.key1 = read_binary(in);
-    }
-    else if (ch == '2')
-    {
-      data.key2 = read_complex(in);
-    }
-    else if (ch == '3')
-    {
-      data.key3 = read_string(in);
-    }
-
-    for (char expected : {'k', 'e', 'y'})
-    {
-      if (!(in >> ch) || ch != expected)
-      {
-        throw std::logic_error("err");
-      }
-    }
-
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
-    {
-      throw std::logic_error("err");
-    }
-    if (ch == '1')
-    {
-      data.key1 = read_binary(in);
-    }
-    else if (ch == '2')
-    {
-      data.key2 = read_complex(in);
-    }
-    else if (ch == '3')
-    {
-      data.key3 = read_string(in);
-    }
-
-    for (char expected : {'k', 'e', 'y'})
-    {
-      if (!(in >> ch) || ch != expected)
-      {
-        throw std::logic_error("err");
-      }
-    }
-
-    if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
-    {
-      throw std::logic_error("err");
-    }
-    if (ch == '1')
-    {
-      data.key1 = read_binary(in);
-    }
-    else if (ch == '2')
-    {
-      data.key2 = read_complex(in);
-    }
-    else if (ch == '3')
-    {
-      data.key3 = read_string(in);
-    }
-
-    if (!(in >> ch) || ch != ')')
-    {
-      throw std::logic_error("err");
-    }
+    expect(in, {')'});
   }
 }
 
@@ -187,7 +127,7 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   {
     in.setstate(std::ios::failbit);
     std::string line;
-    getline(in, line);
+    getline(in, line); //Вправду костыль. Лишь дочитывание строки до конца и не более.
     return in;
   }
   data = temp;
