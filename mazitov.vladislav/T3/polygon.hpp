@@ -23,24 +23,7 @@ namespace mazitov
   std::istream &operator>>(std::istream &in, Polygon &dest);
   std::ostream& operator<<(std::ostream& out, const Polygon& src);
 
-  struct PolygonAreaAccumulator
-  {
-    PolygonAreaAccumulator(const Polygon &p):
-      poly(p),
-      n(p.points.size())
-    {}
-
-    double operator()(double acc, const Point &p1) const
-    {
-      size_t i = &p1 - &poly.points[0];
-      const Point &p2 = poly.points[(i + 1) % n];
-      return acc + (p1.x * p2.y - p2.x * p1.y);
-    }
-
-    const Polygon &poly;
-    size_t n;
-  };
-
+  double triangleArea(const Point&, const Point&, const Point&);
   double getPolygonArea(const Polygon &);
   bool isEvenVertexNum(const Polygon &);
   bool isOddVertexNum(const Polygon &);

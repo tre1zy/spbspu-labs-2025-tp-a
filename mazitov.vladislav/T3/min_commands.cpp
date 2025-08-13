@@ -1,42 +1,48 @@
 #include "min_commands.hpp"
 #include <format_guard.hpp>
+#include <algorithm>
 #include <functional>
 #include <map>
-#include <numeric>
 #include <iomanip>
 #include <stdexcept>
-#include <format_guard.hpp>
 
 namespace
 {
   using mazitov::FormatGuard;
+  using mazitov::getPolygonArea;
   using mazitov::Polygon;
 
-  struct MinAreaAccumulator
+  bool areaLess(const Polygon &a, const Polygon &b)
   {
-    double operator()(double currentMin, const Polygon &poly) const
-    {
-      return (currentMin == 0) ? (getPolygonArea(poly)) : (std::min(currentMin, getPolygonArea(poly)));
-    }
-  };
+    return getPolygonArea(a) < getPolygonArea(b);
+  }
 
-  struct MinVerticesAccumulator
+  bool vertexCountLess(const Polygon &a, const Polygon &b)
   {
-    std::size_t operator()(std::size_t currentMin, const Polygon &poly) const
-    {
-      return (currentMin == 0) ? (poly.points.size()) : (std::min(currentMin, poly.points.size()));
-    }
-  };
+    return a.points.size() < b.points.size();
+  }
+
+  void printPolygonArea(const Polygon &poly, std::ostream &out)
+  {
+    FormatGuard guard(out);
+    out << std::fixed << std::setprecision(1) << getPolygonArea(poly);
+  }
+
+  void printVertexCount(const Polygon &poly, std::ostream &out)
+  {
+    out << poly.points.size();
+  }
 
   void printMinArea(const std::vector< Polygon > &polys, std::ostream &out)
   {
-    FormatGuard guard(out);
-    out << std::fixed << std::setprecision(1) << std::accumulate(polys.begin(), polys.end(), 0.0, MinAreaAccumulator());
+    auto minIt = std::min_element(polys.begin(), polys.end(), areaLess);
+    printPolygonArea(*minIt, out);
   }
 
   void printMinVertices(const std::vector< Polygon > &polys, std::ostream &out)
   {
-    out << std::accumulate(polys.begin(), polys.end(), 0ull, MinVerticesAccumulator());
+    auto minIt = std::min_element(polys.begin(), polys.end(), vertexCountLess);
+    printVertexCount(*minIt, out);
   }
 }
 
@@ -48,9 +54,11 @@ void mazitov::printMin(const std::vector< Polygon > &polys, std::istream &in, st
   }
 
   using std::placeholders::_1;
-  std::map< std::string, std::function< void(std::ostream &) > > subcommands{
-      {"AREA", std::bind(printMinArea, std::cref(polys), _1)},
-      {"VERTEXES", std::bind(printMinVertices, std::cref(polys), _1)}};
+  std::map< std::string, std::function< void(std::ostream &) > > subcommands
+  {
+    {"AREA", std::bind(printMinArea, std::cref(polys), _1)},
+    {"VERTEXES", std::bind(printMinVertices, std::cref(polys), _1)}
+  };
 
   std::string subcommand;
   in >> subcommand;

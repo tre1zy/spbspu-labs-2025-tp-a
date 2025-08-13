@@ -8,7 +8,9 @@
 
 double mazitov::calcAreasSum(const std::vector< Polygon > &polygons)
 {
-  return std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, areaSumOperator);
+  std::vector<double> polygonAreas(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), polygonAreas.begin(), getPolygonArea);
+  return std::accumulate(polygonAreas.cbegin(), polygonAreas.cend(), 0.0);
 }
 
 double mazitov::getEvenArea(const std::vector< Polygon > &polygons)

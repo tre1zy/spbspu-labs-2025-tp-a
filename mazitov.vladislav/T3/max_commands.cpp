@@ -1,42 +1,48 @@
 #include "max_commands.hpp"
 #include <format_guard.hpp>
+#include <algorithm>
 #include <functional>
 #include <map>
-#include <numeric>
 #include <iomanip>
 #include <stdexcept>
-#include <format_guard.hpp>
 
 namespace
 {
-  using mazitov::Polygon;
   using mazitov::FormatGuard;
+  using mazitov::getPolygonArea;
+  using mazitov::Polygon;
 
-  struct MaxAreaAccumulator
+  bool areaGreater(const Polygon &a, const Polygon &b)
   {
-    double operator()(double currentMax, const Polygon &poly) const
-    {
-      return std::max(currentMax, getPolygonArea(poly));
-    }
-  };
+    return getPolygonArea(a) < getPolygonArea(b); // for max_element
+  }
 
-  struct MaxVerticesAccumulator
+  bool vertexCountGreater(const Polygon &a, const Polygon &b)
   {
-    std::size_t operator()(std::size_t currentMax, const Polygon &poly) const
-    {
-      return std::max(currentMax, poly.points.size());
-    }
-  };
+    return a.points.size() < b.points.size(); // for max_element
+  }
+
+  void printPolygonArea(const Polygon &poly, std::ostream &out)
+  {
+    FormatGuard guard(out);
+    out << std::fixed << std::setprecision(1) << getPolygonArea(poly);
+  }
+
+  void printVertexCount(const Polygon &poly, std::ostream &out)
+  {
+    out << poly.points.size();
+  }
 
   void printMaxArea(const std::vector< Polygon > &polys, std::ostream &out)
   {
-    FormatGuard guard(out);
-    out << std::fixed << std::setprecision(1) << std::accumulate(polys.begin(), polys.end(), 0.0, MaxAreaAccumulator());
+    auto maxIt = std::max_element(polys.begin(), polys.end(), areaGreater);
+    printPolygonArea(*maxIt, out);
   }
 
   void printMaxVertices(const std::vector< Polygon > &polys, std::ostream &out)
   {
-    out << std::accumulate(polys.begin(), polys.end(), 0ull, MaxVerticesAccumulator());
+    auto maxIt = std::max_element(polys.begin(), polys.end(), vertexCountGreater);
+    printVertexCount(*maxIt, out);
   }
 }
 

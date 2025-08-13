@@ -1,5 +1,6 @@
 #include "polygon.hpp"
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <numeric>
 #include <delimiter.hpp>
@@ -97,6 +98,11 @@ bool mazitov::operator==(const Polygon &lhs, const Polygon &rhs)
   return lhs.points == rhs.points;
 }
 
+double mazitov::triangleArea(const Point &a, const Point &b, const Point &c)
+{
+  return std::abs((a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) / 2.0);
+}
+
 double mazitov::getPolygonArea(const Polygon &poly)
 {
   if (poly.points.size() < 3)
@@ -104,13 +110,13 @@ double mazitov::getPolygonArea(const Polygon &poly)
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
-  double area = std::accumulate(poly.points.cbegin(), poly.points.cend(), 0.0, PolygonAreaAccumulator(poly)) / 2.0;
-  return std::abs(area);
-}
-
-double mazitov::areaSumOperator(double init, const Polygon &poly)
-{
-  return init + getPolygonArea(poly);
+  std::vector< double > trianglesAreas(poly.points.size() - 2);
+  const Point pivot = poly.points.front();
+  auto functor = std::bind(triangleArea, pivot, std::placeholders::_1, std::placeholders::_2);
+  auto point1_it = std::next(poly.points.begin());
+  auto pointN_it = std::prev(poly.points.end());
+  std::transform(point1_it, pointN_it, std::next(point1_it), trianglesAreas.begin(), functor);
+  return std::accumulate(trianglesAreas.begin(), trianglesAreas.end(), 0.0);
 }
 
 bool mazitov::isEvenVertexNum(const Polygon &poly)
