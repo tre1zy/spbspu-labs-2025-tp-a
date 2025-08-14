@@ -248,7 +248,7 @@ void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, st
     throw std::invalid_argument("polygon is empty");
   }
   MaxSeqPredicate predicate(srcPoints);
-  std::count_if(polygon.begin(), polygon.end(), std::ref(predicate));
+  int count = std::count_if(polygon.begin(), polygon.end(), std::ref(predicate));
   out << predicate.maxSequence << "\n";
 }
 
