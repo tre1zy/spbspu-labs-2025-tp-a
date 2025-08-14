@@ -123,6 +123,39 @@ void getCountVertexes(std::ostream &out, const std::vector< shak::Polygon > &pol
   out << std::count_if(polygons.begin(), polygons.end(), std::bind(shak::areEqualVertexes, vertexCount, std::placeholders::_1)) << "\n";
 }
 
+namespace shak
+{
+  struct MaxSeqPredicate
+  {
+    explicit MaxSeqPredicate(const std::vector< Point > &target):
+      targetPoints(target),
+      currentSequence(0),
+      maxSequence(0)
+    {}
+
+    MaxSeqPredicate(const MaxSeqPredicate &) = delete;
+    MaxSeqPredicate & operator=(const MaxSeqPredicate &) = delete;
+
+    bool operator()(const Polygon &polygon)
+    {
+      bool matches = (polygon.points == targetPoints);
+      if (matches)
+      {
+        currentSequence++;
+      }
+      else
+      {
+        currentSequence = 0;
+      }
+      maxSequence = std::max(maxSequence, currentSequence);
+      return matches;
+    }
+    const std::vector< Point > &targetPoints;
+    size_t currentSequence;
+    size_t maxSequence;
+  };
+}
+
 void shak::createCommandHandler(std::map< std::string, std::function< void() > > &cmds, std::vector< Polygon > &polygons)
 {
   cmds["AREA"] = std::bind(cmdArea, std::cref(polygons), std::ref(std::cin), std::ref(std::cout));
@@ -200,10 +233,8 @@ void shak::cmdCount(const std::vector< Polygon > &polygons, std::istream &in, st
 
 void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, std::ostream &out)
 {
-  size_t counter = 0;
   size_t vertexCount = 0;
   std::vector< Point > srcPoints;
-  std::vector< size_t > matchCount;
   using inIter = std::istream_iterator< Point >;
   in >> vertexCount;
   if (vertexCount < 3)
@@ -216,12 +247,9 @@ void shak::cmdMaxSeq(const std::vector< Polygon > &polygon, std::istream &in, st
   {
     throw std::invalid_argument("polygon is empty");
   }
-  matchCount.reserve(polygon.size());
-  using namespace std::placeholders;
-  auto functor = std::bind(equalCounter, _1, srcPoints, counter);
-  std::transform(std::begin(polygon), std::end(polygon), std::back_inserter(matchCount), functor);
-  auto maxMatchIter = std::max_element(matchCount.begin(), matchCount.end());
-  out << *maxMatchIter << "\n";
+  MaxSeqPredicate predicate(srcPoints);
+  std::count_if(polygon.begin(), polygon.end(), std::ref(predicate));
+  out << predicate.maxSequence << "\n";
 }
 
 void shak::cmdRects(const std::vector< Polygon > &polygons, std::ostream &out)

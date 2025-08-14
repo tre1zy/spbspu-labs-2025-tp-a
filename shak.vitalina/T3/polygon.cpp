@@ -70,6 +70,11 @@ std::istream& shak::operator>>(std::istream &in, Polygon &dest)
   return in;
 }
 
+bool  shak::operator==(const std::vector< Point > &left, const std::vector< Point > &right)
+{
+  return left.size() == right.size() && std::equal(left.begin(), left.end(), right.begin());
+}
+
 bool shak::isEven(const Polygon &polygons)
 {
   return (polygons.points.size() % 2 == 0);
@@ -117,19 +122,6 @@ double shak::getArea(const Polygon &polygon)
 size_t shak::getVertexes(const Polygon &polygon)
 {
   return polygon.points.size();
-}
-
-size_t shak::equalCounter(const Polygon &polygon, const std::vector< Point > &targetPoints, size_t &counter)
-{
-  if (targetPoints == polygon.points)
-  {
-    counter++;
-  }
-  else
-  {
-    counter = 0;
-  }
-  return counter;
 }
 
 double shak::TriangleArea::operator()(const Point & point3)
