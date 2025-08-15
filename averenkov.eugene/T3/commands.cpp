@@ -164,7 +164,7 @@ void averenkov::MaxAreaFinder::operator()(const std::vector< Polygon >& polygons
     throw std::runtime_error("Error");
   }
   auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator());
-  out << calculateArea(*it);
+  out << std::fixed << std::setprecision(1) << calculateArea(*it);
 }
 
 void averenkov::MaxVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
@@ -184,7 +184,7 @@ void averenkov::MinAreaFinder::operator()(const std::vector< Polygon >& polygons
     throw std::runtime_error("No polygons for MIN calculation");
   }
   auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator());
-  out << calculateArea(*it);
+  out << std::fixed << std::setprecision(1) << calculateArea(*it);
 }
 
 void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
