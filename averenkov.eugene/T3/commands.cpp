@@ -55,6 +55,16 @@ bool averenkov::PolygonEqual::operator()(const Polygon& a, const Polygon& b) con
   return std::is_permutation(a.points.cbegin(), a.points.cend(), b.points.cbegin());
 }
 
+bool averenkov::AreaComparator::operator()(const Polygon& a, const Polygon& b) const
+{
+  return calculateArea(a) < calculateArea(b);
+}
+
+bool averenkov::VertexCountComparator::operator()(const Polygon& a, const Polygon& b) const
+{
+  return a.points.size() < b.points.size();
+}
+
 double averenkov::calculateArea(const Polygon& poly)
 {
   const auto& points{ poly.points };
@@ -151,19 +161,10 @@ void averenkov::MaxAreaFinder::operator()(const std::vector< Polygon >& polygons
 {
   if (polygons.empty())
   {
-    throw std::runtime_error("No polygons for MAX calculation");
+    throw std::runtime_error("Error");
   }
-  double maxArea = calculateArea(polygons[0]);
-  for (const auto& poly : polygons)
-  {
-    double area = calculateArea(poly);
-    if (area > maxArea)
-    {
-      maxArea = area;
-    }
-  }
-  iofmtguard guard(out);
-  out << std::fixed << std::setprecision(1) << maxArea;
+  auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator());
+  out << calculateArea(*it);
 }
 
 void averenkov::MaxVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
@@ -172,16 +173,8 @@ void averenkov::MaxVertexCountFinder::operator()(const std::vector< Polygon >& p
   {
     throw std::runtime_error("No polygons for MAX calculation");
   }
-  size_t maxVertices = polygons[0].points.size();
-  for (const auto& poly : polygons)
-  {
-    size_t vertices = poly.points.size();
-    if (vertices > maxVertices)
-    {
-      maxVertices = vertices;
-    }
-  }
-  out << maxVertices;
+  auto it = std::max_element(polygons.begin(), polygons.end(), VertexCountComparator());
+  out << it->points.size();
 }
 
 void averenkov::MinAreaFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
@@ -190,17 +183,8 @@ void averenkov::MinAreaFinder::operator()(const std::vector< Polygon >& polygons
   {
     throw std::runtime_error("No polygons for MIN calculation");
   }
-  double minArea = calculateArea(polygons[0]);
-  for (const auto& poly : polygons)
-  {
-    double area = calculateArea(poly);
-    if (area < minArea)
-    {
-      minArea = area;
-    }
-  }
-  averenkov::iofmtguard guard(out);
-  out << std::fixed << std::setprecision(1) << minArea;
+  auto it = std::min_element(polygons.begin(), polygons.end(), AreaComparator());
+  out << calculateArea(*it);
 }
 
 void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& polygons, std::ostream& out) const
@@ -209,16 +193,8 @@ void averenkov::MinVertexCountFinder::operator()(const std::vector< Polygon >& p
   {
     throw std::runtime_error("No polygons for MIN calculation");
   }
-  size_t minVertices = polygons[0].points.size();
-  for (const auto& poly: polygons)
-  {
-    size_t vertices = poly.points.size();
-    if (vertices < minVertices)
-    {
-      minVertices = vertices;
-    }
-  }
-  out << minVertices;
+  auto it = std::min_element(polygons.begin(), polygons.end(), VertexCountComparator());
+  out << it->points.size();
 }
 
 bool averenkov::IsEven::operator()(const Polygon& poly) const

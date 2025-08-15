@@ -23,6 +23,16 @@ namespace averenkov
     size_t num_;
   };
 
+  struct AreaComparator
+  {
+    bool operator()(const Polygon& a, const Polygon& b) const;
+  };
+
+  struct VertexCountComparator
+  {
+    bool operator()(const Polygon& a, const Polygon& b) const;
+  };
+
   struct AreaSumCalculator
   {
     double operator()(const std::vector< Polygon >& polygons) const;
