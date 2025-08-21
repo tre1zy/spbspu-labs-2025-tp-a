@@ -97,25 +97,29 @@ std::istream& krylov::operator>>(std::istream& in, DataStruct& data)
   std::string key;
   constexpr size_t keysNumbers = 3;
   size_t count = 0;
+  bool wasKey1 = false, wasKey2 = false, wasKey3 = false;
   while (count < keysNumbers && in)
   {
     in >> key;
-    if (key == "key1")
+    if (key == "key1" && !wasKey1)
     {
       in >> UllBinI{ input.key1 };
       in >> DelimiterIO{ ':' };
+      wasKey1 = true;
       ++count;
     }
-    else if (key == "key2")
+    else if (key == "key2" && !wasKey2)
     {
       in >> UllHexIO{ input.key2 };
       in >> DelimiterIO{ ':' };
+      wasKey2 = true;
       ++count;
     }
-    else if (key == "key3")
+    else if (key == "key3" && !wasKey3)
     {
       in >> StringIO{ input.key3 };
       in >> DelimiterIO{ ':' };
+      wasKey3 = true;
       ++count;
     }
     else

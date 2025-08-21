@@ -9,8 +9,6 @@
 int main()
 {
   using namespace krylov;
-  StreamGuard in(std::cin);
-  StreamGuard out(std::cout);
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
