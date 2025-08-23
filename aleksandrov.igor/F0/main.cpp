@@ -26,9 +26,10 @@ int main(int argc, char* argv[])
     }
   }
 
+  Sequences sequences;
   try
   {
-    processCommands(std::cin, std::cout);
+    processCommands(std::cin, std::cout, sequences);
   }
   catch (const std::bad_alloc&)
   {
