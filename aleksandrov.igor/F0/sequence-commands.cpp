@@ -6,6 +6,7 @@
 #include <functional>
 #include <algorithm>
 #include <map>
+#include <stream-guard.hpp>
 #include "music-io-utils.hpp"
 
 namespace
@@ -22,6 +23,7 @@ namespace
 
 void aleksandrov::printHelp(std::ostream& out)
 {
+  StreamGuard guard(out);
   out << "No help\n";
 }
 
@@ -59,11 +61,12 @@ void aleksandrov::listSeqs(std::ostream& out, const Sequences& seqs)
 {
   if (seqs.empty())
   {
-    out << "No sequences\n";
+    out << "No sequences.\n";
     return;
   }
   std::ostream_iterator< std::string > outIt(out, "\n");
   KeyReturner< std::string, Sequence > returner;
+  StreamGuard guard(out);
   std::transform(seqs.begin(), seqs.end(), outIt, returner);
 }
 
@@ -124,6 +127,7 @@ void aleksandrov::printSeq(std::istream& in, std::ostream& out, const Sequences&
   }
   const Sequence& sequence = seqIt->second;
   std::ostream_iterator< MusicalElement > outIt(out, "\n");
+  StreamGuard guard(out);
   std::copy(sequence.begin(), sequence.end(), outIt);
 }
 

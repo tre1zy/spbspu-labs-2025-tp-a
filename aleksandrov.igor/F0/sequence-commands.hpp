@@ -2,6 +2,7 @@
 #define SEQUENCE_COMMANDS_HPP
 
 #include <ios>
+#include <unordered_map>
 #include "music.hpp"
 
 namespace aleksandrov
