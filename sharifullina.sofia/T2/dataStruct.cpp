@@ -1,15 +1,12 @@
 #include "dataStruct.hpp"
 #include "scopeGuard.hpp"
-
 #include <complex>
 #include <string>
-#include <iomanip>
-#include <sstream>
 #include <iostream>
 #include <iomanip>
-#include <string>
 #include <utility>
 #include <limits>
+#include <cmath>
 
 namespace
 {
@@ -108,9 +105,13 @@ namespace
 
 bool sharifullina::DataStruct::operator<(const DataStruct& other) const
 {
-  if (std::abs(key1) != std::abs(other.key1))
+  const double epsilon = 1e-10;
+  const double abs1 = std::abs(key1);
+  const double abs2 = std::abs(other.key1);
+
+  if (std::abs(abs1 - abs2) > epsilon)
   {
-    return std::abs(key1) < std::abs(other.key1);
+    return abs1 < abs2;
   }
 
   const double lhsRatio =
@@ -204,15 +205,15 @@ std::istream& sharifullina::operator>>(std::istream& in, DataStruct& dest)
 std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest)
 {
   std::ostream::sentry sentry(out);
-  if (!sentry) return out;
+  if (!sentry)
+  {
+    return out;
+  }
 
   sharifullina::iofmtguard guard(out);
-  out << std::fixed << std::setprecision(1) << std::showpoint;
+  out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")";
+  out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
+  out << ":key3 \"" << dest.key3 << "\":)";
 
-  out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")"
-      << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)"
-      << ":key3 ";
-  out << std::quoted(dest.key3);
-  out << ":)";
   return out;
 }
