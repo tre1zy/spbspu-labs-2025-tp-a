@@ -2,22 +2,33 @@
 #include <algorithm>
 #include <numeric>
 #include <vector>
+#include <functional>
+#include <iterator>
 #include "functors.hpp"
 
 double trukhanov::getArea(const Polygon& polygon)
 {
-  std::size_t n = polygon.points.size();
+  const auto& pts = polygon.points;
+  std::size_t n = pts.size();
   if (n < 3)
-    return 0.0;
+  {
+    return 0;
+  }
 
-  std::vector< std::size_t > indices(n - 2);
-  std::iota(indices.begin(), indices.end(), 1);
+  std::vector<double> areas;
+  areas.reserve(n - 2);
 
-  PolygonAreaSum summer(polygon);
+  using namespace std::placeholders;
+  auto calc = std::bind(VectorProduct{}, pts[0], _1, _2);
 
-  double area = std::accumulate(indices.begin(), indices.end(), 0.0, summer);
-  return area;
+  std::transform(pts.begin() + 1, pts.end() - 1,
+    pts.begin() + 2,
+    std::back_inserter(areas),
+    calc);
+
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
+
 
 bool trukhanov::isEven(const Polygon& polygon)
 {
@@ -34,40 +45,6 @@ bool trukhanov::compareByVertexes(const Polygon& lhs, const Polygon& rhs)
   return lhs.points.size() < rhs.points.size();
 }
 
-static int dot(const trukhanov::Point& a, const trukhanov::Point& b)
-{
-  return a.x * b.x + a.y * b.y;
-}
-
-static trukhanov::Point sub(const trukhanov::Point& a, const trukhanov::Point& b)
-{
-  return { a.x - b.x, a.y - b.y };
-}
-
-static bool isRightAngle(const trukhanov::Point& a, const trukhanov::Point& b, const trukhanov::Point& c)
-{
-  trukhanov::Point ab = sub(b, a);
-  trukhanov::Point bc = sub(c, b);
-  return dot(ab, bc) == 0;
-}
-
-struct HasRightAngle
-{
-  const std::vector< trukhanov::Point >& points;
-  size_t size;
-
-  HasRightAngle(const std::vector< trukhanov::Point >& pts) : points(pts), size(pts.size()) {}
-
-  bool operator()(size_t i) const
-  {
-    using namespace trukhanov;
-    const Point& a = points[i];
-    const Point& b = points[(i + 1) % size];
-    const Point& c = points[(i + 2) % size];
-    return isRightAngle(a, b, c);
-  }
-};
-
 bool trukhanov::isRight(const Polygon& polygon)
 {
   size_t n = polygon.points.size();
@@ -76,12 +53,10 @@ bool trukhanov::isRight(const Polygon& polygon)
     return false;
   }
 
-  std::vector< size_t > indices(n);
+  std::vector<size_t> indices(n);
   std::iota(indices.begin(), indices.end(), 0);
 
   return std::any_of(indices.begin(), indices.end(), HasRightAngle(polygon.points));
-
-  return false;
 }
 
 bool trukhanov::operator<(const Point& lhs, const Point& rhs)

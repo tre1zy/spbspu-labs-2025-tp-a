@@ -48,6 +48,11 @@ namespace trukhanov
     double operator()(const Point& a, const Point& b, const Point& c) const;
   };
 
+  struct VectorProduct
+  {
+    double operator()(const Point& a, const Point& b, const Point& c) const;
+  };
+
   struct PolygonAreaSum
   {
     PolygonAreaSum(const Polygon& polygon);
@@ -56,6 +61,15 @@ namespace trukhanov
 
   private:
     const Polygon& polygon_;
+  };
+
+  struct HasRightAngle
+  {
+    explicit HasRightAngle(const std::vector<Point>& pts);
+    bool operator()(size_t i) const;
+
+  private:
+    const std::vector<Point>& pts_;
   };
 }
 

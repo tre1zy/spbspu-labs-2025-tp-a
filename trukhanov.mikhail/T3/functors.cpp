@@ -62,3 +62,27 @@ double trukhanov::PolygonAreaSum::operator()(double sum, size_t i) const
   TriangleArea areaCalc;
   return sum + areaCalc(a, b, c);
 }
+
+double trukhanov::VectorProduct::operator()(const Point& a, const Point& b, const Point& c) const
+{
+  return 0.5 * std::abs(
+    static_cast<double>((b.x - a.x) * (c.y - a.y) -
+      (c.x - a.x) * (b.y - a.y)));
+}
+
+trukhanov::HasRightAngle::HasRightAngle(const std::vector<Point>&pts) : pts_(pts) {}
+
+bool trukhanov::HasRightAngle::operator()(size_t i) const
+{
+  size_t n = pts_.size();
+  const Point& a = pts_[(i + n - 1) % n];
+  const Point& b = pts_[i];
+  const Point& c = pts_[(i + 1) % n];
+
+  int abx = b.x - a.x;
+  int aby = b.y - a.y;
+  int bcx = c.x - b.x;
+  int bcy = c.y - b.y;
+
+  return (abx * bcx + aby * bcy) == 0;
+}
