@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 #include <iomanip>
-#include <stream_guard.hpp>
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 #include "polygon.hpp"
 #include "data_input.hpp"
+#include "stream_guard.hpp"
 
 void trukhanov::area(std::istream& in, std::ostream& out, const std::vector < Polygon >& src)
 {
@@ -19,7 +19,7 @@ void trukhanov::area(std::istream& in, std::ostream& out, const std::vector < Po
 
   if (subcommand == "EVEN")
   {
-    std::vector<Polygon> filtered;
+    std::vector< Polygon > filtered;
     std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), isEven);
 
     std::vector< double > areas(filtered.size());
@@ -30,7 +30,7 @@ void trukhanov::area(std::istream& in, std::ostream& out, const std::vector < Po
   }
   else if (subcommand == "ODD")
   {
-    std::vector<Polygon> filtered;
+    std::vector< Polygon > filtered;
     std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), isOdd);
 
     std::vector< double > areas(filtered.size());

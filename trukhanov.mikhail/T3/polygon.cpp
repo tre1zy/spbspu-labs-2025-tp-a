@@ -4,7 +4,7 @@
 #include <vector>
 #include <functional>
 #include <iterator>
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 
 double trukhanov::getArea(const Polygon& polygon)
 {
@@ -15,16 +15,13 @@ double trukhanov::getArea(const Polygon& polygon)
     return 0;
   }
 
-  std::vector<double> areas;
+  std::vector< double > areas;
   areas.reserve(n - 2);
 
   using namespace std::placeholders;
   auto calc = std::bind(VectorProduct{}, pts[0], _1, _2);
 
-  std::transform(pts.begin() + 1, pts.end() - 1,
-    pts.begin() + 2,
-    std::back_inserter(areas),
-    calc);
+  std::transform(pts.begin() + 1, pts.end() - 1,pts.begin() + 2, std::back_inserter(areas), calc);
 
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
@@ -53,7 +50,7 @@ bool trukhanov::isRight(const Polygon& polygon)
     return false;
   }
 
-  std::vector<size_t> indices(n);
+  std::vector< size_t > indices(n);
   std::iota(indices.begin(), indices.end(), 0);
 
   return std::any_of(indices.begin(), indices.end(), HasRightAngle(polygon.points));

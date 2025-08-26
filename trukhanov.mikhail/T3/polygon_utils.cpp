@@ -1,4 +1,4 @@
-#include "functors.hpp"
+#include "polygon_utils.hpp"
 #include <algorithm>
 #include <cmath>
 #include "polygon.hpp"
@@ -51,26 +51,10 @@ double trukhanov::TriangleArea::operator()(const Point& a, const Point& b, const
   return std::abs((a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) / 2.0);
 }
 
-trukhanov::PolygonAreaSum::PolygonAreaSum(const Polygon& polygon) : polygon_(polygon) {}
-
-double trukhanov::PolygonAreaSum::operator()(double sum, size_t i) const
-{
-  const Point& a = polygon_.points[0];
-  const Point& b = polygon_.points[i];
-  const Point& c = polygon_.points[i + 1];
-
-  TriangleArea areaCalc;
-  return sum + areaCalc(a, b, c);
-}
-
 double trukhanov::VectorProduct::operator()(const Point& a, const Point& b, const Point& c) const
 {
-  return 0.5 * std::abs(
-    static_cast<double>((b.x - a.x) * (c.y - a.y) -
-      (c.x - a.x) * (b.y - a.y)));
+  return 0.5 * std::abs(static_cast< double >((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)));
 }
-
-trukhanov::HasRightAngle::HasRightAngle(const std::vector<Point>&pts) : pts_(pts) {}
 
 bool trukhanov::HasRightAngle::operator()(size_t i) const
 {

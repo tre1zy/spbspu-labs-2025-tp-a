@@ -8,7 +8,6 @@ namespace trukhanov
   struct Point
   {
     int x, y;
-
   };
 
   bool operator<(const Point& lhs, const Point& rhs);

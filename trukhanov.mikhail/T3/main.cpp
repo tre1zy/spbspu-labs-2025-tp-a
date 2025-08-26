@@ -1,9 +1,11 @@
-#include <functional>
+#include <iterator>
 #include <iostream>
-#include <sstream>
+#include <vector>
 #include <fstream>
 #include <limits>
 #include <map>
+#include <string>
+#include <functional>
 #include "commands.hpp"
 #include "polygon.hpp"
 #include "data_input.hpp"
@@ -16,32 +18,25 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::ifstream file(argv[1]);
-  if (!file.is_open())
+  std::ifstream input(argv[1]);
+  if (!input.is_open())
   {
     std::cerr << "ERROR: there is no such file\n";
     return 1;
   }
 
   using trukhanov::Polygon;
+  using polygon_it = std::istream_iterator< Polygon >;
+
   std::vector< Polygon > polygons;
-  std::string line;
-
-  while (std::getline(file, line))
+  while (!input.eof())
   {
-    if (line.empty())
+    if (!input)
     {
-      continue;
+      input.clear();
+      input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-
-    std::istringstream iss(line);
-    Polygon poly;
-    iss >> poly;
-
-    if (iss && poly.points.size() >= 3)
-    {
-      polygons.push_back(std::move(poly));
-    }
+    std::copy(polygon_it(input), polygon_it(), std::back_inserter(polygons));
   }
 
   std::map< std::string, std::function< void() > > cmds;
@@ -59,12 +54,9 @@ int main(int argc, char* argv[])
     {
       cmds.at(command)();
     }
-    catch (const std::exception&)
+    catch (...)
     {
-      if (std::cin.fail())
-      {
-        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
-      }
+      std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }

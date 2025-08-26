@@ -34,7 +34,10 @@ std::ostream& trukhanov::operator<<(std::ostream& out, const Point& point)
 std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 {
   std::istream::sentry sentry(in);
-  if (!sentry) return in;
+  if (!sentry)
+  {
+    return in;
+  }
 
   size_t n = 0;
   in >> n;
@@ -46,20 +49,14 @@ std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 
   Polygon temp;
   temp.points.reserve(n);
-  std::copy_n(std::istream_iterator< Point >(in), n, std::back_inserter(temp.points));
 
-  std::istream::sentry trailing_sentry(in, true);
-  if (trailing_sentry)
+  std::istream_iterator< Point > it(in);
+  std::copy_n(it, n, std::back_inserter(temp.points));
+
+  if (temp.points.size() != n || !in)
   {
-
-    Point extra;
-    in >> extra;
-    if (in)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    in.clear();
+    in.setstate(std::ios::failbit);
+    return in;
   }
 
   polygon = std::move(temp);
@@ -69,6 +66,6 @@ std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
 std::ostream& trukhanov::operator<<(std::ostream& out, const Polygon& polygon)
 {
   out << polygon.points.size() << ' ';
-  std::copy(polygon.points.begin(), polygon.points.end(), std::ostream_iterator<Point>(out, " "));
+  std::copy(polygon.points.begin(), polygon.points.end(), std::ostream_iterator< Point >(out, " "));
   return out;
 }

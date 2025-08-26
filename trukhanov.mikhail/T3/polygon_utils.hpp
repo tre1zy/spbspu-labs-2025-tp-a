@@ -1,5 +1,5 @@
-#ifndef FUNCTORS_HPP
-#define FUNCTORS_HPP
+#ifndef POLYGON_UTILS_HPP
+#define POLYGON_UTILS_HPP
 
 #include <cstddef>
 #include "polygon.hpp"
@@ -53,22 +53,10 @@ namespace trukhanov
     double operator()(const Point& a, const Point& b, const Point& c) const;
   };
 
-  struct PolygonAreaSum
-  {
-    PolygonAreaSum(const Polygon& polygon);
-
-    double operator()(double sum, size_t i) const;
-
-  private:
-    const Polygon& polygon_;
-  };
-
   struct HasRightAngle
   {
-    explicit HasRightAngle(const std::vector<Point>& pts);
+    explicit HasRightAngle(const std::vector< Point >& pts) : pts_(pts) {}
     bool operator()(size_t i) const;
-
-  private:
     const std::vector<Point>& pts_;
   };
 }
