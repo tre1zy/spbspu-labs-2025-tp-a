@@ -5,11 +5,11 @@
 
 namespace sharifullina
 {
-  class iofmtguard
+  class IofmtGuard
   {
   public:
-    explicit iofmtguard(std::basic_ios< char >& s);
-    ~iofmtguard();
+    explicit IofmtGuard(std::basic_ios< char >& s);
+    ~IofmtGuard();
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;

@@ -210,7 +210,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest
     return out;
   }
 
-  sharifullina::iofmtguard guard(out);
+  sharifullina::IofmtGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
   out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")";
