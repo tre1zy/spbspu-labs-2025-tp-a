@@ -23,11 +23,6 @@ namespace trukhanov
     bool operator()(const Polygon& p) const;
   };
 
-  struct AccumulateAll
-  {
-    double operator()(double sum, const Polygon& p) const;
-  };
-
   struct CompareByVertexes
   {
     bool operator()(const Polygon& lhs, const Polygon& rhs) const;
@@ -41,11 +36,6 @@ namespace trukhanov
   struct PolygonHasMinSize
   {
     bool operator()(const Polygon& p) const;
-  };
-
-  struct TriangleArea
-  {
-    double operator()(const Point& a, const Point& b, const Point& c) const;
   };
 
   struct VectorProduct

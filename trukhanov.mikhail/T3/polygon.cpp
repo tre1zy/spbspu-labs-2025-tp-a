@@ -21,7 +21,7 @@ double trukhanov::getArea(const Polygon& polygon)
   using namespace std::placeholders;
   auto calc = std::bind(VectorProduct{}, pts[0], _1, _2);
 
-  std::transform(pts.begin() + 1, pts.end() - 1,pts.begin() + 2, std::back_inserter(areas), calc);
+  std::transform(pts.begin() + 1, pts.end() - 1, pts.begin() + 2, std::back_inserter(areas), calc);
 
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
