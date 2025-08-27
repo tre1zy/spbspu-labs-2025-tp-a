@@ -77,25 +77,57 @@ namespace averenkov
     double operator()(const std::vector< Polygon >& polygons) const;
   };
 
+  void printMaxArea(const std::vector<Polygon>& polygons, std::ostream& out);
+
+  void printMaxVertexCount(const std::vector<Polygon>& polygons, std::ostream& out);
+
+  void printMinArea(const std::vector<Polygon>& polygons, std::ostream& out);
+
+  void printMinVertexCount(const std::vector<Polygon>& polygons, std::ostream& out);
+
   struct MaxAreaFinder
   {
-    void operator()(const std::vector< Polygon >& polygons, std::ostream& out) const;
+  public:
+    explicit MaxAreaFinder(const std::vector<Polygon>& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MaxAreaFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MaxAreaFinder& finder);
 
   struct MaxVertexCountFinder
   {
-    void operator()(const std::vector< Polygon >& polygons, std::ostream& out) const;
+  public:
+    explicit MaxVertexCountFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MaxVertexCountFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MaxVertexCountFinder& finder);
 
   struct MinAreaFinder
   {
-    void operator()(const std::vector< Polygon >& polygons, std::ostream& out) const;
+  public:
+    explicit MinAreaFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MinAreaFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MinAreaFinder& finder);
 
   struct MinVertexCountFinder
   {
-    void operator()(const std::vector< Polygon >& polygons, std::ostream& out) const;
+  public:
+    explicit MinVertexCountFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MinVertexCountFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MinVertexCountFinder& finder);
 
   struct EvenCounter
   {
