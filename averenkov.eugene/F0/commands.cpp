@@ -3,14 +3,15 @@
 #include <fstream>
 #include <numeric>
 
-bool averenkov::ItemFinder::operator()(const Item& item) const
-{
-  return item.getName() == name;
-}
-
-bool averenkov::ItemFinderPtr::operator()(const Item* item) const
+bool averenkov::ItemFinder::operator()(const std::shared_ptr< Item >& item) const
 {
   return item->getName() == name;
+}
+
+bool averenkov::ItemFinderPtr::operator()(std::weak_ptr< const Item > weakItem) const
+{
+  auto item = weakItem.lock();
+  return item && item->getName() == name;
 }
 
 bool averenkov::KitFinder::operator()(const std::pair< const std::string, Kit >& kit) const
@@ -23,7 +24,7 @@ void averenkov::KitItemRemover::operator()(std::pair< const std::string, Kit >& 
   kit.second.removeItem(name);
 }
 
-const averenkov::Item* averenkov::ItemCopier::operator()(const averenkov::Item* item) const
+std::shared_ptr< const averenkov::Item > averenkov::ItemCopier::operator()(std::shared_ptr< const Item > item) const
 {
   return item;
 }
@@ -37,12 +38,12 @@ bool averenkov::MaskChecker::operator()(int pos) const
   return mask & (1 << pos);
 }
 
-int averenkov::WeightCalculator::operator()(int sum, const Item* item)
+int averenkov::WeightCalculator::operator()(int sum, std::shared_ptr< const Item > item)
 {
   return sum + item->getWeight();
 }
 
-int averenkov::ValueCalculator::operator()(int sum, const Item* item)
+int averenkov::ValueCalculator::operator()(int sum, std::shared_ptr< const Item > item)
 {
   return sum + item->getValue();
 }
@@ -51,35 +52,25 @@ averenkov::ItemAdder::ItemAdder(Kit& k):
   kit(k)
 {}
 
-void averenkov::ItemAdder::operator()(const Item* item)
+void averenkov::ItemAdder::operator()(std::shared_ptr< const Item > item)
 {
   kit.addItem(item);
 }
 
-void averenkov::ItemPrinter::operator()(const Item& item) const
+void averenkov::printItemToOut(std::ostream& out, const std::shared_ptr< Item >& item)
 {
-  out << "Item: " << item.getName();
-  out << ", Weight: " << item.getWeight();
-  out << ", Value: " << item.getValue() << "\n";
+  out << *item;
 }
 
-void averenkov::KitItemPrinter::operator()(const Item* item) const
+
+void averenkov::printKitToOut(std::ostream& out, const std::pair< const std::string, Kit >& kit_pair)
 {
-  out << "    - " << item->getName() << "\n";
+  out << kit_pair;
 }
 
-void averenkov::KitPrinter::operator()(const std::pair< const std::string, Kit >& kit_pair) const
+void averenkov::printKnapsackToOut(std::ostream& out, const std::pair< const std::string, Knapsack >& knapsack_pair)
 {
-  out << "Kit: " << kit_pair.first << "\n";
-  out << "  Items:\n";
-  auto its = kit_pair.second.getItems();
-  std::for_each(its.begin(), its.end(), KitItemPrinter{ out });
-}
-
-void averenkov::KnapsackPrinter::operator()(const std::pair< const std::string, Knapsack >& knapsack_pair) const
-{
-  out << "Knapsack: " << knapsack_pair.first;
-  out << ", Capacity: " << knapsack_pair.second.getCapacity() << "\n";
+  out << knapsack_pair;
 }
 
 void averenkov::printHelp(std::ostream& out)
@@ -125,12 +116,14 @@ void averenkov::addItem(Base& base, const std::vector< std::string >& args)
     throw std::invalid_argument("Invalid arguments count for add");
   }
 
+  auto new_item = std::make_shared<Item>(args[1], std::stoi(args[2]), std::stoi(args[3]));
+
   if (std::any_of(base.items.begin(), base.items.end(), ItemFinder{ args[1] }))
   {
     throw std::invalid_argument("Item already exists");
   }
 
-  base.items.emplace_back(args[1], std::stoi(args[2]), std::stoi(args[3]));
+  base.items.push_back(new_item);
 }
 
 void averenkov::removeItem(Base& base, const std::vector< std::string >& args)
@@ -162,9 +155,9 @@ void averenkov::editItem(Base& base, const std::vector< std::string >& args)
   {
     throw std::invalid_argument("Item not found");
   }
-
-  it->setWeight(std::stoi(args[2]));
-  it->setValue(std::stoi(args[3]));
+  auto item = *it;
+  item->setWeight(std::stoi(args[2]));
+  item->setValue(std::stoi(args[3]));
 }
 
 void averenkov::addKit(Base& base, const std::vector< std::string >& args)
@@ -216,14 +209,14 @@ void averenkov::addToKit(Base& base, const std::vector< std::string >& args)
   }
 
   const auto& items_in_kit = kit_it->second.getItems();
-  Item* item_ptr = std::addressof(*item_it);
+  auto found = std::find_if(items_in_kit.begin(), items_in_kit.end(), ItemFinderPtr{ args[2] });
 
-  if (std::find(items_in_kit.begin(), items_in_kit.end(), item_ptr) != items_in_kit.end())
+  if (found != items_in_kit.end())
   {
     throw std::invalid_argument("Item already in kit");
   }
 
-  kit_it->second.addItem(std::addressof(*item_it));
+  kit_it->second.addItem(*item_it);
 }
 
 void averenkov::removeFromKit(Base& base, const std::vector< std::string >& args)
@@ -286,12 +279,17 @@ void averenkov::showStats(const Base& base, const std::vector< std::string >& ar
   {
     throw std::invalid_argument("stats command takes no arguments");
   }
+
+  auto printItem = std::bind(printItemToOut, std::ref(std::cout), std::placeholders::_1);
+  auto printKit = std::bind(printKitToOut, std::ref(std::cout), std::placeholders::_1);
+  auto printKnapsack = std::bind(printKnapsackToOut, std::ref(std::cout), std::placeholders::_1);
+
   std::cout << "=== Items ===\n";
-  std::for_each(base.items.begin(), base.items.end(), ItemPrinter{ std::cout });
+  std::for_each(base.items.begin(), base.items.end(), printItem);
   std::cout << "\n=== Kits ===\n";
-  std::for_each(base.kits.begin(), base.kits.end(), KitPrinter{ std::cout });
+  std::for_each(base.kits.begin(), base.kits.end(), printKit);
   std::cout << "\n=== Knapsacks ===\n";
-  std::for_each(base.knapsacks.begin(), base.knapsacks.end(), KnapsackPrinter{ std::cout });
+  std::for_each(base.knapsacks.begin(), base.knapsacks.end(), printKnapsack);
   std::cout << "\n=== Current Knapsack ===\n";
   std::cout << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
 }
@@ -320,14 +318,19 @@ void averenkov::saveToFile(const Base& base, const std::vector< std::string >& a
   {
     throw std::runtime_error("Cannot open file for writing: " + filename);
   }
+
+  auto printItem = std::bind(printItemToOut, std::ref(out), std::placeholders::_1);
+  auto printKit = std::bind(printKitToOut, std::ref(out), std::placeholders::_1);
+  auto printKnapsack = std::bind(printKnapsackToOut, std::ref(out), std::placeholders::_1);
+
   out << "=== Items ===\n";
-  std::for_each(base.items.begin(), base.items.end(), ItemPrinter{ out });
+  std::for_each(base.items.begin(), base.items.end(), printItem);
 
   out << "\n=== Kits ===\n";
-  std::for_each(base.kits.begin(), base.kits.end(), KitPrinter{ out });
+  std::for_each(base.kits.begin(), base.kits.end(), printKit);
 
   out << "\n=== Knapsacks ===\n";
-  std::for_each(base.knapsacks.begin(), base.knapsacks.end(), KnapsackPrinter{out});
+  std::for_each(base.knapsacks.begin(), base.knapsacks.end(), printKnapsack);
 
   out << "\n=== Current Knapsack ===\n";
   out << "Capacity: " << base.current_knapsack.getCapacity() << "\n";
@@ -375,7 +378,8 @@ void averenkov::loadFromFile(Base& base, const std::vector< std::string >& args)
       space_pos = line.find(' ', pos);
       value = std::stoi(line.substr(pos, (space_pos == std::string::npos) ? line.size() - pos : space_pos - pos));
       pos = (space_pos == std::string::npos) ? line.size() : space_pos + 1;
-      base.items.emplace_back(name, weight, value);
+      auto new_item = std::make_shared< Item >(name, weight, value);
+      base.items.push_back(new_item);
     }
   }
 
@@ -402,7 +406,7 @@ void averenkov::loadFromFile(Base& base, const std::vector< std::string >& args)
         auto it = std::find_if(base.items.begin(), base.items.end(), finder);
         if (it != base.items.end())
         {
-          kit.addItem(std::addressof(*it));
+          kit.addItem(*it);
         }
       }
     }

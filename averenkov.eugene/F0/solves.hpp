@@ -6,7 +6,7 @@
 namespace averenkov
 {
 
-  using vec_it = std::vector< const Item* >;
+  using vec_it = std::vector< std::shared_ptr< const Item > >;
   using vec_st = const std::vector< std::string >&;
 
   struct CombinationEvaluator
@@ -24,8 +24,8 @@ namespace averenkov
 
   struct CombinationBuilder
   {
-    std::vector< const Item* >& current;
-    const std::vector< const Item* >& items;
+    std::vector< std::shared_ptr< const Item > >& current;
+    const std::vector< std::shared_ptr< const Item > >& items;
     void operator()(int pos) const;
   };
 
@@ -113,7 +113,7 @@ namespace averenkov
 
   struct ItemSorter
   {
-    bool operator()(const Item* a, const Item* b) const;
+    bool operator()(std::shared_ptr< const Item > a, std::shared_ptr< const Item > b) const;
   };
 
   struct BoundCalculator
@@ -125,7 +125,7 @@ namespace averenkov
 
   struct BoundCalculatorHelper
   {
-    const std::vector<const Item*>& items;
+    const std::vector< std::shared_ptr< const Item > >& items;
     int capacity;
     int bound;
     int total_weight;

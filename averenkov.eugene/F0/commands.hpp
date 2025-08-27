@@ -13,13 +13,13 @@ namespace averenkov
   struct ItemFinder
   {
     const std::string& name;
-    bool operator()(const Item& item) const;
+    bool operator()(const std::shared_ptr< Item >& item) const;
   };
 
   struct ItemFinderPtr
   {
     const std::string& name;
-    bool operator()(const Item* item) const;
+    bool operator()(std::weak_ptr< const Item > weakItem) const;
   };
 
   struct KitFinder
@@ -37,7 +37,7 @@ namespace averenkov
   class ItemCopier
   {
   public:
-    const Item* operator()(const Item* item) const;
+    std::shared_ptr< const Item > operator()(std::shared_ptr< const Item > item) const;
   };
 
   struct MaskChecker
@@ -50,49 +50,25 @@ namespace averenkov
 
   struct WeightCalculator
   {
-    int operator()(int sum, const Item* item);
+    int operator()(int sum, std::shared_ptr< const Item > item);
   };
 
   struct ValueCalculator
   {
-    int operator()(int sum, const Item* item);
+    int operator()(int sum, std::shared_ptr< const Item > item);
   };
 
   struct ItemAdder
   {
     explicit ItemAdder(Kit& k);
-    void operator()(const Item* item);
+    void operator()(std::shared_ptr< const Item > item);
   private:
     Kit& kit;
   };
 
-  class ItemPrinter
-  {
-  public:
-    std::ostream& out;
-    void operator()(const Item& item) const;
-  };
-
-  class KitItemPrinter
-  {
-  public:
-    std::ostream& out;
-    void operator()(const Item* item) const;
-  };
-
-  class KitPrinter
-  {
-  public:
-    std::ostream& out;
-    void operator()(const std::pair< const std::string, Kit >& kit_pair) const;
-  };
-
-  class KnapsackPrinter
-  {
-  public:
-    std::ostream& out;
-    void operator()(const std::pair< const std::string, Knapsack >& knapsack_pair) const;
-  };
+  void printItemToOut(std::ostream& out, const std::shared_ptr< Item >& item);
+  void printKitToOut(std::ostream& out, const std::pair< const std::string, Kit >& kit_pair);
+  void printKnapsackToOut(std::ostream& out, const std::pair< const std::string, Knapsack >& knapsack_pair);
 
   void printHelp(std::ostream& out);
   void addItem(Base& base, const std::vector< std::string >& args);

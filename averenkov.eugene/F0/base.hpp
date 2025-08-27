@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include "item.hpp"
 #include "kit.hpp"
 #include "knapsack.hpp"
@@ -14,7 +15,7 @@ namespace averenkov
   {
   public:
     Base();
-    std::vector< Item > items;
+    std::vector< std::shared_ptr< Item > > items;
     std::map< std::string, Kit > kits;
     std::map< std::string, Knapsack > knapsacks;
     Knapsack current_knapsack;

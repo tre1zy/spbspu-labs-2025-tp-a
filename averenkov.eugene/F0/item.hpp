@@ -2,6 +2,7 @@
 #define ITEM_HPP
 
 #include <string>
+#include <ostream>
 
 namespace averenkov
 {
@@ -20,6 +21,8 @@ namespace averenkov
     int weight_;
     int value_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const Item& item);
 
 }
 

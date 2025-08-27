@@ -1,6 +1,7 @@
 #ifndef KIT_HPP
 #define KIT_HPP
 #include <string>
+#include <memory>
 #include <vector>
 #include <functional>
 #include <algorithm>
@@ -14,19 +15,18 @@ namespace averenkov
   public:
     Kit(const std::string& n);
 
-    void addItem(const Item* item);
-    std::vector< const Item* > getItems() const;
+    void addItem(std::shared_ptr< const Item > item);
+    std::vector< std::shared_ptr< const Item > > getItems() const;
     void removeItem(const std::string& item_name);
     bool containsItem(const std::string& item_name) const;
 
   private:
     std::string name_;
-    std::vector< const Item* > items_;
-    static bool compareItemByName(const Item* item, const std::string& name);
+    std::vector< std::weak_ptr< const Item > > items_;
+//    static bool compareItemByName(const Item* item, const std::string& name);
   };
 
-
-  struct ItemNameComparer
+/*  struct ItemNameComparer
   {
   public:
     ItemNameComparer(const std::string& n);
@@ -35,7 +35,16 @@ namespace averenkov
   private:
     const std::string& name_;
 
+  };*/
+
+  struct KitItemPrinter
+  {
+  public:
+    void operator()(const std::shared_ptr< const Item > item) const;
+    std::ostream& out;
   };
+
+  std::ostream& operator<<(std::ostream& out, const std::pair<const std::string, Kit>& kit_pair);
 }
 
 #endif

@@ -163,7 +163,7 @@ void averenkov::BacktrackStep::operator()()
   }
 }
 
-bool averenkov::ItemSorter::operator()(const Item* a, const Item* b) const
+bool averenkov::ItemSorter::operator()(std::shared_ptr < const Item > a, std::shared_ptr< const Item > b) const
 {
   return a->getValue() * b->getWeight() > b->getValue() * a->getWeight();
 }
@@ -253,7 +253,7 @@ void averenkov::BBSolutionBuilder::operator()() const
   {
     if (included[current_index])
     {
-      resultKit.addItem(items[current_index]);
+      resultKit.addItem(std::make_shared< Item >(*items[current_index]));
     }
     BBSolutionBuilder next{items, included, resultKit, current_index + 1};
     next();
@@ -294,12 +294,12 @@ void averenkov::bruteforce(Base& base, vec_st args)
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  std::vector< const Item* > items = sourceKit.getItems();
+  const auto& items = sourceKit.getItems();
 
-  std::vector< std::vector< const Item* > > allCombinations;
+  std::vector< std::vector< std::shared_ptr < const Item > > > allCombinations;
   generateCombinations(items, allCombinations, {}, 0);
 
-  std::vector< const Item* > bestCombination;
+  std::vector< std::shared_ptr < const Item > > bestCombination;
   int maxValue = 0;
   int bestWeight = 0;
   CombinationEvaluator evaluator(capacity, bestCombination, maxValue, bestWeight);
@@ -339,7 +339,7 @@ void averenkov::dynamicProgrammingSolve(Base& base, vec_st args)
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  std::vector< const Item* > items = sourceKit.getItems();
+  std::vector< std::shared_ptr< const Item > > items = sourceKit.getItems();
 
   std::vector< std::vector< int > > dp(items.size() + 1);
   DPTableInitializer init{dp, capacity};
@@ -348,7 +348,7 @@ void averenkov::dynamicProgrammingSolve(Base& base, vec_st args)
   DPRowProcessor processor{items, dp, 1};
   processor();
 
-  std::vector< const Item* > selectedItems;
+  std::vector< std::shared_ptr< const Item > > selectedItems;
   int remaining_weight = capacity;
   DPSolutionBuilder builder{items, dp, selectedItems, remaining_weight, items.size()};
   builder();
@@ -419,7 +419,7 @@ void averenkov::branchAndBoundSolve(Base& base, const std::vector<std::string>& 
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  std::vector< const Item* > items = sourceKit.getItems();
+  std::vector< std::shared_ptr< const Item > > items = sourceKit.getItems();
 
   ItemSorter sorter;
   std::sort(items.begin(), items.end(), sorter);

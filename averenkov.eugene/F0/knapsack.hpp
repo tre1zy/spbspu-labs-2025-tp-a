@@ -1,5 +1,6 @@
 #ifndef KNAPSACK_HPP
 #define KNAPSACK_HPP
+#include <ostream>
 
 namespace averenkov
 {
@@ -12,6 +13,8 @@ namespace averenkov
   private:
     int capacity_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const std::pair< const std::string, Knapsack >& knapsack_pair);
 }
 
 #endif
