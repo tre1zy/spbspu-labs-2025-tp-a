@@ -1,22 +1,8 @@
 #include "kit.hpp"
 
-/*averenkov::ItemNameComparer::ItemNameComparer(const std::string& n):
-  name_(n)
-{}*/
-
 averenkov::Kit::Kit(const std::string& name):
   name_(name)
 {}
-
-/*bool averenkov::Kit::compareItemByName(const std::shared_ptr< const Item >& item, const std::string& name)
-{
-  return item->getName() == name;
-}
-
-bool averenkov::ItemNameComparer::operator()(const Item item) const
-{
-  return item->getName() == name_;
-}*/
 
 void averenkov::Kit::addItem(std::shared_ptr< const Item > item)
 {

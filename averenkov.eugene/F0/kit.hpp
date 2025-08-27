@@ -23,19 +23,7 @@ namespace averenkov
   private:
     std::string name_;
     std::vector< std::weak_ptr< const Item > > items_;
-//    static bool compareItemByName(const Item* item, const std::string& name);
   };
-
-/*  struct ItemNameComparer
-  {
-  public:
-    ItemNameComparer(const std::string& n);
-    bool operator()(const Item* item) const;
-
-  private:
-    const std::string& name_;
-
-  };*/
 
   struct KitItemPrinter
   {
