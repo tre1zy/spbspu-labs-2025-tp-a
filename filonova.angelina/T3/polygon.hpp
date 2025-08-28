@@ -31,29 +31,21 @@ namespace filonova
   bool isOdd(const Polygon &p);
   bool isEven(const Polygon &p);
 
-  struct Triangle
-  {
-    Point a, b, c;
-  };
+  double getDistance(const Point &p1, const Point &p2);
+  Polygon buildTriangle(size_t i, const std::vector< Point > &pts);
 
   struct TriangleGenerator
   {
-    const std::vector< Point > &points_;
-    size_t current_;
-
-    explicit TriangleGenerator(const std::vector< Point > &points, size_t start = 1);
-    bool hasNext() const;
-    Triangle next();
+    size_t &index;
+    const std::vector< Point > &points;
+    Polygon operator()();
   };
 
-  struct TriangleAreaFunctor
-  {
-    double operator()(const Triangle &tri) const;
-  };
+  std::vector< Polygon > polygonToTriangles(const Polygon &p);
 
-  double triangleArea(const Point &a, const Point &b, const Point &c);
-  double getArea(const Polygon &polygon);
-  double computeTotalArea(const std::vector< Polygon > &polygons);
+  double getTriangleArea(const Polygon &triangle);
+  double getPolygonArea(const Polygon &polygon);
+  double getTotalArea(const std::vector< Polygon > &polygons);
 }
 
 #endif

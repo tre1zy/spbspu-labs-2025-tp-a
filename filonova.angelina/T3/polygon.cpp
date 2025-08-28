@@ -66,61 +66,53 @@ bool filonova::isEven(const Polygon &p)
   return (p.points.size() % 2) == 0;
 }
 
-filonova::TriangleGenerator::TriangleGenerator(const std::vector< Point > &points, size_t start): points_(points), current_(start)
+double filonova::getDistance(const Point &p1, const Point &p2)
 {
-  if (points.size() < MIN_VERTEX_COUNT)
-  {
-    throw std::invalid_argument("<INVALID COMMAND>");
-  }
+  return std::sqrt(std::pow(p1.x - p2.x, 2) + std::pow(p1.y - p2.y, 2));
 }
 
-bool filonova::TriangleGenerator::hasNext() const
+filonova::Polygon filonova::buildTriangle(size_t i, const std::vector< Point > &pts)
 {
-  return current_ < points_.size() - 1;
+  return Polygon{std::vector< Point >{pts[0], pts[i + 1], pts[i + 2]}};
 }
 
-filonova::Triangle filonova::TriangleGenerator::next()
+filonova::Polygon filonova::TriangleGenerator::operator()()
 {
-  Triangle tr = {points_[0], points_[current_], points_[current_ + 1]};
-  current_++;
-  return tr;
+  return buildTriangle(index++, points);
 }
 
-double filonova::TriangleAreaFunctor::operator()(const Triangle &tri) const
+std::vector< filonova::Polygon > filonova::polygonToTriangles(const Polygon &p)
 {
-  return triangleArea(tri.a, tri.b, tri.c);
+  std::vector< Polygon > triangles(p.points.size() - 2);
+  size_t index = 0;
+  std::generate(triangles.begin(), triangles.end(), TriangleGenerator{index, p.points});
+
+  return triangles;
 }
 
-double filonova::triangleArea(const Point &a, const Point &b, const Point &c)
+double filonova::getTriangleArea(const Polygon &triangle)
 {
-  double term1 = static_cast< double >(a.x) * (b.y - c.y);
-  double term2 = static_cast< double >(b.x) * (c.y - a.y);
-  double term3 = static_cast< double >(c.x) * (a.y - b.y);
-  return std::abs(term1 + term2 + term3) / 2.0;
+  double a = getDistance(triangle.points[0], triangle.points[1]);
+  double b = getDistance(triangle.points[1], triangle.points[2]);
+  double c = getDistance(triangle.points[0], triangle.points[2]);
+  double s = (a + b + c) / 2.0;
+
+  return std::sqrt(s * (s - a) * (s - b) * (s - c));
 }
 
-double filonova::getArea(const Polygon &polygon)
+double filonova::getPolygonArea(const Polygon &polygon)
 {
-  if (polygon.points.size() < MIN_VERTEX_COUNT)
-  {
-    throw std::invalid_argument("<INVALID COMMAND>");
-  }
+  std::vector< Polygon > triangles = polygonToTriangles(polygon);
+  std::vector< double > areas;
+  std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getTriangleArea);
 
-  TriangleGenerator generator(polygon.points);
-  TriangleAreaFunctor areaFunc;
-  double area = 0.0;
-
-  while (generator.hasNext())
-  {
-    area += areaFunc(generator.next());
-  }
-
-  return area;
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
-double filonova::computeTotalArea(const std::vector< Polygon > &polygons)
+double filonova::getTotalArea(const std::vector< Polygon > &polygons)
 {
   std::vector< double > areas(polygons.size());
-  std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+  std::transform(polygons.begin(), polygons.end(), areas.begin(), getPolygonArea);
+
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }

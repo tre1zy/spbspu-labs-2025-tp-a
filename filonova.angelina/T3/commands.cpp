@@ -23,7 +23,7 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
       return;
     }
 
-    double totalArea = computeTotalArea(polygons);
+    double totalArea = getTotalArea(polygons);
     out << std::fixed << std::setprecision(1) << totalArea / polygons.size();
     return;
   }
@@ -45,7 +45,7 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
     return;
   }
 
-  double totalArea = computeTotalArea(filteredPolygons);
+  double totalArea = getTotalArea(filteredPolygons);
   out << std::fixed << std::setprecision(1) << totalArea;
 }
 
@@ -65,7 +65,7 @@ void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polyg
   if (subcmd == "AREA")
   {
     auto maxIt = std::max_element(polygons.begin(), polygons.end(), CompareByArea());
-    out << getArea(*maxIt);
+    out << getPolygonArea(*maxIt);
   }
   else if (subcmd == "VERTEXES")
   {
@@ -94,7 +94,7 @@ void filonova::min(std::istream &in, std::ostream &out, const std::vector< Polyg
   if (subcmd == "AREA")
   {
     auto minIt = std::min_element(polygons.begin(), polygons.end(), CompareByArea());
-    out << getArea(*minIt);
+    out << getPolygonArea(*minIt);
   }
   else if (subcmd == "VERTEXES")
   {

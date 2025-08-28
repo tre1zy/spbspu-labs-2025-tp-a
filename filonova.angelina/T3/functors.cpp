@@ -9,7 +9,7 @@ bool filonova::HasVertexCount::operator()(const Polygon &p) const
 
 bool filonova::CompareByArea::operator()(const Polygon &a, const Polygon &b) const
 {
-  return getArea(a) < getArea(b);
+  return getPolygonArea(a) < getPolygonArea(b);
 }
 
 bool filonova::CompareByVertexes::operator()(const Polygon &a, const Polygon &b) const
@@ -58,6 +58,7 @@ double filonova::IsRectangle::dot(const Point &a, const Point &b, const Point &c
   double aby = b.y - a.y;
   double bcx = c.x - b.x;
   double bcy = c.y - b.y;
+
   return abx * bcx + aby * bcy;
 }
 
@@ -65,6 +66,7 @@ double filonova::IsRectangle::getDistanceSquared(const Point &a, const Point &b)
 {
   double dx = b.x - a.x;
   double dy = b.y - a.y;
+
   return dx * dx + dy * dy;
 }
 
@@ -85,13 +87,13 @@ bool filonova::IsRectangle::operator()(const Polygon &polygon) const
     return false;
   }
 
-  std::vector< filonova::AngleCheckPoints > angles_to_check;
-  angles_to_check.reserve(RECTANGLE_SIDES);
+  std::vector< filonova::AngleCheckPoints > angles;
+  angles.reserve(RECTANGLE_SIDES);
 
-  angles_to_check.push_back({points[3], points[0], points[1]});
-  angles_to_check.push_back({points[0], points[1], points[2]});
-  angles_to_check.push_back({points[1], points[2], points[3]});
-  angles_to_check.push_back({points[2], points[3], points[0]});
+  angles.push_back({points[3], points[0], points[1]});
+  angles.push_back({points[0], points[1], points[2]});
+  angles.push_back({points[1], points[2], points[3]});
+  angles.push_back({points[2], points[3], points[0]});
 
-  return std::all_of(angles_to_check.begin(), angles_to_check.end(), IsRightAngle{});
+  return std::all_of(angles.begin(), angles.end(), IsRightAngle{});
 }
