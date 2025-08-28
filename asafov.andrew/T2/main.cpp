@@ -4,6 +4,7 @@
 #include <vector>
 #include <limits>
 #include "datastruct.h"
+
 int main()
 {
   using asafov::DataStruct;

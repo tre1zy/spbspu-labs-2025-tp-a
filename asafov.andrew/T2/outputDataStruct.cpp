@@ -1,27 +1,30 @@
 #include "datastruct.h"
 #include <iomanip>
-#include <bitset>
 #include <algorithm>
 
 namespace
 {
-  void outputULLBin(std::ostream& os, unsigned long long num)
-  {
+  
+void outputULLBin(std::ostream& os, unsigned long long num)
+{
+    os << "0b0";
+
     if (num == 0)
     {
-      os << "0b0";
+      os << '0';
       return;
     }
 
-    os << "0b0";
-    std::string bits;
-    while (num > 0)
+    int highest = 63;
+    while (((num >> highest) & 1ULL) == 0)
     {
-      bits.push_back((num & 1) ? '1' : '0');
-      num >>= 1;
+      --highest;
     }
-    std::reverse(bits.begin(), bits.end());
-    os << bits;
+
+    for (int i = highest; i >= 0; --i)
+    {
+      os << (((num >> i) & 1ULL) ? '1' : '0');
+    }
   }
 
   void outputCmpLsp(std::ostream& os, const std::complex< double >& data)
