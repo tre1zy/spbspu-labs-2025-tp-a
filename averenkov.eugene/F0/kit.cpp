@@ -13,20 +13,9 @@ void averenkov::Kit::addItem(std::shared_ptr< const Item > item)
   items_.push_back(item);
 }
 
-std::vector< std::shared_ptr< const averenkov::Item > > averenkov::Kit::getItems() const
+std::vector< std::weak_ptr< const averenkov::Item > > averenkov::Kit::getItems() const
 {
-  std::vector< std::shared_ptr< const Item > > valid_items;
-
-  for (size_t i = 0; i < items_.size(); ++i)
-  {
-    std::shared_ptr<const Item> shared_item = items_[i].lock();
-    if (shared_item)
-    {
-      valid_items.push_back(shared_item);
-    }
-  }
-
-  return valid_items;
+  return items_;
 }
 
 void averenkov::Kit::removeItem(const std::string& item_name)
@@ -58,9 +47,12 @@ bool averenkov::Kit::containsItem(const std::string& item_name) const
   return false;
 }
 
-void averenkov::KitItemPrinter::operator()(const std::shared_ptr< const Item > item) const
+void averenkov::KitItemPrinter::operator()(const std::weak_ptr< const Item > item) const
 {
-  out << "    - " << item->getName() << "\n";
+  if (auto shared_item = item.lock())
+  {
+    out << "    - " << shared_item->getName() << "\n";
+  }
 }
 
 std::ostream& averenkov::operator<<(std::ostream& os, const std::pair< const std::string, Kit >& kit_pair)

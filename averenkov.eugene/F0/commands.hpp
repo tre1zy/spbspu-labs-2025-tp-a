@@ -58,10 +58,20 @@ namespace averenkov
     int operator()(int sum, std::shared_ptr< const Item > item);
   };
 
-  struct ItemAdder
+  struct WeakWeightCalculator
   {
-    explicit ItemAdder(Kit& k);
-    void operator()(std::shared_ptr< const Item > item);
+    int operator()(int sum, std::weak_ptr< const Item > item);
+  };
+
+  struct WeakValueCalculator
+  {
+    int operator()(int sum, std::weak_ptr< const Item > item);
+  };
+
+  struct WeakItemAdder
+  {
+    explicit WeakItemAdder(Kit& k);
+    void operator()(std::weak_ptr< const Item > weak_item);
   private:
     Kit& kit;
   };

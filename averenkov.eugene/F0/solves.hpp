@@ -6,8 +6,11 @@
 namespace averenkov
 {
 
-  using vec_it = std::vector< std::shared_ptr< const Item > >;
+  using vec_it = std::vector< std::weak_ptr< const Item > >;
+  using vecs_it = std::vector< std::shared_ptr< const Item > >;
   using vec_st = const std::vector< std::string >&;
+
+  vecs_it sharingVec(vec_it weak_items);
 
   struct CombinationEvaluator
   {
@@ -39,7 +42,7 @@ namespace averenkov
 
   struct DPRowFiller
   {
-    const vec_it& items;
+    const vec_it& weak_items;
     std::vector< std::vector< int > >& dp;
     size_t current_index;
     int current_weight;
@@ -58,7 +61,7 @@ namespace averenkov
 
   struct DPSolutionBuilder
   {
-    const vec_it& items;
+    const vec_it& weak_items;
     const std::vector< std::vector< int > >& dp;
     vec_it& result;
     int& remaining_weight;
@@ -69,7 +72,7 @@ namespace averenkov
 
   struct BacktrackState
   {
-    const vec_it& items;
+    const vec_it& weak_items;
     int capacity;
     vec_it& best_items;
     int& best_value;
@@ -113,12 +116,12 @@ namespace averenkov
 
   struct ItemSorter
   {
-    bool operator()(std::shared_ptr< const Item > a, std::shared_ptr< const Item > b) const;
+    bool operator()(std::weak_ptr< const Item > shared_a, std::weak_ptr< const Item > shared_b) const;
   };
 
   struct BoundCalculator
   {
-    const vec_it& items;
+    const vec_it& weak_items;
     int capacity;
     int operator()(const Node* node) const;
   };
@@ -137,7 +140,7 @@ namespace averenkov
   struct NodeExpander
   {
     std::queue< Node* >& queue;
-    const vec_it& items;
+    const vec_it& weak_items;
     int capacity;
     int& max_value;
     std::vector< bool >& best_included;

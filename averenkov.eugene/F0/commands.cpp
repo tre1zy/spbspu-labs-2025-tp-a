@@ -48,13 +48,34 @@ int averenkov::ValueCalculator::operator()(int sum, std::shared_ptr< const Item 
   return sum + item->getValue();
 }
 
-averenkov::ItemAdder::ItemAdder(Kit& k):
+int averenkov::WeakWeightCalculator::operator()(int sum, std::weak_ptr< const Item > item)
+{
+  if (auto weak_item = item.lock())
+  {
+    return sum + weak_item->getWeight();
+  }
+  return sum;
+}
+
+int averenkov::WeakValueCalculator::operator()(int sum, std::weak_ptr< const Item > item)
+{
+  if (auto weak_item = item.lock())
+  {
+    return sum + weak_item->getValue();
+  }
+  return sum;
+}
+
+averenkov::WeakItemAdder::WeakItemAdder(Kit& k):
   kit(k)
 {}
 
-void averenkov::ItemAdder::operator()(std::shared_ptr< const Item > item)
+void averenkov::WeakItemAdder::operator()(std::weak_ptr< const Item > weak_item)
 {
-  kit.addItem(item);
+  if (auto item = weak_item.lock())
+  {
+    kit.addItem(item);
+  }
 }
 
 void averenkov::printItemToOut(std::ostream& out, const std::shared_ptr< Item >& item)

@@ -16,7 +16,7 @@ namespace averenkov
     Kit(const std::string& n);
 
     void addItem(std::shared_ptr< const Item > item);
-    std::vector< std::shared_ptr< const Item > > getItems() const;
+    std::vector< std::weak_ptr< const Item > > getItems() const;
     void removeItem(const std::string& item_name);
     bool containsItem(const std::string& item_name) const;
 
@@ -28,7 +28,7 @@ namespace averenkov
   struct KitItemPrinter
   {
   public:
-    void operator()(const std::shared_ptr< const Item > item) const;
+    void operator()(const std::weak_ptr< const Item > item) const;
     std::ostream& out;
   };
 

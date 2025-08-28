@@ -2,6 +2,19 @@
 #include "solves.hpp"
 #include "commands.hpp"
 
+averenkov::vecs_it averenkov::sharingVec(vec_it weak_items)
+{
+  vecs_it items;
+  for (size_t i = 0; i < weak_items.size(); i++)
+  {
+    if (auto shared_item = weak_items[i].lock())
+    {
+      items.push_back(shared_item);
+    }
+  }
+  return items;
+}
+
 void averenkov::CombinationBuilder::operator()(int pos) const
 {
   if (MaskChecker(pos)(pos))
@@ -38,6 +51,7 @@ void averenkov::DPTableInitializer::operator()(std::vector<int>& row) const
 
 void averenkov::DPRowFiller::operator()()
 {
+  auto items = sharingVec(weak_items);
   if (current_weight > 0)
   {
     if (items[current_index-1]->getWeight() <= current_weight)
@@ -50,7 +64,7 @@ void averenkov::DPRowFiller::operator()()
     {
       dp[current_index][current_weight] = dp[current_index-1][current_weight];
     }
-    DPRowFiller next{items, dp, current_index, current_weight - 1};
+    DPRowFiller next{weak_items, dp, current_index, current_weight - 1};
     next();
   }
 }
@@ -69,6 +83,7 @@ void averenkov::DPRowProcessor::operator()()
 
 void averenkov::DPSolutionBuilder::operator()()
 {
+  auto items = sharingVec(weak_items);
   if (current_index > 0 && remaining_weight > 0)
   {
     if (dp[current_index][remaining_weight] != dp[current_index-1][remaining_weight])
@@ -76,7 +91,7 @@ void averenkov::DPSolutionBuilder::operator()()
       result.push_back(items[current_index-1]);
       remaining_weight -= items[current_index-1]->getWeight();
     }
-    DPSolutionBuilder next{items, dp, result, remaining_weight, current_index - 1};
+    DPSolutionBuilder next{weak_items, dp, result, remaining_weight, current_index - 1};
     next();
   }
 }
@@ -96,12 +111,12 @@ void averenkov::generateCombinations(const vec_it& items, std::vector< vec_it >&
 
 int averenkov::calculateTotalWeight(const vec_it& combination)
 {
-  return std::accumulate(combination.begin(), combination.end(), 0, WeightCalculator());
+  return std::accumulate(combination.begin(), combination.end(), 0, WeakWeightCalculator());
 }
 
 int averenkov::calculateTotalValue(const vec_it& combination)
 {
-  return std::accumulate(combination.begin(), combination.end(), 0, ValueCalculator());
+  return std::accumulate(combination.begin(), combination.end(), 0, WeakValueCalculator());
 }
 
 averenkov::ItemCollector::ItemCollector(vec_it& r, const std::vector< bool >& inc, const vec_it& it):
@@ -122,22 +137,24 @@ void averenkov::ItemCollector::operator()(bool is_included)
 
 void averenkov::BestSolutionUpdater::operator()()
 {
+  auto items = sharingVec(state.weak_items);
   int best_weight = 0;
-  WeightCalculator calc;
+  WeakWeightCalculator calc;
   best_weight = std::accumulate(state.best_items.begin(), state.best_items.end(), 0, calc);
   auto cond = (state.current_value == state.best_value && state.current_weight < best_weight);
   if (state.current_value > state.best_value || cond)
   {
     state.best_value = state.current_value;
     state.best_items.clear();
-    ItemCollector collector(state.best_items, state.included, state.items);
+    ItemCollector collector(state.best_items, state.included, state.weak_items);
     std::for_each(state.included.begin(), state.included.end(), collector);
   }
 }
 
 void averenkov::BacktrackStep::operator()()
 {
-  if (state.index >= state.items.size())
+  auto items = sharingVec(state.weak_items);
+  if (state.index >= items.size())
   {
     BestSolutionUpdater updater{state};
     updater();
@@ -148,28 +165,32 @@ void averenkov::BacktrackStep::operator()()
   next_state.index++;
   BacktrackStep step{next_state};
   step();
-  if (state.current_weight + state.items[state.index]->getWeight() <= state.capacity)
+  if (state.current_weight + items[state.index]->getWeight() <= state.capacity)
   {
     state.included[state.index] = true;
-    state.current_weight += state.items[state.index]->getWeight();
-    state.current_value += state.items[state.index]->getValue();
+    state.current_weight += items[state.index]->getWeight();
+    state.current_value += items[state.index]->getValue();
     BacktrackState include_state = state;
     include_state.index++;
     BacktrackStep include_step{include_state};
     include_step();
     state.included[state.index] = false;
-    state.current_weight -= state.items[state.index]->getWeight();
-    state.current_value -= state.items[state.index]->getValue();
+    state.current_weight -= items[state.index]->getWeight();
+    state.current_value -= items[state.index]->getValue();
   }
 }
 
-bool averenkov::ItemSorter::operator()(std::shared_ptr < const Item > a, std::shared_ptr< const Item > b) const
+bool averenkov::ItemSorter::operator()(std::weak_ptr < const Item > shared_a, std::weak_ptr< const Item > shared_b) const
 {
+  auto a = shared_a.lock();
+  auto b = shared_b.lock();
   return a->getValue() * b->getWeight() > b->getValue() * a->getWeight();
 }
 
 int averenkov::BoundCalculator::operator()(const Node* node) const
 {
+  auto items = sharingVec(weak_items);
+
   if (node->weight >= capacity)
   {
     return 0;
@@ -199,13 +220,15 @@ void averenkov::BoundCalculatorHelper::operator()()
 
 void averenkov::NodeExpander::operator()(Node* node) const
 {
+  auto items = sharingVec(weak_items);
+
   if (node->bound > max_value)
   {
     auto w = node->weight + items[node->level]->getWeight();
     auto v = node->value + items[node->level]->getValue();
     Node* left = new Node{ node->level + 1, w, v, 0, node->included };
     left->included[node->level] = true;
-    left->bound = BoundCalculator{items, capacity}(left);
+    left->bound = BoundCalculator{weak_items, capacity}(left);
 
     if (left->weight <= capacity && left->value > max_value)
     {
@@ -222,7 +245,7 @@ void averenkov::NodeExpander::operator()(Node* node) const
       delete left;
     }
     Node* right = new Node{ node->level + 1, node->weight, node->value, 0, node->included };
-    right->bound = BoundCalculator{items, capacity}(right);
+    right->bound = BoundCalculator{weak_items, capacity}(right);
     if (right->bound > max_value)
     {
       queue.push(right);
@@ -253,7 +276,10 @@ void averenkov::BBSolutionBuilder::operator()() const
   {
     if (included[current_index])
     {
-      resultKit.addItem(std::make_shared< Item >(*items[current_index]));
+      if (auto shared_item = items[current_index].lock())
+      {
+        resultKit.addItem(shared_item);
+      }
     }
     BBSolutionBuilder next{items, included, resultKit, current_index + 1};
     next();
@@ -296,10 +322,10 @@ void averenkov::bruteforce(Base& base, vec_st args)
   int capacity = base.current_knapsack.getCapacity();
   const auto& items = sourceKit.getItems();
 
-  std::vector< std::vector< std::shared_ptr < const Item > > > allCombinations;
+  std::vector< std::vector< std::weak_ptr < const Item > > > allCombinations;
   generateCombinations(items, allCombinations, {}, 0);
 
-  std::vector< std::shared_ptr < const Item > > bestCombination;
+  std::vector< std::weak_ptr < const Item > > bestCombination;
   int maxValue = 0;
   int bestWeight = 0;
   CombinationEvaluator evaluator(capacity, bestCombination, maxValue, bestWeight);
@@ -312,7 +338,7 @@ void averenkov::bruteforce(Base& base, vec_st args)
   auto emplaceResult = base.kits.emplace(resultKitName, Kit(resultKitName));
   Kit& resultKit = emplaceResult.first->second;
 
-  ItemAdder adder(resultKit);
+  WeakItemAdder adder(resultKit);
   std::for_each(bestCombination.begin(), bestCombination.end(), adder);
 }
 
@@ -339,7 +365,7 @@ void averenkov::dynamicProgrammingSolve(Base& base, vec_st args)
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  std::vector< std::shared_ptr< const Item > > items = sourceKit.getItems();
+  std::vector< std::weak_ptr< const Item > > items = sourceKit.getItems();
 
   std::vector< std::vector< int > > dp(items.size() + 1);
   DPTableInitializer init{dp, capacity};
@@ -348,13 +374,13 @@ void averenkov::dynamicProgrammingSolve(Base& base, vec_st args)
   DPRowProcessor processor{items, dp, 1};
   processor();
 
-  std::vector< std::shared_ptr< const Item > > selectedItems;
+  std::vector< std::weak_ptr< const Item > > selectedItems;
   int remaining_weight = capacity;
   DPSolutionBuilder builder{items, dp, selectedItems, remaining_weight, items.size()};
   builder();
 
   Kit& resultKit = base.kits.emplace(resultKitName, Kit(resultKitName)).first->second;
-  ItemAdder adder(resultKit);
+  WeakItemAdder adder(resultKit);
   std::for_each(selectedItems.begin(), selectedItems.end(), adder);
 }
 
@@ -392,7 +418,7 @@ void averenkov::backtrackingSolve(Base& base, vec_st args)
   step();
 
   Kit& resultKit = base.kits.emplace(resultKitName, Kit(resultKitName)).first->second;
-  ItemAdder adder(resultKit);
+  WeakItemAdder adder(resultKit);
   std::for_each(best_items.begin(), best_items.end(), adder);
 }
 
@@ -419,7 +445,7 @@ void averenkov::branchAndBoundSolve(Base& base, const std::vector<std::string>& 
 
   const Kit& sourceKit = kitIt->second;
   int capacity = base.current_knapsack.getCapacity();
-  std::vector< std::shared_ptr< const Item > > items = sourceKit.getItems();
+  std::vector< std::weak_ptr< const Item > > items = sourceKit.getItems();
 
   ItemSorter sorter;
   std::sort(items.begin(), items.end(), sorter);
