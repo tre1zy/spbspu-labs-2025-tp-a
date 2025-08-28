@@ -132,11 +132,11 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   {
     in.setstate(std::ios::failbit);
     std::string line;
-    skipLine(in, line);
+    skipLine(in);
     return in;
   }
   data = temp;
   std::string line;
-  skipLine(in, line);
+  skipLine(in);
   return in;
 }
