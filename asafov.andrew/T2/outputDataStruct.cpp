@@ -10,7 +10,6 @@ namespace
 
     if (num == 0)
     {
-      os << '0';
       return;
     }
 
@@ -24,7 +23,6 @@ namespace
     {
       os << (((num >> i) & 1ULL) ? '1' : '0');
     }
-    os << '\n';
   }
 
   void outputCmpLsp(std::ostream& os, const std::complex< double >& data)
