@@ -4,9 +4,8 @@
 
 namespace
 {
-  
-void outputULLBin(std::ostream& os, unsigned long long num)
-{
+  void outputULLBin(std::ostream& os, unsigned long long num)
+  {
     os << "0b0";
 
     if (num == 0)
