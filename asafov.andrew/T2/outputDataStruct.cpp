@@ -24,6 +24,7 @@ namespace
     {
       os << (((num >> i) & 1ULL) ? '1' : '0');
     }
+    os << '\n';
   }
 
   void outputCmpLsp(std::ostream& os, const std::complex< double >& data)
