@@ -4,7 +4,10 @@
 #include <sstream>
 #include <iterator>
 #include <algorithm>
-#include "functors.hpp"
+#include "output_functors.hpp"
+#include "split_functors.hpp"
+#include "filter_functors.hpp"
+#include "word_functors.hpp"
 #include "index.hpp"
 
 trukhanov::CommandProcessor::CommandProcessor(std::ostream& output) : out_(output) {}
@@ -109,10 +112,11 @@ void trukhanov::CommandProcessor::createIndex(const std::string& indexName, cons
   ConcordanceIndex newIndex;
   newIndex.sourceFile = filename;
 
-  std::copy(
-    std::istream_iterator< std::string >(file),
-    std::istream_iterator< std::string >(),
-    std::back_inserter(newIndex.lines));
+  std::string line;
+  while (std::getline(file, line))
+  {
+    newIndex.lines.push_back(line);
+  }
 
   if (newIndex.lines.empty())
   {
@@ -126,8 +130,9 @@ void trukhanov::CommandProcessor::createIndex(const std::string& indexName, cons
   std::transform(lineNumbers.begin(), lineNumbers.end(), lineNumbers.begin(), processor);
 
   indexes_[indexName] = std::move(newIndex);
-  out_ << "Index '" << indexName << "' created successfully\n";
+  out_ << "Index " << indexName << " created successfully" << '\n';
 }
+
 
 void trukhanov::CommandProcessor::searchWord(const std::string& indexName, const std::string& word)
 {
@@ -164,7 +169,7 @@ void trukhanov::CommandProcessor::clearIndex(const std::string& indexName)
   }
 
   indexes_.erase(it);
-  out_ << "Index '" << indexName << "' cleared\n";
+  out_ << "Index " << indexName << " cleared" << '\n';
 }
 
 void trukhanov::CommandProcessor::showFrequency(const std::string& indexName)
@@ -202,7 +207,7 @@ void trukhanov::CommandProcessor::saveIndex(const std::string& indexName, const 
   const trukhanov::ConcordanceIndex& index = it->second;
 
   std::for_each(index.index.begin(), index.index.end(), trukhanov::FileWriter{ file });
-  out_ << "Index '" << indexName << "' saved to '" << filename << "'\n";
+  out_ << "Index " << indexName << " saved to " << filename << '\n';
 }
 
 void trukhanov::CommandProcessor::exportWord(
@@ -227,7 +232,7 @@ void trukhanov::CommandProcessor::exportWord(
   ExportWordFunctor exporter{ index.lines, file, word };
   exporter(index.index);
 
-  out_ << "Word '" << word << "' exported to '" << filename << "'\n";
+  out_ << "Word " << word << " exported to " << filename << '\n';
 }
 
 void trukhanov::CommandProcessor::filterLines(const std::string& indexName, std::size_t fromLine, std::size_t toLine)
@@ -247,7 +252,7 @@ void trukhanov::CommandProcessor::filterLines(const std::string& indexName, std:
 
   std::string newName = indexName + "_filtered";
   indexes_[newName] = std::move(newIndex);
-  out_ << "Filtered index '" << newName << "' created from lines " << fromLine << " to " << toLine << "\n";
+  out_ << "Filtered index " << newName << " created from lines " << fromLine << " to " << toLine << '\n';
 }
 
 void trukhanov::CommandProcessor::replaceWord(
@@ -266,7 +271,7 @@ void trukhanov::CommandProcessor::replaceWord(
   ReplaceWordFunctor replacer{ index, oldWord, newWord };
   replacer();
 
-  out_ << "Word '" << oldWord << "' replaced with '" << newWord << "' in index '" << indexName << "'\n";
+  out_ << "Word " << oldWord << " replaced with " << newWord << " in index " << indexName << '\n';
 }
 
 void trukhanov::CommandProcessor::listIndexes()
@@ -284,9 +289,7 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   auto it2 = indexes_.find(name2);
 
   if (it1 == indexes_.end() || it2 == indexes_.end())
-  {
     throw std::invalid_argument("Invalid command");
-  }
 
   const ConcordanceIndex& index1 = it1->second;
   const ConcordanceIndex& index2 = it2->second;
@@ -294,16 +297,29 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   std::set< std::string > words1;
   std::set< std::string > words2;
 
-  std::transform(index1.index.begin(), index1.index.end(), std::inserter(words1, words1.begin()), ExtractWord{});
-  std::transform(index2.index.begin(), index2.index.end(), std::inserter(words2, words2.begin()), ExtractWord{});
+  std::transform(index1.index.begin(),
+    index1.index.end(),
+    std::inserter(words1, words1.begin()),
+    trukhanov::ExtractWord{});
+  std::transform(index2.index.begin(),
+    index2.index.end(),
+    std::inserter(words2, words2.begin()),
+    trukhanov::ExtractWord{});
 
   std::set< std::string > common;
   std::set< std::string > unique1;
   std::set< std::string > unique2;
 
-  std::set_intersection(words1.begin(), words1.end(), words2.begin(), words2.end(), std::inserter(common, common.begin()));
-  std::set_difference(words1.begin(), words1.end(), words2.begin(), words2.end(), std::inserter(unique1, unique1.begin()));
-  std::set_difference(words2.begin(), words2.end(), words1.begin(), words1.end(), std::inserter(unique2, unique2.begin()));
+  std::set_intersection(words1.begin(), words1.end(), words2.begin(), words2.end(),
+    std::inserter(common, common.begin()));
+  std::set_difference(words1.begin(), words1.end(), words2.begin(), words2.end(),
+    std::inserter(unique1, unique1.begin()));
+  std::set_difference(words2.begin(), words2.end(), words1.begin(), words1.end(),
+    std::inserter(unique2, unique2.begin()));
+
+  std::vector< std::string > diffs;
+  std::copy_if(common.begin(), common.end(), std::back_inserter(diffs),
+    trukhanov::FindDifferentFrequencies{ index1, index2 });
 
   out_ << "Common words:\n";
   std::copy(common.begin(), common.end(), std::ostream_iterator< std::string >(out_, "\n"));
@@ -315,14 +331,9 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   std::copy(unique2.begin(), unique2.end(), std::ostream_iterator< std::string >(out_, "\n"));
 
   out_ << "Different frequencies:\n";
-  std::vector< std::string > diffs;
-  std::copy_if(
-    common.begin(),
-    common.end(),
-    std::back_inserter(diffs),
-    trukhanov::FindDifferentFrequencies{ index1, index2 });
   std::copy(diffs.begin(), diffs.end(), std::ostream_iterator< std::string >(out_, "\n"));
 }
+
 
 void trukhanov::CommandProcessor::longestWords(const std::string& indexName, std::size_t count)
 {
@@ -408,7 +419,7 @@ void trukhanov::CommandProcessor::mergeIndexes(
   std::copy(lines2.begin(), lines2.end(), std::back_inserter(result.lines));
 
   indexes_[newIndex] = std::move(result);
-  out_ << "Index '" << newIndex << "' created by merging\n";
+  out_ << "Index " << newIndex << " created by merging" << '\n';
 }
 
 void trukhanov::CommandProcessor::reconstructText(const std::string& indexName, const std::string& filename)
@@ -430,7 +441,7 @@ void trukhanov::CommandProcessor::reconstructText(const std::string& indexName, 
   std::ostream_iterator< std::string > outIt(outFile, "\n");
   std::copy(lines.begin(), lines.end(), outIt);
 
-  out_ << "Text reconstructed to '" << filename << "'\n";
+  out_ << "Text reconstructed to " << filename << '\n';
 }
 
 void trukhanov::CommandProcessor::mergeByLines(
@@ -459,5 +470,5 @@ void trukhanov::CommandProcessor::mergeByLines(
   std::for_each(resultIndex.lines.begin(), resultIndex.lines.end(), trukhanov::LineSplitter{ resultIndex.index, 1 });
 
   indexes_[newIndex] = std::move(resultIndex);
-  out_ << "Index '" << newIndex << "' created by merging lines\n";
+  out_ << "Index " << newIndex << " created by merging lines" << '\n';
 }
