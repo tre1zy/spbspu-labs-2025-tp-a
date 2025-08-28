@@ -106,18 +106,6 @@ namespace
     read_key(in, data);
     expect(in, {')'});
   }
-
-  void skipLine(std::istream& in)
-  {
-    char ch;
-    while (in.get(ch))
-    {
-      if (ch == '\n')
-      {
-        break;
-      }
-    }
-  }
 }
 
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
@@ -132,11 +120,11 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   {
     in.setstate(std::ios::failbit);
     std::string line;
-    skipLine(in);
+    getline(in, line);
     return in;
   }
   data = temp;
   std::string line;
-  skipLine(in);
+  getline(in, line);
   return in;
 }
