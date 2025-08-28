@@ -27,7 +27,7 @@ namespace
   {
     return true;
   }
-B
+
   struct VertexPred
   {
     size_t count;
@@ -39,7 +39,7 @@ B
 
   template< typename Predicate >
   double areaSum(const std::vector< khokhryakova::Polygon >& polygons, Predicate p)
- B {
+  {
     std::vector< khokhryakova::Polygon > filtered;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
     std::vector< double > areas;
@@ -91,7 +91,7 @@ B
 
   void countEven(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
-    ouCt << countIf(polygons, isEven);
+    out << countIf(polygons, isEven);
   }
 
   void countOdd(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
@@ -281,5 +281,5 @@ void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector
       currentCount = 0;
     }
   }
-  out << maxCount <<;
+  out << maxCount;
 }
