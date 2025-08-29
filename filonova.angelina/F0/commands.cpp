@@ -1,7 +1,7 @@
 #include "commands.hpp"
 #include "support.hpp"
 
-void filonova::createDictionary(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::createDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   in >> name;
@@ -15,7 +15,7 @@ void filonova::createDictionary(DictionarySet& dicts, std::istream& in, std::ost
   dicts[name].clear();
 }
 
-void filonova::deleteDictionary(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::deleteDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   in >> name;
@@ -26,7 +26,7 @@ void filonova::deleteDictionary(DictionarySet& dicts, std::istream& in, std::ost
   }
 }
 
-void filonova::insert(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::insert(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name, filename;
   in >> name >> filename;
@@ -45,43 +45,28 @@ void filonova::insert(DictionarySet& dicts, std::istream& in, std::ostream& out)
     return;
   }
 
-  std::vector< std::string > words;
-  std::string word;
-  while (file >> word)
+  Word w;
+  while (file >> w)
   {
-    words.push_back(word);
-  }
-
-  if (!std::all_of(words.begin(), words.end(), isValidWord))
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  std::transform(
-    words.begin(),
-    words.end(),
-    words.begin(),
-    toLower);
-  for (const auto& current : words)
-  {
-    it->second[current]++;
+    it->second[w.text]++;
   }
 }
 
-void filonova::remove(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::remove(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
-  std::string name, word;
-  in >> name >> word;
+  std::string name;
+  Word w;
+
+  in >> name >> w;
 
   auto it = dicts.find(name);
   if (it == dicts.end())
   {
-    out << "<INVALID COMMAND>\n";
+    out << "<WRONG DICT>\n";
     return;
   }
 
-  auto wIt = it->second.find(word);
+  auto wIt = it->second.find(w.text);
   if (wIt == it->second.end())
   {
     out << "<INVALID COMMAND>\n";
@@ -91,7 +76,7 @@ void filonova::remove(DictionarySet& dicts, std::istream& in, std::ostream& out)
   it->second.erase(wIt);
 }
 
-void filonova::clear(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::clear(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   in >> name;
@@ -102,6 +87,7 @@ void filonova::clear(DictionarySet& dicts, std::istream& in, std::ostream& out)
     out << "<WRONG DICT>\n";
     return;
   }
+
   if (it->second.empty())
   {
     out << "<EMPTY>\n";
@@ -111,10 +97,11 @@ void filonova::clear(DictionarySet& dicts, std::istream& in, std::ostream& out)
   it->second.clear();
 }
 
-void filonova::contains(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::contains(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
-  std::string name, word;
-  in >> name >> word;
+  std::string name;
+  Word w;
+  in >> name >> w;
 
   auto it = dicts.find(name);
   if (it == dicts.end())
@@ -123,12 +110,11 @@ void filonova::contains(DictionarySet& dicts, std::istream& in, std::ostream& ou
     return;
   }
 
-  word = toLower(word);
-  bool found = it->second.find(word) != it->second.end();
+  bool found = it->second.count(w.text);
   out << (found ? "<YES>\n" : "<NO>\n");
 }
 
-void filonova::merge(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::merge(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string newDict, dict1, dict2;
   if (!(in >> newDict >> dict1 >> dict2))
@@ -138,27 +124,22 @@ void filonova::merge(DictionarySet& dicts, std::istream& in, std::ostream& out)
     return;
   }
 
-  if (!isValidName(newDict) || !isValidName(dict1) || !isValidName(dict2))
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
   auto it1 = dicts.find(dict1);
   auto it2 = dicts.find(dict2);
-  if (it1 == dicts.end() || it2 == dicts.end())
+
+  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
   {
     out << "<WRONG DICT>\n";
     return;
   }
 
-  Dictionary& dictNew = dicts[newDict];
+  Dictionary &dictNew = dicts[newDict];
   dictNew.clear();
 
   std::copy(
     it1->second.begin(),
     it1->second.end(),
-    std::inserter(dictNew, dictNew.begin()));
+    std::inserter(dictNew, dictNew.end()));
 
   std::for_each(
     it2->second.begin(),
@@ -166,34 +147,10 @@ void filonova::merge(DictionarySet& dicts, std::istream& in, std::ostream& out)
     MergeDictEntry(dictNew));
 }
 
-void filonova::print(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::print(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   in >> name;
-
-  auto it = dicts.find(name);
-  if (it == dicts.end() || it->second.empty())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
-  std::sort(
-    words.begin(),
-    words.end(),
-    CompareByFrequencyDescending());
-
-  for (const auto& current : words)
-  {
-    out << current.first << " : " << current.second << '\n';
-  }
-}
-
-void filonova::count(DictionarySet& dicts, std::istream& in, std::ostream& out)
-{
-  std::string name, word;
-  in >> name >> word;
 
   auto it = dicts.find(name);
   if (it == dicts.end())
@@ -202,9 +159,38 @@ void filonova::count(DictionarySet& dicts, std::istream& in, std::ostream& out)
     return;
   }
 
-  word = toLower(word);
+  if (it->second.empty())
+  {
+    out << "<EMPTY>\n";
+    return;
+  }
 
-  auto wIt = it->second.find(word);
+  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
+  std::sort(
+    words.begin(),
+    words.end(),
+    CompareByFrequency(true));
+
+  for (const auto &current : words)
+  {
+    out << Word{current.first} << ": " << current.second << '\n';
+  }
+}
+
+void filonova::count(DictionarySet &dicts, std::istream &in, std::ostream &out)
+{
+  std::string name;
+  Word w;
+  in >> name >> w;
+
+  auto it = dicts.find(name);
+  if (it == dicts.end())
+  {
+    out << "<WRONG DICT>\n";
+    return;
+  }
+
+  auto wIt = it->second.find(w.text);
   if (wIt == it->second.end())
   {
     out << "<NOT FOUND>\n";
@@ -215,13 +201,13 @@ void filonova::count(DictionarySet& dicts, std::istream& in, std::ostream& out)
   }
 }
 
-void filonova::top(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::top(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   int count;
   in >> name >> count;
 
-  if (!isValidName(name) || count <= 0)
+  if (in.fail() || count <= 0)
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -230,7 +216,7 @@ void filonova::top(DictionarySet& dicts, std::istream& in, std::ostream& out)
   auto it = dicts.find(name);
   if (it == dicts.end())
   {
-    out << "<INVALID COMMAND>\n";
+    out << "<WRONG DICT>\n";
     return;
   }
 
@@ -244,16 +230,16 @@ void filonova::top(DictionarySet& dicts, std::istream& in, std::ostream& out)
   std::sort(
     words.begin(),
     words.end(),
-    CompareByFrequencyDescending());
+    CompareByFrequency(true));
 
-  size_t limit = std::min(static_cast<size_t>(count), words.size());
+  size_t limit = std::min(static_cast< size_t >(count), words.size());
   for (size_t i = 0; i < limit; ++i)
   {
-    out << words[i].first << ": " << words[i].second << "\n";
+    out << Word{words[i].first} << ": " << words[i].second << "\n";
   }
 }
 
-void filonova::unique(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::unique(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   in >> name;
@@ -268,13 +254,13 @@ void filonova::unique(DictionarySet& dicts, std::istream& in, std::ostream& out)
   out << it->second.size() << "\n";
 }
 
-void filonova::mostrare(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::mostrare(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
   int count;
   in >> name >> count;
 
-  if (!isValidName(name) || count <= 0)
+  if (in.fail() || count <= 0)
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -287,7 +273,7 @@ void filonova::mostrare(DictionarySet& dicts, std::istream& in, std::ostream& ou
     return;
   }
 
-  const auto& dict = it->second;
+  const auto &dict = it->second;
   if (dict.empty())
   {
     out << "<EMPTY>\n";
@@ -298,16 +284,16 @@ void filonova::mostrare(DictionarySet& dicts, std::istream& in, std::ostream& ou
   std::sort(
     words.begin(),
     words.end(),
-    CompareByFrequencyAscending());
+    CompareByFrequency(false));
 
-  size_t limit = std::min(static_cast<size_t>(count), words.size());
+  size_t limit = std::min(static_cast< size_t >(count), words.size());
   for (size_t i = 0; i < limit; ++i)
   {
-    out << words[i].first << ": " << words[i].second << "\n";
+    out << Word{words[i].first} << ": " << words[i].second << "\n";
   }
 }
 
-void filonova::intersectDictionary(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string newDict, dict1, dict2;
   if (!(in >> newDict >> dict1 >> dict2))
@@ -317,31 +303,25 @@ void filonova::intersectDictionary(DictionarySet& dicts, std::istream& in, std::
     return;
   }
 
-  if (!isValidName(newDict) || !isValidName(dict1) || !isValidName(dict2))
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
   auto it1 = dicts.find(dict1);
   auto it2 = dicts.find(dict2);
-  if (it1 == dicts.end() || it2 == dicts.end())
+  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
   {
     out << "<WRONG DICT>\n";
     return;
   }
 
-  Dictionary& dictNew = dicts[newDict];
+  Dictionary &dictNew = dicts[newDict];
   dictNew.clear();
 
   std::copy_if(
     it1->second.begin(),
     it1->second.end(),
     std::inserter(dictNew, dictNew.begin()),
-    FilterByPresenceInDict(it2->second, true));
+    WordPresenceFilter(it2->second, true));
 }
 
-void filonova::excludeDictionary(DictionarySet& dicts, std::istream& in, std::ostream& out)
+void filonova::excludeDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string newDict, dict1, dict2;
   if (!(in >> newDict >> dict1 >> dict2))
@@ -351,27 +331,20 @@ void filonova::excludeDictionary(DictionarySet& dicts, std::istream& in, std::os
     return;
   }
 
-  if (!isValidName(newDict) || !isValidName(dict1) || !isValidName(dict2))
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
   auto it1 = dicts.find(dict1);
   auto it2 = dicts.find(dict2);
-
-  if (it1 == dicts.end() || it2 == dicts.end())
+  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
   {
     out << "<WRONG DICT>\n";
     return;
   }
 
-  Dictionary& dictNew = dicts[newDict];
+  Dictionary &dictNew = dicts[newDict];
   dictNew.clear();
 
   std::copy_if(
     it1->second.begin(),
     it1->second.end(),
     std::inserter(dictNew, dictNew.begin()),
-    FilterByPresenceInDict(it2->second, false));
+    WordPresenceFilter(it2->second, false));
 }
