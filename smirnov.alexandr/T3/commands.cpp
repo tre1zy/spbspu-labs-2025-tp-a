@@ -207,7 +207,7 @@ namespace
 
   struct MaxSeq
   {
-    const smirnov::Polygon & pattern;
+    smirnov::Polygon pattern;
     size_t cur_seq;
     size_t max_seq;
     MaxSeq(const smirnov::Polygon & p):
@@ -215,20 +215,22 @@ namespace
       cur_seq(0),
       max_seq(0)
     {}
-    void operator()(const smirnov::Polygon & poly)
+    MaxSeq operator()(const MaxSeq & acc, const smirnov::Polygon & poly) const
     {
+      MaxSeq res = acc;
       if (poly == pattern)
       {
-        ++cur_seq;
-        if (cur_seq > max_seq)
+        res.cur_seq = res.cur_seq +1;
+        if (res.cur_seq > res.max_seq)
         {
-          max_seq = cur_seq;
+          res.max_seq = res.cur_seq;
         }
       }
       else
       {
-        cur_seq = 0;
+        res.cur_seq = 0;
       }
+      return res;
     }
   };
 
@@ -437,7 +439,7 @@ void smirnov::printMaxSeq(std::istream & in, std::ostream & out, const std::vect
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  MaxSeq finder(pattern);
-  std::for_each(polygons.begin(), polygons.end(), std::ref(finder));
-  out << finder.max_seq << "\n";
+  MaxSeq start(pattern);
+  MaxSeq result = std::accumulate(polygons.begin(), polygons.end(), start, MaxSeq(pattern));
+  out << result.max_seq << "\n";
 }
