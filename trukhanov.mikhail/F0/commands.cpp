@@ -133,7 +133,6 @@ void trukhanov::CommandProcessor::createIndex(const std::string& indexName, cons
   out_ << "Index " << indexName << " created successfully" << '\n';
 }
 
-
 void trukhanov::CommandProcessor::searchWord(const std::string& indexName, const std::string& word)
 {
   auto it = indexes_.find(indexName);
@@ -317,7 +316,7 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   std::set_difference(words2.begin(), words2.end(), words1.begin(), words1.end(),
     std::inserter(unique2, unique2.begin()));
 
-  std::vector< std::string > diffs;
+  std::vector< std::string>  diffs;
   std::copy_if(common.begin(), common.end(), std::back_inserter(diffs),
     trukhanov::FindDifferentFrequencies{ index1, index2 });
 
@@ -334,7 +333,6 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   std::copy(diffs.begin(), diffs.end(), std::ostream_iterator< std::string >(out_, "\n"));
 }
 
-
 void trukhanov::CommandProcessor::longestWords(const std::string& indexName, std::size_t count)
 {
   auto it = indexes_.find(indexName);
@@ -345,7 +343,7 @@ void trukhanov::CommandProcessor::longestWords(const std::string& indexName, std
   }
 
   const ConcordanceIndex& index = it->second;
-  std::vector<std::string> result;
+  std::vector< std::string > result;
 
   std::transform(index.index.begin(), index.index.end(), std::back_inserter(result), trukhanov::ExtractWord{});
   std::sort(result.begin(), result.end(), trukhanov::LengthGreater{});

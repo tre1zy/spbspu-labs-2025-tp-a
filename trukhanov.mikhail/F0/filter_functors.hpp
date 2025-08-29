@@ -26,7 +26,7 @@ namespace trukhanov
     const ConcordanceIndex& src;
     ConcordanceIndex& dest;
 
-    void operator()(const std::pair<const std::string, std::set<std::size_t>>& pair) const;
+    void operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
   };
 
   struct LineFilter

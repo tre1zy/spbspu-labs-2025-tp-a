@@ -15,7 +15,6 @@ void trukhanov::ShowEntry::operator()(const std::pair< std::string, std::size_t 
   out << pair.first << ' ' << pair.second << '\n';
 }
 
-
 void trukhanov::FileWriter::operator()(const std::pair< const std::string, std::set< std::size_t > >& entry) const
 {
   out << entry.first << ' ';
@@ -25,16 +24,43 @@ void trukhanov::FileWriter::operator()(const std::pair< const std::string, std::
 
 std::string trukhanov::MergeLinesFunctor::operator()()
 {
-  std::string l1 = (i < lines1.size()) ? lines1[i] : "";
-  std::string l2 = (i < lines2.size()) ? lines2[i] : "";
+  std::string line1;
+  if (i < lines1.size())
+  {
+    line1 = lines1[i];
+  }
+  else
+  {
+    line1 = "";
+  }
+
+  std::string line2;
+  if (i < lines2.size())
+  {
+    line2 = lines2[i];
+  }
+  else
+  {
+    line2 = "";
+  }
   ++i;
-  return l1 + " " + l2;
+  return line1 + " " + line2;
 }
 
 std::string trukhanov::FormatIndexEntry::operator()(const std::pair< const std::string, ConcordanceIndex >& pair) const
 {
   const std::string& file = pair.second.sourceFile;
-  return pair.first + ": " + (file.empty() ? "<NO FILE>" : file);
+  std::string result;
+
+  if (file.empty())
+  {
+    result = pair.first + ": <NO FILE>";
+  }
+  else
+  {
+    result = pair.first + ": " + file;
+  }
+  return result;
 }
 
 std::size_t trukhanov::AddOffset::operator()(std::size_t val) const

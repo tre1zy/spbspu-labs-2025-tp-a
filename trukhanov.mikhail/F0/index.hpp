@@ -22,13 +22,6 @@ namespace trukhanov
   public:
     using IndexContainer = std::map< std::string, ConcordanceIndex >;
 
-    bool hasIndex(const std::string& name) const;
-    bool addIndex(const std::string& name, const ConcordanceIndex& index);
-    bool removeIndex(const std::string& name);
-    const ConcordanceIndex* getIndex(const std::string& name) const;
-    ConcordanceIndex* getIndex(const std::string& name);
-    const IndexContainer& getAll() const;
-
   private:
     IndexContainer indexes_;
   };
