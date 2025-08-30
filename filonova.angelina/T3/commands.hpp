@@ -1,14 +1,9 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
-#include "functors.hpp"
 #include "polygon.hpp"
 
-#include <algorithm>
-#include <functional>
-#include <iomanip>
-#include <limits>
-#include <sstream>
+#include <iostream>
 #include <string>
 
 namespace filonova

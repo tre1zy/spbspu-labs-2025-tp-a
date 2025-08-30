@@ -1,6 +1,8 @@
 #include "functors.hpp"
 
-filonova::HasVertexCount::HasVertexCount(size_t count): count_(count) {}
+filonova::HasVertexCount::HasVertexCount(size_t count):
+  count_(count)
+  {}
 
 bool filonova::HasVertexCount::operator()(const Polygon &p) const
 {
