@@ -29,14 +29,12 @@ namespace
 
   double getAreaOfPolygon(const voronina::Polygon &shape);
   double getAreaOfTriangle(const voronina::Polygon &p);
-  double getAreaOfGivenAmountOfVertexes(double areaSum, const voronina::Polygon &shape, int vertexes);
   bool areaComporator(const voronina::Polygon &left, const voronina::Polygon &right);
   bool vertexesComporator(const voronina::Polygon &left, const voronina::Polygon &right);
   bool isEven(const voronina::Polygon &shape);
   bool isOdd(const voronina::Polygon &shape);
   bool hasGivenAmountOfVertexes(const voronina::Polygon &shape, int vertexes);
   bool isRightAngle(const voronina::Polygon &p);
-  voronina::Point getSide(const voronina::Point &p1, const voronina::Point &p2);
 
   TriangleGenerator::TriangleGenerator(const std::vector< voronina::Point > &pts):
     points(pts),
@@ -117,13 +115,6 @@ namespace
     auto side1 = p.points[1] - p.points[0];
     auto side2 = p.points[2] - p.points[1];
     return (side1.x * side2.x + side1.y * side2.y) == 0;
-  }
-
-  voronina::Point getSide(const voronina::Point &p1, const voronina::Point &p2)
-  {
-    voronina::Point newSide;
-    newSide = { p1.x - p2.x, p1.y - p2.y };
-    return newSide;
   }
 }
 
