@@ -6,10 +6,10 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <stream_guard.hpp>
+#include <data_input.hpp>
 #include "polygon_utils.hpp"
 #include "polygon.hpp"
-#include "data_input.hpp"
-#include "stream_guard.hpp"
 
 void areaEven(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
 {

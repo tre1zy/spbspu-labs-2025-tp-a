@@ -1,7 +1,9 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
+#include <data_input.hpp>
 #include <vector>
+#include <iostream>
 
 namespace trukhanov
 {
@@ -23,6 +25,11 @@ namespace trukhanov
   bool isOdd(const Polygon& p);
   bool compareByVertexes(const Polygon& p1, const Polygon& p2);
   bool isRight(const Polygon& p);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, Point& point);
+  std::ostream& operator<<(std::ostream& out, const Point& point);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 }
 
 #endif

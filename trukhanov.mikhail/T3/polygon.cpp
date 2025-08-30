@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <iterator>
+#include <data_input.hpp>
 #include "polygon_utils.hpp"
 
 double trukhanov::getArea(const Polygon& polygon)
@@ -25,7 +26,6 @@ double trukhanov::getArea(const Polygon& polygon)
 
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
-
 
 bool trukhanov::isEven(const Polygon& polygon)
 {
@@ -64,4 +64,58 @@ bool trukhanov::operator<(const Point& lhs, const Point& rhs)
 bool trukhanov::operator==(const Point& lhs, const Point& rhs)
 {
   return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+std::istream& trukhanov::operator>>(std::istream& in, Point& point)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) return in;
+
+  in >> DelimiterIO{ '(' } >> point.x >> DelimiterIO{ ';' } >> point.y >> DelimiterIO{ ')' };
+  return in;
+}
+
+std::ostream& trukhanov::operator<<(std::ostream& out, const Point& point)
+{
+  out << '(' << point.x << ';' << point.y << ')';
+  return out;
+}
+
+std::istream& trukhanov::operator>>(std::istream& in, Polygon& polygon)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  size_t n = 0;
+  in >> n;
+  if (!in || n < 3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  Polygon temp;
+  temp.points.reserve(n);
+
+  std::istream_iterator< Point > it(in);
+  std::copy_n(it, n, std::back_inserter(temp.points));
+
+  if (temp.points.size() != n || !in)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  polygon = std::move(temp);
+  return in;
+}
+
+std::ostream& trukhanov::operator<<(std::ostream& out, const Polygon& polygon)
+{
+  out << polygon.points.size() << ' ';
+  std::copy(polygon.points.begin(), polygon.points.end(), std::ostream_iterator< Point >(out, " "));
+  return out;
 }

@@ -6,9 +6,9 @@
 #include <map>
 #include <string>
 #include <functional>
+#include <data_input.hpp>
 #include "commands.hpp"
 #include "polygon.hpp"
-#include "data_input.hpp"
 
 int main(int argc, char* argv[])
 {
