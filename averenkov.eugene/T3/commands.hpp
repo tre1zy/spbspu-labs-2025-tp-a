@@ -9,8 +9,7 @@
 
 namespace averenkov
 {
-  template< class Func >
-  double acum(const std::vector< Polygon >& polygons, Func func);
+  double acum(const std::vector< Polygon >& polygons, std::function< double(double accumulator, const Polygon& polygon) > func);
 
   struct Prod
   {

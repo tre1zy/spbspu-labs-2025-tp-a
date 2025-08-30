@@ -1,7 +1,6 @@
 #include "commands.hpp"
 
-template< class Func >
-double averenkov::acum(const std::vector< Polygon >& plgs, Func func)
+double averenkov::acum(const std::vector< Polygon >& plgs, std::function< double(double accum, const Polygon& plg) > func)
 {
   return std::accumulate(plgs.begin(), plgs.end(), 0.0, (func));
 }
@@ -100,7 +99,7 @@ double averenkov::EvenSumCalculator::operator()(double sum, const Polygon& poly)
 
 double averenkov::EvenSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, (*this));
+  return acum(polygons, (*this));
 }
 
 double averenkov::OddSumCalculator::operator()(double sum, const Polygon& poly) const
@@ -114,7 +113,7 @@ double averenkov::OddSumCalculator::operator()(double sum, const Polygon& poly) 
 
 double averenkov::OddSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, (*this));
+  return acum(polygons, (*this));
 }
 
 double averenkov::NumVertexCalculator::operator()(double sum, const Polygon& poly) const
@@ -128,7 +127,7 @@ double averenkov::NumVertexCalculator::operator()(double sum, const Polygon& pol
 
 double averenkov::NumVertexCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
-  return std::accumulate(polygons.begin(), polygons.end(), 0.0, (*this));
+  return acum(polygons, (*this));
 }
 
 double averenkov::MeanAreaCalculator::operator()(const std::vector< Polygon >& polygons) const
