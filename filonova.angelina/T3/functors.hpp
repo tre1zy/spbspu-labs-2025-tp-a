@@ -4,7 +4,7 @@
 #include "polygon.hpp"
 
 constexpr size_t RECTANGLE_SIDES = 4;
-static constexpr double EPS = 1e-9;
+constexpr double EPS = 1e-9;
 
 namespace filonova
 {

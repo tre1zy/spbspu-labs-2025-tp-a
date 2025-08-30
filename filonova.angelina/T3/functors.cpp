@@ -2,7 +2,7 @@
 
 filonova::HasVertexCount::HasVertexCount(size_t count):
   count_(count)
-  {}
+{}
 
 bool filonova::HasVertexCount::operator()(const Polygon &p) const
 {
@@ -29,7 +29,9 @@ bool filonova::ComparePointByY::operator()(const Point &a, const Point &b) const
   return a.y < b.y || (a.y == b.y && a.x < b.x);
 }
 
-filonova::IntersectsWith::IntersectsWith(const Polygon &polygon): polygon_(polygon) {}
+filonova::IntersectsWith::IntersectsWith(const Polygon &polygon):
+  polygon_(polygon)
+{}
 
 bool filonova::IntersectsWith::operator()(const Polygon &other) const
 {

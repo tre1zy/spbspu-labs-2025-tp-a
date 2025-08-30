@@ -1,5 +1,3 @@
-#include "commands.hpp"
-
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -9,6 +7,8 @@
 #include <limits>
 #include <map>
 #include <vector>
+
+#include "commands.hpp"
 
 int main(int argc, char *argv[])
 {

@@ -1,7 +1,8 @@
+#include <iomanip>
+
 #include "commands.hpp"
 #include "functors.hpp"
 
-#include <iomanip>
 
 void filonova::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
