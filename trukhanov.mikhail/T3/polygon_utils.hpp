@@ -9,6 +9,7 @@ namespace trukhanov
   struct isSize
   {
     size_t size;
+    isSize(size_t s) : size (s) {}
     bool operator()(const Polygon& p) const;
   };
 
@@ -43,13 +44,28 @@ namespace trukhanov
     double operator()(const Point& a, const Point& b, const Point& c) const;
   };
 
+  struct Angle
+  {
+    Point a;
+    Point b;
+    Point c;
+  };
+
+  struct MakeAngles
+  {
+    const std::vector< Point >& pts;
+    Angle operator()(std::size_t i) const
+    {
+      std::size_t n = pts.size();
+      return { pts[i], pts[(i + 1) % n], pts[(i + 2) % n] };
+    }
+  };
+
   struct HasRightAngle
   {
-    explicit HasRightAngle(const std::vector< Point >& pts):
-      pts_(pts)
-    {}
-    bool operator()(size_t i) const;
-    const std::vector<Point>& pts_;
+    explicit HasRightAngle(const std::vector< Point >& pts) : pts_(pts) {}
+    bool operator()(const Angle& ang) const;
+    const std::vector< Point >& pts_;
   };
 }
 

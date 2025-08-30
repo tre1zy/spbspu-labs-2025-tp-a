@@ -44,7 +44,8 @@ bool trukhanov::compareByVertexes(const Polygon& lhs, const Polygon& rhs)
 
 bool trukhanov::isRight(const Polygon& polygon)
 {
-  size_t n = polygon.points.size();
+  const auto& pts = polygon.points;
+  size_t n = pts.size();
   if (n < 3)
   {
     return false;
@@ -53,7 +54,10 @@ bool trukhanov::isRight(const Polygon& polygon)
   std::vector< size_t > indices(n);
   std::iota(indices.begin(), indices.end(), 0);
 
-  return std::any_of(indices.begin(), indices.end(), HasRightAngle(polygon.points));
+  std::vector< Angle > angles(pts.size());
+  std::transform(indices.begin(), indices.end(), angles.begin(), MakeAngles{pts});
+
+  return std::any_of(angles.begin(), angles.end(), HasRightAngle(polygon.points));
 }
 
 bool trukhanov::operator<(const Point& lhs, const Point& rhs)
@@ -64,6 +68,20 @@ bool trukhanov::operator<(const Point& lhs, const Point& rhs)
 bool trukhanov::operator==(const Point& lhs, const Point& rhs)
 {
   return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+std::istream& trukhanov::operator>>(std::istream& in, DelimiterIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) return in;
+
+  char c = '\0';
+  in >> c;
+  if (in && c != dest.exp)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
 
 std::istream& trukhanov::operator>>(std::istream& in, Point& point)

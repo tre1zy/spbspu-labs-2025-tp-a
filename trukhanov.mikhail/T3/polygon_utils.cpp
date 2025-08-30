@@ -3,7 +3,7 @@
 #include <cmath>
 #include "polygon.hpp"
 
-bool trukhanov::isSize::operator()(const Polygon& p) const
+bool trukhanov::isSize::operator()(const trukhanov::Polygon& p) const
 {
   return p.points.size() == size;
 }
@@ -46,17 +46,11 @@ double trukhanov::VectorProduct::operator()(const Point& a, const Point& b, cons
   return 0.5 * std::abs(static_cast< double >((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)));
 }
 
-bool trukhanov::HasRightAngle::operator()(size_t i) const
+bool trukhanov::HasRightAngle::operator()(const Angle& ang) const
 {
-  size_t n = pts_.size();
-  const Point& a = pts_[(i + n - 1) % n];
-  const Point& b = pts_[i];
-  const Point& c = pts_[(i + 1) % n];
-
-  int abx = b.x - a.x;
-  int aby = b.y - a.y;
-  int bcx = c.x - b.x;
-  int bcy = c.y - b.y;
-
-  return (abx * bcx + aby * bcy) == 0;
+  int x1 = ang.a.x - ang.b.x;
+  int y1 = ang.a.y - ang.b.y;
+  int x2 = ang.c.x - ang.b.x;
+  int y2 = ang.c.y - ang.b.y;
+  return x1 * x2 + y1 * y2 == 0;
 }
