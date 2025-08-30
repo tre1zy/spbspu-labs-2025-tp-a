@@ -60,11 +60,8 @@ int main(int argc, char *argv[])
         {
           std::cout << "<INVALID COMMAND>" << '\n';
         }
-        if (!in)
-        {
-          in.clear();
-          in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-        }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
     }
   }
