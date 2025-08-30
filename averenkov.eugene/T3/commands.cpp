@@ -158,6 +158,7 @@ std::ostream& averenkov::operator<<(std::ostream& out, const MaxAreaFinder& find
     throw std::runtime_error("Error");
   }
   auto it = std::max_element(finder.polygons_.begin(), finder.polygons_.end(), AreaComparator());
+  iofmtguard guard(out);
   out << std::fixed << std::setprecision(1) << calculateArea(*it);
   return out;
 }
@@ -180,6 +181,7 @@ std::ostream& averenkov::operator<<(std::ostream& out, const MinAreaFinder& find
     throw std::runtime_error("No polygons for MIN calculation");
   }
   auto it = std::min_element(finder.polygons_.begin(), finder.polygons_.end(), AreaComparator());
+  iofmtguard guard(out);
   out << std::fixed << std::setprecision(1) << calculateArea(*it);
   return out;
 }
