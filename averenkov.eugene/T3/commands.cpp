@@ -217,25 +217,25 @@ std::ostream& averenkov::operator<<(std::ostream& out, const MinVertexCountFinde
   return out;
 }
 
-void averenkov::printMaxArea(const std::vector<Polygon>& polygons, std::ostream& out)
+void averenkov::printMaxArea(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   MaxAreaFinder finder(polygons);
   out << finder;
 }
 
-void averenkov::printMaxVertexCount(const std::vector<Polygon>& polygons, std::ostream& out)
+void averenkov::printMaxVertexCount(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   MaxVertexCountFinder finder(polygons);
   out << finder;
 }
 
-void averenkov::printMinArea(const std::vector<Polygon>& polygons, std::ostream& out)
+void averenkov::printMinArea(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   MinAreaFinder finder(polygons);
   out << finder;
 }
 
-void averenkov::printMinVertexCount(const std::vector<Polygon>& polygons, std::ostream& out)
+void averenkov::printMinVertexCount(const std::vector< Polygon >& polygons, std::ostream& out)
 {
   MinVertexCountFinder finder(polygons);
   out << finder;
@@ -270,7 +270,7 @@ void averenkov::printAreaSum(std::istream& in, const std::vector< Polygon >& pol
 {
   std::string param;
   in >> param;
-  std::map<std::string, std::function<double(const std::vector< Polygon >&)>> commands;
+  std::map< std::string, std::function< double(const std::vector< Polygon >&) > > commands;
   commands["EVEN"] = EvenSumCalculator();
   commands["ODD"] = OddSumCalculator();
   commands["MEAN"] = MeanAreaCalculator();
@@ -317,7 +317,7 @@ void averenkov::printMinValueOf(std::istream& in, const std::vector< Polygon >& 
   std::string param;
   in >> param;
 
-  std::map<std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > commands;
+  std::map< std::string, std::function< void(const std::vector< Polygon >&, std::ostream&) > > commands;
   commands["AREA"] = printMinArea;
   commands["VERTEXES"] = printMinVertexCount;
 

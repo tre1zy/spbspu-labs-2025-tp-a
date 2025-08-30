@@ -27,7 +27,7 @@ std::istream& averenkov::operator>>(std::istream& in, Point& p)
 
 std::istream& averenkov::operator>>(std::istream& in, averenkov::Polygon& poly)
 {
-  std::istream::sentry sentry{ in };
+  std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;

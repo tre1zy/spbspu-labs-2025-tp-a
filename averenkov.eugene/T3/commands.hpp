@@ -37,21 +37,21 @@ namespace averenkov
   {
     double operator()(const std::vector< Polygon >& polygons) const;
   private:
-    double calculateRecursive(const std::vector<Polygon>& polygons, size_t index, double sum) const;
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
   };
 
   struct EvenSumCalculator
   {
     double operator()(const std::vector< Polygon >& polygons) const;
   private:
-    double calculateRecursive(const std::vector<Polygon>& polygons, size_t index, double sum) const;
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
   };
 
   struct OddSumCalculator
   {
     double operator()(const std::vector< Polygon >& polygons) const;
   private:
-    double calculateRecursive(const std::vector<Polygon>& polygons, size_t index, double sum) const;
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
   };
 
   struct IsEven
@@ -69,7 +69,7 @@ namespace averenkov
     size_t num;
     double operator()(const std::vector< Polygon >& polygons) const;
   private:
-    double calculateRecursive(const std::vector<Polygon>& polygons, size_t index, double sum) const;
+    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
  };
 
   struct MeanAreaCalculator
@@ -77,18 +77,18 @@ namespace averenkov
     double operator()(const std::vector< Polygon >& polygons) const;
   };
 
-  void printMaxArea(const std::vector<Polygon>& polygons, std::ostream& out);
+  void printMaxArea(const std::vector< Polygon >& polygons, std::ostream& out);
 
-  void printMaxVertexCount(const std::vector<Polygon>& polygons, std::ostream& out);
+  void printMaxVertexCount(const std::vector< Polygon >& polygons, std::ostream& out);
 
-  void printMinArea(const std::vector<Polygon>& polygons, std::ostream& out);
+  void printMinArea(const std::vector< Polygon >& polygons, std::ostream& out);
 
-  void printMinVertexCount(const std::vector<Polygon>& polygons, std::ostream& out);
+  void printMinVertexCount(const std::vector< Polygon >& polygons, std::ostream& out);
 
   struct MaxAreaFinder
   {
   public:
-    explicit MaxAreaFinder(const std::vector<Polygon>& polygons);
+    explicit MaxAreaFinder(const std::vector< Polygon >& polygons);
     friend std::ostream& operator<<(std::ostream& out, const MaxAreaFinder& finder);
   private:
     const std::vector< Polygon >& polygons_;
