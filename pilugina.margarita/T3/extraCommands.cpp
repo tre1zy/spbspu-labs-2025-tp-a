@@ -31,7 +31,8 @@ int pilugina::echo(std::vector< Polygon > &polygons, const Polygon &target)
 }
 
 pilugina::IntersectsWith::IntersectsWith(const Polygon &polygon):
-  polygon_(polygon){}
+  polygon_(polygon)
+{}
 
 bool pilugina::IntersectsWith::operator()(const Polygon &other) const
 {
@@ -41,7 +42,8 @@ bool pilugina::IntersectsWith::operator()(const Polygon &other) const
 }
 
 pilugina::PermutationPredicate::PermutationPredicate(const Polygon &ref):
-  poly(ref){}
+  poly(ref)
+{}
 
 bool pilugina::PermutationPredicate::operator()(const Polygon &other) const
 {
