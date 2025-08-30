@@ -1,11 +1,12 @@
-#include <iomanip>
-
 #include "commands.hpp"
-#include "functors.hpp"
 
+#include <iomanip>
+#include "functors.hpp"
 
 void filonova::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  filonova::FormatGuard guard(out);
+
   std::string subcmd;
   in >> subcmd;
 
@@ -55,6 +56,8 @@ void filonova::area(std::istream &in, std::ostream &out, const std::vector< Poly
 
 void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  filonova::FormatGuard guard(out);
+
   std::string subcmd;
   in >> subcmd;
 
@@ -84,6 +87,8 @@ void filonova::max(std::istream &in, std::ostream &out, const std::vector< Polyg
 
 void filonova::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
+  filonova::FormatGuard guard(out);
+
   std::string subcmd;
   in >> subcmd;
 

@@ -1,3 +1,5 @@
+#include "commands.hpp"
+
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -7,8 +9,6 @@
 #include <limits>
 #include <map>
 #include <vector>
-
-#include "commands.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -31,8 +31,11 @@ int main(int argc, char *argv[])
     while (!in.eof())
     {
       std::copy(input_it_t{in}, input_it_t{}, std::back_inserter(polygons));
-      in.clear();
-      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      if (!in)
+      {
+        in.clear();
+        in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
 
     std::map< std::string, std::function< void(std::istream &, std::ostream &) > > cmds;
@@ -57,8 +60,11 @@ int main(int argc, char *argv[])
         {
           std::cout << "<INVALID COMMAND>" << '\n';
         }
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        if (!in)
+        {
+          in.clear();
+          in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        }
       }
     }
   }
