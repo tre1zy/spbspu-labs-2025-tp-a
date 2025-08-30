@@ -71,14 +71,6 @@ namespace
     }
   };
 
-  struct PolygonToAreaTransformer
-  {
-    double operator()(const kushekbaev::Polygon& polygon) const
-    {
-      return getArea(polygon);
-    }
-  };
-
   struct PredicateForEvenPolygons
   {
     bool operator()(const kushekbaev::Polygon& polygon) const
@@ -112,6 +104,14 @@ namespace
     double total = std::accumulate(partial_areas.begin(), partial_areas.end(), 0.0);
     return std::abs(total) / 2.0;
   }
+
+  struct PolygonToAreaTransformer
+  {
+    double operator()(const kushekbaev::Polygon& polygon) const
+    {
+      return getArea(polygon);
+    }
+  };
 
   bool hasRightAngle(const kushekbaev::Polygon& polygon)
   {
