@@ -33,22 +33,26 @@ namespace averenkov
     bool operator()(const Polygon& a, const Polygon& b) const;
   };
 
-  struct AreaSumCalculator
+  struct AreaCalculatorBase
   {
-    double operator()(double sum, const Polygon& poly) const;
+    virtual ~AreaCalculatorBase() = default;
     double operator()(const std::vector< Polygon >& polygons) const;
+    virtual double operator()(double sum, const Polygon& poly) const;
   };
 
-  struct EvenSumCalculator
+  struct AreaSumCalculator : AreaCalculatorBase
   {
     double operator()(double sum, const Polygon& poly) const;
-    double operator()(const std::vector< Polygon >& polygons) const;
   };
 
-  struct OddSumCalculator
+  struct EvenSumCalculator : AreaCalculatorBase
   {
     double operator()(double sum, const Polygon& poly) const;
-    double operator()(const std::vector< Polygon >& polygons) const;
+  };
+
+  struct OddSumCalculator : AreaCalculatorBase
+  {
+    double operator()(double sum, const Polygon& poly) const;
   };
 
   struct IsEven
@@ -65,7 +69,6 @@ namespace averenkov
   {
     size_t num;
     double operator()(double sum, const Polygon& poly) const;
-    double operator()(const std::vector< Polygon >& polygons) const;
  };
 
   struct MeanAreaCalculator
