@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include "functors.hpp"
+#include "format_guard.hpp"
 
 void filonova::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
