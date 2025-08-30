@@ -10,6 +10,18 @@
 #include <Delimiter.h>
 #include "Subcommands.h"
 
+namespace {
+  int tryConvertToInt(const std::string &value)
+  {
+    if (!std::all_of(value.cbegin(), value.cend(), voronina::isDigitBool))
+    {
+      throw std::invalid_argument("ERROR: Wrong argument");
+    }
+
+    return std::stoi(value);
+  }
+}
+
 void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
   iofmtguard ifmtguard(in);
@@ -31,15 +43,9 @@ void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std:
   {
     subcmds.at(parametr)();
   }
-  catch(...)
+  catch (...)
   {
-    if (!std::all_of(parametr.cbegin(), parametr.cend(), isDigitBool))
-    {
-      throw std::invalid_argument("ERROR: Wrong argument");
-    }
-
-    int vertexes = std::stoi(parametr);
-
+    int vertexes = tryConvertToInt(parametr);
     voronina::getVertexes(shapes, out, vertexes);
   }
 }
@@ -109,15 +115,9 @@ void voronina::count(const std::vector< Polygon > &shapes, std::istream &in, std
   {
     subcmds.at(parametr)();
   }
-  catch(...)
+  catch (...)
   {
-    if (!std::all_of(parametr.cbegin(), parametr.cend(), isDigitBool))
-    {
-      throw std::invalid_argument("ERROR: Wrong argument");
-    }
-
-    int vertexes = std::stoi(parametr);
-
+    int vertexes = tryConvertToInt(parametr);
     voronina::getVertexesCount(shapes, out, vertexes);
   }
 }

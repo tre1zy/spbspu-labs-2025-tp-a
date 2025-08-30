@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <limits>
 
 #include "Shapes.h"
 #include "Commands.h"

@@ -51,8 +51,8 @@ std::istream &voronina::operator>>(std::istream &in, Polygon &polygon)
   std::copy_n(std::istream_iterator< Point >(in), vertexes, points.begin());
   if (!in)
   {
-      in.setstate(std::ios::failbit);
-      return in;
+    in.setstate(std::ios::failbit);
+    return in;
   }
   polygon.points = points;
   return in;

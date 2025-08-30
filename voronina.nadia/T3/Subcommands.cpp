@@ -21,24 +21,6 @@ double voronina::getAreaOfTriangle(const Point &p1, const Point &p2, const Point
   return 0.5 * std::abs((p1.x - p3.x) * (p2.y - p1.y) - (p1.x - p2.x) * (p3.y - p1.y));
 }
 
-double voronina::getAreaForEvenPolygons(double areaSum, const Polygon &shape)
-{
-  if (shape.points.size() % 2 == 0)
-  {
-    return areaSum + getAreaOfPolygon(shape);
-  }
-  return areaSum;
-}
-
-double voronina::getAreaForOddPolygons(double areaSum, const Polygon &shape)
-{
-  if (shape.points.size() % 2 != 0)
-  {
-    return areaSum + getAreaOfPolygon(shape);
-  }
-  return areaSum;
-}
-
 double voronina::getSumArea(double areaSum, const Polygon &shape)
 {
   return areaSum + getAreaOfPolygon(shape);
@@ -47,15 +29,6 @@ double voronina::getSumArea(double areaSum, const Polygon &shape)
 bool voronina::isDigitBool(char c)
 {
   return static_cast< bool >(isdigit(c));
-}
-
-double voronina::getAreaOfGivenAmountOfVertexes(double areaSum, const Polygon &shape, int vertexes)
-{
-  if (shape.points.size() == static_cast< size_t >(vertexes))
-  {
-    return areaSum + getAreaOfPolygon(shape);
-  }
-  return areaSum;
 }
 
 int voronina::isEqual(const Polygon &left, const Polygon &right)
@@ -109,18 +82,16 @@ bool voronina::isThereRightAngleInPolygon(const Polygon &shape)
   std::transform(shapePBegin + 1, shape.points.cend(), shapePBegin, sides.begin(), getSide);
   sides[shape.points.size() - 1] = getSide(shape.points[0], shape.points[shape.points.size() - 1]);
 
-  std::vector< bool > hasRightAngleVector(shape.points.size());
-  std::transform(sides.cbegin() + 1, sides.cend(), sides.cbegin(), hasRightAngleVector.begin(), isRightAngle);
+  if (std::adjacent_find(sides.begin(), sides.end(), isRightAngle) != sides.end()) {
+    return true;
+  }
 
-  hasRightAngleVector[sides.size() - 1] = isRightAngle(sides[0], sides[sides.size() - 1]);
-  return std::any_of(hasRightAngleVector.cbegin(), hasRightAngleVector.cend(), isTrue);
+  return isRightAngle(sides.back(), sides.front());
 }
-
 voronina::Point voronina::getSide(const Point &p1, const Point &p2)
 {
   Point newSide;
-  newSide.x = p1.x - p2.x;
-  newSide.y = p1.y - p2.y;
+  newSide = { p1.x - p2.x, p1.y - p2.y };
   return newSide;
 }
 
@@ -129,24 +100,31 @@ bool voronina::isTrue(bool element)
   return element != 0;
 }
 
-
 void voronina::getEven(const std::vector< Polygon > &shapes, std::ostream &out)
 {
-  out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, getAreaForEvenPolygons);
+  std::vector< Polygon > evenPolygons;
+  std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(evenPolygons), isEven);
+  std::vector< double > areas;
+  std::transform(evenPolygons.cbegin(), evenPolygons.cend(), std::back_inserter(areas), getAreaOfPolygon);
+  out << std::accumulate(areas.cbegin(), areas.cend(), 0.0);
 }
 
 void voronina::getOdd(const std::vector< Polygon > &shapes, std::ostream &out)
 {
-  out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, getAreaForOddPolygons);
+  std::vector< Polygon > oddPolygons;
+  std::copy_if(shapes.begin(), shapes.end(), std::back_inserter(oddPolygons), isOdd);
+  std::vector< double > areas;
+  std::transform(oddPolygons.cbegin(), oddPolygons.cend(), std::back_inserter(areas), getAreaOfPolygon);
+  out << std::accumulate(areas.cbegin(), areas.cend(), 0.0);
 }
 
 void voronina::getMean(const std::vector< Polygon > &shapes, std::ostream &out)
 {
   if (shapes.size() == 0)
-    {
-      throw std::invalid_argument("ERROR: No shapes");
-    }
-    out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, getSumArea) / shapes.size();
+  {
+    throw std::invalid_argument("ERROR: No shapes");
+  }
+  out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, getSumArea) / shapes.size();
 }
 
 void voronina::getVertexes(const std::vector< Polygon > &shapes, std::ostream &out, int vertexes)
@@ -154,15 +132,18 @@ void voronina::getVertexes(const std::vector< Polygon > &shapes, std::ostream &o
   const int MIN_AMOUNT_OF_VERTEXES = 3;
   if (vertexes >= MIN_AMOUNT_OF_VERTEXES)
   {
-    auto bindForGetArea = std::bind(getAreaOfGivenAmountOfVertexes, _1, _2, vertexes);
-    out << std::accumulate(shapes.cbegin(), shapes.cend(), 0.0, bindForGetArea);
+    using namespace std::placeholders;
+    std::vector< Polygon > filtered;
+    std::copy_if(shapes.cbegin(), shapes.cend(), std::back_inserter(filtered), std::bind(hasGivenAmountOfVertexes, _1, vertexes));
+    std::vector< double > areas;
+    std::transform(filtered.cbegin(), filtered.cend(), std::back_inserter(areas), getAreaOfPolygon);
+    out << std::accumulate(areas.cbegin(), areas.cend(), 0.0);
   }
   else
   {
     throw std::invalid_argument("ERROR: Invalid amount of vertexes");
   }
 }
-
 
 void voronina::getAreaMax(const std::vector< Polygon > &shapes, std::ostream &out)
 {
@@ -188,7 +169,6 @@ void voronina::getVertexesMin(const std::vector< Polygon > &shapes, std::ostream
   out << (*std::min_element(shapes.cbegin(), shapes.cend(), vertexesComporator)).points.size();
 }
 
-
 void voronina::getEvenCount(const std::vector< Polygon > &shapes, std::ostream &out)
 {
   out << std::count_if(shapes.cbegin(), shapes.cend(), isEven);
@@ -203,11 +183,11 @@ void voronina::getVertexesCount(const std::vector< Polygon > &shapes, std::ostre
 {
   const int MIN_AMOUNT_OF_VERTEXES = 3;
   if (vertexes >= MIN_AMOUNT_OF_VERTEXES)
-    {
-      out << std::count_if(shapes.cbegin(), shapes.cend(), std::bind(hasGivenAmountOfVertexes, _1, vertexes));
-    }
-    else
-    {
-      throw std::invalid_argument("ERROR: Invalid amount of vertexes");
-    }
+  {
+    out << std::count_if(shapes.cbegin(), shapes.cend(), std::bind(hasGivenAmountOfVertexes, _1, vertexes));
+  }
+  else
+  {
+    throw std::invalid_argument("ERROR: Invalid amount of vertexes");
+  }
 }

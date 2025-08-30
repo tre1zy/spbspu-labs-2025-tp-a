@@ -13,8 +13,6 @@ namespace voronina
   using namespace std::placeholders;
   double getAreaOfPolygon(const Polygon& shape);
   double getAreaOfTriangle(const Point& p1, const Point& p2, const Point& p3);
-  double getAreaForEvenPolygons(double areaSum, const Polygon& shape);
-  double getAreaForOddPolygons(double areaSum, const Polygon& shape);
   double getSumArea(double areaSum, const Polygon& shape);
   bool isDigitBool(char c);
   double getAreaOfGivenAmountOfVertexes(double areaSum, const Polygon& shape, int vertexes);
