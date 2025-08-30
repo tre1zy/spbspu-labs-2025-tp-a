@@ -51,39 +51,6 @@ namespace
     }
   };
 
-  double getArea(const kushekbaev::Polygon& polygon);
-  struct PolygonAreaAccumulator
-  {
-    double operator()(double sum, const kushekbaev::Polygon& polygon)
-    {
-      return sum + getArea(polygon);
-    }
-  };
-
-  struct PredicatePolygonAreaAccumulator
-  {
-    PredicatePolygonAreaAccumulator(bool (*pred)(const kushekbaev::Polygon&)):
-      predicate(pred)
-    {}
-    bool (*predicate)(const kushekbaev::Polygon&);
-    double operator()(double sum, const kushekbaev::Polygon& polygon)
-    {
-      return predicate(polygon) ? sum + getArea(polygon) : sum;
-    }
-  };
-
-  struct AreaNumAccumulator
-  {
-    AreaNumAccumulator(size_t num):
-      num_of_vertices(num)
-    {}
-    size_t num_of_vertices;
-    double operator()(double sum, const kushekbaev::Polygon& polygon)
-    {
-      return (polygon.points.size() == num_of_vertices) ? sum + getArea(polygon) : sum;
-    }
-  };
-
   struct RightAngleChecker
   {
     RightAngleChecker(const kushekbaev::Polygon& polygon):
@@ -101,6 +68,30 @@ namespace
       double cbx = c.x - b.x;
       double cby = c.y - b.y;
       return (abx * cbx + aby * cby) == 0;
+    }
+  };
+
+  struct PolygonToAreaTransformer
+  {
+    double operator()(const kushekbaev::Polygon& polygon) const
+    {
+      return getArea(polygon);
+    }
+  };
+
+  struct PredicateForEvenPolygons
+  {
+    bool operator()(const kushekbaev::Polygon& polygon) const
+    {
+      return polygon.points.size() % 2 == 0;
+    }
+  };
+
+  struct PredicateForOddPolygons
+  {
+    bool operator()(const kushekbaev::Polygon& polygon) const
+    {
+      return polygon.points.size() % 2 != 0;
     }
   };
 
@@ -155,7 +146,10 @@ namespace
 
   double totalArea(const std::vector< kushekbaev::Polygon >& polygons)
   {
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, PolygonAreaAccumulator());
+    std::vector< double > areas;
+    areas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), PolygonToAreaTransformer());
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
   double countWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, PredicateForVertices predicate)
@@ -168,9 +162,7 @@ namespace
   {
     std::vector< kushekbaev::Polygon > predicated;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(predicated), predicate);
-    std::vector< double > areas;
-    std::transform(predicated.begin(), predicated.end(), std::back_inserter(areas), getArea);
-    return std::accumulate(areas.begin(), areas.end(), 0);
+    return totalArea(predicated);
   }
 
   bool compareArea(const kushekbaev::Polygon& polygon1, const kushekbaev::Polygon& polygon2)
@@ -185,12 +177,16 @@ namespace
 
   double areaEven(const std::vector< kushekbaev::Polygon >& polygons)
   {
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, PredicatePolygonAreaAccumulator(isEven));
+    std::vector< kushekbaev::Polygon > evenPolygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(evenPolygons), PredicateForEvenPolygons());
+    return totalArea(evenPolygons);
   }
 
   double areaOdd(const std::vector< kushekbaev::Polygon >& polygons)
   {
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, PredicatePolygonAreaAccumulator(isOdd));
+    std::vector< kushekbaev::Polygon > oddPolygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(oddPolygons), PredicateForOddPolygons());
+    return totalArea(oddPolygons);
   }
 
   double areaMean(const std::vector< kushekbaev::Polygon >& polygons)
@@ -204,7 +200,9 @@ namespace
 
   double areaNum(const std::vector< kushekbaev::Polygon >& polygons, size_t num_of_vertices)
   {
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaNumAccumulator(num_of_vertices));
+    std::vector< kushekbaev::Polygon > filteredPolygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), PredicateForVertices{num_of_vertices});
+    return totalArea(filteredPolygons);
   }
 
   void maxArea(const std::vector< kushekbaev::Polygon >& polygons, std::ostream& out)
