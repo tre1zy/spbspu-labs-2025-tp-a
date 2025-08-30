@@ -39,7 +39,7 @@ namespace
   voronina::Point getSide(const voronina::Point &p1, const voronina::Point &p2);
 
   TriangleGenerator::TriangleGenerator(const std::vector< voronina::Point > &pts):
-    points(pts), 
+    points(pts),
     i(1)
   {}
 
@@ -52,7 +52,7 @@ namespace
   }
 
   SideTriangleGenerator::SideTriangleGenerator(const std::vector< voronina::Point > &pts):
-    points(pts), 
+    points(pts),
     i(1)
   {}
 
