@@ -10,7 +10,6 @@ namespace pilugina
   std::size_t getCountOdd(const std::vector< Polygon > &);
   std::size_t getCountEven(const std::vector< Polygon > &);
   std::size_t getCountVertices(const std::vector< Polygon > &);
-
   std::size_t getCount(const std::vector< Polygon > &, std::istream &);
 }
 

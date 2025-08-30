@@ -6,7 +6,7 @@
 
 namespace pilugina
 {
-  std::size_t echo(std::vector< Polygon > &, const Polygon &);
+  int echo(std::vector< Polygon > &, const Polygon &);
 
   struct EchoTransform
   {

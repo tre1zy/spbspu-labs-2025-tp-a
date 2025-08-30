@@ -1,6 +1,5 @@
 #include "maxCommands.hpp"
 #include <algorithm>
-#include <format_guard.hpp>
 #include <functional>
 #include <map>
 #include <numeric>

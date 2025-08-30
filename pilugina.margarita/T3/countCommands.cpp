@@ -18,8 +18,7 @@ std::size_t pilugina::getCount(const std::vector< Polygon > &polys, std::istream
 {
   std::map< std::string, std::function< std::size_t() > > subcommands
   {
-    {"EVEN", std::bind(getCountEven, std::cref(polys))},
-    {"ODD", std::bind(getCountOdd, std::cref(polys))}
+    {"EVEN", std::bind(getCountEven, std::cref(polys))}, {"ODD", std::bind(getCountOdd, std::cref(polys))}
   };
 
   std::string subcommand;

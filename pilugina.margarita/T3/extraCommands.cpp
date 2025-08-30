@@ -1,5 +1,6 @@
 #include "extraCommands.hpp"
 #include <algorithm>
+#include <functional>
 
 int pilugina::EchoTransform::operator()(const Polygon &p) const
 {
@@ -15,21 +16,22 @@ int pilugina::EchoTransform::operator()(const Polygon &p) const
   return 0;
 }
 
-std::size_t pilugina::echo(std::vector< Polygon > &polys, const Polygon &poly)
+int pilugina::echo(std::vector< Polygon > &polygons, const Polygon &target)
 {
-  std::size_t count = std::count(polys.begin(), polys.end(), poly);
-
+  using namespace std::placeholders;
+  int count = std::count(polygons.begin(), polygons.end(), target);
   std::vector< Polygon > result;
-  result.reserve(polys.size() + count);
-  std::for_each(polys.begin(), polys.end(), EchoTransform{poly, result});
-  polys = std::move(result);
+  result.reserve(polygons.size() + count);
+  std::copy(polygons.begin(), polygons.end(), std::back_inserter(result));
+  auto polygonEqT = std::bind(std::equal_to< Polygon >(), std::placeholders::_1, target);
+  std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(result), polygonEqT);
+
+  polygons.swap(result);
   return count;
 }
 
 pilugina::IntersectsWith::IntersectsWith(const Polygon &polygon):
-  polygon_(polygon)
-{
-}
+  polygon_(polygon){}
 
 bool pilugina::IntersectsWith::operator()(const Polygon &other) const
 {
@@ -39,9 +41,7 @@ bool pilugina::IntersectsWith::operator()(const Polygon &other) const
 }
 
 pilugina::PermutationPredicate::PermutationPredicate(const Polygon &ref):
-  poly(ref)
-{
-}
+  poly(ref){}
 
 bool pilugina::PermutationPredicate::operator()(const Polygon &other) const
 {
