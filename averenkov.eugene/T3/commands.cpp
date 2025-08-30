@@ -76,76 +76,54 @@ double averenkov::calculateArea(const Polygon& poly)
 
 double averenkov::AreaSumCalculator::operator()(const std::vector< Polygon >& plgs) const
 {
-  return calculateRecursive(plgs, 0, 0.0);
+  return std::accumulate(plgs.begin(), plgs.end(), 0.0, (*this));
 }
 
-double averenkov::AreaSumCalculator::calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+double averenkov::AreaSumCalculator::operator()(double sum, const Polygon& poly) const
 {
-  if (index >= polygons.size())
+  return sum + calculateArea(poly);
+}
+
+double averenkov::EvenSumCalculator::operator()(double sum, const Polygon& poly) const
+{
+  if (poly.points.size() % 2 == 0)
   {
-    return sum;
+    return sum + calculateArea(poly);
   }
-  return calculateRecursive(polygons, index + 1, sum + calculateArea(polygons[index]));
+  return sum;
 }
 
 double averenkov::EvenSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
-  return calculateRecursive(polygons, 0, 0.0);
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, (*this));
 }
 
-double averenkov::EvenSumCalculator::calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+double averenkov::OddSumCalculator::operator()(double sum, const Polygon& poly) const
 {
-  if (index >= polygons.size())
+  if (poly.points.size() % 2 != 0)
   {
-    return sum;
+    sum += calculateArea(poly);
   }
-  const Polygon& poly = polygons[index];
-  double currentSum = sum;
-  if (poly.points.size() % 2 == 0)
-  {
-    currentSum += calculateArea(poly);
-  }
-  return calculateRecursive(polygons, index + 1, currentSum);
+  return sum;
 }
 
 double averenkov::OddSumCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
-  return calculateRecursive(polygons, 0, 0.0);
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, (*this));
 }
 
-double averenkov::OddSumCalculator::calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
+double averenkov::NumVertexCalculator::operator()(double sum, const Polygon& poly) const
 {
-  if (index >= polygons.size())
+  if (poly.points.size() == num)
   {
-    return sum;
+    return sum + calculateArea(poly);
   }
-  const Polygon& poly = polygons[index];
-  double currentSum = sum;
-  if (poly.points.size() % 2 != 0)
-  {
-    currentSum += calculateArea(poly);
-  }
-  return calculateRecursive(polygons, index + 1, currentSum);
+  return sum;
 }
 
 double averenkov::NumVertexCalculator::operator()(const std::vector< Polygon >& polygons) const
 {
-  return calculateRecursive(polygons, 0, 0.0);
-}
-
-double averenkov::NumVertexCalculator::calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const
-{
-  if (index >= polygons.size())
-  {
-    return sum;
-  }
-  const Polygon& poly = polygons[index];
-  double currentSum = sum;
-  if (poly.points.size() == num)
-  {
-    currentSum += calculateArea(poly);
-  }
-  return calculateRecursive(polygons, index + 1, currentSum);
+  return std::accumulate(polygons.begin(), polygons.end(), 0.0, (*this));
 }
 
 double averenkov::MeanAreaCalculator::operator()(const std::vector< Polygon >& polygons) const

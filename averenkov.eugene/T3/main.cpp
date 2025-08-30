@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::map<std::string, std::function<void()>> cmds;
+  std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(averenkov::printAreaSum, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
   cmds["MAX"] = std::bind(averenkov::printMaxValueOf, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));
   cmds["MIN"] = std::bind(averenkov::printMinValueOf, std::ref(std::cin), std::cref(polygons), std::ref(std::cout));

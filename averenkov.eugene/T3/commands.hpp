@@ -35,23 +35,20 @@ namespace averenkov
 
   struct AreaSumCalculator
   {
+    double operator()(double sum, const Polygon& poly) const;
     double operator()(const std::vector< Polygon >& polygons) const;
-  private:
-    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
   };
 
   struct EvenSumCalculator
   {
+    double operator()(double sum, const Polygon& poly) const;
     double operator()(const std::vector< Polygon >& polygons) const;
-  private:
-    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
   };
 
   struct OddSumCalculator
   {
+    double operator()(double sum, const Polygon& poly) const;
     double operator()(const std::vector< Polygon >& polygons) const;
-  private:
-    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
   };
 
   struct IsEven
@@ -67,9 +64,8 @@ namespace averenkov
   struct NumVertexCalculator
   {
     size_t num;
+    double operator()(double sum, const Polygon& poly) const;
     double operator()(const std::vector< Polygon >& polygons) const;
-  private:
-    double calculateRecursive(const std::vector< Polygon >& polygons, size_t index, double sum) const;
  };
 
   struct MeanAreaCalculator
