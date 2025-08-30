@@ -10,18 +10,6 @@
 #include <Delimiter.h>
 #include "Subcommands.h"
 
-namespace {
-  int tryConvertToInt(const std::string &value)
-  {
-    if (!std::all_of(value.cbegin(), value.cend(), voronina::isDigitBool))
-    {
-      throw std::invalid_argument("ERROR: Wrong argument");
-    }
-
-    return std::stoi(value);
-  }
-}
-
 void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
 {
   iofmtguard ifmtguard(in);
@@ -30,9 +18,9 @@ void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std:
   in >> DelimiterIO{' '};
 
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["EVEN"] = std::bind(voronina::getEven, std::cref(shapes), std::ref(out));
-  subcmds["ODD"] = std::bind(voronina::getOdd, std::cref(shapes), std::ref(out));
-  subcmds["MEAN"] = std::bind(voronina::getMean, std::cref(shapes), std::ref(out));
+  subcmds["EVEN"] = std::bind(getEven, std::cref(shapes), std::ref(out));
+  subcmds["ODD"] = std::bind(getOdd, std::cref(shapes), std::ref(out));
+  subcmds["MEAN"] = std::bind(getMean, std::cref(shapes), std::ref(out));
 
   std::string parametr = "";
   in >> parametr;
@@ -42,12 +30,12 @@ void voronina::area(const std::vector< Polygon > &shapes, std::istream &in, std:
   try
   {
     subcmds.at(parametr)();
+    return;
   }
   catch (...)
-  {
-    int vertexes = tryConvertToInt(parametr);
-    voronina::getVertexes(shapes, out, vertexes);
-  }
+  {}
+  int vertexes = std::stoi(parametr);
+  getVertexes(shapes, out, vertexes);
 }
 
 void voronina::max(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
@@ -63,8 +51,8 @@ void voronina::max(const std::vector< Polygon > &shapes, std::istream &in, std::
   in >> DelimiterIO{' '};
 
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(voronina::getAreaMax, std::cref(shapes), std::ref(out));
-  subcmds["VERTEXES"] = std::bind(voronina::getVertexesMax, std::cref(shapes), std::ref(out));
+  subcmds["AREA"] = std::bind(getAreaMax, std::cref(shapes), std::ref(out));
+  subcmds["VERTEXES"] = std::bind(getVertexesMax, std::cref(shapes), std::ref(out));
 
   std::string parametr = "";
   in >> parametr;
@@ -85,8 +73,8 @@ void voronina::min(const std::vector< Polygon > &shapes, std::istream &in, std::
   in >> DelimiterIO{' '};
 
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(voronina::getAreaMin, std::cref(shapes), std::ref(out));
-  subcmds["VERTEXES"] = std::bind(voronina::getVertexesMin, std::cref(shapes), std::ref(out));
+  subcmds["AREA"] = std::bind(getAreaMin, std::cref(shapes), std::ref(out));
+  subcmds["VERTEXES"] = std::bind(getVertexesMin, std::cref(shapes), std::ref(out));
 
   std::string parametr = "";
   in >> parametr;
@@ -103,8 +91,8 @@ void voronina::count(const std::vector< Polygon > &shapes, std::istream &in, std
   in >> DelimiterIO{' '};
 
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["EVEN"] = std::bind(voronina::getEvenCount, std::cref(shapes), std::ref(out));
-  subcmds["ODD"] = std::bind(voronina::getOddCount, std::cref(shapes), std::ref(out));
+  subcmds["EVEN"] = std::bind(getEvenCount, std::cref(shapes), std::ref(out));
+  subcmds["ODD"] = std::bind(getOddCount, std::cref(shapes), std::ref(out));
 
   std::string parametr = "";
   in >> parametr;
@@ -114,12 +102,12 @@ void voronina::count(const std::vector< Polygon > &shapes, std::istream &in, std
   try
   {
     subcmds.at(parametr)();
+    return;
   }
   catch (...)
-  {
-    int vertexes = tryConvertToInt(parametr);
-    voronina::getVertexesCount(shapes, out, vertexes);
-  }
+  {}
+  int vertexes = std::stoi(parametr);
+  getVertexesCount(shapes, out, vertexes);
 }
 
 void voronina::maxseq(const std::vector< Polygon > &shapes, std::istream &in, std::ostream &out)
@@ -138,9 +126,9 @@ void voronina::maxseq(const std::vector< Polygon > &shapes, std::istream &in, st
 
   std::vector< int > supVector(shapes.size());
   std::vector< int >::iterator subVecBegin = supVector.begin();
-  std::transform(shapes.cbegin(), shapes.cend(), subVecBegin, std::bind(isEqual, _1, std::cref(polygon)));
+  std::transform(shapes.cbegin(), shapes.cend(), subVecBegin, std::bind(std::equal_to< Polygon >{}, _1, std::cref(polygon)));
 
-  std::transform(subVecBegin + 1, supVector.end(), subVecBegin, subVecBegin + 1, getMaxSeq);
+  std::transform(subVecBegin + 1, supVector.end(), subVecBegin, subVecBegin + 1, maxSeqFolder);
   out << *std::max_element(supVector.cbegin(), supVector.cend());
 }
 

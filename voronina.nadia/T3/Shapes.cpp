@@ -63,6 +63,11 @@ bool voronina::Point::operator==(const Point &point) const
   return (x == point.x && y == point.y);
 }
 
+voronina::Point voronina::operator-(const Point &left, const Point &right)
+{
+  return Point {left.x - right.x, left.y - right.y};
+}
+
 bool voronina::Polygon::operator==(const Polygon &polygon) const
 {
   return (points == polygon.points);

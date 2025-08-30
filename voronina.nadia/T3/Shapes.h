@@ -12,6 +12,7 @@ namespace voronina
     bool operator==(const Point& point) const;
   };
 
+  Point operator-(const Point &left, const Point &right);
   std::istream& operator>>(std::istream& in, Point& point);
 
   struct Polygon
