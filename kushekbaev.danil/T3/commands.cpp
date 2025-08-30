@@ -281,7 +281,7 @@ void kushekbaev::area(std::istream& in, std::ostream& out, const std::vector< Po
     size_t num_of_vertices = std::stoull(subcommand);
     if (num_of_vertices < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
     {
-      throw std::logic_error("Too few vertices!");
+      throw;
     }
     result = areaNum(polygons, num_of_vertices);
   }
@@ -302,7 +302,7 @@ void kushekbaev::max(std::istream& in, std::ostream& out, const std::vector< Pol
   }
   catch (...)
   {
-    throw std::out_of_range("<UNKNOWN COMMAND>");
+    throw;
   }
 }
 
@@ -319,7 +319,7 @@ void kushekbaev::min(std::istream& in, std::ostream& out, const std::vector< Pol
   }
   catch (...)
   {
-    throw std::out_of_range("<UNKNOWN COMMAND>");
+    throw;
   }
 }
 
@@ -339,7 +339,7 @@ void kushekbaev::count(std::istream& in, std::ostream& out, const std::vector< P
     size_t num_of_vertices = std::stoull(subcommand);
     if (num_of_vertices < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
     {
-      throw std::logic_error("Too few vertices!");
+      throw;
     }
     countNum(polygons, out, num_of_vertices);
   }
