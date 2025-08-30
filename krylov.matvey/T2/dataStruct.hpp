@@ -1,6 +1,7 @@
 #ifndef DATASTRUCT_HPP
 #define DATASTRUCT_HPP
 #include <string>
+#include <delimeterIO.hpp>
 
 namespace krylov
 {
@@ -14,12 +15,6 @@ namespace krylov
   std::ostream& operator<<(std::ostream& out, const DataStruct& data);
   std::istream& operator>>(std::istream& in, DataStruct& data);
   bool operator<(const DataStruct& lhs, const DataStruct& rhs);
-
-  struct DelimiterIO
-  {
-    char delim;
-  };
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 
   struct UllHexIO
   {
