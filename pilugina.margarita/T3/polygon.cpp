@@ -10,8 +10,8 @@ std::istream &pilugina::operator>>(std::istream &in, Point &dest)
   {
     return in;
   }
-  Point temp {0, 0};
-  in >> DelimiterIO {'('} >> temp.x >> DelimiterIO {';'} >> temp.y >> DelimiterIO {')'};
+  Point temp{0, 0};
+  in >> DelimiterIO{'('} >> temp.x >> DelimiterIO{';'} >> temp.y >> DelimiterIO{')'};
   if (in)
   {
     dest = temp;
@@ -34,10 +34,10 @@ std::istream &pilugina::operator>>(std::istream &in, Polygon &dest)
     return in;
   }
   dest.points.clear();
-  std::copy_n(std::istream_iterator< Point > {in}, vertex_num - 1, std::back_inserter(dest.points));
+  std::copy_n(std::istream_iterator< Point >{in}, vertex_num - 1, std::back_inserter(dest.points));
   if (in.peek() != '\n')
   {
-    std::copy_n(std::istream_iterator< Point > {in}, 1, std::back_inserter(dest.points));
+    std::copy_n(std::istream_iterator< Point >{in}, 1, std::back_inserter(dest.points));
   }
   if (!in || dest.points.size() != vertex_num || in.peek() != '\n')
   {

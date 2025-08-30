@@ -4,11 +4,9 @@
 #include <iomanip>
 #include "areaCommands.hpp"
 #include "countCommands.hpp"
-#include "echo.hpp"
 #include "maxCommands.hpp"
 #include "minCommands.hpp"
-#include "intersects.hpp"
-#include "permutations.hpp"
+#include "extraCommands.hpp"
 
 void pilugina::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
 {

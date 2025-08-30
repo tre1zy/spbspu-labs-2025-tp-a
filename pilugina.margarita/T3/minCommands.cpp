@@ -1,30 +1,23 @@
 #include "minCommands.hpp"
+#include <algorithm>
 #include <format_guard.hpp>
 #include <functional>
 #include <map>
 #include <numeric>
 #include <iomanip>
-#include "polygonUtils.hpp"
-
-double pilugina::updateMinArea(double currentMin, const Polygon &poly)
-{
-  return std::min(currentMin, getPolygonArea(poly));
-}
-
-double pilugina::updateMinVertices(std::size_t currentMin, const Polygon &poly)
-{
-  return std::min(currentMin, poly.points.size());
-}
+#include "areaCommands.hpp"
 
 void pilugina::printMinArea(const std::vector< Polygon > &polys, std::ostream &out)
 {
-  FormatGuard g(out);
-  out << std::setprecision(1) << std::accumulate(polys.cbegin(), polys.cend(), 0.0, updateMinArea);
+  std::vector< double > areas(polys.size());
+  std::transform(polys.cbegin(), polys.cend(), areas.begin(), getPolygonArea);
+  out << std::fixed << std::setprecision(1) << *std::min_element(areas.cbegin(), areas.cend());
 }
 
 void pilugina::printMinVertices(const std::vector< Polygon > &polys, std::ostream &out)
 {
-  out << std::accumulate(polys.cbegin(), polys.cend(), 0ull, updateMinVertices);
+  auto it = std::min_element(polys.begin(), polys.end());
+  out << it->points.size();
 }
 
 void pilugina::printMin(const std::vector< Polygon > &polys, std::istream &in, std::ostream &out)
@@ -34,12 +27,13 @@ void pilugina::printMin(const std::vector< Polygon > &polys, std::istream &in, s
     throw std::invalid_argument("<INVALID COMMAND>");
   }
 
-  using std::placeholders::_1;
-  std::map< std::string, std::function< void(std::ostream &) > > subcommands{
-      {"AREA", std::bind(printMinArea, std::cref(polys), _1)},
-      {"VERTEXES", std::bind(printMinVertices, std::cref(polys), _1)}};
+  std::map< std::string, std::function< void() > > subcommands
+  {
+    {"AREA", std::bind(printMinArea, std::cref(polys), std::ref(out))},
+    {"VERTEXES", std::bind(printMinVertices, std::cref(polys), std::ref(out))}
+  };
 
   std::string subcommand;
   in >> subcommand;
-  subcommands.at(subcommand)(out);
+  subcommands.at(subcommand)();
 }

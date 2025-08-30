@@ -12,7 +12,7 @@
 int main(int argc, char **argv)
 {
   using pilugina::Polygon;
-  using is_it_poly = std::istream_iterator<Polygon>;
+  using is_it_poly = std::istream_iterator< Polygon >;
   if (argc != 2)
   {
     std::cerr << "<INVALID PARAMETERS NUMBER>\n";
@@ -41,13 +41,13 @@ int main(int argc, char **argv)
   using namespace std::placeholders;
   std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands
   {
-      {"AREA", std::bind(pilugina::areaCommand, _1, _2, std::cref(polygons))},
-      {"MAX", std::bind(pilugina::maxCommand, _1, _2, std::cref(polygons))},
-      {"MIN", std::bind(pilugina::minCommand, _1, _2, std::cref(polygons))},
-      {"COUNT", std::bind(pilugina::countCommand, _1, _2, std::cref(polygons))},
-      {"ECHO", std::bind(pilugina::echoCommand, _1, _2, std::ref(polygons))},
-      {"INTERSECTIONS", std::bind(pilugina::intersectsCommand, _1, _2, std::cref(polygons))},
-      {"PERMS", std::bind(pilugina::permsCommand, _1, _2, std::cref(polygons))}
+    {"AREA", std::bind(pilugina::areaCommand, _1, _2, std::cref(polygons))},
+    {"MAX", std::bind(pilugina::maxCommand, _1, _2, std::cref(polygons))},
+    {"MIN", std::bind(pilugina::minCommand, _1, _2, std::cref(polygons))},
+    {"COUNT", std::bind(pilugina::countCommand, _1, _2, std::cref(polygons))},
+    {"ECHO", std::bind(pilugina::echoCommand, _1, _2, std::ref(polygons))},
+    {"INTERSECTIONS", std::bind(pilugina::intersectsCommand, _1, _2, std::cref(polygons))},
+    {"PERMS", std::bind(pilugina::permsCommand, _1, _2, std::cref(polygons))}
   };
 
   std::string command;
