@@ -1,5 +1,11 @@
 #include "commands.hpp"
 
+template< class Func >
+double averenkov::acum(const std::vector< Polygon >& plgs, Func func)
+{
+  return std::accumulate(plgs.begin(), plgs.end(), 0.0, (func));
+}
+
 double averenkov::Prod::operator()(const averenkov::Point& a, const averenkov::Point& b) const
 {
   return a.x * b.y - b.x * a.y;
@@ -38,8 +44,7 @@ bool averenkov::RightAngleChecker::operator()(const Polygon& poly) const
 
 averenkov::VertexCount::VertexCount(size_t num):
   num_(num)
-{
-}
+{}
 
 bool averenkov::VertexCount::operator()(const Polygon& poly) const
 {
@@ -76,7 +81,7 @@ double averenkov::calculateArea(const Polygon& poly)
 
 double averenkov::AreaSumCalculator::operator()(const std::vector< Polygon >& plgs) const
 {
-  return std::accumulate(plgs.begin(), plgs.end(), 0.0, (*this));
+  return acum(plgs, (*this));
 }
 
 double averenkov::AreaSumCalculator::operator()(double sum, const Polygon& poly) const
@@ -340,7 +345,7 @@ void averenkov::printPermsCnt(std::istream& in, const std::vector< Polygon >& po
     throw std::runtime_error("Invalid PERMS parameter");
   }
   PolygonEqual comparator;
-  auto func = std::bind(&PolygonEqual::operator(), &comparator, std::placeholders::_1, target);
+  auto func = std::bind(&PolygonEqual::operator(), std::addressof(comparator), std::placeholders::_1, target);
   size_t count = std::count_if(polygons.begin(), polygons.end(), func);
   out << count;
 }
@@ -361,7 +366,7 @@ void averenkov::printRmEcho(std::istream& in, std::vector< Polygon >& polygons, 
 
   size_t removed = 0;
   PolygonEqual comparator;
-  auto func = std::bind(&PolygonEqual::operator(), &comparator, std::placeholders::_1, target);
+  auto func = std::bind(&PolygonEqual::operator(), std::addressof(comparator), std::placeholders::_1, target);
   auto newEnd = std::unique(polygons.begin(), polygons.end(), func);
 
   removed = std::distance(newEnd, polygons.end());

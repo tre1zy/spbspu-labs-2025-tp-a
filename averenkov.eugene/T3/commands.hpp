@@ -9,6 +9,9 @@
 
 namespace averenkov
 {
+  template< class Func >
+  double acum(const std::vector< Polygon >& polygons, Func func);
+
   struct Prod
   {
     double operator()(const averenkov::Point& a, const averenkov::Point& b) const;
