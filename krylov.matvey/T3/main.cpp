@@ -5,8 +5,9 @@
 #include <iterator>
 #include <functional>
 #include "geometry.hpp"
+#include "commands.hpp"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   using namespace krylov;
 
@@ -31,4 +32,27 @@ int main(int argc, char **argv)
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+  std::map< std::string, std::function< void() > > commands;
+  commands["AREA"] = std::bind(doAreaComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MAX"] = std::bind(doMaxComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MIN"] = std::bind(doMinComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["COUNT"] = std::bind(doCountComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["MAXSEQ"] = std::bind(doMaxseqComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["INTERSECT"] = std::bind(doIntersectComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      commands.at(command)();
+      std::cout << "\n";
+    }
+    catch (const std::exception&)
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
 }
+
