@@ -45,7 +45,9 @@ namespace trukhanov
 
   struct HasRightAngle
   {
-    explicit HasRightAngle(const std::vector< Point >& pts) : pts_(pts) {}
+    explicit HasRightAngle(const std::vector< Point >& pts):
+      pts_(pts)
+    {}
     bool operator()(size_t i) const;
     const std::vector<Point>& pts_;
   };

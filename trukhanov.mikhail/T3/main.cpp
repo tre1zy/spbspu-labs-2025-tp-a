@@ -29,14 +29,14 @@ int main(int argc, char* argv[])
   using polygon_it = std::istream_iterator< Polygon >;
 
   std::vector< Polygon > polygons;
-  while (!input.eof())
+  while (!input.eof() && !input.bad())
   {
+    std::copy(polygon_it(input), polygon_it(), std::back_inserter(polygons));
     if (!input)
     {
       input.clear();
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::copy(polygon_it(input), polygon_it(), std::back_inserter(polygons));
   }
 
   std::map< std::string, std::function< void() > > cmds;
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   cmds["RIGHTSHAPES"] = std::bind(trukhanov::right, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;
-  while (!(std::cin >> command).eof())
+  while (!(std::cin >> command).eof() && !std::cin.bad())
   {
     try
     {
