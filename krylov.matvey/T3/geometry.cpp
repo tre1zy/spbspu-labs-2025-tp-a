@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <delimeterIO.hpp>
 
 std::istream& krylov::operator>>(std::istream& in, Point& p)
 {
