@@ -46,6 +46,12 @@ double trukhanov::VectorProduct::operator()(const Point& a, const Point& b, cons
   return 0.5 * std::abs(static_cast< double >((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)));
 }
 
+trukhanov::Angle trukhanov::MakeAngles::operator()(std::size_t i) const
+{
+  std::size_t n = pts.size();
+  return { pts[i], pts[(i + 1) % n], pts[(i + 2) % n] };
+}
+
 bool trukhanov::HasRightAngle::operator()(const Angle& ang) const
 {
   int x1 = ang.a.x - ang.b.x;

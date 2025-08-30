@@ -20,6 +20,13 @@ namespace trukhanov
     std::vector< Point > points;
   };
 
+  struct Angle
+  {
+    Point a;
+    Point b;
+    Point c;
+  };
+
   double getArea(const Polygon& p);
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);

@@ -155,7 +155,7 @@ void trukhanov::area(std::istream& in, std::ostream& out, const std::vector < Po
 
   out << std::fixed << std::showpoint << std::setprecision(1);
 
-  std::map< std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function< void() > > subcommands;
   subcommands["EVEN"] = std::bind(areaEven, std::ref(out), std::cref(src));
   subcommands["ODD"] = std::bind(areaOdd, std::ref(out), std::cref(src));
   subcommands["MEAN"] = std::bind(areaMean, std::ref(out), std::cref(src));
@@ -166,14 +166,7 @@ void trukhanov::area(std::istream& in, std::ostream& out, const std::vector < Po
   }
   else
   {
-    try
-    {
-      subcommands.at(subcommand)();
-    }
-    catch (...)
-    {
-      throw std::invalid_argument("Unknown subcommand");
-    }
+    subcommands.at(subcommand)();
   }
 }
 
@@ -185,17 +178,10 @@ void trukhanov::max(std::istream& in, std::ostream& out, const std::vector < Pol
 
   out << std::fixed << std::showpoint << std::setprecision(1);
 
-  std::map< std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function<void() > > subcommands;
   subcommands["AREA"] = std::bind(maxArea, std::ref(out), std::cref(src));
   subcommands["VERTEXES"] = std::bind(maxVertexes, std::ref(out), std::cref(src));
-  try
-  {
-    subcommands.at(subcommand)();
-  }
-  catch (...)
-  {
-    throw std::invalid_argument("Unknown subcommand");
-  }
+  subcommands.at(subcommand)();
 }
 
 void trukhanov::min(std::istream& in, std::ostream& out, const std::vector < Polygon >& src)
@@ -206,17 +192,10 @@ void trukhanov::min(std::istream& in, std::ostream& out, const std::vector < Pol
 
   out << std::fixed << std::showpoint << std::setprecision(1);
 
-  std::map< std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function< void() > > subcommands;
   subcommands["AREA"] = std::bind(minArea, std::ref(out), std::cref(src));
   subcommands["VERTEXES"] = std::bind(minVertexes, std::ref(out), std::cref(src));
-  try
-  {
-    subcommands.at(subcommand)();
-  }
-  catch (...)
-  {
-    throw std::invalid_argument("Unknown subcommand");
-  }
+  subcommands.at(subcommand)();
 }
 
 void trukhanov::count(std::istream& in, std::ostream& out, const std::vector < Polygon >& src)
@@ -224,7 +203,7 @@ void trukhanov::count(std::istream& in, std::ostream& out, const std::vector < P
   std::string subcommand;
   in >> subcommand;
 
-  std::map< std::string, std::function<void()>> subcommands;
+  std::map< std::string, std::function< void() > > subcommands;
   subcommands["EVEN"] = std::bind(countEven, std::ref(out), std::cref(src));
   subcommands["ODD"] = std::bind(countOdd, std::ref(out), std::cref(src));
   if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
@@ -234,14 +213,7 @@ void trukhanov::count(std::istream& in, std::ostream& out, const std::vector < P
   }
   else
   {
-    try
-    {
-      subcommands.at(subcommand)();
-    }
-    catch (...)
-    {
-      throw std::invalid_argument("Unknown subcommand");
-    }
+    subcommands.at(subcommand)();
   }
 }
 
