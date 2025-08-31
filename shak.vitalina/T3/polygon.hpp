@@ -28,8 +28,8 @@ namespace shak
   double getArea(const Polygon &polygon);
   size_t getVertexes(const Polygon &polygon);
   size_t equalCounter(const Polygon &polygon, const std::vector< Point > &targetPoints, size_t& counter);
- 
- struct TriangleArea
+
+  struct TriangleArea
   {
     Point point1;
     Point point2;
