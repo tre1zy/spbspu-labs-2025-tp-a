@@ -21,15 +21,15 @@ namespace shak
     std::vector< Point > points;
   };
   std::istream &operator>>(std::istream &in, Polygon &dest);
-  bool operator==(const std::vector< Point > &left, const std::vector< Point > &right);
   bool isEven(const Polygon &polygon);
   bool isOdd(const Polygon &polygon);
   bool areEqualVertexes(size_t numOfVertexes, const Polygon &polygon);
   bool checkRectangle(const Polygon &polygon);
   double getArea(const Polygon &polygon);
   size_t getVertexes(const Polygon &polygon);
-
-  struct TriangleArea
+  size_t equalCounter(const Polygon &polygon, const std::vector< Point > &targetPoints, size_t& counter);
+ 
+ struct TriangleArea
   {
     Point point1;
     Point point2;
