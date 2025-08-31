@@ -1,4 +1,5 @@
 #include "geometry.hpp"
+#include <numeric>
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -48,4 +49,97 @@ std::istream& krylov::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
+bool krylov::Point::operator==(const Point& p) const
+{
+  return x == p.x && y == p.y;
+}
 
+bool krylov::Point::operator<(const Point& p) const
+{
+  return std::tie(x, y) < std::tie(p.x, p.y);
+}
+
+bool krylov::VertexesCmp::operator()(const Polygon& polygon) const
+{
+  return polygon.points.size() == k;
+}
+
+bool krylov::isEven(const Polygon &polygon)
+{
+  return polygon.points.size() % 2 == 0;
+}
+
+bool krylov::isOdd(const Polygon &polygon)
+{
+  return !isEven(polygon);
+}
+
+double krylov::getArea(const Polygon& polygon)
+{
+  const std::vector< Point > &p = polygon.points;
+  double area = crossProduct(p.back(), p.front());
+  area += std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, crossProduct);
+  return std::abs(area) / 2.0;
+}
+
+double krylov::areaMean(const std::vector< Polygon >& polygons)
+{
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+  double res = std::accumulate(areas.begin(), areas.end(), 0.0);
+  return res / polygons.size();
+}
+
+bool krylov::maxArea(const Polygon& p1, const Polygon& p2)
+{
+  return getArea(p1) < getArea(p2);
+}
+
+bool krylov::maxVertexes(const Polygon& p1, const Polygon& p2)
+{
+  return p1.points.size() < p2.points.size();
+}
+
+size_t krylov::countEven(const std::vector< Polygon >& polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isEven);
+}
+
+size_t krylov::countOdd(const std::vector< Polygon >& polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isOdd);
+}
+
+size_t krylov::countVertexes(const std::vector< Polygon >& polygons, size_t vert)
+{
+  using namespace std::placeholders;
+
+  VertexesCmp cmp{ vert };
+  return std::count_if(polygons.begin(), polygons.end(), cmp);
+}
+
+bool krylov::isPointsEqual(const Point& p1, const Point& p2)
+{
+  return p1.x == p2.x && p1.y == p2.y;
+}
+
+bool krylov::isPolygonsEqual(const Polygon& p1, const Polygon& p2)
+{
+  const std::vector< Point >& points1 = p1.points;
+  const std::vector< Point >& points2 = p2.points;
+  if (points1.size() != points2.size())
+  {
+    return false;
+  }
+  return std::equal(points1.begin(), points1.end(), points2.begin(), isPointsEqual);
+}
+
+bool krylov::isPolygonsEqualToExample(const Polygon& p1, const Polygon& p2, const Polygon& example)
+{
+  return isPolygonsEqual(p1, example) && isPolygonsEqual(p2, example);
+}
+
+int krylov::crossProduct(const krylov::Point &p1, const krylov::Point &p2)
+{
+  return p1.x * p2.y - p1.y * p2.x;
+}

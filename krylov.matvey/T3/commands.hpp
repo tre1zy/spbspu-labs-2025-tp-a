@@ -12,8 +12,8 @@ namespace krylov
   void doMaxComm(const std::vector< Polygon> &polygons, std::ostream &out, std::istream &in);
   void doMinComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
   void doCountComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
-  void doMaxseqComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
-  void doIntersectComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  //void doMaxseqComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
+  //void doIntersectComm(const std::vector< Polygon > &polygons, std::ostream &out, std::istream &in);
 }
 
 #endif
