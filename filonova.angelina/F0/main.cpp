@@ -1,18 +1,15 @@
 #include "commands.hpp"
-
-#include <functional>
 #include <iostream>
-#include <limits>
+#include <functional>
 #include <map>
-#include <string>
-
-using namespace std::placeholders;
+#include <limits>
 
 int main()
 {
   filonova::DictionarySet dictionaries;
+  using namespace std::placeholders;
 
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
+  std::map< std::string, std::function< void(std::istream &, std::ostream &) > > commands;
   commands["CREATE"] = std::bind(filonova::createDictionary, std::ref(dictionaries), _1, _2);
   commands["DELETE"] = std::bind(filonova::deleteDictionary, std::ref(dictionaries), _1, _2);
   commands["INSERT"] = std::bind(filonova::insert, std::ref(dictionaries), _1, _2);

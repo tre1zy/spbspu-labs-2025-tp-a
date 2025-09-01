@@ -1,13 +1,9 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
-#include <algorithm>
 #include <fstream>
-#include <iostream>
-#include <limits>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 namespace filonova
 {

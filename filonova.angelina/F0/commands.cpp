@@ -1,4 +1,8 @@
 #include "commands.hpp"
+#include <vector>
+#include <limits>
+#include <iterator>
+#include <algorithm>
 #include "support.hpp"
 
 void filonova::createDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -141,9 +145,9 @@ void filonova::merge(DictionarySet &dicts, std::istream &in, std::ostream &out)
     it1->second.end(),
     std::inserter(dictNew, dictNew.end()));
 
-  std::for_each(
-    it2->second.begin(),
-    it2->second.end(),
+  std::transform(
+    it2->second.begin(), it2->second.end(),
+    std::inserter(dictNew, dictNew.end()),
     MergeDictEntry(dictNew));
 }
 
@@ -171,10 +175,11 @@ void filonova::print(DictionarySet &dicts, std::istream &in, std::ostream &out)
     words.end(),
     CompareByFrequency(true));
 
-  for (const auto &current : words)
-  {
-    out << Word{current.first} << ": " << current.second << '\n';
-  }
+  std::transform(
+    words.begin(),
+    words.end(),
+    std::ostream_iterator< std::string >(out, "\n"),
+    printPair);
 }
 
 void filonova::count(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -233,10 +238,11 @@ void filonova::top(DictionarySet &dicts, std::istream &in, std::ostream &out)
     CompareByFrequency(true));
 
   size_t limit = std::min(static_cast< size_t >(count), words.size());
-  for (size_t i = 0; i < limit; ++i)
-  {
-    out << Word{words[i].first} << ": " << words[i].second << "\n";
-  }
+  std::transform(
+    words.begin(),
+    words.begin() + limit,
+    std::ostream_iterator< std::string >(out, "\n"),
+    printPair);
 }
 
 void filonova::unique(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -273,24 +279,24 @@ void filonova::mostrare(DictionarySet &dicts, std::istream &in, std::ostream &ou
     return;
   }
 
-  const auto &dict = it->second;
-  if (dict.empty())
+  if (it->second.empty())
   {
     out << "<EMPTY>\n";
     return;
   }
 
-  std::vector< std::pair< std::string, size_t > > words(dict.begin(), dict.end());
+  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
   std::sort(
     words.begin(),
     words.end(),
     CompareByFrequency(false));
 
   size_t limit = std::min(static_cast< size_t >(count), words.size());
-  for (size_t i = 0; i < limit; ++i)
-  {
-    out << Word{words[i].first} << ": " << words[i].second << "\n";
-  }
+  std::transform(
+    words.begin(),
+    words.begin() + limit,
+    std::ostream_iterator< std::string >(out, "\n"),
+    printPair);
 }
 
 void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)

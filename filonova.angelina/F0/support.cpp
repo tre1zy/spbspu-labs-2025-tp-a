@@ -1,6 +1,7 @@
 #include "support.hpp"
+#include <algorithm>
 
-bool filonova::is_letter(char c)
+bool filonova::isLetter(char c)
 {
   return std::isalpha(static_cast< unsigned char >(c));
 }
@@ -15,7 +16,7 @@ std::istream &filonova::operator>>(std::istream &in, Word &w)
 
   std::string temp;
   in >> temp;
-  if (std::none_of(temp.begin(), temp.end(), is_letter))
+  if (std::none_of(temp.begin(), temp.end(), isLetter))
   {
     in.setstate(std::ios::failbit);
   }
@@ -64,17 +65,26 @@ bool filonova::isValidName(const std::string &name)
   return !name.empty() && std::all_of(name.begin(), name.end(), IsValidNameChar());
 }
 
-filonova::MergeDictEntry::MergeDictEntry(Dictionary &d): destination(d) {}
-
-void filonova::MergeDictEntry::operator()(const std::pair< const std::string, size_t > &pair) const
+std::string filonova::printPair(const std::pair< std::string, size_t > &p)
 {
-  destination[pair.first] += pair.second;
+  return p.first + ": " + std::to_string(p.second);
 }
 
-filonova::CompareByFrequency::CompareByFrequency(bool desc): descending(desc) {}
+filonova::MergeDictEntry::MergeDictEntry(Dictionary &d):
+  destination(d)
+{}
 
-bool filonova::CompareByFrequency::operator()(const std::pair< std::string, size_t > &a,
-  const std::pair< std::string, size_t > &b) const
+std::pair< const std::string, size_t > filonova::MergeDictEntry::operator()(const std::pair< const std::string, size_t > &pair) const
+{
+  destination[pair.first] += pair.second;
+  return std::make_pair(pair.first, destination[pair.first]);
+}
+
+filonova::CompareByFrequency::CompareByFrequency(bool desc):
+  descending(desc)
+{}
+
+bool filonova::CompareByFrequency::operator()(const std::pair< std::string, size_t > &a, const std::pair< std::string, size_t > &b) const
 {
   if (a.second == b.second)
   {
@@ -83,7 +93,10 @@ bool filonova::CompareByFrequency::operator()(const std::pair< std::string, size
   return descending ? a.second > b.second : a.second < b.second;
 }
 
-filonova::WordPresenceFilter::WordPresenceFilter(const Dictionary &d, bool state): dict2(d), presenceState(state) {}
+filonova::WordPresenceFilter::WordPresenceFilter(const Dictionary &d, bool state):
+  dict2(d),
+  presenceState(state)
+{}
 
 bool filonova::WordPresenceFilter::operator()(const std::pair< const std::string, size_t > &entry) const
 {
