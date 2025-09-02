@@ -134,11 +134,6 @@ bool krylov::isPolygonsEqual(const Polygon& p1, const Polygon& p2)
   return std::equal(points1.begin(), points1.end(), points2.begin(), isPointsEqual);
 }
 
-bool krylov::isPolygonsEqualToExample(const Polygon& p1, const Polygon& p2, const Polygon& example)
-{
-  return isPolygonsEqual(p1, example) && isPolygonsEqual(p2, example);
-}
-
 int krylov::crossProduct(const krylov::Point &p1, const krylov::Point &p2)
 {
   return p1.x * p2.y - p1.y * p2.x;

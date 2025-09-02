@@ -112,6 +112,22 @@ namespace
     size_t res = countVertexes(polygons, vert);
     out << res;
   }
+
+  size_t getMaxseq(const Polygon& polygon, const Polygon& pattern)
+  {
+    size_t currentSeq = 0;
+    size_t maxSeq = 0;
+    if (isPolygonsEqual(polygon, pattern))
+    {
+      currentSeq++;
+      maxSeq = std::max(maxSeq, currentSeq);
+    }
+    else
+    {
+      currentSeq = 0;
+    }
+    return maxSeq;
+  }
 }
 
 void krylov::doAreaComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
@@ -182,4 +198,14 @@ void krylov::doCountComm(const std::vector< Polygon >& polygons, std::ostream& o
   {
     commands.at(subcommand)();
   }
+}
+
+void krylov::doMaxseqComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
+{
+  using namespace std::placeholders;
+  Polygon pattern;
+  in >> pattern;
+  std::vector< size_t > seqOfPolygons(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), seqOfPolygons.begin(), std::bind(getMaxseq, _1, std::cref(pattern)));
+  out << *std::max_element(seqOfPolygons.begin(), seqOfPolygons.end());
 }

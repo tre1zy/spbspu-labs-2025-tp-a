@@ -39,7 +39,6 @@ namespace krylov
   size_t countVertexes(const std::vector< Polygon >& polygons, size_t vert);
   bool isPointsEqual(const Point& p1, const Point& p2);
   bool isPolygonsEqual(const Polygon& p1, const Polygon& p2);
-  bool isPolygonsEqualToExample(const Polygon& p1, const Polygon& p2, const Polygon& example);
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);
   int crossProduct(const Point& p1, const Point& p2);
