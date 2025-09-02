@@ -12,6 +12,9 @@ namespace trukhanov
     int x, y;
   };
 
+  std::istream& operator>>(std::istream& in, Point& point);
+  std::ostream& operator<<(std::ostream& out, const Point& point);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   bool operator<(const Point& lhs, const Point& rhs);
   bool operator==(const Point& lhs, const Point& rhs);
 
@@ -19,6 +22,9 @@ namespace trukhanov
   {
     std::vector< Point > points;
   };
+
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 
   struct Angle
   {
@@ -32,11 +38,6 @@ namespace trukhanov
   bool isOdd(const Polygon& p);
   bool compareByVertexes(const Polygon& p1, const Polygon& p2);
   bool isRight(const Polygon& p);
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, Point& point);
-  std::ostream& operator<<(std::ostream& out, const Point& point);
-  std::istream& operator>>(std::istream& in, Polygon& polygon);
-  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 }
 
 #endif
