@@ -296,14 +296,7 @@ void kushekbaev::max(std::istream& in, std::ostream& out, const std::vector< Pol
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["AREA"] = std::bind(maxArea, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(maxVertices, std::cref(polygons), std::ref(out));
-  try
-  {
-    subcommands.at(subcommand)();
-  }
-  catch (...)
-  {
-    throw;
-  }
+  subcommands.at(subcommand)();
 }
 
 void kushekbaev::min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -313,14 +306,7 @@ void kushekbaev::min(std::istream& in, std::ostream& out, const std::vector< Pol
   std::map< std::string, std::function< void() > > subcommands;
   subcommands["AREA"] = std::bind(minArea, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(minVertices, std::cref(polygons), std::ref(out));
-  try
-  {
-    subcommands.at(subcommand)();
-  }
-  catch (...)
-  {
-    throw;
-  }
+  subcommands.at(subcommand)();
 }
 
 void kushekbaev::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
