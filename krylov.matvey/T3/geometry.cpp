@@ -49,14 +49,19 @@ std::istream& krylov::operator>>(std::istream& in, Polygon& polygon)
   return in;
 }
 
-bool krylov::Point::operator==(const Point& p) const
+bool krylov::Point::operator==(const Point& other) const
 {
-  return x == p.x && y == p.y;
+  return x == other.x && y == other.y;
 }
 
-bool krylov::Point::operator<(const Point& p) const
+bool krylov::Point::operator<(const Point& other) const
 {
-  return std::tie(x, y) < std::tie(p.x, p.y);
+  return std::tie(x, y) < std::tie(other.x, other.y);
+}
+
+bool krylov::Polygon::operator==(const Polygon& other) const
+{
+  return points == other.points;
 }
 
 bool krylov::VertexesCmp::operator()(const Polygon& polygon) const

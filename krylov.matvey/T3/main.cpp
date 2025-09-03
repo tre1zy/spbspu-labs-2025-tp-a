@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   commands["MIN"] = std::bind(doMinComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
   commands["COUNT"] = std::bind(doCountComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
   commands["MAXSEQ"] = std::bind(doMaxseqComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
-  //commands["INTERSECT"] = std::bind(doIntersectComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
+  commands["INTERSECT"] = std::bind(doIntersectComm, std::cref(polygons), std::ref(std::cout), std::ref(std::cin));
   std::string command;
   while (!(std::cin >> command).eof())
   {

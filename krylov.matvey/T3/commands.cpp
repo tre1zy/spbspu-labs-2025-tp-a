@@ -205,6 +205,10 @@ void krylov::doMaxseqComm(const std::vector< Polygon >& polygons, std::ostream& 
   using namespace std::placeholders;
   Polygon pattern;
   in >> pattern;
+  if (std::count(polygons.begin(), polygons.end(), pattern) == 0)
+  {
+    throw std::logic_error("No similar polygons");
+  }
   std::vector< size_t > seqOfPolygons(polygons.size());
   std::transform(polygons.begin(), polygons.end(), seqOfPolygons.begin(), std::bind(getMaxseq, _1, std::cref(pattern)));
   out << *std::max_element(seqOfPolygons.begin(), seqOfPolygons.end());

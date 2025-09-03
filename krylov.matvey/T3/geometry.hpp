@@ -9,14 +9,15 @@ namespace krylov
   {
     int x;
     int y;
-    bool operator==(const Point &p) const;
-    bool operator<(const Point &p) const;
+    bool operator==(const Point& other) const;
+    bool operator<(const Point& other) const;
   };
   std::istream& operator>>(std::istream& in, Point& p);
 
   struct Polygon
   {
     std::vector< Point > points;
+    bool operator==(const Polygon& other) const;
   };
   std::istream& operator>>(std::istream& in, Polygon& polygon);
 
@@ -48,7 +49,6 @@ namespace krylov
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);
   int crossProduct(const Point& p1, const Point& p2);
-  bool hasIntersection(const Polygon& polygon1, const Polygon& polygon2);
 }
 
 #endif
