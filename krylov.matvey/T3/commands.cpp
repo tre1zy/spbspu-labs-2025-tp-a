@@ -209,3 +209,10 @@ void krylov::doMaxseqComm(const std::vector< Polygon >& polygons, std::ostream& 
   std::transform(polygons.begin(), polygons.end(), seqOfPolygons.begin(), std::bind(getMaxseq, _1, std::cref(pattern)));
   out << *std::max_element(seqOfPolygons.begin(), seqOfPolygons.end());
 }
+
+void krylov::doIntersectComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
+{
+  Polygon target;
+  in >> target;
+  out << std::count_if(polygons.begin(), polygons.end(), IntersectCmp{ target });
+}

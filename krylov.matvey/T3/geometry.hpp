@@ -30,6 +30,12 @@ namespace krylov
     bool operator()(const Polygon &polygon) const;
   };
 
+  struct IntersectCmp
+  {
+    const Polygon& polygon;
+    bool operator()(const Polygon& other) const;
+  };
+
   double getArea(const Polygon& polygon);
   double areaMean(const std::vector< Polygon >& polygons);
   bool maxArea(const Polygon& p1, const Polygon& p2);
@@ -42,6 +48,7 @@ namespace krylov
   bool isEven(const Polygon& p);
   bool isOdd(const Polygon& p);
   int crossProduct(const Point& p1, const Point& p2);
+  bool hasIntersection(const Polygon& polygon1, const Polygon& polygon2);
 }
 
 #endif

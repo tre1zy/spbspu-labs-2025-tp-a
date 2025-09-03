@@ -64,6 +64,13 @@ bool krylov::VertexesCmp::operator()(const Polygon& polygon) const
   return polygon.points.size() == k;
 }
 
+bool krylov::IntersectCmp::operator()(const Polygon& other) const
+{
+  auto left = std::minmax_element(polygon.points.begin(), polygon.points.end());
+  auto right = std::minmax_element(other.points.begin(), other.points.end());
+  return !(*left.second < *right.first || *right.second < *left.first);
+}
+
 bool krylov::isEven(const Polygon &polygon)
 {
   return polygon.points.size() % 2 == 0;
@@ -138,3 +145,4 @@ int krylov::crossProduct(const krylov::Point &p1, const krylov::Point &p2)
 {
   return p1.x * p2.y - p1.y * p2.x;
 }
+
