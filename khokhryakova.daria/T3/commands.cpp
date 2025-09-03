@@ -261,3 +261,7 @@ void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector
     }
   }
   out << maxCount;
+<<<<<<< HEAD
+=======
+}
+>>>>>>> refs/remotes/origin/khokhryakova.daria/T3
