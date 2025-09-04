@@ -35,7 +35,7 @@ namespace shiryaeva
   {
     bool operator()(const Polygon& lhs, const Polygon& rhs) const;
   };
-  
+
   struct CompareByVertexCount
   {
     bool operator()(const Polygon& lhs, const Polygon& rhs) const;
