@@ -27,4 +27,14 @@ namespace shiryaeva
   {
     return polygon.points.size();
   }
+
+  bool CompareByArea::operator()(const Polygon& lhs, const Polygon& rhs) const
+  {
+    return getArea(lhs) < getArea(rhs);
+  }
+
+  bool CompareByVertexCount::operator()(const Polygon& lhs, const Polygon& rhs) const
+  {
+    return lhs.points.size() < rhs.points.size();
+  }
 }

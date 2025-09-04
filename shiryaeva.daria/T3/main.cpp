@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         {"MAX", std::bind(shiryaeva::max, std::placeholders::_1, std::placeholders::_2, polygons)},
         {"MIN", std::bind(shiryaeva::min, std::placeholders::_1, std::placeholders::_2, polygons)},
         {"COUNT", std::bind(shiryaeva::count, std::placeholders::_1, std::placeholders::_2, polygons)},
-        {"LESSAREA", std::bind(shiryaeva::lessarea, std::placeholders::_1, std::placeholders::_2, polygons)},
+        {"LESSAREA", std::bind(shiryaeva::lessArea, std::placeholders::_1, std::placeholders::_2, polygons)},
         {"INTERSECTIONS", std::bind(shiryaeva::intersections, std::placeholders::_1, std::placeholders::_2, polygons)}
     };
 
@@ -51,25 +51,13 @@ int main(int argc, char* argv[])
   {
     try
     {
-      auto it = commands.find(command);
-      if (it != commands.end())
-      {
-        it->second(std::cin, std::cout);
-      }
-      else
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
+      commands.at(command)(std::cin, std::cout);
     }
-    catch (const std::exception& e)
+    catch (const std::out_of_range&)
     {
-        std::cout << e.what();
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
-    std::cout << '\n';
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
-
-    return 0;
+  return 0;
 }
 
