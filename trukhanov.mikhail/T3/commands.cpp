@@ -102,7 +102,6 @@ void minArea(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
   out << getArea(*std::min_element(src.begin(), src.end(), trukhanov::CompareByArea())) << '\n';
 }
 
-
 void minVertexes(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
 {
   if (src.empty())

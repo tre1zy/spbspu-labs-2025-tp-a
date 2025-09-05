@@ -73,7 +73,10 @@ bool trukhanov::operator==(const Point& lhs, const Point& rhs)
 std::istream& trukhanov::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sentry(in);
-  if (!sentry) return in;
+  if (!sentry)
+  {
+    return in;
+  }
 
   in >> DelimiterIO{ '(' } >> point.x >> DelimiterIO{ ';' } >> point.y >> DelimiterIO{ ')' };
   return in;
