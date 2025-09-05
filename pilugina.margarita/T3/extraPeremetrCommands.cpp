@@ -43,7 +43,7 @@ namespace pilugina
     return (poly.points.size() % 2) == 1;
   }
 
-  bool isEqualVertexNum(std::size_t n, const Polygon &poly)
+  bool isEqualVertexNumP(std::size_t n, const Polygon &poly)
   {
     return n == poly.points.size();
   }
