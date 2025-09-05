@@ -2,6 +2,7 @@
 #define EXTRA_COMMANDS_HPP
 
 #include <vector>
+#include <cmath>
 #include "polygon.hpp"
 
 namespace pilugina
