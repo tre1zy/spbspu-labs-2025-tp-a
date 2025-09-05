@@ -29,7 +29,7 @@ int main(int argc, char * argv[])
     std::copy(istream_it{file}, istream_it{}, std::back_inserter(polygons));
     if (file.fail())
     {
-      file.clear();
+      file.clear(file.rdstate() ^ std::ios::failbit);
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
@@ -51,7 +51,7 @@ int main(int argc, char * argv[])
     {
       if (std::cin.fail())
       {
-        std::cin.clear();
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";

@@ -392,7 +392,7 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
 {
   std::string arg;
   in >> arg;
-  typedef std::map< std::string, std::function< void() > > sub_map;
+  using sub_map = std::map< std::string, std::function< void() > >;
   sub_map sub_cmds;
   sub_cmds["EVEN"] = std::bind(printCountEven, std::cref(polygons), std::ref(out));
   sub_cmds["ODD"] = std::bind(printCountOdd, std::cref(polygons), std::ref(out));
