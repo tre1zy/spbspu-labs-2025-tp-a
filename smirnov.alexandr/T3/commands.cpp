@@ -52,54 +52,6 @@ namespace
     }
   };
 
-  double sumEvenArea(double acc, const smirnov::Polygon & poly)
-  {
-    if (isEven(poly))
-    {
-      return acc + getArea(poly);
-    }
-    else
-    {
-      return acc + 0.0;
-    }
-  }
-
-  double sumOddArea(double acc, const smirnov::Polygon & poly)
-  {
-    if (isOdd(poly))
-    {
-      return acc + getArea(poly);
-    }
-    else
-    {
-      return acc + 0.0;
-    }
-  }
-
-  double sumAllArea(double acc, const smirnov::Polygon & poly)
-  {
-    return acc + getArea(poly);
-  }
-
-  struct SumAreaByVertex
-  {
-    size_t count;
-    SumAreaByVertex(size_t c):
-      count(c)
-    {}
-    double operator()(double acc, const smirnov::Polygon & poly) const
-    {
-      if (poly.points.size() == count)
-      {
-        return acc + getArea(poly);
-      }
-      else
-      {
-        return acc + 0.0;
-      }
-    }
-  };
-
   struct InFrameCheck
   {
     int min_x, max_x, min_y, max_y;
