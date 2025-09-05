@@ -313,24 +313,23 @@ void smirnov::printArea(std::istream & in, std::ostream & out, const std::vector
   out << std::fixed << std::setprecision(1);
   std::string arg;
   in >> arg;
-  typedef std::map< std::string, std::function< void() > > sub_map;
+  using sub_map =  std::map< std::string, std::function< void() > >;
   sub_map sub_cmds;
   sub_cmds["EVEN"] = std::bind(printAreaEven, std::cref(polygons), std::ref(out));
   sub_cmds["ODD"] = std::bind(printAreaOdd, std::cref(polygons), std::ref(out));
   sub_cmds["MEAN"] = std::bind(printAreaMean, std::cref(polygons), std::ref(out));
   try
   {
-    if (sub_cmds.count(arg))
-    {
-      sub_cmds.at(arg)();
-      return;
-    }
-    size_t numVtx = std::stoul(arg);
-    printAreaByVertex(polygons, out, numVtx);
+    sub_cmds.at(arg)();
   }
   catch (...)
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    size_t numVtx = std::stoull(arg);
+    if (numVtx < 3)
+    {
+      throw std::logic_error("<INVALID COMMAND");
+    }
+    printAreaByVertex(polygons, out, numVtx);
   }
 }
 
@@ -344,7 +343,7 @@ void smirnov::printMax(std::istream & in, std::ostream & out, const std::vector<
   out << std::fixed << std::setprecision(1);
   std::string arg;
   in >> arg;
-  typedef std::map< std::string, std::function< void() > > sub_map;
+  using sub_map = std::map< std::string, std::function< void() > >;
   sub_map sub_cmds;
   sub_cmds["AREA"] = std::bind(printMaxArea, std::cref(polygons), std::ref(out));
   sub_cmds["VERTEXES"] = std::bind(printMaxVertexes, std::cref(polygons), std::ref(out));
@@ -368,7 +367,7 @@ void smirnov::printMin(std::istream & in, std::ostream & out, const std::vector<
   out << std::fixed << std::setprecision(1);
   std::string arg;
   in >> arg;
-  typedef std::map< std::string, std::function< void() > > sub_map;
+  using sub_map =  std::map< std::string, std::function< void() > >;
   sub_map sub_cmds;
   sub_cmds["AREA"] = std::bind(printMinArea, std::cref(polygons), std::ref(out));
   sub_cmds["VERTEXES"] = std::bind(printMinVertexes, std::cref(polygons), std::ref(out));
@@ -392,17 +391,16 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
   sub_cmds["ODD"] = std::bind(printCountOdd, std::cref(polygons), std::ref(out));
   try
   {
-    if (sub_cmds.count(arg))
-    {
-      sub_cmds.at(arg)();
-      return;
-    }
-    size_t numVtx = std::stoul(arg);
-    printCountByVertex(polygons, out, numVtx);
+    sub_cmds.at(arg)();
   }
   catch (...)
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    size_t numVtx = std::stoull(arg);
+    if (numVtx < 3)
+    {
+      throw std::logic_error("<INVALID COMMAND");
+    }
+    printCountByVertex(polygons, out, numVtx);
   }
 }
 
