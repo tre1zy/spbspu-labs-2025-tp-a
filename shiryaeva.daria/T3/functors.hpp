@@ -14,7 +14,7 @@ namespace shiryaeva
   {
     bool operator()(const Polygon& polygon) const;
   };
-
+  
   struct HasVertexCount
   {
     size_t count;
