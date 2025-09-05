@@ -91,41 +91,41 @@ namespace
 
   void countEven(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
-    out << countIf(polygons, isEven);
+    out << countIf(polygons, isEven) << "\n";
   }
 
   void countOdd(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
-    out << countIf(polygons, isOdd);
+    out << countIf(polygons, isOdd) << "\n";
   }
 
   void countNum(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out, size_t n)
   {
-    out << countIf(polygons, VertexPred{ n });
+    out << countIf(polygons, VertexPred{ n }) << "\n";
   }
 
   void areaMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto max = *std::max_element(polygons.begin(), polygons.end(), areaCompare);
-    out << std::fixed << std::setprecision(1) << khokhryakova::getArea(max);
+    out << std::fixed << std::setprecision(1) << khokhryakova::getArea(max) << "\n";
   }
 
   void vertexMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto max = *std::max_element(polygons.begin(), polygons.end(), vertexCompare);
-    out << max.points.size();
+    out << max.points.size() << "\n";
   }
 
   void areaMin(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto min = *std::min_element(polygons.begin(), polygons.end(), areaCompare);
-    out << std::fixed << std::setprecision(1) << khokhryakova::getArea(min);
+    out << std::fixed << std::setprecision(1) << khokhryakova::getArea(min) << "\n";
   }
 
   void vertexMin(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto min = *std::min_element(polygons.begin(), polygons.end(), vertexCompare);
-    out << min.points.size();
+    out << min.points.size() << "\n";
   }
 }
 
@@ -281,5 +281,5 @@ void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector
       currentCount = 0;
     }
   }
-  out << maxCount;
+  out << maxCount << "\n";
 }
