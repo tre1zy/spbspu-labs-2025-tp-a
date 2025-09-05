@@ -125,85 +125,79 @@ namespace
     return a.points.size() < b.points.size();
   }
 
-  struct CompareX
+  bool compareX(const smirnov::Point & a, const smirnov::Point & b)
   {
-    bool operator()(const smirnov::Point & a, const smirnov::Point & b) const
+    return a.x < b.x;
+  }
+
+  bool compareY(const smirnov::Point & a, const smirnov::Point & b)
+  {
+    return a.y < b.y;
+  }
+
+  struct MinXInAll
+  {
+    int operator()(const smirnov::Polygon & a, const smirnov::Polygon & b) const
     {
-      return a.x < b.x;
+      int minA = std::min_element(a.points.begin(), a.points.end(), compareX)->x;
+      int minB = std::min_element(b.points.begin(), b.points.end(), compareX)->x;
+      return minA < minB;
     }
   };
 
-  struct CompareY
+  struct MaxXInAll
   {
-    bool operator()(const smirnov::Point & a, const smirnov::Point & b) const
+    int operator()(const smirnov::Polygon & a, const smirnov::Polygon & b) const
     {
-      return a.y < b.y;
+      int maxA = std::max_element(a.points.begin(), a.points.end(), compareX)->x;
+      int maxB = std::max_element(b.points.begin(), b.points.end(), compareX)->x;
+      return maxA < maxB;
     }
   };
 
-  struct MinXInPolygon
+  struct MinYInAll
   {
-    int operator()(int acc, const smirnov::Polygon & poly) const
+    int operator()(const smirnov::Polygon & a, const smirnov::Polygon & b) const
     {
-      int local_min = std::min_element(poly.points.begin(), poly.points.end(), CompareX())->x;
-      if (local_min < acc)
-      {
-        return local_min;
-      }
-      else
-      {
-        return acc;
-      }
+      int minA = std::min_element(a.points.begin(), a.points.end(), compareY)->y;
+      int minB = std::min_element(b.points.begin(), b.points.end(), compareY)->y;
+      return minA < minB;
     }
   };
 
-  struct MaxXInPolygon
+  struct MaxYInAll
   {
-    int operator()(int acc, const smirnov::Polygon & poly) const
+    int operator()(const smirnov::Polygon & a, const smirnov::Polygon & b) const
     {
-      int local_max = std::max_element(poly.points.begin(), poly.points.end(), CompareX())->x;
-      if (local_max > acc)
-      {
-        return local_max;
-      }
-      else
-      {
-        return acc;
-      }
+      int maxA = std::max_element(a.points.begin(), a.points.end(), compareY)->y;
+      int maxB = std::max_element(b.points.begin(), b.points.end(), compareY)->y;
+      return maxA < maxB;
     }
   };
 
-  struct MinYInPolygon
+  int getMinX(const std::vector< smirnov::Polygon > & polygons)
   {
-    int operator()(int acc, const smirnov::Polygon & poly) const
-    {
-      int local_min = std::min_element(poly.points.begin(), poly.points.end(), CompareY())->y;
-      if (local_min < acc)
-      {
-        return local_min;
-      }
-      else
-      {
-        return acc;
-      }
-    }
-  };
+    auto it = std::min_element(polygons.begin(), polygons.end(), MinXInAll());
+    return std::min_element(it->points.begin(), it->points.end(), compareX)->x;
+  }
 
-  struct MaxYInPolygon
+  int getMaxX(const std::vector< smirnov::Polygon > & polygons)
   {
-    int operator()(int acc, const smirnov::Polygon & poly) const
-    {
-      int local_max = std::max_element(poly.points.begin(), poly.points.end(), CompareY())->y;
-      if (local_max > acc)
-      {
-        return local_max;
-      }
-      else
-      {
-        return acc;
-      }
-    }
-  };
+    auto it = std::max_element(polygons.begin(), polygons.end(), MaxXInAll());
+    return std::max_element(it->points.begin(), it->points.end(), compareX)->x;
+  }
+
+  int getMinY(const std::vector< smirnov::Polygon > & polygons)
+  {
+    auto it = std::min_element(polygons.begin(), polygons.end(), MinYInAll());
+    return std::min_element(it->points.begin(), it->points.end(), compareY)->y;
+  }
+
+  int getMaxY(const std::vector< smirnov::Polygon > & polygons)
+  {
+    auto it = std::max_element(polygons.begin(), polygons.end(), MaxYInAll());
+    return std::max_element(it->points.begin(), it->points.end(), compareY)->y;
+  }
 
   struct MaxSeq
   {
@@ -423,10 +417,10 @@ void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vec
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  int min_x = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::max(), MinXInPolygon());
-  int max_x = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::min(), MaxXInPolygon());
-  int min_y = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::max(), MinYInPolygon());
-  int max_y = std::accumulate(polygons.begin(), polygons.end(), std::numeric_limits< int >::min(), MaxYInPolygon());
+  int min_x = getMinX(polygons);
+  int max_x = getMaxX(polygons);
+  int min_y = getMinY(polygons);
+  int max_y = getMaxY(polygons);
   InFrameCheck checker(min_x, max_x, min_y, max_y);
   bool in_frame = std::all_of(poly.points.begin(), poly.points.end(), checker);
   out << (in_frame ? "<TRUE>" : "<FALSE>") << "\n";
