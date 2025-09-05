@@ -99,6 +99,11 @@ namespace
     out << countIf(polygons, isOdd) << "\n";
   }
 
+  void countNum(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out, size_t n)
+  {
+    out << countIf(polygons, VertexPred{ n }) << "\n";
+  }
+
   void areaMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
   {
     auto max = *std::max_element(polygons.begin(), polygons.end(), areaCompare);
