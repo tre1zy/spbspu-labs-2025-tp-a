@@ -230,13 +230,21 @@ namespace
 
   void printAreaEven(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
   {
-    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, sumEvenArea);
+    std::vector< smirnov::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isEven);
+    std::vector< double > areas(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+    double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << sum << "\n";
   }
 
   void printAreaOdd(const std::vector< smirnov::Polygon > & polygons, std::ostream & out)
   {
-    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, sumOddArea);
+    std::vector< smirnov::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isOdd);
+    std::vector< double > areas(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+    double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << sum << "\n";
   }
 
@@ -244,9 +252,11 @@ namespace
   {
     if (polygons.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+        throw std::logic_error("<INVALID COMMAND>");
     }
-    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, sumAllArea);
+    std::vector< double > areas(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+    double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << (sum / polygons.size()) << "\n";
   }
 
@@ -254,9 +264,13 @@ namespace
   {
     if (numVtx < 3)
     {
-      throw std::logic_error("<INVALID COMMAND>");
+        throw std::logic_error("<INVALID COMMAND>");
     }
-    double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, SumAreaByVertex(numVtx));
+    std::vector< smirnov::Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), IsVertexCount(numVtx));
+    std::vector< double > areas(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+    double sum = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << sum << "\n";
   }
 
