@@ -38,7 +38,7 @@ void filonova::insert(DictionarySet &dicts, std::istream &in, std::ostream &out)
   auto it = dicts.find(name);
   if (it == dicts.end())
   {
-    out << "<INVALID COMMAND>\n";
+    out << "<WRONG DICT>\n";
     return;
   }
 
@@ -146,7 +146,8 @@ void filonova::merge(DictionarySet &dicts, std::istream &in, std::ostream &out)
     std::inserter(dictNew, dictNew.end()));
 
   std::transform(
-    it2->second.begin(), it2->second.end(),
+    it2->second.begin(),
+    it2->second.end(),
     std::inserter(dictNew, dictNew.end()),
     MergeDictEntry(dictNew));
 }
