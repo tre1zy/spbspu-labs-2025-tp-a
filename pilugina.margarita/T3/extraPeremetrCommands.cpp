@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
+#include <cmath>
 #include "polygon.hpp"
 
 namespace pilugina
