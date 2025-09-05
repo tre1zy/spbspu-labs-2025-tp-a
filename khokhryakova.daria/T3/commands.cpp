@@ -188,14 +188,6 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector< P
   std::map< std::string, std::function<void() > > subcommands;
   subcommands["AREA"] = std::bind(areaMin, std::cref(polygons), std::ref(out));
   subcommands["VERTEXES"] = std::bind(vertexMin, std::cref(polygons), std::ref(out));
-  try
-  {
-    subcommands.at(command)();
-  }
-  catch (...)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
 }
 
 void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -205,19 +197,6 @@ void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector<
   std::map< std::string, std::function<void() > > subcommands;
   subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
   subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
-  try
-  {
-    subcommands.at(command)();
-  }
-  catch (...)
-  {
-    size_t n = std::stoull(command);
-    if (n < 3)
-    {
-        throw std::logic_error("Error: vertices < 3");
-    }
-    countNum(polygons, out, n);
-  }
 }
 
 void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons, const std::string& filename)
@@ -255,7 +234,7 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygo
     file << "\n";
   }
   polygons = newPolygons;
-  out << count << "\n";
+  out << count;
 }
 
 void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
