@@ -1,9 +1,21 @@
 #include "support.hpp"
 #include <algorithm>
+#include <iterator>
+#include <vector>
 
 bool filonova::isLetter(char c)
 {
   return std::isalpha(static_cast< unsigned char >(c));
+}
+
+char filonova::toLower(char c)
+{
+  return static_cast< char >(std::tolower(static_cast< unsigned char >(c)));
+}
+
+bool filonova::isPunct(char c)
+{
+  return std::ispunct(static_cast< unsigned char >(c));
 }
 
 std::istream &filonova::operator>>(std::istream &in, Word &w)
@@ -22,23 +34,19 @@ std::istream &filonova::operator>>(std::istream &in, Word &w)
   }
   else
   {
-    const char *specialСhars = "'\"()";
-    if (temp.find_first_of(specialСhars) != std::string::npos)
+    const char *specialChars = "'\"()";
+    if (temp.find_first_of(specialChars) != std::string::npos)
     {
-      temp = temp.substr(temp.find_first_not_of(specialСhars));
-      temp = temp.substr(0, temp.find_first_of(specialСhars));
+      temp = temp.substr(temp.find_first_not_of(specialChars));
+      temp = temp.substr(0, temp.find_first_of(specialChars));
     }
 
-    while (!temp.empty() && std::ispunct(static_cast< unsigned char >(temp.back())))
+    while (!temp.empty() && isPunct(temp.back()))
     {
       temp.pop_back();
     }
 
-    std::transform(
-      temp.begin(),
-      temp.end(),
-      temp.begin(),
-      static_cast< int (*)(int) >(std::tolower));
+    std::transform(temp.begin(), temp.end(), temp.begin(), toLower);
 
     w.text = std::move(temp);
   }
@@ -94,12 +102,54 @@ bool filonova::CompareByFrequency::operator()(const std::pair< std::string, size
 }
 
 filonova::WordPresenceFilter::WordPresenceFilter(const Dictionary &d, bool state):
-  dict2(d),
-  presenceState(state)
+  dict2(d), presenceState(state)
 {}
 
 bool filonova::WordPresenceFilter::operator()(const std::pair< const std::string, size_t > &entry) const
 {
   bool found = dict2.count(entry.first);
   return presenceState ? found : !found;
+}
+
+void filonova::printWords(const DictionarySet &dicts, const std::string &name, std::ostream &out, size_t limit, bool descending)
+{
+  auto it = dicts.find(name);
+  if (it == dicts.end())
+  {
+    out << "<WRONG DICT>\n";
+    return;
+  }
+
+  if (it->second.empty())
+  {
+    out << "<EMPTY>\n";
+    return;
+  }
+
+  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
+  std::sort(words.begin(), words.end(), CompareByFrequency(true));
+
+  if (limit == 0 || limit > words.size())
+  {
+    limit = words.size();
+  }
+
+  std::transform(words.begin(), words.begin() + limit, std::ostream_iterator< std::string >(out, "\n"), printPair);
+}
+
+void filonova::combineDictionaries(DictionarySet &dicts, const std::string &newDict, const std::string &dict1, const std::string &dict2, std::ostream &out, bool intersect)
+{
+  auto it1 = dicts.find(dict1);
+  auto it2 = dicts.find(dict2);
+
+  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
+  {
+    out << "<WRONG DICT>\n";
+    return;
+  }
+
+  Dictionary &dictNew = dicts[newDict];
+  dictNew.clear();
+
+  std::copy_if(it1->second.begin(), it1->second.end(), std::inserter(dictNew, dictNew.begin()), WordPresenceFilter(it2->second, intersect));
 }

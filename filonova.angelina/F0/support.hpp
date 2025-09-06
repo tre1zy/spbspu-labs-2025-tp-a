@@ -16,6 +16,8 @@ namespace filonova
   };
 
   bool isLetter(char c);
+  char toLower(char c);
+  bool isPunct(char c);
   std::istream &operator>>(std::istream &in, Word &w);
   std::ostream &operator<<(std::ostream &out, const Word &w);
   bool operator<(const Word &lhs, const Word &rhs);
@@ -49,6 +51,10 @@ namespace filonova
     WordPresenceFilter(const Dictionary &d, bool state);
     bool operator()(const std::pair< const std::string, size_t > &entry) const;
   };
+
+  void printWords(const DictionarySet &dicts, const std::string &name, std::ostream &out, size_t limit, bool descending);
+  void combineDictionaries(DictionarySet &dicts, const std::string &newDict, const std::string &dict1, const std::string &dict2, std::ostream &out, bool intersect);
+
 }
 
 #endif

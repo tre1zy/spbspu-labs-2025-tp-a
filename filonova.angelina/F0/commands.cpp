@@ -140,16 +140,9 @@ void filonova::merge(DictionarySet &dicts, std::istream &in, std::ostream &out)
   Dictionary &dictNew = dicts[newDict];
   dictNew.clear();
 
-  std::copy(
-    it1->second.begin(),
-    it1->second.end(),
-    std::inserter(dictNew, dictNew.end()));
+  std::copy(it1->second.begin(), it1->second.end(), std::inserter(dictNew, dictNew.end()));
 
-  std::transform(
-    it2->second.begin(),
-    it2->second.end(),
-    std::inserter(dictNew, dictNew.end()),
-    MergeDictEntry(dictNew));
+  std::transform(it2->second.begin(), it2->second.end(), std::inserter(dictNew, dictNew.end()), MergeDictEntry(dictNew));
 }
 
 void filonova::print(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -157,30 +150,7 @@ void filonova::print(DictionarySet &dicts, std::istream &in, std::ostream &out)
   std::string name;
   in >> name;
 
-  auto it = dicts.find(name);
-  if (it == dicts.end())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  if (it->second.empty())
-  {
-    out << "<EMPTY>\n";
-    return;
-  }
-
-  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
-  std::sort(
-    words.begin(),
-    words.end(),
-    CompareByFrequency(true));
-
-  std::transform(
-    words.begin(),
-    words.end(),
-    std::ostream_iterator< std::string >(out, "\n"),
-    printPair);
+  printWords(dicts, name, out, 0, true);
 }
 
 void filonova::count(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -210,7 +180,7 @@ void filonova::count(DictionarySet &dicts, std::istream &in, std::ostream &out)
 void filonova::top(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
-  int count;
+  int count = 0;
   in >> name >> count;
 
   if (in.fail() || count <= 0)
@@ -219,31 +189,7 @@ void filonova::top(DictionarySet &dicts, std::istream &in, std::ostream &out)
     return;
   }
 
-  auto it = dicts.find(name);
-  if (it == dicts.end())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  if (it->second.empty())
-  {
-    out << "<EMPTY>\n";
-    return;
-  }
-
-  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
-  std::sort(
-    words.begin(),
-    words.end(),
-    CompareByFrequency(true));
-
-  size_t limit = std::min(static_cast< size_t >(count), words.size());
-  std::transform(
-    words.begin(),
-    words.begin() + limit,
-    std::ostream_iterator< std::string >(out, "\n"),
-    printPair);
+  printWords(dicts, name, out, static_cast< size_t >(count), true);
 }
 
 void filonova::unique(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -264,7 +210,7 @@ void filonova::unique(DictionarySet &dicts, std::istream &in, std::ostream &out)
 void filonova::mostrare(DictionarySet &dicts, std::istream &in, std::ostream &out)
 {
   std::string name;
-  int count;
+  int count = 0;
   in >> name >> count;
 
   if (in.fail() || count <= 0)
@@ -273,31 +219,7 @@ void filonova::mostrare(DictionarySet &dicts, std::istream &in, std::ostream &ou
     return;
   }
 
-  auto it = dicts.find(name);
-  if (it == dicts.end())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  if (it->second.empty())
-  {
-    out << "<EMPTY>\n";
-    return;
-  }
-
-  std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
-  std::sort(
-    words.begin(),
-    words.end(),
-    CompareByFrequency(false));
-
-  size_t limit = std::min(static_cast< size_t >(count), words.size());
-  std::transform(
-    words.begin(),
-    words.begin() + limit,
-    std::ostream_iterator< std::string >(out, "\n"),
-    printPair);
+  printWords(dicts, name, out, static_cast< size_t >(count), true);
 }
 
 void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -310,22 +232,7 @@ void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in, std::
     return;
   }
 
-  auto it1 = dicts.find(dict1);
-  auto it2 = dicts.find(dict2);
-  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  Dictionary &dictNew = dicts[newDict];
-  dictNew.clear();
-
-  std::copy_if(
-    it1->second.begin(),
-    it1->second.end(),
-    std::inserter(dictNew, dictNew.begin()),
-    WordPresenceFilter(it2->second, true));
+  combineDictionaries(dicts, newDict, dict1, dict2, out, true);
 }
 
 void filonova::excludeDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
@@ -338,20 +245,5 @@ void filonova::excludeDictionary(DictionarySet &dicts, std::istream &in, std::os
     return;
   }
 
-  auto it1 = dicts.find(dict1);
-  auto it2 = dicts.find(dict2);
-  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  Dictionary &dictNew = dicts[newDict];
-  dictNew.clear();
-
-  std::copy_if(
-    it1->second.begin(),
-    it1->second.end(),
-    std::inserter(dictNew, dictNew.begin()),
-    WordPresenceFilter(it2->second, false));
+  combineDictionaries(dicts, newDict, dict1, dict2, out, false);
 }
