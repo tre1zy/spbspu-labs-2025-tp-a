@@ -6,15 +6,18 @@
 #include <utility>
 #include "dataIO.hpp"
 
-struct DataStruct
+namespace averenkov
 {
-  char key1;
-  std::pair< long long, unsigned long long > key2;
-  std::string key3;
-};
+  struct DataStruct
+  {
+    char key1;
+    std::pair< long long, unsigned long long > key2;
+    std::string key3;
+  };
 
-std::istream& operator>>(std::istream& in, DataStruct& dest);
-std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
-bool operator<(const DataStruct& a, const DataStruct& b);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  bool operator<(const DataStruct& a, const DataStruct& b);
+}
 
 #endif

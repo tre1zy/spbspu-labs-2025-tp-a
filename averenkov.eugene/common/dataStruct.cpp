@@ -1,11 +1,9 @@
 #include "dataStruct.hpp"
-#include <sstream>
+#include <istream>
 #include <algorithm>
 #include "iofmtguard.hpp"
 
-using namespace averenkov;
-
-std::istream& operator>>(std::istream& in, DataStruct& dest)
+std::istream& averenkov::operator>>(std::istream& in, DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -15,19 +13,26 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
   DataStruct tmp;
   in >> DelimiterIO{'('} >> DelimiterIO{':'};
   std::string field;
+  bool hasKey1 = false;
+  bool hasKey2 = false;
+  bool hasKey3 = false;
+
   while (in >> field)
   {
-    if (field == "key1")
+    if (field == "key1" && !hasKey1)
     {
       in >> CharIO{tmp.key1} >> DelimiterIO{':'};
+      hasKey1 = true;
     }
-    else if (field == "key2")
+    else if (field == "key2" && !hasKey2)
     {
       in >> RationalIO{tmp.key2} >> DelimiterIO{':'};
+      hasKey2 = true;
     }
-    else if (field == "key3")
+    else if (field == "key3" && !hasKey3)
     {
       in >> StringIO{tmp.key3} >> DelimiterIO{':'};
+      hasKey3 = true;
     }
     else if (field == ")")
     {
@@ -46,7 +51,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& dest)
+std::ostream& averenkov::operator<<(std::ostream& out, const DataStruct& dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -61,17 +66,15 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& dest)
   return out;
 }
 
-bool operator<(const DataStruct& a, const DataStruct& b)
+bool averenkov::operator<(const DataStruct& a, const DataStruct& b)
 {
   if (a.key1 != b.key1)
   {
     return a.key1 < b.key1;
   }
-  double a_val = static_cast< double >(a.key2.first) / a.key2.second;
-  double b_val = static_cast< double >(b.key2.first) / b.key2.second;
-  if (std::abs(a_val - b_val) > 1e-9)
+  if (a.key2 != b.key2)
   {
-    return a_val < b_val;
+    return a.key2 < b.key2;
   }
   return a.key3.length() < b.key3.length();
 }

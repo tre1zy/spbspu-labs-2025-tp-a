@@ -9,6 +9,12 @@
 
 namespace averenkov
 {
+  double acum(const std::vector< Polygon >& polygons, std::function< double(double accumulator, const Polygon& polygon) > func);
+
+  struct Prod
+  {
+    double operator()(const averenkov::Point& a, const averenkov::Point& b) const;
+  };
 
   struct VertexCount
   {
@@ -19,66 +25,130 @@ namespace averenkov
     size_t num_;
   };
 
+  struct AreaComparator
+  {
+    bool operator()(const Polygon& a, const Polygon& b) const;
+  };
+
+  struct VertexCountComparator
+  {
+    bool operator()(const Polygon& a, const Polygon& b) const;
+  };
+
   struct AreaSumCalculator
   {
-    double operator()(const std::vector<Polygon>& polygons) const;
+    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector< Polygon >& polygons) const;
   };
 
-  struct EvenAreaSumCalculator
+  struct EvenSumCalculator
   {
-    double operator()(const std::vector<Polygon>& polygons) const;
+    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector< Polygon >& polygons) const;
   };
 
-  struct OddAreaSumCalculator
+  struct OddSumCalculator
   {
-    double operator()(const std::vector<Polygon>& polygons) const;
+    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector< Polygon >& polygons) const;
   };
 
-  struct NumVertexAreaSumCalculator
+  struct IsEven
+  {
+    bool operator()(const Polygon& poly) const;
+  };
+
+  struct IsOdd
+  {
+    bool operator()(const Polygon& poly) const;
+  };
+
+  struct NumVertexCalculator
   {
     size_t num;
-    double operator()(const std::vector<Polygon>& polygons) const;
-  };
+    double operator()(double sum, const Polygon& poly) const;
+    double operator()(const std::vector< Polygon >& polygons) const;
+ };
 
   struct MeanAreaCalculator
   {
-    double operator()(const std::vector<Polygon>& polygons) const;
+    double operator()(const std::vector< Polygon >& polygons) const;
   };
+
+  void printMaxArea(const std::vector< Polygon >& polygons, std::ostream& out);
+
+  void printMaxVertexCount(const std::vector< Polygon >& polygons, std::ostream& out);
+
+  void printMinArea(const std::vector< Polygon >& polygons, std::ostream& out);
+
+  void printMinVertexCount(const std::vector< Polygon >& polygons, std::ostream& out);
 
   struct MaxAreaFinder
   {
-    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
+  public:
+    explicit MaxAreaFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MaxAreaFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MaxAreaFinder& finder);
 
   struct MaxVertexCountFinder
   {
-    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
+  public:
+    explicit MaxVertexCountFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MaxVertexCountFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MaxVertexCountFinder& finder);
 
   struct MinAreaFinder
   {
-    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
+  public:
+    explicit MinAreaFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MinAreaFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MinAreaFinder& finder);
 
   struct MinVertexCountFinder
   {
-    void operator()(const std::vector<Polygon>& polygons, std::ostream& out) const;
+  public:
+    explicit MinVertexCountFinder(const std::vector< Polygon >& polygons);
+    friend std::ostream& operator<<(std::ostream& out, const MinVertexCountFinder& finder);
+  private:
+    const std::vector< Polygon >& polygons_;
   };
+
+  std::ostream& operator<<(std::ostream& out, const MinVertexCountFinder& finder);
 
   struct EvenCounter
   {
-    size_t operator()(const std::vector<Polygon>& polygons) const;
+    size_t operator()(const std::vector< Polygon >& polygons) const;
   };
 
   struct OddCounter
   {
-    size_t operator()(const std::vector<Polygon>& polygons) const;
+    size_t operator()(const std::vector< Polygon >& polygons) const;
   };
 
   struct NumVertexCounter
   {
     size_t num;
-    size_t operator()(const std::vector<Polygon>& polygons) const;
+    size_t operator()(const std::vector< Polygon >& polygons) const;
+  };
+
+  struct AngleCheckHelper
+  {
+    const std::vector< Point >& pts;
+    size_t idx;
+    AngleCheckHelper(const std::vector< Point >& points);
+    bool operator()(const Point&);
   };
 
   struct RightAngleChecker
