@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     std::copy(polygon_it(input), polygon_it(), std::back_inserter(polygons));
     if (!input)
     {
-      input.clear();
+      input.clear(input.rdstate() ^ std::ios_base::failbit);
       input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }

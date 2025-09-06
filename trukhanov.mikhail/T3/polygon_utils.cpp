@@ -3,12 +3,14 @@
 #include <cmath>
 #include "polygon.hpp"
 
+trukhanov::isSize::isSize(size_t s) : size(s) {}
+
 bool trukhanov::isSize::operator()(const trukhanov::Polygon& p) const
 {
   return p.points.size() == size;
 }
 
-bool trukhanov::CompareByArea::operator()(const Polygon& lhs, const Polygon& rhs) const
+bool trukhanov::CompareByArea(const Polygon& lhs, const Polygon& rhs)
 {
   double lhsArea = getArea(lhs);
   double rhsArea = getArea(rhs);
@@ -20,12 +22,12 @@ bool trukhanov::LessArea::operator()(const Polygon& p) const
   return getArea(p) < area;
 }
 
-bool trukhanov::CompareByVertexes::operator()(const Polygon& lhs, const Polygon& rhs) const
+bool trukhanov::compareByVertexes(const Polygon& lhs, const Polygon& rhs)
 {
-  return compareByVertexes(lhs, rhs);
+  return lhs.points.size(), rhs.points.size();
 }
 
-bool trukhanov::HasDuplicates::operator()(const Polygon& p) const
+bool trukhanov::HasDuplicates(const Polygon& p)
 {
   if (p.points.size() < 2)
   {
@@ -36,14 +38,14 @@ bool trukhanov::HasDuplicates::operator()(const Polygon& p) const
   return std::adjacent_find(sortedPoints.begin(), sortedPoints.end()) != sortedPoints.end();
 }
 
-bool trukhanov::PolygonHasMinSize::operator()(const trukhanov::Polygon& p) const
+bool trukhanov::PolygonHasMinSize(const trukhanov::Polygon& p)
 {
   return p.points.size() >= 3;
 }
 
-double trukhanov::VectorProduct::operator()(const Point& a, const Point& b, const Point& c) const
+double trukhanov::VectorProduct(const Point& a, const Point& b, const Point& c)
 {
-  return 0.5 * std::abs(static_cast< double >((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)));
+  return 0.5 * std::abs(static_cast<double>((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)));
 }
 
 trukhanov::Angle trukhanov::MakeAngles::operator()(std::size_t i) const

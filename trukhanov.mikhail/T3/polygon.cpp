@@ -16,13 +16,12 @@ double trukhanov::getArea(const Polygon& polygon)
     return 0;
   }
 
-  std::vector< double > areas;
-  areas.reserve(n - 2);
+  std::vector< double > areas(n-2);
 
   using namespace std::placeholders;
-  auto calc = std::bind(VectorProduct{}, pts[0], _1, _2);
+  auto calc = std::bind(VectorProduct, pts[0], _1, _2);
 
-  std::transform(pts.begin() + 1, pts.end() - 1, pts.begin() + 2, std::back_inserter(areas), calc);
+  std::transform(pts.begin() + 1, pts.end() - 1, pts.begin() + 2, areas.begin(), calc);
 
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
@@ -35,11 +34,6 @@ bool trukhanov::isEven(const Polygon& polygon)
 bool trukhanov::isOdd(const Polygon& polygon)
 {
   return polygon.points.size() != 0 && polygon.points.size() % 2 != 0;
-}
-
-bool trukhanov::compareByVertexes(const Polygon& lhs, const Polygon& rhs)
-{
-  return lhs.points.size() < rhs.points.size();
 }
 
 bool trukhanov::isRight(const Polygon& polygon)

@@ -81,7 +81,7 @@ void maxArea(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
   {
     throw std::invalid_argument("Unknown subcommand");
   }
-  out << getArea(*std::max_element(src.begin(), src.end(), trukhanov::CompareByArea())) << '\n';
+  out << getArea(*std::max_element(src.begin(), src.end(), trukhanov::CompareByArea)) << '\n';
 }
 
 void maxVertexes(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
@@ -90,7 +90,7 @@ void maxVertexes(std::ostream& out, const std::vector < trukhanov::Polygon >& sr
   {
     throw std::invalid_argument("Unknown subcommand");
   }
-  out << std::max_element(src.begin(), src.end(), trukhanov::CompareByVertexes())->points.size() << '\n';
+  out << std::max_element(src.begin(), src.end(), trukhanov::compareByVertexes)->points.size() << '\n';
 }
 
 void minArea(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
@@ -99,7 +99,7 @@ void minArea(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
   {
     throw std::invalid_argument("Unknown subcommand");
   }
-  out << getArea(*std::min_element(src.begin(), src.end(), trukhanov::CompareByArea())) << '\n';
+  out << getArea(*std::min_element(src.begin(), src.end(), trukhanov::CompareByArea)) << '\n';
 }
 
 void minVertexes(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
@@ -108,24 +108,24 @@ void minVertexes(std::ostream& out, const std::vector < trukhanov::Polygon >& sr
   {
     throw std::invalid_argument("Unknown subcommand");
   }
-  out << std::min_element(src.begin(), src.end(), trukhanov::CompareByVertexes())->points.size() << '\n';
+  out << std::min_element(src.begin(), src.end(), trukhanov::compareByVertexes)->points.size() << '\n';
 }
 
 void countEven(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
 {
   std::vector< trukhanov::Polygon > filtered;
-  std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), trukhanov::PolygonHasMinSize{});
+  std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), trukhanov::PolygonHasMinSize);
   out << std::count_if(filtered.begin(), filtered.end(), trukhanov::isEven) << '\n';
 }
 
 void countOdd(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
 {
   std::vector< trukhanov::Polygon > filtered;
-  std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), trukhanov::PolygonHasMinSize{});
+  std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), trukhanov::PolygonHasMinSize);
   out << std::count_if(filtered.begin(), filtered.end(), trukhanov::isOdd) << '\n';
 }
 
-struct countVertexes
+struct CountVertexes
 {
   const std::vector< trukhanov::Polygon >& src;
   std::ostream& out;
@@ -140,7 +140,7 @@ struct countVertexes
     else
     {
       std::vector< trukhanov::Polygon > filtered;
-      std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), trukhanov::PolygonHasMinSize{});
+      std::copy_if(src.begin(), src.end(), std::back_inserter(filtered), trukhanov::PolygonHasMinSize);
       out << std::count_if(filtered.begin(), filtered.end(), trukhanov::isSize{ n }) << '\n';
     }
   }
@@ -208,7 +208,7 @@ void trukhanov::count(std::istream& in, std::ostream& out, const std::vector < P
   if (std::all_of(subcommand.begin(), subcommand.end(), ::isdigit))
   {
     size_t n = std::stoull(subcommand);
-    countVertexes{ src, out, n }();
+    CountVertexes{ src, out, n }();
   }
   else
   {
@@ -221,8 +221,7 @@ void trukhanov::lessArea(std::istream& in, std::ostream& out, const std::vector 
   Polygon polygon;
   in >> polygon;
 
-  HasDuplicates checkDuplicates;
-  if (!in || polygon.points.size() < 3 || !checkDuplicates(polygon))
+  if (!in || polygon.points.size() < 3 || !HasDuplicates(polygon))
   {
     throw std::invalid_argument("Unknown subcommand");
   }

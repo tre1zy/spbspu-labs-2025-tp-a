@@ -1,9 +1,9 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-#include <data_input.hpp>
 #include <vector>
 #include <iostream>
+#include <data_input.hpp>
 
 namespace trukhanov
 {

@@ -2,6 +2,7 @@
 #define POLYGON_UTILS_HPP
 
 #include <cstddef>
+#include <algorithm>
 #include "polygon.hpp"
 
 namespace trukhanov
@@ -9,14 +10,11 @@ namespace trukhanov
   struct isSize
   {
     size_t size;
-    isSize(size_t s) : size (s) {}
+    isSize(size_t s);
     bool operator()(const Polygon& p) const;
   };
 
-  struct CompareByArea
-  {
-    bool operator()(const Polygon& lhs, const Polygon& rhs) const;
-  };
+  bool CompareByArea(const Polygon& lhs, const Polygon& rhs);
 
   struct LessArea
   {
@@ -24,25 +22,13 @@ namespace trukhanov
     bool operator()(const Polygon& p) const;
   };
 
-  struct CompareByVertexes
-  {
-    bool operator()(const Polygon& lhs, const Polygon& rhs) const;
-  };
+  bool compareByVertexes(const Polygon& lhs, const Polygon& rhs);
 
-  struct HasDuplicates
-  {
-    bool operator()(const Polygon& p) const;
-  };
+  bool HasDuplicates(const Polygon& p);
 
-  struct PolygonHasMinSize
-  {
-    bool operator()(const Polygon& p) const;
-  };
+  bool PolygonHasMinSize(const trukhanov::Polygon& p);
 
-  struct VectorProduct
-  {
-    double operator()(const Point& a, const Point& b, const Point& c) const;
-  };
+  double VectorProduct(const Point& a, const Point& b, const Point& c);
 
   struct MakeAngles
   {
@@ -52,7 +38,7 @@ namespace trukhanov
 
   struct HasRightAngle
   {
-    explicit HasRightAngle(const std::vector< Point >& pts):
+    explicit HasRightAngle(const std::vector< Point >& pts) :
       pts_(pts)
     {}
     bool operator()(const Angle& ang) const;
