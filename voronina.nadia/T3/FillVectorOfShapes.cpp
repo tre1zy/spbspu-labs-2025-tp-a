@@ -1,6 +1,5 @@
 #include "FillVectorOfShapes.h"
 
-#include <exception>
 #include <iterator>
 #include <limits>
 
@@ -15,7 +14,7 @@ namespace voronina
     std::vector< Polygon > input;
     while (!fin.eof())
     {
-      using IstreamIterator = std::istream_iterator < Polygon >;
+      using IstreamIterator = std::istream_iterator< Polygon >;
       std::copy(IstreamIterator(fin), IstreamIterator(), std::back_inserter(input));
       if (fin.fail() && !fin.eof())
       {

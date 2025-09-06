@@ -1,11 +1,11 @@
-#include <string>
-#include <map>
 #include <functional>
 #include <limits>
+#include <map>
+#include <string>
 
-#include "Shapes.h"
 #include "Commands.h"
 #include "FillVectorOfShapes.h"
+#include "Shapes.h"
 
 int main(int argc, char* argv[])
 {

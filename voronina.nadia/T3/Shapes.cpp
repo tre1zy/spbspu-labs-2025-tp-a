@@ -1,13 +1,13 @@
 #include "Shapes.h"
 
-#include <iomanip>
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 
 #include <Delimiter.h>
 #include <IOFmtguard.h>
 
-std::istream &voronina::operator>>(std::istream &in, Point &point)
+std::istream& voronina::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -16,11 +16,11 @@ std::istream &voronina::operator>>(std::istream &in, Point &point)
   }
 
   Point input;
-  in >> DelimiterIO{'('};
+  in >> DelimiterIO{ '(' };
   in >> input.x;
-  in >> DelimiterIO{';'};
+  in >> DelimiterIO{ ';' };
   in >> input.y;
-  in >> DelimiterIO{')'};
+  in >> DelimiterIO{ ')' };
 
   if (!in.fail())
   {
@@ -29,7 +29,7 @@ std::istream &voronina::operator>>(std::istream &in, Point &point)
   return in;
 }
 
-std::istream &voronina::operator>>(std::istream &in, Polygon &polygon)
+std::istream& voronina::operator>>(std::istream& in, Polygon& polygon)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -58,17 +58,24 @@ std::istream &voronina::operator>>(std::istream &in, Polygon &polygon)
   return in;
 }
 
-bool voronina::Point::operator==(const Point &point) const
+bool voronina::Point::operator==(const Point& point) const
 {
   return (x == point.x && y == point.y);
 }
 
-voronina::Point voronina::operator-(const Point &left, const Point &right)
+voronina::Point voronina::operator-(const Point& left, const Point& right)
 {
-  return Point {left.x - right.x, left.y - right.y};
+  return Point{ left.x - right.x, left.y - right.y };
 }
 
-bool voronina::Polygon::operator==(const Polygon &polygon) const
+double voronina::distance(const Point& left, const Point& right)
+{
+  int dx = left.x - right.x;
+  int dy = left.y - right.y;
+  return std::sqrt(dx * dx + dy * dy);
+}
+
+bool voronina::Polygon::operator==(const Polygon& polygon) const
 {
   return (points == polygon.points);
 }

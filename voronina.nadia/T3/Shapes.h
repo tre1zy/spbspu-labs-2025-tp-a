@@ -1,8 +1,8 @@
 #ifndef SHAPES_H
 #define SHAPES_H
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 namespace voronina
 {
@@ -12,8 +12,10 @@ namespace voronina
     bool operator==(const Point& point) const;
   };
 
-  Point operator-(const Point &left, const Point &right);
+  Point operator-(const Point& left, const Point& right);
   std::istream& operator>>(std::istream& in, Point& point);
+
+  double distance(const Point& left, const Point& right);
 
   struct Polygon
   {
