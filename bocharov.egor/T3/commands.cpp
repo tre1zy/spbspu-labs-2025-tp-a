@@ -14,22 +14,17 @@ namespace
   using namespace bocharov;
   using Predicate = std::function< bool(const Polygon &) >;
 
-  struct AreaAccumulator
-  {
-    Predicate pred;
-    double operator()(double sum, const Polygon & poly) const
-    {
-      return pred(poly) ? sum + getPolygonArea(poly) : sum;
-    }
-  };
-
   struct AreaSumCalculator
   {
     Predicate pred;
     double operator()(const std::vector< Polygon > & polygons) const
     {
-      AreaAccumulator accumulator{pred};
-      return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+      std::vector<Polygon> filteredPolygons;
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
+      std::vector<double> areas;
+      areas.reserve(filteredPolygons.size());
+      std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), getPolygonArea);
+      return std::accumulate(areas.begin(), areas.end(), 0.0);
     }
   };
 
@@ -100,8 +95,8 @@ namespace
   void getAreaByPredicate(std::ostream & out, const std::vector< Polygon > & polygons, Predicate pred)
   {
     StreamGuard guard(out);
-    AreaAccumulator accumulator{pred};
-    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+    AreaSumCalculator calculator{pred};
+    double result = calculator(polygons);
     out << std::fixed << std::setprecision(1) << result;
   }
 
