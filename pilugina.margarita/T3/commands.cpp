@@ -7,7 +7,7 @@
 #include "maxCommands.hpp"
 #include "minCommands.hpp"
 #include "extraCommands.hpp"
-#include "extraPeremetrCommands.hpp"
+#include "extraPerimeterCommands.hpp"
 
 void pilugina::areaCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
 {
@@ -72,7 +72,7 @@ void pilugina::permsCommand(std::istream &in, std::ostream &out, const std::vect
   }
 }
 
-void pilugina::peremeterCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
+void pilugina::perimeterCommand(std::istream &in, std::ostream &out, const std::vector< Polygon > &polys)
 {
   FormatGuard g(out);
   out << std::fixed << std::setprecision(1) << calcPerimeters(polys, in);

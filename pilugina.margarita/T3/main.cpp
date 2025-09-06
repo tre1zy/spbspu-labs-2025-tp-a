@@ -47,7 +47,7 @@ int main(int argc, char **argv)
       {"ECHO", std::bind(pilugina::echoCommand, _1, _2, std::ref(polygons))},
       {"INTERSECTIONS", std::bind(pilugina::intersectsCommand, _1, _2, std::cref(polygons))},
       {"PERMS", std::bind(pilugina::permsCommand, _1, _2, std::cref(polygons))},
-      {"PEREMETR", std::bind(pilugina::peremeterCommand, _1, _2, std::cref(polygons))}
+      {"PERIMETER", std::bind(pilugina::perimeterCommand, _1, _2, std::cref(polygons))}
 
   };
 

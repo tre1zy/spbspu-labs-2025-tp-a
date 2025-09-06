@@ -12,7 +12,7 @@ namespace pilugina
   void echoCommand(std::istream &, std::ostream &, std::vector< Polygon > &);
   void intersectsCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
   void permsCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
-  void peremeterCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
+  void perimeterCommand(std::istream &, std::ostream &, const std::vector< Polygon > &);
 }
 
 #endif
