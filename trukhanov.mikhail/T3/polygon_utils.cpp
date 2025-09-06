@@ -24,7 +24,7 @@ bool trukhanov::LessArea::operator()(const Polygon& p) const
 
 bool trukhanov::compareByVertexes(const Polygon& lhs, const Polygon& rhs)
 {
-  return lhs.points.size(), rhs.points.size();
+  return lhs.points.size() < rhs.points.size();
 }
 
 bool trukhanov::HasDuplicates(const Polygon& p)
