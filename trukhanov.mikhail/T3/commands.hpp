@@ -13,6 +13,7 @@ namespace trukhanov
   void count(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
   void lessArea(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
   void right(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
+  void commonSide(std::istream& in, std::ostream& out, const std::vector < Polygon >& src);
 }
 
 #endif

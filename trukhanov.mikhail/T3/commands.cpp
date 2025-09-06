@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 #include <iomanip>
-#include <stream_guard.hpp>
 #include <data_input.hpp>
+#include <stream_guard.hpp>
 #include "polygon_utils.hpp"
 #include "polygon.hpp"
 
@@ -125,6 +125,35 @@ void countOdd(std::ostream& out, const std::vector < trukhanov::Polygon >& src)
   out << std::count_if(filtered.begin(), filtered.end(), trukhanov::isOdd) << '\n';
 }
 
+struct ShowCommonPoint
+{
+  const std::vector< trukhanov::Polygon >& polygons;
+  std::ostream& out;
+
+  void operator()() const
+  {
+    bool result = trukhanov::hasCommonPoint(polygons);
+    out << (result ? "YES\n" : "NO\n");
+  }
+};
+
+struct ShowCommonSide
+{
+  const std::vector< trukhanov::Polygon >& polygons;
+  std::ostream& out;
+
+  void operator()() const
+  {
+    if (polygons.size() < 2)
+    {
+      out << "NO\n";
+      return;
+    }
+    bool result = trukhanov::CheckAllSides(polygons)(0);
+    out << (result ? "YES\n" : "NO\n");
+  }
+};
+
 struct CountVertexes
 {
   const std::vector< trukhanov::Polygon >& src;
@@ -214,6 +243,19 @@ void trukhanov::count(std::istream& in, std::ostream& out, const std::vector < P
   {
     subcommands.at(subcommand)();
   }
+}
+
+void trukhanov::commonSide(std::istream& in, std::ostream& out, const std::vector < Polygon >& src)
+{
+  std::string subcommand;
+  in >> subcommand;
+
+  out << std::fixed << std::showpoint << std::setprecision(1);
+
+  std::map< std::string, std::function< void() > > subcommands;
+  subcommands["SIDE"] = ShowCommonSide{ src, out };
+  subcommands["VERTEXES"] = ShowCommonPoint{ src, out };
+  subcommands.at(subcommand)();
 }
 
 void trukhanov::lessArea(std::istream& in, std::ostream& out, const std::vector < Polygon >& src)

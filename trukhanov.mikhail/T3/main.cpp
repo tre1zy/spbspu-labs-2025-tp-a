@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
   cmds["COUNT"] = std::bind(trukhanov::count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["LESSAREA"] = std::bind(trukhanov::lessArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   cmds["RIGHTSHAPES"] = std::bind(trukhanov::right, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COMMONSIDE"] = std::bind(trukhanov::commonSide, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (!(std::cin >> command).eof() && !std::cin.bad())
