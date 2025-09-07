@@ -19,3 +19,21 @@ std::istream& smirnov::operator>>(std::istream& in, BinKey&& key)
     }
     return in;
 }
+
+std::istream& smirnov::operator>>(std::istream& in, RATKey&& key)
+{
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+        in.setstate(std::ios::failbit);
+    }
+    long long ll{};
+    unsigned long long ull{};
+    in >> anyStrD{ "(:n" } >> ll >> anyStrD{ ":d" } >> ull >> strictStrD{ ":)" };
+    if (in)
+    {
+        key.pair.first = ll;
+        key.pair.second = ull;
+    }
+    return in;
+}
