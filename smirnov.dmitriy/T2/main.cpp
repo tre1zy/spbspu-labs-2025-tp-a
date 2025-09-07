@@ -3,19 +3,24 @@
 #include <limits>
 #include "DataStruct.hpp"
 
-int main() {
-    using namespace smirnov;
+int main()
+{
+  using namespace smirnov;
+  using inputIt = std::istream_iterator< DataStruct >;
+  using outputIt = std::ostream_iterator< DataStruct >;
 
-    using input_it_t = std::istream_iterator< DataStruct >;
-    using output_it_t = std::ostream_iterator< DataStruct >;
-    std::vector< DataStruct > data;
-    while (!std::cin.eof())
+  std::list< DataStruct > data{};
+
+  while (!std::cin.eof())
+  {
+    if (!std::cin)
     {
-        std::copy(input_it_t{std::cin}, input_it_t{}, std::back_inserter(data));
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::sort(data.begin(), data.end());
-    std::copy(data.cbegin(), data.cend(), output_it_t{std::cout, "\n"});
-    return 0;
+    std::copy(inputIt{ std::cin }, inputIt{}, std::back_inserter(data));
+  }
+  data.sort();
+  std::copy(data.cbegin(), data.cend(), outputIt{ std::cout, "\n" });
+  return 0;
 }
