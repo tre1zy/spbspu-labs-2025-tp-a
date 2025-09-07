@@ -1,6 +1,7 @@
-#include "DelimiterI.hpp"
-#include <istream>
+#include "Delimiter.hpp"
+
 #include <cctype>
+#include <ios>
 
 std::istream & smirnov::operator>>(std::istream & input, Delimiter && exp)
 {
