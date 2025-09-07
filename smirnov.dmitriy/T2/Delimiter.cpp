@@ -3,21 +3,53 @@
 #include <cctype>
 #include <ios>
 
-std::istream & smirnov::operator>>(std::istream & input, Delimiter && exp)
+std::istream& smirnov::operator>>(std::istream& in, const DelimiterCharI&& delimiter)
 {
-    std::istream::sentry guard(input);
-    if (!guard)
-    {
-        return input;
-    }
-    char c = 0;
-    for (size_t i = 0; exp.expected[i] != '\0'; i++)
-    {
-        input >> c;
-        if (c != exp.expected[i])
-        {
-            input.setstate(std::ios::failbit);
-        }
-    }
-    return input;
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  char c = 0;
+  in >> c;
+
+  if (std::isalpha(c))
+  {
+    c = std::tolower(c);
+  }
+
+  if (c != delimiter.expected)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
+
+std::istream& smirnov::operator>>(std::istream& in, const DelimiterStringI&& delimiter)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  for (size_t i = 0; delimiter.expected[i] != '\0'; ++i)
+  {
+    char c = {};
+    in >> c;
+
+    if (std::isalpha(c))
+    {
+      c = std::tolower(c);
+    }
+
+    if (c != delimiter.expected[i])
+    {
+      in.setstate(std::ios::failbit);
+      break;
+    }
+  }
+  return in;
+}
+
