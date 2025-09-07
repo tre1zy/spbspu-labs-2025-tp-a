@@ -11,7 +11,7 @@ namespace smirnov {
         std::string key3;
         std::string raw_bin;
 
-	bool operator<(const DataStruct &other) const;
+  bool operator<(const DataStruct &other) const;
     };
 
     std::istream& operator>>(std::istream& is, DataStruct& ds);

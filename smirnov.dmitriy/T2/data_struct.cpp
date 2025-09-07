@@ -136,7 +136,7 @@ namespace smirnov {
         return os;
     }
 
-	bool DataStruct::operator<(const DataStruct& other) const
+  bool DataStruct::operator<(const DataStruct& other) const
   {
       if (key1 == other.key1)
       {
