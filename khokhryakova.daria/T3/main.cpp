@@ -6,8 +6,7 @@
 #include <string>
 #include <functional>
 #include "commands.h"
-#include "polygon.h"
-#include "polygon.h"
+#include "poligon.h"
 
 int main(int argc, char** argv)
 {
