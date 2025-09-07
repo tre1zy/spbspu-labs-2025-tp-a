@@ -13,11 +13,7 @@ int main()
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
-    std::copy(
-      isIterator(std::cin),
-      isIterator(),
-      std::back_inserter(data)
-    );
+    std::copy(isIterator(std::cin), isIterator(), std::back_inserter(data));
     if (!std::cin)
     {
       std::cin.clear();
@@ -25,10 +21,6 @@ int main()
     }
   }
   std::sort(data.begin(), data.end(), compare);
-  std::copy(
-    data.cbegin(),
-    data.cend(),
-    osIterator(std::cout, "\n")
-  );
+  std::copy(data.cbegin(), data.cend(), osIterator(std::cout, "\n"));
   return 0;
 }
