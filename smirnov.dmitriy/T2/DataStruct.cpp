@@ -81,3 +81,19 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& value)
   return in;
 }
 
+std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& value)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
+  {
+    return out;
+  }
+  ScopeGuard scopeGuard(out);
+
+  out << std::setprecision(1) << std::fixed << "(";
+  out << ":key1 " << value.key1 << "d";
+  out << ":key2 0b" << getBinNumber(value.key2);
+  out << ":key3 \"" << value.key3 << "\":)";
+
+  return out;
+}
