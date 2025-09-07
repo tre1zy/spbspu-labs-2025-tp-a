@@ -1,9 +1,7 @@
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <limits>
+#include <list>
 #include <iterator>
-#include "data_struct.hpp"
+#include <limits>
+#include "DataStruct.hpp"
 
 int main() {
     using namespace smirnov;
