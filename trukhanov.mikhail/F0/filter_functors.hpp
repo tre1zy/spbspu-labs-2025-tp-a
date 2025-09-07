@@ -25,7 +25,6 @@ namespace trukhanov
     std::size_t to;
     const ConcordanceIndex& src;
     ConcordanceIndex& dest;
-
     void operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
   };
 
@@ -35,13 +34,7 @@ namespace trukhanov
     std::size_t to;
     const ConcordanceIndex& src;
     ConcordanceIndex& dest;
-    LineFilter(
-      const ConcordanceIndex& s,
-      ConcordanceIndex& d,
-      std::size_t f,
-      std::size_t t)
-      : from(f), to(t), src(s), dest(d)
-    {}
+    LineFilter(const ConcordanceIndex& s, ConcordanceIndex& d, std::size_t f, std::size_t t);
     void operator()() const;
   };
 }

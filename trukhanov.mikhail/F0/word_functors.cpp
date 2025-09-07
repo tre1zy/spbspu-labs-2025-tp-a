@@ -3,6 +3,10 @@
 #include <iterator>
 #include <sstream>
 
+trukhanov::FindWord::FindWord(const ConcordanceIndex& index_, const std::string& word_, const std::string& indexName_, std::ostream& out_):
+  word(word_), index(index_), indexName(indexName_), out(out_)
+{}
+
 void trukhanov::FindWord::operator()() const
 {
   auto it = index.index.find(word);
@@ -13,8 +17,16 @@ void trukhanov::FindWord::operator()() const
     return;
   }
 
-  std::copy(it->second.begin(), it->second.end(), std::ostream_iterator< size_t >(out, " "));
-  out << '\n';
+  if (!it->second.empty())
+  {
+    auto last = std::prev(it->second.end());
+    std::copy(it->second.begin(), last, std::ostream_iterator< size_t >(out, " "));
+    out << *last << '\n';
+  }
+  else
+  {
+    out << '\n';
+  }
 }
 
 void trukhanov::ReplaceWordFunctor::operator()()
@@ -46,6 +58,10 @@ void trukhanov::PrintExportLine::operator()(std::size_t lineNo) const
     out << ' ' << lineNo;
   }
 }
+
+trukhanov::ExportWordFunctor::ExportWordFunctor(const std::vector< std::string >& lines_, std::ostream& out_, const std::string& word_):
+  lines(lines_), out(out_), word(word_)
+{}
 
 void trukhanov::ExportWordFunctor::operator()(const std::map< std::string, std::set< std::size_t > >& index) const
 {

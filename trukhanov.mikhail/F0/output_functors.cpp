@@ -5,8 +5,19 @@
 
 void trukhanov::ShowIndexEntry::operator()(const std::pair< const std::string, std::set< size_t > >& entry) const
 {
-  out << entry.first << ' ';
-  std::copy(entry.second.begin(), entry.second.end(), std::ostream_iterator< std::size_t >(out, " "));
+  out << entry.first;
+
+  if (!entry.second.empty())
+  {
+    auto last = std::prev(entry.second.end());
+    if (entry.second.begin() != last)
+    {
+      std::copy(entry.second.begin(), last, std::ostream_iterator< size_t >(out, " "));
+      out << ' ';
+    }
+    out << *last;
+  }
+
   out << '\n';
 }
 
@@ -17,8 +28,19 @@ void trukhanov::ShowEntry::operator()(const std::pair< std::string, std::size_t 
 
 void trukhanov::FileWriter::operator()(const std::pair< const std::string, std::set< std::size_t > >& entry) const
 {
-  out << entry.first << ' ';
-  std::copy(entry.second.begin(), entry.second.end(), std::ostream_iterator< std::size_t >(out, " "));
+  out << entry.first;
+
+  if (!entry.second.empty())
+  {
+    auto last = std::prev(entry.second.end());
+    if (entry.second.begin() != last)
+    {
+      std::copy(entry.second.begin(), last, std::ostream_iterator< std::size_t >(out, " "));
+      out << ' ';
+    }
+    out << *last;
+  }
+
   out << '\n';
 }
 

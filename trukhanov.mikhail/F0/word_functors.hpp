@@ -14,13 +14,7 @@ namespace trukhanov
     const ConcordanceIndex& index;
     const std::string& indexName;
     std::ostream& out;
-    FindWord(
-      const ConcordanceIndex& index_,
-      const std::string& word_,
-      const std::string& indexName_,
-      std::ostream& out_)
-      : word(word_), index(index_), indexName(indexName_), out(out_)
-    {}
+    FindWord(const ConcordanceIndex& index_, const std::string& word_, const std::string& indexName_, std::ostream& out_);
     void operator()() const;
   };
 
@@ -41,11 +35,7 @@ namespace trukhanov
 
   struct ExportWordFunctor
   {
-    ExportWordFunctor(
-      const std::vector< std::string >& lines_,
-      std::ostream& out_, const std::string& word_)
-      : lines(lines_), out(out_), word(word_)
-    {}
+    ExportWordFunctor(const std::vector< std::string >& lines_, std::ostream& out_, const std::string& word_);
     void operator()(const std::map< std::string, std::set< std::size_t > >& index) const;
   private:
     const std::vector< std::string >& lines;
