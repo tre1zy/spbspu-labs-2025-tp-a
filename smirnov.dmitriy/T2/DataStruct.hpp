@@ -3,19 +3,23 @@
 
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include "Delimiter.hpp"
 
-namespace smirnov {
-    struct DataStruct {
-        double key1;
-        unsigned long long key2;
-        std::string key3;
-        std::string raw_bin;
+namespace smirnov
+{
+  struct DataStruct
+  {
+    double key1;
+    unsigned long long key2;
+    std::string key3;
 
-  bool operator<(const DataStruct &other) const;
-    };
+    bool operator<(const DataStruct& oth) const;
+  };
 
-    std::istream& operator>>(std::istream& is, DataStruct& ds);
-    std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
+std::istream& operator>>(std::istream& in, DataStruct& value);
+std::ostream& operator<<(std::ostream& out, const DataStruct& value);
+
 }
 
 #endif
