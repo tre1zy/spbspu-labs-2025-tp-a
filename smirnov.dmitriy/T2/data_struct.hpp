@@ -10,9 +10,10 @@ namespace smirnov {
         unsigned long long key2;
         std::string key3;
         std::string raw_bin;
+
+	bool operator<(const DataStruct &other) const;
     };
 
-    bool compareDataStruct(const DataStruct& a, const DataStruct& b);
     std::istream& operator>>(std::istream& is, DataStruct& ds);
     std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
 }
