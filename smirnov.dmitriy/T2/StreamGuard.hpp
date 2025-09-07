@@ -3,3 +3,18 @@
 
 #include <ios>
 
+namespace smirnov
+{
+    class StreamGuard
+    {
+    public:
+        explicit StreamGuard(std::basic_ios< char > & ios);
+        ~StreamGuard();
+    private:
+        std::basic_ios< char > & ios_;
+        std::streamsize precision_;
+        std::basic_ios< char >::fmtflags flags_;
+    };
+}
+
+#endif
