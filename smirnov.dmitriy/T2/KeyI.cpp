@@ -37,3 +37,19 @@ std::istream& smirnov::operator>>(std::istream& in, RATKey&& key)
     }
     return in;
 }
+
+std::istream& smirnov::operator>>(std::istream& in, STRKey&& key)
+{
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+        in.setstate(std::ios::failbit);
+    }
+    std::string tmp = "";
+    std::getline(in >> strictDel{ '"' }, tmp, '"');
+    if (in)
+    {
+        key.str = tmp;
+    }
+    return in;
+}
