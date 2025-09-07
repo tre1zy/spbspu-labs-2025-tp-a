@@ -33,7 +33,7 @@ namespace
     size_t count;
     bool operator()(const khokhryakova::Polygon& poly)
     {
-        return poly.points.size() == count;
+      return poly.points.size() == count;
     }
   };
 
@@ -61,13 +61,17 @@ namespace
   {
     if (polygons.empty())
     {
-      throw std::logic_error("No polygons");
+      throw std::logic_error("<INVALID COMMAND>");
     }
     return areaSum(polygons, acceptAll) / polygons.size();
   }
 
   double areaNum(const std::vector< khokhryakova::Polygon >& polygons, size_t angle)
   {
+    if (angle < 3)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     return areaSum(polygons, VertexPred{ angle });
   }
 
@@ -84,48 +88,66 @@ namespace
   template< typename Predicate >
   size_t countIf(const std::vector< khokhryakova::Polygon >& polygons, Predicate p)
   {
-    std::vector< khokhryakova::Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), p);
-    return filtered.size();
+    return std::count_if(polygons.begin(), polygons.end(), p);
   }
 
-  void countEven(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
+  size_t countEven(const std::vector< khokhryakova::Polygon >& polygons)
   {
-    out << countIf(polygons, isEven) << "\n";
+    return countIf(polygons, isEven);
   }
 
-  void countOdd(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
+  size_t countOdd(const std::vector< khokhryakova::Polygon >& polygons)
   {
-    out << countIf(polygons, isOdd) << "\n";
+    return countIf(polygons, isOdd);
   }
 
-  void countNum(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out, size_t n)
+  size_t countNum(const std::vector< khokhryakova::Polygon >& polygons, size_t n)
   {
-    out << countIf(polygons, VertexPred{ n }) << "\n";
+    if (n < 3)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    return countIf(polygons, VertexPred{ n });
   }
 
-  void areaMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
+  double areaMax(const std::vector< khokhryakova::Polygon >& polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     auto max = *std::max_element(polygons.begin(), polygons.end(), areaCompare);
-    out << std::fixed << std::setprecision(1) << khokhryakova::getArea(max) << "\n";
+    return khokhryakova::getArea(max);
   }
 
-  void vertexMax(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
+  size_t vertexMax(const std::vector< khokhryakova::Polygon >& polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     auto max = *std::max_element(polygons.begin(), polygons.end(), vertexCompare);
-    out << max.points.size() << "\n";
+    return max.points.size();
   }
 
-  void areaMin(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
+  double areaMin(const std::vector< khokhryakova::Polygon >& polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     auto min = *std::min_element(polygons.begin(), polygons.end(), areaCompare);
-    out << std::fixed << std::setprecision(1) << khokhryakova::getArea(min) << "\n";
+    return khokhryakova::getArea(min);
   }
 
-  void vertexMin(const std::vector< khokhryakova::Polygon >& polygons, std::ostream& out)
+  size_t vertexMin(const std::vector< khokhryakova::Polygon >& polygons)
   {
+    if (polygons.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     auto min = *std::min_element(polygons.begin(), polygons.end(), vertexCompare);
-    out << min.points.size() << "\n";
+    return min.points.size();
   }
 }
 
@@ -137,22 +159,29 @@ void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector< 
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
   subcommands["ODD"] = std::bind(areaOdd, std::cref(polygons));
   subcommands["MEAN"] = std::bind(areaMedian, std::cref(polygons));
-  try
+  if (subcommands.count(command))
   {
-    if (subcommands.count(command))
-    {
-      out << std::fixed << std::setprecision(1) << subcommands.at(command)() << "\n";
-    }
-    else
+    out << std::fixed << std::setprecision(1) << subcommands.at(command)() << "\n";
+  }
+  else
+  {
+    try
     {
       size_t angles = std::stoull(command);
-      if (angles < 3) throw std::logic_error("Error: vertices < 3");
+      if (angles < 3)
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
       out << std::fixed << std::setprecision(1) << areaNum(polygons, angles) << "\n";
     }
-  }
-  catch (...)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
+    catch (const std::invalid_argument&)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    catch (const std::out_of_range&)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
   }
 }
 
@@ -162,16 +191,17 @@ void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector< P
   in >> command;
   if (polygons.empty())
   {
-    throw std::logic_error("Error: not found polygons");
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  std::map< std::string, std::function<void() > > subcommands;
-  subcommands["AREA"] = std::bind(areaMax, std::cref(polygons), std::ref(out));
-  subcommands["VERTEXES"] = std::bind(vertexMax, std::cref(polygons), std::ref(out));
-  try
+  if (command == "AREA")
   {
-    subcommands.at(command)();
+    out << std::fixed << std::setprecision(1) << areaMax(polygons) << "\n";
   }
-  catch (...)
+  else if (command == "VERTEXES")
+  {
+    out << vertexMax(polygons) << "\n";
+  }
+  else
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -183,20 +213,50 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector< P
   in >> command;
   if (polygons.empty())
   {
-    throw std::logic_error("Error: not found polygons");
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  std::map< std::string, std::function<void() > > subcommands;
-  subcommands["AREA"] = std::bind(areaMin, std::cref(polygons), std::ref(out));
-  subcommands["VERTEXES"] = std::bind(vertexMin, std::cref(polygons), std::ref(out));
+  if (command == "AREA")
+  {
+    out << std::fixed << std::setprecision(1) << areaMin(polygons) << "\n";
+  }
+  else if (command == "VERTEXES")
+  {
+    out << vertexMin(polygons) << "\n";
+  }
+  else
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
 }
 
 void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
 {
   std::string command;
   in >> command;
-  std::map< std::string, std::function<void() > > subcommands;
-  subcommands["EVEN"] = std::bind(countEven, std::cref(polygons), std::ref(out));
-  subcommands["ODD"] = std::bind(countOdd, std::cref(polygons), std::ref(out));
+  if (command == "EVEN")
+  {
+    out << countEven(polygons) << "\n";
+  }
+  else if (command == "ODD")
+  {
+    out << countOdd(polygons) << "\n";
+  }
+  else
+  {
+    try
+    {
+      size_t n = std::stoull(command);
+      out << countNum(polygons, n) << "\n";
+    }
+    catch (const std::invalid_argument&)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    catch (const std::out_of_range&)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+  }
 }
 
 void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygon >& polygons, const std::string& filename)
@@ -234,7 +294,7 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygo
     file << "\n";
   }
   polygons = newPolygons;
-  out << count;
+  out << count << "\n";
 }
 
 void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)

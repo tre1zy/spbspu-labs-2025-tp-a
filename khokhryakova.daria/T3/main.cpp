@@ -6,6 +6,8 @@
 #include <string>
 #include <functional>
 #include "commands.h"
+#include "polygon.h"
+#include "polygon.h"
 
 int main(int argc, char** argv)
 {
@@ -17,6 +19,7 @@ int main(int argc, char** argv)
     std::cerr << "Incorrect parameters\n";
     return 1;
   }
+
   std::vector< Polygon > polygon;
   std::ifstream file(argv[1]);
   while (!file.eof())
@@ -28,21 +31,23 @@ int main(int argc, char** argv)
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
-  std::map< std::string, std::function<void() > > commands;
+
+  std::map< std::string, std::function< void() > > commands;
   const std::string filename = argv[1];
+
   commands["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
   commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
   commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
   commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
   commands["ECHO"] = std::bind(echo, std::ref(std::cin), std::ref(std::cout), std::ref(polygon), argv[1]);
   commands["MAXSEQ"] = std::bind(maxSeq, std::ref(std::cin), std::ref(std::cout), std::cref(polygon));
+
   std::string command;
   while (!(std::cin >> command).eof())
   {
     try
     {
       commands.at(command)();
-      std::cout << "\n";
     }
     catch (...)
     {
