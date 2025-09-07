@@ -136,9 +136,17 @@ namespace smirnov {
         return os;
     }
 
-    bool compareDataStruct(const DataStruct& a, const DataStruct& b) {
-        if (a.key1 != b.key1) return a.key1 < b.key1;
-        if (a.key2 != b.key2) return a.key2 < b.key2;
-        return a.key3.size() < b.key3.size();
-    }
+	bool DataStruct::operator<(const DataStruct& other) const
+  {
+      if (key1 == other.key1)
+      {
+          if (key2 * other.key2 == other.key2 * key2)
+          {
+              return key3.size() < other.key3.size();
+          }
+          return key2 * other.key2 < other.key2 * key2;
+      }
+      return key1 < other.key1;
+  }
 }
+
