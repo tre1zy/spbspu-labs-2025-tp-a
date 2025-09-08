@@ -10,23 +10,10 @@
 
 namespace trukhanov
 {
-
-  struct ShowIndexEntry
-  {
-    std::ostream& out;
-    void operator()(const std::pair< const std::string, std::set< std::size_t > >& entry) const;
-  };
-
   struct ShowEntry
   {
     std::ostream& out;
     void operator()(const std::pair< std::string, std::size_t >& pair) const;
-  };
-
-  struct FileWriter
-  {
-    std::ostream& out;
-    void operator()(const std::pair< const std::string, std::set< std::size_t > >& entry) const;
   };
 
   struct MergeLinesFunctor
@@ -50,9 +37,19 @@ namespace trukhanov
 
   struct MergeWithOffset
   {
-    trukhanov::ConcordanceIndex& dest;
+    ConcordanceIndex& dest;
     std::size_t offset;
-    void operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
+    void operator()(const std::pair<const std::string, std::set< std::size_t > >& pair) const;
+  };
+
+  struct PairToWordEntry
+  {
+    WordEntry operator()(const IndexMap::value_type& p) const;
+  };
+
+  struct ShowEntryToString
+  {
+    std::string operator()(const std::pair< std::string, std::size_t >& p) const;
   };
 }
 

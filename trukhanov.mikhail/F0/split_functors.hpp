@@ -21,12 +21,6 @@ namespace trukhanov
     std::map< std::string, std::set< std::size_t > >& wordMap;
     std::size_t operator()(std::size_t lineNumber) const;
   };
-
-  struct InsertToIndex
-  {
-    ConcordanceIndex& index;
-    void operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
-  };
 }
 
 #endif

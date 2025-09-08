@@ -12,18 +12,22 @@ std::size_t trukhanov::AdjustOffset::operator()(std::size_t val) const
   return val - offset;
 }
 
-void trukhanov::ProcessPair::operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const
+std::pair< std::string, std::set< std::size_t > > trukhanov::FilterAdjustPair::operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const
 {
   std::vector< std::size_t > filtered;
   std::copy_if(pair.second.begin(), pair.second.end(), std::back_inserter(filtered), trukhanov::InRange{ from, to });
 
-  if (!filtered.empty())
+  if (filtered.empty())
   {
-    std::set< std::size_t > adjusted;
-    std::transform(filtered.begin(), filtered.end(), std::inserter(adjusted, adjusted.end()), trukhanov::AdjustOffset{ from - 1 });
-    dest.index[pair.first] = std::move(adjusted);
+    return {};
   }
+
+  std::set< std::size_t > adjusted;
+  std::transform(filtered.begin(), filtered.end(), std::inserter(adjusted, adjusted.end()), trukhanov::AdjustOffset{ from - 1 });
+
+  return { pair.first, std::move(adjusted) };
 }
+
 
 trukhanov::LineFilter::LineFilter(const ConcordanceIndex& s, ConcordanceIndex& d, std::size_t f,std::size_t t):
   from(f), to(t), src(s), dest(d)
@@ -31,5 +35,10 @@ trukhanov::LineFilter::LineFilter(const ConcordanceIndex& s, ConcordanceIndex& d
 
 void trukhanov::LineFilter::operator()() const
 {
-  std::for_each(src.index.begin(), src.index.end(), ProcessPair{ from, to, src, dest });
+  std::transform(
+    src.index.begin(),
+    src.index.end(),
+    std::inserter(dest.index, dest.index.end()),
+    FilterAdjustPair{ from, to }
+  );
 }

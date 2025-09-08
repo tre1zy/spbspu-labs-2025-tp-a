@@ -18,8 +18,3 @@ std::size_t trukhanov::SplitWords::operator()(std::size_t lineNumber) const
   std::for_each(words.begin(), words.end(), splitter);
   return lineNumber;
 }
-
-void trukhanov::InsertToIndex::operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const
-{
-  index.index[pair.first] = pair.second;
-}

@@ -1,47 +1,11 @@
 #include "output_functors.hpp"
 #include <algorithm>
 #include <iterator>
-#include <sstream>
-
-void trukhanov::ShowIndexEntry::operator()(const std::pair< const std::string, std::set< size_t > >& entry) const
-{
-  out << entry.first;
-
-  if (!entry.second.empty())
-  {
-    auto last = std::prev(entry.second.end());
-    if (entry.second.begin() != last)
-    {
-      std::copy(entry.second.begin(), last, std::ostream_iterator< size_t >(out, " "));
-      out << ' ';
-    }
-    out << *last;
-  }
-
-  out << '\n';
-}
+#include <iostream>
 
 void trukhanov::ShowEntry::operator()(const std::pair< std::string, std::size_t >& pair) const
 {
   out << pair.first << ' ' << pair.second << '\n';
-}
-
-void trukhanov::FileWriter::operator()(const std::pair< const std::string, std::set< std::size_t > >& entry) const
-{
-  out << entry.first;
-
-  if (!entry.second.empty())
-  {
-    auto last = std::prev(entry.second.end());
-    if (entry.second.begin() != last)
-    {
-      std::copy(entry.second.begin(), last, std::ostream_iterator< std::size_t >(out, " "));
-      out << ' ';
-    }
-    out << *last;
-  }
-
-  out << '\n';
 }
 
 std::string trukhanov::MergeLinesFunctor::operator()()
@@ -96,7 +60,21 @@ void trukhanov::MergeWithOffset::operator()(const std::pair< const std::string, 
   std::transform(
     pair.second.begin(),
     pair.second.end(),
-    std::inserter(adjusted,adjusted.end()),
-    trukhanov::AddOffset{ offset });
-  dest.index[pair.first].insert(adjusted.begin(), adjusted.end());
+    std::inserter(adjusted, adjusted.end()),
+    AddOffset{ offset }
+  );
+
+  auto& target = dest.index[pair.first];
+  target.insert(adjusted.begin(), adjusted.end());
+}
+
+
+trukhanov::WordEntry trukhanov::PairToWordEntry::operator()(const IndexMap::value_type& p) const
+{
+  return WordEntry(p);
+}
+
+std::string trukhanov::ShowEntryToString::operator()(const std::pair< std::string, std::size_t >& p) const
+{
+  return p.first + " : " + std::to_string(p.second);
 }

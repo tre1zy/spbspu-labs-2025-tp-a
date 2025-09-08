@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 {
   if (argc > 2)
   {
-    std::cerr << "ERROR: wrong arguments\n";
+    std::cerr << "ERROR: wrong arguments" << '\n';
     return 1;
   }
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     std::ifstream test(arg);
     if (!test.is_open())
     {
-      std::cerr << "ERROR: there is no such file\n";
+      std::cerr << "ERROR: there is no such file" << '\n';
       return 1;
     }
   }
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     };
 
   std::string command;
-  while (!(std::cin >> command).eof())
+  while (!(std::cin >> command).eof() && !std::cin.bad())
   {
     try
     {
@@ -90,9 +90,9 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
+      std::cout << "<INVALID COMMAND>" << '\n';
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
   return 0;

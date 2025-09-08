@@ -19,13 +19,11 @@ namespace trukhanov
     std::size_t operator()(std::size_t val) const;
   };
 
-  struct ProcessPair
+  struct FilterAdjustPair
   {
     std::size_t from;
     std::size_t to;
-    const ConcordanceIndex& src;
-    ConcordanceIndex& dest;
-    void operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
+    std::pair< std::string, std::set< std::size_t > > operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
   };
 
   struct LineFilter

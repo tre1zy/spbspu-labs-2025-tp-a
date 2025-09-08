@@ -26,13 +26,6 @@ namespace trukhanov
     void operator()();
   };
 
-  struct PrintExportLine
-  {
-    std::ostream& out;
-    const std::vector< std::string >& lines;
-    void operator()(std::size_t lineNo) const;
-  };
-
   struct ExportWordFunctor
   {
     ExportWordFunctor(const std::vector< std::string >& lines_, std::ostream& out_, const std::string& word_);
@@ -78,8 +71,7 @@ namespace trukhanov
 
   struct FrequencyCollector
   {
-    std::vector< std::pair< std::string, std::size_t > >& result;
-    void operator()(const std::pair< const std::string, std::set< std::size_t > >& entry) const;
+    std::pair< std::string, std::size_t > operator()(const IndexMap::value_type& entry) const;
   };
 }
 
