@@ -37,8 +37,8 @@ namespace voronina
 
   std::ostream& operator<<(std::ostream& out, Symbol const& symbol)
   {
-    iofmtguard guard{out};
-   
+    iofmtguard guard{ out };
+
     std::string symbolRepresentation;
     switch (symbol.symbol)
     {

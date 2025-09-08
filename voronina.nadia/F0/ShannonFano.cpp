@@ -175,7 +175,7 @@ namespace
   {
     return sum + symb.frequency * std::log2(symb.frequency);
   }
-}
+} // namespace
 
 namespace voronina
 {

@@ -247,7 +247,7 @@ namespace
   {
     return a.code < b.code;
   };
-}
+} // namespace
 
 namespace voronina
 {
