@@ -14,7 +14,12 @@ namespace trukhanov
     const ConcordanceIndex& index;
     const std::string& indexName;
     std::ostream& out;
-    FindWord(const ConcordanceIndex& index_, const std::string& word_, const std::string& indexName_, std::ostream& out_);
+    FindWord(
+      const ConcordanceIndex& index_,
+      const std::string& word_,
+      const std::string& indexName_,
+      std::ostream& out_
+    );
     void operator()() const;
   };
 
@@ -66,7 +71,9 @@ namespace trukhanov
 
   struct CompareByFrequencyDesc
   {
-    bool operator()(const std::pair< std::string, std::size_t >& a, const std::pair< std::string, std::size_t >& b) const;
+    bool operator()(
+      const std::pair< std::string, std::size_t >& a,
+      const std::pair< std::string, std::size_t >& b) const;
   };
 
   struct FrequencyCollector

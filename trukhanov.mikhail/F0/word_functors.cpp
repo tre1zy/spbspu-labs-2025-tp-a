@@ -4,7 +4,11 @@
 #include <algorithm>
 #include <iterator>
 
-trukhanov::FindWord::FindWord(const ConcordanceIndex& index_, const std::string& word_, const std::string& indexName_, std::ostream& out_):
+trukhanov::FindWord::FindWord(
+  const ConcordanceIndex& index_,
+  const std::string& word_,
+  const std::string& indexName_,
+  std::ostream& out_):
   word(word_), index(index_), indexName(indexName_), out(out_)
 {}
 
@@ -41,7 +45,9 @@ void trukhanov::ReplaceWordFunctor::operator()()
   index.index.erase(oldWord);
 }
 
-trukhanov::ExportWordFunctor::ExportWordFunctor(const std::vector< std::string >& lines_, std::ostream& out_, const std::string& word_):
+trukhanov::ExportWordFunctor::ExportWordFunctor(
+  const std::vector< std::string >& lines_,
+  std::ostream& out_, const std::string& word_):
   lines(lines_), out(out_), word(word_)
 {}
 

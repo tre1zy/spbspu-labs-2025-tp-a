@@ -23,7 +23,9 @@ namespace trukhanov
   {
     std::size_t from;
     std::size_t to;
-    std::pair< std::string, std::set< std::size_t > > operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
+    std::pair< std::string, std::set< std::size_t > > operator()(
+      const std::pair< const std::string,
+      std::set< std::size_t > >& pair) const;
   };
 
   struct LineFilter
