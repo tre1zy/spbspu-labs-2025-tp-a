@@ -28,7 +28,7 @@ std::ostream& nikitin::operator<<(std::ostream& out, const DataStruct& dest)
   out << std::fixed << std::setprecision(1);
   out << ":key2 #c(" << dest.key2.real() << " " << dest.key2.imag() << ")";
   out << ":key3 " << "\"" << dest.key3 << "\":)";
-  return out; 
+  return out;
 }
 
 std::istream& nikitin::operator>>(std::istream& in, DataStruct& dest)
