@@ -116,7 +116,7 @@ void trukhanov::CommandProcessor::showIndex(const std::string& indexName)
 
   const ConcordanceIndex& index = it->second;
 
-  std::transform(index.index.begin(), index.index.end(), std::ostream_iterator< WordEntry >(out_, "\n"), PairToWordEntry{});
+  std::transform(index.index.begin(), index.index.end(), std::ostream_iterator< WordEntry >(out_, "\n"), pairToWordEntry);
 }
 
 void trukhanov::CommandProcessor::clearIndex(const std::string& indexName)
@@ -142,9 +142,9 @@ void trukhanov::CommandProcessor::showFrequency(const std::string& indexName)
 
   std::vector< std::pair< std::string, std::size_t > > result;
 
-  std::transform(it->second.index.begin(), it->second.index.end(), std::back_inserter(result), FrequencyCollector{});
-  std::sort(result.begin(), result.end(), CompareByFrequencyDesc{});
-  std::transform(result.begin(), result.end(), std::ostream_iterator< std::string >(out_, "\n"), ShowEntryToString{});
+  std::transform(it->second.index.begin(), it->second.index.end(), std::back_inserter(result), frequencyCollector);
+  std::sort(result.begin(), result.end(), compareByFrequencyDesc);
+  std::transform(result.begin(), result.end(), std::ostream_iterator< std::string >(out_, "\n"), showEntryToString);
 }
 
 void trukhanov::CommandProcessor::saveIndex(const std::string& indexName, const std::string& filename)
@@ -163,10 +163,9 @@ void trukhanov::CommandProcessor::saveIndex(const std::string& indexName, const 
     throw std::invalid_argument("Invalid command");
   }
 
-  const trukhanov::ConcordanceIndex& index = it->second;
+  const ConcordanceIndex& index = it->second;
 
-  std::transform(index.index.begin(), index.index.end(), std::ostream_iterator< WordEntry >(file, "\n"), PairToWordEntry{}
-  );
+  std::transform(index.index.begin(), index.index.end(), std::ostream_iterator< WordEntry >(file, "\n"), pairToWordEntry);
   out_ << "Index " << indexName << " saved to " << filename << '\n';
 }
 
@@ -233,7 +232,7 @@ void trukhanov::CommandProcessor::listIndexes()
   std::vector< std::string > lines;
   lines.reserve(indexes_.size());
 
-  std::transform(indexes_.begin(), indexes_.end(), std::back_inserter(lines), trukhanov::FormatIndexEntry{});
+  std::transform(indexes_.begin(), indexes_.end(), std::back_inserter(lines), formatIndexEntry);
   std::copy(lines.begin(), lines.end(), std::ostream_iterator< std::string >(out_, "\n"));
 }
 
@@ -253,8 +252,8 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   std::set< std::string > words1;
   std::set< std::string > words2;
 
-  std::transform(index1.index.begin(), index1.index.end(), std::inserter(words1, words1.begin()), trukhanov::ExtractWord{});
-  std::transform(index2.index.begin(), index2.index.end(), std::inserter(words2, words2.begin()), trukhanov::ExtractWord{});
+  std::transform(index1.index.begin(), index1.index.end(), std::inserter(words1, words1.begin()), extractWord);
+  std::transform(index2.index.begin(), index2.index.end(), std::inserter(words2, words2.begin()), extractWord);
 
   std::set< std::string > common;
   std::set< std::string > unique1;
@@ -265,7 +264,7 @@ void trukhanov::CommandProcessor::compareIndexes(const std::string& name1, const
   std::set_difference(words2.begin(), words2.end(), words1.begin(), words1.end(), std::inserter(unique2, unique2.begin()));
 
   std::vector< std::string>  diffs;
-  std::copy_if(common.begin(), common.end(), std::back_inserter(diffs), trukhanov::FindDifferentFrequencies{ index1, index2 });
+  std::copy_if(common.begin(), common.end(), std::back_inserter(diffs), FindDifferentFrequencies{ index1, index2 });
 
   out_ << "Common words:\n";
   std::copy(common.begin(), common.end(), std::ostream_iterator< std::string >(out_, "\n"));
@@ -292,15 +291,15 @@ void trukhanov::CommandProcessor::longestWords(const std::string& indexName, std
   const ConcordanceIndex& index = it->second;
   std::vector< std::string > result;
 
-  std::transform(index.index.begin(), index.index.end(), std::back_inserter(result), trukhanov::ExtractWord{});
-  std::sort(result.begin(), result.end(), trukhanov::LengthGreater{});
+  std::transform(index.index.begin(), index.index.end(), std::back_inserter(result), extractWord);
+  std::sort(result.begin(), result.end(), lengthGreater);
 
   if (result.size() > count)
   {
     result.resize(count);
   }
 
-  std::transform(result.begin(), result.end(), std::ostream_iterator< std::string >(out_, "\n"), trukhanov::OutputWord{ out_ });
+  std::transform(result.begin(), result.end(), std::ostream_iterator< std::string >(out_, "\n"), OutputWord{ out_ });
 }
 
 void trukhanov::CommandProcessor::shortestWords(const std::string& indexName, std::size_t count)
@@ -315,8 +314,8 @@ void trukhanov::CommandProcessor::shortestWords(const std::string& indexName, st
   const ConcordanceIndex& index = it->second;
   std::vector< std::string > result;
 
-  std::transform(index.index.begin(), index.index.end(), std::back_inserter(result), trukhanov::ExtractWord{});
-  std::sort(result.begin(), result.end(), trukhanov::LengthLess{});
+  std::transform(index.index.begin(), index.index.end(), std::back_inserter(result), extractWord);
+  std::sort(result.begin(), result.end(), lengthLess);
 
   if (result.size() > count)
   {
@@ -388,7 +387,7 @@ void trukhanov::CommandProcessor::mergeByLines(const std::string& index1, const 
   std::size_t maxSize = std::max(lines1.size(), lines2.size());
 
   std::vector< std::string > mergedLines(maxSize);
-  std::generate(mergedLines.begin(), mergedLines.end(), trukhanov::MergeLinesFunctor{ lines1, lines2, 0 });
+  std::generate(mergedLines.begin(), mergedLines.end(), MergeLinesFunctor{ lines1, lines2, 0 });
 
   ConcordanceIndex resultIndex;
   resultIndex.lines = mergedLines;

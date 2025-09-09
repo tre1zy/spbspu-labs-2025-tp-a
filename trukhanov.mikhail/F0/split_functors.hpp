@@ -22,15 +22,9 @@ namespace trukhanov
     std::size_t operator()(std::size_t lineNumber) const;
   };
 
-  struct IsSpace
-  {
-    bool operator()(unsigned char ch) const;
-  };
+  bool isSpace(unsigned char ch);
 
-  struct NotSpace
-  {
-    bool operator()(unsigned char ch) const;
-  };
+  bool notSpace(unsigned char ch);
 
   struct RecursiveSplitter
   {

@@ -14,12 +14,7 @@ namespace trukhanov
     const ConcordanceIndex& index;
     const std::string& indexName;
     std::ostream& out;
-    FindWord(
-      const ConcordanceIndex& index_,
-      const std::string& word_,
-      const std::string& indexName_,
-      std::ostream& out_
-    );
+    FindWord(const ConcordanceIndex& index_, const std::string& word_, const std::string& indexName_, std::ostream& out_);
     void operator()() const;
   };
 
@@ -41,20 +36,11 @@ namespace trukhanov
     const std::string& word;
   };
 
-  struct LengthGreater
-  {
-    bool operator()(const std::string& a, const std::string& b) const;
-  };
+  bool lengthGreater(const std::string& a, const std::string& b);
 
-  struct LengthLess
-  {
-    bool operator()(const std::string& a, const std::string& b) const;
-  };
+  bool lengthLess(const std::string& a, const std::string& b);
 
-  struct ExtractWord
-  {
-    std::string operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const;
-  };
+  std::string extractWord(const std::pair< const std::string, std::set< std::size_t > >& pair);
 
   struct OutputWord
   {
@@ -69,17 +55,9 @@ namespace trukhanov
     bool operator()(const std::string& word) const;
   };
 
-  struct CompareByFrequencyDesc
-  {
-    bool operator()(
-      const std::pair< std::string, std::size_t >& a,
-      const std::pair< std::string, std::size_t >& b) const;
-  };
+  bool compareByFrequencyDesc(const std::pair< std::string, std::size_t >& a, const std::pair< std::string, std::size_t >& b);
 
-  struct FrequencyCollector
-  {
-    std::pair< std::string, std::size_t > operator()(const IndexMap::value_type& entry) const;
-  };
+  std::pair< std::string, std::size_t > frequencyCollector(const IndexMap::value_type& entry);
 }
 
 #endif

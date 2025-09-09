@@ -16,7 +16,7 @@ std::pair< std::string, std::set< std::size_t > > trukhanov::FilterAdjustPair::o
   const std::pair< const std::string, std::set< std::size_t > >& pair) const
 {
   std::vector< std::size_t > filtered;
-  std::copy_if(pair.second.begin(), pair.second.end(), std::back_inserter(filtered), trukhanov::InRange{ from, to });
+  std::copy_if(pair.second.begin(), pair.second.end(), std::back_inserter(filtered), InRange{ from, to });
 
   if (filtered.empty())
   {
@@ -28,7 +28,7 @@ std::pair< std::string, std::set< std::size_t > > trukhanov::FilterAdjustPair::o
     filtered.begin(),
     filtered.end(),
     std::inserter(adjusted, adjusted.end()),
-    trukhanov::AdjustOffset{ from - 1 }
+    AdjustOffset{ from - 1 }
   );
 
   return { pair.first, std::move(adjusted) };

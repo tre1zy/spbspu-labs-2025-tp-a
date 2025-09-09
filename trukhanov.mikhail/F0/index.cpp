@@ -23,7 +23,8 @@ std::ostream& trukhanov::operator<<(std::ostream& out, const std::set< size_t >&
   if (it != s.end())
   {
     out << " ";
-    std::copy(it, s.end(), std::ostream_iterator< size_t >(out, " "));
+    std::copy(it, std::prev(s.end()), std::ostream_iterator< size_t >(out, " "));
+    out << *std::prev(s.end());
   }
 
   return out;

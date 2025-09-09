@@ -24,10 +24,7 @@ namespace trukhanov
     std::string operator()();
   };
 
-  struct FormatIndexEntry
-  {
-    std::string operator()(const std::pair< const std::string, ConcordanceIndex >& pair) const;
-  };
+  std::string formatIndexEntry(const std::pair< const std::string, ConcordanceIndex >& pair);
 
   struct AddOffset
   {
@@ -42,15 +39,9 @@ namespace trukhanov
     void operator()(const std::pair<const std::string, std::set< std::size_t > >& pair) const;
   };
 
-  struct PairToWordEntry
-  {
-    WordEntry operator()(const IndexMap::value_type& p) const;
-  };
+  WordEntry pairToWordEntry(const IndexMap::value_type& p);
 
-  struct ShowEntryToString
-  {
-    std::string operator()(const std::pair< std::string, std::size_t >& p) const;
-  };
+  std::string showEntryToString(const std::pair< std::string, std::size_t >& p);
 }
 
 #endif

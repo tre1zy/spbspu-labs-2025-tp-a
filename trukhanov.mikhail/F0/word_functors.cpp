@@ -63,17 +63,17 @@ void trukhanov::ExportWordFunctor::operator()(const std::map< std::string, std::
   out << entry << '\n';
 }
 
-bool trukhanov::LengthGreater::operator()(const std::string& a, const std::string& b) const
+bool trukhanov::lengthGreater(const std::string& a, const std::string& b)
 {
   return a.length() > b.length() || (a.length() == b.length() && a < b);
 }
 
-bool trukhanov::LengthLess::operator()(const std::string& a, const std::string& b) const
+bool trukhanov::lengthLess(const std::string& a, const std::string& b)
 {
   return a.length() < b.length() || (a.length() == b.length() && a < b);
 }
 
-std::string trukhanov::ExtractWord::operator()(const std::pair< const std::string, std::set< std::size_t > >& pair) const
+std::string trukhanov::extractWord(const std::pair< const std::string, std::set< std::size_t > >& pair)
 {
   return pair.first;
 }
@@ -83,7 +83,7 @@ std::string trukhanov::OutputWord::operator()(const std::string& word) const
   return word;
 }
 
-std::pair< std::string, std::size_t > trukhanov::FrequencyCollector::operator()(const IndexMap::value_type& entry) const
+std::pair< std::string, std::size_t > trukhanov::frequencyCollector(const IndexMap::value_type& entry)
 {
   return { entry.first, entry.second.size() };
 }
@@ -95,11 +95,12 @@ bool trukhanov::FindDifferentFrequencies::operator()(const std::string& word) co
   return set1.size() != set2.size();
 }
 
-bool trukhanov::CompareByFrequencyDesc::operator()(
+bool trukhanov::compareByFrequencyDesc(
   const std::pair< std::string,
   std::size_t >& a,
   const std::pair< std::string,
-  std::size_t >& b) const
+  std::size_t >& b
+)
 {
   return a.second > b.second;
 }
