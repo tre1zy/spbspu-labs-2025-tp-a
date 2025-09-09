@@ -1,4 +1,5 @@
 #include "index.hpp"
+#include "split_functors.hpp"
 #include <iostream>
 #include <set>
 #include <iterator>
@@ -32,4 +33,18 @@ std::ostream& trukhanov::operator<<(std::ostream& out, const trukhanov::WordEntr
 {
   out << entry.word << " : " << entry.lines;
   return out;
+}
+
+std::istream& trukhanov::operator>>(std::istream& in, std::vector< std::string >& args)
+{
+  std::string line;
+  if (!std::getline(in, line))
+  {
+    return in;
+  }
+
+  RecursiveSplitter splitter{ args };
+  splitter(line.begin(), line.end());
+
+  return in;
 }

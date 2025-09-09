@@ -27,6 +27,8 @@ namespace trukhanov
     std::string sourceFile;
   };
 
+  std::istream& operator>>(std::istream& in, std::vector< std::string >& args);
+
   class IndexStorage
   {
   public:
