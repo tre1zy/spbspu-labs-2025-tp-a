@@ -19,3 +19,13 @@ std::istream &smirnov::operator>>(std::istream &in, ULLBinary &&key)
   return in;
 }
 
+std::istream& smirnov::operator>>(std::istream& in, DBLLit&& key)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in >> key.value >> DelimiterCharI{ 'd' };
+}
