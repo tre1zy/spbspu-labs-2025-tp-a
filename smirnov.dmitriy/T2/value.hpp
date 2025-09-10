@@ -1,5 +1,5 @@
 #ifndef VALUE_HPP
-#define VALUE_HPP_HPP
+#define VALUE_HPP
 
 #include <istream>
 #include <string>
