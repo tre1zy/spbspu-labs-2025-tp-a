@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cmath>
 #include <iomanip>
-
+//
 namespace cherkasov
 {
   bool DataStruct::operator<(const DataStruct& other) const
