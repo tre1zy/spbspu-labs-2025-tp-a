@@ -11,11 +11,11 @@ std::istream& holodilov::operator>>(std::istream& in, DataStruct& dataStruct)
   }
 
   DataStruct dataStructTemp;
-  in >> io::DelimIO('(');
+  in >> io::DelimIO{ '(' };
   for (int i = 0; i < 3; ++i)
   {
-    in >> io::DelimIO(':');
-    io::KeyNameIO keyName(0);
+    in >> io::DelimIO{ ':' };
+    io::KeyNameIO keyName{ 0 };
     in >> keyName;
     if (keyName.keyNumber == 1)
     {
@@ -34,8 +34,8 @@ std::istream& holodilov::operator>>(std::istream& in, DataStruct& dataStruct)
       return in;
     }
   }
-  in >> io::DelimIO(':');
-  in >> io::DelimIO(')');
+  in >> io::DelimIO{ ':' };
+  in >> io::DelimIO{ ')' };
   if (in)
   {
     dataStruct = dataStructTemp;
@@ -95,7 +95,7 @@ std::istream& holodilov::io::operator>>(std::istream& in, UllOctIO&& ullOct)
   {
     return in;
   }
-  in >> DelimIO('0');
+  in >> DelimIO{ '0' };
   in >> ullOct.ullOctRef;
   if (in)
   {
@@ -128,13 +128,13 @@ std::istream& holodilov::io::operator>>(std::istream& in, ComplexIO&& complex)
   {
     return in;
   }
-  in >> DelimIO('#');
-  in >> DelimIO('c');
-  in >> DelimIO('(');
+  in >> DelimIO{ '#' };
+  in >> DelimIO{ 'c' };
+  in >> DelimIO{ '(' };
   double complexRe = 0;
   double complexIm = 0;
   in >> complexRe >> complexIm;
-  in >> DelimIO(')');
+  in >> DelimIO{ ')' };
   if (in)
   {
     complex.complexRef = std::complex< double >(complexRe, complexIm);
@@ -149,7 +149,7 @@ std::istream& holodilov::io::operator>>(std::istream& in, StringIO&& str)
   {
     return in;
   }
-  in >> DelimIO('\"');
+  in >> DelimIO{ '\"' };
   return std::getline(in, str.strRef, '\"');
 }
 
@@ -160,7 +160,7 @@ std::istream& holodilov::io::operator>>(std::istream& in, KeyNameIO& keyName)
   {
     return in;
   }
-  in >> DelimIO('k') >> DelimIO('e') >> DelimIO('y');
+  in >> DelimIO{ 'k' } >> DelimIO{ 'e' } >> DelimIO{ 'y' };
   if (in)
   {
     in >> keyName.keyNumber;
