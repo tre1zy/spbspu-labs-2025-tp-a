@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cmath>
 #include <iomanip>
-//
+
 namespace cherkasov
 {
   bool DataStruct::operator<(const DataStruct& other) const
@@ -32,44 +32,121 @@ namespace cherkasov
   std::istream& operator>>(std::istream& in, Complex&& io)
   {
     StreamGuard g(in);
-    in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('};
-    double re = 0.0, im = 0.0;
-    in >> re;
-    if (in.peek() == '+' || in.peek() == '-')
+    std::istream::sentry s(in);
+    if (!s)
     {
-      in >> im;
+      return in;
+    }
+    in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('};
+    if (!in)
+    {
+      return in;
+    }
+    double re = 0.0;
+    in >> re;
+    if (!in)
+    {
+      return in;
+    }
+    while (std::isspace(in.peek()))
+    {
+      in.get();
+    }
+    double im = 0.0;
+    in >> im;
+    if (!in)
+    {
+      return in;
     }
     in >> ExpectChar{')'};
     if (in)
     {
-      io.c = std::complex<double>(re, im);
+      io.c = std::complex< double >(re, im);
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Rational&& io)
+    std::istream& operator>>(std::istream& in, Rational&& io)
   {
     StreamGuard guard(in);
-    in >> ExpectChar{'('} >> ExpectChar{':'} >> ExpectChar{'N'} >> io.rat.first
-       >> ExpectChar{':'} >> ExpectChar{'D'} >> io.rat.second
-       >> ExpectChar{':'} >> ExpectChar{')'};
+    std::istream::sentry s(in);
+    if (!s)
+    {
+      return in;
+    }
+    in >> ExpectChar{'('} >> ExpectChar{':'} >> ExpectChar{'N'};
+    if (!in)
+    {
+      return in;
+    }
+    while (std::isspace(in.peek()))
+    {
+      in.get();
+    }
+    in >> io.rat.first;
+    if (!in)
+    {
+      return in;
+    }
+    in >> ExpectChar{':'} >> ExpectChar{'D'};
+    if (!in)
+    {
+      return in;
+    }
+    while (std::isspace(in.peek()))
+    {
+      in.get();
+    }
+    in >> io.rat.second;
+    if (io.rat.second == 0)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> ExpectChar{':'} >> ExpectChar{')'};
     return in;
   }
-
   std::istream& operator>>(std::istream& in, Strings&& io)
   {
     StreamGuard guard(in);
-    in >> std::noskipws >> ExpectChar{'"'};
-    char ch;
-    while (in >> ch && ch != '"')
+    std::istream::sentry s(in);
+    if (!s)
     {
-      if (ch == '\n')
+      return in;
+    }
+    in >> std::noskipws >> ExpectChar{'"'};
+    if (!in)
+    {
+      return in;
+    }
+    char ch;
+    io.s.clear();
+    bool escape = false;
+    while (in >> ch)
+    {
+      if (escape)
       {
-        in.setstate(std::ios::failbit);
+        io.s += ch;
+        escape = false;
+      }
+      else if (ch == '\\')
+      {
+        escape = true;
+      }
+      else if (ch == '"')
+      {
         break;
       }
-      io.s += ch;
+      else
+      {
+        io.s += ch;
+      }
     }
+    if (ch != '"')
+    {
+      in.setstate(std::ios::failbit);
+    }
+    in >> std::skipws;
     return in;
   }
 
@@ -84,11 +161,19 @@ namespace cherkasov
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
-    in >> ExpectChar{'('};
-    while (in)
+    in >> ExpectChar{'('} >> ExpectChar{':'};
+    while (in && in.peek() != ')')
     {
       std::string label;
-      in >> ExpectChar{':'} >> label;
+      char c;
+      while (in.get(c) && c != ':' && !std::isspace(c))
+      {
+        label += c;
+      }
+      if (c != ':')
+      {
+        while (in.get(c) && c != ':') {}
+      }
       if (label == "key1")
       {
         if (in.peek() == '#')
@@ -98,7 +183,7 @@ namespace cherkasov
         }
         else
         {
-         std::string dummy;
+          std::string dummy;
           std::getline(in, dummy, ':');
         }
       }
@@ -122,22 +207,22 @@ namespace cherkasov
       }
       else
       {
-        in.setstate(std::ios::failbit);
-        break;
+        std::string dummy;
+        std::getline(in, dummy, ':');
       }
-      if (in.peek() == ':')
+      while (std::isspace(in.peek()))
       {
-        in >> ExpectChar{':'};
-        if (in.peek() == ')')
-        {
-          in >> ExpectChar{')'};
-          break;
-        }
+        in.get();
       }
     }
+    in >> ExpectChar{')'};
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
       obj = temp;
+    }
+    else
+    {
+      in.setstate(std::ios::failbit);
     }
     return in;
   }
@@ -145,13 +230,14 @@ namespace cherkasov
   std::ostream& operator<<(std::ostream& out, const DataStruct& obj)
   {
     StreamGuard guard(out);
-    out << "(:key1 #c(" << std::fixed << std::setprecision(1) << obj.key1.real();
+    out << "(:key1 #c(" << std::fixed << std::setprecision(1);
+    out << obj.key1.real();
     if (obj.key1.imag() >= 0)
     {
       out << "+";
     }
     out << obj.key1.imag() << ")";
-    out << ":key2 (:N" << obj.key2.first << ":D" << obj.key2.second << ":)";
+    out << ":key2 (:N " << obj.key2.first << ":D " << obj.key2.second << ":)";
     out << ":key3 \"" << obj.key3 << "\":)";
     return out;
   }
