@@ -19,15 +19,15 @@ std::istream& holodilov::operator>>(std::istream& in, DataStruct& dataStruct)
     in >> keyName;
     if (keyName.keyNumber == 1)
     {
-      in >> io::UllOctIO(dataStructTemp.key1);
+      in >> io::UllOctIO{ dataStructTemp.key1 };
     }
     else if (keyName.keyNumber == 2)
     {
-      in >> io::ComplexIO(dataStructTemp.key2);
+      in >> io::ComplexIO{ dataStructTemp.key2 };
     }
     else if (keyName.keyNumber == 3)
     {
-      in >> io::StringIO(dataStructTemp.key3);
+      in >> io::StringIO{ dataStructTemp.key3 };
     }
     if (!in)
     {
