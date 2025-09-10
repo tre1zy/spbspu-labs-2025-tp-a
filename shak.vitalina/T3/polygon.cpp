@@ -26,24 +26,9 @@ bool shak::operator==(const Point &point1, const Point &point2)
   return ((point1.x == point2.x) && (point1.y == point2.y));
 }
 
-bool shak::operator<(const Point &point1, const Point &point2)
-{
-  return ((point1.x < point2.x) && (point1.y < point2.y));
-}
-
-bool shak::operator<=(const Point &point1, const Point &point2)
-{
-  return ((point1.x <= point2.x) && (point1.y <= point2.y));
-}
-
-bool shak::operator>=(const Point &point1, const Point &point2)
-{
-  return ((point1.x >= point2.x) && (point1.y >= point2.y));
-}
-
 double shak::getDistance(const Point &point1, const Point &point2)
 {
-  return (sqrt((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y)));
+  return (std::sqrt((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y)));
 }
 
 std::istream& shak::operator>>(std::istream &in, Polygon &dest)
@@ -98,7 +83,8 @@ bool shak::checkRectangle(const Polygon &polygon)
   double side3 = getDistance(points[2], points[3]);
   double side4 = getDistance(points[3], points[0]);
   bool isOpositeEqual = std::abs(side1 - side3) < epsilon && std::abs(side2 - side4) < epsilon;
-  if (!isOpositeEqual) {
+  if (!isOpositeEqual)
+  {
     return false;
   }
   double diagonal1 = getDistance(points[0], points[2]);
