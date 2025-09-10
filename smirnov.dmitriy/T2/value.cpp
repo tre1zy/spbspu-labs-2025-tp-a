@@ -29,3 +29,19 @@ std::istream& smirnov::operator>>(std::istream& in, DBLLit&& key)
 
   return in >> key.value >> DelimiterCharI{ 'd' };
 }
+
+std::istream& smirnov::operator>>(std::istream& in, StrKey&& key)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    in.setstate(std::ios::failbit);
+  }
+  std::string tmp{};
+  std::getline(in >> DelimiterCharI{ '"' }, tmp, '"');
+  if (in)
+  {
+    key.str = tmp;
+  }
+  return in;
+}
