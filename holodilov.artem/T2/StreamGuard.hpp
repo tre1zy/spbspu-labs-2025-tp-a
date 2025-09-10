@@ -25,4 +25,4 @@ namespace holodilov
   };
 }
 
-#endif //STREAM_GUARD_H
+#endif

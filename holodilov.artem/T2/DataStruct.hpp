@@ -61,4 +61,4 @@ namespace holodilov
   }
 }
 
-#endif //DATA_STRUCT_H
+#endif
