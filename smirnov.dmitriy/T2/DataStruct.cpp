@@ -1,8 +1,9 @@
 #include "DataStruct.hpp"
-#include <bitset>
 #include <algorithm>
+#include <bitset>
 #include "Delimiter.hpp"
 #include "ScopeGuard.hpp"
+#include "value.hpp"
 
 std::string getBinNumber(unsigned long long value)
 {
@@ -23,7 +24,7 @@ bool smirnov::DataStruct::operator<(const DataStruct& other) const
     return key2 < other.key2;
   }
 
-  return (key3.length() <= other.key3.length());
+  return key3.length() <= other.key3.length();
 }
 
 std::istream& smirnov::operator>>(std::istream& in, DataStruct& value)
@@ -51,23 +52,17 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& value)
     {
       case 1:
       {
-        in >> value.key1 >> delChar{ 'd' };
+        in >> DBLLit{value.key1};
         break;
       }
       case 2:
       {
-        std::bitset< 64 > bin;
-        in >> delString{ "0b" } >> bin;
-        if (in)
-        {
-          value.key2 = bin.to_ullong();
-        }
+        in >> ULLBinary{value.key2};
         break;
       }
       case 3:
       {
-        in >> delChar{ '"' };
-        std::getline(in, value.key3, '"');
+        in >> StrKey{value.key3};
         break;
       }
       default:
@@ -97,3 +92,4 @@ std::ostream& smirnov::operator<<(std::ostream& out, const DataStruct& value)
 
   return out;
 }
+
