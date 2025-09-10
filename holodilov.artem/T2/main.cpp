@@ -5,16 +5,19 @@
 #include <limits>
 #include "DataStruct.hpp"
 
-int main() {
+int main()
+{
   using holodilov::DataStruct;
   using istreamIter = std::istream_iterator<DataStruct>;
   using ostreamIter = std::ostream_iterator<DataStruct>;
 
   std::vector< DataStruct > vecDataStruct;
-  while (!std::cin.eof()) {
+  while (!std::cin.eof())
+  {
     std::copy(istreamIter(std::cin), istreamIter(), std::back_inserter(vecDataStruct));
 
-    if (!std::cin) {
+    if (!std::cin)
+    {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }

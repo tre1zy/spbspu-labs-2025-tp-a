@@ -3,8 +3,10 @@
 
 #include <iostream>
 
-namespace holodilov {
-  class StreamGuard final {
+namespace holodilov
+{
+  class StreamGuard final
+  {
   public:
     explicit StreamGuard(std::basic_ios<char>& stream);
 

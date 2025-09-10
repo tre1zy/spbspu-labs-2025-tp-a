@@ -4,9 +4,11 @@
 #include <complex>
 #include <string>
 
-namespace holodilov {
+namespace holodilov
+{
 
-  struct DataStruct {
+  struct DataStruct
+  {
     unsigned long long key1;
     std::complex< double > key2;
     std::string key3;
@@ -18,26 +20,32 @@ namespace holodilov {
 
   std::ostream& operator<<(std::ostream& out, const DataStruct& dataStruct);
 
-  namespace io {
-    struct DelimIO {
+  namespace io
+  {
+    struct DelimIO
+    {
       char delim;
     };
 
-    struct UllOctIO {
+    struct UllOctIO
+    {
       unsigned long long& ullOctRef;
 
       bool checkOctFormat() const;
     };
 
-    struct ComplexIO {
+    struct ComplexIO
+    {
       std::complex<  double  >& complexRef;
     };
 
-    struct StringIO {
+    struct StringIO
+    {
       std::string& strRef;
     };
 
-    struct KeyNameIO {
+    struct KeyNameIO
+    {
       int keyNumber;
     };
 
