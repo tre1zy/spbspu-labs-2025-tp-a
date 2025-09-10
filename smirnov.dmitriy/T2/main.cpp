@@ -2,7 +2,7 @@
 #include <iterator>
 #include <limits>
 #include "DataStruct.hpp"
- 
+
 int main()
 {
   using namespace smirnov;
