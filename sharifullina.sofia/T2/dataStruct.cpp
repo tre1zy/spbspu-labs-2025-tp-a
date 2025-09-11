@@ -1,5 +1,4 @@
 #include "dataStruct.hpp"
-#include "scopeGuard.hpp"
 #include <complex>
 #include <string>
 #include <iostream>
@@ -7,6 +6,7 @@
 #include <utility>
 #include <limits>
 #include <cmath>
+#include "scopeGuard.hpp"
 
 namespace
 {
@@ -17,24 +17,26 @@ namespace
 
   struct ComplexIO
   {
-    std::complex<double>& ref;
+    std::complex< double > & ref;
   };
 
   struct RationalIO
   {
-    std::pair<long long, unsigned long long>& ref;
+    std::pair< long long, unsigned long long > & ref;
   };
 
   struct StringIO
   {
-    std::string& ref;
+    std::string & ref;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+  std::istream& operator>>(std::istream& in, DelimiterIO && dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-
+    if (!sentry)
+    {
+      return in;
+    }
     char c = 0;
     in >> c;
     if (in && c != dest.exp)
@@ -43,166 +45,93 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, ComplexIO&& dest)
+  std::istream& operator>>(std::istream& in, ComplexIO && dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-
-    char hash = 0, c = 0, lparen = 0, rparen = 0;
+    if (!sentry)
+    {
+      return in;
+    }
     double real = 0.0, imag = 0.0;
-
-    in >> hash >> c >> lparen >> real >> imag >> rparen;
-    if (in && hash == '#' && c == 'c' && lparen == '(' && rparen == ')')
+    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' };
+    in >> DelimiterIO{ '(' };
+    in >> real >> imag;
+    in >> DelimiterIO{ ')' };
+    if (in)
     {
       dest.ref = std::complex<double>(real, imag);
-    }
-    else
-    {
-      in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, RationalIO&& dest)
+  std::istream& operator>>(std::istream& in, RationalIO && dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-
-    char lparen = 0, colon1 = 0, nchar = 0, colon2 = 0, dchar = 0, colon3 = 0, rparen = 0;
-    long long num = 0;
-    unsigned long long den = 0;
-
-    in >> lparen >> colon1 >> nchar >> num >> colon2 >> dchar >> den >> colon3 >> rparen;
-    if (in &&
-        lparen == '(' && colon1 == ':' && nchar == 'N' &&
-        colon2 == ':' && dchar == 'D' && colon3 == ':' &&
-        rparen == ')')
+    if (!sentry)
     {
-      dest.ref = std::make_pair(num, den);
+      return in;
     }
-    else
-    {
-      in.setstate(std::ios::failbit);
-    }
+    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' } >> dest.ref.first;
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second >> DelimiterIO{ ':' };
+    in >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
     return in;
   }
 
   std::istream& operator>>(std::istream& in, StringIO&& dest)
   {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-
-    std::string tmp;
-    if (!(in >> std::quoted(tmp)))
+    if (!sentry)
     {
-      in.setstate(std::ios::failbit);
       return in;
     }
-    dest.ref = tmp;
-    return in;
+    return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
   }
 }
 
-bool sharifullina::DataStruct::operator<(const DataStruct& other) const
-{
-  const double epsilon = 1e-10;
-  const double abs1 = std::abs(key1);
-  const double abs2 = std::abs(other.key1);
-
-  if (std::abs(abs1 - abs2) > epsilon)
-  {
-    return abs1 < abs2;
-  }
-
-  const double lhsRatio =
-      static_cast<double>(key2.first) / key2.second;
-  const double rhsRatio =
-      static_cast<double>(other.key2.first) / other.key2.second;
-
-  if (lhsRatio != rhsRatio)
-  {
-    return lhsRatio < rhsRatio;
-  }
-
-  return key3.length() < other.key3.length();
-}
-
-std::istream& sharifullina::operator>>(std::istream& in, DataStruct& dest)
+std::istream & sharifullina::operator>>(std::istream & in, sharifullina::DataStruct & dest)
 {
   std::istream::sentry sentry(in);
-  if (!sentry) return in;
-
-  DataStruct result;
-  bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-
-  in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-
-  while (in && in.peek() != ')')
+  if (!sentry)
   {
-    std::string key;
-    if (!(in >> key))
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (key == "key1")
-    {
-      if (!(in >> ComplexIO{ result.key1 }))
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      hasKey1 = true;
-    }
-    else if (key == "key2")
-    {
-      if (!(in >> RationalIO{ result.key2 }))
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      hasKey2 = true;
-    }
-    else if (key == "key3")
-    {
-      if (!(in >> StringIO{ result.key3 }))
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      hasKey3 = true;
-    }
-    else
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(in >> DelimiterIO{ ':' }))
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-  }
-
-  if (!(in >> DelimiterIO{ ')' }))
-  {
-    in.setstate(std::ios::failbit);
     return in;
   }
-
-  if (!(hasKey1 && hasKey2 && hasKey3))
+  DataStruct input;
   {
-    in.setstate(std::ios::failbit);
-    return in;
+    std::vector< std::string > keys(3);
+    in >> DelimiterIO{ '(' };
+    for (size_t i = 0; i < 3; i++)
+    {
+      in >> DelimiterIO{ ':' };
+      in >> keys[i];
+      if (keys[i] == "key1")
+      {
+        in >> ComplexIO{ input.key1 };
+      }
+      else if (keys[i] == "key2")
+      {
+        in >> RationalIO{ input.key2 };
+      }
+      else if (keys[i] == "key3")
+      {
+        in >> StringIO{ input.key3 };
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+    }
+    in >> DelimiterIO{ ':' };
+    in >> DelimiterIO{ ')' };
   }
-
-  dest = std::move(result);
+  if (in)
+  {
+    dest = input;
+  }
   return in;
 }
 
-std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest)
+std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::DataStruct & dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -218,4 +147,24 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const DataStruct& dest
   out << ":key3 \"" << dest.key3 << "\":)";
 
   return out;
+}
+
+bool sharifullina::DataStruct::operator<(const DataStruct& other) const
+{
+  const double abs1 = std::abs(key1);
+  const double abs2 = std::abs(other.key1);
+
+  if (abs1 != abs2)
+  {
+    return abs1 < abs2;
+  }
+
+  const double lhsRatio = static_cast< double >(key2.first) / key2.second;
+  const double rhsRatio = static_cast< double >(other.key2.first) / other.key2.second;
+
+  if (lhsRatio != rhsRatio)
+  {
+    return lhsRatio < rhsRatio;
+  }
+  return key3.length() < other.key3.length();
 }
