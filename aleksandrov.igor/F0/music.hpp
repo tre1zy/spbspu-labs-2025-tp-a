@@ -19,7 +19,8 @@ namespace aleksandrov
 enum class aleksandrov::MusicalElementType
 {
   Note,
-  Interval
+  Interval,
+  None
 };
 
 struct aleksandrov::Note
@@ -38,6 +39,7 @@ struct aleksandrov::Interval
 class aleksandrov::MusicalElement
 {
 public:
+  MusicalElement();
   explicit MusicalElement(const Note&);
   explicit MusicalElement(const Interval&);
 
@@ -50,6 +52,7 @@ public:
 
   bool isNote() const noexcept;
   bool isInterval() const noexcept;
+  bool isNone() const noexcept;
 
 private:
   MusicalElementType type_;

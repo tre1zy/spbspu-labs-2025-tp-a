@@ -33,6 +33,10 @@ void aleksandrov::processCommands(std::istream& in, std::ostream& out, Sequences
   commands["list"] = std::bind(listSeqs, std::ref(out), std::cref(seqs));
   commands["new"] = std::bind(newSeq, std::ref(in), std::ref(seqs));
   commands["load"] = std::bind(loadSeq, std::ref(in), std::ref(seqs));
+  commands["save"] = std::bind(saveSeq, std::ref(in), std::ref(seqs));
+  commands["clear"] = std::bind(clearSeq, std::ref(in), std::ref(seqs));
+  commands["remove"] = std::bind(removeSeq, std::ref(in), std::ref(seqs));
+  commands["clone"] = std::bind(cloneSeq, std::ref(in), std::ref(seqs));
   commands["print"] = std::bind(printSeq, std::ref(in), std::ref(out), std::cref(seqs));
 
   std::string command;
@@ -102,7 +106,9 @@ void aleksandrov::loadSeq(std::istream& in, Sequences& seqs)
     throw std::logic_error("Incorrect file!");
   }
   Sequence seq;
-  readSequence(file, seq);
+  std::istream_iterator< MusicalElement > inItBegin(file);
+  std::istream_iterator< MusicalElement > inItEnd;
+  std::copy(inItBegin, inItEnd, std::back_inserter(seq));
   if (file || file.eof())
   {
     seqs[seqName] = std::move(seq);
@@ -111,6 +117,92 @@ void aleksandrov::loadSeq(std::istream& in, Sequences& seqs)
   {
     throw std::logic_error("Incorrect sequence description!");
   }
+}
+
+void aleksandrov::saveSeq(std::istream& in, Sequences& seqs)
+{
+  std::string seqName;
+  if (!(in >> seqName))
+  {
+    throw std::logic_error("Incorrect sequence name!");
+  }
+  auto seqIt = seqs.find(seqName);
+  if (seqIt == seqs.end())
+  {
+    throw std::logic_error("No such sequence '" + seqName + "'");
+  }
+  std::string fileName;
+  if (!(in >> fileName))
+  {
+    throw std::logic_error("Incorrect file name!");
+  }
+  std::ofstream file(fileName);
+  if (!file)
+  {
+    throw std::logic_error("Incorrect file!");
+  }
+  const Sequence& sequence = seqIt->second;
+  std::ostream_iterator< MusicalElement > outIt(file, " ");
+  StreamGuard guard(file);
+  std::copy(sequence.begin(), sequence.end(), outIt);
+  if (!file)
+  {
+    throw std::logic_error("Failed to write to file!");
+  }
+}
+
+void aleksandrov::clearSeq(std::istream& in, Sequences& seqs)
+{
+  std::string seqName;
+  if (!(in >> seqName))
+  {
+    throw std::logic_error("Incorrect sequence name!");
+  }
+  auto seqIt = seqs.find(seqName);
+  if (seqIt == seqs.end())
+  {
+    throw std::logic_error("There is no such sequence '" + seqName + "'");
+  }
+  seqIt->second.clear();
+}
+
+void aleksandrov::removeSeq(std::istream& in, Sequences& seqs)
+{
+  std::string seqName;
+  if (!(in >> seqName))
+  {
+    throw std::logic_error("Incorrect sequence name!");
+  }
+  auto seqIt = seqs.find(seqName);
+  if (seqIt == seqs.end())
+  {
+    throw std::logic_error("No such sequence '" + seqName + "'");
+  }
+  seqs.erase(seqIt);
+}
+
+void aleksandrov::cloneSeq(std::istream& in, Sequences& seqs)
+{
+  std::string seqName;
+  if (!(in >> seqName))
+  {
+    throw std::logic_error("Incorrect sequence name!");
+  }
+  auto seqIt = seqs.find(seqName);
+  if (seqIt == seqs.end())
+  {
+    throw std::logic_error("No such sequence '" + seqName + "'");
+  }
+  std::string seqCloneName;
+  if (!(in >> seqCloneName))
+  {
+    throw std::logic_error("Incorrect sequence clone name!");
+  }
+  if (seqs.find(seqCloneName) != seqs.end())
+  {
+    throw std::logic_error("Sequence '" + seqCloneName + "' already exists!");
+  }
+  seqs.insert({ seqCloneName, seqIt->second });
 }
 
 void aleksandrov::printSeq(std::istream& in, std::ostream& out, const Sequences& seqs)

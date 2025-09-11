@@ -1,6 +1,10 @@
 #include "music.hpp"
 #include <cassert>
 
+aleksandrov::MusicalElement::MusicalElement():
+  type_(MusicalElementType::None)
+{}
+
 aleksandrov::MusicalElement::MusicalElement(const Note& note):
   type_(MusicalElementType::Note),
   note_(note)
@@ -18,6 +22,7 @@ aleksandrov::MusicalElementType aleksandrov::MusicalElement::getType() const noe
 
 aleksandrov::Note& aleksandrov::MusicalElement::note()
 {
+  assert(isNote());
   return const_cast< Note& >(static_cast< const MusicalElement& >(*this).note());
 }
 
@@ -29,6 +34,7 @@ const aleksandrov::Note& aleksandrov::MusicalElement::note() const
 
 aleksandrov::Interval& aleksandrov::MusicalElement::interval()
 {
+  assert(isInterval());
   return const_cast< Interval& >(static_cast< const MusicalElement& >(*this).interval());
 }
 
@@ -46,5 +52,10 @@ bool aleksandrov::MusicalElement::isNote() const noexcept
 bool aleksandrov::MusicalElement::isInterval() const noexcept
 {
   return type_ == MusicalElementType::Interval;
+}
+
+bool aleksandrov::MusicalElement::isNone() const noexcept
+{
+  return type_ == MusicalElementType::None;
 }
 

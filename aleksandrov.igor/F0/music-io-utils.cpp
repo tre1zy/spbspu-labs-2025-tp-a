@@ -165,12 +165,3 @@ std::ostream& aleksandrov::operator<<(std::ostream& out, const MusicalElement& e
   return out;
 }
 
-void aleksandrov::readSequence(std::istream& in, Sequence& sequence)
-{
-  MusicalElement el(Note{});
-  while (in >> el)
-  {
-    sequence.push_back(el);
-  }
-}
-
