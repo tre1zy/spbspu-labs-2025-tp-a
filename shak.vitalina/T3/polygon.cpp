@@ -1,4 +1,5 @@
 #include "polygon.hpp"
+#include <functional>
 #include <algorithm>
 #include <iterator>
 #include <numeric>
@@ -29,6 +30,15 @@ bool shak::operator==(const Point &point1, const Point &point2)
 double shak::getDistance(const Point &point1, const Point &point2)
 {
   return (std::sqrt((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y)));
+}
+
+double shak::getTriangleArea(const Point &point1, const Point &point2, const Point &point3)
+{
+  double a = getDistance(point1, point2);
+  double b = getDistance(point2, point3);
+  double c = getDistance(point1, point3);
+  double p = (a + b + c) / 2.0;
+  return (std::sqrt(p * (p - a) * (p - b) * (p - c)));
 }
 
 std::istream& shak::operator>>(std::istream &in, Polygon &dest)
@@ -94,10 +104,11 @@ bool shak::checkRectangle(const Polygon &polygon)
 
 double shak::getArea(const Polygon &polygon)
 {
-  TriangleArea triangleAreaCalc{polygon.points[0], polygon.points[1]};
-  std::vector< double > areas(polygon.points.size());
-  std::transform(std::begin(polygon.points) + 2, std::end(polygon.points), areas.begin(), triangleAreaCalc);
-  return std::accumulate(areas.begin(), areas.end(), 0.0, std::plus< double >{});
+  std::vector< double > areas(polygon.points.size()- 2);
+  using namespace std::placeholders;
+  auto triangleAreaCalc = std::bind(getTriangleArea, polygon.points[0], _1, _2);
+  std::transform(std::begin(polygon.points) + 1, std::end(polygon.points) - 1, std::begin(polygon.points) + 2, std::back_inserter(areas), triangleAreaCalc);
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
 size_t shak::getVertexes(const Polygon &polygon)
@@ -116,14 +127,4 @@ size_t shak::equalCounter(const Polygon &polygon, const std::vector< Point > &ta
     counter = 0;
   }
   return counter;
-}
-
-double shak::TriangleArea::operator()(const Point & point3)
-{
-  double a = getDistance(point1, point2);
-  double b = getDistance(point2, point3);
-  double c = getDistance(point1, point3);
-  double p = (a + b + c) / 2;
-  point2 = point3;
-  return (std::sqrt(p * (p - a) * (p - b) * (p - c)));
 }
