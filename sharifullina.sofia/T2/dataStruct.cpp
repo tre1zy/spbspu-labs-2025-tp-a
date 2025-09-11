@@ -1,4 +1,5 @@
 #include "dataStruct.hpp"
+#include <vector>
 #include <complex>
 #include <string>
 #include <iostream>
