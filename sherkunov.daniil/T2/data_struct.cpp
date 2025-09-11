@@ -201,9 +201,9 @@ namespace sherkunov {
     std::pair<long long, unsigned long long> key2_copy = value.key2;
     std::string key3_copy = value.key3;
 
-    output << "(:key1 " << io_helpers::LongLongIO{value.key1};
-    output << ":key2 (:" << io_helpers::PairIO{value.key2} << ":)";
-    output << ":key3 " << io_helpers::StringIO{value.key3} << ":)";
+    output << "(:key1 " << io_helpers::LongLongIO{key1_copy};
+    output << ":key2 (:" << io_helpers::PairIO{key2_copy} << ":)";
+    output << ":key3 " << io_helpers::StringIO{key3_copy} << ":)";
     return output;
   }
 
