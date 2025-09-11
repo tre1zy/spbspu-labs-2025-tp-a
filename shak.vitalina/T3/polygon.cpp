@@ -105,8 +105,8 @@ bool shak::checkRectangle(const Polygon &polygon)
 double shak::getArea(const Polygon &polygon)
 {
   std::vector< double > areas(polygon.points.size()- 2);
-  auto &begin = polygon.points.begin();
-  auto &end = polygon.points.end();
+  const auto &begin = polygon.points.cbegin();
+  const auto &end = polygon.points.cend();
   using namespace std::placeholders;
   auto triangleAreaCalc = std::bind(getTriangleArea, polygon.points[0], _1, _2);
   std::transform(begin + 1, end - 1, begin + 2, std::back_inserter(areas), triangleAreaCalc);
