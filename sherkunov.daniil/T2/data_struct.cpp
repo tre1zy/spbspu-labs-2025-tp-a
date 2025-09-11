@@ -140,10 +140,10 @@ namespace sherkunov {
 
   std::istream& io_helpers::operator>>(std::istream& input, Key2IO&& value)
   {
-    return input >> DelimiterIO{'('} 
-                 >> DelimiterIO{':'} 
-                 >> PairIO{value.ref} 
-                 >> DelimiterIO{':'} 
+    return input >> DelimiterIO{'('}
+                 >> DelimiterIO{':'}
+                 >> PairIO{value.ref}
+                 >> DelimiterIO{':'}
                  >> DelimiterIO{')'};
   }
 
