@@ -10,6 +10,7 @@ void trukhanov::CommandProcessor::createIndexCmd(const std::vector< std::string 
   }
   createIndex(args[0], args[1]);
 }
+
 void trukhanov::CommandProcessor::showIndexCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 1)
@@ -18,6 +19,7 @@ void trukhanov::CommandProcessor::showIndexCmd(const std::vector< std::string >&
   }
   showIndex(args[0]);
 }
+
 void trukhanov::CommandProcessor::searchWordCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
@@ -26,6 +28,7 @@ void trukhanov::CommandProcessor::searchWordCmd(const std::vector< std::string >
   }
   searchWord(args[0], args[1]);
 }
+
 void trukhanov::CommandProcessor::saveIndexCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
@@ -34,6 +37,7 @@ void trukhanov::CommandProcessor::saveIndexCmd(const std::vector< std::string >&
   }
   saveIndex(args[0], args[1]);
 }
+
 void trukhanov::CommandProcessor::replaceWordCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 3)
@@ -42,6 +46,7 @@ void trukhanov::CommandProcessor::replaceWordCmd(const std::vector< std::string 
   }
   replaceWord(args[0], args[1], args[2]);
 }
+
 void trukhanov::CommandProcessor::exportWordCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 3)
@@ -50,6 +55,7 @@ void trukhanov::CommandProcessor::exportWordCmd(const std::vector< std::string >
   }
   exportWord(args[0], args[1], args[2]);
 }
+
 void trukhanov::CommandProcessor::mergeIndexesCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 3)
@@ -58,6 +64,7 @@ void trukhanov::CommandProcessor::mergeIndexesCmd(const std::vector< std::string
   }
   mergeIndexes(args[0], args[1], args[2]);
 }
+
 void trukhanov::CommandProcessor::mergeByLinesCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 3)
@@ -66,6 +73,7 @@ void trukhanov::CommandProcessor::mergeByLinesCmd(const std::vector< std::string
   }
   mergeByLines(args[0], args[1], args[2]);
 }
+
 void trukhanov::CommandProcessor::showFrequencyCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 1)
@@ -74,6 +82,7 @@ void trukhanov::CommandProcessor::showFrequencyCmd(const std::vector< std::strin
   }
   showFrequency(args[0]);
 }
+
 void trukhanov::CommandProcessor::listIndexesCmd(const std::vector< std::string >& args)
 {
   if (!args.empty())
@@ -82,6 +91,7 @@ void trukhanov::CommandProcessor::listIndexesCmd(const std::vector< std::string 
   }
   listIndexes();
 }
+
 void trukhanov::CommandProcessor::reconstructTextCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
@@ -90,6 +100,7 @@ void trukhanov::CommandProcessor::reconstructTextCmd(const std::vector< std::str
   }
   reconstructText(args[0], args[1]);
 }
+
 void trukhanov::CommandProcessor::compareIndexesCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
@@ -98,6 +109,7 @@ void trukhanov::CommandProcessor::compareIndexesCmd(const std::vector< std::stri
   }
   compareIndexes(args[0], args[1]);
 }
+
 void trukhanov::CommandProcessor::longestWordsCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
@@ -110,6 +122,7 @@ void trukhanov::CommandProcessor::longestWordsCmd(const std::vector< std::string
   }
   longestWords(args[0], std::stoi(args[1]));
 }
+
 void trukhanov::CommandProcessor::shortestWordsCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
@@ -122,6 +135,7 @@ void trukhanov::CommandProcessor::shortestWordsCmd(const std::vector< std::strin
   }
   shortestWords(args[0], std::stoi(args[1]));
 }
+
 void trukhanov::CommandProcessor::clearIndexCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 1)
@@ -130,6 +144,7 @@ void trukhanov::CommandProcessor::clearIndexCmd(const std::vector< std::string >
   }
   clearIndex(args[0]);
 }
+
 void trukhanov::CommandProcessor::filterLinesCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 3)

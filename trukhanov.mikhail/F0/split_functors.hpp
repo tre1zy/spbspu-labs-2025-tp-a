@@ -10,7 +10,7 @@ namespace trukhanov
 {
   struct LineSplitter
   {
-    std::map< std::string, std::set< std::size_t > >& wordMap;
+    IndexMap& wordMap;
     std::size_t lineNumber;
     std::string operator()(const std::string& word) const;
   };
@@ -18,7 +18,7 @@ namespace trukhanov
   struct SplitWords
   {
     std::vector< std::string >& lines;
-    std::map< std::string, std::set< std::size_t > >& wordMap;
+    IndexMap& wordMap;
     std::size_t operator()(std::size_t lineNumber) const;
   };
 

@@ -29,7 +29,7 @@ namespace trukhanov
   struct ExportWordFunctor
   {
     ExportWordFunctor(const std::vector< std::string >& lines_, std::ostream& out_, const std::string& word_);
-    void operator()(const std::map< std::string, std::set< std::size_t > >& index) const;
+    void operator()(const IndexMap& index) const;
   private:
     const std::vector< std::string >& lines;
     std::ostream& out;

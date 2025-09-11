@@ -51,7 +51,7 @@ trukhanov::ExportWordFunctor::ExportWordFunctor(
   lines(lines_), out(out_), word(word_)
 {}
 
-void trukhanov::ExportWordFunctor::operator()(const std::map< std::string, std::set< std::size_t > >& index) const
+void trukhanov::ExportWordFunctor::operator()(const IndexMap& index) const
 {
   auto it = index.find(word);
   if (it == index.end())

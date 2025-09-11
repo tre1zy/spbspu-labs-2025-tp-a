@@ -34,7 +34,6 @@ std::pair< std::string, std::set< std::size_t > > trukhanov::FilterAdjustPair::o
   return { pair.first, std::move(adjusted) };
 }
 
-
 trukhanov::LineFilter::LineFilter(const ConcordanceIndex& s, ConcordanceIndex& d, std::size_t f,std::size_t t):
   from(f), to(t), src(s), dest(d)
 {}
