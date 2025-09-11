@@ -25,18 +25,24 @@ namespace sherkunov {
       std::string& ref;
     };
 
+    struct Key2IO {
+      std::pair<long long, unsigned long long>& ref;
+    };
+
     std::istream& operator>>(std::istream& input, DelimiterIO&& value);
     std::istream& operator>>(std::istream& input, LexCharIO&& value);
     std::istream& operator>>(std::istream& input, LongLongIO&& value);
     std::istream& operator>>(std::istream& input, PairIO&& value);
     std::istream& operator>>(std::istream& input, StringIO&& value);
+    std::istream& operator>>(std::istream& input, Key2IO&& value);
 
     std::ostream& operator<<(std::ostream& output, const LongLongIO& value);
     std::ostream& operator<<(std::ostream& output, const PairIO& value);
     std::ostream& operator<<(std::ostream& output, const StringIO& value);
   }
 
-  std::istream& sherkunov::io_helpers::operator>>(std::istream& input, DelimiterIO&& value) {
+  std::istream& io_helpers::operator>>(std::istream& input, DelimiterIO&& value)
+  {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -48,7 +54,8 @@ namespace sherkunov {
     return input;
   }
 
-  std::istream& io_helpers::operator>>(std::istream& input, LexCharIO&& value) {
+  std::istream& io_helpers::operator>>(std::istream& input, LexCharIO&& value)
+  {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -60,7 +67,8 @@ namespace sherkunov {
     return input;
   }
 
-  std::istream& io_helpers::operator>>(std::istream& input, LongLongIO&& value) {
+  std::istream& io_helpers::operator>>(std::istream& input, LongLongIO&& value)
+  {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -69,11 +77,12 @@ namespace sherkunov {
     if (!(input >> temp >> LexCharIO{'l'} >> LexCharIO{'l'})) {
       return input;
     }
-    value.ref = std::move(temp);
+    value.ref = temp;
     return input;
   }
 
-  std::ostream& io_helpers::operator<<(std::ostream& output, const LongLongIO& value) {
+  std::ostream& io_helpers::operator<<(std::ostream& output, const LongLongIO& value)
+  {
     std::ostream::sentry s(output);
     if (!s) {
       return output;
@@ -81,7 +90,8 @@ namespace sherkunov {
     return output << value.ref << "ll";
   }
 
-  std::istream& io_helpers::operator>>(std::istream& input, PairIO&& value) {
+  std::istream& io_helpers::operator>>(std::istream& input, PairIO&& value)
+  {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -95,7 +105,8 @@ namespace sherkunov {
     return input;
   }
 
-  std::ostream& io_helpers::operator<<(std::ostream& output, const PairIO& value) {
+  std::ostream& io_helpers::operator<<(std::ostream& output, const PairIO& value)
+  {
     std::ostream::sentry s(output);
     if (!s) {
       return output;
@@ -103,7 +114,8 @@ namespace sherkunov {
     return output << "N " << value.ref.first << ":D " << value.ref.second;
   }
 
-  std::istream& io_helpers::operator>>(std::istream& input, StringIO&& value) {
+  std::istream& io_helpers::operator>>(std::istream& input, StringIO&& value)
+  {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -112,12 +124,13 @@ namespace sherkunov {
     input >> DelimiterIO{'"'};
     std::getline(input, temp, '"');
     if (input) {
-      value.ref = temp;
+      value.ref = std::move(temp);
     }
     return input;
   }
 
-  std::ostream& io_helpers::operator<<(std::ostream& output, const StringIO& value) {
+  std::ostream& io_helpers::operator<<(std::ostream& output, const StringIO& value)
+  {
     std::ostream::sentry s(output);
     if (!s) {
       return output;
@@ -125,7 +138,17 @@ namespace sherkunov {
     return output << '"' << value.ref << '"';
   }
 
-  std::istream& operator>>(std::istream& input, DataStruct& value) {
+  std::istream& io_helpers::operator>>(std::istream& input, Key2IO&& value)
+  {
+    return input >> DelimiterIO{'('} 
+                 >> DelimiterIO{':'} 
+                 >> PairIO{value.ref} 
+                 >> DelimiterIO{':'} 
+                 >> DelimiterIO{')'};
+  }
+
+  std::istream& operator>>(std::istream& input, DataStruct& value)
+  {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -167,21 +190,21 @@ namespace sherkunov {
     }
     return input;
   }
-  std::ostream& operator<<(std::ostream& output, const DataStruct& value) {
+
+  std::ostream& operator<<(std::ostream& output, const DataStruct& value)
+  {
     std::ostream::sentry s(output);
     if (!s) {
       return output;
     }
-    long long ll = value.key1;
-    std::pair<long long, unsigned long long> pair = value.key2;
-    std::string str = value.key3;
-    output << "(:key1 " << io_helpers::LongLongIO{ll};
-    output << ":key2 (:" << io_helpers::PairIO{pair} << ":)";
-    output << ":key3 " << io_helpers::StringIO{str} << ":)";
+    output << "(:key1 " << io_helpers::LongLongIO{value.key1};
+    output << ":key2 (:" << io_helpers::PairIO{value.key2} << ":)";
+    output << ":key3 " << io_helpers::StringIO{value.key3} << ":)";
     return output;
   }
 
-  bool operator<(const DataStruct& lhs, const DataStruct& rhs) {
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs)
+  {
     if (lhs.key1 != rhs.key1) {
       return lhs.key1 < rhs.key1;
     } else {
