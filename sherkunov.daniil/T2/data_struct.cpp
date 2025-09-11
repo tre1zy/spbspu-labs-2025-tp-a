@@ -35,7 +35,7 @@ namespace sherkunov {
     std::ostream& operator<<(std::ostream& output, const StringIO& value);
   }
 
-  std::istream& io_helpers::operator>>(std::istream& input, DelimiterIO&& value) {
+  std::istream& sherkunoc::io_helpers::operator>>(std::istream& input, DelimiterIO&& value) {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -147,9 +147,7 @@ namespace sherkunov {
         input >> io_helpers::LongLongIO{temp.key1};
         break;
       case '2':
-        input >> io_helpers::DelimiterIO{'('} >> io_helpers::DelimiterIO{':'}
-              >> io_helpers::PairIO{temp.key2} >> io_helpers::DelimiterIO{':'}
-              >> io_helpers::DelimiterIO{')'};
+        input >> io_helpers::Key2IO{temp.key2};
         break;
       case '3':
         input >> io_helpers::StringIO{temp.key3};
@@ -164,7 +162,7 @@ namespace sherkunov {
 
     input >> io_helpers::DelimiterIO{')'};
     if (input) {
-      value = temp;
+      value = std::move(temp);
     }
     return input;
   }

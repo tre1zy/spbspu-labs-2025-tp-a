@@ -5,21 +5,19 @@
 #include <vector>
 #include "data_struct.hpp"
 
-int main() {
+int main()
+{
   using InputStreamIterator = std::istream_iterator<sherkunov::DataStruct>;
   using OutputStreamIterator = std::ostream_iterator<sherkunov::DataStruct>;
 
   std::vector<sherkunov::DataStruct> data;
 
   InputStreamIterator it(std::cin);
-  while (it != InputStreamIterator{}) {
-    data.push_back(*it);
-    ++it;
-
-    if (std::cin.fail() && !std::cin.eof()) {
-      std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      it = InputStreamIterator(std::cin);
+  std::copy(InputStreamIterator(std::cin), InputStreamIterator{}, std::back_inserter(data));
+  if (std::cin.fail() && !std::cin.eof()) {
+     std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
+     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+     it = InputStreamIterator(std::cin);
     }
   }
 
