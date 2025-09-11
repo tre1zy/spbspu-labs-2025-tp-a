@@ -12,15 +12,7 @@ int main()
 
   std::vector<sherkunov::DataStruct> data;
 
-  InputStreamIterator it(std::cin);
   std::copy(InputStreamIterator(std::cin), InputStreamIterator{}, std::back_inserter(data));
-
-    if (std::cin.fail() && !std::cin.eof()) {
-      std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      it = InputStreamIterator(std::cin);
-    }
-  }
 
   if (std::cin.bad()) {
     std::cerr << "Error: Critical input failure\n";
