@@ -1,5 +1,6 @@
 #include "data_struct.hpp"
 #include <iostream>
+#include <cctype>
 
 namespace sherkunov {
   namespace io_helpers {
@@ -35,7 +36,7 @@ namespace sherkunov {
     std::ostream& operator<<(std::ostream& output, const StringIO& value);
   }
 
-  std::istream& sherkunoc::io_helpers::operator>>(std::istream& input, DelimiterIO&& value) {
+  std::istream& sherkunov::io_helpers::operator>>(std::istream& input, DelimiterIO&& value) {
     std::istream::sentry s(input);
     if (!s) {
       return input;
@@ -68,7 +69,7 @@ namespace sherkunov {
     if (!(input >> temp >> LexCharIO{'l'} >> LexCharIO{'l'})) {
       return input;
     }
-    value.ref = temp;
+    value.ref = std::move(temp);
     return input;
   }
 
