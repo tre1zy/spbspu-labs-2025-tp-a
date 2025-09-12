@@ -2,14 +2,13 @@
 #define DATASTRUCT_HPP
 
 #include <string>
-#include <complex>
 #include <iostream>
 
 namespace sharifullina
 {
   struct DataStruct
   {
-    std::complex< double > key1;
+    long long key1;
     std::pair< long long, unsigned long long > key2;
     std::string key3;
 

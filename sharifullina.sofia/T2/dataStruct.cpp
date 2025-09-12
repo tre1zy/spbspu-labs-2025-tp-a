@@ -16,9 +16,9 @@ namespace
     char exp;
   };
 
-  struct ComplexIO
+  struct LongLongIO
   {
-    std::complex< double > & ref;
+    long long & ref;
   };
 
   struct RationalIO
@@ -38,7 +38,7 @@ namespace
     {
       return in;
     }
-    char c = 0;
+    char c = '0';
     in >> c;
     if (in && c != dest.exp)
       in.setstate(std::ios::failbit);
@@ -46,23 +46,14 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, ComplexIO && dest)
+  std::istream& operator>>(std::istream& in, LongLongIO && dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
     {
       return in;
     }
-    double real = 0.0, imag = 0.0;
-    in >> DelimiterIO{ '#' } >> DelimiterIO{ 'c' };
-    in >> DelimiterIO{ '(' };
-    in >> real >> imag;
-    in >> DelimiterIO{ ')' };
-    if (in)
-    {
-      dest.ref = std::complex<double>(real, imag);
-    }
-    return in;
+    return in >> dest.ref;
   }
 
   std::istream& operator>>(std::istream& in, RationalIO && dest)
@@ -74,7 +65,7 @@ namespace
     }
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' } >> dest.ref.first;
     in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second >> DelimiterIO{ ':' };
-    in >> DelimiterIO{ ')' } >> DelimiterIO{ ':' };
+    in >> DelimiterIO{ ')' };
     return in;
   }
 
@@ -89,7 +80,7 @@ namespace
   }
 }
 
-std::istream & sharifullina::operator>>(std::istream & in, sharifullina::DataStruct & dest)
+std::istream& sharifullina::operator>>(std::istream& in, sharifullina::DataStruct& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -106,7 +97,7 @@ std::istream & sharifullina::operator>>(std::istream & in, sharifullina::DataStr
       in >> keys[i];
       if (keys[i] == "key1")
       {
-        in >> ComplexIO{ input.key1 };
+        in >> LongLongIO{ input.key1 };
       }
       else if (keys[i] == "key2")
       {
@@ -152,16 +143,16 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
 
 bool sharifullina::DataStruct::operator<(const DataStruct& other) const
 {
-  const double abs1 = std::abs(key1);
-  const double abs2 = std::abs(other.key1);
+  const double abs1 = std::llabs(key1);
+  const double abs2 = std::llabs(other.key1);
 
   if (abs1 != abs2)
   {
     return abs1 < abs2;
   }
 
-  const double lhsRatio = static_cast< double >(key2.first) / key2.second;
-  const double rhsRatio = static_cast< double >(other.key2.first) / other.key2.second;
+  const double lhsRatio = static_cast<double>(key2.first) / key2.second;
+  const double rhsRatio = static_cast<double>(other.key2.first) / other.key2.second;
 
   if (lhsRatio != rhsRatio)
   {
