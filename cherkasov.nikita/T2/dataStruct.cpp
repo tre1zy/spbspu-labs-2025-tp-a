@@ -18,191 +18,177 @@ namespace cherkasov
     }
     return key3.size() < other.key3.size();
   }
-  std::istream& operator>>(std::istream& in, ExpectChar&& d)
-  {
-    char c;
-    if (!(in >> c) || c != d.exp)
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
 
-  std::istream& operator>>(std::istream& in, Complex&& io)
+  std::istream& operator>>(std::istream& in, DataStruct& value)
   {
-    StreamGuard g(in);
-    std::istream::sentry s(in);
-    if (!s)
+    std::istream::sentry sentry(in);
+    if (!sentry)
     {
       return in;
     }
-    in >> ExpectChar{'#'} >> ExpectChar{'c'} >> ExpectChar{'('};
-    if (!in)
-    {
-      return in;
-    }
-    double re = 0.0;
-    in >> re;
-    if (!in)
-    {
-      return in;
-    }
-    while (std::isspace(in.peek()))
-    {
-      in.get();
-    }
-    double im = 0.0;
-    in >> im;
-    if (!in)
-    {
-      return in;
-    }
-    in >> ExpectChar{')'};
-    if (in)
-    {
-      io.c = std::complex<double>(re, im);
-    }
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, Rational&& io)
-  {
-    StreamGuard guard(in);
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    in >> ExpectChar{'('} >> ExpectChar{':'} >> ExpectChar{'N'};
-    if (!in)
-    {
-      return in;
-    }
-    while (std::isspace(in.peek()))
-    {
-      in.get();
-    }
-    in >> io.rat.first;
-    if (!in)
-    {
-      return in;
-    }
-    in >> ExpectChar{':'} >> ExpectChar{'D'};
-    if (!in)
-    {
-      return in;
-    }
-    while (std::isspace(in.peek()))
-    {
-      in.get();
-    }
-    in >> io.rat.second;
-    if (io.rat.second == 0)
+    std::string token;
+    char ch;
+    if (!(in >> ch) || ch != '(')
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-    in >> ExpectChar{':'} >> ExpectChar{')'};
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, Strings&& io)
-  {
-    StreamGuard guard(in);
-    std::istream::sentry s(in);
-    if (!s)
+    if (!(in >> ch) || ch != ':')
     {
+      in.setstate(std::ios::failbit);
       return in;
     }
-    in >> std::noskipws >> ExpectChar{'"'};
-    if (!in)
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+    std::complex<double> tmp1{};
+    std::pair<long long, unsigned long long> tmp2{};
+    std::string tmp3{};
+    while (true)
     {
-      return in;
-    }
-    char ch = 0;
-    io.s.clear();
-    bool escape = false;
-    while (in >> ch)
-    {
-      if (escape)
+      if (!(in >> ch))
       {
-        io.s += ch;
-        escape = false;
+        in.setstate(std::ios::failbit);
+        return in;
       }
-      else if (ch == '\\')
+      if (ch != ':')
       {
-        escape = true;
+        in.setstate(std::ios::failbit);
+        return in;
       }
-      else if (ch == '"')
+      std::string key;
+      if (!(in >> key))
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      if (key == "key1")
+      {
+        std::string mark;
+        if (!(in >> mark) || mark.rfind("#c", 0) != 0)
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        if (!(in >> ch) || ch != '(')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        double re, im;
+        if (!(in >> re >> im))
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        if (!(in >> ch) || ch != ')')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        hasKey1 = true;
+        tmp1 = {re, im};
+      }
+      else if (key == "key2")
+      {
+        if (!(in >> ch) || ch != '(')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        std::string Nmark;
+        if (!(in >> Nmark) || Nmark != "N")
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        long long num;
+        if (!(in >> num))
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        if (!(in >> ch) || ch != ':')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        std::string Dmark;
+        if (!(in >> Dmark) || Dmark != "D")
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        unsigned long long den;
+        if (!(in >> den))
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        if (!(in >> ch) || ch != ':')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        if (!(in >> ch) || ch != ')')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        hasKey2 = true;
+        tmp2 = {num, den};
+      }
+      else if (key == "key3")
+      {
+        if (!(in >> ch) || ch != '"')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        std::ostringstream oss;
+        while (in.get(ch))
+        {
+          if (ch == '"') break;
+          oss << ch;
+        }
+        tmp3 = oss.str();
+        hasKey3 = true;
+      }
+      else if (key == ")")
       {
         break;
       }
       else
       {
-        io.s += ch;
+        std::string skip;
+        if (!(in >> skip))
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
       }
-    }
-    if (ch != '"')
-    {
-      in.setstate(std::ios::failbit);
-    }
-    in >> std::skipws;
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, DataStruct& obj)
-  {
-    std::istream::sentry s(in);
-    if (!s)
-    {
-      return in;
-    }
-    DataStruct temp;
-    bool hasKey1 = false;
-    bool hasKey2 = false;
-    bool hasKey3 = false;
-    in >> ExpectChar{'('} >> ExpectChar{':'};
-    while (in && in.peek() != ')')
-    {
-      std::string label;
-      char c;
-      while (in.get(c) && c != ':' && !std::isspace(c))
+      std::streampos pos = in.tellg();
+      if (in >> ch)
       {
-        label += c;
-      }
-      if (c != ':')
-      {
-        while (in.get(c) && c != ':') {}
-      }
-      if (label == "key1")
-      {
-        in >> Complex{temp.key1};
-        hasKey1 = bool(in);
-      }
-      else if (label == "key2")
-      {
-        in >> Rational{temp.key2};
-        hasKey2 = bool(in);
-      }
-      else if (label == "key3")
-      {
-        in >> Strings{temp.key3};
-        hasKey3 = bool(in);
+        if (ch == ':' && in.peek() == ')')
+        {
+          in.get();
+          break;
+        }
+        else
+        {
+          in.unget();
+        }
       }
       else
       {
-        std::string dummy;
-        std::getline(in, dummy, ':');
-      }
-      while (std::isspace(in.peek()))
-      {
-        in.get();
+        in.clear();
+        in.seekg(pos);
       }
     }
-    in >> ExpectChar{')'};
-    if (in && hasKey1 && hasKey2 && hasKey3)
+    if (hasKey1 && hasKey2 && hasKey3)
     {
-      obj = temp;
+      value.key1 = tmp1;
+      value.key2 = tmp2;
+      value.key3 = tmp3;
     }
     else
     {
@@ -211,18 +197,12 @@ namespace cherkasov
     return in;
   }
 
-  std::ostream& operator<<(std::ostream& out, const DataStruct& obj)
+  std::ostream& operator<<(std::ostream& out, const DataStruct& value)
   {
-    StreamGuard guard(out);
-    out << "(:key1 #c(" << std::fixed << std::setprecision(1);
-    out << obj.key1.real();
-    if (obj.key1.imag() >= 0)
-    {
-      out << "+";
-    }
-    out << obj.key1.imag() << ")";
-    out << ":key2 (:N " << obj.key2.first << ":D " << obj.key2.second << ":)";
-    out << ":key3 \"" << obj.key3 << "\":)";
+    out << "(:key1 #c(" << std::fixed << std::setprecision(1)
+        << value.key1.real() << " " << value.key1.imag() << "):";
+    out << "key2 (:N " << value.key2.first << ":D " << value.key2.second << ":):";
+    out << "key3 \"" << value.key3 << "\":)";
     return out;
   }
 }
