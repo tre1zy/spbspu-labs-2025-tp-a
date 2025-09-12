@@ -147,7 +147,7 @@ namespace cherkasov
     }
     StreamGuard guard(out);
     out << "(:";
-    out << "key1 #c(" << std::fixed << std::setprecision(1) 
+    out << "key1 #c(" << std::fixed << std::setprecision(1)
         << obj.key1.real() << " " << obj.key1.imag() << ")";
     out << ":";
     out << "key2 (:N " << obj.key2.first << ":D " << obj.key2.second << ":)";
