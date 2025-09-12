@@ -134,7 +134,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
   sharifullina::IofmtGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
-  out << "(:key1 #c(" << dest.key1.real() << " " << dest.key1.imag() << ")";
+  out << "(:key1 " << dest.key1;
   out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
   out << ":key3 \"" << dest.key3 << "\":)";
 
