@@ -17,8 +17,14 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const UllBinOutput& dest)
 
   if (dest.ref == 0)
   {
-    return out << "0";
+    return out << "0b0";
   }
+
+  if (dest.ref == 1)
+  {
+    return out << "0b01";
+  }
+
   std::string bin;
   unsigned long long val = dest.ref;
 
@@ -28,5 +34,5 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const UllBinOutput& dest)
     val /= 2;
   }
 
-  return out << bin;
+  return out << "0b" << bin;
 }
