@@ -1,11 +1,87 @@
 #include "dataStruct.hpp"
-#include "streamGuard.hpp"
 #include <sstream>
 #include <iomanip>
-#include <cctype>
+#include <complex>
 
 namespace cherkasov
 {
+  std::istream& operator>>(std::istream& in, ExpectChar&& exp)
+  {
+    char c{};
+    if (!(in >> c) || c != exp.exp)
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
+  }
+
+  std::istream& operator>>(std::istream& in, Label&& exp)
+  {
+    std::string token;
+    if (!(in >> token) || token != exp.exp)
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
+  }
+
+  std::istream& operator>>(std::istream& in, Complex&& c)
+  {
+    in >> Label{"#c"} >> ExpectChar{'('};
+    double re{}, im{};
+    if (!(in >> re >> im))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> ExpectChar{')'};
+    c.c = {re, im};
+    return in;
+  }
+
+  std::istream& operator>>(std::istream& in, Rational&& rat)
+  {
+    in >> ExpectChar{'('} >> Label{"N"};
+    long long num{};
+    if (!(in >> num))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> ExpectChar{':'} >> Label{"D"};
+    unsigned long long den{};
+    if (!(in >> den))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> ExpectChar{':'} >> ExpectChar{')'};
+    rat.rat = {num, den};
+    return in;
+  }
+
+  std::istream& operator>>(std::istream& in, Strings&& s)
+  {
+    in >> ExpectChar{'"'};
+    std::ostringstream oss;
+    char ch{};
+    while (in.get(ch))
+    {
+      if (ch == '"')
+      {
+        break;
+      }
+      if (ch == '\n')
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      oss << ch;
+    }
+    s.s = oss.str();
+    return in;
+  }
+
   bool DataStruct::operator<(const DataStruct& other) const
   {
     if (std::abs(key1) != std::abs(other.key1))
@@ -21,35 +97,18 @@ namespace cherkasov
 
   std::istream& operator>>(std::istream& in, DataStruct& value)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
+    std::istream::sentry s(in);
+    if (!s)
     {
       return in;
     }
-
-    char ch;
-    if (!(in >> ch) || ch != '(')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    bool hasKey1 = false;
-    bool hasKey2 = false;
-    bool hasKey3 = false;
-    std::complex<double> tmp1{};
-    std::pair<long long, unsigned long long> tmp2{};
-    std::string tmp3{};
-
+    DataStruct tmp{};
+    bool has1 = false, has2 = false, has3 = false;
+    in >> ExpectChar{'('};
     while (in)
     {
-      if (!(in >> ch) || ch != ':')
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-
-      std::string key;
+      in >> ExpectChar{':'};
+      std::string key{};
       if (!(in >> key))
       {
         in.setstate(std::ios::failbit);
@@ -58,138 +117,39 @@ namespace cherkasov
 
       if (key == "key1")
       {
-        std::string mark;
-        if (!(in >> mark) || mark != "#c")
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        if (!(in >> ch) || ch != '(')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        double re{}, im{};
-        if (!(in >> re >> im))
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        if (!(in >> ch) || ch != ')')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        tmp1 = {re, im};
-        hasKey1 = true;
+        in >> Complex{tmp.key1};
+        has1 = true;
       }
       else if (key == "key2")
       {
-        if (!(in >> ch) || ch != '(')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        std::string Nmark;
-        if (!(in >> Nmark) || Nmark != "N")
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        long long num{};
-        if (!(in >> num))
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        if (!(in >> ch) || ch != ':')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        std::string Dmark;
-        if (!(in >> Dmark) || Dmark != "D")
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        unsigned long long den{};
-        if (!(in >> den))
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        if (!(in >> ch) || ch != ':')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        if (!(in >> ch) || ch != ')')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        tmp2 = {num, den};
-        hasKey2 = true;
+        in >> Rational{tmp.key2};
+        has2 = true;
       }
       else if (key == "key3")
       {
-        if (!(in >> ch) || ch != '"')
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        std::ostringstream oss;
-        while (in.get(ch))
-        {
-          if (ch == '"')
-          {
-            break;
-          }
-          if (ch == '\n')
-          {
-            in.setstate(std::ios::failbit);
-            return in;
-          }
-          oss << ch;
-        }
-        tmp3 = oss.str();
-        hasKey3 = true;
-      }
-      else if (key == ")")
-      {
-        break;
+        in >> Strings{tmp.key3};
+        has3 = true;
       }
       else
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      std::streampos pos = in.tellg();
-      if (in >> ch)
+
+      if (in.peek() == ':')
       {
-        if (ch == ':' && in.peek() == ')')
+        in.get();
+        if (in.peek() == ')')
         {
           in.get();
           break;
         }
-        else
-        {
-          in.unget();
-        }
-      }
-      else
-      {
-        in.clear();
-        in.seekg(pos);
       }
     }
 
-    if (hasKey1 && hasKey2 && hasKey3)
+    if (has1 && has2 && has3)
     {
-      value.key1 = tmp1;
-      value.key2 = tmp2;
-      value.key3 = tmp3;
+      value = tmp;
     }
     else
     {
