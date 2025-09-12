@@ -228,3 +228,31 @@ void shak::cmdRects(const std::vector< Polygon > &polygons, std::ostream &out)
 {
   out << std::count_if(polygons.begin(), polygons.end(), checkRectangle) << "\n";
 }
+
+bool massCenterEquals(const shak::Polygon &polygon, const shak::DPoint &targetCenter)
+{
+  return shak::getMassCenter(polygon) == targetCenter;
+}
+
+void shak::cmdMassCenter(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out)
+{
+  size_t vertexCount = 0;
+  in >> vertexCount;
+  if (vertexCount < 3)
+  {
+    throw std::invalid_argument("polygon must have at least 3 vertexes");
+  }
+  std::vector<Point> srcPoints;
+  srcPoints.reserve(vertexCount);
+  using inIter = std::istream_iterator<Point>;
+  std::copy_n(inIter{in}, vertexCount, std::back_inserter(srcPoints));
+  if (srcPoints.empty())
+  {
+    throw std::invalid_argument("polygon is empty");
+  }
+  Polygon targetPolygon{srcPoints};
+  DPoint targetCenter = shak::getMassCenter(targetPolygon);
+  auto hasSameCenter = std::bind(massCenterEquals, std::placeholders::_1, targetCenter);
+  size_t count = std::count_if(polygons.begin(), polygons.end(), hasSameCenter);
+  out << count << "\n";
+}

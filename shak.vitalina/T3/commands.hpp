@@ -15,5 +15,6 @@ namespace shak
   void cmdCount(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);
   void cmdMaxSeq(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);
   void cmdRects(const std::vector< Polygon > &polygons, std::ostream &out);
+  void cmdMassCenter(const std::vector< Polygon > &polygons, std::istream &in, std::ostream &out);
 }
 #endif

@@ -26,5 +26,14 @@ namespace shak
   double getArea(const Polygon &polygon);
   size_t getVertexes(const Polygon &polygon);
   size_t equalCounter(const Polygon &polygon, const std::vector< Point > &targetPoints, size_t& counter);
+
+  struct DPoint
+  {
+    double x, y;
+  };
+  bool operator==(const DPoint &left, const DPoint& right);
+  double SumX(double sumX, const shak::Point &point);
+  double SumY(double sumX, const shak::Point &point);
+  DPoint getMassCenter(const Polygon &polygon);
 }
 #endif

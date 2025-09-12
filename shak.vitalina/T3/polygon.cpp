@@ -130,3 +130,26 @@ size_t shak::equalCounter(const Polygon &polygon, const std::vector< Point > &ta
   }
   return counter;
 }
+
+bool shak::operator==(const DPoint &point1, const DPoint &point2)
+{
+  return ((point1.x == point2.x) && (point1.y == point2.y));
+}
+
+double shak::SumX(double sumX, const shak::Point &point)
+{
+  return sumX + static_cast<double>(point.x);
+}
+
+double shak::SumY(double sumY, const shak::Point &point)
+{
+  return sumY +  static_cast<double>(point.y);
+}
+
+shak::DPoint shak::getMassCenter(const shak::Polygon &polygon)
+{
+  double sumX = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, SumX);
+  double sumY = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, SumY);
+  double numberPoints  = static_cast< double >(polygon.points.size());
+  return { sumX / numberPoints, sumY / numberPoints };
+}
