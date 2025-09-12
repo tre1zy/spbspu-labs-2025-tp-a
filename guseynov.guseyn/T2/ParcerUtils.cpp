@@ -1,8 +1,9 @@
-#include "ParserUtils.h"
+#include "ParcerUtils.h"
 #include <sstream>
 #include <iomanip>
 #include <cctype>
 #include <algorithm>
+#include <cmath>
 
 namespace ParserUtils {
 

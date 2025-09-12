@@ -1,8 +1,9 @@
 #include "DataStruct.h"
-#include "ParserUtils.h"
+#include "ParcerUtils.h"
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <cmath>
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
   std::string line;

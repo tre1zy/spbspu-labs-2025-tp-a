@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 int main() {
   std::vector<DataStruct> dataVector;
