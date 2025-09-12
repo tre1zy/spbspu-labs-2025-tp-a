@@ -35,7 +35,8 @@ namespace shiryaeva
     {
       if (polygons.empty())
       {
-        throw std::invalid_argument("<INVALID COMMAND>");
+        out << "<INVALID COMMAND>";
+        return;
       }
 
       filteredPolygons = polygons;
@@ -46,7 +47,8 @@ namespace shiryaeva
       size_t num = std::stoul(subcmd);
       if (num < 3)
       {
-        throw std::invalid_argument("<INVALID COMMAND>");
+        out << "<INVALID COMMAND>";
+        return;
       }
 
       std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), HasVertexCount{num});
@@ -54,10 +56,11 @@ namespace shiryaeva
     }
     else
     {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      out << "<INVALID COMMAND>";
+      return;
     }
 
-    std::vector<double> areas;
+    std::vector< double > areas;
     std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
     double total = std::accumulate(areas.begin(), areas.end(), 0.0);
 
@@ -149,13 +152,15 @@ namespace shiryaeva
       size_t num = std::stoul(subcmd);
       if (num < 3)
       {
-        throw std::invalid_argument("<INVALID COMMAND>");
+        out << "<INVALID COMMAND>";
+        return;
       }
       out << std::count_if(polygons.begin(), polygons.end(), HasVertexCount{num});
     }
     else
     {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      out << "<INVALID COMMAND>";
+      return;
     }
   }
 
@@ -166,7 +171,8 @@ namespace shiryaeva
 
     if (!in || target.points.size() < 3 || (in.peek() != '\n' && !in.eof()))
     {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      out << "<INVALID COMMAND>";
+      return;
     }
 
     double targetArea = getArea(target);
@@ -188,7 +194,8 @@ namespace shiryaeva
     Polygon target;
     if (!(in >> target) || target.points.size() < 3)
     {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      out << "<INVALID COMMAND>";
+      return;
     }
 
     struct IntersectsWith
