@@ -1,5 +1,6 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
+
 #include <string>
 #include <iostream>
 #include <complex>
@@ -15,37 +16,32 @@ namespace cherkasov
     bool operator<(const DataStruct& other) const;
   };
 
-  struct Complex
-  {
-    std::complex< double >& c;
-  };
-
-  struct Rational
-  {
-    std::pair< long long, unsigned long long >& rat;
-  };
-
-  struct Strings
-  {
-    std::string& s;
-  };
-
-  struct ExpectChar
+  struct DelimiterIO
   {
     char exp;
   };
 
-  struct Label
+  struct ComplexIO
   {
-    std::string exp;
+    std::complex< double >& ref;
   };
 
-  std::istream& operator>>(std::istream& in, ExpectChar&&);
-  std::istream& operator>>(std::istream& in, Label&&);
-  std::istream& operator>>(std::istream& in, Complex&&);
-  std::istream& operator>>(std::istream& in, Rational&&);
-  std::istream& operator>>(std::istream& in, Strings&&);
-  std::istream& operator>>(std::istream& in, DataStruct&);
-  std::ostream& operator<<(std::ostream& out, const DataStruct&);
+  struct RationalIO
+  {
+    std::pair< long long, unsigned long long >& ref;
+  };
+
+  struct StringIO
+  {
+    std::string& ref;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimiterIO&& obj);
+  std::istream& operator>>(std::istream& in, ComplexIO&& obj);
+  std::istream& operator>>(std::istream& in, RationalIO&& obj);
+  std::istream& operator>>(std::istream& in, StringIO&& obj);
+  std::istream& operator>>(std::istream& in, DataStruct& obj);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& obj);
 }
+
 #endif

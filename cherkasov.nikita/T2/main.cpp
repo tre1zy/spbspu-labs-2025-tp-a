@@ -2,6 +2,7 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
+#include <limits>
 #include "dataStruct.hpp"
 #include "streamGuard.hpp"
 
@@ -16,6 +17,7 @@ int main()
     if (std::cin.fail())
     {
       std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
     }
     std::copy(
@@ -25,6 +27,6 @@ int main()
     );
   }
   std::sort(data.begin(), data.end());
-  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
+  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
+  return 0;
 }
