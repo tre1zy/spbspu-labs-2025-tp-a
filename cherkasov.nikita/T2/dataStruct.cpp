@@ -1,24 +1,11 @@
 #include "dataStruct.hpp"
 #include "streamGuard.hpp"
 #include <sstream>
-#include <cmath>
 #include <iomanip>
+#include <cctype>
 
 namespace cherkasov
 {
-  bool DataStruct::operator<(const DataStruct& other) const
-  {
-    if (std::abs(key1) != std::abs(other.key1))
-    {
-      return std::abs(key1) < std::abs(other.key1);
-    }
-    if (key2 != other.key2)
-    {
-      return key2 < other.key2;
-    }
-    return key3.size() < other.key3.size();
-  }
-
   std::istream& operator>>(std::istream& in, ExpectChar&& d)
   {
     char c;
@@ -61,12 +48,12 @@ namespace cherkasov
     in >> ExpectChar{')'};
     if (in)
     {
-      io.c = std::complex< double >(re, im);
+      io.c = std::complex<double>(re, im);
     }
     return in;
   }
 
-    std::istream& operator>>(std::istream& in, Rational&& io)
+  std::istream& operator>>(std::istream& in, Rational&& io)
   {
     StreamGuard guard(in);
     std::istream::sentry s(in);
@@ -106,6 +93,7 @@ namespace cherkasov
     in >> ExpectChar{':'} >> ExpectChar{')'};
     return in;
   }
+
   std::istream& operator>>(std::istream& in, Strings&& io)
   {
     StreamGuard guard(in);
@@ -119,7 +107,7 @@ namespace cherkasov
     {
       return in;
     }
-    char ch;
+    char ch = 0;
     io.s.clear();
     bool escape = false;
     while (in >> ch)
@@ -176,34 +164,18 @@ namespace cherkasov
       }
       if (label == "key1")
       {
-        if (in.peek() == '#')
-        {
-          in >> Complex{temp.key1};
-          hasKey1 = true;
-        }
-        else
-        {
-          std::string dummy;
-          std::getline(in, dummy, ':');
-        }
+        in >> Complex{temp.key1};
+        hasKey1 = bool(in);
       }
       else if (label == "key2")
       {
-        if (in.peek() == '(')
-        {
-          in >> Rational{temp.key2};
-          hasKey2 = true;
-        }
-        else
-        {
-          std::string dummy;
-          std::getline(in, dummy, ':');
-        }
+        in >> Rational{temp.key2};
+        hasKey2 = bool(in);
       }
       else if (label == "key3")
       {
         in >> Strings{temp.key3};
-        hasKey3 = true;
+        hasKey3 = bool(in);
       }
       else
       {
