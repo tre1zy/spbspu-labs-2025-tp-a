@@ -11,7 +11,7 @@ std::istream& smirnov::operator>>(std::istream& in, const DelimiterCharI&& delim
     return in;
   }
 
-  char c = 0;
+  char c{};
   in >> c;
 
   if (std::isalpha(c))
