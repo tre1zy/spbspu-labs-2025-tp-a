@@ -1,5 +1,6 @@
 #include "dataStruct.hpp"
 #include <vector>
+#include <cstdlib>
 #include <complex>
 #include <string>
 #include <iostream>
@@ -64,8 +65,8 @@ namespace
       return in;
     }
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> DelimiterIO{ 'N' } >> dest.ref.first;
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second >> DelimiterIO{ ':' };
-    in >> DelimiterIO{ ')' };
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> dest.ref.second;
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
     return in;
   }
 
@@ -143,8 +144,8 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
 
 bool sharifullina::DataStruct::operator<(const DataStruct& other) const
 {
-  const double abs1 = std::llabs(key1);
-  const double abs2 = std::llabs(other.key1);
+  const long long abs1 = std::llabs(key1);
+  const long long abs2 = std::llabs(other.key1);
 
   if (abs1 != abs2)
   {
