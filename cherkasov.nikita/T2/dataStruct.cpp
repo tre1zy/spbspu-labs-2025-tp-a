@@ -1,5 +1,7 @@
 #include "dataStruct.hpp"
+#include "streamGuard.hpp"
 #include <iostream>
+#include <iomanip>
 #include <stdexcept>
 #include <sstream>
 
@@ -149,6 +151,8 @@ namespace cherkasov
     {
       return out;
     }
+    StreamGuard guard(out);
+    out << std::fixed << std::showpoint << std::setprecision(1);
     out << "(:key1 #c(" << obj.key1.real() << " " << obj.key1.imag() << "):";
     out << "key2 (:N " << obj.key2.first << ":D " << obj.key2.second << ":):";
     out << "key3 \"" << obj.key3 << "\":)";
