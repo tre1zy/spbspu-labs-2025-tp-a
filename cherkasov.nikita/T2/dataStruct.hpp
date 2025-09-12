@@ -43,5 +43,4 @@ namespace cherkasov
   std::istream& operator>>(std::istream& in, DataStruct& obj);
   std::ostream& operator<<(std::ostream& out, const DataStruct& obj);
 }
-
 #endif
