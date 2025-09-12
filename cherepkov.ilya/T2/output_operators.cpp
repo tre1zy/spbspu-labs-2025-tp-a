@@ -17,12 +17,12 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const UllBinOutput& dest)
 
   if (dest.ref == 0)
   {
-    return out << "0b0";
+    return out << "0";
   }
 
   if (dest.ref == 1)
   {
-    return out << "0b01";
+    return out << "01";
   }
 
   std::string bin;
