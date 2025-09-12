@@ -1,6 +1,7 @@
 #include "data_struct.hpp"
 #include "stream_guard.hpp"
 #include "input_operators.hpp"
+#include "output_operators.hpp"
 
 
 std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
@@ -75,39 +76,18 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
   return in;
 }
 
-std::string convertToBinary(unsigned long long val)
-{
-  if (val == 0)
-  {
-    return "0";
-  }
-  std::string bin;
-  bin.reserve(64);
-
-  while (val > 0)
-  {
-    bin.push_back('0' + (val % 2));
-    val /= 2;
-  }
-  std::reverse(bin.begin(), bin.end());
-  return bin;
-}
-
 std::ostream& cherepkov::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
-  if (!sentry)
-  {
+  if (!sentry) {
     return out;
   }
   cherepkov::StreamGuard guard(out);
-
-  out << "(:";
-  out << "key1 " << src.key1 << "ull" << ":";
-  out << "key2 0b" << (src.key2 == 0 ? "" : "0") << convertToBinary(src.key2);
-  out << ":key3 \"" << src.key3;
-  out << "\":)";
-
+  
+  out << "(:key1 " << UllLitOutput{src.key1} << ":";
+  out << "key2 0b" << UllBinOutput{src.key2} << ":";
+  out << "key3 \"" << src.key3 << "\":)";
+  
   return out;
 }
 
