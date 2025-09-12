@@ -30,7 +30,7 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const UllBinOutput& dest)
 
   while (val > 0)
   {
-    bin.insert(0, std::to_string(val % 2));
+    bin.push_back('0' + (val % 2));
     val /= 2;
   }
   std::reverse(bin.begin(), bin.end());
