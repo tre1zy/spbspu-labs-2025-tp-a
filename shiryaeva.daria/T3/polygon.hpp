@@ -1,7 +1,7 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-#include "input_struct.hpp"
+#include <input_struct.hpp>
 #include <vector>
 #include <istream>
 
