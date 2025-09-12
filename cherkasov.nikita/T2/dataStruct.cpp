@@ -6,7 +6,7 @@
 
 namespace cherkasov
 {
-  bool DataStruct::operator<(const DataStruct& other) const 
+  bool DataStruct::operator<(const DataStruct& other) const
   {
     if (std::abs(key1) != std::abs(other.key1))
     {
