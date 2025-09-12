@@ -26,44 +26,40 @@ namespace cherkasov
     {
       return in;
     }
-    std::string token;
+
     char ch;
     if (!(in >> ch) || ch != '(')
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-    if (!(in >> ch) || ch != ':')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+
+    bool hasKey1 = false;
+    bool hasKey2 = false;
+    bool hasKey3 = false;
     std::complex<double> tmp1{};
     std::pair<long long, unsigned long long> tmp2{};
     std::string tmp3{};
-    while (true)
+
+    while (in)
     {
-      if (!(in >> ch))
+      if (!(in >> ch) || ch != ':')
       {
         in.setstate(std::ios::failbit);
         return in;
       }
-      if (ch != ':')
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
+
       std::string key;
       if (!(in >> key))
       {
         in.setstate(std::ios::failbit);
         return in;
       }
+
       if (key == "key1")
       {
         std::string mark;
-        if (!(in >> mark) || mark.rfind("#c", 0) != 0)
+        if (!(in >> mark) || mark != "#c")
         {
           in.setstate(std::ios::failbit);
           return in;
@@ -73,7 +69,7 @@ namespace cherkasov
           in.setstate(std::ios::failbit);
           return in;
         }
-        double re, im;
+        double re{}, im{};
         if (!(in >> re >> im))
         {
           in.setstate(std::ios::failbit);
@@ -84,8 +80,8 @@ namespace cherkasov
           in.setstate(std::ios::failbit);
           return in;
         }
-        hasKey1 = true;
         tmp1 = {re, im};
+        hasKey1 = true;
       }
       else if (key == "key2")
       {
@@ -100,7 +96,7 @@ namespace cherkasov
           in.setstate(std::ios::failbit);
           return in;
         }
-        long long num;
+        long long num{};
         if (!(in >> num))
         {
           in.setstate(std::ios::failbit);
@@ -117,7 +113,7 @@ namespace cherkasov
           in.setstate(std::ios::failbit);
           return in;
         }
-        unsigned long long den;
+        unsigned long long den{};
         if (!(in >> den))
         {
           in.setstate(std::ios::failbit);
@@ -133,8 +129,8 @@ namespace cherkasov
           in.setstate(std::ios::failbit);
           return in;
         }
-        hasKey2 = true;
         tmp2 = {num, den};
+        hasKey2 = true;
       }
       else if (key == "key3")
       {
@@ -146,7 +142,15 @@ namespace cherkasov
         std::ostringstream oss;
         while (in.get(ch))
         {
-          if (ch == '"') break;
+          if (ch == '"')
+          {
+            break;
+          }
+          if (ch == '\n')
+          {
+            in.setstate(std::ios::failbit);
+            return in;
+          }
           oss << ch;
         }
         tmp3 = oss.str();
@@ -158,12 +162,8 @@ namespace cherkasov
       }
       else
       {
-        std::string skip;
-        if (!(in >> skip))
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
+        in.setstate(std::ios::failbit);
+        return in;
       }
       std::streampos pos = in.tellg();
       if (in >> ch)
@@ -184,6 +184,7 @@ namespace cherkasov
         in.seekg(pos);
       }
     }
+
     if (hasKey1 && hasKey2 && hasKey3)
     {
       value.key1 = tmp1;
