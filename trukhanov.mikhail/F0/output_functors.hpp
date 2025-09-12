@@ -10,12 +10,6 @@
 
 namespace trukhanov
 {
-  struct ShowEntry
-  {
-    std::ostream& out;
-    void operator()(const std::pair< std::string, std::size_t >& pair) const;
-  };
-
   struct MergeLinesFunctor
   {
     const std::vector< std::string >& lines1;

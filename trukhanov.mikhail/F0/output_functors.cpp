@@ -3,11 +3,6 @@
 #include <iterator>
 #include <iostream>
 
-void trukhanov::ShowEntry::operator()(const std::pair< std::string, std::size_t >& pair) const
-{
-  out << pair.first << ' ' << pair.second << '\n';
-}
-
 std::string trukhanov::MergeLinesFunctor::operator()()
 {
   std::string line1;
