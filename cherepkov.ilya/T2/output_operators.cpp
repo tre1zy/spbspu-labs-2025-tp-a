@@ -20,19 +20,16 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const UllBinOutput& dest)
     return out << "0";
   }
 
-  if (dest.ref == 1)
-  {
-    return out << "01";
-  }
-
   std::string bin;
   unsigned long long val = dest.ref;
+  bin.reserve(64);
 
   while (val > 0)
   {
     bin.insert(0, std::to_string(val % 2));
     val /= 2;
   }
+  std::reverse(bin.begin(), bin.end());
 
-  return out << "0b" << bin;
+  return out << bin;
 }
