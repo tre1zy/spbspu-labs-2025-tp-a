@@ -1,7 +1,7 @@
 #include "value.hpp"
+#include "delimiter.hpp"
 #include <bitset>
 #include <string>
-#include "Delimiter.hpp"
 
 std::istream &smirnov::operator>>(std::istream &in, ULLBinary &&key)
 {
