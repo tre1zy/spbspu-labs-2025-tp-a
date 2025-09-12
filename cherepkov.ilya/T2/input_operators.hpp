@@ -4,14 +4,10 @@
 #include <string>
 #include <istream>
 #include <iomanip>
+#include <delimiter_io.hpp>
 
 namespace cherepkov
 {
-  struct DelimiterIO
-  {
-    char exp;
-  };
-
   struct UllLitValue
   {
     unsigned long long& ref;
@@ -27,7 +23,6 @@ namespace cherepkov
     std::string& ref;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, UllLitValue&& dest);
   std::istream& operator>>(std::istream& in, UllBinValue&& dest);
   std::istream& operator>>(std::istream& in, StringValue&& dest);

@@ -1,23 +1,4 @@
-#include "input_operators.hpp"
-
-
-std::istream& cherepkov::operator>>(std::istream& in, DelimiterIO&& dest)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-  char c = '0';
-  in >> c;
-  c = std::tolower(c);
-
-  if (in && (c != dest.exp))
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
-}
+#include <input_operators.hpp>
 
 std::istream& cherepkov::operator>>(std::istream& in, UllLitValue&& dest)
 {
