@@ -1,5 +1,5 @@
 #include "output_operators.hpp"
-#include "stream_guard.hpp"
+#include <stream_guard.hpp>
 
 std::ostream& cherepkov::operator<<(std::ostream& out, const UllLitOutput& dest)
 {
