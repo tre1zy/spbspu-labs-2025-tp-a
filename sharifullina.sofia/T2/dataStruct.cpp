@@ -142,7 +142,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
   sharifullina::IofmtGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
-  out << "(:key1 " << dest.key1 << (dest.key1 < 0 ? "LL" : "ll");
+  out << "(:key1 " << dest.key1 << "ll";
   out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
   out << ":key3 \"" << dest.key3 << "\":)";
 
@@ -151,12 +151,10 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
 
 bool sharifullina::DataStruct::operator<(const DataStruct& other) const
 {
-  const long long abs1 = std::llabs(key1);
-  const long long abs2 = std::llabs(other.key1);
 
-  if (abs1 != abs2)
+  if (key1 != other.key1)
   {
-    return abs1 < abs2;
+    return key1 < other.key1;
   }
 
   const double lhsRatio = static_cast<double>(key2.first) / key2.second;
