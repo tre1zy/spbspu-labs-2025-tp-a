@@ -1,7 +1,7 @@
 #include <list>
 #include <iterator>
 #include <limits>
-#include "DataStruct.hpp"
+#include "datastruct.hpp"
 
 int main()
 {
