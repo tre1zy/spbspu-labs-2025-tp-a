@@ -83,11 +83,11 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const DataStruct& src)
     return out;
   }
   cherepkov::StreamGuard guard(out);
-  
+
   out << "(:key1 " << UllLitOutput{src.key1} << ":";
   out << "key2 0b" << UllBinOutput{src.key2} << ":";
   out << "key3 \"" << src.key3 << "\":)";
-  
+
   return out;
 }
 
