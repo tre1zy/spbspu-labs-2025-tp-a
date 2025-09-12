@@ -54,7 +54,14 @@ namespace
     {
       return in;
     }
-    return in >> dest.ref;
+    in >> dest.ref;
+    char c1, c2;
+    in >> c1 >> c2;
+    if (in && ((c1 != 'l' && c1 != 'L') || (c2 != 'l' && c2 != 'L')))
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, RationalIO && dest)
@@ -135,7 +142,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
   sharifullina::IofmtGuard guard(out);
   out << std::fixed << std::setprecision(1);
 
-  out << "(:key1 " << dest.key1;
+  out << "(:key1 " << dest.key1 << (dest.key1 < 0 ? "LL" : "ll");
   out << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)";
   out << ":key3 \"" << dest.key3 << "\":)";
 
