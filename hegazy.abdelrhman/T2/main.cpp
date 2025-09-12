@@ -1,29 +1,34 @@
+
+#include "data_struct.hpp"
+#include "input_struct.hpp"
+
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <vector>
-#include "data_struct.hpp"
 
-int main()
-{
-    using pilugina::DataStruct;
-    using input_it = std::istream_iterator<DataStruct>;
-    using output_it = std::ostream_iterator<DataStruct>;
-
+int main() {
+    using namespace martynov;
     std::vector<DataStruct> data;
 
-    while (!std::cin.eof())
-    {
-        std::copy(input_it{ std::cin }, input_it{}, std::back_inserter(data));
-        if (std::cin.fail())
-        {
+    DataStruct ds;
+    while (std::cin) {
+        if (std::cin >> ds) {
+            data.push_back(ds);
+        }
+        else {
+            if (std::cin.eof()) {
+                break;
+            }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
 
-    std::sort(data.begin(), data.end());
-    std::copy(data.begin(), data.end(), output_it{ std::cout, "\n" });
+    std::sort(data.begin(), data.end(), compare);
+
+    std::copy(data.begin(), data.end(), std::ostream_iterator<DataStruct>(std::cout, "\n"));
+
     return 0;
 }

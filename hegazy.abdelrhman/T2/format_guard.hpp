@@ -1,23 +1,21 @@
+
 #ifndef FORMAT_GUARD_HPP
 #define FORMAT_GUARD_HPP
 
-#include <iostream>
 #include <ios>
 
-namespace pilugina
-{
-    class FormatGuard
-    {
-    public:
-        explicit FormatGuard(std::ostream& s);
-        ~FormatGuard();
+namespace martynov {
 
+    class FormatGuard {
     private:
-        std::ostream& stream_;
-        std::ios::fmtflags flags_;
-        std::streamsize precision_;
-        char fill_;
-    };
-}
+        std::ios& stream;
+        std::ios::fmtflags flags;
 
-#endif
+    public:
+        FormatGuard(std::ios& s) : stream(s), flags(s.flags()) {}
+        ~FormatGuard() { stream.flags(flags); }
+    };
+
+} 
+
+#endif  
