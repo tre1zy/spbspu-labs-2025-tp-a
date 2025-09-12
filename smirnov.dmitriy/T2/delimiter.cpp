@@ -1,4 +1,4 @@
-#include "Delimiter.hpp"
+#include "delimiter.hpp"
 
 #include <cctype>
 #include <ios>
@@ -36,7 +36,7 @@ std::istream& smirnov::operator>>(std::istream& in, const DelimiterStringI&& del
 
   for (size_t i = 0; delimiter.expected[i] != '\0'; ++i)
   {
-    char c = {};
+    char c{};
     in >> c;
 
     if (std::isalpha(c))
@@ -52,4 +52,3 @@ std::istream& smirnov::operator>>(std::istream& in, const DelimiterStringI&& del
   }
   return in;
 }
-
