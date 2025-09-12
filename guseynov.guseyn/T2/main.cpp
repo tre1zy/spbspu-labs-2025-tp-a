@@ -1,26 +1,30 @@
 #include "DataStruct.h"
 #include <iostream>
+#include <iterator>
 #include <vector>
 #include <algorithm>
-#include <iterator>
 #include <limits>
 
-int main() {
-  std::vector<DataStruct> dataVector;
-  std::copy(
-    std::istream_iterator<DataStruct>(std::cin),
-    std::istream_iterator<DataStruct>(),
-    std::back_inserter(dataVector)
-  );
-  if (std::cin.fail() && !std::cin.eof()) {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+int main()
+{
+  using guseynov::DataStruct;
+  using input_it_t = std::istream_iterator<DataStruct>;
+  using output_it_t = std::ostream_iterator<DataStruct>;
+
+  std::vector<DataStruct> data;
+
+  while (!std::cin.eof())
+  {
+    std::copy(input_it_t{std::cin}, input_it_t{}, std::back_inserter(data));
+    if (std::cin.fail())
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
   }
-  std::sort(dataVector.begin(), dataVector.end(), compareDataStruct);
-  std::copy(
-    dataVector.begin(),
-    dataVector.end(),
-    std::ostream_iterator<DataStruct>(std::cout, "\n")
-  );
+
+  std::sort(data.begin(), data.end());
+  std::copy(data.cbegin(), data.cend(), output_it_t{std::cout, "\n"});
+
   return 0;
 }
