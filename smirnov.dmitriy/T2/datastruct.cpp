@@ -1,30 +1,36 @@
-#include "DataStruct.hpp"
-#include <algorithm>
-#include <bitset>
-#include "Delimiter.hpp"
-#include "ScopeGuard.hpp"
+#include "dataStruct.hpp"
+#include "delimiter.hpp"
+#include "scopeGuard.hpp"
 #include "value.hpp"
+#include <bitset>
 
-std::string getBinNumber(unsigned long long value)
+namespace
 {
-  std::bitset< 64 > bin(value);
-  std::string binString = bin.to_string();
-  return "0" + binString.erase(0, binString.find('1'));
+  std::string getBinNumber(unsigned long long value)
+  {
+    std::bitset< 64 > bin(value);
+    std::string binString = bin.to_string();
+    return "0" + binString.erase(0, binString.find('1'));
+  }
 }
 
-bool smirnov::DataStruct::operator<(const DataStruct& other) const
+bool smirnov::operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
-  if (key1 != other.key1)
+  if (lhs.key1 == rhs.key1)
   {
-    return key1 < other.key1;
+    if (lhs.key2 == rhs.key2)
+    {
+      return lhs.key3.length() < rhs.key3.length();
+    }
+    else
+    {
+      return lhs.key2 < rhs.key2;
+    }
   }
-
-  else if (key2 != other.key2)
+  else
   {
-    return key2 < other.key2;
+    return lhs.key1 < rhs.key1;
   }
-
-  return key3.length() <= other.key3.length();
 }
 
 std::istream& smirnov::operator>>(std::istream& in, DataStruct& value)
@@ -37,17 +43,14 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& value)
 
   ScopeGuard scopeGuard(in);
 
-  using delChar = DelimiterCharI;
-  using delString = DelimiterStringI;
-
   const size_t KEY_NUMBER = 3;
   size_t keyI = 0;
 
-  in >> delChar{ '(' };
+  in >> DelimiterCharI{ '(' };
 
   for (size_t i = 0; i < KEY_NUMBER; ++i)
   {
-    in >> delString{ ":key" } >> keyI;
+    in >> DelimiterStringI{ ":key" } >> keyI;
     switch (keyI)
     {
       case 1:
@@ -72,7 +75,7 @@ std::istream& smirnov::operator>>(std::istream& in, DataStruct& value)
     }
   }
 
-  in >> delString{ ":)" };
+  in >> DelimiterStringI{ ":)" };
   return in;
 }
 
