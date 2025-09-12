@@ -1,4 +1,4 @@
-#include "ScopeGuard.hpp"
+#include "scopeGuard.hpp"
 
 smirnov::ScopeGuard::ScopeGuard(std::basic_ios< char >& s):
   s_(s),
