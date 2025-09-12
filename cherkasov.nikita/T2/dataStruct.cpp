@@ -6,6 +6,18 @@
 
 namespace cherkasov
 {
+  bool DataStruct::operator<(const DataStruct& other) const 
+  {
+    if (std::abs(key1) != std::abs(other.key1))
+    {
+      return std::abs(key1) < std::abs(other.key1);
+    }
+    if (key2 != other.key2)
+    {
+      return key2 < other.key2;
+    }
+    return key3.size() < other.key3.size();
+  }
   std::istream& operator>>(std::istream& in, ExpectChar&& d)
   {
     char c;
