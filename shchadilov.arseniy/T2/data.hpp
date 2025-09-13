@@ -1,26 +1,78 @@
-#ifndef SCOPE_GUARD_HPP
-#define SCOPE_GUARD_HPP
+#ifndef DATA_HPP
+#define DATA_HPP
 
 #include <iostream>
+#include <string>
+#include <array>
 
 namespace shchadilov
 {
-  class StreamGuard
+  struct DataStruct
   {
-  public:
-    explicit StreamGuard(std::basic_ios< char >& s);
-    ~StreamGuard();
-    StreamGuard(const StreamGuard&) = delete;
-    StreamGuard(StreamGuard&&) = delete;
-    StreamGuard& operator=(const StreamGuard&) = delete;
-    StreamGuard& operator=(StreamGuard&&) = delete;
-  private:
-    std::streamsize precision_;
-    std::streamsize width_;
-    std::basic_ios< char >& s_;
-    std::basic_ios< char >::fmtflags fmt_;
-    char fill_;
+    double key1;
+    unsigned long long key2;
+    std::string key3;
   };
+
+  struct DelimiterIO
+  {
+    char exp;
+  };
+
+  struct DoubleI
+  {
+    double& ref;
+  };
+
+  struct UllIO
+  {
+    unsigned long long& ref;
+  };
+
+  struct StringI
+  {
+    std::string& ref;
+  };
+
+  struct DoubleO
+  {
+    const double& ref;
+  };
+
+  struct UllO
+  {
+    const unsigned long long& ref;
+  };
+
+  struct StringO
+  {
+    const std::string& ref;
+  };
+
+  struct KeyIO
+  {
+    DataStruct& data;
+    std::array< bool, 3 > used;
+  };
+  
+  struct WordI
+  {
+    const std::string& ref;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DoubleI&& dest);
+  std::istream& operator>>(std::istream& in, UllIO&& dest);
+  std::istream& operator>>(std::istream& in, StringI&& dest);
+  std::istream& operator>>(std::istream& in, KeyIO& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::istream& operator>>(std::istream& in, WordI&&);
+  std::ostream& operator<<(std::ostream& out, const DoubleO& dest);
+  std::ostream& operator<<(std::ostream& out, const UllO& dest);
+  std::ostream& operator<<(std::ostream& out, const StringO& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+
+  bool compare(const DataStruct& lhs, const DataStruct& rhs);
 }
 
 #endif
