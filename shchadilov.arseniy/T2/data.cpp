@@ -3,6 +3,11 @@
 #include <iomanip>
 #include "streamGuard.hpp"
 
+shchadilov::KeyIO::KeyIO(DataStruct& data, std::array< bool, 3 > used) :
+  data(data),
+  used(used)
+{};
+
 std::istream& shchadilov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
@@ -113,7 +118,7 @@ std::istream& shchadilov::operator>>(std::istream& in, DataStruct& dest)
     return in;
   }
   DataStruct temp{};
-  KeyIO keyReader{ temp, { false, false, false} };
+  KeyIO keyReader(temp);
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
   for (size_t i = 0; i < 3; ++i)
   {

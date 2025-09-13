@@ -51,6 +51,7 @@ namespace shchadilov
 
   struct KeyIO
   {
+    KeyIO(DataStruct& data, std::array< bool, 3 > used = { false, false, false });
     DataStruct& data;
     std::array< bool, 3 > used;
   };
