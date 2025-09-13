@@ -7,20 +7,6 @@
 #include "StreamGuard.hpp"
 namespace nikonov
 {
-  namespace detail
-  {
-    int hexCharToInt(char c)
-    {
-      if (c >= 'A' && c <= 'F')
-      {
-        return c - 'A' + 10;
-      }
-      if (c >= 'a' && c <= 'f')
-      {
-        return c - 'a' + 10;
-      }
-      return c;
-    }
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     {
       std::istream::sentry sentry(in);
@@ -54,7 +40,7 @@ namespace nikonov
         in.setstate(std::ios::failbit);
         return in;
       }
-      int exp = static_cast<int>(std::floor(std::log10(abs_val)));
+      int exp = static_cast< int >(std::floor(std::log10(abs_val)));
       double mantissa = abs_val / std::pow(10, exp);
       if (!(mantissa >= 1.0 && mantissa < 10.0))
       {
@@ -141,7 +127,7 @@ namespace nikonov
       {
         return out;
       }
-      out << "0x" << std::hex << std::uppercase <<  toOut.ref;
+      out << "0x" << std::hex << std::uppercase << toOut.ref;
       return out;;
     }
     std::ostream& operator<<(std::ostream& out, const StringO& toOut)

@@ -3,7 +3,7 @@
 #include <iterator>
 #include <algorithm>
 #include "DataStruct.hpp"
-namespace nikonov::detail
+namespace
 {
   bool compareDataStructs(const DataStruct& lhs, const DataStruct& rhs)
   {
@@ -18,6 +18,7 @@ namespace nikonov::detail
     return lhs.key1 < rhs.key1;
   }
 }
+
 int main()
 {
   using nikonov::DataStruct;
@@ -32,6 +33,6 @@ int main()
     std::copy(data_istream_it(std::cin), data_istream_it(), std::back_inserter(dS));
   }
   std::copy(data_istream_it(std::cin), data_istream_it(), std::back_inserter(dS));
-  std::sort(dS.begin(), dS.end(), nikonov::detail::compareDataStructs);
+  std::sort(dS.begin(), dS.end(), compareDataStructs);
   std::copy(dS.begin(), dS.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
 }
