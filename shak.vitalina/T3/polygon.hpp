@@ -32,8 +32,8 @@ namespace shak
     double x, y;
   };
   bool operator==(const DPoint &left, const DPoint& right);
-  double SumX(double sumX, const shak::Point &point);
-  double SumY(double sumX, const shak::Point &point);
+  double getX(const shak::Point &point);
+  double getY(const shak::Point &point);
   DPoint getMassCenter(const Polygon &polygon);
 }
 #endif

@@ -136,20 +136,24 @@ bool shak::operator==(const DPoint &point1, const DPoint &point2)
   return ((point1.x == point2.x) && (point1.y == point2.y));
 }
 
-double shak::SumX(double sumX, const shak::Point &point)
+double shak::getX(const shak::Point &point)
 {
-  return sumX + static_cast< double >(point.x);
+  return static_cast< double >(point.x);
 }
 
-double shak::SumY(double sumY, const shak::Point &point)
+double shak::getY(const shak::Point &point)
 {
-  return sumY +  static_cast< double >(point.y);
+  return static_cast< double >(point.y);
 }
 
 shak::DPoint shak::getMassCenter(const shak::Polygon &polygon)
 {
-  double sumX = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, SumX);
-  double sumY = std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, SumY);
+  std::vector< double > pointX(polygon.points.size());
+  std::vector< double > pointY(polygon.points.size());
+  std::transform(polygon.points.begin(), polygon.points.end(), std::back_inserter(pointX), getX);
+  std::transform(polygon.points.begin(), polygon.points.end(), std::back_inserter(pointY), getY);
+  double sumX = std::accumulate(pointX.begin(), pointX.end(), 0.0);
+  double sumY = std::accumulate(pointY.begin(), pointY.end(), 0.0);
   double numberPoints  = static_cast< double >(polygon.points.size());
   return { sumX / numberPoints, sumY / numberPoints };
 }
