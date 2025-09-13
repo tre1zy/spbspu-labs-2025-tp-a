@@ -88,7 +88,7 @@ namespace
   }
 }
 
-std::istream& sharifullina::operator>>(std::istream& in, sharifullina::DataStruct& dest)
+std::istream& sharifullina::operator>>(std::istream & in, sharifullina::DataStruct & dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -149,7 +149,7 @@ std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::Da
   return out;
 }
 
-bool sharifullina::DataStruct::operator<(const DataStruct& other) const
+bool sharifullina::DataStruct::operator<(const DataStruct & other) const
 {
 
   if (key1 != other.key1)
@@ -157,8 +157,8 @@ bool sharifullina::DataStruct::operator<(const DataStruct& other) const
     return key1 < other.key1;
   }
 
-  const double lhsRatio = static_cast<double>(key2.first) / key2.second;
-  const double rhsRatio = static_cast<double>(other.key2.first) / other.key2.second;
+  const double lhsRatio = static_cast< double >(key2.first) / key2.second;
+  const double rhsRatio = static_cast< double >(other.key2.first) / other.key2.second;
 
   if (lhsRatio != rhsRatio)
   {
