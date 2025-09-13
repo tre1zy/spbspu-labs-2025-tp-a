@@ -53,7 +53,7 @@ namespace holodilov
 
       friend std::istream& operator>>(std::istream& in, KeyNameIO& keyName);
     private:
-      int keyNumber_;
+      int keyNumber_ = 0;
 
       bool isValid() const;
     };
@@ -67,8 +67,6 @@ namespace holodilov
     std::istream& operator>>(std::istream& in, StringIO&& str);
 
     std::istream& operator>>(std::istream& in, KeyNameIO& keyName);
-
-    std::ostream& operator<<(std::ostream& out, const KeyNameIO& keyName);
   }
 }
 
