@@ -19,7 +19,7 @@ std::ostream& cherepkov::operator<<(std::ostream& out, const UllBinOutput& dest)
   {
     return out;
   }
-  
+
   StreamGuard guard(out);
 
   if (dest.ref == 0)
