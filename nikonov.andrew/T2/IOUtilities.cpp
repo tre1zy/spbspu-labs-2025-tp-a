@@ -48,7 +48,8 @@ namespace nikonov
       {
         return in;
       }
-      double abs_val = abs(val);
+      in >> DelimiterIO{ ':' };
+      double abs_val = std::abs(val);
       if (abs_val == 0.0)
       {
         in.setstate(std::ios::failbit);
@@ -58,8 +59,8 @@ namespace nikonov
       double mantissa = abs_val / std::pow(10, exp);
       if (!(mantissa >= 1.0 && mantissa < 10.0))
       {
-          in.setstate(std::ios::failbit);
-          return in;
+        in.setstate(std::ios::failbit);
+        return in;
       }
       dest.ref = val;
       return in;
@@ -76,8 +77,10 @@ namespace nikonov
       if (in >> c && (c != 'x' && c != 'X'))
       {
         in.setstate(std::ios::failbit);
+        return in;
       }
       in >> std::hex >> dest.ref;
+      in >> DelimiterIO{ ':' };
       if (!in)
       {
         in.setstate(std::ios::failbit);
@@ -88,10 +91,11 @@ namespace nikonov
     {
       std::istream::sentry sentry(in);
       if (!sentry)
-      {;
+      {
         return in;
       }
       std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+      in >> DelimiterIO{ ':' };
       return in;
     }
     std::istream& operator>>(std::istream& in, LabelI&& dest)

@@ -28,17 +28,17 @@ namespace nikonov
         in >> label{ keyName };
         if (keyName == "key1")
         {
-          in >> dbl{ input.key1 } >> sep{ ':' };
+          in >> dbl{ input.key1 };
           hasKey1 = true;
         }
         else if (keyName == "key2")
         {
-          in >> ull{ input.key2 } >> sep{ ':' };
+          in >> ull{ input.key2 };
           hasKey2 = true;
         }
         else if (keyName == "key3")
         {
-          in >> str{ input.key3 } >> sep{ ':' };
+          in >> str{ input.key3 };
           hasKey3 = true;
         }
         else
