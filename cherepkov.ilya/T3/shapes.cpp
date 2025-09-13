@@ -6,7 +6,7 @@
 std::istream& cherepkov::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sent(in);
-  if (!sent) 
+  if (!sent)
   {
     return in;
   }
