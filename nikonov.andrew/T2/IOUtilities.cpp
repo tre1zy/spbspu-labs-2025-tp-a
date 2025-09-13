@@ -7,6 +7,8 @@
 #include "StreamGuard.hpp"
 namespace nikonov
 {
+  namespace detail
+  {
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     {
       std::istream::sentry sentry(in);
@@ -91,7 +93,6 @@ namespace nikonov
       std::getline(in, dest.ref, ' ');
       return in;
     }
-
     std::ostream& operator<<(std::ostream& out, const DoubleO& dest)
     {
       std::ostream::sentry sentry(out);
