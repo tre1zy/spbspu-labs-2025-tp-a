@@ -5,9 +5,6 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <utility>
-#include <limits>
-#include <cmath>
 #include "scopeGuard.hpp"
 
 namespace
@@ -32,7 +29,7 @@ namespace
     std::string & ref;
   };
 
-  std::istream& operator>>(std::istream& in, DelimiterIO && dest)
+  std::istream & operator>>(std::istream & in, DelimiterIO && dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -42,12 +39,13 @@ namespace
     char c = '0';
     in >> c;
     if (in && c != dest.exp)
+    {
       in.setstate(std::ios::failbit);
-
+    }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, LongLongIO && dest)
+  std::istream & operator>>(std::istream & in, LongLongIO && dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -55,7 +53,8 @@ namespace
       return in;
     }
     in >> dest.ref;
-    char c1, c2;
+    char c1 = '0';
+    char c2 = '0';
     in >> c1 >> c2;
     if (in && ((c1 != 'l' && c1 != 'L') || (c2 != 'l' && c2 != 'L')))
     {
@@ -64,7 +63,7 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, RationalIO && dest)
+  std::istream & operator>>(std::istream & in, RationalIO && dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -77,7 +76,7 @@ namespace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, StringIO&& dest)
+  std::istream & operator>>(std::istream& in, StringIO && dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -88,7 +87,7 @@ namespace
   }
 }
 
-std::istream& sharifullina::operator>>(std::istream & in, sharifullina::DataStruct & dest)
+std::istream & sharifullina::operator>>(std::istream & in, sharifullina::DataStruct & dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -131,7 +130,7 @@ std::istream& sharifullina::operator>>(std::istream & in, sharifullina::DataStru
   return in;
 }
 
-std::ostream& sharifullina::operator<<(std::ostream& out, const sharifullina::DataStruct & dest)
+std::ostream & sharifullina::operator<<(std::ostream & out, const sharifullina::DataStruct & dest)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)

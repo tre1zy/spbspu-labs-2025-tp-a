@@ -15,8 +15,8 @@ namespace sharifullina
     bool operator<(const DataStruct & other) const;
   };
 
-  std::istream& operator>>(std::istream& in, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  std::istream & operator>>(std::istream & in, DataStruct & dest);
+  std::ostream & operator<<(std::ostream & out, const DataStruct & dest);
 }
 
 #endif
