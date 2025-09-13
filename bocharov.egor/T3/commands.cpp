@@ -59,7 +59,10 @@ namespace
   class ToFlag
   {
   public:
-    explicit ToFlag(const Polygon & target) : target_(target) {}
+    explicit ToFlag(const Polygon & target):
+      target_(target)
+    {}
+
     size_t operator()(const Polygon & poly) const
     {
       return poly == target_ ? 1 : 0;
