@@ -239,11 +239,7 @@ void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector<
       size_t n = std::stoull(command);
       out << countNum(polygons, n);
     }
-    catch (const std::invalid_argument&)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    catch (const std::out_of_range&)
+    catch (const std::exception&)
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
