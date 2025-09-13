@@ -159,29 +159,18 @@ void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector< 
   subcommands["EVEN"] = std::bind(areaEven, std::cref(polygons));
   subcommands["ODD"] = std::bind(areaOdd, std::cref(polygons));
   subcommands["MEAN"] = std::bind(areaMedian, std::cref(polygons));
-  if (subcommands.count(command))
+  try
   {
-    out << std::fixed << std::setprecision(1) << subcommands.at(command)() << "\n";
+    out << std::fixed << std::setprecision(1) << subcommands.at(command)();
   }
-  else
+  catch (const std::exception&)
   {
-    try
+    size_t angles = std::stoull(command);
+    if (angles < 3)
     {
-      size_t angles = std::stoull(command);
-      if (angles < 3)
-      {
-        throw std::logic_error("<INVALID COMMAND>");
-      }
-      out << std::fixed << std::setprecision(1) << areaNum(polygons, angles) << "\n";
+        throw std::logic_error("Error: vertices < 3");
     }
-    catch (const std::invalid_argument&)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    catch (const std::out_of_range&)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
+    out << std::fixed << std::setprecision(1) << areaNum(polygons, angles);
   }
 }
 
