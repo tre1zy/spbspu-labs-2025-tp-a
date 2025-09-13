@@ -2,7 +2,6 @@
 #include <functional>
 #include "commands.h"
 
-template < typename T >
 int main(int argc, char** argv)
 {
   using namespace orlova;
@@ -27,7 +26,7 @@ int main(int argc, char** argv)
     file >> dicts;
     if (file.fail() && !file.eof())
     {
-      throw std::logic_error("<INVALID FILE>");
+      std::cerr << "<INVALID FILE>\n";
     }
   }
   cmds["addemptydictionary"] = std::bind(addEmptyDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
@@ -40,7 +39,7 @@ int main(int argc, char** argv)
   cmds["append"] = std::bind(append, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["dictionarysize"] = std::bind(dictionarySize, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["intersectionofdicts"] = std::bind(intersectionOfDicts, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
-  cmds["delete"] = std::bind(delete, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));;
+  cmds["deletedictionary"] = std::bind(deleteDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));;
   cmds["nonrepeatingwords"] = std::bind(nonrepeatingWords, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["residual"] = std::bind(residual, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   std::string command;
