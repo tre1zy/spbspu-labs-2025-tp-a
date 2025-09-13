@@ -22,15 +22,6 @@ namespace
     auto it = translations.begin();
     out << *it;
     std::advance(it, 1);
-
-    /*struct TranslationTransform
-    {
-        void operator()(std::ostream& out, const std::string& trans)
-        {
-            out << ", " << trans;
-        }
-    };*/
-
     std::copy(it, translations.end(), std::ostream_iterator< std::string >(out, ", "));
   }
 
@@ -179,17 +170,17 @@ void orlova::merge(std::istream& in, std::ostream& out, Dictionaries& dicts)
 
   struct DictMerger
   {
-    using Pair = std::pair< std::string, std::string >;
+    using Pair = std::pair< std::string, std::list < std::string > >;
     Dictionary newDict;
     DictMerger(const Dictionary& dict) :
       newDict(dict)
     {}
-    Pair operator()(const Pair& pair) const
+    Pair operator()(const Pair& pair)
     {
       auto it = newDict.find(pair.first);
       if (it != newDict.end())
       {
-        it->second.insert(it->second.end(), pair.second.begin(), pair.second.end()); //cpp.ref list
+        it->second.insert(it->second.end(), pair.second.begin(), pair.second.end());
         return *it;
       }
       else
