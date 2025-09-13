@@ -5,6 +5,7 @@
 #include "DataStruct.hpp"
 namespace
 {
+  using namespace nikonov;
   bool compareDataStructs(const DataStruct& lhs, const DataStruct& rhs)
   {
     if (lhs.key1 == rhs.key1)
