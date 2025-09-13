@@ -133,7 +133,7 @@ void filonova::printWords(const DictionarySet &dicts, const std::string &name, s
   }
 
   std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
-  std::sort(words.begin(), words.end(), CompareByFrequency(true));
+  std::sort(words.begin(), words.end(), CompareByFrequency(descending));
 
   if (limit == 0 || limit > words.size())
   {
