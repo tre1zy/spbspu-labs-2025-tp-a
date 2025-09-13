@@ -23,8 +23,10 @@ namespace pilugina
     {
       return 0.0;
     }
-    double perimeter = std::inner_product(poly.points.begin(), poly.points.end() - 1, poly.points.begin() + 1, 0.0,
-                                          std::plus<>(), getLineSize);
+    double perimeter;
+    auto first = poly.points.begin();
+    auto last = poly.points.end() - 1;
+    perimeter = std::inner_product(first, last, first + 1, 0.0, std::plus<>(), getLineSize);
     perimeter += getLineSize(poly.points.back(), poly.points.front());
     return perimeter;
   }
@@ -80,9 +82,11 @@ namespace pilugina
 
   double calcPerimeters(const std::vector< Polygon > &polys, std::istream &in)
   {
-    std::map< std::string, std::function< double() > > subcommands {
-        {"EVEN", std::bind(getEvenPerimeter, std::cref(polys))},
-        {"ODD", std::bind(getOddPerimeter, std::cref(polys))}};
+    std::map< std::string, std::function< double() > > subcommands
+    {
+      {"EVEN", std::bind(getEvenPerimeter, std::cref(polys))},
+      {"ODD", std::bind(getOddPerimeter, std::cref(polys))}
+    };
 
     std::string subcommand;
     in >> subcommand;
