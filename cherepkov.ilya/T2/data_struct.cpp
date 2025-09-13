@@ -12,7 +12,7 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
     return in;
   }
 
-  DataStruct temp = {0, 0, ""};
+  DataStruct temp;
   size_t keysRead = 0;
   bool has_key1 = false, has_key2 = false, has_key3 = false;
 

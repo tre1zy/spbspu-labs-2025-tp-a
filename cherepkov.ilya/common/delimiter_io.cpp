@@ -4,7 +4,10 @@
 std::istream& cherepkov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
   std::istream::sentry sentry(in);
-  if (!sentry) return in;
+  if (!sentry)
+  {
+    return in;
+  }
 
   char c = '0';
   in >> c;
