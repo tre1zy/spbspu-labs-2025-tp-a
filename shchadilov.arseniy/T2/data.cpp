@@ -72,7 +72,7 @@ std::istream& shchadilov::operator>>(std::istream& in, KeyIO& dest)
   {
     return in;
   }
-  in >> DelimiterIO{ 'k' } >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' };
+  in >> WordI{"key"};
   int key = 0;
   in >> key;
   if (key < 1 || key > 3)
@@ -80,12 +80,12 @@ std::istream& shchadilov::operator>>(std::istream& in, KeyIO& dest)
     in.setstate(std::ios::failbit);
     return in;
   }
-  if (dest.used[key])
+  if (dest.used[key - 1])
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  dest.used[key] = true;
+  dest.used[key - 1] = true;
   switch (key)
   {
   case 1:
@@ -113,7 +113,7 @@ std::istream& shchadilov::operator>>(std::istream& in, DataStruct& dest)
     return in;
   }
   DataStruct temp{};
-  KeyIO keyReader{ temp, { false, false, false, false } };
+  KeyIO keyReader{ temp, { false, false, false} };
   in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
   for (size_t i = 0; i < 3; ++i)
   {
@@ -127,6 +127,23 @@ std::istream& shchadilov::operator>>(std::istream& in, DataStruct& dest)
   if (in)
   {
     dest = temp;
+  }
+  return in;
+}
+
+std::istream& shchadilov::operator>>(std::istream& in, WordI&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  std::string word = {};
+  in >> word;
+  if (in && (word != dest.ref))
+  {
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
