@@ -173,7 +173,7 @@ void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector< 
     }
     size = areaNum(polygons, angles);
   }
-  out << std::fixed << std::setprecision(1) << size;
+  out << std::fixed << std::setprecision(2) << size;
 }
 
 void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -186,11 +186,11 @@ void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector< P
   }
   if (command == "AREA")
   {
-    out << std::fixed << std::setprecision(1) << areaMax(polygons) << "\n";
+    out << std::fixed << std::setprecision(1) << areaMax(polygons);
   }
   else if (command == "VERTEXES")
   {
-    out << vertexMax(polygons) << "\n";
+    out << vertexMax(polygons);
   }
   else
   {
@@ -208,11 +208,11 @@ void khokhryakova::min(std::istream& in, std::ostream& out, const std::vector< P
   }
   if (command == "AREA")
   {
-    out << std::fixed << std::setprecision(1) << areaMin(polygons) << "\n";
+    out << std::fixed << std::setprecision(1) << areaMin(polygons);
   }
   else if (command == "VERTEXES")
   {
-    out << vertexMin(polygons) << "\n";
+    out << vertexMin(polygons);
   }
   else
   {
@@ -226,18 +226,18 @@ void khokhryakova::count(std::istream& in, std::ostream& out, const std::vector<
   in >> command;
   if (command == "EVEN")
   {
-    out << countEven(polygons) << "\n";
+    out << countEven(polygons);
   }
   else if (command == "ODD")
   {
-    out << countOdd(polygons) << "\n";
+    out << countOdd(polygons);
   }
   else
   {
     try
     {
       size_t n = std::stoull(command);
-      out << countNum(polygons, n) << "\n";
+      out << countNum(polygons, n);
     }
     catch (const std::invalid_argument&)
     {
@@ -285,7 +285,7 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygo
     file << "\n";
   }
   polygons = newPolygons;
-  out << count << "\n";
+  out << count;
 }
 
 void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
@@ -311,5 +311,5 @@ void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector
       currentCount = 0;
     }
   }
-  out << maxCount << "\n";
+  out << maxCount;
 }
