@@ -21,7 +21,7 @@ namespace
     {
       std::vector<Polygon> filteredPolygons;
       std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
-      std::vector<double> areas;
+      std::vector< double > areas;
       areas.reserve(filteredPolygons.size());
       std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), getPolygonArea);
       return std::accumulate(areas.begin(), areas.end(), 0.0);
@@ -79,19 +79,14 @@ namespace
     }
   };
 
-  enum class ExtremumType { Min, Max };
-
-  void getExtremumArea(std::ostream & out, const std::vector< Polygon > & polygons, ExtremumType type)
+  template<typename Compare>
+  void getExtremumArea(std::ostream & out, const std::vector< Polygon > & polygons, Compare comp)
   {
     StreamGuard guard(out);
     std::vector< double > areas;
     areas.reserve(polygons.size());
     std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
-
-    auto extremum_it = (type == ExtremumType::Min)
-      ? std::min_element(areas.begin(), areas.end())
-      : std::max_element(areas.begin(), areas.end());
-
+    auto extremum_it = std::min_element(areas.begin(), areas.end(), comp);
     out << std::fixed << std::setprecision(1) << *extremum_it;
   }
 
@@ -209,7 +204,7 @@ void bocharov::getMax(std::istream & in, std::ostream & out, const std::vector< 
     throw std::runtime_error("ERROR: there are no polygons");
   }
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(getExtremumArea, std::ref(out), std::cref(polygons), ExtremumType::Max);
+  subcmds["AREA"] = std::bind(getExtremumArea< std::greater< double > >, std::ref(out), std::cref(polygons), std::greater< double >());
   subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
@@ -224,7 +219,7 @@ void bocharov::getMin(std::istream & in, std::ostream & out, const std::vector< 
     throw std::runtime_error("ERROR: there are no polygons");
   }
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(getExtremumArea, std::ref(out), std::cref(polygons), ExtremumType::Min);
+  subcmds["AREA"] = std::bind(getExtremumArea< std::less< double > >, std::ref(out), std::cref(polygons), std::less< double >());
   subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
