@@ -4,8 +4,6 @@
 #include <iomanip>
 #include <vector>
 #include <numeric>
-#include <limits>
-#include <fstream>
 #include <stdexcept>
 #include <string>
 #include "commands.h"
@@ -261,7 +259,7 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygo
   }
   size_t count = 0;
   std::vector< Polygon > newPolygons;
-  for (const auto& p : polygons)
+  for (const auto& p: polygons)
   {
     newPolygons.push_back(p);
     if (p == poly)
@@ -275,10 +273,10 @@ void khokhryakova::echo(std::istream& in, std::ostream& out, std::vector< Polygo
   {
     throw std::runtime_error("Failed to open file for writing");
   }
-  for (const auto& p : newPolygons)
+  for (const auto& p: newPolygons)
   {
     file << p.points.size();
-    for (const auto& point : p.points)
+    for (const auto& point: p.points)
     {
       file << " (" << point.x << ";" << point.y << ")";
     }
@@ -299,7 +297,7 @@ void khokhryakova::maxSeq(std::istream& in, std::ostream& out, const std::vector
   }
   size_t maxCount = 0;
   size_t currentCount = 0;
-  for (const auto& p : polygons)
+  for (const auto& p: polygons)
   {
     if (p == poly)
     {
