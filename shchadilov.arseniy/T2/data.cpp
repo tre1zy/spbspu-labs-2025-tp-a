@@ -3,7 +3,7 @@
 #include <iomanip>
 #include "streamGuard.hpp"
 
-shchadilov::KeyIO::KeyIO(DataStruct& data, std::array< bool, 3 > used) :
+shchadilov::KeyIO::KeyIO(DataStruct& data, std::array< bool, 3 > used):
   data(data),
   used(used)
 {};
