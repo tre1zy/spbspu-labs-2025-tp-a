@@ -48,7 +48,6 @@ namespace nikonov
       {
         return in;
       }
-      in >> DelimiterIO{ ':' };
       double abs_val = std::abs(val);
       if (abs_val == 0.0)
       {
@@ -80,7 +79,6 @@ namespace nikonov
         return in;
       }
       in >> std::hex >> dest.ref;
-      in >> DelimiterIO{ ':' };
       if (!in)
       {
         in.setstate(std::ios::failbit);
@@ -95,7 +93,6 @@ namespace nikonov
         return in;
       }
       std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
-      in >> DelimiterIO{ ':' };
       return in;
     }
     std::istream& operator>>(std::istream& in, LabelI&& dest)
