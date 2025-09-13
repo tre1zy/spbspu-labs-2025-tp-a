@@ -9,10 +9,6 @@ namespace pilugina
 {
   double getLineSize(const Point &p1, const Point &p2);
   double getPolygonPerimeter(const Polygon &poly);
-  double prmtrSumOperator(double init, const Polygon &poly);
-  bool isEvenVertexNumP(const Polygon &poly);
-  bool isOddVertexNumP(const Polygon &poly);
-  bool isEqualVertexNum(std::size_t n, const Polygon &poly);
   double calcPerimetersSum(const std::vector< Polygon > &polys);
   double getEvenPerimeter(const std::vector< Polygon > &polys);
   double getOddPerimeter(const std::vector< Polygon > &polys);

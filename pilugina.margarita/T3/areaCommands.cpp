@@ -4,7 +4,6 @@
 #include <numeric>
 #include <algorithm>
 #include <stdexcept>
-#include <vector>
 #include "polygon.hpp"
 
 double pilugina::getTriangleArea(const Point &p1, const Point &p2, const Point &p3)
@@ -24,11 +23,6 @@ double pilugina::getPolygonArea(const Polygon &poly)
   auto firstP = poly.points.begin();
   auto endP = poly.points.end();
   return std::inner_product(firstP + 1, endP - 1, firstP + 2, 0.0, std::plus<>(), boundArea);
-}
-
-double pilugina::areaSumOperator(double init, const Polygon &poly)
-{
-  return init + getPolygonArea(poly);
 }
 
 bool pilugina::isEvenVertexNum(const Polygon &poly)

@@ -4,9 +4,9 @@
 #include <numeric>
 #include <algorithm>
 #include <stdexcept>
-#include <vector>
 #include <cmath>
 #include "polygon.hpp"
+#include "areaCommands.hpp"
 
 namespace pilugina
 {
@@ -31,26 +31,6 @@ namespace pilugina
     return perimeter;
   }
 
-  double prmtrSumOperator(double init, const Polygon &poly)
-  {
-    return init + getPolygonPerimeter(poly);
-  }
-
-  bool isEvenVertexNumP(const Polygon &poly)
-  {
-    return (poly.points.size() % 2) == 0;
-  }
-
-  bool isOddVertexNumP(const Polygon &poly)
-  {
-    return (poly.points.size() % 2) == 1;
-  }
-
-  bool isEqualVertexNumP(std::size_t n, const Polygon &poly)
-  {
-    return n == poly.points.size();
-  }
-
   double calcPerimetersSum(const std::vector< Polygon > &polys)
   {
     std::vector< double > perimeters(polys.size());
@@ -61,14 +41,14 @@ namespace pilugina
   double getEvenPerimeter(const std::vector< Polygon > &polys)
   {
     std::vector< Polygon > filtered;
-    std::copy_if(polys.cbegin(), polys.cend(), std::back_inserter(filtered), isEvenVertexNumP);
+    std::copy_if(polys.cbegin(), polys.cend(), std::back_inserter(filtered), isEvenVertexNum);
     return calcPerimetersSum(filtered);
   }
 
   double getOddPerimeter(const std::vector< Polygon > &polys)
   {
     std::vector< Polygon > filtered;
-    std::copy_if(polys.cbegin(), polys.cend(), std::back_inserter(filtered), isOddVertexNumP);
+    std::copy_if(polys.cbegin(), polys.cend(), std::back_inserter(filtered), isOddVertexNum);
     return calcPerimetersSum(filtered);
   }
 

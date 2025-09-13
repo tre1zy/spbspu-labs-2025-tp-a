@@ -12,7 +12,6 @@ namespace pilugina
   bool isEvenVertexNum(const Polygon &);
   bool isOddVertexNum(const Polygon &);
   bool isEqualVertexNum(std::size_t, const Polygon &);
-  double areaSumOperator(double, const Polygon &);
   double calcAreasSum(const std::vector< Polygon > &);
   double getEvenArea(const std::vector< Polygon > &);
   double getOddArea(const std::vector< Polygon > &);
