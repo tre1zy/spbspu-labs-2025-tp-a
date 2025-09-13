@@ -101,14 +101,22 @@ bool filonova::CompareByFrequency::operator()(const std::pair< std::string, size
   return descending ? a.second > b.second : a.second < b.second;
 }
 
-filonova::WordPresenceFilter::WordPresenceFilter(const Dictionary &d, bool state):
-  dict2(d), presenceState(state)
+filonova::WordIntersectFilter::WordIntersectFilter(const Dictionary &d):
+  dict2(d)
 {}
 
-bool filonova::WordPresenceFilter::operator()(const std::pair< const std::string, size_t > &entry) const
+bool filonova::WordIntersectFilter::operator()(const std::pair< const std::string, size_t > &entry) const
 {
-  bool found = dict2.count(entry.first);
-  return presenceState ? found : !found;
+  return dict2.count(entry.first) > 0;
+}
+
+filonova::WordExcludeFilter::WordExcludeFilter(const Dictionary &d):
+  dict2(d)
+{}
+
+bool filonova::WordExcludeFilter::operator()(const std::pair< const std::string, size_t > &entry) const
+{
+  return dict2.count(entry.first) == 0;
 }
 
 void filonova::printWords(const DictionarySet &dicts, const std::string &name, std::ostream &out, size_t limit, bool descending)
@@ -116,14 +124,12 @@ void filonova::printWords(const DictionarySet &dicts, const std::string &name, s
   auto it = dicts.find(name);
   if (it == dicts.end())
   {
-    out << "<WRONG DICT>\n";
-    return;
+    throw std::logic_error("<WRONG DICT>");
   }
 
   if (it->second.empty())
   {
-    out << "<EMPTY>\n";
-    return;
+    throw std::logic_error("<EMPTY>");
   }
 
   std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
@@ -135,21 +141,4 @@ void filonova::printWords(const DictionarySet &dicts, const std::string &name, s
   }
 
   std::transform(words.begin(), words.begin() + limit, std::ostream_iterator< std::string >(out, "\n"), printPair);
-}
-
-void filonova::combineDictionaries(DictionarySet &dicts, const std::string &newDict, const std::string &dict1, const std::string &dict2, std::ostream &out, bool intersect)
-{
-  auto it1 = dicts.find(dict1);
-  auto it2 = dicts.find(dict2);
-
-  if (!isValidName(newDict) || it1 == dicts.end() || it2 == dicts.end())
-  {
-    out << "<WRONG DICT>\n";
-    return;
-  }
-
-  Dictionary &dictNew = dicts[newDict];
-  dictNew.clear();
-
-  std::copy_if(it1->second.begin(), it1->second.end(), std::inserter(dictNew, dictNew.begin()), WordPresenceFilter(it2->second, intersect));
 }

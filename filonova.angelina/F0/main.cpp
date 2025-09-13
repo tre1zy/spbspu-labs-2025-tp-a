@@ -31,7 +31,15 @@ int main()
     auto it = commands.find(commandKey);
     if (it != commands.end())
     {
-      it->second(std::cin, std::cout);
+      try
+      {
+        it->second(std::cin, std::cout);
+      }
+      catch (const std::exception &e)
+      {
+        std::cout << e.what() << "\n";
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
     else
     {
