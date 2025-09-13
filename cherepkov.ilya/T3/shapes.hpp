@@ -17,6 +17,7 @@ namespace cherepkov
 
   std::istream& operator>>(std::istream& in, Point& point); 
   std::istream& operator>>(std::istream& in, Polygon& polygon);
+  Point handleNewLine(std::istream& in, const Point& point);
 
 }
 #endif

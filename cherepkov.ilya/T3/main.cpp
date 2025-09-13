@@ -3,6 +3,7 @@
 #include <map>
 #include <functional>
 #include <fstream>
+#include <limits>
 #include "shapes.hpp"
 
 int main(int argc, char* argv[])
@@ -27,7 +28,7 @@ int main(int argc, char* argv[])
   using input_iter = std::istream_iterator< Polygon >;
   while (!file.eof())
   {
-    std::copy(input_iter{in}, input_iter{}, std::back_inserter(polygons));
+    std::copy(input_iter{file}, input_iter{}, std::back_inserter(polygons));
     if (!file)
     {
       file.clear();
