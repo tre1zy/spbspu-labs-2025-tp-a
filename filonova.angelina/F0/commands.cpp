@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "support.hpp"
 
-void filonova::createDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::createDictionary(DictionarySet &dicts, std::istream &in)
 {
   std::string name;
   in >> name;
@@ -18,7 +18,7 @@ void filonova::createDictionary(DictionarySet &dicts, std::istream &in, std::ost
   dicts[name].clear();
 }
 
-void filonova::deleteDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::deleteDictionary(DictionarySet &dicts, std::istream &in)
 {
   std::string name;
   in >> name;
@@ -29,7 +29,7 @@ void filonova::deleteDictionary(DictionarySet &dicts, std::istream &in, std::ost
   }
 }
 
-void filonova::insert(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::insert(DictionarySet &dicts, std::istream &in)
 {
   std::string name, filename;
   in >> name >> filename;
@@ -53,7 +53,7 @@ void filonova::insert(DictionarySet &dicts, std::istream &in, std::ostream &out)
   }
 }
 
-void filonova::remove(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::remove(DictionarySet &dicts, std::istream &in)
 {
   std::string name;
   Word w;
@@ -75,7 +75,7 @@ void filonova::remove(DictionarySet &dicts, std::istream &in, std::ostream &out)
   it->second.erase(wIt);
 }
 
-void filonova::clear(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::clear(DictionarySet &dicts, std::istream &in)
 {
   std::string name;
   in >> name;
@@ -110,7 +110,7 @@ void filonova::contains(DictionarySet &dicts, std::istream &in, std::ostream &ou
   out << (found ? "<YES>\n" : "<NO>\n");
 }
 
-void filonova::merge(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::merge(DictionarySet &dicts, std::istream &in)
 {
   std::string newDict, dict1, dict2;
   if (!(in >> newDict >> dict1 >> dict2))
@@ -206,7 +206,7 @@ void filonova::mostrare(DictionarySet &dicts, std::istream &in, std::ostream &ou
 
   printWords(dicts, name, out, static_cast< size_t >(count), true);
 }
-void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in)
 {
   std::string newDict, dict1, dict2;
   if (!(in >> newDict >> dict1 >> dict2))
@@ -228,7 +228,7 @@ void filonova::intersectDictionary(DictionarySet &dicts, std::istream &in, std::
   std::copy_if(it1->second.begin(), it1->second.end(), std::inserter(dictNew, dictNew.begin()), WordIntersectFilter(it2->second));
 }
 
-void filonova::excludeDictionary(DictionarySet &dicts, std::istream &in, std::ostream &out)
+void filonova::excludeDictionary(DictionarySet &dicts, std::istream &in)
 {
   std::string newDict, dict1, dict2;
   if (!(in >> newDict >> dict1 >> dict2))
