@@ -116,3 +116,23 @@ double filonova::getTotalArea(const std::vector< Polygon > &polygons)
 
   return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
+
+bool filonova::compareByArea(const Polygon &a, const Polygon &b)
+{
+  return getPolygonArea(a) < getPolygonArea(b);
+}
+
+bool filonova::compareByVertexes(const Polygon &a, const Polygon &b)
+{
+  return a.points.size() < b.points.size();
+}
+
+bool filonova::comparePointByX(const Point &a, const Point &b)
+{
+  return (a.x < b.x) || (a.x == b.x && a.y < b.y);
+}
+
+bool filonova::comparePointByY(const Point &a, const Point &b)
+{
+  return (a.y < b.y) || (a.y == b.y && a.x < b.x);
+}

@@ -1,7 +1,7 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-#include <input_struct.hpp>
+#include "input_struct.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -46,6 +46,11 @@ namespace filonova
   double getTriangleArea(const Polygon &triangle);
   double getPolygonArea(const Polygon &polygon);
   double getTotalArea(const std::vector< Polygon > &polygons);
+
+  bool compareByArea(const Polygon &a, const Polygon &b);
+  bool compareByVertexes(const Polygon &a, const Polygon &b);
+  bool comparePointByX(const Point &a, const Point &b);
+  bool comparePointByY(const Point &a, const Point &b);
 }
 
 #endif
