@@ -6,7 +6,7 @@
 shchadilov::KeyIO::KeyIO(DataStruct& data, std::array< bool, 3 > used):
   data(data),
   used(used)
-{};
+{}
 
 std::istream& shchadilov::operator>>(std::istream& in, DelimiterIO&& dest)
 {
