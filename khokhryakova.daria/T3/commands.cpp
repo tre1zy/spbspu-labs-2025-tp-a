@@ -175,10 +175,6 @@ void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector< 
       }
       size = areaNum(polygons, angles);
     }
-    catch (const std::exception&)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
   }
   out << std::fixed << std::setprecision(1) << size << "\n";
 }
