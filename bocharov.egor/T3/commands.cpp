@@ -21,8 +21,9 @@ namespace
     {
       std::vector<Polygon> filteredPolygons;
       std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
-      std::vector< double > areas;
-      areas.reserve(filteredPolygons.size());
+
+      std::vector< double > areas(filteredPolygons.size());
+
       std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), getPolygonArea);
       return std::accumulate(areas.begin(), areas.end(), 0.0);
     }
