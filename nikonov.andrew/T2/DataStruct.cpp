@@ -29,30 +29,30 @@ namespace nikonov
         if (keyName == "key1")
         {
           if (hasKey1)
-	  {
-	    in.setstate(std::ios::failbit);
-	    break;
-	  }
+          {
+            in.setstate(std::ios::failbit);
+            break;
+          }
 	  in >> dbl{ input.key1 } >> sep{ ':' };
           hasKey1 = true;
         }
         else if (keyName == "key2")
         {
-	  if (hasKey2)
-	  {
-	    in.setstate(std::ios::failbit);
-	    break;
-	  }
+          if (hasKey2)
+          {
+            in.setstate(std::ios::failbit);
+            break;
+          }
           in >> ull{ input.key2 } >> sep{ ':' };
           hasKey2 = true;
         }
         else if (keyName == "key3")
         {
-	  if (hasKey3)
-	  {
-	    in.setstate(std::ios::failbit);
-	    break;
-	  }
+          if (hasKey3)
+          {
+            in.setstate(std::ios::failbit);
+            break;
+          }
           in >> str{ input.key3 } >> sep{ ':' };
           hasKey3 = true;
         }
