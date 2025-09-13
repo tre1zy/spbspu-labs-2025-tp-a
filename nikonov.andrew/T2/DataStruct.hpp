@@ -6,9 +6,9 @@ namespace nikonov
 {
   struct DataStruct
   {
-    double key1_;
-    unsigned long long key2_;
-    std::string key3_;
+    double key1;
+    unsigned long long key2;
+    std::string key3;
   };
   std::istream& operator>>(std::istream& out, DataStruct& dest);
   std::ostream& operator<<(std::ostream& out, const DataStruct& dest);

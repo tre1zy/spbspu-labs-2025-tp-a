@@ -5,17 +5,17 @@
 #include "DataStruct.hpp"
 namespace nikonov::detail
 {
-  bool mySortComparator(DataStruct& a, DataStruct& b)
+  bool compareDataStructs(const DataStruct& lhs, const DataStruct& rhs)
   {
-    if (a.key1_ == b.key1_)
+    if (lhs.key1 == rhs.key1)
     {
-      if (a.key2_ == b.key2_)
+      if (lhs.key2 == rhs.key2)
       {
-        return a.key3_.length() < b.key3_.length();
+        return lhs.key3.length() < rhs.key3.length();
       }
-      return a.key2_ < b.key2_;
+      return lhs.key2 < rhs.key2;
     }
-    return a.key1_ < b.key1_;
+    return lhs.key1 < rhs.key1;
   }
 }
 int main()
@@ -32,6 +32,6 @@ int main()
     std::copy(data_istream_it(std::cin), data_istream_it(), std::back_inserter(dS));
   }
   std::copy(data_istream_it(std::cin), data_istream_it(), std::back_inserter(dS));
-  std::sort(dS.begin(), dS.end(), nikonov::detail::mySortComparator);
+  std::sort(dS.begin(), dS.end(), nikonov::detail::compareDataStructs);
   std::copy(dS.begin(), dS.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
 }

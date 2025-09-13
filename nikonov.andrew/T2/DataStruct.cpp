@@ -1,7 +1,7 @@
 #include "DataStruct.hpp"
 #include <iomanip>
 #include "StreamGuard.hpp"
-#include "IO-utilities.hpp"
+#include "IOUtilities.hpp"
 namespace nikonov
 {
   std::istream& operator>>(std::istream& in, DataStruct& dest)
@@ -14,10 +14,10 @@ namespace nikonov
     DataStruct input;
     {
       using sep = detail::DelimiterIO;
-      using label = detail::LabelIO;
-      using dbl = detail::DoubleIO;
-      using ull = detail::UnsignedLongLong;
-      using str = detail::StringIO;
+      using label = detail::LabelI;
+      using dbl = detail::DoubleI;
+      using ull = detail::UnsignedLongLongI;
+      using str = detail::StringI;
       bool hasKey1 = false;
       bool hasKey2 = false;
       bool hasKey3 = false;
@@ -28,17 +28,17 @@ namespace nikonov
         in >> label{ keyName };
         if (keyName == "key1")
         {
-          in >> dbl{ input.key1_ } >> sep{ ':' };
+          in >> dbl{ input.key1 } >> sep{ ':' };
           hasKey1 = true;
         }
         else if (keyName == "key2")
         {
-          in >> ull{ input.key2_ } >> sep{ ':' };
+          in >> ull{ input.key2 } >> sep{ ':' };
           hasKey2 = true;
         }
         else if (keyName == "key3")
         {
-          in >> str{ input.key3_ } >> sep{ ':' };
+          in >> str{ input.key3 } >> sep{ ':' };
           hasKey3 = true;
         }
         else
@@ -54,9 +54,7 @@ namespace nikonov
     }
     if (in)
     {
-      dest.key1_ = input.key1_;
-      dest.key2_ = input.key2_;
-      dest.key3_ = input.key3_;
+      dest = input;
     }
     return in;
   }
@@ -69,9 +67,9 @@ namespace nikonov
     }
     StreamGuard outGuard(out);
     out << "(";
-    out << ":key1 " << detail::DoubleIO{ const_cast< double & >(toOut.key1_) };
-    out << ":key2 " << detail::UnsignedLongLong{ const_cast< unsigned long long& >(toOut.key2_) };
-    out << ":key3 " << detail::StringIO{ const_cast< std::string & >(toOut.key3_) };
+    out << ":key1 " << detail::DoubleO{ toOut.key1 };
+    out << ":key2 " << detail::UnsignedLongLongO{ toOut.key2 };
+    out << ":key3 " << detail::StringO{ toOut.key3 };
     out << ":)";
     return out;
   }
