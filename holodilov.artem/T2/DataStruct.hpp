@@ -46,7 +46,16 @@ namespace holodilov
 
     struct KeyNameIO
     {
-      int keyNumber;
+    public:
+      int getKeyNumber() const;
+
+      void fillDataStructField(std::istream& in, DataStruct& dataStruct) const;
+
+      friend std::istream& operator>>(std::istream& in, KeyNameIO& keyName);
+    private:
+      int keyNumber_;
+
+      bool isValid() const;
     };
 
     std::istream& operator>>(std::istream& in, DelimIO&& delim);
@@ -58,6 +67,8 @@ namespace holodilov
     std::istream& operator>>(std::istream& in, StringIO&& str);
 
     std::istream& operator>>(std::istream& in, KeyNameIO& keyName);
+
+    std::ostream& operator<<(std::ostream& out, const KeyNameIO& keyName);
   }
 }
 
