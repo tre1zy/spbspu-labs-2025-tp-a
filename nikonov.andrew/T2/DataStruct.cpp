@@ -33,7 +33,7 @@ namespace nikonov
             in.setstate(std::ios::failbit);
             break;
           }
-	        in >> dbl{ input.key1 } >> sep{ ':' };
+          in >> dbl{ input.key1 } >> sep{ ':' };
           hasKey1 = true;
         }
         else if (keyName == "key2")
