@@ -33,6 +33,7 @@ namespace
 
     std::copy(it, translations.end(), std::ostream_iterator< std::string >(out, ", "));
   }
+
   orlova::Translations intersectLists(orlova::Translations& list1, orlova::Translations& list2)
   {
     list1.sort();
@@ -41,6 +42,7 @@ namespace
     std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
     return res;
   }
+
   std::pair< std::string, orlova::Translations > intersectListDict(const std::pair< std::string, orlova::Translations >& pair,
     const orlova::Dictionary& intersected)
   {

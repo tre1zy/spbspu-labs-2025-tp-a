@@ -11,7 +11,7 @@
 namespace orlova
 {
   using namespace std::placeholders;
-  using Translation = std::list< std::string >;
+  using Translations = std::list< std::string >;
   using Dictionary = std::map< std::string, Translation >;
   using Dictionaries = std::map< std::string, Dictionary >;
   void addEmptyDictionary(std::istream&, std::ostream&, Dictionaries&);
