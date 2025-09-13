@@ -72,7 +72,7 @@ std::istream& shchadilov::operator>>(std::istream& in, KeyIO& dest)
   {
     return in;
   }
-  in >> WordI{"key"};
+  in >> WordI{3, "key"};
   int key = 0;
   in >> key;
   if (key < 1 || key > 3)
@@ -139,11 +139,13 @@ std::istream& shchadilov::operator>>(std::istream& in, WordI&& dest)
     return in;
   }
 
-  std::string word = {};
-  in >> word;
-  if (in && (word != dest.ref))
+  char c = '0';
+  for (int i = 0; i < dest.length; ++i)
   {
-    in.setstate(std::ios::failbit);
+    in >> c;
+    if (in && (dest.ref[i] != c)) {
+      in.setstate(std::ios::failbit);
+    }
   }
   return in;
 }

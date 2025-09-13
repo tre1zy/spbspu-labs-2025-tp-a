@@ -54,9 +54,10 @@ namespace shchadilov
     DataStruct& data;
     std::array< bool, 3 > used;
   };
-
+  
   struct WordI
   {
+    const int length;
     const std::string& ref;
   };
 
