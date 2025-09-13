@@ -11,7 +11,7 @@ int main()
   using input_it_t = std::istream_iterator<cherepkov::DataStruct>;
   using output_it_t = std::ostream_iterator<cherepkov::DataStruct>;
 
-  std::vector<cherepkov::DataStruct> data;
+  std::vector< cherepkov::DataStruct > data;
 
   while (!std::cin.eof())
   {
@@ -24,7 +24,6 @@ int main()
   }
 
   std::sort(data.begin(), data.end());
-
   std::copy(data.begin(), data.end(), output_it_t(std::cout, "\n"));
 
   return 0;

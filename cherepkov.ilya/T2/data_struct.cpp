@@ -9,10 +9,10 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
   std::istream::sentry sentry(in);
   if (!sentry)
   {
-      return in;
+    return in;
   }
 
-  DataStruct temp;
+  DataStruct temp = {0, 0, ""};
   size_t keysRead = 0;
   bool has_key1 = false, has_key2 = false, has_key3 = false;
 
@@ -26,12 +26,12 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
     if (key == "key1")
     {
       if (has_key1)
-        {
-          in.setstate(std::ios::failbit);
-          return in;
-        }
-        in >> UllLitValue{ temp.key1 };
-        has_key1 = true;
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in >> UllLitValue{ temp.key1 };
+      has_key1 = true;
     }
     else if (key == "key2")
     {
@@ -40,8 +40,8 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
         in.setstate(std::ios::failbit);
         return in;
       }
-        in >> UllBinValue{ temp.key2 };
-        has_key2 = true;
+      in >> UllBinValue{ temp.key2 };
+      has_key2 = true;
     }
     else if (key == "key3")
     {
@@ -50,13 +50,13 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
         in.setstate(std::ios::failbit);
         return in;
       }
-        in >> StringValue{ temp.key3 };
-        has_key3 = true;
+      in >> StringValue{ temp.key3 };
+      has_key3 = true;
     }
     else
     {
-        in.setstate(std::ios::failbit);
-        return in;
+      in.setstate(std::ios::failbit);
+      return in;
     }
 
     if (!in)
@@ -70,7 +70,7 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
 
   if (in)
   {
-      dest = std::move(temp);
+    dest = std::move(temp);
   }
 
   return in;
@@ -79,7 +79,8 @@ std::istream& cherepkov::operator>>(std::istream& in, DataStruct& dest)
 std::ostream& cherepkov::operator<<(std::ostream& out, const DataStruct& src)
 {
   std::ostream::sentry sentry(out);
-  if (!sentry) {
+  if (!sentry)
+  {
     return out;
   }
   cherepkov::StreamGuard guard(out);
