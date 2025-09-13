@@ -64,24 +64,6 @@ std::istream & bocharov::operator>>(std::istream & in, Polygon & dest)
   return in;
 }
 
-std::ostream & bocharov::operator<<(std::ostream & out, const Point & dest)
-{
-  return out << '(' << dest.x << ';' << dest.y << ')';
-}
-
-std::ostream & bocharov::operator<<(std::ostream & out, const Polygon & dest)
-{
-  std::ostream::sentry sentry(out);
-  if (!sentry)
-  {
-    return out;
-  }
-  using oIterator = std::ostream_iterator< Point >;
-  out << dest.points.size() << ' ';
-  std::copy(dest.points.begin(), dest.points.end(), oIterator(out, " "));
-  return out;
-}
-
 bool bocharov::Point::operator==(const Point & rhs) const
 {
   return x == rhs.x && y == rhs.y;
