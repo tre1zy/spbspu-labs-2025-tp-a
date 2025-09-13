@@ -36,4 +36,30 @@ int main(int argc, char* argv[])
     }
   }
 
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["INFRAME"] =
+  cmds["SAME"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      cmds.at(command)();
+    }
+    catch (...)
+    {
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
+  return 0;
 }
