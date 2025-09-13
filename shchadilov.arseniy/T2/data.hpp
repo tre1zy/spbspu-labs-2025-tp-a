@@ -18,7 +18,6 @@ namespace shchadilov
   {
     char exp;
   };
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 
   struct DoubleI
   {
@@ -56,6 +55,7 @@ namespace shchadilov
     std::array< bool, 4 > used;
   };
 
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& in, DoubleI&& dest);
   std::istream& operator>>(std::istream& in, UllIO&& dest);
   std::istream& operator>>(std::istream& in, StringI&& dest);
