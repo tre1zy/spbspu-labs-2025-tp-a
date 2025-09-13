@@ -11,11 +11,11 @@ std::istream& nikonov::operator>>(std::istream& in, DataStruct& dest)
   }
   DataStruct input;
   {
-    using sep = detail::DelimiterIO;
-    using label = detail::LabelI;
-    using dbl = detail::DoubleI;
-    using ull = detail::UnsignedLongLongI;
-    using str = detail::StringI;
+    using sep = DelimiterIO;
+    using label = LabelI;
+    using dbl = DoubleI;
+    using ull = UnsignedLongLongI;
+    using str = StringI;
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
@@ -80,9 +80,9 @@ std::ostream& nikonov::operator<<(std::ostream& out, const DataStruct& toOut)
   }
   StreamGuard outGuard(out);
   out << "(";
-  out << ":key1 " << detail::DoubleO{ toOut.key1 };
-  out << ":key2 " << detail::UnsignedLongLongO{ toOut.key2 };
-  out << ":key3 " << detail::StringO{ toOut.key3 };
+  out << ":key1 " << DoubleO{ toOut.key1 };
+  out << ":key2 " << UnsignedLongLongO{ toOut.key2 };
+  out << ":key3 " << StringO{ toOut.key3 };
   out << ":)";
   return out;
 }
