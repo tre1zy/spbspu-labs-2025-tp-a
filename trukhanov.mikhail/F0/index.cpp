@@ -44,8 +44,9 @@ std::istream& trukhanov::operator>>(std::istream& in, std::vector< std::string >
     return in;
   }
 
-  RecursiveSplitter splitter{ args };
-  splitter(line.begin(), line.end());
+  std::size_t wordCount = countWords(line);
+  WordGenerator gen{ line.begin(), line.end() };
+  std::generate_n(std::back_inserter(args), wordCount, gen);
 
   return in;
 }

@@ -26,10 +26,20 @@ namespace trukhanov
 
   bool notSpace(unsigned char ch);
 
-  struct RecursiveSplitter
+  struct WordCounter
   {
-    std::vector< std::string >& out;
-    void operator()(std::string::const_iterator first, std::string::const_iterator last) const;
+    bool prevSpase;
+    WordCounter();
+    bool operator()(unsigned char ch);
+  };
+
+  std::size_t countWords(const std::string& line);
+
+  struct WordGenerator
+  {
+    std::string::const_iterator cur;
+    std::string::const_iterator end;
+    std::string operator()();
   };
 
   struct SplitAndAdd

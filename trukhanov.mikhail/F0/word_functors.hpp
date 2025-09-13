@@ -28,12 +28,12 @@ namespace trukhanov
 
   struct ExportWordFunctor
   {
-    ExportWordFunctor(const std::vector< std::string >& lines_, std::ostream& out_, const std::string& word_);
+    ExportWordFunctor(const std::vector< std::string >& lines, std::ostream& out, const std::string& word);
     void operator()(const IndexMap& index) const;
   private:
-    const std::vector< std::string >& lines;
-    std::ostream& out;
-    const std::string& word;
+    const std::vector< std::string >& lines_;
+    std::ostream& out_;
+    const std::string& word_;
   };
 
   bool lengthGreater(const std::string& a, const std::string& b);

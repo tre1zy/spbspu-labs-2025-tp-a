@@ -26,7 +26,6 @@ void trukhanov::FindWord::operator()() const
   out << entry << '\n';
 }
 
-
 void trukhanov::ReplaceWordFunctor::operator()()
 {
   if (oldWord == newWord)
@@ -46,21 +45,22 @@ void trukhanov::ReplaceWordFunctor::operator()()
 }
 
 trukhanov::ExportWordFunctor::ExportWordFunctor(
-  const std::vector< std::string >& lines_,
-  std::ostream& out_, const std::string& word_):
-  lines(lines_), out(out_), word(word_)
+  const std::vector< std::string >& lines,
+  std::ostream& out,
+  const std::string& word):
+  lines_(lines), out_(out), word_(word)
 {}
 
 void trukhanov::ExportWordFunctor::operator()(const IndexMap& index) const
 {
-  auto it = index.find(word);
+  auto it = index.find(word_);
   if (it == index.end())
   {
     throw std::invalid_argument("Invalid command");
   }
 
   WordEntry entry(*it);
-  out << entry << '\n';
+  out_ << entry << '\n';
 }
 
 bool trukhanov::lengthGreater(const std::string& a, const std::string& b)
@@ -96,10 +96,8 @@ bool trukhanov::FindDifferentFrequencies::operator()(const std::string& word) co
 }
 
 bool trukhanov::compareByFrequencyDesc(
-  const std::pair< std::string,
-  std::size_t >& a,
-  const std::pair< std::string,
-  std::size_t >& b
+  const std::pair< std::string, std::size_t >& a,
+  const std::pair< std::string, std::size_t >& b
 )
 {
   return a.second > b.second;

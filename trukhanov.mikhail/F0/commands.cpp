@@ -11,7 +11,9 @@
 #include <functional>
 #include <algorithm>
 
-trukhanov::CommandProcessor::CommandProcessor(std::ostream& output) : out_(output) { initializeCommands(); }
+trukhanov::CommandProcessor::CommandProcessor(std::ostream& output):
+  out_(output)
+{ initializeCommands(); }
 
 void trukhanov::CommandProcessor::initializeCommands()
 {
@@ -38,8 +40,9 @@ void trukhanov::CommandProcessor::initializeCommands()
 void trukhanov::CommandProcessor::execute(const std::string& line)
 {
   std::vector< std::string > args;
-  RecursiveSplitter splitter{ args };
-  splitter(line.begin(), line.end());
+  std::size_t wordCount = countWords(line);
+  WordGenerator gen{ line.begin(), line.end() };
+  std::generate_n(std::back_inserter(args), wordCount, gen);
 
   if (args.empty())
   {
