@@ -173,7 +173,7 @@ void khokhryakova::area(std::istream& in, std::ostream& out, const std::vector< 
     }
     size = areaNum(polygons, angles);
   }
-  out << std::fixed << std::setprecision(2) << size;
+  out << std::fixed << std::setprecision(1) << size;
 }
 
 void khokhryakova::max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
