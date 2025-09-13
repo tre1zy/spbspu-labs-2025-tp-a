@@ -138,12 +138,12 @@ bool shak::operator==(const DPoint &point1, const DPoint &point2)
 
 double shak::SumX(double sumX, const shak::Point &point)
 {
-  return sumX + static_cast<double>(point.x);
+  return sumX + static_cast< double >(point.x);
 }
 
 double shak::SumY(double sumY, const shak::Point &point)
 {
-  return sumY +  static_cast<double>(point.y);
+  return sumY +  static_cast< double >(point.y);
 }
 
 shak::DPoint shak::getMassCenter(const shak::Polygon &polygon)
