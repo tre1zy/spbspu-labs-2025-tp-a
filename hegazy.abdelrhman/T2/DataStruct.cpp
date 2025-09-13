@@ -94,7 +94,7 @@ std::istream &bob::operator>>(std::istream &is, LabelIO &&dest)
     return is;
   }
 
-  for (char exp_char : dest.exp)
+  for (char exp_char: dest.exp)
   {
     char c;
     is >> c;
@@ -174,8 +174,7 @@ bob::IoGuard::IoGuard(std::basic_ios< char > &s):
   fill_(s.fill()),
   precision_(s.precision()),
   fmt_(s.flags())
-{
-}
+{}
 
 bob::IoGuard::~IoGuard()
 {
