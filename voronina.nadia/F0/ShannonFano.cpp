@@ -232,7 +232,7 @@ namespace
     }
     return sum;
   }
-} // namespace
+}
 
 namespace voronina
 {
@@ -399,4 +399,4 @@ namespace voronina
               std::ostream_iterator< Symbol >(out, "\n"));
     return out;
   }
-} // namespace voronina
+}
