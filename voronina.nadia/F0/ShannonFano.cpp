@@ -74,8 +74,8 @@ namespace
     {
       if (degree < 0)
       {
-        throw std::out_of_range(
-            "Degree must be in the range 0-7. Developer might have made a mistake.");
+        throw std::out_of_range("Degree must be in the range 0-7. Developer "
+                                "might have made a mistake.");
       }
       if (bit == '1')
       {
@@ -90,8 +90,8 @@ namespace
   {
     char operator()(const std::string& byte) const
     {
-      return static_cast< char >(
-          std::accumulate(byte.begin(), byte.end(), 0, BitToDecimalConverter()));
+      return static_cast< char >(std::accumulate(byte.begin(), byte.end(), 0,
+                                                 BitToDecimalConverter()));
     }
   };
 
@@ -132,7 +132,8 @@ namespace
   {
     const std::unordered_map< char, Symbol >& symbolMap;
 
-    SymbolToCodeTransformer(const std::unordered_map< char, Symbol >& symbolMap):
+    SymbolToCodeTransformer(
+        const std::unordered_map< char, Symbol >& symbolMap):
       symbolMap(symbolMap)
     {}
 
@@ -163,7 +164,8 @@ namespace
     }
   };
 
-  int encodeBitMaskToDestination(const std::string& bitMask, std::string& destination)
+  int encodeBitMaskToDestination(const std::string& bitMask,
+                                 std::string& destination)
   {
     int decimalSum = 0;
     int bitMaskLength = bitMask.length();
@@ -171,10 +173,13 @@ namespace
     std::vector< std::string > bytes;
 
     auto generator = ByteGenerator(bitMask, bitMaskLength);
-    std::generate_n(std::back_inserter(bytes), (bitMaskLength + 7) / 8, generator);
+    std::generate_n(std::back_inserter(bytes), (bitMaskLength + 7) / 8,
+                    generator);
     auto transformer = ByteMaskToCharTransformer();
-    std::transform(bytes.begin(), bytes.end(), std::back_inserter(destination), transformer);
-    if (bitMaskLength == 0) {
+    std::transform(bytes.begin(), bytes.end(), std::back_inserter(destination),
+                   transformer);
+    if (bitMaskLength == 0)
+    {
       return 8;
     }
     return bitMaskLength % 8;
@@ -210,13 +215,16 @@ namespace voronina
     auto uniqueEnd = std::unique(sortedText.begin(), sortedText.end());
     symbols_.clear();
 
-    std::transform(sortedText.begin(), uniqueEnd, std::back_inserter(symbols_), SymbolCreator{});
-    std::transform(symbols_.begin(), symbols_.end(), symbols_.begin(), FrequencySetter(text));
+    std::transform(sortedText.begin(), uniqueEnd, std::back_inserter(symbols_),
+                   SymbolCreator{});
+    std::transform(symbols_.begin(), symbols_.end(), symbols_.begin(),
+                   FrequencySetter(text));
     std::sort(symbols_.begin(), symbols_.end(), FrequencyComparator{});
   }
 
-  void ShannonFanoTable::shannonFanoRecursion(const std::vector< Symbol >::iterator& begin,
-                                              const std::vector< Symbol >::iterator& end)
+  void ShannonFanoTable::shannonFanoRecursion(
+      const std::vector< Symbol >::iterator& begin,
+      const std::vector< Symbol >::iterator& end)
   {
     if (begin == end)
     {
@@ -231,9 +239,11 @@ namespace voronina
                    std::bind(&Symbol::frequency, std::placeholders::_1));
 
     std::vector< double > prefixSums(frequencies.size());
-    std::partial_sum(frequencies.begin(), frequencies.end(), prefixSums.begin());
+    std::partial_sum(frequencies.begin(), frequencies.end(),
+                     prefixSums.begin());
 
-    auto splitIterator = std::find_if(begin, end, SplitPointFinder(total, prefixSums));
+    auto splitIterator =
+        std::find_if(begin, end, SplitPointFinder(total, prefixSums));
     std::transform(begin, splitIterator + 1, begin, appendZero);
     std::transform(splitIterator + 1, end + 1, splitIterator + 1, appendOne);
 
@@ -246,7 +256,8 @@ namespace voronina
   {
     if (text.empty())
     {
-      throw std::invalid_argument("Невозможно создать кодировку Шеннона-Фано из пустой строки.");
+      throw std::invalid_argument(
+          "Невозможно создать кодировку Шеннона-Фано из пустой строки.");
     }
 
     originFile_ = originFile;
@@ -254,47 +265,58 @@ namespace voronina
     shannonFanoRecursion(symbols_.begin(), symbols_.end() - 1);
 
     auto symbolInserter = std::inserter(symbolMap_, symbolMap_.end());
-    std::transform(symbols_.begin(), symbols_.end(), symbolInserter, SymbolToSymbolMapEntry());
+    std::transform(symbols_.begin(), symbols_.end(), symbolInserter,
+                   SymbolToSymbolMapEntry());
 
     auto codeMapInserter = std::inserter(codeMap_, codeMap_.end());
-    std::transform(symbols_.begin(), symbols_.end(), codeMapInserter, SymbolToCodeMapEntry());
+    std::transform(symbols_.begin(), symbols_.end(), codeMapInserter,
+                   SymbolToCodeMapEntry());
   }
 
-  int ShannonFanoTable::encode(const std::string& text, std::string& destination) const
+  int ShannonFanoTable::encode(const std::string& text,
+                               std::string& destination) const
   {
     if (symbolMap_.empty())
     {
-      throw std::logic_error("Contract violation: symbolMap_ must be initialized before encoding. "
-                             "Call generateShannonFanoCodes() first.");
+      throw std::logic_error(
+          "Contract violation: symbolMap_ must be initialized before encoding. "
+          "Call generateShannonFanoCodes() first.");
     }
-    std::string bitMask = std::accumulate(text.begin(), text.end(), std::string{},
-                                          SymbolToCodeTransformer(symbolMap_));
+    std::string bitMask =
+        std::accumulate(text.begin(), text.end(), std::string{},
+                        SymbolToCodeTransformer(symbolMap_));
     return encodeBitMaskToDestination(bitMask, destination);
   }
 
-  std::string ShannonFanoTable::decode(const std::string& text, int significantBitsInLastByte) const
+  std::string ShannonFanoTable::decode(const std::string& text,
+                                       int significantBitsInLastByte) const
   {
     if (symbolMap_.empty())
     {
-      auto errorMessage = "Contract violation: symbolMap_ must be initialized before decoding";
+      auto errorMessage =
+          "Contract violation: symbolMap_ must be initialized before decoding";
       throw std::logic_error(errorMessage);
     }
 
     if (significantBitsInLastByte > 7)
     {
-      throw std::invalid_argument(
-          "Количество значимых битов в последнем байте должно быть в диапазоне от 0 до 7");
+      throw std::invalid_argument("Количество значимых битов в последнем байте "
+                                  "должно быть в диапазоне от 0 до 7");
     }
 
     std::vector< unsigned char > bytes;
     bytes.reserve(text.size());
 
-    auto toUnsignedChar = std::bind(staticCast< unsigned char >, std::placeholders::_1);
-    std::transform(text.begin(), text.end(), std::back_inserter(bytes), toUnsignedChar);
+    auto toUnsignedChar =
+        std::bind(staticCast< unsigned char >, std::placeholders::_1);
+    std::transform(text.begin(), text.end(), std::back_inserter(bytes),
+                   toUnsignedChar);
 
     std::vector< std::string > bitMasks;
-    std::transform(bytes.begin(), bytes.end(), std::back_inserter(bitMasks), byteToString);
-    std::string bitMask = std::accumulate(bitMasks.begin(), bitMasks.end(), std::string{});
+    std::transform(bytes.begin(), bytes.end(), std::back_inserter(bitMasks),
+                   byteToString);
+    std::string bitMask =
+        std::accumulate(bitMasks.begin(), bitMasks.end(), std::string{});
 
     std::size_t bitMaskLength = bitMask.length();
     if (significantBitsInLastByte != 0)
@@ -320,7 +342,8 @@ namespace voronina
 
   double ShannonFanoTable::calculateEntropy()
   {
-    return -1 * std::accumulate(symbols_.begin(), symbols_.end(), 0.0, logFrequencyAccumulator);
+    return -1 * std::accumulate(symbols_.begin(), symbols_.end(), 0.0,
+                                logFrequencyAccumulator);
   }
 
   std::ostream& operator<<(std::ostream& out, const ShannonFanoTable& table)
