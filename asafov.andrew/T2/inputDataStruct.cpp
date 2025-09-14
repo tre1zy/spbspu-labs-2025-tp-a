@@ -129,7 +129,7 @@ namespace
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
   DataStruct temp;
-  in >> std::noskipws;  
+  in >> std::noskipws;
   unsafe_read(in, temp);
   data = temp;
   std::string line;
