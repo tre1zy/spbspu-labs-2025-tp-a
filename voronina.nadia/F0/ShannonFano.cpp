@@ -269,8 +269,8 @@ namespace voronina
     double total = std::accumulate(begin, end + 1, 0.0, FrequencyAccumulator{});
 
     std::vector< double > frequencies(std::distance(begin, end) + 1);
-    std::transform(begin, end + 1, frequencies.begin(),
-                   std::bind(&Symbol::frequency, std::placeholders::_1));
+    auto transformer = std::bind(&Symbol::frequency, std::placeholders::_1);
+    std::transform(begin, end + 1, frequencies.begin(), transformer);
 
     std::vector< double > prefixSums(frequencies.size());
     std::partial_sum(frequencies.begin(), frequencies.end(), prefixSums.begin());
@@ -383,8 +383,9 @@ namespace voronina
     iofmtguard ofmtguard(out);
     std::cout << std::left << std::setw(10) << "Symbol" << std::setw(10);
     std::cout << "Frequency" << "Code\n";
-    std::copy(std::begin(table.symbols_), std::end(table.symbols_),
-              std::ostream_iterator< Symbol >(out, "\n"));
+    auto begin = table.symbols_.begin();
+    using OIter = std::ostream_iterator<Symbol>;
+    std::copy(begin, table.symbols_.end(), OIter(out, "\n"));
     return out;
   }
 }
