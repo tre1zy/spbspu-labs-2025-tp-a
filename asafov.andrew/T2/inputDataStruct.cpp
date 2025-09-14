@@ -12,6 +12,8 @@ namespace
       if (!(in >> ch) || ch != e)
       {
         in.setstate(std::ios::failbit);
+        std::string line;
+        skipLine(in);
       }
     }
   }
@@ -23,11 +25,15 @@ namespace
     if (!(in >> real))
     {
       in.setstate(std::ios::failbit);
+      std::string line;
+      skipLine(in);
     }
     expect(in, {' '});
     if (!(in >> imag))
     {
       in.setstate(std::ios::failbit);
+      std::string line;
+      skipLine(in);
     }
     expect(in, {')', ':'});
     return {real, imag};
@@ -44,6 +50,8 @@ namespace
       if (!(in >> ch))
       {
         in.setstate(std::ios::failbit);
+        std::string line;
+        skipLine(in);
       }
       if (ch == ':')
       {
@@ -66,6 +74,8 @@ namespace
       if (!(in >> ch))
       {
         in.setstate(std::ios::failbit);
+        std::string line;
+        skipLine(in);
       }
       if (ch == '"')
       {
@@ -88,6 +98,8 @@ namespace
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
       in.setstate(std::ios::failbit);
+      std::string line;
+      skipLine(in);
     }
 
     if (ch == '1')
