@@ -22,9 +22,6 @@ namespace holodilov
     bool operator==(const Polygon& rhs) const;
 
     double getArea() const;
-
-  private:
-    double calculateTriangleArea(size_t index) const;
   };
 
   std::istream& operator>>(std::istream& is, Point& point);

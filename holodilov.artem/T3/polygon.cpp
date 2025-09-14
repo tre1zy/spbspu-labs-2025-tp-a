@@ -1,21 +1,13 @@
 #include "polygon.hpp"
-
 #include <algorithm>
 #include <iterator>
-
+#include <numeric>
 #include "DelimIO.hpp"
 
-double holodilov::Polygon::calculateTriangleArea(const size_t index) const
+int sumPointPairForArea(const holodilov::Point& point)
 {
-  if (index == points.size()-1)
-  {
-    return points[0].x*std::abs(points[1].y - points[index].y);
-  }
-  if (index == points.size() -2)
-  {
-    return points[index+1].x*std::abs(points[0].y - points[index].y) + calculateTriangleArea(index+1);
-  }
-  return points[index+1].x*std::abs(points[index+2].y - points[index].y) + calculateTriangleArea(index+1);
+  holodilov::Point previousPoint = *(&point-1);
+  return point.y*previousPoint.x - point.x*previousPoint.y;
 }
 
 double holodilov::Polygon::getArea() const
@@ -24,7 +16,10 @@ double holodilov::Polygon::getArea() const
   {
     return 0;
   }
-  return calculateTriangleArea(0) / 2.0;
+  std::vector< int > summands(points.size());
+  std::transform(points.begin()+1, points.end(), summands.begin(), sumPointPairForArea);
+  summands.push_back(points[points.size()-1].x*points[0].y - points[points.size()-1].y*points[0].x);
+  return std::abs(std::accumulate(summands.begin(), summands.end(), 0)) / 2.0;
 }
 
 bool holodilov::Point::operator==(const Point& rhs) const
@@ -39,6 +34,12 @@ bool holodilov::Polygon::operator==(const Polygon& rhs) const
 
 std::istream& holodilov::operator>>(std::istream& is, Point& point)
 {
+  std::istream::sentry sentry(is);
+  if (!sentry)
+  {
+    return is;
+  }
+
   Point pointTemp { 0, 0 };
   is >> DelimIO{ '(' };
   is >> pointTemp.x >> DelimIO{ ';' };
@@ -52,6 +53,12 @@ std::istream& holodilov::operator>>(std::istream& is, Point& point)
 
 std::istream& holodilov::operator>>(std::istream& is, Polygon& polygon)
 {
+  std::istream::sentry sentry(is);
+  if (!sentry)
+  {
+    return is;
+  }
+
   int amountPoints = 0;
   is >> amountPoints;
   if (!is)
@@ -62,7 +69,11 @@ std::istream& holodilov::operator>>(std::istream& is, Polygon& polygon)
   Polygon polygonTemp;
   using istreamIter = std::istream_iterator< Point >;
   std::copy_n(istreamIter(is), amountPoints, std::back_inserter(polygonTemp.points));
-  if (is && polygonTemp.points.size() == amountPoints)
+  if (polygonTemp.points.size() == amountPoints)
+  {
+    is.setstate(std::ios::failbit);
+  }
+  if (is)
   {
     polygon = polygonTemp;
   }

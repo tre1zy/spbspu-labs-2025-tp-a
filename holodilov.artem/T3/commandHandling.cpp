@@ -1,41 +1,46 @@
 #include "commandHandling.hpp"
 #include <algorithm>
 #include <functional>
+#include <numeric>
 #include "exceptions.hpp"
 #include "polygon.hpp"
 
-bool holodilov::commands::compareAreaWithTarget(const Polygon &polygon, const double targetArea) {
+using VecPolygons = std::vector< holodilov::Polygon >;
+
+bool compareAreaWithTarget(const holodilov::Polygon& polygon, double targetArea)
+{
   std::cout << "Target area = " << targetArea << '\n';
   std::cout << "polygon area = " << polygon.getArea() << "\n";
   return polygon.getArea() < targetArea;
 }
 
-
-void holodilov::commands::echo(std::istream& is, std::ostream& os, std::vector< Polygon >& vecPolygons)
+VecPolygons accumulateEcho(VecPolygons vecPolygons, const holodilov::Polygon& polygon, const holodilov::Polygon& targetPolygon)
 {
-  Polygon polygon;
-  is >> polygon;
+  vecPolygons.push_back(polygon);
+  if (polygon == targetPolygon)
+  {
+    vecPolygons.push_back(polygon);
+  }
+  return vecPolygons;
+}
+
+void holodilov::commands::echo(std::istream& is, std::ostream& os, VecPolygons& vecPolygons)
+{
+  Polygon targetPolygon;
+  is >> targetPolygon;
   if (!is || is.peek() != '\n')
   {
     throw InvalidCommandException();
   }
 
-  // std::vector< Polygon > vecResult;
-  // const size_t amountDuplicates = std::count(vecPolygons.begin(), vecPolygons.end(), polygon);
-  // vecResult.reserve(vecPolygons.size() + amountDuplicates);
-  //
-  // std::transform(vecPolygons.begin(), vecPolygons.end(), vecResult.begin(), [&](const Polygon& polygon) {
-  //   if (polygon == polygon) {
-  //     vecResult.push_back(polygon);
-  //   }
-  //   return polygon;
-  // });
-  //
-  // vecPolygons.swap(vecResult);
-  // os << amountDuplicates << "\n";
+  const size_t amountDuplicates = std::count(vecPolygons.begin(), vecPolygons.end(), targetPolygon);
+
+  auto accumulateBound = std::bind(accumulateEcho, std::placeholders::_1, std::placeholders::_2, std::cref(targetPolygon));
+  vecPolygons = std::accumulate(vecPolygons.begin(), vecPolygons.end(), VecPolygons(0), accumulateBound);
+  os << amountDuplicates << '\n';
 }
 
-void holodilov::commands::lessArea(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons)
+void holodilov::commands::lessArea(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
 {
   Polygon targetPolygon;
   is >> targetPolygon;
