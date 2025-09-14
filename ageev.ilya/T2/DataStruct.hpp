@@ -44,11 +44,11 @@ namespace ageev
     double ref;
   };
 
-  class iofmtguard
+  class Iofmtguard
   {
   public:
-    iofmtguard(std::basic_ios< char >& s);
-    ~iofmtguard();
+    Iofmtguard(std::basic_ios< char >& s);
+    ~Iofmtguard();
   private:
     std::basic_ios< char >& s_;
     std::streamsize width_;
@@ -63,8 +63,9 @@ namespace ageev
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, LabelIO&& dest);
   std::istream& operator>>(std::istream& in, DataStruct& dest);
-  std::ostream& operator<<(std::ostream& out, DoubleSciIO& dest);
-  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  std::ostream& operator<<(std::ostream & out, const DoubleToSciForm & dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& src);
+
 }
 
 #endif

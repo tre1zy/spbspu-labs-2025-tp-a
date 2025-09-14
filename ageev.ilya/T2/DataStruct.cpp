@@ -1,5 +1,4 @@
 #include "DataStruct.hpp"
-#include <stdexcept>
 #include <cmath>
 #include <string>
 #include <iomanip>
@@ -111,8 +110,7 @@ namespace ageev
 
   std::ostream & operator<<(std::ostream & out, const DoubleToSciForm & dest)
   {
-    std::ios::fmtflags oldFlags = out.flags();
-    std::streamsize oldPrecision = out.precision();
+    Iofmtguard guard(out);
     if (dest.ref == 0.0)
     {
       out << "0.0e+0";
@@ -147,8 +145,6 @@ namespace ageev
       out << '-' << -exponent;
     }
 
-    out.flags(oldFlags);
-    out.precision(oldPrecision);
     return out;
   }
 
@@ -161,7 +157,9 @@ namespace ageev
     }
 
     DataStruct input;
-    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+    bool hasKey1 = false,
+    hasKey2 = false,
+    hasKey3 = false;
     int fields = 0;
 
     using sep = DelimiterIO;
@@ -222,14 +220,14 @@ namespace ageev
     {
       return out;
     }
-    iofmtguard fmtguard(out);
+    Iofmtguard fmtguard(out);
     out << "(:key1 " << std::fixed << std::setprecision(1);
     out << src.key1 << "d:" << "key2 ";
     out << DoubleToSciForm{src.key2} << ":" << "key3 \"" << src.key3 << "\":)";
     return out;
   }
 
-  iofmtguard::iofmtguard(std::basic_ios< char >& s):
+  Iofmtguard::Iofmtguard(std::basic_ios< char >& s):
     s_(s),
     width_(s.width()),
     fill_(s.fill()),
@@ -237,7 +235,7 @@ namespace ageev
     fmt_(s.flags())
   {}
 
-  iofmtguard::~iofmtguard()
+  Iofmtguard::~Iofmtguard()
   {
     s_.width(width_);
     s_.fill(fill_);

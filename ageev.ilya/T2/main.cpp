@@ -3,7 +3,6 @@
 #include <iterator>
 #include <algorithm>
 #include <limits>
-#include <sstream>
 #include "DataStruct.hpp"
 
 int main()
@@ -17,7 +16,7 @@ int main()
   while (!std::cin.eof())
   {
     std::copy(InputDataIt(std::cin), InputDataIt(), std::back_inserter(data));
-    if (!std::cin)
+    if (std::cin.fail() && !std::cin.eof())
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
