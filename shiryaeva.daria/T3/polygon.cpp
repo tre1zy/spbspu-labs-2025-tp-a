@@ -83,7 +83,7 @@ namespace shiryaeva
   std::vector<Polygon> polygonToTriangles(const Polygon &p)
   {
     std::vector< Polygon > tris;
-    tris.reserve(p.points.size() - 2);
+    tris.resize(p.points.size() - 2);
     size_t index = 0;
     std::generate(tris.begin(), tris.end(), TriangleGenerator{index, p.points});
     return tris;
