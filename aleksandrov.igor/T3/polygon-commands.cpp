@@ -1,57 +1,38 @@
 #include "polygon-commands.hpp"
-#include <functional>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
 #include <iomanip>
 #include <numeric>
 #include <limits>
-#include <cmath>
-#include <map>
 #include <stream-guard.hpp>
 
 namespace
 {
   using namespace aleksandrov;
 
-  double multPoints(const Point& a, const Point& b)
+  double abs(double num) noexcept
+  {
+    return num < 0 ? -num : num;
+  }
+
+  double det(const Point& a, const Point& b) noexcept
   {
     return a.x * b.y - a.y * b.x;
   }
 
   double calcArea(const Polygon& polygon)
   {
+    if (polygon.points.size() < 3)
+    {
+      return 0.0;
+    }
     auto begin = polygon.points.begin();
     auto end = polygon.points.end();
-    auto plus = std::plus< double >{};
-    double sum = std::inner_product(begin, end - 1, begin + 1, 0.0, plus, multPoints);
-    sum += multPoints(polygon.points.back(), polygon.points.front());
-    return std::abs(sum) / 2.0;
-  }
-
-  size_t calcVertices(const Polygon& polygon)
-  {
-    return polygon.points.size();
-  }
-
-  int getMinX(int curr, const Point& point)
-  {
-    return std::min(curr, point.x);
-  }
-
-  int getMinY(int curr, const Point& point)
-  {
-    return std::min(curr, point.y);
-  }
-
-  int getMaxX(int curr, const Point& point)
-  {
-    return std::max(curr, point.x);
-  }
-
-  int getMaxY(int curr, const Point& point)
-  {
-    return std::max(curr, point.y);
+    auto plus = std::plus<>{};
+    double sum = std::inner_product(begin, end - 1, begin + 1, 0.0, plus, det);
+    sum += det(polygon.points.back(), polygon.points.front());
+    return abs(sum) / 2.0;
   }
 
   struct EvenVerticesChecker
@@ -72,149 +53,80 @@ namespace
 
   struct NVerticesChecker
   {
+    size_t n;
+
     bool operator()(const Polygon& polygon) const
     {
-      return polygon.points.size() == numOfVertices;
-    }
-    size_t numOfVertices;
-  };
-
-  template< class C >
-  struct CondAreaAccumulator
-  {
-    double operator()(double sum, const Polygon& polygon) const
-    {
-      if (cond(polygon))
-      {
-        return sum + calcArea(polygon);
-      }
-      return sum;
-    }
-    C cond;
-  };
-
-  struct AreaAccumulator
-  {
-    double operator()(const Polygon& polygon) const
-    {
-      return calcArea(polygon);
-    }
-    double operator()(double sum, const Polygon& polygon) const
-    {
-      return sum + calcArea(polygon);
+      return polygon.points.size() == n;
     }
   };
 
-  struct VerticesAccumulator
+  struct PointXComparator
   {
-    size_t operator()(const Polygon& polygon) const
+    bool operator()(const Point& a, const Point& b) const
     {
-      return calcVertices(polygon);
+      return a.x < b.x;
     }
   };
 
-  struct AreaComparator
+  struct PointYComparator
   {
-    bool operator()(const Polygon& a, const Polygon& b) const
+    bool operator()(const Point& a, const Point& b) const
     {
-      return calcArea(a) < calcArea(b);
-    }
-  };
-
-  struct VerticesComparator
-  {
-    bool operator()(const Polygon& a, const Polygon& b) const
-    {
-      return a.points.size() < b.points.size();
+      return a.y < b.y;
     }
   };
 
   FrameRect getFrameRect(const Polygon& polygon)
   {
     const auto& pts = polygon.points;
-    if (pts.empty())
-    {
-      return {};
-    }
-    int minX = std::accumulate(pts.begin() + 1, pts.end(), pts[0].x, getMinX);
-    int minY = std::accumulate(pts.begin() + 1, pts.end(), pts[0].y, getMinY);
-    int maxX = std::accumulate(pts.begin() + 1, pts.end(), pts[0].x, getMaxX);
-    int maxY = std::accumulate(pts.begin() + 1, pts.end(), pts[0].y, getMaxY);
-    return { { minX, minY }, { maxX, maxY } };
+    auto minmaxX = std::minmax_element(pts.begin(), pts.end(), PointXComparator{});
+    auto minmaxY = std::minmax_element(pts.begin(), pts.end(), PointYComparator{});
+    return { Point{ minmaxX.first->x, minmaxY.first->y }, Point{ minmaxX.second->x, minmaxY.second->y } };
   }
 
-  void getFrameRects(std::vector< FrameRect >& dest, const Polygons& src)
+  struct InFrameChecker
   {
-    auto inserter = std::back_inserter(dest);
-    std::transform(src.begin(), src.end(), inserter, getFrameRect);
-  }
+    const FrameRect& rect;
 
-  struct FrameRectsMerger
-  {
-    FrameRect operator()(const FrameRect& a, const FrameRect& b) const
+    bool operator()(const Polygon& polygon) const
     {
-      int minX = getMinX(a.first.x, b.first);
-      int minY = getMinY(a.first.y, b.first);
-      int maxX = getMaxX(a.second.x, b.second);
-      int maxY = getMaxY(a.second.y, b.second);
-      return { { minX, minY }, { maxX, maxY } };
+      FrameRect toCheck = getFrameRect(polygon);
+
+      bool isAIn = rect.first.x >= toCheck.first.x && rect.first.y >= toCheck.first.y;
+      bool isBIn = rect.second.x <= toCheck.second.x && rect.second.y <= toCheck.second.y;
+      return isAIn && isBIn;
     }
   };
 
-  FrameRect mergeFrameRects(std::vector< FrameRect >& rects)
+  struct PerpendicularChecker
   {
-    if (rects.empty())
+    const Polygon& polygon;
+
+    bool operator()(size_t i) const
     {
-      return {};
+      size_t size = polygon.points.size();
+      auto a = polygon.points[i];
+      auto b = polygon.points[(i + 1) % size];
+      auto c = polygon.points[(i + 2) % size];
+
+      double xAB = b.x - a.x;
+      double yAB = b.y - a.y;
+      double xBC = c.x - b.x;
+      double yBC = c.y - b.y;
+
+      return xAB * yAB + xBC * yBC == 0;
     }
-    return std::accumulate(rects.begin(), rects.end(), rects[0], FrameRectsMerger{});
-  }
-
-  Vector calcVectorCoords(const Point& a, const Point& b)
-  {
-    return { b.x - a.x, b.y - a.y };
-  }
-
-  std::vector< Vector > getEdgeVectors(const Polygon& polygons)
-  {
-    std::vector< Vector > vectors;
-    auto begin = polygons.points.begin();
-    auto end = polygons.points.end();
-    auto inserter = std::back_inserter(vectors);
-    std::transform(begin, end - 1, begin + 1, inserter, calcVectorCoords);
-    vectors.emplace_back(calcVectorCoords(*(end - 1), *begin));
-    return vectors;
-  }
-
-  void getEdges(std::vector< std::vector< Vector > >& dest, const Polygons& src)
-  {
-    auto begin = src.begin();
-    auto end = src.end();
-    auto inserter = std::back_inserter(dest);
-    std::transform(begin, end, inserter, getEdgeVectors);
-  }
+  };
 
   struct RightAngleChecker
   {
-    bool operator()(const std::vector< Vector >& vectors) const
+    bool operator()(const Polygon& polygon) const
     {
-      struct PerpendicularChecker
-      {
-        bool operator()(const Vector& a, const Vector& b) const
-        {
-          return (a.first * b.first + a.second * b.second) == 0;
-        }
-      };
-      PerpendicularChecker checker{};
-      auto begin = vectors.begin();
-      auto end = vectors.end();
-      bool hasRightAngle = std::adjacent_find(begin, end, checker) != end;
-
-      if (!hasRightAngle && vectors.size() >= 2)
-      {
-        return checker(vectors.back(), vectors.front());
-      }
-      return hasRightAngle;
+      std::vector< size_t > indexes(polygon.points.size());
+      std::iota(indexes.begin(), indexes.end(), 0);
+      PerpendicularChecker checker{ polygon };
+      return std::any_of(indexes.begin(), indexes.end(), checker);
     }
   };
 }
@@ -234,23 +146,39 @@ void aleksandrov::getPolygons(std::istream& in, Polygons& polygons)
   }
 }
 
-template< class Pred >
-void aleksandrov::printAreaSumIf(const Polygons& polygons, Pred p, std::ostream& out)
+void aleksandrov::processCommands(std::istream& in, std::ostream& out, Polygons& polygons)
 {
-  CondAreaAccumulator< Pred > accumulator{ p };
-  out << std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
-}
+  std::map< std::string, std::function< void() > > commands;
 
-void aleksandrov::printMeanArea(const Polygons& polygons, std::ostream& out)
-{
-  if (polygons.empty())
+  commands["AREA"] = std::bind(execArea, std::cref(polygons), std::ref(in), std::ref(out));
+  size_t max = polygons.size() - 1;
+  commands["MAX"] = std::bind(execIthSmallest, std::cref(polygons), max, std::ref(in), std::ref(out));
+  commands["MIN"] = std::bind(execIthSmallest, std::cref(polygons), 0, std::ref(in), std::ref(out));
+  commands["COUNT"] = std::bind(execCount, std::cref(polygons), std::ref(in), std::ref(out));
+  commands["INFRAME"] = std::bind(execInFrame, std::cref(polygons), std::ref(in), std::ref(out));
+  commands["RIGHTSHAPES"] = std::bind(execRightShapes, std::cref(polygons), std::ref(out));
+
+  std::string command;
+  while (!(in >> command).eof())
   {
-    throw std::logic_error("There are no polygons!");
+    try
+    {
+      commands.at(command)();
+      out << '\n';
+    }
+    catch (...)
+    {
+      if (in.fail())
+      {
+        in.clear(in.rdstate() ^ std::ios::failbit);
+      }
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      out << "<INVALID COMMAND>\n";
+    }
   }
-  out << std::accumulate(polygons.begin(), polygons.end(), 0.0, AreaAccumulator{}) / polygons.size();
 }
 
-void aleksandrov::area(const Polygons& polygons, std::istream& in, std::ostream& out)
+void aleksandrov::execArea(const Polygons& polygons, std::istream& in, std::ostream& out)
 {
   std::string subcommand;
   in >> subcommand;
@@ -260,13 +188,12 @@ void aleksandrov::area(const Polygons& polygons, std::istream& in, std::ostream&
 
   std::map< std::string, std::function< void() > > subcommands;
 
-  using evenPred = EvenVerticesChecker;
-  subcommands["EVEN"] = std::bind(printAreaSumIf< evenPred >, std::cref(polygons), evenPred{}, std::ref(out));
+  using evenF = EvenVerticesChecker;
+  using oddF = OddVerticesChecker;
 
-  using oddPred = OddVerticesChecker;
-  subcommands["ODD"] = std::bind(printAreaSumIf< oddPred >, std::cref(polygons), oddPred{}, std::ref(out));
-
-  subcommands["MEAN"] = std::bind(printMeanArea, std::cref(polygons), std::ref(out));
+  subcommands["EVEN"] = std::bind(execAreaIf< evenF >, std::cref(polygons), evenF{}, std::ref(out));
+  subcommands["ODD"] = std::bind(execAreaIf< oddF >, std::cref(polygons), oddF{}, std::ref(out));
+  subcommands["MEAN"] = std::bind(execAreaMean, std::cref(polygons), std::ref(out));
 
   auto it = subcommands.find(subcommand);
   if (it != subcommands.end())
@@ -280,29 +207,33 @@ void aleksandrov::area(const Polygons& polygons, std::istream& in, std::ostream&
   {
     throw std::logic_error("Incorrect number of vertices!");
   }
-  NVerticesChecker checker{ numOfVertices };
-  printAreaSumIf(polygons, checker, out);
+  using NF = NVerticesChecker;
+  execAreaIf< NF >(polygons, NVerticesChecker{ numOfVertices }, out);
 }
 
 template< class F >
-void aleksandrov::printIthSmallest(const Polygons& polygons, size_t i, F f, std::ostream& out)
+void aleksandrov::execAreaIf(const Polygons& polygons, F f, std::ostream& out)
 {
-  using ReturnType = decltype(f(polygons.front()));
-  std::vector< ReturnType > data;
-  std::transform(polygons.begin(), polygons.end(), std::back_inserter(data), f);
-
-  if (i < polygons.size())
-  {
-    std::nth_element(data.begin(), data.begin() + i, data.end());
-    out << data[i];
-  }
-  else
-  {
-    out << *std::max_element(data.begin(), data.end());
-  }
+  Polygons satisfying;
+  size_t size = std::count_if(polygons.begin(), polygons.end(), f);
+  satisfying.reserve(size);
+  std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(satisfying), f);
+  const auto accumulator = std::bind(std::plus<>{}, _1, std::bind(calcArea, _2));
+  out << std::accumulate(satisfying.begin(), satisfying.end(), 0.0, accumulator);
 }
 
-void aleksandrov::ithSmallest(const Polygons& polygons, size_t i, std::istream& in, std::ostream& out)
+void aleksandrov::execAreaMean(const Polygons& polygons, std::ostream& out)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("There are no polygons!");
+  }
+  const auto accumulator = std::bind(std::plus<>{}, _1, std::bind(calcArea, _2));
+  double areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+  out << areaSum / polygons.size();
+}
+
+void aleksandrov::execIthSmallest(const Polygons& polygons, size_t i, std::istream& in, std::ostream& out)
 {
   if (polygons.empty())
   {
@@ -316,33 +247,53 @@ void aleksandrov::ithSmallest(const Polygons& polygons, size_t i, std::istream& 
 
   std::map< std::string, std::function< void() > > subcommands;
 
-  using areaAcc = AreaAccumulator;
-  subcommands["AREA"] = std::bind(printIthSmallest< areaAcc >, std::cref(polygons), i, areaAcc{}, std::ref(out));
+  const auto areaAcc = std::bind(calcArea, _1);
+  using areaF = decltype(areaAcc);
+  subcommands.emplace("AREA", std::bind(execIthSmallestImpl< areaF >, std::cref(polygons), std::ref(areaAcc), i, std::ref(out)));
 
-  using vertsAcc = VerticesAccumulator;
-  subcommands["VERTEXES"] = std::bind(printIthSmallest< vertsAcc >, std::cref(polygons), i, vertsAcc{}, std::ref(out));
+  auto verts = std::bind(std::mem_fn(&Polygon::points), _1);
+  auto size = std::bind(std::mem_fn(&std::vector< Point >::size), verts);
+  using vertsF = decltype(size);
+  subcommands.emplace("VERTEXES", std::bind(execIthSmallestImpl< vertsF >, std::cref(polygons), std::ref(size), i, std::ref(out)));
 
   subcommands.at(subcommand)();
 }
 
+template< class F >
+void aleksandrov::execIthSmallestImpl(const Polygons& polygons, F f, size_t i, std::ostream& out)
+{
+  std::vector< decltype(f(polygons.front())) > data;
+  std::transform(polygons.begin(), polygons.end(), std::back_inserter(data), f);
+
+  if (i < polygons.size())
+  {
+    std::nth_element(data.begin(), data.begin() + i, data.end());
+    out << data[i];
+  }
+  else
+  {
+    out << *std::max_element(data.begin(), data.end());
+  }
+}
+
 template< class Pred >
-void aleksandrov::printCountIf(const Polygons& polygons, Pred p, std::ostream& out)
+void aleksandrov::execCountIf(const Polygons& polygons, Pred p, std::ostream& out)
 {
   out << std::count_if(polygons.begin(), polygons.end(), p);
 }
 
-void aleksandrov::count(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+void aleksandrov::execCount(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
   std::string subcommand;
   in >> subcommand;
 
   std::map< std::string, std::function< void() > > subcommands;
 
-  using evenPred = EvenVerticesChecker;
-  subcommands["EVEN"] = std::bind(printCountIf< evenPred >, std::cref(polygons), evenPred{}, std::ref(out));
+  using evenF = EvenVerticesChecker;
+  using oddF = OddVerticesChecker;
 
-  using oddPred = OddVerticesChecker;
-  subcommands["ODD"] = std::bind(printCountIf< oddPred >, std::cref(polygons), oddPred{}, std::ref(out));
+  subcommands["EVEN"] = std::bind(execCountIf< evenF >, std::cref(polygons), evenF{}, std::ref(out));
+  subcommands["ODD"] = std::bind(execCountIf< oddF >, std::cref(polygons), oddF{}, std::ref(out));
 
   auto it = subcommands.find(subcommand);
   if (it != subcommands.end())
@@ -356,10 +307,10 @@ void aleksandrov::count(const std::vector< Polygon >& polygons, std::istream& in
   {
     throw std::logic_error("Incorrect number of vertexes!");
   }
-  printCountIf(polygons, NVerticesChecker{ numOfVertices }, out);
+  execCountIf(polygons, NVerticesChecker{ numOfVertices }, out);
 }
 
-void aleksandrov::inFrame(const Polygons& polygons, std::istream& in, std::ostream& out)
+void aleksandrov::execInFrame(const Polygons& polygons, std::istream& in, std::ostream& out)
 {
   Polygon polygon;
   if (!(in >> polygon) || polygons.empty())
@@ -374,24 +325,19 @@ void aleksandrov::inFrame(const Polygons& polygons, std::istream& in, std::ostre
     throw std::logic_error("Incorrect input!");
   }
 
-  std::vector< FrameRect > frameRects;
-  getFrameRects(frameRects, polygons);
+  FrameRect rect = getFrameRect(polygon);
 
-  FrameRect merged = mergeFrameRects(frameRects);
-  FrameRect input = getFrameRect(polygon);
-
-  bool isMinInside = merged.first.x <= input.first.x && merged.first.y <= input.first.y;
-  bool isMaxInside = merged.second.x >= input.second.x && merged.second.y >= input.second.y;
-
-  out << ((isMinInside && isMaxInside) ? "<TRUE>" : "<FALSE>");
+  InFrameChecker checker{ rect };
+  out << (std::all_of(polygons.begin(), polygons.end(), checker) ? "<TRUE>" : "<FALSE>");
 }
 
-void aleksandrov::rightShapes(const Polygons& polygons, std::ostream& out)
+void aleksandrov::execRightShapes(const Polygons& polygons, std::ostream& out)
 {
-  std::vector< std::vector< Vector > > allEdges;
-  getEdges(allEdges, polygons);
-
+  if (polygons.empty())
+  {
+    throw std::logic_error("There are no polygons!");
+  }
   RightAngleChecker checker{};
-  out << std::count_if(allEdges.begin(), allEdges.end(), checker);
+  out << std::count_if(polygons.begin(), polygons.end(), checker);
 }
 

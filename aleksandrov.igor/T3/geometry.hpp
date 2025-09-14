@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <ios>
-#include "geometry.hpp"
 
 namespace aleksandrov
 {
