@@ -1,5 +1,4 @@
 #include "commands.hpp"
-#include "functors.hpp"
 #include <format_guard.hpp>
 #include <algorithm>
 #include <iomanip>
@@ -7,208 +6,231 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
-#include <istream>
-#include <ostream>
 
 namespace shiryaeva
 {
-  void area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  bool hasVertexCount(const Polygon &p, std::size_t count)
   {
+    return p.points.size() == count;
+  }
+
+  bool intersectsWith(const Polygon &a, const Polygon &b)
+  {
+    int p1_minX = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
+    int p1_maxX = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
+    int p1_minY = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByY)->y;
+    int p1_maxY = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByY)->y;
+
+    int p2_minX = std::min_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByX)->x;
+    int p2_maxX = std::max_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByX)->x;
+    int p2_minY = std::min_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByY)->y;
+    int p2_maxY = std::max_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByY)->y;
+
+    bool x_overlap = (p1_minX <= p2_maxX) && (p2_minX <= p1_maxX);
+    bool y_overlap = (p1_minY <= p2_maxY) && (p2_minY <= p1_maxY);
+
+    return x_overlap && y_overlap;
+  }
+
+  void area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+  {
+    FormatGuard guard(out);
     std::string subcmd;
     in >> subcmd;
 
-    FormatGuard guard(out);
-    out << std::fixed << std::setprecision(1);
-
-    std::vector< Polygon > filteredPolygons;
-    bool needMeanCalculation = false;
-
+    std::vector< Polygon > filtered;
     if (subcmd == "EVEN")
     {
-      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsEven{});
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isEven);
     }
     else if (subcmd == "ODD")
     {
-      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), IsOdd{});
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isOdd);
     }
     else if (subcmd == "MEAN")
     {
       if (polygons.empty())
       {
-        out << "<INVALID COMMAND>";
-        return;
+        throw std::logic_error("<INVALID COMMAND>");
       }
-
-      filteredPolygons = polygons;
-      needMeanCalculation = true;
+      out << std::fixed << std::setprecision(1) << getTotalArea(polygons) / polygons.size();
+      return;
     }
     else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
     {
-      size_t num = std::stoul(subcmd);
-      if (num < 3)
+      std::size_t n = std::stoul(subcmd);
+      if (n < MIN_VERTEX_COUNT)
       {
-        out << "<INVALID COMMAND>";
-        return;
+        throw std::invalid_argument("<INVALID COMMAND>");
       }
-
-      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), HasVertexCount{num});
-
+      std::function< bool(const Polygon&) > pred = std::bind(hasVertexCount, std::placeholders::_1, n);
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
     }
-    else
-    {
-      out << "<INVALID COMMAND>";
-      return;
-    }
-
-    std::vector< double > areas;
-    std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), GetPolygonArea{});
-    double total = std::accumulate(areas.begin(), areas.end(), 0.0);
-
-    if (needMeanCalculation)
-    {
-        out << total / areas.size();
-    }
-    else
-    {
-        out << total;
-    }
+      else
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
+      out << std::fixed << std::setprecision(1) << getTotalArea(filtered);
   }
 
-  void max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  void max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     FormatGuard guard(out);
     std::string subcmd;
     in >> subcmd;
-
-    out << std::fixed << std::setprecision(1);
-
+        
     if (polygons.empty())
     {
-      out << "<INVALID COMMAND>";
-      return;
+      throw std::logic_error("<INVALID COMMAND>");
     }
+    out << std::fixed << std::setprecision(1);
 
     if (subcmd == "AREA")
     {
-      auto maxIt = std::max_element(polygons.begin(), polygons.end(), CompareByArea());
-      out << getArea(*maxIt);
+      auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByArea);
+      out << getPolygonArea(*maxIt);
     }
     else if (subcmd == "VERTEXES")
     {
-      auto maxIt = std::max_element(polygons.begin(), polygons.end(), CompareByVertexCount());
+      auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByVertexes);
       out << maxIt->points.size();
     }
-    else
-    {
-      out << "<INVALID COMMAND>";
-    }
+      else
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
   }
 
-  void min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  void min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     FormatGuard guard(out);
     std::string subcmd;
     in >> subcmd;
-
     out << std::fixed << std::setprecision(1);
 
     if (polygons.empty())
     {
-      out << "<INVALID COMMAND>";
-      return;
+      throw std::logic_error("<INVALID COMMAND>");
     }
+    out << std::fixed << std::setprecision(1);
 
     if (subcmd == "AREA")
     {
-      auto minIt = std::min_element(polygons.begin(), polygons.end(), CompareByArea());
-      out << getArea(*minIt);
+      auto minIt = std::min_element(polygons.begin(), polygons.end(), compareByArea);
+      out << getPolygonArea(*minIt);
     }
     else if (subcmd == "VERTEXES")
     {
-      auto minIt = std::min_element(polygons.begin(), polygons.end(), CompareByVertexCount());
+      auto minIt = std::min_element(polygons.begin(), polygons.end(), compareByVertexes);
       out << minIt->points.size();
     }
     else
     {
-      out << "<INVALID COMMAND>";
+      throw std::logic_error("<INVALID COMMAND>");
     }
   }
 
-  void count(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  void count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     std::string subcmd;
     in >> subcmd;
+    std::size_t cnt = 0;
 
     if (subcmd == "EVEN")
     {
-      out << std::count_if(polygons.begin(), polygons.end(), IsEven{});
+      cnt = std::count_if(polygons.begin(), polygons.end(), isEven);
     }
     else if (subcmd == "ODD")
     {
-      out << std::count_if(polygons.begin(), polygons.end(), IsOdd{});
+      cnt = std::count_if(polygons.begin(), polygons.end(), isOdd);
     }
     else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
     {
-      size_t num = std::stoul(subcmd);
-      if (num < 3)
+      size_t vertexCount = std::stoul(subcmd);
+      if (vertexCount < MIN_VERTEX_COUNT)
       {
-        out << "<INVALID COMMAND>";
-        return;
+        throw std::invalid_argument("<INVALID COMMAND>");
       }
-      out << std::count_if(polygons.begin(), polygons.end(), HasVertexCount{num});
+      auto pred = std::bind(hasVertexCount, std::placeholders::_1, vertexCount);
+      cnt = std::count_if(polygons.begin(), polygons.end(), pred);
     }
     else
     {
-      out << "<INVALID COMMAND>";
-      return;
+      throw std::logic_error("<INVALID COMMAND>");
     }
+    out << cnt;
   }
 
-  void lessArea(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  void lessArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    Polygon target;
-    in >> target;
-
-    if (!in || target.points.size() < 3 || (in.peek() != '\n' && !in.eof()))
+    FormatGuard guard(out);
+    Polygon polygon;
+    in >> polygon;
+    if (!in)
     {
-      out << "<INVALID COMMAND>";
-      return;
+      throw std::logic_error("<INVALID COMMAND>");
     }
-
-    double targetArea = getArea(target);
-
-    struct LessArea
-    {
-      double area;
-      bool operator()(const Polygon& p) const
+    size_t cnt = std::count_if(
+      polygons.begin(), polygons.end(),
+      [&polygon](const Polygon &p)
       {
-        return getArea(p) < area;
-      }
-    };
-
-    out << std::count_if(polygons.begin(), polygons.end(), LessArea{targetArea});
+        return getPolygonArea(p) < getPolygonArea(polygon);
+      });
+    out << cnt;
   }
 
-  void intersections(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons)
+  void intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
-    Polygon target;
-    if (!(in >> target) || target.points.size() < 3)
+    Polygon polygon;
+    in >> polygon;
+    if ((polygon.points.empty()) || (!in) || (in.peek() != '\n'))
     {
-      out << "<INVALID COMMAND>";
-      return;
+      throw std::logic_error("<INVALID COMMAND>");
     }
 
-    struct IntersectsWith
-    {
-      Polygon polygon;
-      bool operator()(const Polygon& other) const
-      {
-        auto left = std::minmax_element(polygon.points.begin(), polygon.points.end());
-        auto right = std::minmax_element(other.points.begin(), other.points.end());
-        return !((*left.second < *right.first) || (*right.second < *left.first));
-      }
-    };
+    out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectsWith, polygon, std::placeholders::_1));
+  }
 
-    out << std::count_if(polygons.begin(), polygons.end(), IntersectsWith{target});
+  double dot(const Point &a, const Point &b, const Point &c)
+  {
+    double abx = b.x - a.x;
+    double aby = b.y - a.y;
+    double bcx = c.x - b.x;
+    double bcy = c.y - b.y;
+    return abx * bcx + aby * bcy;
+  }
+
+  double getDistanceSquared(const Point &a, const Point &b)
+  {
+    double dx = b.x - a.x;
+    double dy = b.y - a.y;
+    return dx * dx + dy * dy;
+  }
+
+  bool isRightAngle(const Point &prev, const Point &current, const Point &next)
+  {
+    return std::abs(dot(prev, current, next)) <= EPS;
+  }
+
+  bool isRectangle(const Polygon &polygon)
+  {
+    const auto &points = polygon.points;
+
+    if (points.size() != RECTANGLE_SIDES)
+    {
+      return false;
+    }
+    double diag1 = getDistanceSquared(points[0], points[2]);
+    double diag2 = getDistanceSquared(points[1], points[3]);
+
+    if (std::abs(diag1 - diag2) > EPS)
+    {
+      return false;
+    }
+
+    return isRightAngle(points[3], points[0], points[1]) &&
+      isRightAngle(points[0], points[1], points[2]) &&
+      isRightAngle(points[1], points[2], points[3]) &&
+      isRightAngle(points[2], points[3], points[0]);
   }
 }

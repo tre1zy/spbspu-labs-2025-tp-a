@@ -1,63 +1,62 @@
 #include "commands.hpp"
-#include "polygon.hpp"
 #include <fstream>
-#include <functional>
-#include <iostream>
 #include <iterator>
-#include <limits>
 #include <map>
 #include <vector>
+#include <limits>
+#include <functional>
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
+  using namespace shiryaeva;
   if (argc != 2)
   {
-    std::cerr << "Usage: " << argv[0] << " filename\n";
+    std::cerr << "<INVALID COMMAND>\n";
     return 1;
   }
 
-  std::ifstream file(argv[1]);
-  if (!file)
+  std::ifstream in(argv[1]);
+  if (!in.is_open())
   {
-    std::cerr << "Error opening file\n";
+    std::cerr << "<INVALID COMMAND>\n";
     return 1;
   }
 
-  using Polygon = shiryaeva::Polygon;
-  using PolygonIter = std::istream_iterator< Polygon >;
   std::vector< Polygon > polygons;
-
-  while (!file.eof())
+  using input_it_t = std::istream_iterator< Polygon >;
+  while (!in.eof())
   {
-    std::copy(PolygonIter(file), PolygonIter(), std::back_inserter(polygons));
-    if (file.fail() && !file.eof())
+    std::copy(input_it_t{in}, input_it_t{}, std::back_inserter(polygons));
+    if (!in)
     {
-      file.clear();
-      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      in.clear();
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) >> commands = {
-        {"AREA", std::bind(shiryaeva::area, std::placeholders::_1, std::placeholders::_2, polygons)},
-        {"MAX", std::bind(shiryaeva::max, std::placeholders::_1, std::placeholders::_2, polygons)},
-        {"MIN", std::bind(shiryaeva::min, std::placeholders::_1, std::placeholders::_2, polygons)},
-        {"COUNT", std::bind(shiryaeva::count, std::placeholders::_1, std::placeholders::_2, polygons)},
-        {"LESSAREA", std::bind(shiryaeva::lessArea, std::placeholders::_1, std::placeholders::_2, polygons)},
-        {"INTERSECTIONS", std::bind(shiryaeva::intersections, std::placeholders::_1, std::placeholders::_2, polygons)}
-    };
+  std::map< std::string, std::function<void(std::istream &, std::ostream &) >> cmds;
+  using namespace std::placeholders;
+  cmds["AREA"] = std::bind(area, _1, _2, std::cref(polygons));
+  cmds["MAX"] = std::bind(max, _1, _2, std::cref(polygons));
+  cmds["MIN"] = std::bind(min, _1, _2, std::cref(polygons));
+  cmds["COUNT"] = std::bind(count, _1, _2, std::cref(polygons));
+  cmds["INTERSECTIONS"] = std::bind(intersections, _1, _2, std::cref(polygons));
+  cmds["LESSAREA"] = std::bind(lessArea, _1, _2, std::cref(polygons));
 
   std::string command;
   while (std::cin >> command)
   {
     try
     {
-      commands.at(command)(std::cin, std::cout);
+      cmds.at(command)(std::cin, std::cout);
+      std::cout << '\n';
     }
-    catch (const std::out_of_range&)
+    catch (...)
     {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      std::cout << "<INVALID COMMAND>\n";
     }
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
-  return 0;
 }
 

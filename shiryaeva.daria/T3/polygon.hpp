@@ -1,9 +1,10 @@
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-#include <input_struct.hpp>
+#include "input_struct.hpp"
 #include <vector>
 #include <istream>
+#include <cmath>
 
 constexpr size_t MIN_VERTEX_COUNT = 3;
 
@@ -11,7 +12,8 @@ namespace shiryaeva
 {
   struct Point
   {
-    int x, y;
+    int x;
+    int y;
   };
 
   struct Polygon
@@ -19,20 +21,32 @@ namespace shiryaeva
     std::vector< Point > points;
   };
 
-  struct VectorProduct
+  bool isOdd(const Polygon &p);
+  bool isEven(const Polygon &p);
+
+  std::istream &operator>>(std::istream &in, Point &point);
+  std::istream &operator>>(std::istream &in, Polygon &polygon);
+
+  bool operator==(const Point &lhs, const Point &rhs);
+  bool operator<(const Point &lhs, const Point &rhs);
+
+  struct TriangleGenerator
   {
-    double operator()(const Point& p1, const Point& p2) const
-    {
-      return p1.x * p2.y - p2.x * p1.y;
-    }
+    size_t &index;
+    const std::vector< Point > &points;
+    Polygon operator()();
   };
 
-  bool operator==(const Point& lhs, const Point& rhs);
-  bool operator<(const Point& lhs, const Point& rhs);
-
-  std::istream& operator>>(std::istream& in, Point& point);
-  std::istream& operator>>(std::istream& in, Polygon& polygon);
-  double getArea(const Polygon& polygon);
+  double getDistance(const Point &p1, const Point &p2);
+  Polygon buildTriangle(size_t i, const std::vector< Point > &pts);
+  std::vector< Polygon > polygonToTriangles(const Polygon &p);
+  double getTriangleArea(const Polygon &triangle);
+  double getPolygonArea(const Polygon &polygon);
+  double getTotalArea(const std::vector< Polygon > &polygons);
+  bool compareByArea(const Polygon &a, const Polygon &b);
+  bool compareByVertexes(const Polygon &a, const Polygon &b);
+  bool comparePointByX(const Point &a, const Point &b);
+  bool comparePointByY(const Point &a, const Point &b);
 }
 
 #endif
