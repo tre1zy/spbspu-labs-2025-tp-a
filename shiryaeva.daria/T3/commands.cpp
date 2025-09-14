@@ -33,6 +33,17 @@ namespace shiryaeva
     return x_overlap && y_overlap;
   }
 
+  bool HasDuplicates(const Polygon& p)
+  {
+    if (p.points.size() < 2)
+    {
+      return false;
+    }
+    std::vector< Point > sortedPoints = p.points;
+    std::sort(sortedPoints.begin(), sortedPoints.end());
+    return std::adjacent_find(sortedPoints.begin(), sortedPoints.end()) != sortedPoints.end();
+  }
+
   void area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
   {
     FormatGuard guard(out);
@@ -167,7 +178,7 @@ namespace shiryaeva
     FormatGuard guard(out);
     Polygon polygon;
     in >> polygon;
-    if (!in || polygon.points.size() < 3)
+    if (!in || polygon.points.size() < 3 || !HasDuplicates(polygon))
     {
       throw std::logic_error("<INVALID COMMAND>");
     }

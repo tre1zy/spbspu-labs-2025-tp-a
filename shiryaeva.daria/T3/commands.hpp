@@ -12,6 +12,7 @@ namespace shiryaeva
 {
   bool hasVertexCount(const Polygon &p, size_t count);
   bool isRectangle(const Polygon &polygon);
+  bool HasDuplicates(const Polygon& p)
   void area(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
   void max(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
   void min(std::istream& in, std::ostream& out, const std::vector< Polygon >& polygons);
