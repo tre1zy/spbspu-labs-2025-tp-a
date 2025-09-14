@@ -201,8 +201,9 @@ namespace
     using PrefixedIO = PrefixedIO< ' ', std::size_t >;
 
     std::vector< std::size_t > indexes;
-    std::copy_n(std::istream_iterator< PrefixedIO >(in), encodingIndexes.expectedAmount,
-                std::back_inserter(indexes));
+    using IIter = std::istream_iterator< PrefixedIO >;
+    auto inserter = std::back_inserter(indexes);
+    std::copy_n(IIter(in), encodingIndexes.expectedAmount, inserter);
 
     if (!in)
     {
@@ -438,7 +439,8 @@ namespace voronina
     std::size_t encodingIndex = encodingNumber - 1;
     if (encodingIndex >= vectorOfTables.size())
     {
-      throw std::invalid_argument("Код с номером " + std::to_string(encodingNumber) + " не найден");
+      throw std::invalid_argument("Код с номером " + std::to_string(encodingNumber) +
+                                  " не найден");
     }
     out << vectorOfTables[encodingIndex] << '\n';
   }
@@ -467,7 +469,8 @@ namespace voronina
       throw std::invalid_argument("Ошибка чтения номеров кодировок");
     }
     std::string encodedFilename = "encodedCompare.txt";
-    out << std::left << std::setw(10) << "Encoding" << std::setw(20) << "Compression ratio" << '\n';
+    out << std::left << std::setw(10) << "Encoding" << std::setw(20) << "Compression ratio"
+        << '\n';
     out << std::fixed << std::setprecision(2);
 
     using namespace std::placeholders;
@@ -570,7 +573,8 @@ namespace voronina
     std::transform(begin, end, std::back_inserter(chosenTables), tableChooser);
 
     CodeInfoFunctor functor;
-    std::transform(chosenTables.begin(), chosenTables.end(), std::back_inserter(codes), functor);
+    std::transform(chosenTables.begin(), chosenTables.end(), std::back_inserter(codes),
+                   functor);
     out << CodeInfoHeader{};
     std::copy(codes.begin(), codes.end(), std::ostream_iterator< CodeInfo >(out, "\n"));
   }
@@ -622,14 +626,17 @@ namespace voronina
 
     using namespace std::placeholders;
     std::vector< CanEncodePrinter > printers;
-    auto begin = validIndexes.begin();
-    auto end = validIndexes.end();
-    auto builder = std::bind(canEncodePrinterBuilder, std::ref(out), _1, _2);
-    std::transform(begin, end, canEncodeResults.begin(), std::back_inserter(printers),
-                   std::move(builder));
+    {
+      auto begin = validIndexes.begin();
+      auto end = validIndexes.end();
+      auto begin2 = canEncodeResults.begin();
+      auto inserter = std::back_inserter(printers);
+      auto builder = std::bind(canEncodePrinterBuilder, std::ref(out), _1, _2);
+      std::transform(begin, end, begin2, inserter, std::move(builder));
+    }
     out << CanEncodeHeader{};
-    std::copy(printers.begin(), printers.end(),
-              std::ostream_iterator< CanEncodePrinter >{ out, "\n" });
+    using OIter = std::ostream_iterator< CanEncodePrinter >;
+    std::copy(printers.begin(), printers.end(), OIter{ out, "\n" });
   }
 
   void visualize(const std::vector< ShannonFanoTable >& vectorOfTables, std::istream& in,
