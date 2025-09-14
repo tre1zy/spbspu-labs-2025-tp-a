@@ -374,8 +374,8 @@ namespace voronina
 
   double ShannonFanoTable::calculateEntropy()
   {
-    return -1 *
-           std::accumulate(symbols_.begin(), symbols_.end(), 0.0, logFrequencyAccumulator);
+    auto accumulator = logFrequencyAccumulator;
+    return -1 * std::accumulate(symbols_.begin(), symbols_.end(), 0.0, accumulator);
   }
 
   std::ostream& operator<<(std::ostream& out, const ShannonFanoTable& table)
