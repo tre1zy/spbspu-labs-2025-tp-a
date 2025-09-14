@@ -59,7 +59,7 @@ std::istream& holodilov::operator>>(std::istream& is, Polygon& polygon)
     return is;
   }
 
-  int amountPoints = 0;
+  size_t amountPoints = 0;
   is >> amountPoints;
   if (!is)
   {
