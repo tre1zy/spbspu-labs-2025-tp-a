@@ -84,6 +84,14 @@ namespace
     char operator()();
   };
 
+  struct BitMaskExtractor
+  {
+    const std::string& bitMask;
+    int& i;
+    BitMaskExtractor(const std::string& bitMask, int& i);
+    char operator()();
+  };
+
   int encodeBitMaskToDestination(const std::string& bitMask,
                                  std::string& destination);
 
@@ -108,10 +116,7 @@ namespace
   {
     std::string result;
     BitExtractor extractor(byte);
-    for (int i = 0; i < 8; ++i)
-    {
-      result += extractor();
-    }
+    std::generate_n(std::back_inserter(result), 8, extractor);
     return result;
   }
 
@@ -122,10 +127,9 @@ namespace
   std::string ByteGenerator::operator()()
   {
     std::string byte;
-    for (int k = 0; k < 8 && i < bitMaskLength; ++k, ++i)
-    {
-      byte += bitMask[i];
-    }
+    int bitsToExtract = std::min(8, bitMaskLength - i);
+    auto extractor = BitMaskExtractor(bitMask, i);
+    std::generate_n(std::back_inserter(byte), bitsToExtract, extractor);
     return byte;
   }
 
@@ -188,6 +192,15 @@ namespace
   char ByteToCharFunctor::operator()()
   {
     return transformer(generator());
+  }
+
+  BitMaskExtractor::BitMaskExtractor(const std::string& bitMask, int& i):
+    bitMask(bitMask),
+    i(i)
+  {}
+
+  char BitMaskExtractor::operator()() {
+    return bitMask[i++];
   }
 
   int encodeBitMaskToDestination(const std::string& bitMask,
