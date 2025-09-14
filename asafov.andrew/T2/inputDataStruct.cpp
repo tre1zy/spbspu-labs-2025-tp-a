@@ -4,6 +4,18 @@
 
 namespace
 {
+  void skipLine(std::istream& in)
+  {
+    char ch;
+    while (in.get(ch))
+    {
+      if (ch == '\n')
+      {
+        break;
+      }
+    }
+  }
+
   void expect(std::istream& in, std::initializer_list<char> expected)
   {
     char ch;
@@ -123,18 +135,6 @@ namespace
     read_key(in, data);
     read_key(in, data);
     expect(in, {')'});
-  }
-
-  void skipLine(std::istream& in)
-  {
-    char ch;
-    while (in.get(ch))
-    {
-      if (ch == '\n')
-      {
-        break;
-      }
-    }
   }
 }
 
