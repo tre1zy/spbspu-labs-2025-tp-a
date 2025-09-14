@@ -80,24 +80,61 @@ namespace
   FrameRect getFrameRect(const Polygon& polygon)
   {
     const auto& pts = polygon.points;
+    if (pts.empty())
+    {
+      return {};
+    }
     auto minmaxX = std::minmax_element(pts.begin(), pts.end(), PointXComparator{});
     auto minmaxY = std::minmax_element(pts.begin(), pts.end(), PointYComparator{});
+
     return { Point{ minmaxX.first->x, minmaxY.first->y }, Point{ minmaxX.second->x, minmaxY.second->y } };
   }
 
-  struct InFrameChecker
+  struct MinXComparator
   {
-    const FrameRect& rect;
-
-    bool operator()(const Polygon& polygon) const
+    bool operator()(const FrameRect& a, const FrameRect& b) const
     {
-      FrameRect toCheck = getFrameRect(polygon);
-
-      bool isAIn = rect.first.x >= toCheck.first.x && rect.first.y >= toCheck.first.y;
-      bool isBIn = rect.second.x <= toCheck.second.x && rect.second.y <= toCheck.second.y;
-      return isAIn && isBIn;
+      return a.first.x < b.first.x;
     }
   };
+
+  struct MinYComparator
+  {
+    bool operator()(const FrameRect& a, const FrameRect& b) const
+    {
+      return a.first.y < b.first.y;
+    }
+  };
+
+  struct MaxXComparator
+  {
+    bool operator()(const FrameRect& a, const FrameRect& b) const
+    {
+      return a.second.x < b.second.x;
+    }
+  };
+
+  struct MaxYComparator
+  {
+    bool operator()(const FrameRect& a, const FrameRect& b) const
+    {
+      return a.second.y < b.second.y;
+    }
+  };
+
+  FrameRect mergeFrameRects(const std::vector< FrameRect >& frameRects)
+  {
+    if (frameRects.empty())
+    {
+      return {};
+    }
+    auto minX = std::min_element(frameRects.begin(), frameRects.end(), MinXComparator{});
+    auto minY = std::min_element(frameRects.begin(), frameRects.end(), MinYComparator{});
+    auto maxX = std::max_element(frameRects.begin(), frameRects.end(), MaxXComparator{});
+    auto maxY = std::max_element(frameRects.begin(), frameRects.end(), MaxYComparator{});
+
+    return { { minX->first.x, minY->first.y }, { maxX->second.x, maxY->second.y } };
+  }
 
   struct PerpendicularChecker
   {
@@ -325,10 +362,16 @@ void aleksandrov::execInFrame(const Polygons& polygons, std::istream& in, std::o
     throw std::logic_error("Incorrect input!");
   }
 
-  FrameRect rect = getFrameRect(polygon);
+  std::vector< FrameRect > rects(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), rects.begin(), getFrameRect);
 
-  InFrameChecker checker{ rect };
-  out << (std::all_of(polygons.begin(), polygons.end(), checker) ? "<TRUE>" : "<FALSE>");
+  FrameRect merged = mergeFrameRects(rects);
+  FrameRect input = getFrameRect(polygon);
+
+  bool isMinInside = merged.first.x <= input.first.x && merged.first.y <= input.first.y;
+  bool isMaxInside = merged.second.x >= input.second.x && merged.second.y >= input.second.y;
+
+  out << (isMinInside && isMaxInside ? "<TRUE>" : "<FALSE>");
 }
 
 void aleksandrov::execRightShapes(const Polygons& polygons, std::ostream& out)
