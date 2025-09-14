@@ -92,8 +92,7 @@ namespace
     char operator()();
   };
 
-  int encodeBitMaskToDestination(const std::string& bitMask,
-                                 std::string& destination);
+  int encodeBitMaskToDestination(const std::string& bitMask, std::string& destination);
 
   double logFrequencyAccumulator(double sum, const Symbol& symb);
 
@@ -145,14 +144,12 @@ namespace
     return std::accumulate(byte.begin(), byte.end(), 0, accumulator);
   }
 
-  std::pair< char, Symbol >
-  SymbolToSymbolMapEntry::operator()(const Symbol& symbol) const
+  std::pair< char, Symbol > SymbolToSymbolMapEntry::operator()(const Symbol& symbol) const
   {
     return { symbol.symbol, symbol };
   }
 
-  std::pair< std::string, Symbol >
-  SymbolToCodeMapEntry::operator()(const Symbol& symbol) const
+  std::pair< std::string, Symbol > SymbolToCodeMapEntry::operator()(const Symbol& symbol) const
   {
     return { symbol.code, symbol };
   }
@@ -161,8 +158,7 @@ namespace
     symbolMap(symbolMap)
   {}
 
-  std::string SymbolToCodeTransformer::operator()(const std::string& acc,
-                                                  char symbol) const
+  std::string SymbolToCodeTransformer::operator()(const std::string& acc, char symbol) const
   {
     auto it = symbolMap.find(symbol);
     if (it != symbolMap.end())
@@ -184,8 +180,7 @@ namespace
     return symbol;
   }
 
-  ByteToCharFunctor::ByteToCharFunctor(ByteGenerator& gen,
-                                       ByteMaskToCharTransformer& trans):
+  ByteToCharFunctor::ByteToCharFunctor(ByteGenerator& gen, ByteMaskToCharTransformer& trans):
     generator(gen), transformer(trans)
   {}
 
@@ -195,16 +190,15 @@ namespace
   }
 
   BitMaskExtractor::BitMaskExtractor(const std::string& bitMask, int& i):
-    bitMask(bitMask),
-    i(i)
+    bitMask(bitMask), i(i)
   {}
 
-  char BitMaskExtractor::operator()() {
+  char BitMaskExtractor::operator()()
+  {
     return bitMask[i++];
   }
 
-  int encodeBitMaskToDestination(const std::string& bitMask,
-                                 std::string& destination)
+  int encodeBitMaskToDestination(const std::string& bitMask, std::string& destination)
   {
     int bitMaskLength = bitMask.length();
     int fullBytes = bitMaskLength / 8;
@@ -213,8 +207,7 @@ namespace
     ByteGenerator generator(bitMask, bitMaskLength);
     ByteMaskToCharTransformer transformer;
     ByteToCharFunctor byteToCharFunctor(generator, transformer);
-    std::generate_n(std::back_inserter(destination), fullBytes,
-                    byteToCharFunctor);
+    std::generate_n(std::back_inserter(destination), fullBytes, byteToCharFunctor);
     if (remainingBits)
     {
       std::string lastByte = bitMask.substr(fullBytes * 8, remainingBits);
@@ -266,8 +259,7 @@ namespace voronina
     std::sort(begin, end, FrequencyComparator{});
   }
 
-  void ShannonFanoTable::shannonFanoRecursion(const SymbIter& begin,
-                                              const SymbIter& end)
+  void ShannonFanoTable::shannonFanoRecursion(const SymbIter& begin, const SymbIter& end)
   {
     if (begin == end)
     {
@@ -281,17 +273,14 @@ namespace voronina
                    std::bind(&Symbol::frequency, std::placeholders::_1));
 
     std::vector< double > prefixSums(frequencies.size());
-    std::partial_sum(frequencies.begin(), frequencies.end(),
-                     prefixSums.begin());
+    std::partial_sum(frequencies.begin(), frequencies.end(), prefixSums.begin());
 
-    auto greaterThanTotal = std::bind(std::greater_equal< double >{},
-                                      std::placeholders::_1, total / 2);
+    using namespace std::placeholders;
+    auto greaterThanTotal = std::bind(std::greater_equal< double >{}, _1, total / 2);
     auto sumsBegin = prefixSums.begin();
     auto sumsEnd = prefixSums.end();
-    auto prefixSumsSplitIterator =
-        std::find_if(sumsBegin, sumsEnd, greaterThanTotal);
-    auto splitIterator =
-        begin + std::distance(prefixSums.begin(), prefixSumsSplitIterator);
+    auto prefixSumsSplitIterator = std::find_if(sumsBegin, sumsEnd, greaterThanTotal);
+    auto splitIterator = begin + std::distance(prefixSums.begin(), prefixSumsSplitIterator);
     std::transform(begin, splitIterator + 1, begin, appendZero);
     std::transform(splitIterator + 1, end + 1, splitIterator + 1, appendOne);
 
@@ -340,8 +329,7 @@ namespace voronina
   {
     if (symbolMap_.empty())
     {
-      auto errorMessage =
-          "Contract violation: symbolMap_ must be initialized before decoding";
+      auto errorMessage = "Contract violation: symbolMap_ must be initialized before decoding";
       throw std::logic_error(errorMessage);
     }
 
@@ -386,8 +374,8 @@ namespace voronina
 
   double ShannonFanoTable::calculateEntropy()
   {
-    return -1 * std::accumulate(symbols_.begin(), symbols_.end(), 0.0,
-                                logFrequencyAccumulator);
+    return -1 *
+           std::accumulate(symbols_.begin(), symbols_.end(), 0.0, logFrequencyAccumulator);
   }
 
   std::ostream& operator<<(std::ostream& out, const ShannonFanoTable& table)
