@@ -21,9 +21,11 @@ namespace aleksandrov
   void cloneSeq(std::istream&, Sequences&);
   void addToSeq(std::istream&, Sequences&);
   void removeFromSeq(std::istream&, Sequences&);
+  void mergeSeqs(std::istream&, Sequences&);
   void printSeq(std::istream&, std::ostream&, const Sequences&);
   void elementsSeq(std::istream&, std::ostream&, const Sequences&);
   void notesSeq(std::istream&, std::ostream&, const Sequences&);
+  void typeSeq(std::istream&, std::ostream&, const Sequences&);
 }
 
 #endif
