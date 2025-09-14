@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include <format_guard.hpp>
+#include <functional>
 #include <algorithm>
 #include <iomanip>
 #include <limits>
