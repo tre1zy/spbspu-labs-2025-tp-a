@@ -5,12 +5,13 @@
 
 namespace fedorova
 {
-    struct DelimiterIO
-    {
-        char exp;
-    };
+  struct DelimiterIO
+  {
+    char exp;
+  };
 
-    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 }
 
 #endif
+

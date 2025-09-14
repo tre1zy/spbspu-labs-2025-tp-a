@@ -6,23 +6,24 @@
 
 namespace fedorova
 {
-	struct Point
-	{
-		int x;
-		int y;
-	};
+  struct Point
+  {
+    int x;
+    int y;
+  };
 
-	struct Polygon
-	{
-		std::vector< Point > points;
-	};
+  struct Polygon
+  {
+    std::vector< Point > points;
+  };
 
-	bool operator==(const Point&, const Point&);
-	bool operator==(const Polygon&, const Polygon&);
-	std::istream& operator>>(std::istream&, Point&);
-	std::istream& operator>>(std::istream&, Polygon&);
-	std::ostream& operator<<(std::ostream&, const Point&);
-	std::ostream& operator<<(std::ostream&, const Polygon&);
+  bool operator==(const Point&, const Point&);
+  bool operator==(const Polygon&, const Polygon&);
+  std::istream& operator>>(std::istream&, Point&);
+  std::istream& operator>>(std::istream&, Polygon&);
+  std::ostream& operator<<(std::ostream&, const Point&);
+  std::ostream& operator<<(std::ostream&, const Polygon&);
 }
 
 #endif
+
