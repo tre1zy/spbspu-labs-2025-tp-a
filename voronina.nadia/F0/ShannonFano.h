@@ -25,14 +25,15 @@ namespace voronina
     friend std::ostream& operator<<(std::ostream& out, const ShannonFanoTable& table);
 
   private:
+    using SymbIter = std::vector< Symbol >::iterator;
+
     std::string originFile_;
     std::vector< Symbol > symbols_;
     std::unordered_map< char, Symbol > symbolMap_;
     std::unordered_map< std::string, Symbol > codeMap_;
 
     void initializeSymbolFrequencies(const std::string& text);
-    void shannonFanoRecursion(const std::vector< Symbol >::iterator& begin,
-                              const std::vector< Symbol >::iterator& end);
+    void shannonFanoRecursion(const SymbIter& begin, const SymbIter& end);
   };
 }
 

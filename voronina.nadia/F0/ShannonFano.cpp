@@ -14,39 +14,18 @@ namespace
   using namespace voronina;
 
   template < class T >
-  T staticCast(const T& value)
-  {
-    return static_cast< T >(value);
-  }
+  T staticCast(const T& value);
 
   struct BitExtractor
   {
     int j = 7;
     unsigned char byte;
 
-    BitExtractor(unsigned char b):
-      byte(b)
-    {}
-
+    BitExtractor(unsigned char b);
     char operator()();
   };
 
-  char BitExtractor::operator()()
-  {
-    char bit = ((byte >> j) & 1) ? '1' : '0';
-    if (--j < 0)
-    {
-      j = 7;
-    }
-    return bit;
-  }
-
-  std::string byteToString(unsigned char byte)
-  {
-    std::string acc;
-    std::generate_n(std::back_inserter(acc), 8, BitExtractor(byte));
-    return acc;
-  }
+  std::string byteToString(unsigned char byte);
 
   struct ByteGenerator
   {
@@ -54,123 +33,193 @@ namespace
     int bitMaskLength;
     int i = 0;
 
-    ByteGenerator(const std::string& bitMask, int bitMaskLength):
-      bitMask(bitMask), bitMaskLength(bitMaskLength)
-    {}
-
-    std::string operator()()
-    {
-      std::string byte = bitMask.substr(i, 8);
-      i += 8;
-      return byte.append(8 - byte.length(), '0');
-    }
+    ByteGenerator(const std::string& bitMask, int bitMaskLength);
+    std::string operator()();
   };
 
-  struct BitToDecimalConverter
+  struct BitToDecimalAccumulator
   {
     int degree = 7;
-
-    int operator()(int sum, char bit)
-    {
-      if (degree < 0)
-      {
-        throw std::out_of_range("Degree must be in the range 0-7. Developer "
-                                "might have made a mistake.");
-      }
-      if (bit == '1')
-      {
-        sum += (1 << degree);
-      }
-      --degree;
-      return sum;
-    }
+    int operator()(int sum, char bit);
   };
 
   struct ByteMaskToCharTransformer
   {
-    char operator()(const std::string& byte) const
-    {
-      return static_cast< char >(std::accumulate(byte.begin(), byte.end(), 0,
-                                                 BitToDecimalConverter()));
-    }
+    char operator()(const std::string& byte) const;
   };
 
   struct SymbolToSymbolMapEntry
   {
-    std::pair< char, Symbol > operator()(const Symbol& symbol) const
-    {
-      return std::make_pair(symbol.symbol, symbol);
-    }
+    std::pair< char, Symbol > operator()(const Symbol& symbol) const;
   };
 
   struct SymbolToCodeMapEntry
   {
-    std::pair< std::string, Symbol > operator()(const Symbol& symbol) const
-    {
-      return std::make_pair(symbol.code, symbol);
-    }
+    std::pair< std::string, Symbol > operator()(const Symbol& symbol) const;
   };
 
   struct SymbolToCodeTransformer
   {
-    const std::unordered_map< char, Symbol >& symbolMap;
+    using SymbolMap = std::unordered_map< char, Symbol >;
+    const SymbolMap& symbolMap;
 
-    SymbolToCodeTransformer(
-        const std::unordered_map< char, Symbol >& symbolMap):
-      symbolMap(symbolMap)
-    {}
-
-    std::string operator()(const std::string& acc, char symbol) const
-    {
-      auto it = symbolMap.find(symbol);
-      if (it == symbolMap.end())
-      {
-        throw std::invalid_argument("Символ '" + std::string(1, symbol) +
-                                    "' не может быть закодирован.");
-      }
-      return acc + it->second.code;
-    }
+    SymbolToCodeTransformer(const SymbolMap& symbolMap);
+    std::string operator()(const std::string& acc, char symbol) const;
   };
 
   struct FrequencySetter
   {
     const std::string& text;
-    FrequencySetter(const std::string& text):
-      text(text)
-    {}
-
-    Symbol operator()(Symbol symbol) const
-    {
-      auto count = std::count(text.begin(), text.end(), symbol.symbol);
-      symbol.frequency = static_cast< double >(count) / text.length();
-      return symbol;
-    }
+    FrequencySetter(const std::string& text);
+    Symbol operator()(Symbol symbol) const;
   };
+
+  struct ByteToCharFunctor
+  {
+    ByteGenerator& generator;
+    ByteMaskToCharTransformer& transformer;
+
+    ByteToCharFunctor(ByteGenerator& gen, ByteMaskToCharTransformer& trans);
+
+    char operator()();
+  };
+
+  int encodeBitMaskToDestination(const std::string& bitMask,
+                                 std::string& destination);
+
+  double logFrequencyAccumulator(double sum, const Symbol& symb);
+
+  template < class T >
+  T staticCast(const T& value)
+  {
+    return value;
+  }
+
+  BitExtractor::BitExtractor(unsigned char b):
+    byte(b)
+  {}
+
+  char BitExtractor::operator()()
+  {
+    return ((byte >> j--) & 1) + '0';
+  }
+
+  std::string byteToString(unsigned char byte)
+  {
+    std::string result;
+    BitExtractor extractor(byte);
+    for (int i = 0; i < 8; ++i)
+    {
+      result += extractor();
+    }
+    return result;
+  }
+
+  ByteGenerator::ByteGenerator(const std::string& bitMask, int bitMaskLength):
+    bitMask(bitMask), bitMaskLength(bitMaskLength)
+  {}
+
+  std::string ByteGenerator::operator()()
+  {
+    std::string byte;
+    for (int k = 0; k < 8 && i < bitMaskLength; ++k, ++i)
+    {
+      byte += bitMask[i];
+    }
+    return byte;
+  }
+
+  int BitToDecimalAccumulator::operator()(int sum, char bit)
+  {
+    sum += (bit - '0') << degree--;
+    return sum;
+  }
+
+  char ByteMaskToCharTransformer::operator()(const std::string& byte) const
+  {
+    auto accumulator = BitToDecimalAccumulator{};
+    return std::accumulate(byte.begin(), byte.end(), 0, accumulator);
+  }
+
+  std::pair< char, Symbol >
+  SymbolToSymbolMapEntry::operator()(const Symbol& symbol) const
+  {
+    return { symbol.symbol, symbol };
+  }
+
+  std::pair< std::string, Symbol >
+  SymbolToCodeMapEntry::operator()(const Symbol& symbol) const
+  {
+    return { symbol.code, symbol };
+  }
+
+  SymbolToCodeTransformer::SymbolToCodeTransformer(const SymbolMap& symbolMap):
+    symbolMap(symbolMap)
+  {}
+
+  std::string SymbolToCodeTransformer::operator()(const std::string& acc,
+                                                  char symbol) const
+  {
+    auto it = symbolMap.find(symbol);
+    if (it != symbolMap.end())
+    {
+      return acc + it->second.code;
+    }
+    return acc;
+  }
+
+  FrequencySetter::FrequencySetter(const std::string& text):
+    text(text)
+  {}
+
+  Symbol FrequencySetter::operator()(Symbol symbol) const
+  {
+    auto size = static_cast< double >(text.size());
+    auto count = std::count(text.begin(), text.end(), symbol.symbol);
+    symbol.frequency = count / size;
+    return symbol;
+  }
+
+  ByteToCharFunctor::ByteToCharFunctor(ByteGenerator& gen,
+                                       ByteMaskToCharTransformer& trans):
+    generator(gen), transformer(trans)
+  {}
+
+  char ByteToCharFunctor::operator()()
+  {
+    return transformer(generator());
+  }
 
   int encodeBitMaskToDestination(const std::string& bitMask,
                                  std::string& destination)
   {
     int bitMaskLength = bitMask.length();
-    std::vector< std::string > bytes;
+    int fullBytes = bitMaskLength / 8;
+    int remainingBits = bitMaskLength % 8;
 
-    auto generator = ByteGenerator(bitMask, bitMaskLength);
-    std::generate_n(std::back_inserter(bytes), (bitMaskLength + 7) / 8,
-                    generator);
-    auto transformer = ByteMaskToCharTransformer();
-    std::transform(bytes.begin(), bytes.end(), std::back_inserter(destination),
-                   transformer);
-    if (bitMaskLength == 0)
+    ByteGenerator generator(bitMask, bitMaskLength);
+    ByteMaskToCharTransformer transformer;
+    ByteToCharFunctor byteToCharFunctor(generator, transformer);
+    std::generate_n(std::back_inserter(destination), fullBytes,
+                    byteToCharFunctor);
+    if (remainingBits)
     {
-      return 8;
+      std::string lastByte = bitMask.substr(fullBytes * 8, remainingBits);
+      lastByte.append(8 - remainingBits, '0');
+      destination += transformer(lastByte);
     }
-    return bitMaskLength % 8;
+    return remainingBits;
   }
 
   double logFrequencyAccumulator(double sum, const Symbol& symb)
   {
-    return sum + symb.frequency * std::log2(symb.frequency);
+    if (symb.frequency > 0)
+    {
+      return sum + symb.frequency * std::log2(symb.frequency);
+    }
+    return sum;
   }
-}
+} // namespace
 
 namespace voronina
 {
@@ -196,16 +245,16 @@ namespace voronina
     auto uniqueEnd = std::unique(sortedText.begin(), sortedText.end());
     symbols_.clear();
 
-    std::transform(sortedText.begin(), uniqueEnd, std::back_inserter(symbols_),
-                   SymbolCreator{});
-    std::transform(symbols_.begin(), symbols_.end(), symbols_.begin(),
-                   FrequencySetter(text));
-    std::sort(symbols_.begin(), symbols_.end(), FrequencyComparator{});
+    auto inserter = std::back_inserter(symbols_);
+    std::transform(sortedText.begin(), uniqueEnd, inserter, SymbolCreator{});
+    auto begin = symbols_.begin();
+    auto end = symbols_.end();
+    std::transform(begin, end, begin, FrequencySetter(text));
+    std::sort(begin, end, FrequencyComparator{});
   }
 
-  void ShannonFanoTable::shannonFanoRecursion(
-      const std::vector< Symbol >::iterator& begin,
-      const std::vector< Symbol >::iterator& end)
+  void ShannonFanoTable::shannonFanoRecursion(const SymbIter& begin,
+                                              const SymbIter& end)
   {
     if (begin == end)
     {
@@ -222,9 +271,14 @@ namespace voronina
     std::partial_sum(frequencies.begin(), frequencies.end(),
                      prefixSums.begin());
 
-    auto greaterThanTotal = std::bind(std::greater_equal<double>{}, std::placeholders::_1, total / 2);
-    auto prefixSumsSplitIterator = std::find_if(prefixSums.begin(), prefixSums.end(), greaterThanTotal);
-    auto splitIterator = begin + std::distance(prefixSums.begin(), prefixSumsSplitIterator);
+    auto greaterThanTotal = std::bind(std::greater_equal< double >{},
+                                      std::placeholders::_1, total / 2);
+    auto sumsBegin = prefixSums.begin();
+    auto sumsEnd = prefixSums.end();
+    auto prefixSumsSplitIterator =
+        std::find_if(sumsBegin, sumsEnd, greaterThanTotal);
+    auto splitIterator =
+        begin + std::distance(prefixSums.begin(), prefixSumsSplitIterator);
     std::transform(begin, splitIterator + 1, begin, appendZero);
     std::transform(splitIterator + 1, end + 1, splitIterator + 1, appendOne);
 
@@ -237,8 +291,8 @@ namespace voronina
   {
     if (text.empty())
     {
-      throw std::invalid_argument(
-          "Невозможно создать кодировку Шеннона-Фано из пустой строки.");
+      static auto errMessage = "Невозможно создать кодировку Шеннона-Фано из пустой строки";
+      throw std::invalid_argument(errMessage);
     }
 
     originFile_ = originFile;
@@ -246,16 +300,14 @@ namespace voronina
     shannonFanoRecursion(symbols_.begin(), symbols_.end() - 1);
 
     auto symbolInserter = std::inserter(symbolMap_, symbolMap_.end());
-    std::transform(symbols_.begin(), symbols_.end(), symbolInserter,
-                   SymbolToSymbolMapEntry());
+    auto transformer = SymbolToSymbolMapEntry();
+    std::transform(symbols_.begin(), symbols_.end(), symbolInserter, transformer);
 
     auto codeMapInserter = std::inserter(codeMap_, codeMap_.end());
-    std::transform(symbols_.begin(), symbols_.end(), codeMapInserter,
-                   SymbolToCodeMapEntry());
+    std::transform(symbols_.begin(), symbols_.end(), codeMapInserter, SymbolToCodeMapEntry());
   }
 
-  int ShannonFanoTable::encode(const std::string& text,
-                               std::string& destination) const
+  int ShannonFanoTable::encode(const std::string& text, std::string& destination) const
   {
     if (symbolMap_.empty())
     {
@@ -263,9 +315,10 @@ namespace voronina
           "Contract violation: symbolMap_ must be initialized before encoding. "
           "Call generateShannonFanoCodes() first.");
     }
-    std::string bitMask =
-        std::accumulate(text.begin(), text.end(), std::string{},
-                        SymbolToCodeTransformer(symbolMap_));
+    auto transformer = SymbolToCodeTransformer(symbolMap_);
+    auto begin = text.begin();
+    auto end = text.end();
+    std::string bitMask = std::accumulate(begin, end, std::string{}, transformer);
     return encodeBitMaskToDestination(bitMask, destination);
   }
 
@@ -288,16 +341,13 @@ namespace voronina
     std::vector< unsigned char > bytes;
     bytes.reserve(text.size());
 
-    auto toUnsignedChar =
-        std::bind(staticCast< unsigned char >, std::placeholders::_1);
-    std::transform(text.begin(), text.end(), std::back_inserter(bytes),
-                   toUnsignedChar);
+    using namespace std::placeholders;
+    auto toUnsignedChar = std::bind(staticCast< unsigned char >, _1);
+    std::transform(text.begin(), text.end(), std::back_inserter(bytes), toUnsignedChar);
 
     std::vector< std::string > bitMasks;
-    std::transform(bytes.begin(), bytes.end(), std::back_inserter(bitMasks),
-                   byteToString);
-    std::string bitMask =
-        std::accumulate(bitMasks.begin(), bitMasks.end(), std::string{});
+    std::transform(bytes.begin(), bytes.end(), std::back_inserter(bitMasks), byteToString);
+    std::string bitMask = std::accumulate(bitMasks.begin(), bitMasks.end(), std::string{});
 
     std::size_t bitMaskLength = bitMask.length();
     if (significantBitsInLastByte != 0)
@@ -336,4 +386,4 @@ namespace voronina
               std::ostream_iterator< Symbol >(out, "\n"));
     return out;
   }
-}
+} // namespace voronina
