@@ -256,7 +256,7 @@ void fedorova::perms(const std::vector< Polygon >& polygons, std::istream& is, s
   os << std::count_if(polygons.begin(), polygons.end(), std::bind(isPermutation, _1, polygon));
 }
 
-void fedorova::rightShapes(const std::vector< Polygon >& polygons, std::istream& is, std::ostream& os)
+void fedorova::rightShapes(const std::vector< Polygon >& polygons, std::ostream& os)
 {
   os << std::count_if(polygons.cbegin(), polygons.cend(), isRightAngle);
   return;

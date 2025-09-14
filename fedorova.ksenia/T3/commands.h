@@ -24,7 +24,7 @@ namespace fedorova
 
   void perms(const std::vector< Polygon >&, std::istream&, std::ostream&);
 
-  void rightShapes(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void rightShapes(const std::vector< Polygon >&, std::ostream&);
 }
 
 #endif
