@@ -603,15 +603,22 @@ namespace voronina
     }
 
     std::vector< std::size_t > validIndexes;
-    auto less_than_size =
-        std::bind(std::less< std::size_t >(), std::placeholders::_1, vectorOfTables.size());
-    std::copy_if(encodingIndexes.begin(), encodingIndexes.end(), std::back_inserter(validIndexes),
-                 less_than_size);
+    using namespace std::placeholders;
+    auto less_than_size = std::bind(std::less< std::size_t >(), _1, vectorOfTables.size());
+    auto indexBegin = encodingIndexes.begin();
+    auto indexEnd = encodingIndexes.end();
+    auto inserter = std::back_inserter(validIndexes);
+    std::copy_if(indexBegin, indexEnd, inserter, less_than_size);
 
     CanEncodeTransformer functor{ text, vectorOfTables };
     std::vector< std::string > canEncodeResults;
-    std::transform(validIndexes.begin(), validIndexes.end(), std::back_inserter(canEncodeResults),
-                   functor);
+
+    {
+      auto encodeResultsInserter = std::back_inserter(canEncodeResults);
+      auto begin = validIndexes.begin();
+      auto end = validIndexes.end();
+      std::transform(begin, end, encodeResultsInserter, functor);
+    }
 
     using namespace std::placeholders;
     std::vector< CanEncodePrinter > printers;
@@ -640,18 +647,21 @@ namespace voronina
     const ShannonFanoTable& table = vectorOfTables.at(encodingIndex);
 
     std::vector< Entry > entries;
-    std::transform(table.symbols().begin(), table.symbols().end(), std::back_inserter(entries),
-                   entryCreator);
+    auto begin = table.symbols().begin();
+    auto end = table.symbols().end();
+    std::transform(begin, end, std::back_inserter(entries), entryCreator);
 
     std::sort(entries.begin(), entries.end(), compareEntryCodes);
 
     std::vector< std::string > outputLines;
     std::string prevCode;
 
-    std::transform(entries.begin(), entries.end(), std::back_inserter(outputLines),
-                   Visualizer{ prevCode });
+    auto visualizer = Visualizer{ prevCode };
+    auto inserter = std::back_inserter(outputLines);
+    std::transform(entries.begin(), entries.end(), inserter, visualizer);
 
-    std::copy(outputLines.begin(), outputLines.end(), std::ostream_iterator< std::string >(out));
+    using OIter = std::ostream_iterator< std::string >;
+    std::copy(outputLines.begin(), outputLines.end(), OIter(out));
   }
 
   void definiteEncode(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out)
