@@ -9,7 +9,8 @@ namespace voronina
     std::ifstream ifs(filename, std::ios::binary | std::ios::ate);
     if (!ifs.is_open())
     {
-      throw std::invalid_argument("Ошибка при открытии файла: " + filename + ". Проверьте существование такого файла");
+      throw std::invalid_argument("Ошибка при открытии файла: " + filename +
+                                  ". Проверьте существование такого файла");
     }
     std::streamsize size = ifs.tellg();
     ifs.seekg(0, std::ios::beg);

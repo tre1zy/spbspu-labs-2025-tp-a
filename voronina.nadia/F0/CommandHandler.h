@@ -14,7 +14,6 @@ namespace voronina
   class CommandHandler
   {
   public:
-
     CommandHandler();
     CommandHandler(const CommandHandler&) = delete;
     CommandHandler& operator=(const CommandHandler&) = delete;
@@ -23,7 +22,6 @@ namespace voronina
     void executeCommand(const std::string& command, std::istream& input, std::ostream& output);
 
   private:
-
     std::vector< ShannonFanoTable > vectorOfTables_;
     std::vector< std::string > vectorOfOriginFiles_;
     std::map< std::string, std::function< void(std::istream&, std::ostream&) > > cmds_;

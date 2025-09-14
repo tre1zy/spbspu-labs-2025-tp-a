@@ -31,7 +31,8 @@ namespace voronina
     std::unordered_map< std::string, Symbol > codeMap_;
 
     void initializeSymbolFrequencies(const std::string& text);
-    void shannonFanoRecursion(const std::vector< Symbol >::iterator& begin, const std::vector< Symbol >::iterator& end);
+    void shannonFanoRecursion(const std::vector< Symbol >::iterator& begin,
+                              const std::vector< Symbol >::iterator& end);
   };
 }
 

@@ -1,4 +1,5 @@
 #include <clocale>
+#include <limits>
 #include "CommandHandler.h"
 #include "HelpText.h"
 #include "Utils.h"

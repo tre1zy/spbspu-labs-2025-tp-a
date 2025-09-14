@@ -74,7 +74,8 @@ namespace
     {
       if (degree < 0)
       {
-        throw std::out_of_range("Degree must be in the range 0-7. Developer might have made a mistake.");
+        throw std::out_of_range(
+            "Degree must be in the range 0-7. Developer might have made a mistake.");
       }
       if (bit == '1')
       {
@@ -89,7 +90,8 @@ namespace
   {
     char operator()(const std::string& byte) const
     {
-      return static_cast< char >(std::accumulate(byte.begin(), byte.end(), 0, BitToDecimalConverter()));
+      return static_cast< char >(
+          std::accumulate(byte.begin(), byte.end(), 0, BitToDecimalConverter()));
     }
   };
 
@@ -139,7 +141,8 @@ namespace
       auto it = symbolMap.find(symbol);
       if (it == symbolMap.end())
       {
-        throw std::invalid_argument("Символ '" + std::string(1, symbol) + "' не может быть закодирован.");
+        throw std::invalid_argument("Символ '" + std::string(1, symbol) +
+                                    "' не может быть закодирован.");
       }
       return acc + it->second.code;
     }
@@ -154,7 +157,9 @@ namespace
 
     Symbol operator()(Symbol symbol) const
     {
-      symbol.frequency = static_cast< double >(std::count(text.begin(), text.end(), symbol.symbol)) / text.length();
+      symbol.frequency =
+          static_cast< double >(std::count(text.begin(), text.end(), symbol.symbol)) /
+          text.length();
       return symbol;
     }
   };
@@ -166,8 +171,13 @@ namespace
     int degree = 7;
     std::vector< std::string > bytes;
 
-    std::generate_n(std::back_inserter(bytes), (bitMaskLength + 7) / 8, ByteGenerator(bitMask, bitMaskLength));
-    std::transform(bytes.begin(), bytes.end(), std::back_inserter(destination), ByteMaskToCharTransformer());
+    auto generator = ByteGenerator(bitMask, bitMaskLength);
+    std::generate_n(std::back_inserter(bytes), (bitMaskLength + 7) / 8, generator);
+    auto transformer = ByteMaskToCharTransformer();
+    std::transform(bytes.begin(), bytes.end(), std::back_inserter(destination), transformer);
+    if (bitMaskLength == 0) {
+      return 8;
+    }
     return bitMaskLength % 8;
   }
 
@@ -175,7 +185,7 @@ namespace
   {
     return sum + symb.frequency * std::log2(symb.frequency);
   }
-} // namespace
+}
 
 namespace voronina
 {
@@ -218,7 +228,8 @@ namespace voronina
     double leftSumFrequency = begin->frequency;
 
     std::vector< double > frequencies(std::distance(begin, end) + 1);
-    std::transform(begin, end + 1, frequencies.begin(), std::bind(&Symbol::frequency, std::placeholders::_1));
+    std::transform(begin, end + 1, frequencies.begin(),
+                   std::bind(&Symbol::frequency, std::placeholders::_1));
 
     std::vector< double > prefixSums(frequencies.size());
     std::partial_sum(frequencies.begin(), frequencies.end(), prefixSums.begin());
@@ -231,7 +242,8 @@ namespace voronina
     shannonFanoRecursion(splitIterator + 1, end);
   }
 
-  void ShannonFanoTable::generateShannonFanoCodes(const std::string& text, const std::string originFile)
+  void ShannonFanoTable::generateShannonFanoCodes(const std::string& text,
+                                                  const std::string originFile)
   {
     if (text.empty())
     {
@@ -253,10 +265,11 @@ namespace voronina
   {
     if (symbolMap_.empty())
     {
-      throw std::logic_error(
-          "Contract violation: symbolMap_ must be initialized before encoding. Call generateShannonFanoCodes() first.");
+      throw std::logic_error("Contract violation: symbolMap_ must be initialized before encoding. "
+                             "Call generateShannonFanoCodes() first.");
     }
-    std::string bitMask = std::accumulate(text.begin(), text.end(), std::string{}, SymbolToCodeTransformer(symbolMap_));
+    std::string bitMask = std::accumulate(text.begin(), text.end(), std::string{},
+                                          SymbolToCodeTransformer(symbolMap_));
     return encodeBitMaskToDestination(bitMask, destination);
   }
 
@@ -270,7 +283,8 @@ namespace voronina
 
     if (significantBitsInLastByte > 7)
     {
-      throw std::invalid_argument("Количество значимых битов в последнем байте должно быть в диапазоне от 0 до 7");
+      throw std::invalid_argument(
+          "Количество значимых битов в последнем байте должно быть в диапазоне от 0 до 7");
     }
 
     std::vector< unsigned char > bytes;
@@ -314,7 +328,8 @@ namespace voronina
   {
     iofmtguard ofmtguard(out);
     std::cout << std::left << std::setw(10) << "Symbol" << std::setw(10) << "Frequency" << "Code\n";
-    std::copy(std::begin(table.symbols_), std::end(table.symbols_), std::ostream_iterator< Symbol >(out, "\n"));
+    std::copy(std::begin(table.symbols_), std::end(table.symbols_),
+              std::ostream_iterator< Symbol >(out, "\n"));
     return out;
   }
 }

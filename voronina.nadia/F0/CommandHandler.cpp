@@ -21,7 +21,8 @@ namespace voronina
     cmds_["DEFINITE_ENCODE"] = std::bind(definiteEncode, std::cref(vectorOfTables_), _1, _2);
   }
 
-  void CommandHandler::executeCommand(const std::string& command, std::istream& input, std::ostream& output)
+  void CommandHandler::executeCommand(const std::string& command, std::istream& input,
+                                      std::ostream& output)
   {
     auto it = cmds_.find(command);
     if (it != cmds_.end())

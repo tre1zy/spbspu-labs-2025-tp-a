@@ -54,7 +54,8 @@ namespace voronina
     }
 
     out << std::fixed << std::setprecision(2);
-    out << std::left << std::setw(10) << symbolRepresentation << std::setw(10) << symbol.frequency << symbol.code;
+    out << std::left << std::setw(10) << symbolRepresentation << std::setw(10) << symbol.frequency
+        << symbol.code;
 
     return out;
   }
