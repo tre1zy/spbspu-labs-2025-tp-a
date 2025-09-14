@@ -17,9 +17,13 @@ namespace aleksandrov
   void loadSeq(std::istream&, Sequences&);
   void saveSeq(std::istream&, Sequences&);
   void clearSeq(std::istream&, Sequences&);
-  void removeSeq(std::istream&, Sequences&);
+  void deleteSeq(std::istream&, Sequences&);
   void cloneSeq(std::istream&, Sequences&);
+  void addToSeq(std::istream&, Sequences&);
+  void removeFromSeq(std::istream&, Sequences&);
   void printSeq(std::istream&, std::ostream&, const Sequences&);
+  void elementsSeq(std::istream&, std::ostream&, const Sequences&);
+  void notesSeq(std::istream&, std::ostream&, const Sequences&);
 }
 
 #endif

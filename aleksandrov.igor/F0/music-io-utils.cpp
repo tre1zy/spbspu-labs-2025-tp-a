@@ -142,7 +142,13 @@ std::istream& aleksandrov::operator>>(std::istream& in, MusicalElement& element)
 std::ostream& aleksandrov::operator<<(std::ostream& out, const Note& note)
 {
   StreamGuard guard(out);
-  return out << note.letter << note.accidental << note.pitch;
+  out << note.letter;
+  if (note.accidental != '\0')
+  {
+    out << note.accidental;
+  }
+  out << note.pitch;
+  return out;
 }
 
 std::ostream& aleksandrov::operator<<(std::ostream& out, const Interval& interval)
