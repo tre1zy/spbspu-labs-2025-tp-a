@@ -95,23 +95,6 @@ namespace
     }
   };
 
-  struct SplitPointFinder
-  {
-    double total;
-    const std::vector< double >& prefixSums;
-    std::size_t idx;
-
-    SplitPointFinder(double total, const std::vector< double >& prefixSums):
-      total(total), prefixSums(prefixSums), idx(0)
-    {}
-
-    bool operator()(const Symbol& symb)
-    {
-      double leftSumFrequency = prefixSums[idx++];
-      return leftSumFrequency >= total / 2;
-    }
-  };
-
   struct SymbolToSymbolMapEntry
   {
     std::pair< char, Symbol > operator()(const Symbol& symbol) const
@@ -167,9 +150,7 @@ namespace
   int encodeBitMaskToDestination(const std::string& bitMask,
                                  std::string& destination)
   {
-    int decimalSum = 0;
     int bitMaskLength = bitMask.length();
-    int degree = 7;
     std::vector< std::string > bytes;
 
     auto generator = ByteGenerator(bitMask, bitMaskLength);
@@ -232,7 +213,6 @@ namespace voronina
     }
 
     double total = std::accumulate(begin, end + 1, 0.0, FrequencyAccumulator{});
-    double leftSumFrequency = begin->frequency;
 
     std::vector< double > frequencies(std::distance(begin, end) + 1);
     std::transform(begin, end + 1, frequencies.begin(),
@@ -242,8 +222,9 @@ namespace voronina
     std::partial_sum(frequencies.begin(), frequencies.end(),
                      prefixSums.begin());
 
-    auto splitIterator =
-        std::find_if(begin, end, SplitPointFinder(total, prefixSums));
+    auto greaterThanTotal = std::bind(std::greater_equal<double>{}, std::placeholders::_1, total / 2);
+    auto prefixSumsSplitIterator = std::find_if(prefixSums.begin(), prefixSums.end(), greaterThanTotal);
+    auto splitIterator = begin + std::distance(prefixSums.begin(), prefixSumsSplitIterator);
     std::transform(begin, splitIterator + 1, begin, appendZero);
     std::transform(splitIterator + 1, end + 1, splitIterator + 1, appendOne);
 

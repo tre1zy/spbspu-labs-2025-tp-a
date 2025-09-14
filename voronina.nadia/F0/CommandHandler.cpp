@@ -12,7 +12,7 @@ namespace voronina
     cmds_["DECODE"] = std::bind(decode, std::cref(vectorOfTables_), _1, _2);
     cmds_["PRINTINFO"] = std::bind(printInfo, std::cref(vectorOfTables_), _1, _2);
     cmds_["COMPARE"] = std::bind(compare, std::cref(vectorOfTables_), _1, _2);
-    cmds_["ENTROPY"] = std::bind(entropy, std::cref(vectorOfTables_), _1, _2);
+    cmds_["ENTROPY"] = std::bind(entropy, _1, _2);
     cmds_["ORIGIN"] = std::bind(origin, std::cref(vectorOfTables_), _1, _2);
     cmds_["LISTCODES"] = std::bind(listCodes, std::cref(vectorOfTables_), _1, _2);
     cmds_["CODESINFO"] = std::bind(codesInfo, std::cref(vectorOfTables_), _1, _2);

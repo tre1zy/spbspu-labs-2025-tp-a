@@ -290,13 +290,6 @@ namespace
 
   std::string Visualizer::operator()(const Entry& entry)
   {
-    auto begin1 = prevCodeRef.begin();
-    auto begin2 = entry.code.begin();
-    auto end1 = prevCodeRef.end();
-    auto end2 = entry.code.end();
-    auto mismatch_pair = std::mismatch(begin1, end1, begin2, end2);
-    size_t common = std::distance(prevCodeRef.begin(), mismatch_pair.first);
-
     std::vector< std::string > lines(entry.code.size());
     CodeBitVisualizer bitViz(entry.code);
     std::generate_n(lines.begin(), entry.code.size(), bitViz);
@@ -495,7 +488,7 @@ namespace voronina
     std::copy(results.begin(), results.end(), OutputIterator(out, "\n"));
   }
 
-  void entropy(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out)
+  void entropy(std::istream& in, std::ostream& out)
   {
     iofmtguard inguard{ in };
     iofmtguard outguard{ out };

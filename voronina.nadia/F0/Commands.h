@@ -13,7 +13,7 @@ namespace voronina
   void decode(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
   void printInfo(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
   void compare(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
-  void entropy(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
+  void entropy(std::istream& in, std::ostream& out);
   void origin(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
   void listCodes(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
   void codesInfo(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out);
