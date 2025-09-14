@@ -167,7 +167,7 @@ namespace shiryaeva
     FormatGuard guard(out);
     Polygon polygon;
     in >> polygon;
-    if (!in || polygon.points.size() < 3 || !HasDuplicates(polygon))
+    if (!in || polygon.points.size() < 3)
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
