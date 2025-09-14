@@ -157,9 +157,8 @@ namespace
 
     Symbol operator()(Symbol symbol) const
     {
-      symbol.frequency =
-          static_cast< double >(std::count(text.begin(), text.end(), symbol.symbol)) /
-          text.length();
+      auto count = std::count(text.begin(), text.end(), symbol.symbol);
+      symbol.frequency = static_cast< double >(count) / text.length();
       return symbol;
     }
   };
@@ -327,7 +326,8 @@ namespace voronina
   std::ostream& operator<<(std::ostream& out, const ShannonFanoTable& table)
   {
     iofmtguard ofmtguard(out);
-    std::cout << std::left << std::setw(10) << "Symbol" << std::setw(10) << "Frequency" << "Code\n";
+    std::cout << std::left << std::setw(10) << "Symbol" << std::setw(10);
+    std::cout << "Frequency" << "Code\n";
     std::copy(std::begin(table.symbols_), std::end(table.symbols_),
               std::ostream_iterator< Symbol >(out, "\n"));
     return out;
