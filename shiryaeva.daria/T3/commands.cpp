@@ -66,11 +66,11 @@ namespace shiryaeva
       std::function< bool(const Polygon&) > pred = std::bind(hasVertexCount, std::placeholders::_1, n);
       std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
     }
-      else
-      {
-        throw std::logic_error("<INVALID COMMAND>");
-      }
-      out << std::fixed << std::setprecision(1) << getTotalArea(filtered);
+    else
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    out << std::fixed << std::setprecision(1) << getTotalArea(filtered);
   }
 
   void max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
@@ -78,7 +78,7 @@ namespace shiryaeva
     FormatGuard guard(out);
     std::string subcmd;
     in >> subcmd;
-        
+
     if (polygons.empty())
     {
       throw std::logic_error("<INVALID COMMAND>");
@@ -95,10 +95,10 @@ namespace shiryaeva
       auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByVertexes);
       out << maxIt->points.size();
     }
-      else
-      {
-        throw std::logic_error("<INVALID COMMAND>");
-      }
+    else
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
   }
 
   void min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
