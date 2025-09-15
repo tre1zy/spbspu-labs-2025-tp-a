@@ -1,7 +1,6 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
-#include <cstddef>
 #include <fstream>
 #include <limits>
 #include <map>
@@ -45,7 +44,7 @@ int main(int argc, char** argv)
     {
       commands.at(command)();
     }
-    catch (...)
+    catch (const std::exception&)
     {
       if (std::cin.fail())
       {

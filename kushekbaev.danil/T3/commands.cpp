@@ -11,7 +11,6 @@
 
 namespace
 {
-  constexpr size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
   struct PredicateForVertices
   {
     size_t count;
@@ -105,14 +104,6 @@ namespace
     return std::abs(total) / 2.0;
   }
 
-  struct PolygonToAreaTransformer
-  {
-    double operator()(const kushekbaev::Polygon& polygon) const
-    {
-      return getArea(polygon);
-    }
-  };
-
   bool hasRightAngle(const kushekbaev::Polygon& polygon)
   {
     if (polygon.points.size() < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
@@ -144,11 +135,11 @@ namespace
     return !isEven(polygon);
   }
 
-  double totalArea(const std::vector< kushekbaev::Polygon >& polygons)
+  double calculateTotalArea(const std::vector< kushekbaev::Polygon >& polygons)
   {
     std::vector< double > areas;
     areas.reserve(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), PolygonToAreaTransformer());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea());
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
@@ -158,11 +149,11 @@ namespace
   }
 
   template< typename Predicate >
-  double totalAreaWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, Predicate predicate)
+  double calculateTotalAreaWithPredicate(const std::vector< kushekbaev::Polygon >& polygons, Predicate predicate)
   {
     std::vector< kushekbaev::Polygon > predicated;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(predicated), predicate);
-    return totalArea(predicated);
+    return calculateTotalArea(predicated);
   }
 
   bool compareArea(const kushekbaev::Polygon& polygon1, const kushekbaev::Polygon& polygon2)
@@ -179,14 +170,14 @@ namespace
   {
     std::vector< kushekbaev::Polygon > evenPolygons;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(evenPolygons), PredicateForEvenPolygons());
-    return totalArea(evenPolygons);
+    return calculateTotalArea(evenPolygons);
   }
 
   double areaOdd(const std::vector< kushekbaev::Polygon >& polygons)
   {
     std::vector< kushekbaev::Polygon > oddPolygons;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(oddPolygons), PredicateForOddPolygons());
-    return totalArea(oddPolygons);
+    return calculateTotalArea(oddPolygons);
   }
 
   double areaMean(const std::vector< kushekbaev::Polygon >& polygons)
@@ -195,14 +186,14 @@ namespace
     {
       throw std::logic_error("There are no polygons in vector!");
     }
-    return totalArea(polygons) / polygons.size();
+    return calculateTotalArea(polygons) / polygons.size();
   }
 
   double areaNum(const std::vector< kushekbaev::Polygon >& polygons, size_t num_of_vertices)
   {
     std::vector< kushekbaev::Polygon > filteredPolygons;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), PredicateForVertices{num_of_vertices});
-    return totalArea(filteredPolygons);
+    return calculateTotalArea(filteredPolygons);
   }
 
   void maxArea(const std::vector< kushekbaev::Polygon >& polygons, std::ostream& out)
@@ -276,12 +267,12 @@ void kushekbaev::area(std::istream& in, std::ostream& out, const std::vector< Po
   {
     result = subcommands.at(subcommand)();
   }
-  catch (...)
+  catch (const std::out_of_range&)
   {
     size_t num_of_vertices = std::stoull(subcommand);
     if (num_of_vertices < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
     {
-      throw;
+      throw std::out_of_range("Too few vertices!");
     }
     result = areaNum(polygons, num_of_vertices);
   }

@@ -26,8 +26,7 @@ std::istream& kushekbaev::operator>>(std::istream& in, Polygon& polygon)
     return in;
   }
   StreamGuard s(in);
-  size_t num_of_inputed_vertices = 0;
-  size_t MIN_NUM_OF_VERTICES_IN_POLYGON = 3;
+  constexpr size_t num_of_inputed_vertices = 0;
   if (!(in >> num_of_inputed_vertices) || num_of_inputed_vertices < MIN_NUM_OF_VERTICES_IN_POLYGON)
   {
     in.setstate(std::ios::failbit);

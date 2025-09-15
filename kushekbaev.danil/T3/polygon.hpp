@@ -6,6 +6,8 @@
 
 namespace kushekbaev
 {
+  constexpr size_t MIN_NUMBER_OF_VERTICES_IN_POLYGON = 3;
+
   struct Point
   {
     int x, y;
