@@ -69,7 +69,7 @@ std::istream& holodilov::operator>>(std::istream& is, Polygon& polygon)
   Polygon polygonTemp;
   using istreamIter = std::istream_iterator< Point >;
   std::copy_n(istreamIter(is), amountPoints, std::back_inserter(polygonTemp.points));
-  if (polygonTemp.points.size() != amountPoints)
+  if ((polygonTemp.points.size() != amountPoints) || (polygonTemp.points.size() < 3))
   {
     is.setstate(std::ios::failbit);
   }

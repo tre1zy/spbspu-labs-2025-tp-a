@@ -11,8 +11,6 @@ using VecPolygons = std::vector< holodilov::Polygon >;
 
 bool compareAreaWithTarget(const holodilov::Polygon& polygon, double targetArea)
 {
-  std::cout << "Target area = " << targetArea << '\n';
-  std::cout << "polygon area = " << polygon.getArea() << "\n";
   return polygon.getArea() < targetArea;
 }
 
@@ -33,7 +31,7 @@ void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPoly
   try
   {
     int amountVertexes = std::stoi(subcommand);
-    if (amountVertexes <= 0)
+    if (amountVertexes < 3)
     {
       throw InvalidCommandException();
     }
