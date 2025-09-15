@@ -5,6 +5,7 @@
 #include <set>
 #include <iterator>
 #include <functional>
+#include <cstddef>
 
 namespace
 {
@@ -33,7 +34,6 @@ namespace
     std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
     return res;
   }
-
   std::pair< std::string, orlova::Translations > intersectListDict(const std::pair< std::string, orlova::Translations >& pair,
     const orlova::Dictionary& intersected)
   {
@@ -90,38 +90,77 @@ void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& di
     return;
   }
 
-  struct WordPairGenerator
+  class WordPairGeneratorIterator
   {
-    std::istream& file;
-    bool end_of_file;
-    WordPairGenerator(std::istream& f) :
-      file(f),
-      end_of_file(false)
+  public:
+    using value_type = std::pair< std::string, std::list< std::string > >;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const value_type*;
+    using reference = const value_type&;
+    using iterator_category = std::input_iterator_tag;
+
+    WordPairGeneratorIterator():
+      file(nullptr),
+      end(true)
     {}
-    std::pair< std::string, std::string > operator()()
+
+    WordPairGeneratorIterator(std::istream& f):
+      file(&f),
+      end(false)
     {
-      if (end_of_file)
+      ++(*this);
+    }
+
+    WordPairGeneratorIterator& operator++()
+    {
+      value = value_type();
+      std::string englishWord;
+      if (*file >> englishWord)
       {
-        return { "", "" };
-      }
-      std::string englishWord, russianWord;
-      if (file >> englishWord >> russianWord)
-      {
-        return std::make_pair(englishWord, russianWord);
+        std::list< std::string > russianWords;
+        std::string word;
+        std::istream_iterator< std::string > it(*file), eof;
+        std::copy(it, eof, std::back_inserter(russianWords));
+        value = std::make_pair(englishWord, russianWords);
       }
       else
       {
-        end_of_file = true;
-        return { "", "" };
+        end = true;
       }
+      return *this;
     }
+
+    const value_type& operator*() const
+    {
+      return value;
+    }
+
+    explicit operator bool() const
+    {
+      return !end;
+    }
+
+    bool operator==(const WordPairGeneratorIterator& other) const
+    {
+      return end == other.end;
+    }
+
+    bool operator!=(const WordPairGeneratorIterator& other) const
+    {
+      return !(*this == other);
+    }
+
+  private:
+    std::istream* file = nullptr;
+    value_type value;
+    bool end = true;
   };
 
   Dictionary newDict;
-  /*WordPairGenerator generator(file);
-  std::generate(newDict.begin(), newDict.end(), std::bind(std::ref(generator)));
+  WordPairGeneratorIterator generator(file);
+  std::copy(generator, WordPairGeneratorIterator{}, std::back_inserter(newDict));
   dicts[dictName] = newDict;
-  file.close();*/
+  file.close();
   out << "<DICTIONARY ADDED FROM FILE>\n";
 }
 
@@ -172,7 +211,7 @@ void orlova::merge(std::istream& in, std::ostream& out, Dictionaries& dicts)
   {
     using Pair = std::pair< std::string, std::list < std::string > >;
     Dictionary newDict;
-    DictMerger(const Dictionary& dict) :
+    DictMerger(const Dictionary& dict):
       newDict(dict)
     {}
     Pair operator()(const Pair& pair)
@@ -345,15 +384,15 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
 
   struct DictTransformer
   {
-    using Pair = std::pair< std::string, std::list < std::string > >; // ??????
-    Pair operator()(const Pair& p) const
+    using Pair = std::pair< std::string, std::list < std::string > >;
+    std::string operator()(const Pair& p) const
     {
       return p.first;
     }
   };
 
   std::set< std::string > keys1, keys2, unique_keys;
-  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.end()), DictTransformer{}); //copy
+  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.end()), DictTransformer{});
   std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.end()), DictTransformer{});
   std::set_symmetric_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::back_inserter(unique_keys));
   if (unique_keys.empty())
@@ -365,7 +404,16 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
 
   struct PairTransformer
   {
-    using Pair = std::pair< std::string, std::string >;
+    using Pair = std::pair< std::string, std::list < std::string > >;
+    const Dictionary& dict1;
+    const Dictionary& dict2;
+
+    PairTransformer(const Dictionary& d1,
+      const Dictionary& d2):
+      dict1(d1),
+      dict2(d2)
+    {}
+
     Pair operator()(const std::string& key)
     {
       if (dict1.find(key) != dict1.end())
@@ -379,9 +427,10 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
     }
   };
 
-  std::transform(unique_keys.begin(), unique_keys.end(), std::back_inserter(newDict), PairTransformer{});
+  PairTransformer transformer(dict1, dict2);
+  std::transform(unique_keys.begin(), unique_keys.end(), std::back_inserter(newDict), transformer);
   dicts[newDictName] = newDict;
-  out << "<NONREPEATING WORDS COLLECTED>";
+  out << "<NONREPEATING WORDS COLLECTED>\n";
 }
 
 void orlova::residual(std::istream& in, std::ostream& out, Dictionaries& dicts)
@@ -412,15 +461,19 @@ void orlova::residual(std::istream& in, std::ostream& out, Dictionaries& dicts)
 
   struct ResidualTransform
   {
-    using Pair = std::pair< std::string, std::string >;
+    const Dictionary& dict1;
+    ResidualTransform(const Dictionary& d1):
+      dict1(d1)
+    {}
+    using Pair = std::pair< std::string, std::list < std::string > >;
     Pair operator()(const std::string& key) const
     {
       return std::make_pair(key, dict1.at(key));
     }
   };
 
-  std::transform(difference.begin(), difference.end(), std::back_inserter(newDict), ResidualTransform{});
+  ResidualTransform transformer(dict1);
+  std::transform(difference.begin(), difference.end(), std::back_inserter(newDict), transformer);
   dicts[newDictName] = newDict;
   out << "<RESIDUAL DICTIONARY CREATED>\n";
 }
-
