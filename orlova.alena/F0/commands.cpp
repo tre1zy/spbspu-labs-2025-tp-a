@@ -75,7 +75,6 @@ namespace
       if (*file >> englishWord)
       {
         std::list< std::string > russianWords;
-        std::string word;
         std::istream_iterator< std::string > it(*file), eof;
         std::copy(it, eof, std::back_inserter(russianWords));
         value = std::make_pair(englishWord, russianWords);
@@ -120,7 +119,7 @@ namespace
 
   struct DictMerger
   {
-    using Pair = std::pair< std::string, std::list < std::string > >;
+    using Pair = std::pair< std::string, std::list< std::string > >;
     orlova::Dictionary newDict;
     DictMerger(const orlova::Dictionary& dict):
       newDict(dict)
@@ -149,7 +148,7 @@ namespace
     }
   };
 
-  struct DictTransformer
+  struct KeyExtractor
   {
     using Pair = std::pair< std::string, std::list < std::string > >;
     std::string operator()(const Pair& p) const
@@ -160,7 +159,7 @@ namespace
 
   struct PairTransformer
   {
-    using Pair = std::pair< std::string, std::list < std::string > >;
+    using Pair = std::pair< std::string, std::list< std::string > >;
     const orlova::Dictionary& dict1;
     const orlova::Dictionary& dict2;
 
@@ -180,19 +179,6 @@ namespace
       {
         return { key, dict2.at(key) };
       }
-    }
-  };
-
-  struct ResidualTransform
-  {
-    const orlova::Dictionary& dict1;
-    ResidualTransform(const orlova::Dictionary& d1):
-      dict1(d1)
-    {}
-    using Pair = std::pair< std::string, std::list < std::string > >;
-    Pair operator()(const std::string& key) const
-    {
-      return std::make_pair(key, dict1.at(key));
     }
   };
 }
@@ -221,17 +207,18 @@ void orlova::addEmptyDictionary(std::istream& in, std::ostream& out, Dictionarie
 
 void orlova::addTranslation(std::istream& in, std::ostream& out, Dictionaries& dicts)
 {
-  std::string dictName, englishWord, russianWord;
-  in >> dictName >> englishWord >> russianWord;
+  std::string dictName, englishWord;
+  std::list< std::string > russianWords;
+  in >> dictName >> englishWord;
+  std::istream_iterator< std::string > temp(in), eof;
+  std::copy(temp, eof, std::back_inserter(russianWords));
   auto it = dicts.find(dictName);
-  if (it == dicts.end() || it->second.find(englishWord) != it->second.end())
+  if (!dictionaryExists(dicts, dictName) || it->second.find(englishWord) != it->second.end())
   {
     out << "<INVALID COMMAND>\n";
     return;
   }
-  Translations translation;
-  translation.push_back(russianWord);
-  it->second[englishWord] = translation;
+  it->second[englishWord] = russianWords;
   out << "<TRANSLATION ADDED>\n";
 }
 
@@ -290,10 +277,8 @@ void orlova::merge(std::istream& in, std::ostream& out, Dictionaries& dicts)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto it1 = dicts.find(dictName1);
-  auto& dict1 = it1->second;
-  auto it2 = dicts.find(dictName2);
-  auto& dict2 = it2->second;
+  auto& dict1 = dicts.at(dictName1);
+  auto& dict2 = dicts.at(dictName2);
   if (dict1.empty() && dict2.empty())
   {
     out << "<EMPTY>\n";
@@ -316,8 +301,7 @@ void orlova::clear(std::istream& in, std::ostream& out, Dictionaries& dicts)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto it = dicts.find(dictName);
-  auto& dict = it->second;
+  auto& dict = dicts.at(dictName);
   if (dict.empty())
   {
     out << "<ALREADY EMPTY>\n";
@@ -337,8 +321,7 @@ void orlova::removeWord(std::istream& in, std::ostream& out, Dictionaries& dicts
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto dictIt = dicts.find(dictName);
-  auto& dict = dictIt->second;
+  auto& dict = dicts.at(dictName);
   auto it = dict.find(englishWord);
   if (it == dict.end())
   {
@@ -360,8 +343,7 @@ void orlova::append(std::istream& in, std::ostream& out, Dictionaries& dicts)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto dictIt = dicts.find(dictName);
-  auto& dict = dictIt->second;
+  auto& dict = dicts.at(dictName);
   auto it = dict.find(englishWord);
   if (it == dict.end())
   {
@@ -406,10 +388,8 @@ void orlova::intersectionOfDicts(std::istream& in, std::ostream& out, Dictionari
     return;
   }
   Dictionary temp, newDict;
-  auto d_first = std::inserter(temp, temp.end());
-  std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), d_first, CompareKeys{});
-  d_first = std::inserter(newDict, newDict.end());
-  std::transform(temp.begin(), temp.end(), d_first, std::bind(intersectListDict, _1, dict2));
+  std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), std::inserter(temp, temp.end()), CompareKeys{});
+  std::transform(temp.begin(), temp.end(), std::inserter(newDict, newDict.end()), std::bind(intersectListDict, _1, dict2));
   dicts[newDictName] = newDict;
   out << "<SUCCESSFULLY INTERSECTED>";
 }
@@ -440,13 +420,11 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto it1 = dicts.find(dictName1);
-  auto it2 = dicts.find(dictName2);
-  const auto& dict1 = it1->second;
-  const auto& dict2 = it2->second;
-  std::set< std::string > keys1, keys2, unique_keys;
-  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.begin()), DictTransformer{});
-  std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.begin()), DictTransformer{});
+  const auto& dict1 = dicts.at(dictName1);
+  const auto& dict2 = dicts.at(dictName2);
+  std::list< std::string > keys1, keys2, unique_keys;
+  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.begin()), KeyExtractor{});
+  std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.begin()), KeyExtractor{});
   std::set_symmetric_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::inserter(unique_keys, unique_keys.begin()));
   if (unique_keys.empty())
   {
@@ -471,22 +449,20 @@ void orlova::residual(std::istream& in, std::ostream& out, Dictionaries& dicts)
     out << "<INVALID COMMAND>\n";
     return;
   }
-  auto it1 = dicts.find(dictName1);
-  auto it2 = dicts.find(dictName2);
-  const auto& dict1 = it1->second;
-  const auto& dict2 = it2->second;
-  std::set< std::string > keys1, keys2, difference;
-  std::copy(dict1.begin(), dict1.end(), std::back_inserter(keys1));
-  std::copy(dict2.begin(), dict2.end(), std::back_inserter(keys2));
-  std::set_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::back_inserter(difference));
+  const auto& dict1 = dicts.at(dictName1);
+  const auto& dict2 = dicts.at(dictName2);
+  std::list< std::string > keys1, keys2, difference;
+  std::transform(dict1.begin(), dict1.end(), keys1.begin(), KeyExtractor{});
+  std::transform(dict2.begin(), dict2.end(), keys2.begin(), KeyExtractor{});
+  std::set_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), difference.begin());
   if (difference.empty())
   {
     out << "<DICTIONARIES ARE SIMILAR>\n";
     return;
   }
   Dictionary newDict;
-  ResidualTransform transformer(dict1);
-  std::transform(difference.begin(), difference.end(), std::inserter(newDict, newDict.begin()), transformer);
+  PairTransformer transformer(dict1, dict2);
+  std::transform(difference.begin(), difference.end(), newDict.begin(), transformer);
   dicts[newDictName] = newDict;
   out << "<RESIDUAL DICTIONARY CREATED>\n";
 }
