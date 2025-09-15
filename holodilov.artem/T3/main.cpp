@@ -5,7 +5,7 @@
 #include <functional>
 #include <map>
 #include "polygon.hpp"
-#include "commandHandling.hpp"
+#include "commands.hpp"
 #include "exceptions.hpp"
 
 int main(int argc, char** argv)
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
   using istreamIter = std::istream_iterator< Polygon >;
   std::vector< Polygon > vecPolygons;
-  while (!fis.eof())
+;  while (!fis.eof())
   {
     std::copy(istreamIter(fis), istreamIter(), std::back_inserter(vecPolygons));
     if (!fis)
@@ -39,16 +39,20 @@ int main(int argc, char** argv)
   }
   fis.close();
 
-  std::map< std::string, std::function< void() > > mapCommands;
-  mapCommands["ECHO"] = std::bind(commands::echo, std::ref(std::cin), std::ref(std::cout), std::ref(vecPolygons));
-  mapCommands["LESSAREA"] = std::bind(commands::lessArea, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
-  while (!std::cin.eof())
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(commands::area, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
+  cmds["MIN"] = std::bind(commands::min, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
+  cmds["MAX"] = std::bind(commands::max, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
+  cmds["COUNT"] = std::bind(commands::count, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
+  cmds["ECHO"] = std::bind(commands::echo, std::ref(std::cin), std::ref(std::cout), std::ref(vecPolygons));
+  cmds["LESSAREA"] = std::bind(commands::lessArea, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
+
+  std::string commandName;
+  while (!(std::cin >> commandName).eof())
   {
-    std::string commandName;
-    std::cin >> commandName;
     try
     {
-      mapCommands.at(commandName)();
+      cmds.at(commandName)();
     }
     catch (const std::out_of_range& e)
     {
@@ -63,7 +67,7 @@ int main(int argc, char** argv)
 
     if (!std::cin)
     {
-      std::cin.clear();
+      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
