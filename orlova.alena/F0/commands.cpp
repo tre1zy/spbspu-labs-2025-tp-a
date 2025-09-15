@@ -111,6 +111,10 @@ void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& di
       ++(*this);
     }
 
+    WordPairGeneratorIterator(const WordPairGeneratorIterator& other) = default;
+
+    WordPairGeneratorIterator& operator=(const WordPairGeneratorIterator& other) = default;
+
     WordPairGeneratorIterator& operator++()
     {
       value = value_type();
@@ -130,9 +134,14 @@ void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& di
       return *this;
     }
 
-    const value_type& operator*() const
+    reference operator*() const
     {
       return value;
+    }
+
+    pointer operator->() const
+    {
+      return &value;
     }
 
     explicit operator bool() const
@@ -211,7 +220,7 @@ void orlova::merge(std::istream& in, std::ostream& out, Dictionaries& dicts)
   {
     using Pair = std::pair< std::string, std::list < std::string > >;
     Dictionary newDict;
-    DictMerger(const Dictionary& dict):
+    DictMerger(const Dictionary& dict) :
       newDict(dict)
     {}
     Pair operator()(const Pair& pair)
