@@ -198,7 +198,8 @@ namespace
 }
 
 template<>
-struct std::iterator_traits<WordPairGeneratorIterator> {
+struct std::iterator_traits< WordPairGeneratorIterator >
+{
   using value_type = WordPairGeneratorIterator::value_type;
   using pointer = WordPairGeneratorIterator::pointer;
   using reference = WordPairGeneratorIterator::reference;
@@ -252,7 +253,7 @@ void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& di
   }
   Dictionary newDict;
   WordPairGeneratorIterator generator(file);
-  std::copy(generator, WordPairGeneratorIterator{}, std::back_inserter(newDict));
+  std::copy(generator, WordPairGeneratorIterator{}, std::inserter(newDict, newDict.begin()));
   dicts[dictName] = newDict;
   file.close();
   out << "<DICTIONARY ADDED FROM FILE>\n";
@@ -299,7 +300,7 @@ void orlova::merge(std::istream& in, std::ostream& out, Dictionaries& dicts)
     return;
   }
   Dictionary newDict;
-  std::copy(dict1.begin(), dict1.end(), std::back_inserter(newDict));
+  std::copy(dict1.begin(), dict1.end(), std::inserter(newDict, newDict.begin()));
   DictMerger merger(newDict);
   std::transform(dict2.begin(), dict2.end(), std::inserter(newDict, newDict.end()), merger);
   dicts[newDictName] = newDict;
@@ -444,9 +445,9 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
   const auto& dict1 = it1->second;
   const auto& dict2 = it2->second;
   std::set< std::string > keys1, keys2, unique_keys;
-  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.end()), DictTransformer{});
-  std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.end()), DictTransformer{});
-  std::set_symmetric_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::back_inserter(unique_keys));
+  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.begin()), DictTransformer{});
+  std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.begin()), DictTransformer{});
+  std::set_symmetric_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::inserter(unique_keys, unique_keys.begin()));
   if (unique_keys.empty())
   {
     out << "<DICTIONARIES ARE SIMILAR>\n";
