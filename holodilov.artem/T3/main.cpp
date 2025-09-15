@@ -6,7 +6,6 @@
 #include <map>
 #include "polygon.hpp"
 #include "commands.hpp"
-#include "exceptions.hpp"
 
 int main(int argc, char** argv)
 {
@@ -48,26 +47,20 @@ int main(int argc, char** argv)
   cmds["LESSAREA"] = std::bind(commands::lessArea, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
 
   std::string commandName;
-  while (!(std::cin >> commandName).eof())
+  while (!std::cin.eof())
   {
+    std::cin >> commandName;
     try
     {
       cmds.at(commandName)();
     }
-    catch (const std::out_of_range& e)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      continue;
-    }
-    catch (const InvalidCommandException& e)
-    {
-      std::cout << e.what();
-    }
-
-    if (!std::cin)
-    {
-      std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      if (std::cin.fail())
+      {
+        std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
+      }
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }

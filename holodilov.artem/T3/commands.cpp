@@ -3,7 +3,6 @@
 #include <functional>
 #include <map>
 #include <numeric>
-#include "exceptions.hpp"
 #include "polygon.hpp"
 #include "subcommands.hpp"
 
@@ -33,7 +32,7 @@ void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPoly
     int amountVertexes = std::stoi(subcommand);
     if (amountVertexes < 3)
     {
-      throw InvalidCommandException();
+      throw std::logic_error("Error: vertexes amount must be >= 3.\n");
     }
     subcommands::areaAmount(os, vecPolygons, amountVertexes);
   }
@@ -43,53 +42,40 @@ void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPoly
     cmds["EVEN"] = std::bind(subcommands::areaEven, std::ref(os), std::cref(vecPolygons));
     cmds["ODD"] = std::bind(subcommands::areaOdd, std::ref(os), std::cref(vecPolygons));
     cmds["MEAN"] = std::bind(subcommands::areaMean, std::ref(os), std::cref(vecPolygons));
-    try
-    {
-      cmds.at(subcommand)();
-    }
-    catch (const std::out_of_range& e)
-    {
-      throw InvalidCommandException();
-    }
+    cmds.at(subcommand)();
   }
 }
 
 void holodilov::commands::min(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
 {
+  if (vecPolygons.empty())
+  {
+    throw std::logic_error("Error: no polygons to handle.\n");
+  }
+
   std::string subcommand;
   is >> subcommand;
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(subcommands::minArea, std::ref(os), std::cref(vecPolygons));
   cmds["VERTEXES"] = std::bind(subcommands::minVertexes, std::ref(os), std::cref(vecPolygons));
-
-  try
-  {
-    cmds.at(subcommand)();
-  }
-  catch (const std::out_of_range& e)
-  {
-    throw InvalidCommandException();
-  }
+  cmds.at(subcommand)();
 }
 
 void holodilov::commands::max(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
 {
+  if (vecPolygons.empty())
+  {
+    throw std::logic_error("Error: no polygons to handle.\n");
+  }
+
   std::string subcommand;
   is >> subcommand;
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["AREA"] = std::bind(subcommands::maxArea, std::ref(os), std::cref(vecPolygons));
   cmds["VERTEXES"] = std::bind(subcommands::maxVertexes, std::ref(os), std::cref(vecPolygons));
-
-  try
-  {
-    cmds.at(subcommand)();
-  }
-  catch (const std::out_of_range& e)
-  {
-    throw InvalidCommandException();
-  }
+  cmds.at(subcommand)();
 }
 
 void holodilov::commands::count(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
@@ -99,9 +85,9 @@ void holodilov::commands::count(std::istream& is, std::ostream& os, const VecPol
   try
   {
     int amountVertexes = std::stoi(subcommand);
-    if (amountVertexes <= 0)
+    if (amountVertexes < 3)
     {
-      throw InvalidCommandException();
+      throw std::logic_error("Error: vertexes amount must be >= 3.\n");
     }
     subcommands::countAmount(os, vecPolygons, amountVertexes);
   }
@@ -110,14 +96,7 @@ void holodilov::commands::count(std::istream& is, std::ostream& os, const VecPol
     std::map< std::string, std::function< void() > > cmds;
     cmds["EVEN"] = std::bind(subcommands::countEven, std::ref(os), std::cref(vecPolygons));
     cmds["ODD"] = std::bind(subcommands::countOdd, std::ref(os), std::cref(vecPolygons));
-    try
-    {
-      cmds.at(subcommand)();
-    }
-    catch (const std::out_of_range& e)
-    {
-      throw InvalidCommandException();
-    }
+    cmds.at(subcommand)();
   }
 }
 
@@ -127,7 +106,7 @@ void holodilov::commands::echo(std::istream& is, std::ostream& os, VecPolygons& 
   is >> targetPolygon;
   if (!is || is.peek() != '\n')
   {
-    throw InvalidCommandException();
+    throw std::logic_error("Error: invalid polygon argument.\n");
   }
 
   const size_t amountDuplicates = std::count(vecPolygons.begin(), vecPolygons.end(), targetPolygon);
@@ -143,7 +122,7 @@ void holodilov::commands::lessArea(std::istream& is, std::ostream& os, const Vec
   is >> targetPolygon;
   if (!is || is.peek() != '\n')
   {
-    throw InvalidCommandException();
+    throw std::logic_error("Error: invalid polygon argument.\n");
   }
 
   auto areaComparator = std::bind(compareAreaWithTarget, std::placeholders::_1, targetPolygon.getArea());

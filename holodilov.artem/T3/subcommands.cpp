@@ -3,8 +3,6 @@
 #include <functional>
 #include <iomanip>
 #include <numeric>
-
-#include "exceptions.hpp"
 #include "ScopeGuard.hpp"
 #include "polygon.hpp"
 
@@ -136,7 +134,7 @@ void areaMean(std::ostream& os, const VecPolygons& vecPolygons)
 {
   if (vecPolygons.empty())
   {
-    throw InvalidCommandException();
+    throw std::logic_error("Error: no polygons to handle.\n");
   }
 
   ScopeGuard scopeGuard(os);
