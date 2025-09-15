@@ -4,6 +4,7 @@
 #include <iostream>
 #include <limits>
 #include "datastruct.hpp"
+#include "../common/delimiter.hpp"
 
 int main()
 {
