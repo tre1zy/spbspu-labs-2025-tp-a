@@ -169,7 +169,7 @@ namespace
       dict2(d2)
     {}
 
-    Pair operator()(const std::string& key)
+    Pair operator()(std::string& key)
     {
       if (dict1.find(key) != dict1.end())
       {
@@ -179,6 +179,19 @@ namespace
       {
         return { key, dict2.at(key) };
       }
+    }
+  };
+
+  struct ResidualTransform
+  {
+    const orlova::Dictionary& dict1;
+    ResidualTransform(const orlova::Dictionary& d1):
+      dict1(d1)
+    {}
+    using Pair = std::pair< std::string, std::list< std::string > >;
+    Pair operator()(std::string& key) const
+    {
+      return std::make_pair(key, dict1.at(key));
     }
   };
 }
@@ -452,17 +465,17 @@ void orlova::residual(std::istream& in, std::ostream& out, Dictionaries& dicts)
   const auto& dict1 = dicts.at(dictName1);
   const auto& dict2 = dicts.at(dictName2);
   std::list< std::string > keys1, keys2, difference;
-  std::transform(dict1.begin(), dict1.end(), keys1.begin(), KeyExtractor{});
-  std::transform(dict2.begin(), dict2.end(), keys2.begin(), KeyExtractor{});
-  std::set_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), difference.begin());
+  std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.begin()), KeyExtractor{});
+  std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.begin()), KeyExtractor{});
+  std::set_difference(keys1.begin(), keys1.end(), keys2.begin(), keys2.end(), std::inserter(difference, difference.begin()));
   if (difference.empty())
   {
     out << "<DICTIONARIES ARE SIMILAR>\n";
     return;
   }
   Dictionary newDict;
-  PairTransformer transformer(dict1, dict2);
-  std::transform(difference.begin(), difference.end(), newDict.begin(), transformer);
+  ResidualTransform transformer(dict1);
+  std::transform(difference.begin(), difference.end(), std::inserter(newDict, newDict.begin()), transformer);
   dicts[newDictName] = newDict;
   out << "<RESIDUAL DICTIONARY CREATED>\n";
 }
