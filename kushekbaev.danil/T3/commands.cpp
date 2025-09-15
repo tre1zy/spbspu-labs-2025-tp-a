@@ -309,7 +309,7 @@ void kushekbaev::count(std::istream& in, std::ostream& out, const std::vector< P
   {
     subcommands.at(subcommand)();
   }
-  catch (...)
+  catch (const std::out_of_range&)
   {
     size_t num_of_vertices = std::stoull(subcommand);
     if (num_of_vertices < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
