@@ -1,10 +1,21 @@
 #include "music-io-utils.hpp"
 #include <cassert>
 #include <iostream>
+#include <iterator>
+#include <algorithm>
 #include <stream-guard.hpp>
 
 namespace
 {
+  template< class Key, class Value >
+  struct ValueReturner
+  {
+    const Value& operator()(const std::pair< Key, Value >& pair) const
+    {
+      return pair.second;
+    }
+  };
+
   bool isCorrectLetter(char l) noexcept
   {
     return 'A' <= l && l <= 'H';
@@ -111,6 +122,33 @@ std::istream& aleksandrov::operator>>(std::istream& in, Interval& interval)
   return in;
 }
 
+std::istream& aleksandrov::operator>>(std::istream& in, Chord& chord)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  Chord temp;
+  Note note;
+  do
+  {
+    in >> note;
+    if (!in)
+    {
+      break;
+    }
+    temp.notes.emplace(note.toString(), note);
+  }
+  while (in.peek() == '-' && in.get());
+
+  if (in)
+  {
+    chord = std::move(temp);
+  }
+  return in;
+}
+
 std::istream& aleksandrov::operator>>(std::istream& in, MusicalElement& element)
 {
   std::istream::sentry sentry(in);
@@ -118,23 +156,29 @@ std::istream& aleksandrov::operator>>(std::istream& in, MusicalElement& element)
   {
     return in;
   }
-  Note temp;
+  Chord temp;
   in >> temp;
-  if (in && in.peek() == '-')
+
+  if (in || !temp.notes.empty())
   {
-    in.get();
-    Note yaTemp;
-    if (in >> yaTemp)
+    if (temp.notes.size() == 1)
     {
-      Interval interval{ temp, yaTemp };
-      MusicalElement el(interval);
-      element = std::move(el);
+      element = MusicalElement(temp.notes.begin()->second);
+    }
+    else if (temp.notes.size() == 2)
+    {
+      Note first = temp.notes.begin()->second;
+      Note second = temp.notes.rbegin()->second;
+      element = MusicalElement(Interval{ first, second });
+    }
+    else
+    {
+      element = MusicalElement(temp);
     }
   }
   else
   {
-    MusicalElement el(temp);
-    element = std::move(el);
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
@@ -142,19 +186,22 @@ std::istream& aleksandrov::operator>>(std::istream& in, MusicalElement& element)
 std::ostream& aleksandrov::operator<<(std::ostream& out, const Note& note)
 {
   StreamGuard guard(out);
-  out << note.letter;
-  if (note.accidental != '\0')
-  {
-    out << note.accidental;
-  }
-  out << note.pitch;
-  return out;
+  return out << note.toString();
 }
 
 std::ostream& aleksandrov::operator<<(std::ostream& out, const Interval& interval)
 {
   StreamGuard guard(out);
   return out << interval.first << '-' << interval.second;
+}
+
+std::ostream& aleksandrov::operator<<(std::ostream& out, const Chord& chord)
+{
+  const auto& notes = chord.notes;
+  std::ostream_iterator< Note > outIt(out, "-");
+  ValueReturner< std::string, Note > returner;
+  std::transform(notes.begin(), std::prev(notes.end()), outIt, returner);
+  return out << notes.rbegin()->second;
 }
 
 std::ostream& aleksandrov::operator<<(std::ostream& out, const MusicalElement& element)
@@ -164,8 +211,10 @@ std::ostream& aleksandrov::operator<<(std::ostream& out, const MusicalElement& e
   {
   case MusicalElementType::Note:
     return out << element.note();
-  default:
+  case MusicalElementType::Interval:
     return out << element.interval();
+  default:
+    return out << element.chord();
   }
   assert(false && "Unsupported musical element!");
   return out;

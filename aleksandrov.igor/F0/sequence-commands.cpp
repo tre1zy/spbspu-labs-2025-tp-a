@@ -17,7 +17,7 @@ namespace
   template< class Key, class Value >
   struct KeyReturner
   {
-    Key operator()(const std::pair< Key, Value >& pair) const noexcept
+    const Key& operator()(const std::pair< Key, Value >& pair) const
     {
       return pair.first;
     }
