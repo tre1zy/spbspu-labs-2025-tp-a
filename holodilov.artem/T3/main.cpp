@@ -47,9 +47,8 @@ int main(int argc, char** argv)
   cmds["LESSAREA"] = std::bind(commands::lessArea, std::ref(std::cin), std::ref(std::cout), std::cref(vecPolygons));
 
   std::string commandName;
-  while (!std::cin.eof())
+  while (!(std::cin >> commandName).eof())
   {
-    std::cin >> commandName;
     try
     {
       cmds.at(commandName)();
