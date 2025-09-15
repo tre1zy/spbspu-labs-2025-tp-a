@@ -5,7 +5,7 @@
 #include <map>
 #include <numeric>
 #include "geom.h"
-#include "io-guard.h"
+#include <io-guard.h>
 #include "commands.h"
 
 

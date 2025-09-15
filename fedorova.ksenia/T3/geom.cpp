@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <iterator>
 #include "geom.h"
-#include "io-guard.h"
-#include "delimiter.h"
+#include <io-guard.h>
+#include <delimiter.h>
 
 bool fedorova::operator==(const Point& pointOne, const Point& pointTwo)
 {
