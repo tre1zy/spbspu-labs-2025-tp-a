@@ -75,33 +75,58 @@ namespace
     return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
   }
 
-  struct RightAngles
+  struct SideTriangleGenerator
   {
-    const Polygon& polygon;
-    bool operator()(size_t number) const
-    {
-      size_t countVertexes = polygon.points.size();
-      const Point& previous = polygon.points[(number + countVertexes - 1) % countVertexes];
-      const Point& current = polygon.points[number];
-      const Point& next = polygon.points[(number + 1) % countVertexes];
-      double vector1_x = current.x - previous.x;
-      double vector1_y = current.y - previous.y;
-      double vector2_x = next.x - current.x;
-      double vector2_y = next.y - current.y;
-      double scalarProduct = vector1_x * vector2_x + vector1_y * vector2_y;
-      return scalarProduct == 0;
-    }
+    const std::vector< Point >& points;
+    size_t i;
+
+    SideTriangleGenerator(const std::vector< Point >& pts);
+    Polygon operator()();
   };
+
+  TriangleGenerator::TriangleGenerator(const std::vector< Point >& pts):
+    points(pts), i(1)
+  {}
+
+  Polygon TriangleGenerator::operator()()
+  {
+    Polygon triangle;
+    triangle.points = { points[0], points[i], points[i + 1] };
+    ++i;
+    return triangle;
+  }
+
+  SideTriangleGenerator::SideTriangleGenerator(const std::vector< Point >& pts):
+    points(pts), i(1)
+  {}
+
+  Polygon SideTriangleGenerator::operator()()
+  {
+    Polygon triangle;
+    triangle.points = { points[i - 1], points[i], points[i + 1] };
+    ++i;
+    return triangle;
+  }
 
   bool isRightAngle(const Polygon& polygon)
   {
-    if (polygon.points.size() <= 2)
-    {
-      return false;
-    }
-    std::vector< size_t > nums(polygon.points.size());
-    std::iota(nums.begin(), nums.end(), 0);
-    return std::any_of(nums.begin(), nums.end(), RightAngles{ polygon });
+    auto side1 = polygon.points[1] - polygon.points[0];
+    auto side2 = polygon.points[2] - polygon.points[1];
+    return (side1.x * side2.x + side1.y * side2.y) == 0;
+  }
+
+  bool isThereRightAngleInPolygon(const Polygon& shape)
+  {
+    std::vector< Polygon > triangles(shape.points.size() - 2);
+    std::generate(triangles.begin(), triangles.end(), SideTriangleGenerator{ shape.points });
+
+    const auto n = shape.points.size();
+    auto firstPolygon = Polygon{ { shape.points[n - 1], shape.points[0], shape.points[1] } };
+    auto lastPolygon = Polygon{ { shape.points[n - 2], shape.points[n - 1], shape.points[0] } };
+    triangles.push_back(std::move(firstPolygon));
+    triangles.push_back(std::move(lastPolygon));
+
+    return std::any_of(triangles.begin(), triangles.end(), isRightAngle);
   }
 }
 
@@ -138,7 +163,7 @@ void fedorova::area(const std::vector< Polygon >& polygons, std::istream& is, st
   {
     os << subcmds.at(subCommand)(polygons);
   }
-  catch (...)
+  catch (const std::out_of_range&)
   {
     int numOfVer = std::stoull(subCommand);
     if (numOfVer < 3)
@@ -233,7 +258,7 @@ void fedorova::count(const std::vector< Polygon >& polygons, std::istream& is, s
   {
     os << subcmds.at(subCommand)(polygons);
   }
-  catch (...)
+  catch (const std::out_of_range&)
   {
     size_t numOfVer = std::stoull(subCommand);
     if (numOfVer < 3)
@@ -258,6 +283,6 @@ void fedorova::perms(const std::vector< Polygon >& polygons, std::istream& is, s
 
 void fedorova::rightShapes(const std::vector< Polygon >& polygons, std::ostream& os)
 {
-  os << std::count_if(polygons.cbegin(), polygons.cend(), isRightAngle);
+  os << std::count_if(polygons.cbegin(), polygons.cend(), isThereRightAngleInPolygon);
   return;
 }
