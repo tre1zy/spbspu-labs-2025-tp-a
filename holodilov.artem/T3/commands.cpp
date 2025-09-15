@@ -28,12 +28,51 @@ VecPolygons accumulateEcho(VecPolygons vecPolygons, const holodilov::Polygon& po
 
 void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
 {
-
+  std::string subcommand;
+  is >> subcommand;
+  try
+  {
+    int amountVertexes = std::stoi(subcommand);
+    if (amountVertexes <= 0)
+    {
+      throw InvalidCommandException();
+    }
+    subcommands::areaAmount(is, os, vecPolygons, amountVertexes);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    std::map< std::string, std::function< void() > > cmds;
+    cmds["EVEN"] = std::bind(subcommands::areaEven, std::ref(is), std::ref(os), std::cref(vecPolygons));
+    cmds["ODD"] = std::bind(subcommands::areaOdd, std::ref(is), std::ref(os), std::cref(vecPolygons));
+    cmds["MEAN"] = std::bind(subcommands::areaMean, std::ref(is), std::ref(os), std::cref(vecPolygons));
+    try
+    {
+      cmds.at(subcommand)();
+    }
+    catch (const std::out_of_range& e)
+    {
+      throw InvalidCommandException();
+    }
+  }
 }
 
 void holodilov::commands::min(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
 {
+  std::string subcommand;
+  is >> subcommand;
 
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["AREA"] = std::bind(subcommands::minArea, std::ref(is), std::ref(os), std::cref(vecPolygons));
+  cmds["VERTEXES"] = std::bind(subcommands::minVertexes, std::ref(is), std::ref(os), std::cref(vecPolygons));
+
+  try
+  {
+    cmds.at(subcommand)();
+  }
+  catch (const std::out_of_range& e)
+  {
+    throw InvalidCommandException();
+  }
 }
 
 void holodilov::commands::max(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
