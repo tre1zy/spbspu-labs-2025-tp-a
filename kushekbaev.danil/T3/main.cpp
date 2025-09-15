@@ -19,10 +19,10 @@ int main(int argc, char** argv)
 
   std::vector< Polygon > polygons;
   std::ifstream in(argv[1]);
-  while (!in.eof())
+  while (!in.eof() || !in.badbit)
   {
     std::copy(IsItPol(in), IsItPol(), std::back_inserter(polygons));
-    if (!in)
+    if (in.fail())
     {
       in.clear();
       in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

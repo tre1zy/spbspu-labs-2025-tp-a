@@ -97,19 +97,12 @@ namespace
     auto first1 = points.begin();
     auto last1 = std::prev(points.end());
     auto first2 = std::next(points.begin());
-    std::transform(first1, last1, first2, std::back_inserter(partial_areas), AreaCalculator());
-    double last_segment = AreaCalculator()(points.back(), points.front());
+    std::transform(first1, last1, first2, std::back_inserter(partial_areas), AreaCalculator{});
+    double last_segment = AreaCalculator{}(points.back(), points.front());
     partial_areas.push_back(last_segment);
     double total = std::accumulate(partial_areas.begin(), partial_areas.end(), 0.0);
     return std::abs(total) / 2.0;
   }
-  struct PolygonToAreaTransformer
-  {
-    double operator()(const kushekbaev::Polygon& polygon) const
-    {
-      return getArea(polygon);
-    }
-  };
 
   bool hasRightAngle(const kushekbaev::Polygon& polygon)
   {
@@ -117,9 +110,7 @@ namespace
     {
       return false;
     }
-    std::vector< bool > results;
-    std::transform(polygon.points.begin(), polygon.points.end(), std::back_inserter(results), RightAngleChecker(polygon));
-    return std::find(results.begin(), results.end(), true) != results.end();
+    return std::any_of(polygon.points.begin(), polygon.points.end(), RightAngleChecker{ polygon });
   }
 
   bool isCompabitebleByOverlay(const kushekbaev::Polygon collectedPolygon, const kushekbaev::Polygon inputedPolygon)
@@ -146,7 +137,7 @@ namespace
   {
     std::vector< double > areas;
     areas.reserve(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), PolygonToAreaTransformer());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
@@ -176,14 +167,14 @@ namespace
   double areaEven(const std::vector< kushekbaev::Polygon >& polygons)
   {
     std::vector< kushekbaev::Polygon > evenPolygons;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(evenPolygons), PredicateForEvenPolygons());
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(evenPolygons), PredicateForEvenPolygons{});
     return calculateTotalArea(evenPolygons);
   }
 
   double areaOdd(const std::vector< kushekbaev::Polygon >& polygons)
   {
     std::vector< kushekbaev::Polygon > oddPolygons;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(oddPolygons), PredicateForOddPolygons());
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(oddPolygons), PredicateForOddPolygons{});
     return calculateTotalArea(oddPolygons);
   }
 

@@ -48,10 +48,10 @@ std::ostream& kushekbaev::operator<<(std::ostream& out, const Point& point)
 
 std::ostream& kushekbaev::operator<<(std::ostream& out, const Polygon& polygon)
 {
-  out << polygon.points[0];
-  for (size_t i = 1; i < polygon.points.size(); ++i)
+  if (!polygon.points.empty())
   {
-    out << " " << polygon.points[i];
+    out << polygon.points[0];
+    std::copy(std::next(polygon.points.begin()), polygon.points.end(), std::ostream_iterator< Point >(out, " "));
   }
   return out << "\n";
 }
