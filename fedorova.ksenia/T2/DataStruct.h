@@ -39,7 +39,6 @@ namespace fedorova
   };
 
   bool compareDataStruct(const DataStruct& a, const DataStruct& b);
-  //std::istream& operator>>(std::istream& is, DelimiterIO&& dest);
   std::istream& operator>>(std::istream& is, ULLLiteralIO&& dest);
   std::istream& operator>>(std::istream& is, ULLBinaryI&& dest);
   std::istream& operator>>(std::istream& is, StringIO&& dest);
