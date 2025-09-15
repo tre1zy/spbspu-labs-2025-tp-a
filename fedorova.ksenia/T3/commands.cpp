@@ -75,15 +75,6 @@ namespace
     return std::is_permutation(polygon1.points.begin(), polygon1.points.end(), polygon2.points.begin());
   }
 
-  struct TriangleGenerator
-  {
-    const std::vector< Point >& points;
-    size_t i;
-
-    TriangleGenerator(const std::vector< Point >& pts);
-    Polygon operator()();
-  };
-
   struct SideTriangleGenerator
   {
     const std::vector< Point >& points;
@@ -92,18 +83,6 @@ namespace
     SideTriangleGenerator(const std::vector< Point >& pts);
     Polygon operator()();
   };
-
-  TriangleGenerator::TriangleGenerator(const std::vector< Point >& pts):
-    points(pts), i(1)
-  {}
-
-  Polygon TriangleGenerator::operator()()
-  {
-    Polygon triangle;
-    triangle.points = { points[0], points[i], points[i + 1] };
-    ++i;
-    return triangle;
-  }
 
   SideTriangleGenerator::SideTriangleGenerator(const std::vector< Point >& pts):
     points(pts), i(1)
