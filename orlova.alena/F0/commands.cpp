@@ -34,6 +34,7 @@ namespace
     std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
     return res;
   }
+
   std::pair< std::string, orlova::Translations > intersectListDict(const std::pair< std::string, orlova::Translations >& pair,
     const orlova::Dictionary& intersected)
   {
@@ -42,59 +43,11 @@ namespace
     orlova::Translations res = intersectLists(list1, list2);
     return { pair.first, res };
   }
-}
 
-void orlova::addEmptyDictionary(std::istream& in, std::ostream& out, Dictionaries& dicts)
-{
-  std::string name;
-  in >> name;
-  if (!in || dicts.find(name) != dicts.end())
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-  dicts[name] = Dictionary();
-  out << "<DICTIONARY ADDED>\n";
-}
-
-void orlova::addTranslation(std::istream& in, std::ostream& out, Dictionaries& dicts)
-{
-  std::string dictName, englishWord, russianWord;
-  in >> dictName >> englishWord >> russianWord;
-  auto it = dicts.find(dictName);
-  if (it == dicts.end() || it->second.find(englishWord) != it->second.end())
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-  Translations translation;
-  translation.push_back(russianWord);
-  it->second[englishWord] = translation;
-  out << "<TRANSLATION ADDED>\n";
-}
-
-void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& dicts)
-{
-  std::string dictName;
-  std::string fileName;
-  in >> dictName >> fileName;
-  if (dictionaryExists(dicts, dictName))
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-  std::ifstream file(fileName);
-  if (!file.is_open())
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  class WordPairGeneratorIterator
+  struct WordPairGeneratorIterator
   {
   public:
     using value_type = std::pair< std::string, std::list< std::string > >;
-    using difference_type = std::ptrdiff_t;
     using pointer = const value_type*;
     using reference = const value_type&;
     using iterator_category = std::input_iterator_tag;
@@ -165,6 +118,138 @@ void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& di
     bool end = true;
   };
 
+  struct DictMerger
+  {
+    using Pair = std::pair< std::string, std::list < std::string > >;
+    orlova::Dictionary newDict;
+    DictMerger(const orlova::Dictionary& dict):
+      newDict(dict)
+    {}
+    Pair operator()(const Pair& pair)
+    {
+      auto it = newDict.find(pair.first);
+      if (it != newDict.end())
+      {
+        it->second.insert(it->second.end(), pair.second.begin(), pair.second.end());
+        return *it;
+      }
+      else
+      {
+        newDict[pair.first] = pair.second;
+        return pair;
+      }
+    }
+  };
+
+  struct CompareKeys
+  {
+    bool operator()(const std::pair< std::string, orlova::Translations >& pair1, const std::pair< std::string, orlova::Translations >& pair2)
+    {
+      return pair1.first < pair2.first;
+    }
+  };
+
+  struct DictTransformer
+  {
+    using Pair = std::pair< std::string, std::list < std::string > >;
+    std::string operator()(const Pair& p) const
+    {
+      return p.first;
+    }
+  };
+
+  struct PairTransformer
+  {
+    using Pair = std::pair< std::string, std::list < std::string > >;
+    const orlova::Dictionary& dict1;
+    const orlova::Dictionary& dict2;
+
+    PairTransformer(const orlova::Dictionary& d1,
+      const orlova::Dictionary& d2):
+      dict1(d1),
+      dict2(d2)
+    {}
+
+    Pair operator()(const std::string& key)
+    {
+      if (dict1.find(key) != dict1.end())
+      {
+        return { key, dict1.at(key) };
+      }
+      else
+      {
+        return { key, dict2.at(key) };
+      }
+    }
+  };
+
+  struct ResidualTransform
+  {
+    const orlova::Dictionary& dict1;
+    ResidualTransform(const orlova::Dictionary& d1):
+      dict1(d1)
+    {}
+    using Pair = std::pair< std::string, std::list < std::string > >;
+    Pair operator()(const std::string& key) const
+    {
+      return std::make_pair(key, dict1.at(key));
+    }
+  };
+}
+
+template<>
+struct std::iterator_traits<WordPairGeneratorIterator> {
+  using value_type = WordPairGeneratorIterator::value_type;
+  using pointer = WordPairGeneratorIterator::pointer;
+  using reference = WordPairGeneratorIterator::reference;
+  using iterator_category = WordPairGeneratorIterator::iterator_category;
+};
+
+void orlova::addEmptyDictionary(std::istream& in, std::ostream& out, Dictionaries& dicts)
+{
+  std::string name;
+  in >> name;
+  if (!in || dicts.find(name) != dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  dicts[name] = Dictionary();
+  out << "<DICTIONARY ADDED>\n";
+}
+
+void orlova::addTranslation(std::istream& in, std::ostream& out, Dictionaries& dicts)
+{
+  std::string dictName, englishWord, russianWord;
+  in >> dictName >> englishWord >> russianWord;
+  auto it = dicts.find(dictName);
+  if (it == dicts.end() || it->second.find(englishWord) != it->second.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  Translations translation;
+  translation.push_back(russianWord);
+  it->second[englishWord] = translation;
+  out << "<TRANSLATION ADDED>\n";
+}
+
+void orlova::addDictionary(std::istream& in, std::ostream& out, Dictionaries& dicts)
+{
+  std::string dictName;
+  std::string fileName;
+  in >> dictName >> fileName;
+  if (dictionaryExists(dicts, dictName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  std::ifstream file(fileName);
+  if (!file.is_open())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
   Dictionary newDict;
   WordPairGeneratorIterator generator(file);
   std::copy(generator, WordPairGeneratorIterator{}, std::back_inserter(newDict));
@@ -215,30 +300,6 @@ void orlova::merge(std::istream& in, std::ostream& out, Dictionaries& dicts)
   }
   Dictionary newDict;
   std::copy(dict1.begin(), dict1.end(), std::back_inserter(newDict));
-
-  struct DictMerger
-  {
-    using Pair = std::pair< std::string, std::list < std::string > >;
-    Dictionary newDict;
-    DictMerger(const Dictionary& dict) :
-      newDict(dict)
-    {}
-    Pair operator()(const Pair& pair)
-    {
-      auto it = newDict.find(pair.first);
-      if (it != newDict.end())
-      {
-        it->second.insert(it->second.end(), pair.second.begin(), pair.second.end());
-        return *it;
-      }
-      else
-      {
-        newDict[pair.first] = pair.second;
-        return pair;
-      }
-    }
-  };
-
   DictMerger merger(newDict);
   std::transform(dict2.begin(), dict2.end(), std::inserter(newDict, newDict.end()), merger);
   dicts[newDictName] = newDict;
@@ -345,14 +406,6 @@ void orlova::intersectionOfDicts(std::istream& in, std::ostream& out, Dictionari
   }
   Dictionary temp, newDict;
   auto d_first = std::inserter(temp, temp.end());
-
-  struct CompareKeys
-  {
-    bool operator()(const std::pair< std::string, Translations >& pair1, const std::pair< std::string, Translations >& pair2)
-    {
-      return pair1.first < pair2.first;
-    }
-  };
   std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), d_first, CompareKeys{});
   d_first = std::inserter(newDict, newDict.end());
   std::transform(temp.begin(), temp.end(), d_first, std::bind(intersectListDict, _1, dict2));
@@ -390,16 +443,6 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
   auto it2 = dicts.find(dictName2);
   const auto& dict1 = it1->second;
   const auto& dict2 = it2->second;
-
-  struct DictTransformer
-  {
-    using Pair = std::pair< std::string, std::list < std::string > >;
-    std::string operator()(const Pair& p) const
-    {
-      return p.first;
-    }
-  };
-
   std::set< std::string > keys1, keys2, unique_keys;
   std::transform(dict1.begin(), dict1.end(), std::inserter(keys1, keys1.end()), DictTransformer{});
   std::transform(dict2.begin(), dict2.end(), std::inserter(keys2, keys2.end()), DictTransformer{});
@@ -410,34 +453,8 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
     return;
   }
   Dictionary newDict;
-
-  struct PairTransformer
-  {
-    using Pair = std::pair< std::string, std::list < std::string > >;
-    const Dictionary& dict1;
-    const Dictionary& dict2;
-
-    PairTransformer(const Dictionary& d1,
-      const Dictionary& d2):
-      dict1(d1),
-      dict2(d2)
-    {}
-
-    Pair operator()(const std::string& key)
-    {
-      if (dict1.find(key) != dict1.end())
-      {
-        return { key, dict1.at(key) };
-      }
-      else
-      {
-        return { key, dict2.at(key) };
-      }
-    }
-  };
-
   PairTransformer transformer(dict1, dict2);
-  std::transform(unique_keys.begin(), unique_keys.end(), std::back_inserter(newDict), transformer);
+  std::transform(unique_keys.begin(), unique_keys.end(), std::inserter(newDict, newDict.begin()), transformer);
   dicts[newDictName] = newDict;
   out << "<NONREPEATING WORDS COLLECTED>\n";
 }
@@ -467,22 +484,8 @@ void orlova::residual(std::istream& in, std::ostream& out, Dictionaries& dicts)
     return;
   }
   Dictionary newDict;
-
-  struct ResidualTransform
-  {
-    const Dictionary& dict1;
-    ResidualTransform(const Dictionary& d1):
-      dict1(d1)
-    {}
-    using Pair = std::pair< std::string, std::list < std::string > >;
-    Pair operator()(const std::string& key) const
-    {
-      return std::make_pair(key, dict1.at(key));
-    }
-  };
-
   ResidualTransform transformer(dict1);
-  std::transform(difference.begin(), difference.end(), std::back_inserter(newDict), transformer);
+  std::transform(difference.begin(), difference.end(), std::inserter(newDict, newDict.begin()), transformer);
   dicts[newDictName] = newDict;
   out << "<RESIDUAL DICTIONARY CREATED>\n";
 }
