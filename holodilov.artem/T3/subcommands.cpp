@@ -8,7 +8,7 @@
 #include "ScopeGuard.hpp"
 #include "polygon.hpp"
 
-using VecPolygons = std::vector< holodilov::Polygon >;  
+using VecPolygons = std::vector< holodilov::Polygon >;
 
 bool checkPolygonVertexesAmount(const holodilov::Polygon& polygon, const size_t amountVertexes)
 {
