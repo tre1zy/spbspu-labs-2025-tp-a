@@ -37,14 +37,14 @@ void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPoly
     {
       throw InvalidCommandException();
     }
-    subcommands::areaAmount(is, os, vecPolygons, amountVertexes);
+    subcommands::areaAmount(os, vecPolygons, amountVertexes);
   }
   catch (const std::invalid_argument& e)
   {
     std::map< std::string, std::function< void() > > cmds;
-    cmds["EVEN"] = std::bind(subcommands::areaEven, std::ref(is), std::ref(os), std::cref(vecPolygons));
-    cmds["ODD"] = std::bind(subcommands::areaOdd, std::ref(is), std::ref(os), std::cref(vecPolygons));
-    cmds["MEAN"] = std::bind(subcommands::areaMean, std::ref(is), std::ref(os), std::cref(vecPolygons));
+    cmds["EVEN"] = std::bind(subcommands::areaEven, std::ref(os), std::cref(vecPolygons));
+    cmds["ODD"] = std::bind(subcommands::areaOdd, std::ref(os), std::cref(vecPolygons));
+    cmds["MEAN"] = std::bind(subcommands::areaMean, std::ref(os), std::cref(vecPolygons));
     try
     {
       cmds.at(subcommand)();
@@ -62,8 +62,8 @@ void holodilov::commands::min(std::istream& is, std::ostream& os, const VecPolyg
   is >> subcommand;
 
   std::map< std::string, std::function< void() > > cmds;
-  cmds["AREA"] = std::bind(subcommands::minArea, std::ref(is), std::ref(os), std::cref(vecPolygons));
-  cmds["VERTEXES"] = std::bind(subcommands::minVertexes, std::ref(is), std::ref(os), std::cref(vecPolygons));
+  cmds["AREA"] = std::bind(subcommands::minArea, std::ref(os), std::cref(vecPolygons));
+  cmds["VERTEXES"] = std::bind(subcommands::minVertexes, std::ref(os), std::cref(vecPolygons));
 
   try
   {
@@ -81,8 +81,8 @@ void holodilov::commands::max(std::istream& is, std::ostream& os, const VecPolyg
   is >> subcommand;
 
   std::map< std::string, std::function< void() > > cmds;
-  cmds["AREA"] = std::bind(subcommands::maxArea, std::ref(is), std::ref(os), std::cref(vecPolygons));
-  cmds["VERTEXES"] = std::bind(subcommands::maxVertexes, std::ref(is), std::ref(os), std::cref(vecPolygons));
+  cmds["AREA"] = std::bind(subcommands::maxArea, std::ref(os), std::cref(vecPolygons));
+  cmds["VERTEXES"] = std::bind(subcommands::maxVertexes, std::ref(os), std::cref(vecPolygons));
 
   try
   {
@@ -105,13 +105,13 @@ void holodilov::commands::count(std::istream& is, std::ostream& os, const VecPol
     {
       throw InvalidCommandException();
     }
-    subcommands::countAmount(is, os, vecPolygons, amountVertexes);
+    subcommands::countAmount(os, vecPolygons, amountVertexes);
   }
   catch (const std::invalid_argument& e)
   {
     std::map< std::string, std::function< void() > > cmds;
-    cmds["EVEN"] = std::bind(subcommands::countEven, std::ref(is), std::ref(os), std::cref(vecPolygons));
-    cmds["ODD"] = std::bind(subcommands::countOdd, std::ref(is), std::ref(os), std::cref(vecPolygons));
+    cmds["EVEN"] = std::bind(subcommands::countEven, std::ref(os), std::cref(vecPolygons));
+    cmds["ODD"] = std::bind(subcommands::countOdd, std::ref(os), std::cref(vecPolygons));
     try
     {
       cmds.at(subcommand)();

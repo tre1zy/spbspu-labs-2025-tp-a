@@ -6,20 +6,20 @@
 
 namespace holodilov::subcommands
 {
-  void countEven(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void countOdd(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void countAmount(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons, size_t amountVertexes);
+  void countEven(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void countOdd(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void countAmount(std::ostream& os, const std::vector< Polygon >& vecPolygons, size_t amountVertexes);
 
-  void maxArea(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void maxVertexes(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void maxArea(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void maxVertexes(std::ostream& os, const std::vector< Polygon >& vecPolygons);
 
-  void minArea(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void minVertexes(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void minArea(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void minVertexes(std::ostream& os, const std::vector< Polygon >& vecPolygons);
 
-  void areaEven(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void areaOdd(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void areaMean(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons);
-  void areaAmount(std::istream& is, std::ostream& os, const std::vector< Polygon >& vecPolygons, size_t amountVertexes);
+  void areaEven(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void areaOdd(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void areaMean(std::ostream& os, const std::vector< Polygon >& vecPolygons);
+  void areaAmount(std::ostream& os, const std::vector< Polygon >& vecPolygons, size_t amountVertexes);
 }
 
 #endif
