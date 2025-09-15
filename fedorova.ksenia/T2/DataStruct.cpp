@@ -23,7 +23,7 @@ std::ostream& fedorova::operator<<(std::ostream& os, const ULLBinaryO& dest)
   return os;
 }
 
-std::istream& fedorova::operator>>(std::istream& in, DelimiterIO&& data)
+/*std::istream& fedorova::operator>>(std::istream& in, DelimiterIO&& data)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -41,7 +41,7 @@ std::istream& fedorova::operator>>(std::istream& in, DelimiterIO&& data)
   }
 
   return in;
-}
+}*/
 
 std::istream& fedorova::operator>>(std::istream& is, ULLLiteralIO&& dest)
 {
