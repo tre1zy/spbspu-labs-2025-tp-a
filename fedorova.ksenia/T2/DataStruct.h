@@ -12,10 +12,10 @@ namespace fedorova
     std::string key3;
   };
 
-  struct DelimiterIO
+  /*struct DelimiterIO
   {
     char exp;
-  };
+  };*/
 
   struct ULLLiteralIO
   {
@@ -42,7 +42,7 @@ namespace fedorova
     std::string exp;
   };
 
-  class IoGuard
+  /*class IoGuard
   {
   public:
     explicit IoGuard(std::basic_ios< char >& s);
@@ -53,7 +53,7 @@ namespace fedorova
     char fill_;
     std::streamsize precision_;
     std::basic_ios< char >::fmtflags fmt_;
-  };
+  };*/
 
   bool compareDataStruct(const DataStruct& a, const DataStruct& b);
   std::istream& operator>>(std::istream& is, DelimiterIO&& dest);
