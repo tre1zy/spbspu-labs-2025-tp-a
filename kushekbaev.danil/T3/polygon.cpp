@@ -3,8 +3,8 @@
 #include <functional>
 #include <algorithm>
 #include <iterator>
-#include "streamguard.hpp"
-#include "delimiter.hpp"
+#include "../common/streamguard.hpp"
+#include "../common/delimiter.hpp"
 
 std::istream& kushekbaev::operator>>(std::istream& in, Point& point)
 {
@@ -26,8 +26,8 @@ std::istream& kushekbaev::operator>>(std::istream& in, Polygon& polygon)
     return in;
   }
   StreamGuard s(in);
-  constexpr size_t num_of_inputed_vertices = 0;
-  if (!(in >> num_of_inputed_vertices) || num_of_inputed_vertices < MIN_NUM_OF_VERTICES_IN_POLYGON)
+  size_t num_of_inputed_vertices = 0;
+  if (!(in >> num_of_inputed_vertices) || num_of_inputed_vertices < kushekbaev::MIN_NUMBER_OF_VERTICES_IN_POLYGON)
   {
     in.setstate(std::ios::failbit);
     return in;

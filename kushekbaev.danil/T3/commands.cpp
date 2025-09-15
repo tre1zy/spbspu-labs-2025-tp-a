@@ -7,7 +7,7 @@
 #include <string>
 #include <cmath>
 #include <map>
-#include "streamguard.hpp"
+#include "../common/streamguard.hpp"
 
 namespace
 {
@@ -103,10 +103,17 @@ namespace
     double total = std::accumulate(partial_areas.begin(), partial_areas.end(), 0.0);
     return std::abs(total) / 2.0;
   }
+  struct PolygonToAreaTransformer
+  {
+    double operator()(const kushekbaev::Polygon& polygon) const
+    {
+      return getArea(polygon);
+    }
+  };
 
   bool hasRightAngle(const kushekbaev::Polygon& polygon)
   {
-    if (polygon.points.size() < MIN_NUMBER_OF_VERTICES_IN_POLYGON)
+    if (polygon.points.size() < kushekbaev::MIN_NUMBER_OF_VERTICES_IN_POLYGON)
     {
       return false;
     }
@@ -139,7 +146,7 @@ namespace
   {
     std::vector< double > areas;
     areas.reserve(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getArea());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), PolygonToAreaTransformer());
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
