@@ -14,6 +14,11 @@ bool fedorova::operator==(const Polygon& polygonOne, const Polygon& polygonTwo)
   return polygonOne.points == polygonTwo.points;
 }
 
+fedorova::Point fedorova::operator-(const Point& left, const Point& right)
+{
+  return Point{ left.x - right.x, left.y - right.y };
+}
+
 std::istream& fedorova::operator>>(std::istream& is, Point& point)
 {
   std::istream::sentry sentry(is);

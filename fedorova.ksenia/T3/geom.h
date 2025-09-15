@@ -19,6 +19,7 @@ namespace fedorova
 
   bool operator==(const Point&, const Point&);
   bool operator==(const Polygon&, const Polygon&);
+  Point operator-(const Point& left, const Point& right);
   std::istream& operator>>(std::istream&, Point&);
   std::istream& operator>>(std::istream&, Polygon&);
   std::ostream& operator<<(std::ostream&, const Point&);
