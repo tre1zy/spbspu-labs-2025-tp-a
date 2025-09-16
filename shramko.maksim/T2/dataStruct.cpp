@@ -137,7 +137,7 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
     }
 
     has_bits = true;
-    if (x.key > (std::numeric_limits< unsigned long long >::max() >> 1))
+    if (x.key > (std::numeric_limits<unsigned long long>::max() >> 1))
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -149,24 +149,27 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
       x.key |= 1;
     }
   }
+
   if (!has_bits && x.prefix_zeroes == 0)
   {
     in.setstate(std::ios::failbit);
   }
+
   return in;
 }
 
 std::istream& shramko::operator>>(std::istream& in, StringT& x)
 {
-  std::istream ConvertGuard(in);
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
+
   StreamGuard guard(in);
   in >> std::noskipws;
   in >> ExpectCharT{'"'};
+
   char next;
   while (in >> next && next != '"')
   {
@@ -224,10 +227,12 @@ std::istream& shramko::operator>>(std::istream& in, dataStruct& ds)
       in.setstate(std::ios::failbit);
     }
   }
+
   in >> ExpectCharT{':'} >> ExpectCharT{')'};
   if (in)
   {
     ds = result;
   }
+
   return in;
 }
