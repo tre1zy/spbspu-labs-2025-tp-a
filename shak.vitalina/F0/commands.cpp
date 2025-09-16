@@ -5,7 +5,7 @@
 #include <iterator>
 #include <iomanip>
 
-void shak::createDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &out)
+void shak::createDict(shak::Dictionaries &dicts, std::istream &in)
 {
   std::string dictName;
   in >> dictName;
@@ -20,7 +20,7 @@ void shak::createDict(shak::Dictionaries &dicts, std::istream &in, std::ostream 
   dicts.emplace(dictName, FrequencyDictionary{});
 }
 
-void shak::clearDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &out)
+void shak::clearDict(shak::Dictionaries &dicts, std::istream &in)
 {
   std::string dictName;
   in >> dictName;
@@ -37,7 +37,7 @@ void shak::clearDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &
   dictIter->second.size = 0;
 }
 
-void shak::deleteDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &out)
+void shak::deleteDict(shak::Dictionaries &dicts, std::istream &in)
 {
   std::string dictName;
   in >> dictName;
@@ -71,7 +71,7 @@ void shak::printDict(Dictionaries& dicts, std::istream& in, std::ostream& out)
   std::transform(dictIter.begin(), dictIter.end(), outIt(out, "\n"), printPair);
 }
 
-void shak::insertW(Dictionaries &dicts, std::istream &in, std::ostream &out)
+void shak::insertW(Dictionaries &dicts, std::istream &in)
 {
   std::string word;
   std::string dictName;
@@ -98,7 +98,7 @@ void shak::insertW(Dictionaries &dicts, std::istream &in, std::ostream &out)
   }
 }
 
-void shak::removeW(Dictionaries &dicts, std::istream &in, std::ostream &out)
+void shak::removeW(Dictionaries &dicts, std::istream &in)
 {
   std::string word;
   std::string dictName;
