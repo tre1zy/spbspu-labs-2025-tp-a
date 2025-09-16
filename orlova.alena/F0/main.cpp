@@ -1,34 +1,20 @@
 #include <limits>
 #include <functional>
 #include "commands.h"
+#include "io-utils.h"
 
 int main(int argc, char** argv)
 {
   using namespace orlova;
   std::map< std::string, std::function< void() > > cmds;
 
-  if (argc != 2)
+  if (argc != 1)
   {
     std::cerr << "<INCORRECT ARGUMENTS>\n";
     return 1;
   }
 
-  std::ifstream file(argv[1]);
-  if (!file)
-  {
-    std::cerr << "<INCORRECT FILE>\n";
-    return 1;
-  }
-
   Dictionaries dicts;
-  if (argc == 2)
-  {
-    file >> dicts;
-    if (file.fail() && !file.eof())
-    {
-      std::cerr << "<INVALID FILE>\n";
-    }
-  }
   cmds["addemptydictionary"] = std::bind(addEmptyDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["addtranslation"] = std::bind(addTranslation, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["adddictionary"] = std::bind(addDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
@@ -39,9 +25,10 @@ int main(int argc, char** argv)
   cmds["append"] = std::bind(append, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["dictionarysize"] = std::bind(dictionarySize, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["intersectionofdicts"] = std::bind(intersectionOfDicts, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
-  cmds["deletedictionary"] = std::bind(deleteDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));;
+  cmds["delete"] = std::bind(deleteDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));;
   cmds["nonrepeatingwords"] = std::bind(nonrepeatingWords, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["residual"] = std::bind(residual, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
+  cmds["printdictionary"] = std::bind(printDictionary, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   std::string command;
   while (!(std::cin >> command).eof())
   {
