@@ -2,7 +2,6 @@
 #define IO_UTILS_H
 #include <list>
 #include <map>
-
 #include <iostream>
 
 namespace orlova
@@ -11,8 +10,15 @@ namespace orlova
   using Dictionary = std::map< std::string, Translations >;
   using Dictionaries = std::map< std::string, Dictionary >;
 
-  std::istream& operator>>(std::istream&, Dictionary&);
-  //std::ostream& operator<<(std::ostream&, const Dictionary&);
+  struct DictPairWrapper
+  {
+    std::pair< std::string, std::list< std::string > > p;
+  };
+
+  std::istream& operator>>(std::istream&, std::list< std::string >&);
+  std::ostream& operator<<(std::ostream&, const Dictionary&);
+  std::ostream& operator<<(std::ostream&, const std::list< std::string >&);
+  std::ostream& operator<<(std::ostream&, const DictPairWrapper&);
 }
 
 #endif

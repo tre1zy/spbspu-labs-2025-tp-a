@@ -27,6 +27,7 @@ namespace orlova
   void deleteDictionary(std::istream&, std::ostream&, Dictionaries&);
   void nonrepeatingWords(std::istream&, std::ostream&, Dictionaries&);
   void residual(std::istream&, std::ostream&, Dictionaries&);
+  void printDictionary(std::istream&, std::ostream&, const Dictionaries&);
 }
 
 #endif

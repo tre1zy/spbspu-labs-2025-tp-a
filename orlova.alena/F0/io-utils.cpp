@@ -3,37 +3,70 @@
 #include <map>
 #include <list>
 
-struct DictionaryPair
+orlova::DictPairWrapper returnDictPairWrapper(std::pair< std::string, std::list< std::string > > pair)
 {
-  std::pair< std::string, std::list< std::string > > p;
-};
-
-std::pair< std::string, std::list< std::string > > returnDictionaryPair(DictionaryPair pair)
-{
-  return pair.p;
+  return orlova::DictPairWrapper{ pair };
 }
 
-std::istream& orlova::operator>>(std::istream& in, Dictionary& dict)
+std::istream& orlova::operator>>(std::istream& in, std::list< std::string >& list)
 {
   std::istream::sentry s(in);
   if (!s)
   {
     return in;
   }
-  /*size_t size;
+  size_t size;
   in >> size;
-  if (!in)
+  if (size == 0)
   {
-      in.setstate(std::ios::failbit);
-      return in;
+    return in;
   }
-  std::list< DictionaryPair > tested_list;
-  auto begin = std::istream_iterator< DictionaryPair >(in);
-  auto end = std::istream_iterator< DictionaryPair >();
-  std::copy_n(begin, size, std::back_inserter(tested_list));
-  if (in && tested_list.size() == size)
+  std::list< std::string > tested;
+  auto begin = std::istream_iterator< std::string >(in);
+  auto end = std::istream_iterator< std::string >();
+  std::copy_n(begin, size, std::back_inserter(tested));
+  if (in && tested.size() == size)
   {
-      std::transform(tested_list.begin(), tested_list.end(), std::inserter(dict, dict.end()), returnDictionaryPair);
-  }*/
+    list = tested;
+  }
   return in;
+}
+
+std::ostream& orlova::operator<<(std::ostream& out, const Dictionary& dict)
+{
+  std::ostream::sentry s(out);
+  if (!s || dict.empty())
+  {
+    return out;
+  }
+  auto it = std::ostream_iterator< DictPairWrapper >(out, "\n");
+  std::transform(dict.begin(), dict.end(), it, returnDictPairWrapper);
+  return out;
+}
+
+std::ostream& orlova::operator<<(std::ostream& out, const std::list< std::string >& list)
+{
+  std::ostream::sentry s(out);
+  if (!s || list.empty())
+  {
+    return out;
+  }
+  std::list< std::string > it(list);
+  std::copy(it.begin(), it.end(), std::ostream_iterator< std::string >(out, " "));
+  return out;
+}
+
+std::ostream& orlova::operator<<(std::ostream& out, const DictPairWrapper& pair)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+  out << pair.p.first;
+  if (!pair.p.second.empty())
+  {
+    out << ' ' << pair.p.second;
+  }
+  return out;
 }
