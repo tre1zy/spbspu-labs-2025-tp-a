@@ -3,25 +3,32 @@
 #include <iterator>
 #include <iostream>
 #include <vector>
-
 #include "dataStruct.hpp"
 
 int main()
 {
   using namespace shramko;
-  using iIterator = std::istream_iterator<dataStruct>;
-  using oIterator = std::ostream_iterator<dataStruct>;
+  using oIterator = std::ostream_iterator< dataStruct >;
 
   std::vector< dataStruct > data;
 
   try
   {
-    std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
-
-    if (std::cin.fail() && !std::cin.eof())
+    dataStruct ds;
+    while (true)
     {
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cin >> ds;
+      if (std::cin.eof())
+      {
+        break;
+      }
+      if (std::cin.fail())
+      {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        continue;
+      }
+      data.push_back(ds);
     }
 
     std::sort(data.begin(), data.end());
