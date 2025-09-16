@@ -1,0 +1,224 @@
+#include "commands.hpp"
+#include <functional>
+#include <algorithm>
+#include <numeric>
+#include <iterator>
+#include <iomanip>
+
+void shak::createDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string dictName;
+  in >> dictName;
+  if (!in || dictName.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  if (dicts.count(dictName))
+  {
+    throw std::invalid_argument("dictionary with this name exists");
+  }
+  dicts.emplace(dictName, FrequencyDictionary{});
+}
+
+void shak::clearDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string dictName;
+  in >> dictName;
+  if (!in || dictName.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto dictIter = dicts.find(dictName);
+  if (dictIter == dicts.end())
+  {
+    throw std::invalid_argument("dictionary not found");
+  }
+  dictIter->second.dictionary.clear();
+  dictIter->second.size = 0;
+}
+
+void shak::deleteDict(shak::Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string dictName;
+  in >> dictName;
+  if (!in || dictName.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto dictIter = dicts.find(dictName);
+  if (dictIter == dicts.end())
+  {
+    throw std::invalid_argument("dictionary not found");
+  }
+  dicts.erase(dictIter);
+}
+
+void shak::printDict(Dictionaries& dicts, std::istream& in, std::ostream& out)
+{
+  std::string dictName;
+  in >> dictName;
+  if (dictName.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto it = dicts.find(dictName);
+  if (it == dicts.end())
+  {
+    throw std::invalid_argument("no dictionary with name");
+  }
+  const auto &dictIter = it->second.dictionary;
+  std::transform(dictIter.begin(), dictIter.end(), std::ostream_iterator< std::string >(out, "\n"), shak::printPair);
+}
+
+void shak::insertW(Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string word;
+  std::string dictName;
+  in >> word >> dictName;
+  auto dictIter = dicts.find(dictName);
+  if (word == "" || dictName == "")
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  if (dictIter == dicts.end())
+  {
+    throw std::invalid_argument("no dictionary with name");
+  }
+  else
+  {
+    if (dictIter->second.dictionary.find(word) == dicts.find(dictName)->second.dictionary.end())
+    {
+      dictIter->second.dictionary.insert(std::pair< std::string, size_t >(word, 1));
+    }
+    else
+    {
+      dictIter->second.dictionary.find(word)->second++;
+    }
+  }
+}
+
+void shak::removeW(Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string word;
+  std::string dictName;
+  in >> word >> dictName;
+  auto dictIter = dicts.find(dictName);
+  if (word == "" || dictName == "")
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  if (dicts.find(dictName) == dicts.end())
+  {
+    throw std::invalid_argument("no dictionary with name");
+  }
+  else
+  {
+    if (dictIter->second.dictionary.find(word) == dictIter->second.dictionary.end())
+    {
+      throw std::invalid_argument("no word in dictionary");
+    }
+    else
+    {
+      dicts.find(dictName)->second.dictionary.erase(word);
+    }
+  }
+}
+
+void shak::getFreq(Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string word;
+  std::string dictName;
+  in >> word >> dictName;
+  out << "getFreq";
+  auto dictIter = dicts.find(dictName);
+  if (word == "" || dictName == "")
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  if (dictIter == dicts.end())
+  {
+    throw std::invalid_argument("no dictionary with name");
+  }
+  else
+  {
+    if (dictIter->second.dictionary.find(word) == dicts.find(dictName)->second.dictionary.end())
+    {
+      out << "0/n";
+    }
+    else
+    {
+      out << dicts.find(dictName)->second.dictionary.find(word)->second << '\n';
+    }
+  }
+}
+
+void shak::getUniqe(Dictionaries &dicts, std::istream& in, std::ostream& out)
+{
+  std::string dictName;
+  in >> dictName;
+  if (dictName.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto dictIter = dicts.find(dictName);
+  if (dictIter == dicts.end())
+  {
+    throw std::invalid_argument("no dictionary with name");
+  }
+
+  size_t count = std::count_if(dictIter->second.dictionary.begin(), dictIter->second.dictionary.end(), uniqueOnce);
+  out << count << '\n';
+}
+
+void shak::equal(Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string dict1, dict2, key;
+  in >> dict1 >> dict2 >> key;
+  if (dict1.empty() || dict2.empty() || key.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto dictIter1 = dicts.find(dict1);
+  auto dictIter2 = dicts.find(dict2);
+  if (dictIter1 == dicts.end() || dictIter2 == dicts.end())
+  {
+    throw std::invalid_argument("no dictionaries with names");
+  }
+  auto word1 = dictIter1->second.dictionary.find(key);
+  auto word2 = dictIter2->second.dictionary.find(key);
+  if (word1 == dictIter1->second.dictionary.end() || word2 == dictIter2->second.dictionary.end())
+  {
+    throw std::invalid_argument("no such words in dictionaries");
+  }
+  if (word1->second == word2->second)
+  {
+    out << "YES\n";
+  }
+  else
+  {
+    out << "NO\n";
+  }
+}
+
+void shak::compare(Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string dict1, dict2;
+  in >> dict1 >> dict2;
+  if (dict1.empty() || dict2.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto dictIter1 = dicts.find(dict1);
+  auto dictIter2 = dicts.find(dict2);
+  if (dictIter1 == dicts.end() || dictIter2 == dicts.end())
+  {
+    throw std::invalid_argument("no dictionaries with names");
+  }
+  if (dictIter1->second.dictionary.size() != dictIter2->second.dictionary.size())
+  {
+    out << 0 << '\n';
+    return;
+  }
+  bool eq = std::equal(dictIter1->second.dictionary.begin(), dictIter1->second.dictionary.end(), dictIter2->second.dictionary.begin(), pairEqual);
+  out << (eq ? 1 : 0) << '\n';
+}
