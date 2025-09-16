@@ -1,4 +1,8 @@
 #include "commands.hpp"
+#include <limits>
+#include <iterator>
+#include <functional>
+#include <iostream>
 #include <numeric>
 
 int main()

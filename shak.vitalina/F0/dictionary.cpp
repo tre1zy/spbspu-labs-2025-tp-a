@@ -8,7 +8,7 @@ std::string shak::printPair(const std::pair< std::string, size_t > &p)
 
 bool shak::uniqueOnce(const std::pair< const std::string, size_t > &p)
 {
-    return entry.second == 1;
+    return p.second == 1;
 }
 
 bool shak::pairEqual(const std::pair< const std::string, size_t > &p1, const std::pair< const std::string, size_t > &p2)
