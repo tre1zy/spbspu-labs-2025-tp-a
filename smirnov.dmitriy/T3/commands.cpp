@@ -85,6 +85,15 @@ void doAreaCommand(const std::vector< Polygon >& polygons, std::istream& in, std
    }
  }
 
+ void doMaxCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+ {
+   doMinMaxCommand(polygons, in, out, "max");
+ }
+
+ void doMinCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+ {
+   doMinMaxCommand(polygons, in, out, "min");
+ }
 
 
 }
