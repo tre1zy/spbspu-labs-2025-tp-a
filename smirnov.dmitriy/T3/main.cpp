@@ -4,7 +4,17 @@
 #include "Polygon.hpp"
 #include "Commands.hpp"
 
-int main()
-{}
-///
+int main(int argc, char* argv[])
+{
+using namespace smirnov;
+
+
+
+
+
+
+
+
+}
+
 
