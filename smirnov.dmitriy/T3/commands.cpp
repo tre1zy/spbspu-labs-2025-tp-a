@@ -95,5 +95,34 @@ void doAreaCommand(const std::vector< Polygon >& polygons, std::istream& in, std
    doMinMaxCommand(polygons, in, out, "min");
  }
 
+void doCountCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  std::string s;
+  in >> s;
+  if (s == "EVEN")
+  {
+    out << std::count_if(polygons.begin(), polygons.end(), isEvenCountVertexes) << "\n";
+  }
+  else if (s == "ODD")
+  {
+    out << std::count_if(polygons.begin(), polygons.end(),isOddCountVertexes) << "\n";
+  }
+  else if (s == std::to_string(std::stoi(s)))
+  {
+    size_t n = static_cast< size_t >(std::stoi(s));
+    if (n < 3)
+    {
+      throw std::logic_error("FEW VERTEXES");
+    }
+    else
+    {
+      out << std::count_if(polygons.begin(), polygons.end(), std::bind(isNCountVertexes, _1, n)) << "\n";
+    }
+  }
+  else
+  {
+    throw std::logic_error("INVALID COMMAND");
+  }
+}
 
 }
