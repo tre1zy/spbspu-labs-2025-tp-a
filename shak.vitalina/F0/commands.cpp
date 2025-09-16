@@ -67,7 +67,8 @@ void shak::printDict(Dictionaries& dicts, std::istream& in, std::ostream& out)
     throw std::invalid_argument("no dictionary with name");
   }
   const auto &dictIter = it->second.dictionary;
-  std::transform(dictIter.begin(), dictIter.end(), std::ostream_iterator< std::string >(out, "\n"), shak::printPair);
+  using outIt = std::ostream_iterator<std::string>;
+  std::transform(dictIter.begin(), dictIter.end(), outIt(out, "\n"), printPair);
 }
 
 void shak::insertW(Dictionaries &dicts, std::istream &in, std::ostream &out)
@@ -165,8 +166,8 @@ void shak::getUniqe(Dictionaries &dicts, std::istream& in, std::ostream& out)
   {
     throw std::invalid_argument("no dictionary with name");
   }
-
-  size_t count = std::count_if(dictIter->second.dictionary.begin(), dictIter->second.dictionary.end(), uniqueOnce);
+  auto &dictFreq = dictIter->second.dictionary;
+  size_t count = std::count_if(dictFreq.begin(), dictFreq.end(), uniqueOnce);
   out << count << '\n';
 }
 
@@ -219,6 +220,8 @@ void shak::compare(Dictionaries &dicts, std::istream &in, std::ostream &out)
     out << 0 << '\n';
     return;
   }
-  bool eq = std::equal(dictIter1->second.dictionary.begin(), dictIter1->second.dictionary.end(), dictIter2->second.dictionary.begin(), pairEqual);
+  auto &d1 = dictIter1->second.dictionary;
+  auto &d2 = dictIter2->second.dictionary;
+  bool eq = std::equal(d1.begin(), d1.end(), d2.begin(), pairEqual);
   out << (eq ? 1 : 0) << '\n';
 }
