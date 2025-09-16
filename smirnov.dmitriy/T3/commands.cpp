@@ -49,4 +49,42 @@ void doAreaCommand(const std::vector< Polygon >& polygons, std::istream& in, std
 }
 
 
+ void doMinMaxCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out, const std::string& name)
+ {
+   std::string s;
+   in >> s;
+   if (polygons.empty())
+   {
+     throw std::logic_error("zero polygons");
+   }
+   if (s == "AREA")
+   {
+     if (name == "max")
+     {
+       out << std::fixed << std::setprecision(1) << getArea(*std::max_element(polygons.begin(), polygons.end(), minArea)) << "\n";
+     }
+     else
+     {
+       out << std::fixed << std::setprecision(1) << getArea(*std::min_element(polygons.begin(), polygons.end(), minArea)) << "\n";
+     }
+   }
+   else if (s == "VERTEXES")
+   {
+     if (name == "max")
+     {
+       out << std::fixed << std::setprecision(1) << (*std::max_element(polygons.begin(), polygons.end(), minVertexes)).points.size() << "\n";
+     }
+     else
+     {
+       out << std::fixed << std::setprecision(1) << (*std::min_element(polygons.begin(), polygons.end(), minVertexes)).points.size() << "\n";
+     }
+   }
+   else
+   {
+     throw std::logic_error("INVALID COMMAND");
+   }
+ }
+
+
+
 }
