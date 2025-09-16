@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <map>
 #include <list>
+#include <iterator>
 
 orlova::DictPairWrapper returnDictPairWrapper(std::pair< std::string, std::list< std::string > > pair)
 {

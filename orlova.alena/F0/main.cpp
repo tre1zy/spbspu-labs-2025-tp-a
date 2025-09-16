@@ -14,6 +14,13 @@ int main(int argc, char** argv)
     return 1;
   }
 
+  std::ifstream file(argv[1]);
+  if (!file)
+  {
+    std::cerr << "<INCORRECT FILE>\n";
+    return 1;
+  }
+
   Dictionaries dicts;
   cmds["addemptydictionary"] = std::bind(addEmptyDictionary, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
   cmds["addtranslation"] = std::bind(addTranslation, std::ref(std::cin), std::ref(std::cout), std::ref(dicts));
