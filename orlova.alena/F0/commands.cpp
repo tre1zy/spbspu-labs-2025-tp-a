@@ -5,42 +5,45 @@
 #include <set>
 #include <iterator>
 #include <functional>
-#include <cstddef>
+#include "io-utils.h"
 
 namespace
 {
-  bool dictionaryExists(const orlova::Dictionaries& dicts, const std::string& name)
+  using namespace orlova;
+
+  bool dictionaryExists(const Dictionaries& dicts, const std::string& name)
   {
     return dicts.find(name) != dicts.end();
   }
 
-  void printTranslations(std::ostream& out, const orlova::Translations& translations)
+  void printTranslations(std::ostream& out, const Translations& translations)
   {
     if (translations.empty())
     {
       return;
     }
     auto it = translations.begin();
-    out << *it;
+    out << *it << ", ";
     std::advance(it, 1);
-    std::copy(it, translations.end(), std::ostream_iterator< std::string >(out, ", "));
+    std::copy(it, --translations.end(), std::ostream_iterator< std::string >(out, ", "));
+    out << *(--translations.end());
   }
 
-  orlova::Translations intersectLists(orlova::Translations& list1, orlova::Translations& list2)
+  Translations intersectLists(Translations& list1, Translations& list2)
   {
     list1.sort();
     list2.sort();
-    orlova::Translations res;
+    Translations res;
     std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
     return res;
   }
 
-  std::pair< std::string, orlova::Translations > intersectListDict(const std::pair< std::string, orlova::Translations >& pair,
+  std::pair< std::string, Translations > intersectListDict(const std::pair< std::string, Translations >& pair,
     const orlova::Dictionary& intersected)
   {
-    orlova::Translations list1 = pair.second;
-    orlova::Translations list2 = intersected.at(pair.first);
-    orlova::Translations res = intersectLists(list1, list2);
+    Translations list1 = pair.second;
+    Translations list2 = intersected.at(pair.first);
+    Translations res = intersectLists(list1, list2);
     return { pair.first, res };
   }
 
@@ -52,12 +55,12 @@ namespace
     using reference = const value_type&;
     using iterator_category = std::input_iterator_tag;
 
-    WordPairGeneratorIterator():
+    WordPairGeneratorIterator() :
       file(nullptr),
       end(true)
     {}
 
-    WordPairGeneratorIterator(std::istream& f):
+    WordPairGeneratorIterator(std::istream& f) :
       file(&f),
       end(false)
     {
@@ -72,11 +75,9 @@ namespace
     {
       value = value_type();
       std::string englishWord;
-      if (*file >> englishWord)
+      std::list< std::string > russianWords;
+      if (*file >> englishWord >> russianWords)
       {
-        std::list< std::string > russianWords;
-        std::istream_iterator< std::string > it(*file), eof;
-        std::copy(it, eof, std::back_inserter(russianWords));
         value = std::make_pair(englishWord, russianWords);
       }
       else
@@ -120,8 +121,8 @@ namespace
   struct DictMerger
   {
     using Pair = std::pair< std::string, std::list< std::string > >;
-    orlova::Dictionary newDict;
-    DictMerger(const orlova::Dictionary& dict):
+    Dictionary newDict;
+    DictMerger(const Dictionary& dict) :
       newDict(dict)
     {}
     Pair operator()(const Pair& pair)
@@ -142,7 +143,7 @@ namespace
 
   struct CompareKeys
   {
-    bool operator()(const std::pair< std::string, orlova::Translations >& pair1, const std::pair< std::string, orlova::Translations >& pair2)
+    bool operator()(const std::pair< std::string, orlova::Translations >& pair1, const std::pair< std::string, Translations >& pair2)
     {
       return pair1.first < pair2.first;
     }
@@ -160,11 +161,11 @@ namespace
   struct PairTransformer
   {
     using Pair = std::pair< std::string, std::list< std::string > >;
-    const orlova::Dictionary& dict1;
-    const orlova::Dictionary& dict2;
+    const Dictionary& dict1;
+    const Dictionary& dict2;
 
-    PairTransformer(const orlova::Dictionary& d1,
-      const orlova::Dictionary& d2):
+    PairTransformer(const Dictionary& d1,
+      const Dictionary& d2) :
       dict1(d1),
       dict2(d2)
     {}
@@ -184,8 +185,8 @@ namespace
 
   struct ResidualTransform
   {
-    const orlova::Dictionary& dict1;
-    ResidualTransform(const orlova::Dictionary& d1):
+    const Dictionary& dict1;
+    ResidualTransform(const Dictionary& d1) :
       dict1(d1)
     {}
     using Pair = std::pair< std::string, std::list< std::string > >;
@@ -205,6 +206,27 @@ struct std::iterator_traits< WordPairGeneratorIterator >
   using iterator_category = WordPairGeneratorIterator::iterator_category;
 };
 
+void orlova::printDictionary(std::istream& in, std::ostream& out, const Dictionaries& dicts)
+{
+  std::string name;
+  in >> name;
+  if (!in || dicts.find(name) == dicts.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dict = dicts.at(name);
+  if (dict.empty())
+  {
+    out << "<DICTIONARY IS EMPTY>\n";
+    return;
+  }
+  else
+  {
+    out << dicts.at(name);
+  }
+}
+
 void orlova::addEmptyDictionary(std::istream& in, std::ostream& out, Dictionaries& dicts)
 {
   std::string name;
@@ -220,18 +242,24 @@ void orlova::addEmptyDictionary(std::istream& in, std::ostream& out, Dictionarie
 
 void orlova::addTranslation(std::istream& in, std::ostream& out, Dictionaries& dicts)
 {
-  std::string dictName, englishWord;
-  std::list< std::string > russianWords;
-  in >> dictName >> englishWord;
-  std::istream_iterator< std::string > temp(in), eof;
-  std::copy(temp, eof, std::back_inserter(russianWords));
+  std::string dictName, englishWord, russianWord;
+  in >> dictName >> englishWord >> russianWord;
   auto it = dicts.find(dictName);
-  if (!dictionaryExists(dicts, dictName) || it->second.find(englishWord) != it->second.end())
+  if (!dictionaryExists(dicts, dictName))
   {
     out << "<INVALID COMMAND>\n";
     return;
   }
-  it->second[englishWord] = russianWords;
+  if (it->second.find(englishWord) != it->second.end())
+  {
+    it->second[englishWord].push_back(russianWord);
+  }
+  else
+  {
+    std::list< std::string > russianWords;
+    russianWords.push_back(russianWord);
+    it->second[englishWord] = russianWords;
+  }
   out << "<TRANSLATION ADDED>\n";
 }
 
