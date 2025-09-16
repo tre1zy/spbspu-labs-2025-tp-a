@@ -9,8 +9,8 @@
 int main()
 {
   using namespace shramko;
-  using iIterator = std::istream_iterator< dataStruct >;
-  using oIterator = std::ostream_iterator< dataStruct >;
+  using iIterator = std::istream_iterator<dataStruct>;
+  using oIterator = std::ostream_iterator<dataStruct>;
 
   std::vector< dataStruct > data;
 
@@ -18,9 +18,10 @@ int main()
   {
     std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
 
-    while (!std::cin.eof() && std::cin.fail())
+    while (std::cin.fail())
     {
       std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
     }
 

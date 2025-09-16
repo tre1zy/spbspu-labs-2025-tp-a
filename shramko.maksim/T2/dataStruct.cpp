@@ -1,10 +1,8 @@
 #include "dataStruct.hpp"
-
-#include <bitset>
 #include <iomanip>
-
+#include <string>
+#include <limits>
 #include "streamGuard.hpp"
-
 
 bool shramko::dataStruct::operator<(const dataStruct& other)
 {
@@ -12,10 +10,12 @@ bool shramko::dataStruct::operator<(const dataStruct& other)
   {
     return key1 < other.key1;
   }
+
   if (key2 != other.key2)
   {
     return key2 < other.key2;
   }
+
   return key3.size() < other.key3.size();
 }
 
@@ -25,7 +25,6 @@ std::ostream& shramko::operator<<(std::ostream& out, const DoubleScienceT& x)
   std::snprintf(keyStr, sizeof(keyStr), "%.1e", x.key);
   std::string key(keyStr);
   size_t exp_pos = key.find('e');
-
   if (exp_pos != std::string::npos && (key[exp_pos + 2] == '0'))
   {
     key.erase(exp_pos + 2, 1);
@@ -38,24 +37,30 @@ std::ostream& shramko::operator<<(std::ostream& out, const DoubleScienceT& x)
 std::ostream& shramko::operator<<(std::ostream& out, const UllBinT& x)
 {
   out << "0b";
-  std::bitset< 64 > bits(x.key);
-  std::string binaryStr = bits.to_string();
-  std::size_t firstOne = binaryStr.find('1');
-  if (firstOne != std::string::npos)
+  if (x.key == 0)
   {
-    std::string preffix(x.prefix_zeroes, '0');
-    out << preffix << binaryStr.substr(firstOne);
+    out << "0";
   }
   else
   {
-    out << "0";
+    out << std::string(x.prefix_zeroes, '0');
+    bool started = false;
+    for (int i = 63; i >= 0; --i)
+    {
+      bool bit = (x.key & (1ULL << i)) != 0;
+      if (bit || started)
+      {
+        out << (bit ? '1' : '0');
+        started = true;
+      }
+    }
   }
   return out;
 }
 
 std::ostream& shramko::operator<<(std::ostream& out, const StringT& x)
 {
-  out << "\"" << x.key << "\"";
+  out << std::quoted(x.key);
   return out;
 }
 
@@ -97,8 +102,8 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
   {
     return in;
   }
-  in >> x.key;
 
+  in >> x.key;
   return in;
 }
 
@@ -109,32 +114,42 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
   {
     return in;
   }
+
   StreamGuard guard(in);
   in >> ExpectCharT{'0'} >> ExpectCharT{'b'};
 
-  std::string bits;
+  x.key = 0;
   x.prefix_zeroes = 0;
-  bool first = true;
+  bool has_bits = false;
   char ch;
-  while (in.get(ch) && (ch == '0' || ch == '1'))
+  while (in.get(ch))
   {
-    bits += ch;
-    if (first && ch == '0')
+    if (ch != '0' && ch != '1')
+    {
+      in.unget();
+      break;
+    }
+
+    if (ch == '0' && !has_bits)
     {
       ++x.prefix_zeroes;
+      continue;
     }
-    else
-    {
-      first = false;
-    }
-  }
 
-  if (!bits.empty())
-  {
-    x.key = std::stoull(bits, nullptr, 2);
-    if (in) in.unget();
+    has_bits = true;
+    if (x.key > (std::numeric_limits< unsigned long long >::max() >> 1))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+
+    x.key <<= 1;
+    if (ch == '1')
+    {
+      x.key |= 1;
+    }
   }
-  else
+  if (!has_bits && x.prefix_zeroes == 0)
   {
     in.setstate(std::ios::failbit);
   }
@@ -143,16 +158,15 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
 
 std::istream& shramko::operator>>(std::istream& in, StringT& x)
 {
+  std::istream ConvertGuard(in);
   std::istream::sentry sentry(in);
   if (!sentry)
   {
     return in;
   }
   StreamGuard guard(in);
-
   in >> std::noskipws;
   in >> ExpectCharT{'"'};
-
   char next;
   while (in >> next && next != '"')
   {
@@ -175,8 +189,8 @@ std::istream& shramko::operator>>(std::istream& in, dataStruct& ds)
   }
 
   in >> ExpectCharT{'('};
-
   dataStruct result;
+
   bool is_key1 = false, is_key2 = false, is_key3 = false;
   while ((!is_key1 || !is_key2 || !is_key3) && in)
   {
@@ -210,7 +224,6 @@ std::istream& shramko::operator>>(std::istream& in, dataStruct& ds)
       in.setstate(std::ios::failbit);
     }
   }
-
   in >> ExpectCharT{':'} >> ExpectCharT{')'};
   if (in)
   {
