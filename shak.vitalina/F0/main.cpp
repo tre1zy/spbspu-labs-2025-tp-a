@@ -1,3 +1,6 @@
+#include "commands.hpp"
+#include <numeric>
+
 int main()
 {
   using namespace shak;
