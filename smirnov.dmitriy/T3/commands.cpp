@@ -125,4 +125,16 @@ void doCountCommand(const std::vector< Polygon >& polygons, std::istream& in, st
   }
 }
 
+void doRectsCommand(const std::vector< Polygon >& polygons, std::ostream& out)
+{
+  out << std::count_if(polygons.begin(), polygons.end(), isRect) << "\n";
+}
+
+struct PolygonMaxSeq
+{
+  size_t cur;
+  size_t maxseq;
+  bool operator()(const Polygon& polygon, const Polygon& data);
+};
+
 }
