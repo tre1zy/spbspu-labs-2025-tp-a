@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  std::ifstream file(argv[1]);
+  std::ifstream file(argv[0]);
   if (!file)
   {
     std::cerr << "<INCORRECT FILE>\n";
