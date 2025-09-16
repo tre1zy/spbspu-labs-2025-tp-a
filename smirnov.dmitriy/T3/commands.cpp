@@ -137,4 +137,100 @@ struct PolygonMaxSeq
   bool operator()(const Polygon& polygon, const Polygon& data);
 };
 
+void doMaxseqCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+{
+  smirnov::Polygon data;
+  in >> data;
+  if (data.points.size() < 3)
+  {
+    throw std::logic_error("INVALID COMMAND");
+  }
+  else
+  {
+    PolygonMaxSeq seq{0,0};
+    size_t numberSeq = std::count_if(polygons.begin(), polygons.end(), std::bind(std::ref(seq), _1, data));
+    if (numberSeq < 1)
+    {
+      throw std::logic_error("INVALID COMMAND");
+    }
+    else
+    {
+      out << seq.maxseq << "\n";
+    }
+  }
+}
+
+bool hasIntersection(const Polygon & first, const Polygon & second)
+{
+  auto left = std::minmax_element(first.points.begin(), first.points.end());
+  auto right = std::minmax_element(second.points.begin(), second.points.end());
+  return !((*left.second < *right.first) || (*right.second < *left.first));
+}
+
+void doIntersections(const std::vector< Polygon > & data, std::istream & in, std::ostream & out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (!in)
+  {
+    throw std::logic_error("Wrong argument");
+  }
+  using namespace std::placeholders;
+  auto isIntersected = std::bind(hasIntersection, std::cref(polygon), _1);
+  out << std::count_if(data.begin(), data.end(), isIntersected) << '\n';
+}
+
+bool PolygonMaxSeq::operator()(const Polygon& polygon, const Polygon& data)
+{
+  if (polygon == data)
+  {
+    cur++;
+    maxseq = std::max(maxseq, cur);
+  }
+  else
+  {
+    cur = 0;
+  }
+  return maxseq;
+}
+
+template< class UnaryPredicate >
+double getSumArea(const std::vector< Polygon >& polygons, UnaryPredicate P)
+{
+  std::vector< Polygon > rightPolygons;
+  std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(rightPolygons), P);
+  std::vector< double > areas;
+  std::transform(rightPolygons.cbegin(), rightPolygons.cend(), std::back_inserter(areas), getArea);
+  double result = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
+  return result;
+}
+
+double doAreaEven(const std::vector< Polygon >& polygons)
+{
+  return getSumArea(polygons, isEvenCountVertexes);
+}
+
+double doAreaOdd(const std::vector< Polygon >& polygons)
+{
+  return getSumArea(polygons, isOddCountVertexes);
+}
+
+double doAreaMean(const std::vector< Polygon >& polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::logic_error("NO POLYGONS FOR AREA MEAN COMMAND");
+  }
+  std::vector< double > areas;
+  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), getArea);
+  double result = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
+  result /= polygons.size();
+  return result;
+}
+
+double doAreaNum(const std::vector< Polygon >& polygons, size_t n)
+{
+  return getSumArea(polygons, std::bind(isNCountVertexes, _1, n));
+}
+
 }
