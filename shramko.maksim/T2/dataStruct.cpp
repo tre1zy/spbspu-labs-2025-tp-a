@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <cmath>
 #include "streamGuard.hpp"
 
 bool shramko::dataStruct::operator<(const dataStruct& other)
@@ -21,16 +22,39 @@ bool shramko::dataStruct::operator<(const dataStruct& other)
 
 std::ostream& shramko::operator<<(std::ostream& out, const DoubleScienceT& x)
 {
-  char keyStr[32];
-  std::snprintf(keyStr, sizeof(keyStr), "%.1e", x.key);
-  std::string key(keyStr);
-  size_t exp_pos = key.find('e');
-  if (exp_pos != std::string::npos && (key[exp_pos + 2] == '0'))
+  if (std::isnan(x.key) || std::isinf(x.key))
   {
-    key.erase(exp_pos + 2, 1);
+    return out;
   }
 
-  out << key;
+  if (x.key == 0.0)
+  {
+    out << "0.0e+0";
+    return out;
+  }
+
+  double abs_key = std::fabs(x.key);
+  int exp = static_cast< int >(std::floor(std::log10(abs_key)));
+  double mant = abs_key / std::pow(10.0, exp);
+
+  char sign = (x.key < 0 ? '-' : '\0');
+  if (sign != '\0')
+  {
+    out << sign;
+  }
+
+  int mant_int = static_cast< int >(mant);
+  double frac_part = mant - mant_int;
+  int frac_digit = static_cast< int >(frac_part * 10 + 0.5);
+
+  out << mant_int << '.' << frac_digit << 'e';
+
+  char exp_sign = (exp >= 0 ? '+' : '-');
+  out << exp_sign;
+
+  int abs_exp = std::abs(exp);
+  out << abs_exp;
+
   return out;
 }
 
@@ -60,7 +84,7 @@ std::ostream& shramko::operator<<(std::ostream& out, const UllBinT& x)
 
 std::ostream& shramko::operator<<(std::ostream& out, const StringT& x)
 {
-  out << std::quoted(x.key);
+  out << '"' << x.key << '"';
   return out;
 }
 
@@ -81,12 +105,6 @@ std::ostream& shramko::operator<<(std::ostream& out, const dataStruct& ds)
 
 std::istream& shramko::operator>>(std::istream& in, ExpectCharT&& x)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
   char ch;
   if (!(in >> ch) || ch != x.ch)
   {
@@ -97,52 +115,145 @@ std::istream& shramko::operator>>(std::istream& in, ExpectCharT&& x)
 
 std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
+  double mant_sign = 1.0;
+  int next = in.peek();
+  if (next == std::istream::traits_type::eof())
   {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  char ch = static_cast< char >(next);
+  if (ch == '-')
+  {
+    mant_sign = -1.0;
+    in.get();
+  }
+  else if (ch == '+')
+  {
+    in.get();
+  }
+
+  double mant = 0.0;
+  int frac_digits = 0;
+  bool has_dot = false;
+  bool has_digits = false;
+
+  while (true)
+  {
+    next = in.peek();
+    if (next == std::istream::traits_type::eof()) break;
+    ch = static_cast< char >(next);
+    if (!std::isdigit(ch) && ch != '.') break;
+    in.get();
+    if (ch == '.')
+    {
+      if (has_dot)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      has_dot = true;
+    }
+    else
+    {
+      has_digits = true;
+      if (has_dot)
+      {
+        ++frac_digits;
+      }
+      mant = mant * 10.0 + (ch - '0');
+    }
+  }
+
+  if (!has_digits)
+  {
+    in.setstate(std::ios::failbit);
     return in;
   }
 
-  in >> x.key;
+  if (frac_digits > 0)
+  {
+    mant /= std::pow(10.0, frac_digits);
+  }
+  mant *= mant_sign;
+
+  next = in.peek();
+  if (next == std::istream::traits_type::eof() || (static_cast< char >(next) != 'e' && static_cast< char >(next) != 'E'))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  in.get();
+
+  double exp_sign = 1.0;
+  next = in.peek();
+  if (next == std::istream::traits_type::eof())
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  ch = static_cast< char >(next);
+  if (ch == '-')
+  {
+    exp_sign = -1.0;
+    in.get();
+  }
+  else if (ch == '+')
+  {
+    in.get();
+  }
+
+  int exp = 0;
+  bool has_exp_digits = false;
+  while (true)
+  {
+    next = in.peek();
+    if (next == std::istream::traits_type::eof()) break;
+    ch = static_cast< char >(next);
+    if (!std::isdigit(ch)) break;
+    in.get();
+    has_exp_digits = true;
+    exp = exp * 10 + (ch - '0');
+  }
+
+  if (!has_exp_digits)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
+  exp *= static_cast< int >(exp_sign);
+  x.key = mant * std::pow(10.0, exp);
   return in;
 }
 
 std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
   StreamGuard guard(in);
   in >> ExpectCharT{'0'} >> ExpectCharT{'b'};
 
   x.key = 0;
   x.prefix_zeroes = 0;
   bool has_bits = false;
-  char ch;
-  while (in.get(ch))
-  {
-    if (ch != '0' && ch != '1')
-    {
-      in.unget();
-      break;
-    }
 
+  while (true)
+  {
+    auto next = in.peek();
+    if (next == std::istream::traits_type::eof()) break;
+    char ch = static_cast< char >(next);
+    if (ch != '0' && ch != '1') break;
+    in.get();
     if (ch == '0' && !has_bits)
     {
       ++x.prefix_zeroes;
       continue;
     }
-
     has_bits = true;
-    if (x.key > (std::numeric_limits<unsigned long long>::max() >> 1))
+    if (x.key > (std::numeric_limits< unsigned long long >::max() >> 1))
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-
     x.key <<= 1;
     if (ch == '1')
     {
@@ -160,12 +271,6 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
 
 std::istream& shramko::operator>>(std::istream& in, StringT& x)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
   StreamGuard guard(in);
   in >> std::noskipws;
   in >> ExpectCharT{'"'};
@@ -185,12 +290,6 @@ std::istream& shramko::operator>>(std::istream& in, StringT& x)
 
 std::istream& shramko::operator>>(std::istream& in, dataStruct& ds)
 {
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
   in >> ExpectCharT{'('};
   dataStruct result;
 
