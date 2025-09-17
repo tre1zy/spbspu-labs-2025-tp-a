@@ -158,15 +158,14 @@ namespace cherkasov
     return polys;
   }
 
-  Polygon parsePolygon(const std::string& string)
+  Polygon parsePolygon(const std::string &str)
   {
-    std::istringstream iss(string);
+    std::istringstream iss(str);
     size_t n;
     if (!(iss >> n) || n < 3)
     {
       throw std::invalid_argument("Invalid vertex count");
     }
-
     Polygon poly;
     for (size_t i = 0; i < n; ++i)
     {
@@ -177,6 +176,25 @@ namespace cherkasov
         throw std::invalid_argument("Invalid point format");
       }
       poly.points.push_back(p);
+    }
+    if (poly.points.size() != n)
+    {
+      throw std::invalid_argument("vertex count mismatch");
+    }
+    for (size_t i = 0; i < poly.points.size(); ++i)
+    {
+      for (size_t j = i + 1; j < poly.points.size(); ++j)
+      {
+        if (poly.points[i] == poly.points[j])
+        {
+          throw std::invalid_argument("duplicate point");
+        }
+      }
+    }
+    std::string rest;
+    if (iss >> rest)
+    {
+      throw std::invalid_argument("extra data after polygon");
     }
     return poly;
   }
