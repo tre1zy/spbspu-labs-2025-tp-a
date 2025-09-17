@@ -1,32 +1,9 @@
 #include "geometry.hpp"
-#include <algorithm>
-#include <iterator>
 #include <iostream>
+#include <iterator>
+#include <algorithm>
 #include <stream-guard.hpp>
 #include <input-struct.hpp>
-
-namespace
-{
-  struct DelimiterI
-  {
-    char exp;
-  };
-
-  std::istream& operator>>(std::istream& in, DelimiterI&& rhs)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    char c = '0';
-    if (!(in >> c) || c != rhs.exp)
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
-}
 
 std::istream& aleksandrov::operator>>(std::istream& in, Point& rhs)
 {
@@ -35,8 +12,14 @@ std::istream& aleksandrov::operator>>(std::istream& in, Point& rhs)
   {
     return in;
   }
-  using sep = DelimiterI;
-  return in >> sep{ '(' } >> rhs.x >> sep{ ';' } >> rhs.y >> sep{ ')' };
+  Point temp;
+  using sep = DelimeterI;
+  in >> sep{ '(' } >> temp.x >> sep{ ';' } >> temp.y >> sep{ ')' };
+  if (in)
+  {
+    rhs = temp;
+  }
+  return in;
 }
 
 std::istream& aleksandrov::operator>>(std::istream& in, Polygon& rhs)
@@ -61,29 +44,5 @@ std::istream& aleksandrov::operator>>(std::istream& in, Polygon& rhs)
   }
   rhs.points = points;
   return in;
-}
-
-std::ostream& aleksandrov::operator<<(std::ostream& out, const Point& rhs)
-{
-  std::ostream::sentry sentry(out);
-  if (!sentry)
-  {
-    return out;
-  }
-  StreamGuard guard(out);
-  return out << '(' << rhs.x << ';' << rhs.y << ')';
-}
-
-std::ostream& aleksandrov::operator<<(std::ostream& out, const Polygon& rhs)
-{
-  std::ostream::sentry sentry(out);
-  if (!sentry)
-  {
-    return out;
-  }
-  StreamGuard guard(out);
-  out << rhs.points.size();
-  std::copy(rhs.points.begin(), rhs.points.end(), std::ostream_iterator< Point >(out, " "));
-  return out;
 }
 

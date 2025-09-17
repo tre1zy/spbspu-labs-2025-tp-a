@@ -1,10 +1,11 @@
 #include "polygon-commands.hpp"
-#include <algorithm>
-#include <iterator>
 #include <iostream>
 #include <iomanip>
-#include <numeric>
 #include <limits>
+#include <iterator>
+#include <algorithm>
+#include <numeric>
+#include <map>
 #include <stream-guard.hpp>
 
 namespace
@@ -203,7 +204,7 @@ void aleksandrov::processCommands(std::istream& in, std::ostream& out, Polygons&
       commands.at(command)();
       out << '\n';
     }
-    catch (...)
+    catch (const std::exception&)
     {
       if (in.fail())
       {
@@ -255,8 +256,9 @@ void aleksandrov::execAreaIf(const Polygons& polygons, F f, std::ostream& out)
   size_t size = std::count_if(polygons.begin(), polygons.end(), f);
   satisfying.reserve(size);
   std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(satisfying), f);
-  const auto accumulator = std::bind(std::plus<>{}, _1, std::bind(calcArea, _2));
-  out << std::accumulate(satisfying.begin(), satisfying.end(), 0.0, accumulator);
+  std::vector< double > areas(size);
+  std::transform(satisfying.begin(), satisfying.end(), areas.begin(), calcArea);
+  out << std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
 void aleksandrov::execAreaMean(const Polygons& polygons, std::ostream& out)
@@ -265,8 +267,9 @@ void aleksandrov::execAreaMean(const Polygons& polygons, std::ostream& out)
   {
     throw std::logic_error("There are no polygons!");
   }
-  const auto accumulator = std::bind(std::plus<>{}, _1, std::bind(calcArea, _2));
-  double areaSum = std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), areas.begin(), calcArea);
+  double areaSum = std::accumulate(areas.begin(), areas.end(), 0.0);
   out << areaSum / polygons.size();
 }
 
@@ -286,12 +289,12 @@ void aleksandrov::execIthSmallest(const Polygons& polygons, size_t i, std::istre
 
   const auto areaAcc = std::bind(calcArea, _1);
   using areaF = decltype(areaAcc);
-  subcommands.emplace("AREA", std::bind(execIthSmallestImpl< areaF >, std::cref(polygons), std::ref(areaAcc), i, std::ref(out)));
+  subcommands["AREA"] = std::bind(execIthSmallestImpl< areaF >, std::cref(polygons), std::ref(areaAcc), i, std::ref(out));
 
   auto verts = std::bind(std::mem_fn(&Polygon::points), _1);
   auto size = std::bind(std::mem_fn(&std::vector< Point >::size), verts);
   using vertsF = decltype(size);
-  subcommands.emplace("VERTEXES", std::bind(execIthSmallestImpl< vertsF >, std::cref(polygons), std::ref(size), i, std::ref(out)));
+  subcommands["VERTEXES"] = std::bind(execIthSmallestImpl< vertsF >, std::cref(polygons), std::ref(size), i, std::ref(out));
 
   subcommands.at(subcommand)();
 }

@@ -2,7 +2,6 @@
 #define POLYGON_COMMANDS_HPP
 
 #include <ios>
-#include <map>
 #include <vector>
 #include <functional>
 #include "geometry.hpp"
