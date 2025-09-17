@@ -86,25 +86,27 @@ namespace cherkasov
 
   bool polygonsIntersect(const Polygon& a, const Polygon& b)
   {
-    size_t n = a.points.size();
-    size_t m = b.points.size();
+    if (a.points == b.points)
+    {
+     return true;
+    }
+    const size_t n = a.points.size();
+    const size_t m = b.points.size();
     for (size_t i = 0; i < n; ++i)
     {
-      Point a1 = a.points[i];
-      Point a2 = a.points[(i + 1) % n];
+      const Point &a1 = a.points[i];
+      const Point &a2 = a.points[(i + 1) % n];
       for (size_t j = 0; j < m; ++j)
       {
-        Point b1 = b.points[j];
-        Point b2 = b.points[(j + 1) % m];
+        const Point &b1 = b.points[j];
+        const Point &b2 = b.points[(j + 1) % m];
         if (edgesIntersect(a1, a2, b1, b2))
         {
           return true;
         }
       }
     }
-    return false;
   }
-
   bool hasRightAngle(const Polygon& poly)
   {
     size_t n = poly.points.size();
