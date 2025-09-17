@@ -22,7 +22,7 @@ namespace cherkasov
   };
 
   double getArea(const Polygon& poly);
-  bool PolygonsIntersect(const Polygon& a, const Polygon& b);
+  bool polygonsIntersect(const Polygon& a, const Polygon& b);
   bool hasRightAngle(const Polygon& poly);
 
   std::vector<Polygon> readPolygons(const std::string& filename);
