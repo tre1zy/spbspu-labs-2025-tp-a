@@ -4,6 +4,7 @@
 #include <numeric>
 #include <iterator>
 #include <iomanip>
+#include <vector>
 
 void shak::createDict(shak::Dictionaries &dicts, std::istream &in)
 {
