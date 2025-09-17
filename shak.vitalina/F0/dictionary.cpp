@@ -5,7 +5,6 @@ std::string shak::printPair(const std::pair< std::string, size_t > &p)
   return p.first + ": " + std::to_string(p.second);
 }
 
-
 bool shak::uniqueOnce(const std::pair< const std::string, size_t > &p)
 {
     return p.second == 1;
