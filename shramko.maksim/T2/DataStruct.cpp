@@ -1,4 +1,4 @@
-#include "dataStruct.hpp"
+#include "DataStruct.hpp"
 #include <iomanip>
 #include <string>
 #include <limits>
