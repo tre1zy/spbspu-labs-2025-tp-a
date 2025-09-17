@@ -3,7 +3,29 @@
 #include <string>
 #include <limits>
 #include <cmath>
+#include <cctype>
 #include "streamGuard.hpp"
+
+namespace
+{
+  void skip_ws(std::istream& in)
+  {
+    while (true)
+    {
+      int next = in.peek();
+      if (next == std::istream::traits_type::eof())
+      {
+        break;
+      }
+      char ch = static_cast< char >(next);
+      if (!std::isspace(ch))
+      {
+        break;
+      }
+      in.get();
+    }
+  }
+}
 
 bool shramko::dataStruct::operator<(const dataStruct& other)
 {
@@ -115,6 +137,8 @@ std::istream& shramko::operator>>(std::istream& in, ExpectCharT&& x)
 
 std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
 {
+  skip_ws(in);
+
   double mant_sign = 1.0;
   int next = in.peek();
   if (next == std::istream::traits_type::eof())
@@ -272,6 +296,7 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
 std::istream& shramko::operator>>(std::istream& in, StringT& x)
 {
   StreamGuard guard(in);
+  skip_ws(in);
   in >> std::noskipws;
   in >> ExpectCharT{'"'};
 
