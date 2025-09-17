@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-#include "dataStruct.hpp"
+#include "DataStruct.hpp"
 
 int main()
 {
