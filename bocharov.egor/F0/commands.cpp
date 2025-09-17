@@ -221,28 +221,6 @@ namespace
     }
   };
 
-  struct VectorAccumulator
-  {
-    std::vector<std::pair<std::string, int>> & vec;
-
-    Empty operator()(Empty accum, const std::pair<const std::string, int> & p) const
-    {
-      vec.emplace_back(p.first, p.second);
-      return accum;
-    }
-  };
-
-  struct OutputPrinter
-  {
-    std::ostream & out;
-
-    Empty operator()(Empty accum, const std::pair<std::string, int> & p) const
-    {
-      out << p.first << ' ' << p.second << '\n';
-      return accum;
-    }
-  };
-
   struct DictNameReader
   {
     std::istream & in;
@@ -316,6 +294,32 @@ namespace
       return acc;
     }
   };
+
+  struct TransformPair
+  {
+    std::pair< std::string, int > operator()(const std::pair< const std::string, int > & p) const
+    {
+      return { p.first, p.second };
+    }
+  };
+
+  struct PairToString
+  {
+    std::string operator()(const std::pair< std::string, int > & p) const
+    {
+      return p.first + ' ' + std::to_string(p.second);
+    }
+  };
+
+  struct DictExists
+  {
+    const bocharov::dict_dict_t & dicts;
+    bool operator()(const std::string & dictName) const
+    {
+      return dicts.find(dictName) != dicts.end();
+    }
+  };
+
 }
 
 
@@ -338,7 +342,7 @@ namespace bocharov
         << "mostcommon <N> <K> <dictname1> ... <dictnameK> - print most common words\n"
         << "rewritefile <filename> <N> <dictname1> ... <dictnameN> - rewrite file with dictionaries\n"
         << "rare <K> <result dict> <N> <dict1> <dict2> ... <dictn> - create dictionary with words present in at most K of N dictionaries\n"
-        << "--help - show help\n";
+        << "help - show help\n";
   }
 
   void createDict(std::istream & in, dict_dict_t & dicts)
@@ -508,12 +512,12 @@ namespace bocharov
 
     std::vector<std::pair<std::string, int>> sorted;
     sorted.reserve(frequencies.size());
-    std::accumulate(frequencies.begin(), frequencies.end(), Empty{}, VectorAccumulator{ sorted });
+    std::transform(frequencies.begin(), frequencies.end(), std::back_inserter(sorted), TransformPair{});
 
     std::sort(sorted.begin(), sorted.end(), FreqComparator{});
 
     int num = std::min(n, static_cast<int>(sorted.size()));
-    std::accumulate(sorted.begin(), sorted.begin() + num, Empty{}, OutputPrinter{ out });
+    std::transform(sorted.begin(), sorted.begin() + num, std::ostream_iterator< std::string >(out, "\n"), PairToString{});
   }
 
   void rewriteFile(std::istream & in, const dict_dict_t & dicts)
@@ -549,7 +553,7 @@ namespace bocharov
     std::vector<std::string> dictNames;
     std::generate_n(std::back_inserter(dictNames), n, DictNameReader{ in });
 
-    bool allExist = std::accumulate(dictNames.begin(), dictNames.end(), true, CheckDictExists{ dicts });
+    bool allExist = std::all_of(dictNames.begin(), dictNames.end(), DictExists{ dicts });
     if (!allExist)
     {
       throw std::invalid_argument("INVALID COMMAND");

@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
   commands["writedicts"] = std::bind(writeDicts, std::ref(std::cin), std::cref(dicts));
   commands["mostcommon"] = std::bind(printMostCommon, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   commands["rare"] = std::bind(rare, std::ref(std::cin), std::ref(dicts));
-  commands["--help"] = std::bind(printHelp, std::ref(std::cout));
+  commands["help"] = std::bind(printHelp, std::ref(std::cout));
 
   std::string cmd;
   while (std::cin >> cmd)
