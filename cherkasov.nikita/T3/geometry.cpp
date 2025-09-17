@@ -1,6 +1,9 @@
 #include "geometry.hpp"
 #include <cmath>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 
 namespace cherkasov
 {
@@ -122,5 +125,59 @@ namespace cherkasov
       }
     }
     return false;
+  }
+  std::vector<Polygon> readPolygons(const std::string& filename)
+  {
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+      throw std::runtime_error("Cannot open file: " + filename);
+    }
+
+    std::vector<Polygon> polys;
+    std::string line;
+    while (std::getline(file, line))
+    {
+      if (line.empty())
+      {
+        continue;
+      }
+      try
+      {
+        Polygon poly = parsePolygon(line);
+        if (poly.points.size() >= 3)
+        {
+          polys.push_back(poly);
+        }
+      }
+      catch (...)
+      {
+        continue;
+      }
+    }
+    return polys;
+  }
+
+  Polygon parsePolygon(const std::string& string)
+  {
+    std::istringstream iss(string);
+    size_t n;
+    if (!(iss >> n) || n < 3)
+    {
+      throw std::invalid_argument("Invalid vertex count");
+    }
+
+    Polygon poly;
+    for (size_t i = 0; i < n; ++i)
+    {
+      char ch;
+      Point p;
+      if (!(iss >> ch >> p.x >> ch >> p.y >> ch))
+      {
+        throw std::invalid_argument("Invalid point format");
+      }
+      poly.points.push_back(p);
+    }
+    return poly;
   }
 }

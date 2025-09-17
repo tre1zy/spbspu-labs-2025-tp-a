@@ -2,6 +2,7 @@
 #define GEOMETRY_HPP
 
 #include <vector>
+#include <string>
 
 namespace cherkasov
 {
@@ -20,9 +21,12 @@ namespace cherkasov
     bool operator==(const Polygon& other) const;
   };
 
-  double computeArea(const Polygon& poly);
-  bool doPolygonsIntersect(const Polygon& a, const Polygon& b);
+  double getArea(const Polygon& poly);
+  bool PolygonsIntersect(const Polygon& a, const Polygon& b);
   bool hasRightAngle(const Polygon& poly);
+
+  std::vector<Polygon> readPolygons(const std::string& filename);
+  Polygon parsePolygon(const std::string& string);
 }
 
 #endif
