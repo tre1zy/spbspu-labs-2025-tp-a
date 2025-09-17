@@ -134,7 +134,7 @@ namespace cherkasov
     }
     return false;
   }
-  bool cherkasov::isPointInPolygon(const Point& point, const Polygon& poly)
+  bool isPointInPolygon(const Point& point, const Polygon& poly)
   {
     if (poly.points.size() < 3)
     {
