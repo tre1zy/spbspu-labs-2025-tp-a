@@ -9,7 +9,7 @@
 #include <string>
 #include <set>
 #include "geometry.hpp"
-#include <stream_guard.hpp>
+#include "stream_guard.hpp"
 
 namespace
 {
