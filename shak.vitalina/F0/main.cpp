@@ -21,7 +21,8 @@ int main()
   cmds["most"] = std::bind(mostPopular, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
   cmds["equal"] = std::bind(equal, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
   cmds["compare"] = std::bind(compare, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
-  std::string command;
+  cmds["intersection"] = std::bind(intersection, std::ref(dicts), std::ref(std::cin));
+   std::string command;
   while (!(std::cin >> command).eof())
   {
     try

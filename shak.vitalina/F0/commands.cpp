@@ -254,3 +254,24 @@ void shak::compare(Dictionaries &dicts, std::istream &in, std::ostream &out)
   bool eq = std::equal(d1.begin(), d1.end(), d2.begin(), pairEqual);
   out << (eq ? 1 : 0) << '\n';
 }
+
+void shak::intersection(Dictionaries &dicts, std::istream &in)
+{
+  std::string dict1, dict2, dictNew;
+  in >> dict1 >> dict2 >> dictNew;
+  if (dict1.empty() || dict2.empty())
+  {
+    throw std::invalid_argument("no arguments");
+  }
+  auto dictIter1 = dicts.find(dict1);
+  auto dictIter2 = dicts.find(dict2);
+  if (dictIter1 == dicts.end() || dictIter2 == dicts.end() || dicts.count(dictNew))
+  {
+    throw std::invalid_argument("no dictionaries with names");
+  }
+  auto &d1 = dictIter1->second.dictionary;
+  auto &d2 = dictIter2->second.dictionary;
+  FrequencyDictionary newDict;
+  std::copy_if(d1.begin(), d1.end(), std::inserter(newDict.dictionary, newDict.dictionary.begin()), IntersectDict(dictIter2->second));
+  dicts.emplace(dictNew, std::move(newDict));
+}

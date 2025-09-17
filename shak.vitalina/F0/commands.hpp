@@ -17,5 +17,6 @@ namespace shak
   void mostPopular(Dictionaries &dicts, std::istream &in, std::ostream &out);
   void equal(Dictionaries &dicts, std::istream &in, std::ostream &out);
   void compare(Dictionaries &dicts, std::istream &in, std::ostream &out);
+  void intersection(Dictionaries &dicts, std::istream &in);
 }
 #endif

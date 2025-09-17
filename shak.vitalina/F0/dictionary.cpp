@@ -23,3 +23,12 @@ bool shak::sortByFreq(const std::pair< std::string, size_t > &p1, const std::pai
   }
   return p1.first < p2.first;
 }
+
+shak::IntersectDict::IntersectDict(const shak::FrequencyDictionary &d):
+  dict2(d)
+{}
+
+bool shak::IntersectDict::operator()(const std::pair< const std::string, size_t > &entry) const
+{
+  return dict2.dictionary.count(entry.first) > 0;
+}
