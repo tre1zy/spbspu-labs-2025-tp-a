@@ -86,29 +86,33 @@ namespace cherkasov
 
   bool polygonsIntersect(const Polygon& a, const Polygon& b)
   {
-   if (a.points == b.points)
-  {
-    return true;
-  }
-  const size_t n = a.points.size();
-  const size_t m = b.points.size();
-  for (size_t i = 0; i < n; ++i)
-  {
-    const Point &a1 = a.points[i];
-    const Point &a2 = a.points[(i + 1) % n];
-
-    for (size_t j = 0; j < m; ++j)
+    if (a.points == b.points)
     {
-      const Point &b1 = b.points[j];
-      const Point &b2 = b.points[(j + 1) % m];
-      if (edgesIntersect(a1, a2, b1, b2))
+      return true;
+    }
+    const size_t n = a.points.size();
+    const size_t m = b.points.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+      const Point& a1 = a.points[i];
+      const Point& a2 = a.points[(i + 1) % n];
+      for (size_t j = 0; j < m; ++j)
       {
-        return true;
+        const Point& b1 = b.points[j];
+        const Point& b2 = b.points[(j + 1) % m];
+        if (edgesIntersect(a1, a2, b1, b2))
+        {
+          return true;
+        }
       }
     }
+    if (isPointInPolygon(a.points[0], b) || isPointInPolygon(b.points[0], a))
+    {
+      return true;
+    }
+    return false;
   }
-  return false;
-  }
+
   bool hasRightAngle(const Polygon& poly)
   {
     size_t n = poly.points.size();
@@ -129,6 +133,28 @@ namespace cherkasov
       }
     }
     return false;
+  }
+  bool cherkasov::isPointInPolygon(const Point& point, const Polygon& poly)
+  {
+    if (poly.points.size() < 3)
+    {
+      return false;
+    }
+    bool inside = false;
+    size_t n = poly.points.size();
+    for (size_t i = 0, j = n - 1; i < n; j = i++)
+    {
+      const Point& pi = poly.points[i];
+      const Point& pj = poly.points[j];
+      bool intersect = ((pi.y > point.y) != (pj.y > point.y)) &&
+        (point.x < (pj.x - pi.x) * (point.y - pi.y) / double(pj.y - pi.y) + pi.x);
+
+      if (intersect)
+      {
+        inside = !inside;
+      }
+    }
+    return inside;
   }
   std::vector<Polygon> readPolygons(const std::string& filename)
   {
