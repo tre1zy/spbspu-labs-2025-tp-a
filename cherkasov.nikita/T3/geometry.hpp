@@ -24,7 +24,6 @@ namespace cherkasov
   double getArea(const Polygon& poly);
   bool polygonsIntersect(const Polygon& a, const Polygon& b);
   bool hasRightAngle(const Polygon& poly);
-
   std::vector<Polygon> readPolygons(const std::string& filename);
   Polygon parsePolygon(const std::string& string);
 }
