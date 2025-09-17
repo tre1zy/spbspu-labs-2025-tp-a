@@ -1,28 +1,28 @@
 #include "ioGeometry.hpp"
-#include <ioDelimiter.hpp>
 #include <functional>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
 #include <numeric>
+#include <ioDelimiter.hpp>
 
 namespace
 {
-  int scalarProduct(const bocharov::Point & a, const bocharov::Point & b, const bocharov::Point & c)
-  {
-    int vectorX1 = b.x - a.x;
-    int vectorY1 = b.y - a.y;
-    int vectorX2 = c.x - b.x;
-    int vectorY2 = c.y - b.y;
-    return vectorX1 * vectorX2 + vectorY1 * vectorY2;
-  }
-
   double vectorProduct(const bocharov::Point & p0, const bocharov::Point & p1, const bocharov::Point & p2)
   {
     double d1 = (p1.x - p0.x) * (p2.y - p0.y);
     double d2 = (p2.x - p0.x) * (p1.y - p0.y);
     return 0.5 * std::abs(d1 - d2);
   }
+}
+
+int bocharov::scalarProduct(const Point & a, const Point & b, const Point & c)
+{
+  int vectorX1 = b.x - a.x;
+  int vectorY1 = b.y - a.y;
+  int vectorX2 = c.x - b.x;
+  int vectorY2 = c.y - b.y;
+  return vectorX1 * vectorX2 + vectorY1 * vectorY2;
 }
 
 std::istream & bocharov::operator>>(std::istream & in, Point & dest)
@@ -64,24 +64,6 @@ std::istream & bocharov::operator>>(std::istream & in, Polygon & dest)
   return in;
 }
 
-std::ostream & bocharov::operator<<(std::ostream & out, const Point & dest)
-{
-  return out << '(' << dest.x << ';' << dest.y << ')';
-}
-
-std::ostream & bocharov::operator<<(std::ostream & out, const Polygon & dest)
-{
-  std::ostream::sentry sentry(out);
-  if (!sentry)
-  {
-    return out;
-  }
-  using oIterator = std::ostream_iterator< Point >;
-  out << dest.points.size() << ' ';
-  std::copy(dest.points.begin(), dest.points.end(), oIterator(out, " "));
-  return out;
-}
-
 bool bocharov::Point::operator==(const Point & rhs) const
 {
   return x == rhs.x && y == rhs.y;
@@ -100,17 +82,6 @@ bool bocharov::isEven(const Polygon & polygon)
 bool bocharov::isOdd(const Polygon & polygon)
 {
   return !isEven(polygon);
-}
-
-bool bocharov::isRectangle(const Polygon & polygon)
-{
-  if (polygon.points.size() != 4)
-  {
-    return false;
-  }
-  const auto & p = polygon.points;
-  bool check = (scalarProduct(p[0], p[1], p[2]) == 0) && (scalarProduct(p[1], p[2], p[3]) == 0);
-  return check && (scalarProduct(p[2], p[3], p[0]) == 0);
 }
 
 bool bocharov::hasNVertexes(const Polygon & polygon, size_t num)

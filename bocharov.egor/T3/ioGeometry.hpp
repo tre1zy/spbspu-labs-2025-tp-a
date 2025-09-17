@@ -20,10 +20,11 @@ namespace bocharov
 
   bool isOdd(const Polygon & polygon);
   bool isEven(const Polygon & polygon);
-  bool isRectangle(const Polygon & polygon);
   bool hasNVertexes(const Polygon & polygon, size_t num);
   double getPolygonArea(const Polygon & polygon);
   bool compareVertexes(const Polygon & poly1, const Polygon & poly2);
+  int scalarProduct(const Point & a, const Point & b, const Point & c);
+
 
   std::istream & operator>>(std::istream & in, Point & dest);
   std::istream & operator>>(std::istream & in, Polygon & dest);

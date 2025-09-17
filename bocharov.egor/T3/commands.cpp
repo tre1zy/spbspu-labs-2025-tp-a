@@ -11,110 +11,148 @@
 
 namespace
 {
-  using bocharov::Polygon;
+  using namespace bocharov;
+  using Predicate = std::function< bool(const Polygon &) >;
 
-  void getAreaEven(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  struct AreaSumCalculator
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< bocharov::Polygon > filtered;
-    filtered.reserve(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), bocharov::isEven);
-    std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), bocharov::getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    Predicate pred;
+    double operator()(const std::vector< Polygon > & polygons) const
+    {
+      std::vector<Polygon> filteredPolygons;
+      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filteredPolygons), pred);
+
+      std::vector< double > areas(filteredPolygons.size());
+
+      std::transform(filteredPolygons.begin(), filteredPolygons.end(), std::back_inserter(areas), getPolygonArea);
+      return std::accumulate(areas.begin(), areas.end(), 0.0);
+    }
+  };
+
+  struct AlwaysTrue
+  {
+    bool operator()(const Polygon &) const noexcept
+    {
+      return true;
+    }
+  };
+
+  struct SequenceCounter
+  {
+    const Polygon & target;
+    size_t maxCount = 0;
+    size_t currentCount = 0;
+
+    void process(const Polygon & poly)
+    {
+      if (poly == target)
+      {
+        currentCount++;
+        maxCount = std::max(maxCount, currentCount);
+      }
+      else
+      {
+        currentCount = 0;
+      }
+    }
+  };
+
+  class ToFlag
+  {
+  public:
+    explicit ToFlag(const Polygon & target):
+      target_(target)
+    {}
+
+    size_t operator()(const Polygon & poly) const
+    {
+      return poly == target_ ? 1 : 0;
+    }
+  private:
+    const Polygon & target_;
+  };
+
+  struct ResetableAdder
+  {
+    size_t operator()(size_t prev, size_t x) const
+    {
+      return x ? prev + 1 : 0;
+    }
+  };
+
+  template<typename Compare>
+  void getExtremumArea(std::ostream & out, const std::vector< Polygon > & polygons, Compare comp)
+  {
+    StreamGuard guard(out);
+    std::vector< double > areas;
+    areas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), getPolygonArea);
+    auto extremum_it = std::min_element(areas.begin(), areas.end(), comp);
+    out << std::fixed << std::setprecision(1) << *extremum_it;
   }
 
-  void getAreaOdd(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getAreaByPredicate(std::ostream & out, const std::vector< Polygon > & polygons, Predicate pred)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< bocharov::Polygon > filtered;
-    filtered.reserve(polygons.size());
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), bocharov::isOdd);
-    std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), bocharov::getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    StreamGuard guard(out);
+    AreaSumCalculator calculator{pred};
+    double result = calculator(polygons);
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getAreaMean(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getAreaMean(std::ostream & out, const std::vector< Polygon > & polygons)
   {
     if (polygons.empty())
     {
       throw std::runtime_error("ERROR: there are no polygons");
     }
-    bocharov::StreamGuard guard(out);
-    std::vector< double > areas;
-    areas.reserve(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), bocharov::getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0) / areas.size();
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    StreamGuard guard(out);
+    AreaSumCalculator calculator{AlwaysTrue{}};
+    double result = calculator(polygons) / polygons.size();
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getAreaVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons, size_t num)
+  void getAreaVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< bocharov::Polygon > filtered;
-    filtered.reserve(polygons.size());
-    auto pred = std::bind(bocharov::hasNVertexes, std::placeholders::_1, num);
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
-    std::vector< double > areas(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), bocharov::getPolygonArea);
-    double result = std::accumulate(areas.begin(), areas.end(), 0.0);
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    StreamGuard guard(out);
+    auto pred = std::bind(hasNVertexes, std::placeholders::_1, num);
+    AreaSumCalculator calculator{pred};
+    double result = calculator(polygons);
+    out << std::fixed << std::setprecision(1) << result;
   }
 
-  void getMaxArea(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getMaxVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), bocharov::getPolygonArea);
-    double result = *std::max_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    StreamGuard guard(out);
+    auto result = *std::max_element(polygons.begin(), polygons.end(), compareVertexes);
+    out << result.points.size();
   }
 
-  void getMaxVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getMinVertexes(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    auto result = *std::max_element(polygons.begin(), polygons.end(), bocharov::compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
+    StreamGuard guard(out);
+    auto result = *std::min_element(polygons.begin(), polygons.end(), compareVertexes);
+    out << std::fixed << std::setprecision(1) << result.points.size();
   }
 
-  void getMinArea(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getCountEven(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    std::vector< double > areas(polygons.size());
-    std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas), bocharov::getPolygonArea);
-    double result = *std::min_element(areas.begin(), areas.end());
-    out << std::fixed << std::setprecision(1) << result << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), isEven);
   }
 
-  void getMinVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getCountOdd(std::ostream & out, const std::vector< Polygon > & polygons)
   {
-    bocharov::StreamGuard guard(out);
-    auto result = *std::min_element(polygons.begin(), polygons.end(), bocharov::compareVertexes);
-    out << std::fixed << std::setprecision(1) << result.points.size() << '\n';
+    out << std::count_if(polygons.cbegin(), polygons.cend(), isOdd);
   }
 
-  void getCountEven(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
+  void getCountVertexes(std::ostream & out, const std::vector< Polygon > & polygons, size_t num)
   {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), bocharov::isEven) << '\n';
-  }
-
-  void getCountOdd(std::ostream & out, const std::vector< bocharov::Polygon > & polygons)
-  {
-    out << std::count_if(polygons.cbegin(), polygons.cend(), bocharov::isOdd) << '\n';
-  }
-
-  void getCountVertexes(std::ostream & out, const std::vector< bocharov::Polygon > & polygons, size_t num)
-  {
-    auto pred = std::bind(bocharov::hasNVertexes, std::placeholders::_1, num);
-    out << std::count_if(polygons.cbegin(), polygons.cend(), pred) << '\n';
+    auto pred = std::bind(hasNVertexes, std::placeholders::_1, num);
+    out << std::count_if(polygons.cbegin(), polygons.cend(), pred);
   }
 
   struct RightAngleCheck
   {
-    const bocharov::Polygon & plg;
+    const Polygon & plg;
 
     bool operator()(size_t ind) const
     {
@@ -123,13 +161,7 @@ namespace
       auto curr = plg.points[ind];
       auto next = plg.points[(ind + 1) % n];
 
-      double dx1 = curr.x - prev.x;
-      double dy1 = curr.y - prev.y;
-      double dx2 = next.x - curr.x;
-      double dy2 = next.y - curr.y;
-
-      double scalar = dx1 * dx2 + dy1 * dy2;
-      return scalar == 0;
+      return bocharov::scalarProduct(prev, curr, next) == 0;
     }
   };
 
@@ -145,8 +177,8 @@ namespace
 void bocharov::getArea(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["EVEN"] = std::bind(getAreaEven, std::ref(out), std::cref(polygons));
-  subcmds["ODD"] = std::bind(getAreaOdd, std::ref(out), std::cref(polygons));
+  subcmds["EVEN"] = std::bind(getAreaByPredicate, std::ref(out), std::cref(polygons), isEven);
+  subcmds["ODD"] = std::bind(getAreaByPredicate, std::ref(out), std::cref(polygons), isOdd);
   subcmds["MEAN"] = std::bind(getAreaMean, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
@@ -173,7 +205,7 @@ void bocharov::getMax(std::istream & in, std::ostream & out, const std::vector< 
     throw std::runtime_error("ERROR: there are no polygons");
   }
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(getMaxArea, std::ref(out), std::cref(polygons));
+  subcmds["AREA"] = std::bind(getExtremumArea< std::greater< double > >, std::ref(out), std::cref(polygons), std::greater< double >());
   subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
@@ -188,7 +220,7 @@ void bocharov::getMin(std::istream & in, std::ostream & out, const std::vector< 
     throw std::runtime_error("ERROR: there are no polygons");
   }
   std::map< std::string, std::function< void() > > subcmds;
-  subcmds["AREA"] = std::bind(getMinArea, std::ref(out), std::cref(polygons));
+  subcmds["AREA"] = std::bind(getExtremumArea< std::less< double > >, std::ref(out), std::cref(polygons), std::less< double >());
   subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
 
   std::string subcmd;
@@ -227,24 +259,25 @@ void bocharov::getMaxSeqCommand(std::istream & in, std::ostream & out, const std
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  size_t maxCount = 0;
-  size_t currentCount = 0;
-  for (const auto & poly : polygons)
+
+  if (polygons.empty())
   {
-    if (poly == target)
-    {
-      currentCount++;
-      maxCount = std::max(maxCount, currentCount);
-    }
-    else
-    {
-      currentCount = 0;
-    }
+    out << 0;
+    return;
   }
-    out << maxCount << "\n";
+
+  std::vector< size_t > flags;
+  flags.reserve(polygons.size());
+  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(flags), ToFlag(target));
+
+  std::vector< size_t > sequenceLengths(flags.size());
+  std::partial_sum(flags.cbegin(), flags.cend(), sequenceLengths.begin(), ResetableAdder{});
+
+  size_t maxCount = *std::max_element(sequenceLengths.cbegin(), sequenceLengths.cend());
+  out << maxCount;
 }
 
 void bocharov::getRightsCnt(std::ostream & out, const std::vector< Polygon > & polygons)
 {
-  out << count_if(polygons.cbegin(), polygons.cend(), hasRights) << "\n";
+  out << count_if(polygons.cbegin(), polygons.cend(), hasRights);
 }
