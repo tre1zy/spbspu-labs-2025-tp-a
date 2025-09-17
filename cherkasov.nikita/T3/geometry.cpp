@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-#include <stdexcept>sss
+#include <stdexcept>
 
 namespace cherkasov
 {
