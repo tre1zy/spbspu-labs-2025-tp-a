@@ -10,7 +10,6 @@ namespace geom
         int x;
         int y;
 
-      
         bool operator<(const Point& other) const
         {
             return (x < other.x) || (x == other.x && y < other.y);
@@ -36,7 +35,7 @@ namespace geom
     Polygon createTrg(size_t i, const std::vector<Point>& points);
     std::vector<Polygon> polyToTrg(const Polygon& poly);
 
-    
+
     bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2);
     bool doSegmentsIntersect(const Point& p1, const Point& p2, const Point& q1, const Point& q2);
     int orientation(const Point& p, const Point& q, const Point& r);

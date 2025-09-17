@@ -31,7 +31,7 @@ namespace geom
 
     std::istream& operator>>(std::istream& in, Point& p)
     {
-        
+
         char discard;
         if (!(in >> discard >> p.x >> discard >> p.y >> discard)) {
             in.setstate(std::ios::failbit);
@@ -41,7 +41,7 @@ namespace geom
 
     std::istream& operator>>(std::istream& in, Polygon& poly)
     {
-       
+
         size_t count;
         if (!(in >> count) || count < 3) {
             in.setstate(std::ios::failbit);
@@ -60,7 +60,7 @@ namespace geom
             pts.push_back(p);
         }
 
-        
+
         std::set<Point> uniquePoints;
         for (const auto& point : pts) {
             if (!uniquePoints.insert(point).second) {
@@ -115,7 +115,7 @@ namespace geom
 
     double getPolygonArea(const Polygon& poly)
     {
-        
+
         if (poly.points.size() < 3) return 0.0;
 
         double area = 0.0;
@@ -130,7 +130,6 @@ namespace geom
         return std::abs(area) / 2.0;
     }
 
-    
     int orientation(const Point& p, const Point& q, const Point& r)
     {
         int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
@@ -166,7 +165,7 @@ namespace geom
 
     bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2)
     {
-        
+
         for (size_t i = 0; i < poly1.points.size(); ++i) {
             size_t next_i = (i + 1) % poly1.points.size();
             for (size_t j = 0; j < poly2.points.size(); ++j) {

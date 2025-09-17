@@ -285,7 +285,7 @@ void bob::printIntersectionsCnt(std::istream& input, const std::vector<Polygon>&
         throw std::invalid_argument("Invalid polygon input");
     }
 
-    
+
     std::set<geom::Point> uniquePoints(ref.points.begin(), ref.points.end());
     if (uniquePoints.size() != ref.points.size()) {
         throw std::invalid_argument("Reference polygon has duplicate points");
