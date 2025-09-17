@@ -12,7 +12,6 @@
 int main(int argc, char* argv[])
 {
     using Polygon = geom::Polygon;
-    using it = std::istream_iterator<Polygon>;
 
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <filename>\n";

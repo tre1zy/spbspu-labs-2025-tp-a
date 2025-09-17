@@ -49,11 +49,6 @@ namespace
         }
     };
 
-    bool intersectionCheck(const Polygon& polygon, const Polygon& other)
-    {
-        return geom::doPolygonsIntersect(polygon, other);
-    }
-
     size_t countEvenVertices(const std::vector<Polygon>& polygons)
     {
         return std::count_if(polygons.begin(), polygons.end(), hasEvenVertices);
