@@ -215,15 +215,18 @@ namespace cherkasov
   }
 
   void handleIntersections(const std::vector<Polygon> &polys, const std::string &arg)
+{
+  Polygon q = parsePolygon(arg);
+  size_t count = 0;
+  for (const auto &p : polys)
   {
-    Polygon q = parsePolygon(arg);
-    size_t c = std::count_if(polys.begin(), polys.end(),
-      [&q](const Polygon &p)
-      {
-        return polygonsIntersect(p, q);
-      });
-    printCount(c);
+    if (polygonsIntersect(p, q))
+    {
+      count++;
+    }
   }
+  printCount(count);
+}
 
   void handleRightShapes(const std::vector<Polygon> &polys)
   {
