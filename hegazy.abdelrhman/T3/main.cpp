@@ -11,73 +11,52 @@
 
 int main(int argc, char* argv[])
 {
-    using Polygon = geom::Polygon;
+  using Polygon = geom::Polygon;
+  using it = std::istream_iterator< Polygon >;
 
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <filename>\n";
-        return 1;
+  if (argc != 2)
+  {
+    return 1;
+  }
+
+  std::vector< Polygon > polyList;
+  std::ifstream inFile(argv[1]);
+
+  while (!inFile.eof())
+  {
+    std::copy(it(inFile), it(), std::back_inserter(polyList));
+    if (!inFile)
+    {
+      inFile.clear();
+      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+  }
 
-    std::vector<Polygon> polyList;
-    std::ifstream inFile(argv[1]);
+  std::map< std::string, std::function< void() > > commandMap;
+  commandMap["AREA"] = std::bind(bob::printAreaSum, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  commandMap["MAX"] = std::bind(bob::printMaxValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  commandMap["MIN"] = std::bind(bob::printMinValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  commandMap["COUNT"] = std::bind(bob::printCountOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  commandMap["LESSAREA"] = std::bind(bob::printLessAreaCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
 
-    if (!inFile) {
-        std::cerr << "Error opening file: " << argv[1] << "\n";
-        return 1;
+  std::string line;
+  while (!(std::cin >> line).eof())
+  {
+    try
+    {
+      commandMap.at(line)();
+      std::cout << "\n";
     }
-
-    while (!inFile.eof()) {
-        Polygon poly;
-        if (inFile >> poly) {
-            polyList.push_back(poly);
-        }
-        else {
-            inFile.clear();
-            inFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+    catch (const std::exception& e)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      if (std::cin.fail())
+      {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
-
-    using CommandHandler = std::function<void()>;
-    std::map<std::string, CommandHandler> commandMap;
-
-    commandMap["AREA"] = [&]() {
-        bob::printAreaSum(std::cin, polyList, std::cout);
-        };
-    commandMap["MAX"] = [&]() {
-        bob::printMaxValueOf(std::cin, polyList, std::cout);
-        };
-    commandMap["MIN"] = [&]() {
-        bob::printMinValueOf(std::cin, polyList, std::cout);
-        };
-    commandMap["COUNT"] = [&]() {
-        bob::printCountOf(std::cin, polyList, std::cout);
-        };
-    commandMap["LESSAREA"] = [&]() {
-        bob::printLessAreaCnt(std::cin, polyList, std::cout);
-        };
-    commandMap["INTERSECTIONS"] = [&]() {
-        bob::printIntersectionsCnt(std::cin, polyList, std::cout);
-        };
-
-    std::string line;
-    while (std::cin >> line) {
-        try {
-            auto it = commandMap.find(line);
-            if (it != commandMap.end()) {
-                it->second();
-                std::cout << "\n";
-            }
-            else {
-                throw std::invalid_argument("Unknown command");
-            }
-        }
-        catch (const std::exception& e) {
-            std::cout << "<INVALID COMMAND>\n";
-            if (std::cin.fail()) {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            }
-        }
-    }
-    return 0;
+  }
+  return 0;
 }
