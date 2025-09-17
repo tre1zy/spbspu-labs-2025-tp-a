@@ -270,7 +270,6 @@ void shak::intersection(Dictionaries &dicts, std::istream &in)
     throw std::invalid_argument("no dictionaries with names");
   }
   auto &d1 = dictIter1->second.dictionary;
-  auto &d2 = dictIter2->second.dictionary;
   FrequencyDictionary newDict;
   std::copy_if(d1.begin(), d1.end(), std::inserter(newDict.dictionary, newDict.dictionary.begin()), IntersectDict(dictIter2->second));
   dicts.emplace(dictNew, std::move(newDict));
