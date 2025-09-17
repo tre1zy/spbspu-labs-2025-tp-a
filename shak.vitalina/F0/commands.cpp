@@ -171,6 +171,34 @@ void shak::getUniqe(Dictionaries &dicts, std::istream& in, std::ostream& out)
   out << count << '\n';
 }
 
+void shak::mostPopular(Dictionaries &dicts, std::istream &in, std::ostream &out)
+{
+  std::string dictName;
+  size_t n{};
+  in >> dictName >> n;
+  auto dictIter = dicts.find(dictName);
+  if (dictIter == dicts.end()) {
+    throw std::invalid_argument("no dictionaries with names");
+  }
+  const auto &dict = dictIter->second.dictionary;
+  if (dict.empty()) {
+    throw std::invalid_argument("dictionary is empty");
+  }
+  std::vector< std::pair< std::string, size_t > > words;
+  words.reserve(dict.size());
+  std::copy(dict.begin(), dict.end(), std::back_inserter(words));
+  size_t num = n;
+  if (n == 0 || n > words.size()) {
+    num = words.size();
+  }
+  if (num < words.size()) {
+    std::partial_sort(words.begin(), words.begin() + num, words.end(), sortByFreq);
+  } else {
+    std::sort(words.begin(), words.end(), sortByFreq);
+  }
+  std::transform(words.begin(), words.begin() + num, std::ostream_iterator<std::string>(out, "\n"), printPair);
+}
+
 void shak::equal(Dictionaries &dicts, std::istream &in, std::ostream &out)
 {
   std::string dict1, dict2, key;

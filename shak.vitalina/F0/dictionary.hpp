@@ -21,5 +21,6 @@ namespace shak
   std::string printPair(const std::pair< std::string, size_t > &p);
   bool uniqueOnce(const std::pair< const std::string, size_t > &p);
   bool pairEqual(const std::pair< const std::string, size_t > &p1, const std::pair< const std::string, size_t > &p2);
+  bool sortByFreq(const std::pair< std::string, size_t > &p1 , const std::pair< std::string, size_t > &p2);
 }
 #endif

@@ -15,3 +15,11 @@ bool shak::pairEqual(const std::pair< const std::string, size_t > &p1, const std
 {
   return p1.first == p2.first && p1.second == p2.second;
 }
+
+bool shak::sortByFreq(const std::pair< std::string, size_t > &p1, const std::pair< std::string, size_t > &p2)
+{
+  if (p1.second != p2.second) {
+    return p1.second > p2.second;
+  }
+  return p1.first < p2.first;
+}

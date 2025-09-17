@@ -18,6 +18,7 @@ int main()
   cmds["remove"] = std::bind(removeW, std::ref(dicts), std::ref(std::cin));
   cmds["frequency"] = std::bind(getFreq, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
   cmds["uniqe"] = std::bind(getUniqe, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
+  cmds["most"] = std::bind(mostPopular, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
   cmds["equal"] = std::bind(equal, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
   cmds["compare"] = std::bind(compare, std::ref(dicts), std::ref(std::cin), std::ref(std::cout));
   std::string command;

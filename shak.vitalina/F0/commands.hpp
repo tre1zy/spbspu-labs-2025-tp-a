@@ -14,6 +14,7 @@ namespace shak
   void removeW(Dictionaries &dicts, std::istream &in);
   void getFreq(Dictionaries &dicts, std::istream &in, std::ostream &out);
   void getUniqe(Dictionaries &dicts, std::istream &in, std::ostream &out);
+  void mostPopular(Dictionaries &dicts, std::istream &in, std::ostream &out);
   void equal(Dictionaries &dicts, std::istream &in, std::ostream &out);
   void compare(Dictionaries &dicts, std::istream &in, std::ostream &out);
 }
