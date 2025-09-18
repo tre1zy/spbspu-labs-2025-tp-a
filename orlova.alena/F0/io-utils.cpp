@@ -28,7 +28,7 @@ std::istream& orlova::operator>>(std::istream& in, std::list< std::string >& lis
   std::copy_n(begin, size, std::back_inserter(tested));
   if (in && tested.size() == size)
   {
-    list = tested;
+    list = std::move(tested);
   }
   return in;
 }
