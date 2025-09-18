@@ -131,22 +131,22 @@ void kushekbaev::TranslationsPrinter::operator()()
 
 void kushekbaev::DictionaryPrinter::operator()()
 {
-  std::for_each(word_map.begin(), word_map.end(), EntryPrinter{ out });
+  std::for_each(word_map.begin(), word_map.end(), EntryPrinter{ out }); //copy
 }
 
 void kushekbaev::TranslationsSaver::operator()()
 {
-  std::for_each(translations.begin(), translations.end(), TranslationSaver{ file });
+  std::for_each(translations.begin(), translations.end(), TranslationSaver{ file }); //copy
 }
 
 void kushekbaev::WordsSaver::operator()()
 {
-  std::for_each(word_map.begin(), word_map.end(), WordEntrySaver{ file });
+  std::for_each(word_map.begin(), word_map.end(), WordEntrySaver{ file }); //copy
 }
 
 void kushekbaev::DictsSaver::operator()()
 {
-  std::for_each(dicts.begin(), dicts.end(), DictionaryEntrySaver{file});
+  std::for_each(dicts.begin(), dicts.end(), DictionaryEntrySaver{file}); //copy
 }
 
 void kushekbaev::insert_translations(std::set< std::string >& translations, const std::vector< std::string >& tokens, size_t index)
@@ -211,7 +211,7 @@ void kushekbaev::FileImporter::operator()()
 
 void kushekbaev::WordCollector::operator()()
 {
-  for (const auto& entry : word_map)
+  for (const auto& entry: word_map)
   {
     const std::string& word = entry.first;
     const std::set< std::string >& translations = entry.second;
@@ -233,7 +233,7 @@ void kushekbaev::WordsPrinter::operator()()
 
 void kushekbaev::TranslationRemover::operator()()
 {
-  for (auto it = word_map.begin(); it != word_map.end(); ++it)
+  for (auto it = word_map.begin(); it != word_map.end(); ++it) //!
   {
     auto& translations = it->second;
     if (translations.erase(translation_to_delete))
@@ -251,7 +251,7 @@ void kushekbaev::TranslationRemover::operator()()
 
 void kushekbaev::WordEraser::operator()()
 {
-  std::for_each(words_to_erase.begin(), words_to_erase.end(), WordEraserHelper{ word_map });
+  std::for_each(words_to_erase.begin(), words_to_erase.end(), WordEraserHelper{ word_map }); //!
 }
 
 void kushekbaev::WordFinder::operator()()
@@ -271,5 +271,5 @@ void kushekbaev::ComplementWorker::operator()()
 
 void kushekbaev::IntersectWorker::operator()()
 {
-  std::for_each(dict1.begin(), dict1.end(), IntersectInserter{new_dict, dict2});
+  std::for_each(dict1.begin(), dict1.end(), IntersectInserter{new_dict, dict2}); //!
 }
