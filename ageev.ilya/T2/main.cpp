@@ -16,15 +16,15 @@ int main()
   while (!std::cin.eof())
   {
     std::copy(InputDataIt(std::cin), InputDataIt(), std::back_inserter(data));
+    if (std::cin.bad())
+    {
+      std::cerr << "Fatal I/O error occurred\n";
+      return 2;
+    }
     if (std::cin.fail() && !std::cin.eof())
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
-    if(std::cin.badbit)
-    {
-      std::cout << "You got badbit, app can't continue working";
-      return 2;
     }
   }
   std::sort(data.begin(), data.end());
