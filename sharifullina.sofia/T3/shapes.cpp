@@ -1,5 +1,6 @@
 #include "shapes.hpp"
 #include <algorithm>
+#include <iterator>
 #include <delimiter.hpp>
 
 std::istream & sharifullina::operator>>(std::istream & in, Point & dest)
