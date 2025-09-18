@@ -35,7 +35,6 @@ void shak::clearDict(shak::Dictionaries &dicts, std::istream &in)
     throw std::invalid_argument("dictionary not found");
   }
   dictIter->second.dictionary.clear();
-  dictIter->second.size = 0;
 }
 
 void shak::deleteDict(shak::Dictionaries &dicts, std::istream &in)
