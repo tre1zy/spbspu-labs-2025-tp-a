@@ -1,5 +1,6 @@
 #include <limits>
 #include <functional>
+#include <iostream>
 #include "commands.h"
 #include "io-utils.h"
 

@@ -2,6 +2,7 @@
 #define DETAILS_H
 
 #include <algorithm>
+#include <iterator>
 #include "commands.h"
 #include "io-utils.h"
 

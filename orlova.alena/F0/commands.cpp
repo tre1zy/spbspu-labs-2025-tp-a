@@ -3,7 +3,6 @@
 #include <vector>
 #include <algorithm>
 #include <set>
-#include <iterator>
 #include <functional>
 #include "io-utils.h"
 #include "details.h"
