@@ -3,8 +3,8 @@
 #include <functional>
 #include <algorithm>
 #include <iterator>
-#include "../common/streamguard.hpp"
-#include "../common/delimiter.hpp"
+#include "streamguard.hpp"
+#include "delimiter.hpp"
 
 std::istream& kushekbaev::operator>>(std::istream& in, Point& point)
 {

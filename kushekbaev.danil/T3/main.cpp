@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   commands["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RIGHTSHAPES"] = std::bind(rightshapes, std::ref(std::cout), std::cref(polygons));
+  commands["RIGHTSHAPES"] = std::bind(rightShapes, std::ref(std::cout), std::cref(polygons));
   commands["SAME"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;

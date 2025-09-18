@@ -7,7 +7,7 @@
 #include <string>
 #include <cmath>
 #include <map>
-#include "../common/streamguard.hpp"
+#include "streamguard.hpp"
 
 namespace
 {
@@ -320,7 +320,7 @@ void kushekbaev::count(std::istream& in, std::ostream& out, const std::vector< P
   }
 }
 
-void kushekbaev::rightshapes(std::ostream& out, const std::vector< Polygon >& polygons)
+void kushekbaev::rightShapes(std::ostream& out, const std::vector< Polygon >& polygons)
 {
   out << std::count_if(polygons.begin(), polygons.end(), hasRightAngle) << "\n";
 }
