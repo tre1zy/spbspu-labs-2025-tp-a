@@ -46,6 +46,24 @@ namespace holodilov
   public:
     const char* what() const noexcept override;
   };
+
+  class AlphabetExportException final: public std::exception
+  {
+  public:
+    const char* what() const noexcept override;
+  };
+
+  class AlphabetFileNotFoundException final: public std::exception
+  {
+  public:
+    const char* what() const noexcept override;
+  };
+
+  class InvalidAlphabetFileException final: public std::exception
+  {
+  public:
+    const char* what() const noexcept override;
+  };
 }
 
 #endif

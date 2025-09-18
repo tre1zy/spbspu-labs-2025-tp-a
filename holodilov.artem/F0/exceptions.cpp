@@ -34,3 +34,18 @@ const char* holodilov::InvalidDictionaryFileException::what() const noexcept
 {
   return "Error: dictionary file has invalid format.\n";
 }
+
+const char* holodilov::AlphabetExportException::what() const noexcept
+{
+  return "Error: unable to create alphabet file.\n";
+}
+
+const char* holodilov::AlphabetFileNotFoundException::what() const noexcept
+{
+  return "Error: alphabet file not found.\n";
+}
+
+const char* holodilov::InvalidAlphabetFileException::what() const noexcept
+{
+  return "Error: unable to read alphabet file.\n";
+}

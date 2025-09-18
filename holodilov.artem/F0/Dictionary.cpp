@@ -1,5 +1,6 @@
 #include "Dictionary.hpp"
 
+#include <algorithm>
 #include <iterator>
 #include <map>
 
@@ -19,8 +20,14 @@ std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
   while (beginIter != dict.dict.end())
   {
     out << beginIter->first << " ";
+    out << beginIter->second.size() << " ";
     std::copy(std::begin(beginIter->second), std::end(beginIter->second), OstreamIterator(out, " "));
-    out << "\n";
+    ++beginIter;
+
+    if (beginIter != dict.dict.end()) {
+      out << "\n";
+
+    }
   }
   return out;
 }
@@ -55,14 +62,15 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   {
     in >> englishWord;
     dictTemp.dict[englishWord] = std::list< std::string >();
-    std::string translation;
-    while (in.peek() != '\n')
-    {
-      in >> translation;
-      dictTemp.dict[englishWord].push_back(translation);
-    }
+
+    int amountTranslations = 0;
+    in >> amountTranslations;
+
+    using istreamIter = std::istream_iterator< std::string >;
+    std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dictTemp.dict[englishWord]));
+
   }
-  if (!in)
+  if (in)
   {
     dict = dictTemp;
   }

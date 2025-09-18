@@ -34,10 +34,11 @@ int main(const int argc, const char** argv)
   cmds["UpdateWord"] = std::bind(  updateWord, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
   cmds["PrintDict"] = std::bind(  printDict, std::ref(std::cin), std::ref(std::cout), std::cref(dictionaries));
   cmds["FindWord"] = std::bind(  findWord, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
-  cmds["Merge"] = std::bind(  merge, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
+  // cmds["Merge"] = std::bind(  merge, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
   cmds["Intersect"] = std::bind(  intersect, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
   cmds["PrintDictNames"] = std::bind(  printDictNames, std::ref(std::cout), std::cref(dictionaries));
-  cmds["Alphabet"] = std::bind(alphabet, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
+  cmds["ExportAlphabet"] = std::bind(exportAlphabet, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
+  cmds["CheckAlphabet"] = std::bind(checkAlphabet, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));
 
   std::string strCommand;
   while (!(std::cin >> strCommand).eof())
