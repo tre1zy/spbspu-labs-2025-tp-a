@@ -4,7 +4,7 @@
 
 namespace
 {
-  void skipLine(std::istream& in)
+  /*void skipLine(std::istream& in)
   {
     char ch;
     while (in.get(ch))
@@ -14,7 +14,7 @@ namespace
         break;
       }
     }
-  }
+  }*/
 
   void expect(std::istream& in, std::initializer_list<char> expected)
   {
@@ -24,8 +24,7 @@ namespace
       if (!(in >> ch) || ch != e)
       {
         in.setstate(std::ios::failbit);
-        std::string line;
-        skipLine(in);
+        //skipLine(in);
       }
     }
   }
@@ -37,15 +36,13 @@ namespace
     if (!(in >> real))
     {
       in.setstate(std::ios::failbit);
-      std::string line;
       skipLine(in);
     }
     expect(in, {' '});
     if (!(in >> imag))
     {
       in.setstate(std::ios::failbit);
-      std::string line;
-      skipLine(in);
+      //skipLine(in);
     }
     expect(in, {')', ':'});
     return {real, imag};
@@ -62,8 +59,7 @@ namespace
       if (!(in >> ch))
       {
         in.setstate(std::ios::failbit);
-        std::string line;
-        skipLine(in);
+        //skipLine(in);
       }
       if (ch == ':')
       {
@@ -86,8 +82,7 @@ namespace
       if (!(in >> ch))
       {
         in.setstate(std::ios::failbit);
-        std::string line;
-        skipLine(in);
+        //skipLine(in);
       }
       if (ch == '"')
       {
@@ -110,8 +105,7 @@ namespace
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
       in.setstate(std::ios::failbit);
-      std::string line;
-      skipLine(in);
+      //skipLine(in);
     }
 
     if (ch == '1')
