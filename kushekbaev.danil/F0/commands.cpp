@@ -189,53 +189,53 @@ void kushekbaev::remove_translation(std::ostream& out, std::istream& in, diction
 void kushekbaev::remove_translation_at_all(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name, translation_to_delete;
-    in >> dictionary_name >> translation_to_delete;
-    auto dict_it = current_dictionary_system.find(dictionary_name);
-    if (dict_it == current_dictionary_system.end())
-    {
-      throw std::out_of_range("<DICTIONARY NOT FOUND>");
-    }
-    std::vector< std::string > words_to_erase;
-    size_t removed_count = 0;
-    if (!dict_it->second.empty())
-    {
-      TranslationRemover remover{ translation_to_delete, words_to_erase, removed_count, dict_it->second };
-      remover();
-    }
-    if (removed_count == 0)
-    {
-        throw std::out_of_range("<TRANSLATION NOT FOUND>");
-    }
+  in >> dictionary_name >> translation_to_delete;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  std::vector< std::string > words_to_erase;
+  size_t removed_count = 0;
+  if (!dict_it->second.empty())
+  {
+    TranslationRemover remover{ translation_to_delete, words_to_erase, removed_count, dict_it->second };
+    remover();
+  }
+  if (removed_count == 0)
+  {
+      throw std::out_of_range("<TRANSLATION NOT FOUND>");
+  }
   out << "Removed " << removed_count << " instances of translation '" << translation_to_delete << ".'\n";
 }
 
 void kushekbaev::delete_all_translations(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
   std::string dictionary_name, translation_to_delete;
-    in >> dictionary_name >> translation_to_delete;
-    auto dict_it = current_dictionary_system.find(dictionary_name);
-    if (dict_it == current_dictionary_system.end())
+  in >> dictionary_name >> translation_to_delete;
+  auto dict_it = current_dictionary_system.find(dictionary_name);
+  if (dict_it == current_dictionary_system.end())
+  {
+      throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  std::vector< std::string > matching_words;
+  if (!dict_it->second.empty())
+  {
+    WordFinder finder{ translation_to_delete, matching_words, dict_it->second };
+    finder();
+  }
+  if (matching_words.empty())
+  {
+      throw std::out_of_range("<TRANSLATION NOT FOUND>");
+  }
+  if (!matching_words.empty())
+  {
+    for (const auto& word: matching_words)
     {
-        throw std::out_of_range("<DICTIONARY NOT FOUND>");
+      dict_it->second.erase(word);
     }
-    std::vector< std::string > matching_words;
-    if (!dict_it->second.empty())
-    {
-      WordFinder finder{ translation_to_delete, matching_words, dict_it->second };
-      finder();
-    }
-    if (matching_words.empty())
-    {
-        throw std::out_of_range("<TRANSLATION NOT FOUND>");
-    }
-    if (!matching_words.empty())
-    {
-      for (const auto& word : matching_words)
-      {
-        dict_it->second.erase(word);
-      }
-    }
-  out << std::string("Words with this translation deleted successfully.\n");
+  }
+  out << "Words with this translation deleted successfully.\n";
 }
 
 void kushekbaev::prefix_search(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -322,10 +322,10 @@ void kushekbaev::suffix_search(std::ostream& out, std::istream& in, dictionary_s
     {
       out << "-> " << word << " : ";
       const auto& translations = word_pair.second;
-      for (auto it = translations.begin(); it != translations.end(); ++it)
+      out << *translations.begin();
+      for (auto it = translations.begin()++; it != translations.end(); ++it)
       {
-        if (it != translations.begin()) out << ", ";
-        out << *it;
+        out << "," << *it;
       }
       out << "\n";
       found = true;
@@ -389,13 +389,13 @@ void kushekbaev::merge(std::ostream& out, std::istream& in, dictionary_system& c
     throw std::runtime_error("<NEW DICTIONARY NAME ALREADY EXISTS>");
   }
   auto& new_dict = current_dictionary_system[new_dictionary];
-  for (const auto& entry : first_dict_it->second)
+  for (const auto& entry: first_dict_it->second)
   {
     new_dict[entry.first] = entry.second;
   }
-  for (const auto& entry : second_dict_it->second)
+  for (const auto& entry: second_dict_it->second)
   {
-    for (const auto& translation : entry.second)
+    for (const auto& translation: entry.second)
     {
       new_dict[entry.first].insert(translation);
     }
@@ -418,7 +418,7 @@ void kushekbaev::split(std::ostream& out, std::istream& in, dictionary_system& c
   }
   auto& dict1 = current_dictionary_system[new_dictionary_1];
   auto& dict2 = current_dictionary_system[new_dictionary_2];
-  for (const auto& entry : original_dict_it->second)
+  for (const auto& entry: original_dict_it->second)
   {
     const std::string& word = entry.first;
     const std::set< std::string >& translations = entry.second;
@@ -445,7 +445,7 @@ void kushekbaev::find_words_without_translations(std::ostream& out, std::istream
   }
   bool found_empty = false;
   out << "Words without translations in dictionary '" << dictionary << "':\n";
-  for (const auto& word_entry : dict_it->second)
+  for (const auto& word_entry: dict_it->second)
   {
     const std::string& word = word_entry.first;
     const std::set< std::string >& translations = word_entry.second;
@@ -533,13 +533,13 @@ void kushekbaev::unification(std::ostream& out, std::istream& in, dictionary_sys
   auto& new_dict = current_dictionary_system[new_name];
   const auto& dict1 = dict1_it->second;
   const auto& dict2 = dict2_it->second;
-  for (const auto& entry : dict1)
+  for (const auto& entry: dict1)
   {
     new_dict[entry.first] = entry.second;
   }
-  for (const auto& entry : dict2)
+  for (const auto& entry: dict2)
   {
-    for (const auto& translation : entry.second)
+    for (const auto& translation: entry.second)
     {
       new_dict[entry.first].insert(translation);
     }
