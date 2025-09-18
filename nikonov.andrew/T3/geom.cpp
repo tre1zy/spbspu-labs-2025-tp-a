@@ -3,6 +3,7 @@
 #include <ostream>
 #include <iterator>
 #include <vector>
+#include <DelimetrIO.hpp>
 
 std::istream& nikonov::operator>>(std::istream& in, Point& point)
 {
@@ -11,19 +12,8 @@ std::istream& nikonov::operator>>(std::istream& in, Point& point)
   {
     return in;
   }
-  char open = '0';
-  char sep = '0';
-  char close = '0';
-  if (!(in >> open) || open != '('
-      || !(in >> point.x)
-      || !(in >> sep) || sep != ';'
-      || !(in >> point.y)
-      || !(in >> close) || close != ')')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  return in;
+  using sep = DelimiterIO;
+  return in >> sep{ '(' } >> point.x >> sep{ ';' } >> point.y >> sep{ ')' };
 }
 
 std::istream& nikonov::operator>>(std::istream& in, Polygon& polygon)
@@ -33,14 +23,14 @@ std::istream& nikonov::operator>>(std::istream& in, Polygon& polygon)
   {
     return in;
   }
-  size_t cnt = 0;
-  if (!(in >> cnt) || cnt < 3)
+  size_t vertexCnt = 0;
+  if (!(in >> vertexCnt) || vertexCnt < 3)
   {
     in.setstate(std::ios::failbit);
     return in;
   }
-  std::vector< Point > pts(cnt);
-  for (size_t i = 0; i < cnt; ++i)
+  std::vector< Point > pts(vertexCnt);
+  for (size_t i = 0; i < vertexCnt; ++i)
   {
     if (!(in >> pts[i]))
     {

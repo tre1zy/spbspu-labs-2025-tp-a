@@ -1,86 +1,105 @@
 #include "commands.hpp"
 #include <iomanip>
 #include <numeric>
-namespace nikonov
+#include <algorithm>
+#include <StreamGuard.hpp>
+namespace
 {
-  namespace
+  struct IsEvenPredicate
   {
-    struct IoGuard
+    bool operator()(const nikonov::Polygon& poly) const
     {
-      std::ostream& out;
-      explicit IoGuard(std::ostream& o) : out(o)
-      {
-        out << std::fixed << std::setprecision(1);
-      }
-      ~IoGuard()
-      {
-        out << std::defaultfloat;
-      }
-    };
+      return (poly.points.size() % 2) == 0;
+    }
+  };
 
-    bool isEven(const nikonov::Polygon& poly)
-    {
-      return poly.points.size() % 2 == 0;
-    }
-    bool isOdd(const nikonov::Polygon& poly)
-    {
-      return !isEven(poly);
-    }
-    bool hasVertexCount(const nikonov::Polygon& poly, size_t count)
-    {
-      return poly.points.size() == count;
-    }
-  }
-  void getArea(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+  struct IsOddPredicate
   {
-    std::string subcommand;
-    in >> subcommand;
-    if (subcommand == "EVEN")
+    bool operator()(const nikonov::Polygon& poly) const
     {
-      area::getEvenArea(data, out);
+      return (poly.points.size() % 2) == 1;
     }
-    else if (subcommand == "ODD")
-    {
-      area::getOddArea(data, out);
-    }
-    else if (subcommand == "MEAN")
-    {
-      area::getMeanArea(data, out);
-    }
-    else
-    {
-      try
-      {
-        size_t cnt = std::stoul(subcommand);
-        if (cnt < 3)
-        {
-          throw std::invalid_argument("Vertex count must be at least 3");
-        }
-        area::getVertexCountArea(data, cnt, out);
-      }
-      catch (const std::exception&)
-      {
-        out << "<INVALID COMMAND>\n";
-      }
-    }
-  }
-  namespace area
+  };
+
+  struct AnyPredicate
   {
-    void getEvenArea(const std::vector< Polygon >& data, std::ostream& out)
+    bool operator()(const nikonov::Polygon&) const
     {
-      //
+      return true;
     }
-    void getOddArea(const std::vector< Polygon >& data, std::ostream& out)
+  };
+
+  struct HasVertexCountPredicate
+  {
+    size_t n;
+    explicit HasVertexCountPredicate(std::size_t cnt):
+      n(cnt)
+    {}
+    bool operator()(const nikonov::Polygon& poly) const
     {
-      //
+      return poly.points.size() == n;
     }
-    void getMeanArea(const std::vector< Polygon >& data, std::ostream& out)
+  };
+
+  double gaussArea(const nikonov::Point& a, const nikonov::Point& b)
+  {
+    return a.x * b.y - a.y * b.x;
+  }
+
+  double getPolygonArea(const nikonov::Polygon& poly)
+  {
+    const auto& pts  = poly.points;
+    double sum = std::inner_product(pts.begin(), pts.end() - 1, pts.begin() + 1, 0.0, std::plus< double >{}, gaussArea);
+    sum += gaussArea(pts.back(), pts.front());
+    return std::abs(sum) / 2.0;
+  }
+
+  template < typename Pred >
+  double calculateAreaIf(const std::vector< nikonov::Polygon >& data, Pred condition)
+  {
+    std::vector< nikonov::Polygon > tempPoly;
+    std::copy_if(data.begin(), data.end(), std::back_inserter(tempPoly), condition);
+    std::vector< double > areas;
+    std::transform(tempPoly.begin(), tempPoly.end(), std::back_inserter(areas), getPolygonArea);
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  }
+}
+
+void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+{
+  std::string subcommand;
+  in >> subcommand;
+  StreamGuard guard(out);
+  if (subcommand == "EVEN")
+  {
+    out << calculateAreaIf(data, IsEvenPredicate());
+  }
+  else if (subcommand == "ODD")
+  {
+    out << calculateAreaIf(data, IsOddPredicate());
+  }
+  else if (subcommand == "MEAN")
+  {
+    if (data.empty())
     {
-      //
+      throw std::logic_error("Mean cant be calculated!");
     }
-    void getVertexCountArea(const std::vector< Polygon >& data, std::size_t count, std::ostream& out)
+    out << calculateAreaIf(data, AnyPredicate()) / data.size();
+  }
+  else
+  {
+    try
     {
-      //
+      size_t cnt = std::stoul(subcommand);
+      if (cnt < 3)
+      {
+        throw std::invalid_argument("At least 3 vertex needed!");
+      }
+      out << calculateAreaIf(data, HasVertexCountPredicate(cnt));
+    }
+    catch (const std::exception&)
+    {
+      out << "<INVALID COMMAND>\n";
     }
   }
 }
