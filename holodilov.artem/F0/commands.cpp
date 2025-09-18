@@ -3,25 +3,29 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
+#include <numeric>
 #include "Alphabet.hpp"
 #include "exceptions.hpp"
 #include "ScopeGuard.hpp"
-
 
 std::string dictToDictName(const std::pair<const std::string, holodilov::Dictionary >& pair)
 {
   return pair.first;
 }
 
-std::list< std::string > dictToWordTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& englishWord)
-{
-  return pair.second.dict.at(englishWord);
-}
-
-std::list< std::string > translationsAccumulator(std::list< std::string >& translations, const std::list< std::string >& translation)
+std::list< std::string > translationsAccumulator(std::list< std::string > translations, const std::list< std::string >& translation)
 {
   translations.insert(translations.end(), translation.begin(), translation.end());
   return translations;
+}
+
+std::list< std::string > dictToWordTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& englishWord)
+{
+  if (pair.second.dict.contains(englishWord))
+  {
+    return pair.second.dict.at(englishWord);
+  }
+  return std::list< std::string >();
 }
 
 std::pair< std::string, std::list< std::string > > mapMergeHandler(const std::pair< std::string, std::list< std::string > >& pair, std::map< std::string, std::list< std::string> >& mapToMerge)
@@ -245,7 +249,7 @@ void holodilov::updateWord(std::istream& in, std::ostream& out, std::map< std::s
   }
 
   std::string englishWordNew;
-  in >> englishWord;
+  in >> englishWordNew;
   if (!in)
   {
     throw InvalidCommandException();
@@ -263,7 +267,7 @@ void holodilov::updateWord(std::istream& in, std::ostream& out, std::map< std::s
   std::list< std::string > translations = dictionaries.at(dictName).dict.at(englishWord);
   dictionaries.at(dictName).dict.erase(englishWord);
   dictionaries.at(dictName).dict[englishWordNew] = translations;
-  out << "Word " << englishWord << "was updated to " << englishWordNew << "\n";
+  out << "Word " << englishWord << " was updated to " << englishWordNew << "\n";
 }
 
 void holodilov::printDict(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
@@ -291,65 +295,15 @@ void holodilov::findWord(std::istream& in, std::ostream& out, std::map< std::str
     throw InvalidCommandException();
   }
 
-  std::vector< std::list< std::string > > vecTranslations(dictionaries.size());
+  std::vector< std::list< std::string > > vecTranslationLists(dictionaries.size());
   auto dictToWordTranslationsBound = std::bind(dictToWordTranslations, std::placeholders::_1, std::cref(englishWord));
-  std::transform(dictionaries.begin(), dictionaries.end(), vecTranslations.begin(), dictToWordTranslationsBound);
+  std::transform(dictionaries.begin(), dictionaries.end(), vecTranslationLists.begin(), dictToWordTranslationsBound);
 
-  // std::list< std::string > translations = std::accumulate(vecTranslations.begin(), vecTranslations.end(), std::list< std::string >(), translationsAccumulator);
-  //
-  // using ostreamIter = std::ostream_iterator< std::string >;
-  // std::copy(translations.begin(), translations.end(), ostreamIter(out, "\n"));
-}
+  std::list< std::string > listTranslations;
+  listTranslations = std::accumulate(vecTranslationLists.begin(), vecTranslationLists.end(), std::list < std::string >{ }, translationsAccumulator);
 
-// void holodilov::merge(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
-// {
-//   std::string dictName1;
-//   in >> dictName1;
-//   if (!in)
-//   {
-//     throw InvalidCommandException();
-//   }
-//
-//   std::string dictName2;
-//   in >> dictName2;
-//   if (!in)
-//   {
-//     throw InvalidCommandException();
-//   }
-//
-//   std::string dictNameNew;
-//   in >> dictNameNew;
-//   if (!in)
-//   {
-//     throw InvalidCommandException();
-//   }
-//
-//   std::string dictLangNew;
-//   in >> dictLangNew;
-//   if (!in)
-//   {
-//     throw InvalidCommandException();
-//   }
-//
-//   if ((!dictionaries.contains(dictName1)) || (!dictionaries.contains(dictName2)))
-//   {
-//     throw DictionaryNotFoundException();
-//   }
-//
-//   std::map< std::string, std::list< std::string > > mapDict1 = dictionaries.at(dictName1).dict;
-//
-//   auto mapMergeHandlerBound = std::bind(mapMergeHandler, std::placeholders::_1, dictionaries.at(dictName2).dict);
-//   std::transform(mapDict1.begin(), mapDict1.end(), mapDict1.begin(), mapMergeHandlerBound);
-//
-//   Dictionary dictNew(dictNameNew, dictLangNew);
-//   dictNew.dict = mapDict1;
-//   dictionaries[dictNameNew] = dictNew;
-//   out << "Dictionaries " << dictName1 << " and " << dictName2 << " were merged to " << dictNameNew << "\n";
-// }
-
-void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
-{
-
+  using ostreamIter = std::ostream_iterator< std::string >;
+  std::copy(listTranslations.begin(), listTranslations.end(), ostreamIter(out, "\n"));
 }
 
 void holodilov::exportAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
@@ -448,4 +402,3 @@ void holodilov::printDictNames(std::ostream& out, const std::map< std::string, D
   std::transform(dictionaries.begin(), dictionaries.end(), dictNames.begin(), dictToDictName);
   std::copy(dictNames.begin(), dictNames.end(), ostreamIter(out, "\n"));
 }
-

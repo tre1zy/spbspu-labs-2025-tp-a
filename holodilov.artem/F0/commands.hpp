@@ -27,10 +27,6 @@ namespace holodilov
 
   void findWord(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
 
-  void merge(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
-
-  void intersect(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
-
   void exportAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
 
   void checkAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
