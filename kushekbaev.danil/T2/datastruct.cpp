@@ -1,6 +1,6 @@
 #include "datastruct.hpp"
 #include <iostream>
-#include "delimiter.hpp"
+#include <delimiter.hpp>
 
 bool kushekbaev::DataStruct::operator<(const DataStruct& other) const
 {

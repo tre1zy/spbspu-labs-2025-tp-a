@@ -7,7 +7,7 @@
 #include <string>
 #include <cmath>
 #include <map>
-#include "streamguard.hpp"
+#include <streamguard.hpp>
 
 namespace
 {
