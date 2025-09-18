@@ -51,9 +51,9 @@ std::ostream& ivanova::operator<<(std::ostream& out, const UllBinT& x)
   return out;
 }
 
-std::ostream& ivanova::operator<<(std::ostream& out, const StringT& x)
+std::ostream& ivanova::operator<<(std::ostream& out, const dataStruct& x)
 {
-  out << "\"" << x.key << "\"";
+  out << std::quoted(x.key);
   return out;
 }
 

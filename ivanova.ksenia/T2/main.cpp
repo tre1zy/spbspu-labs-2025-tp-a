@@ -17,13 +17,11 @@ int main()
   try
   {
     std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
-
     while (!std::cin.eof() && std::cin.fail())
     {
       std::cin.clear(std::ios::failbit);
       std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
     }
-
     std::sort(data.begin(), data.end());
     std::copy(data.begin(), data.end(), oIterator(std::cout, "\n"));
   }
