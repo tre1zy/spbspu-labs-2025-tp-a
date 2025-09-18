@@ -4,7 +4,7 @@
 
 namespace
 {
-  void skipLine(std::istream& in)
+  void skipLine(std::istream& in, bool setFail = true)
   {
     char ch;
     while (in >> ch)
@@ -13,6 +13,10 @@ namespace
       {
         break;
       }
+    }
+    if (setFail == true)
+    {
+      in.setstate(std::ios::failbit);
     }
   }
 
@@ -24,7 +28,6 @@ namespace
       if (!(in >> ch) || ch != e)
       {
         skipLine(in);
-        in.setstate(std::ios::failbit);
       }
     }
   }
@@ -36,13 +39,11 @@ namespace
     if (!(in >> real))
     {
       skipLine(in);
-      in.setstate(std::ios::failbit);
     }
     expect(in, {' '});
     if (!(in >> imag))
     {
       skipLine(in);
-      in.setstate(std::ios::failbit);
     }
     expect(in, {')', ':'});
     return {real, imag};
@@ -50,7 +51,7 @@ namespace
 
   unsigned long long read_binary(std::istream& in)
   {
-    char ch;
+    char ch = 0;
     expect(in, {' ', '0', 'b'});
 
     std::string t2;
@@ -59,7 +60,6 @@ namespace
       if (!(in >> ch))
       {
         skipLine(in);
-        in.setstate(std::ios::failbit);
       }
       if (ch == ':')
       {
@@ -82,7 +82,6 @@ namespace
       if (!(in >> ch))
       {
         skipLine(in);
-        in.setstate(std::ios::failbit);
       }
       if (ch == '"')
       {
@@ -105,7 +104,6 @@ namespace
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
       skipLine(in);
-      in.setstate(std::ios::failbit);
     }
 
     if (ch == '1')
@@ -121,24 +119,18 @@ namespace
       data.key3 = read_string(in);
     }
   }
-
-  void unsafe_read(std::istream& in, asafov::DataStruct& data)
-  {
-    expect(in, {'(', ':'});
-    read_key(in, data);
-    read_key(in, data);
-    read_key(in, data);
-    expect(in, {')'});
-  }
 }
 
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
   DataStruct temp;
   in >> std::noskipws;
-  unsafe_read(in, temp);
+  expect(in, {'(', ':'});
+  read_key(in, data);
+  read_key(in, data);
+  read_key(in, data);
+  expect(in, {')'});
   data = temp;
-  std::string line;
-  skipLine(in);
+  skipLine(in, false);
   return in;
 }
