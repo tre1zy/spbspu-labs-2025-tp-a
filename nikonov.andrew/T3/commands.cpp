@@ -70,25 +70,9 @@ namespace
     return getPolygonArea(a) < getPolygonArea(b);
   }
 
-  template < typename Iterator  >
-  void getExtremumBody(Iterator it, std::istream& in, std::ostream& out)
+  bool pVertexesComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
   {
-    std::string subcommand;
-    in >> subcommand;
-    nikonov::StreamGuard guard(out);
-
-    if (subcommand == "AREA")
-    {
-      out << std::fixed << std::setprecision(1) << getPolygonArea(*it);
-    }
-    else if (subcommand == "VERTEXES")
-    {
-      out << it->points.size();
-    }
-    else
-    {
-      out << "<INVALID COMMAND>\n";
-    }
+    return a.points.size() < b.points.size();
   }
 
   size_t countEven(const std::vector< nikonov::Polygon >& polygons)
@@ -128,12 +112,12 @@ namespace
       if (p == target)
       {
         ++currSeq;
-        maxSeq = std::max(maxSeq, currSeq);
       }
       else
       {
         currSeq = 0;
       }
+      maxSeq = std::max(maxSeq, currSeq);
     }
   };
 }
@@ -162,19 +146,12 @@ void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std:
   }
   else
   {
-    try
+    size_t cnt = std::stoul(subcommand);
+    if (cnt < 3)
     {
-      size_t cnt = std::stoul(subcommand);
-      if (cnt < 3)
-      {
-        throw std::invalid_argument("At least 3 vertex needed!");
-      }
-      out << calculateAreaIf(data, HasVertexCountPredicate(cnt));
+      throw std::invalid_argument("At least 3 vertex needed!");
     }
-    catch (const std::exception&)
-    {
-      out << "<INVALID COMMAND>\n";
-    }
+    out << calculateAreaIf(data, HasVertexCountPredicate(cnt));
   }
 }
 
@@ -184,8 +161,23 @@ void nikonov::getMax(const std::vector< Polygon >& data, std::istream& in, std::
   {
     throw std::logic_error("Empty!");
   }
-  auto it = std::max_element(data.begin(), data.end(), pAreaComparator);
-  getExtremumBody(it, in, out);
+  std::string subcommand;
+  in >> subcommand;
+  StreamGuard guard(out);
+  if (subcommand == "AREA")
+  {
+    auto it = std::max_element(data.begin(), data.end(), pAreaComparator);
+    out << std::fixed << std::setprecision(1) << getPolygonArea(*it);
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    auto it = std::max_element(data.begin(), data.end(), pVertexesComparator);
+    out << it->points.size();
+  }
+  else
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
 }
 
 void nikonov::getMin(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
@@ -194,8 +186,23 @@ void nikonov::getMin(const std::vector< Polygon >& data, std::istream& in, std::
   {
     throw std::logic_error("Empty!");
   }
-  auto it = std::min_element(data.begin(), data.end(), pAreaComparator);
-  getExtremumBody(it, in, out);
+  std::string subcommand;
+  in >> subcommand;
+  StreamGuard guard(out);
+  if (subcommand == "AREA")
+  {
+    auto it = std::min_element(data.begin(), data.end(), pAreaComparator);
+    out << std::fixed << std::setprecision(1) << getPolygonArea(*it);
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    auto it = std::min_element(data.begin(), data.end(), pVertexesComparator);
+    out << it->points.size();
+  }
+  else
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
 }
 
 void nikonov::getCount(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
@@ -214,19 +221,12 @@ void nikonov::getCount(const std::vector< Polygon >& data, std::istream& in, std
   }
   else
   {
-    try
+    size_t cnt = std::stoul(subcommand);
+    if (cnt < 3)
     {
-      size_t cnt = std::stoul(subcommand);
-      if (cnt < 3)
-      {
-        throw std::invalid_argument("At least 3 vertex needed!");
-      }
-      out << countNum(data, cnt);
+      throw std::invalid_argument("At least 3 vertex needed!");
     }
-    catch (const std::exception&)
-    {
-      out << "<INVALID COMMAND>\n";
-    }
+    out << countNum(data, cnt);
   }
 }
 
