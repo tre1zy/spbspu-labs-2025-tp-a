@@ -29,10 +29,8 @@ namespace
     out << *(--translations.end());
   }
 
-  Translations intersectLists(Translations& list1, Translations& list2)
+  Translations intersectLists(const Translations& list1, const Translations& list2)
   {
-    list1.sort();
-    list2.sort();
     Translations res;
     std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), std::back_inserter(res));
     return res;
