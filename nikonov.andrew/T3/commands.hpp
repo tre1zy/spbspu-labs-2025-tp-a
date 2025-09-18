@@ -6,11 +6,11 @@
 #include "geom.hpp"
 namespace nikonov
 {
-  void getArea(const std::vector< Polygon >&, std::istream& in, std::ostream& out);
-  void getMax(const std::vector< Polygon >&, std::istream& in, std::ostream& out);
-  void getMin(const std::vector< Polygon >&, std::istream& in, std::ostream& out);
-  void getCount(const std::vector< Polygon >&, std::istream& in, std::ostream& out);
-  void getPerms(const std::vector< Polygon >&, std::istream& in, std::ostream& out);
-  void getMaxseq(const std::vector< Polygon >&, std::istream& in, std::ostream& out);
+  void getArea(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void getMax(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void getMin(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void getCount(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void getPerms(const std::vector< Polygon >&, std::istream&, std::ostream&);
+  void getMaxSeq(const std::vector< Polygon >&, std::istream&, std::ostream&);
 }
 #endif

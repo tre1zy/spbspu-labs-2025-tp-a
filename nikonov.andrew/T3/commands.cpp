@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <numeric>
 #include <algorithm>
+#include <functional>
 #include <StreamGuard.hpp>
 namespace
 {
@@ -64,14 +65,59 @@ namespace
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 
-  bool polygonAreaComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
+  bool pAreaComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
   {
     return getPolygonArea(a) < getPolygonArea(b);
   }
 
-  bool polygonVertexesComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
+  bool pVertexesComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
   {
     return a.points.size() < b.points.size();
+  }
+
+  template < typename Iterator  >
+  void getExtremumBody(Iterator it, std::istream& in, std::ostream& out)
+  {
+    std::string subcommand;
+    in >> subcommand;
+    nikonov::StreamGuard guard(out);
+
+    if (subcommand == "AREA")
+    {
+      out << std::fixed << std::setprecision(1) << getPolygonArea(*it);
+    }
+    else if (subcommand == "VERTEXES")
+    {
+      out << it->points.size();
+    }
+    else
+    {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+
+  size_t countEven(const std::vector< nikonov::Polygon >& polygons)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), IsEvenPredicate());
+  }
+
+  size_t countOdd(const std::vector< nikonov::Polygon >& polygons)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), IsOddPredicate());
+  }
+
+  size_t countNum(const std::vector< nikonov::Polygon >& polygons, size_t numOfVertexes)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), HasVertexCountPredicate(numOfVertexes));
+  }
+
+  bool isPermutation(const nikonov::Polygon& a, const nikonov::Polygon& b)
+  {
+    if (a.points.size() != b.points.size())
+    {
+      return false;
+    }
+    return std::is_permutation(a.points.begin(), a.points.end(), b.points.begin());
   }
 }
 
@@ -119,21 +165,62 @@ void nikonov::getMax(const std::vector< Polygon >& data, std::istream& in, std::
 {
   if (data.empty())
   {
-    throw std::logic_error("It is empty!");
+    throw std::logic_error("Empty!");
   }
+  auto it = std::max_element(data.begin(), data.end(), pAreaComparator);
+  getExtremumBody(it, in, out);
+}
+
+void nikonov::getMin(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+{
+  if (data.empty())
+  {
+    throw std::logic_error("Empty!");
+  }
+  auto it = std::min_element(data.begin(), data.end(), pAreaComparator);
+  getExtremumBody(it, in, out);
+}
+
+void nikonov::getCount(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+{
   std::string subcommand;
   in >> subcommand;
   StreamGuard guard(out);
-  if (subcommand == "AREA")
+  out << std::fixed << std::setprecision(1);
+  if (subcommand == "EVEN")
   {
-    out << std::fixed << std::setprecision(1) << getPolygonArea(*std::max_element(data.begin(), data.end(), polygonAreaComparator));
+    out << countEven(data);
   }
-  else if (subcommand == "VERTEXES")
+  else if (subcommand == "ODD")
   {
-    out << (*std::max_element(data.begin(), data.end(), polygonVertexesComparator)).points.size();
+    out << countOdd(data);
   }
   else
   {
-    out << "<INVALID COMMAND>\n";
+    try
+    {
+      size_t cnt = std::stoul(subcommand);
+      if (cnt < 3)
+      {
+        throw std::invalid_argument("At least 3 vertex needed!");
+      }
+      out << countNum(data, cnt);
+    }
+    catch (const std::exception&)
+    {
+      out << "<INVALID COMMAND>\n";
+    }
   }
+}
+
+void nikonov::getPerms(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (polygon.points.size() < 3)
+  {
+    throw std::logic_error("At least 3 vertex needed!");
+  }
+  using namespace std::placeholders;
+  out << std::count_if(data.begin(), data.end(), std::bind(isPermutation, _1, polygon));
 }
