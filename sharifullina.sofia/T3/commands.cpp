@@ -56,7 +56,7 @@ namespace
     std::vector< double > areaPoly(temp.size());
     std::transform(temp.begin(), temp.end(), areaPoly.begin(), getArea);
     double result = std::accumulate(areaPoly.begin(), areaPoly.end(), 0.0);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
@@ -67,7 +67,7 @@ namespace
     std::vector< double > areaPoly(temp.size());
     std::transform(temp.begin(), temp.end(), areaPoly.begin(), getArea);
     double result = std::accumulate(areaPoly.begin(), areaPoly.end(), 0.0);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
@@ -81,7 +81,7 @@ namespace
     std::vector< double > areaPoly(temp.size());
     std::transform(temp.begin(), temp.end(), areaPoly.begin(), getArea);
     double result = std::accumulate(areaPoly.begin(), areaPoly.end(), 0.0) / polygons.size();
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
@@ -93,7 +93,7 @@ namespace
     std::vector< double > areaPoly(temp.size());
     std::transform(temp.begin(), temp.end(), areaPoly.begin(), getArea);
     double result = std::accumulate(areaPoly.begin(), areaPoly.end(), 0.0);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
 
@@ -101,7 +101,7 @@ namespace
   {
     std::vector< double > areaPoly(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getArea);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     double result = *std::max_element(areaPoly.begin(), areaPoly.end());
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -110,7 +110,7 @@ namespace
   {
     std::vector< size_t > areaPoly(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getNum);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     size_t result = *std::max_element(areaPoly.begin(), areaPoly.end());
     out << result << '\n';
   }
@@ -119,7 +119,7 @@ namespace
   {
     std::vector< double > areaPoly(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getArea);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     double result = *std::min_element(areaPoly.begin(), areaPoly.end());
     out << std::fixed << std::setprecision(1) << result << '\n';
   }
@@ -128,7 +128,7 @@ namespace
   {
     std::vector< size_t > areaPoly(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areaPoly.begin(), getNum);
-    sharifullina::Iofmtguard fmtguard(out);
+    sharifullina::IofmtGuard fmtguard(out);
     size_t result = *std::min_element(areaPoly.begin(), areaPoly.end());
     out << result << '\n';
   }
