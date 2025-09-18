@@ -2,6 +2,7 @@
 #include <iostream>'
 #include <map>
 #include <limits>
+#include <cstring>
 #include "Dictionary.hpp"
 #include "consoleOptions.hpp"
 #include "commands.hpp"
@@ -10,7 +11,7 @@ int main(const int argc, const char** argv)
 {
   using namespace holodilov;
 
-  if (argc == 2 && argv[1] == "--help")
+  if ((argc == 2) && (std::strcmp(argv[1], "--help") == 0))
   {
     printHelpOption(std::cout);
     return 0;
