@@ -6,6 +6,7 @@
 #include <map>
 #include <iomanip>
 #include <scopeGuard.hpp>
+#include "predicates.hpp"
 
 namespace
 {
@@ -152,18 +153,6 @@ namespace
     out << result << '\n';
   }
 
-  bool cmpPoint(const sharifullina::Point & p1, const sharifullina::Point & p2)
-  {
-    if (p1.x != p2.x)
-    {
-      return p1.x < p2.x;
-    }
-    else
-    {
-      return p1.y < p2.y;
-    }
-  }
-
   bool isPermutation(const sharifullina::Polygon & lhs, const sharifullina::Polygon & rhs)
   {
     if (lhs.points.size() != rhs.points.size())
@@ -182,22 +171,16 @@ namespace
 
   void getPerms(std::ostream & out, const std::vector< sharifullina::Polygon > & polygons, const sharifullina::Polygon & target)
   {
-    size_t result = std::count_if(polygons.begin(), polygons.end(),
-      [&](const sharifullina::Polygon & poly)
-      {
-        return isPermutation(poly, target);
-      });
+    sharifullina::detail::IsPermutationPredicate predicate(target);
+    size_t result = std::count_if(polygons.begin(), polygons.end(), predicate);
     out << result << '\n';
   }
 
   void getLessArea(std::ostream & out, const std::vector< sharifullina::Polygon > & polygons, const sharifullina::Polygon & target)
   {
     double targetArea = getArea(target);
-    size_t result = std::count_if(polygons.begin(), polygons.end(),
-      [&](const sharifullina::Polygon & poly)
-      {
-        return getArea(poly) < targetArea;
-      });
+    sharifullina::detail::LessAreaPredicate predicate(targetArea);
+    size_t result = std::count_if(polygons.begin(), polygons.end(), predicate);
     out << result << '\n';
   }
 }
