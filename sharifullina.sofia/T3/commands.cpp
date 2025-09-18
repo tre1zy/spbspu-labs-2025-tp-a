@@ -21,7 +21,7 @@ namespace
     auto it1 = poly.points.begin();
     auto it2 = poly.points.end();
     auto it3 = rotPoly.points.begin();
-    double sum = std::inner_product(it1, it2, it3, 0.0, std::plus< double >(), calcPoints);
+    double sum = std::inner_product(it1, it2, it3, 0.0, std::plus< double >(), sharifullina::detail::calcPoints);
     return std::abs(sum) * 0.5;
   }
 
