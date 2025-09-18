@@ -12,6 +12,7 @@ namespace
       if (!(in >> ch) || ch != e)
       {
         in.setstate(std::ios::failbit);
+        return;
       }
     }
   }
@@ -39,7 +40,7 @@ namespace
     expect(in, {' ', '0', 'b'});
 
     std::string t2;
-    while (true)
+    while (in)
     {
       if (!(in >> ch))
       {
