@@ -113,7 +113,7 @@ namespace
     return std::any_of(polygon.points.begin(), polygon.points.end(), RightAngleChecker{ polygon });
   }
 
-  bool isCompabitebleByOverlay(const kushekbaev::Polygon collectedPolygon, const kushekbaev::Polygon inputedPolygon)
+  bool isCompabitebleByOverlay(const kushekbaev::Polygon& collectedPolygon, const kushekbaev::Polygon& inputedPolygon)
   {
     if (collectedPolygon.points.size() != inputedPolygon.points.size())
     {
