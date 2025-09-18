@@ -6,6 +6,10 @@ namespace
 {
   void skipLine(std::istream& in, bool setFail = true)
   {
+    if (setFail)
+    {
+      in.setstate(std::ios::failbit);
+    }
     char ch;
     while (in >> ch)
     {
@@ -13,10 +17,6 @@ namespace
       {
         break;
       }
-    }
-    if (setFail == true)
-    {
-      in.setstate(std::ios::failbit);
     }
   }
 
@@ -67,7 +67,16 @@ namespace
       }
       t2 += ch;
     }
-    return std::stoull(t2);
+    unsigned long long res = 0;
+    try
+    {
+      res = std::stoull(t2);
+    }
+    catch (...)
+    {
+      skipLine(in);
+    }
+    return res;
   }
 
   std::string read_string(std::istream& in)
