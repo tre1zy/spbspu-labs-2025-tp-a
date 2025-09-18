@@ -101,14 +101,14 @@ namespace
     return std::count_if(polygons.begin(), polygons.end(), IsEvenPredicate());
   }
 
-  size_t countOdd(const std::vector< nikonov::Polygon >& polygons)
+  size_t countOdd(const std::vector< nikonov::Polygon >& data)
   {
-    return std::count_if(polygons.begin(), polygons.end(), IsOddPredicate());
+    return std::count_if(data.begin(), data.end(), IsOddPredicate());
   }
 
-  size_t countNum(const std::vector< nikonov::Polygon >& polygons, size_t numOfVertexes)
+  size_t countNum(const std::vector< nikonov::Polygon >& data, size_t numOfVertexes)
   {
-    return std::count_if(polygons.begin(), polygons.end(), HasVertexCountPredicate(numOfVertexes));
+    return std::count_if(data.begin(), data.end(), HasVertexCountPredicate(numOfVertexes));
   }
 
   bool isPermutation(const nikonov::Polygon& a, const nikonov::Polygon& b)
@@ -119,6 +119,28 @@ namespace
     }
     return std::is_permutation(a.points.begin(), a.points.end(), b.points.begin());
   }
+
+  struct SeqCounter
+  {
+    const nikonov::Polygon& target;
+    size_t currSeq = 0;
+    size_t maxSeq = 0;
+    SeqCounter(const nikonov::Polygon& t):
+      target(t)
+    {}
+    void operator()(const nikonov::Polygon& p)
+    {
+      if (p == target)
+      {
+        ++currSeq;
+        maxSeq = std::max(maxSeq, currSeq);
+      }
+      else
+      {
+        currSeq = 0;
+      }
+    }
+  };
 }
 
 void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
@@ -223,4 +245,21 @@ void nikonov::getPerms(const std::vector< Polygon >& data, std::istream& in, std
   }
   using namespace std::placeholders;
   out << std::count_if(data.begin(), data.end(), std::bind(isPermutation, _1, polygon));
+}
+
+void nikonov::getMaxSeq(const std::vector<Polygon>& data, std::istream& in, std::ostream& out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (polygon.points.size() < 3)
+  {
+    throw std::logic_error("At least 3 vertex needed!");
+  }
+  if (std::count(data.begin(), data.end(), polygon) == 0)
+  {
+    throw std::logic_error("There is no identic polygons");
+  }
+  SeqCounter counter(polygon);
+  std::for_each(data.begin(), data.end(), std::ref(counter));
+  out << counter.maxSeq;
 }
