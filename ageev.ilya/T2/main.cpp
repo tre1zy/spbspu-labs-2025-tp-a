@@ -23,7 +23,7 @@ int main()
     }
     if(std::cin.badbit)
     { 
-      std::cout << "программа не может продолжить работу";
+      std::cout << "You got badbit, can't continue working";
       return 2;
     }
   }
