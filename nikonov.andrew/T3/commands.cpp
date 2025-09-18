@@ -246,9 +246,9 @@ void nikonov::getMaxSeq(const std::vector<Polygon>& data, std::istream& in, std:
 {
   Polygon polygon;
   in >> polygon;
-  if (polygon.points.size() < 3)
+  if (!in || polygon.points.size() < 3)
   {
-    throw std::logic_error("At least 3 vertex needed!");
+    throw std::logic_error("<INVALID COMMAND>");
   }
   SeqCounter counter(polygon);
   std::for_each(data.begin(), data.end(), std::ref(counter));
