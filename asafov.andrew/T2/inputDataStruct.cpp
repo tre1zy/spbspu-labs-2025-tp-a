@@ -4,17 +4,17 @@
 
 namespace
 {
-  /*void skipLine(std::istream& in)
+  void skipLine(std::istream& in)
   {
     char ch;
-    while (in.get(ch))
+    while (in >> ch)
     {
       if (ch == '\n')
       {
         break;
       }
     }
-  }*/
+  }
 
   void expect(std::istream& in, std::initializer_list<char> expected)
   {
@@ -23,8 +23,8 @@ namespace
     {
       if (!(in >> ch) || ch != e)
       {
+        skipLine(in);
         in.setstate(std::ios::failbit);
-        //skipLine(in);
       }
     }
   }
@@ -35,14 +35,14 @@ namespace
     expect(in, {' ', '#', 'c', '('});
     if (!(in >> real))
     {
+      skipLine(in);
       in.setstate(std::ios::failbit);
-      //skipLine(in);
     }
     expect(in, {' '});
     if (!(in >> imag))
     {
+      skipLine(in);
       in.setstate(std::ios::failbit);
-      //skipLine(in);
     }
     expect(in, {')', ':'});
     return {real, imag};
@@ -58,8 +58,8 @@ namespace
     {
       if (!(in >> ch))
       {
+        skipLine(in);
         in.setstate(std::ios::failbit);
-        //skipLine(in);
       }
       if (ch == ':')
       {
@@ -81,8 +81,8 @@ namespace
     {
       if (!(in >> ch))
       {
+        skipLine(in);
         in.setstate(std::ios::failbit);
-        //skipLine(in);
       }
       if (ch == '"')
       {
@@ -104,8 +104,8 @@ namespace
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
+      skipLine(in);
       in.setstate(std::ios::failbit);
-      //skipLine(in);
     }
 
     if (ch == '1')
@@ -139,6 +139,6 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   unsafe_read(in, temp);
   data = temp;
   std::string line;
-  //skipLine(in);
+  skipLine(in);
   return in;
 }
