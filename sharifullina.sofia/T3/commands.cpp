@@ -153,22 +153,6 @@ namespace
     out << result << '\n';
   }
 
-  bool isPermutation(const sharifullina::Polygon & lhs, const sharifullina::Polygon & rhs)
-  {
-    if (lhs.points.size() != rhs.points.size())
-    {
-      return false;
-    }
-
-    std::vector< sharifullina::Point > sortedLhs = lhs.points;
-    std::vector< sharifullina::Point > sortedRhs = rhs.points;
-
-    std::sort(sortedLhs.begin(), sortedLhs.end(), cmpPoint);
-    std::sort(sortedRhs.begin(), sortedRhs.end(), cmpPoint);
-
-    return sortedLhs == sortedRhs;
-  }
-
   void getPerms(std::ostream & out, const std::vector< sharifullina::Polygon > & polygons, const sharifullina::Polygon & target)
   {
     sharifullina::detail::IsPermutationPredicate predicate(target);
