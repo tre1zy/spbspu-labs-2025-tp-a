@@ -107,22 +107,45 @@ std::istream& ivanova::operator>>(std::istream& in, UllBinT& x)
   }
   StreamGuard guard(in);
   in >> ExpectCharT{'0'} >> ExpectCharT{'b'};
-  std::string bits;
-  char ch;
+
+  x.key = 0;
   x.prefix_zeroes = 0;
-  bool first = true;
-  while (in.get(ch) && (ch == '0' || ch == '1')) {
-    bits += ch;
-    if (first && ch == '0') {
-      ++x.prefix_zeroes;
-    } else {
-      first = false;
+  bool reading_prefix = true;
+  char ch;
+  bool has_bits = false;
+
+  while (in.get(ch) && (ch == '0' || ch == '1'))
+  {
+    has_bits = true;
+    
+    if (reading_prefix)
+    {
+      if (ch == '0')
+      {
+        ++x.prefix_zeroes;
+      }
+      else
+      {
+        reading_prefix = false;
+        x.key = 1;
+      }
+    }
+    else
+    {
+      x.key <<= 1;
+      if (ch == '1')
+      {
+        x.key |= 1;
+      }
     }
   }
-  if (!bits.empty()) {
-    x.key = std::stoull(bits, nullptr, 2);
+ 
+  if (has_bits)
+  {
     if (in) in.unget();
-  } else {
+  }
+  else
+  {
     in.setstate(std::ios::failbit);
   }
   return in;

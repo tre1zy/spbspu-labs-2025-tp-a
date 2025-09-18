@@ -9,10 +9,10 @@
 int main()
 {
   using namespace ivanova;
-  using iIterator = std::istream_iterator<dataStruct>;
-  using oIterator = std::ostream_iterator<dataStruct>;
+  using iIterator = std::istream_iterator< dataStruct >;
+  using oIterator = std::ostream_iterator< dataStruct >;
 
-  std::vector<dataStruct> data;
+  std::vector< dataStruct > data;
 
   try
   {
@@ -20,7 +20,7 @@ int main()
 
     while (!std::cin.eof() && std::cin.fail())
     {
-      std::cin.clear();
+      std::cin.clear(std::ios::failbit);
       std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
     }
 
