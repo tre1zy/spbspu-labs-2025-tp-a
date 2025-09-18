@@ -196,11 +196,12 @@ void kushekbaev::FileImporter::operator()()
       {
         std::string word = tokens[0];
         std::set< std::string > translations;
-        if (tokens.size()  > 1) {
-            for (size_t i = 1; i <  tokens.size(); ++i)
-            {
-              translations.insert(tokens[i]);
-            }
+        if (tokens.size()  > 1)
+        {
+          for (size_t i = 1; i <  tokens.size(); ++i)
+          {
+            translations.insert(tokens[i]);
+          }
         }
         dicts[current_dict_name][word].insert(translations.begin(), translations.end());
       }
