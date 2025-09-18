@@ -139,7 +139,7 @@ std::istream& ivanova::operator>>(std::istream& in, UllBinT& x)
       }
     }
   }
- 
+
   if (has_bits)
   {
     if (in) in.unget();
