@@ -37,33 +37,38 @@ namespace
 
   struct ConditionalAreaAccumulator
   {
-    std::function<bool(const Polygon&)> predicate;
-
-    ConditionalAreaAccumulator(std::function<bool(const Polygon&)> pred) : predicate(pred) {}
+    std::function< bool(const Polygon&) > predicate_;
+    ConditionalAreaAccumulator(std::function< bool(const Polygon&) > pred):
+      predicate_(pred)
+    {}
 
     double operator()(double sum, const Polygon& poly) const
     {
-      return predicate(poly) ? sum + getArea(poly) : sum;
+      return predicate_(poly) ? sum + getArea(poly) : sum;
     }
   };
 
   struct ConditionalCounter
   {
-    std::function<bool(const Polygon&)> predicate;
+    std::function< bool(const Polygon&) > predicate_;
 
-    ConditionalCounter(std::function<bool(const Polygon&)> pred) : predicate(pred) {}
+    ConditionalCounter(std::function< bool(const Polygon&) > pred):
+      predicate_(pred)
+    {}
 
     size_t operator()(size_t count, const Polygon& poly) const
     {
-      return predicate(poly) ? count + 1 : count;
+      return predicate_(poly) ? count + 1 : count;
     }
   };
 
   struct VertexCountChecker
   {
-    size_t count;
+    size_t count_;
 
-    VertexCountChecker(size_t cnt) : count(cnt) {}
+    VertexCountChecker(size_t cnt):
+	count_(cnt)
+    {}
 
     bool operator()(const Polygon& poly) const
     {
@@ -83,10 +88,13 @@ namespace
 
       struct AngleCheck
       {
-        const std::vector<Point>& points;
+        const std::vector< Point >& points;
         size_t n;
 
-        AngleCheck(const std::vector<Point>& pts, size_t size) : points(pts), n(size) {}
+        AngleCheck(const std::vector< Point >& pts, size_t size):
+        points_(pts),
+        n__(size)
+        {}
 
         bool operator()(size_t i) const
         {
