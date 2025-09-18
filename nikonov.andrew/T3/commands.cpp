@@ -99,25 +99,37 @@ namespace
     return std::is_permutation(a.points.begin(), a.points.end(), b.points.begin());
   }
 
-  struct SeqCounter
+  struct SeqState
+  {
+    std::size_t curr;
+    std::size_t max;
+    SeqState(size_t c = 0, size_t m = 0):
+      curr(c),
+      max(m)
+    {}
+  };
+
+  struct SeqAccumOp
   {
     const nikonov::Polygon& target;
-    size_t currSeq = 0;
-    size_t maxSeq = 0;
-    SeqCounter(const nikonov::Polygon& t):
+    explicit SeqAccumOp(const nikonov::Polygon& t):
       target(t)
     {}
-    void operator()(const nikonov::Polygon& p)
+    SeqState operator()(SeqState acc, const nikonov::Polygon& p) const
     {
       if (p == target)
       {
-        ++currSeq;
+        ++acc.curr;
+        if (acc.curr > acc.max)
+        {
+          acc.max = acc.curr;
+        }
       }
       else
       {
-        currSeq = 0;
+        acc.curr = 0;
       }
-      maxSeq = std::max(maxSeq, currSeq);
+      return acc;
     }
   };
 }
@@ -244,13 +256,22 @@ void nikonov::getPerms(const std::vector< Polygon >& data, std::istream& in, std
 
 void nikonov::getMaxSeq(const std::vector<Polygon>& data, std::istream& in, std::ostream& out)
 {
-  Polygon polygon;
+  nikonov::Polygon polygon;
   in >> polygon;
   if (!in || polygon.points.size() < 3)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  SeqCounter counter(polygon);
-  std::for_each(data.begin(), data.end(), std::ref(counter));
-  out << counter.maxSeq;
+  if (polygon.points.size() < 3)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  if (std::count(data.begin(), data.end(), polygon) == 0)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  SeqState init(0, 0);
+  SeqAccumOp op(polygon);
+  SeqState result = std::accumulate(data.begin(), data.end(), init, op);
+  out << result.max;
 }
