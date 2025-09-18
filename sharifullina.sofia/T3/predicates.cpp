@@ -2,6 +2,12 @@
 
 namespace sharifullina::detail
 {
+
+  double calcPoints(const Point & p1, const Point & p2)
+  {
+    return p1.x * p2.y - p1.y * p2.x;
+  }
+
   bool cmpPoint(const Point & p1, const Point & p2)
   {
     if (p1.x != p2.x)
