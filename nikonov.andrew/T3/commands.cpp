@@ -70,6 +70,7 @@ void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std:
   std::string subcommand;
   in >> subcommand;
   StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1);
   if (subcommand == "EVEN")
   {
     out << calculateAreaIf(data, IsEvenPredicate());
