@@ -22,8 +22,8 @@ int main()
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     if(std::cin.badbit)
-    { 
-      std::cout << "You got badbit, can't continue working";
+    {
+      std::cout << "You got badbit, app can't continue working";
       return 2;
     }
   }
