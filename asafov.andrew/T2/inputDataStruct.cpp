@@ -36,7 +36,7 @@ namespace
     if (!(in >> real))
     {
       in.setstate(std::ios::failbit);
-      skipLine(in);
+      //skipLine(in);
     }
     expect(in, {' '});
     if (!(in >> imag))
@@ -139,6 +139,6 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   unsafe_read(in, temp);
   data = temp;
   std::string line;
-  skipLine(in);
+  //skipLine(in);
   return in;
 }
