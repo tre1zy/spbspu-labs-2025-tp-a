@@ -123,6 +123,9 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   read_key(in, data);
   read_key(in, data);
   expect(in, {')'});
-  data = temp;
+  if (in.good())
+  {
+    data = temp;
+  }
   return in;
 }
