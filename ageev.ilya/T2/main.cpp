@@ -21,12 +21,13 @@ int main()
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
+    if(std::cin.badbit)
+    { 
+      std::cout << "программа не может продолжить работу";
+      return 2;
+    }
   }
   std::sort(data.begin(), data.end());
-  std::copy(
-    data.begin(),
-    data.end(),
-    std::ostream_iterator< DataStruct >(std::cout, "\n")
-  );
+  std::copy(data.begin(), data.end(), std::ostream_iterator< DataStruct >(std::cout, "\n"));
   return 0;
 }
