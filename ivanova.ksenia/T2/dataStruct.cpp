@@ -117,7 +117,7 @@ std::istream& ivanova::operator>>(std::istream& in, UllBinT& x)
   while (in.get(ch) && (ch == '0' || ch == '1'))
   {
     has_bits = true;
-    
+
     if (reading_prefix)
     {
       if (ch == '0')
