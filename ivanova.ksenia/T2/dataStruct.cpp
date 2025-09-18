@@ -53,7 +53,7 @@ std::ostream& ivanova::operator<<(std::ostream& out, const UllBinT& x)
 
 std::ostream& ivanova::operator<<(std::ostream& out, const dataStruct& x)
 {
-  out << std::quoted(x.key);
+  out << std::quoted(x.key1);
   return out;
 }
 
