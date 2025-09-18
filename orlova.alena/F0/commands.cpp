@@ -55,12 +55,12 @@ namespace
     using reference = const value_type&;
     using iterator_category = std::input_iterator_tag;
 
-    WordPairGeneratorIterator() :
+    WordPairGeneratorIterator():
       file(nullptr),
       end(true)
     {}
 
-    WordPairGeneratorIterator(std::istream& f) :
+    WordPairGeneratorIterator(std::istream& f):
       file(&f),
       end(false)
     {
@@ -122,7 +122,7 @@ namespace
   {
     using Pair = std::pair< std::string, std::list< std::string > >;
     Dictionary newDict;
-    DictMerger(const Dictionary& dict) :
+    DictMerger(const Dictionary& dict):
       newDict(dict)
     {}
     Pair operator()(const Pair& pair)
@@ -165,7 +165,7 @@ namespace
     const Dictionary& dict2;
 
     PairTransformer(const Dictionary& d1,
-      const Dictionary& d2) :
+      const Dictionary& d2):
       dict1(d1),
       dict2(d2)
     {}
@@ -186,7 +186,7 @@ namespace
   struct ResidualTransform
   {
     const Dictionary& dict1;
-    ResidualTransform(const Dictionary& d1) :
+    ResidualTransform(const Dictionary& d1):
       dict1(d1)
     {}
     using Pair = std::pair< std::string, std::list< std::string > >;
