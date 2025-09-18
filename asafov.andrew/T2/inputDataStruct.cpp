@@ -4,22 +4,6 @@
 
 namespace
 {
-  void skipLine(std::istream& in, bool setFail = true)
-  {
-    if (setFail)
-    {
-      in.setstate(std::ios::failbit);
-    }
-    char ch;
-    while (in >> ch)
-    {
-      if (ch == '\n')
-      {
-        break;
-      }
-    }
-  }
-
   void expect(std::istream& in, std::initializer_list<char> expected)
   {
     char ch;
@@ -27,7 +11,7 @@ namespace
     {
       if (!(in >> ch) || ch != e)
       {
-        skipLine(in);
+        in.setstate(std::ios::failbit);
       }
     }
   }
@@ -38,12 +22,12 @@ namespace
     expect(in, {' ', '#', 'c', '('});
     if (!(in >> real))
     {
-      skipLine(in);
+      in.setstate(std::ios::failbit);
     }
     expect(in, {' '});
     if (!(in >> imag))
     {
-      skipLine(in);
+      in.setstate(std::ios::failbit);
     }
     expect(in, {')', ':'});
     return {real, imag};
@@ -59,7 +43,7 @@ namespace
     {
       if (!(in >> ch))
       {
-        skipLine(in);
+        in.setstate(std::ios::failbit);
       }
       if (ch == ':')
       {
@@ -74,7 +58,7 @@ namespace
     }
     catch (...)
     {
-      skipLine(in);
+      in.setstate(std::ios::failbit);
     }
     return res;
   }
@@ -90,7 +74,7 @@ namespace
     {
       if (!(in >> ch))
       {
-        skipLine(in);
+        in.setstate(std::ios::failbit);
       }
       if (ch == '"')
       {
@@ -112,7 +96,7 @@ namespace
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
-      skipLine(in);
+      in.setstate(std::ios::failbit);
     }
 
     if (ch == '1')
@@ -140,6 +124,5 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
   read_key(in, data);
   expect(in, {')'});
   data = temp;
-  skipLine(in, false);
   return in;
 }
