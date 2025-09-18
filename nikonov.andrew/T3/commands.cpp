@@ -70,11 +70,6 @@ namespace
     return getPolygonArea(a) < getPolygonArea(b);
   }
 
-  bool pVertexesComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
-  {
-    return a.points.size() < b.points.size();
-  }
-
   template < typename Iterator  >
   void getExtremumBody(Iterator it, std::istream& in, std::ostream& out)
   {
@@ -254,10 +249,6 @@ void nikonov::getMaxSeq(const std::vector<Polygon>& data, std::istream& in, std:
   if (polygon.points.size() < 3)
   {
     throw std::logic_error("At least 3 vertex needed!");
-  }
-  if (std::count(data.begin(), data.end(), polygon) == 0)
-  {
-    throw std::logic_error("There is no identic polygons");
   }
   SeqCounter counter(polygon);
   std::for_each(data.begin(), data.end(), std::ref(counter));

@@ -1,7 +1,8 @@
 #ifndef GEOM_H
 #define GEOM_H
 #include <vector>
-
+#include <istream>
+#include <ostream>
 namespace nikonov
 {
   struct Point
