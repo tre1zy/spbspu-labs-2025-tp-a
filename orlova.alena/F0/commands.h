@@ -5,7 +5,8 @@
 #include <map>
 #include <list>
 #include <fstream>
-#include <iostream>
+#include <istream>
+#include <ostream>
 #include <functional>
 
 namespace orlova

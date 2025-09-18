@@ -2,7 +2,8 @@
 #define IO_UTILS_H
 #include <list>
 #include <map>
-#include <iostream>
+#include <istream>
+#include <ostream>
 
 namespace orlova
 {
