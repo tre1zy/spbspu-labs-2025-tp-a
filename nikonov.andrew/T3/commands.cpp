@@ -63,6 +63,11 @@ namespace
     std::transform(tempPoly.begin(), tempPoly.end(), std::back_inserter(areas), getPolygonArea);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
+
+  bool polygonAreaComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
+  {
+    return getPolygonArea(a) < getPolygonArea(b);
+  }
 }
 
 void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
@@ -102,5 +107,29 @@ void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std:
     {
       out << "<INVALID COMMAND>\n";
     }
+  }
+}
+
+void nikonov::getMax(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+{
+  if (data.empty())
+  {
+    throw std::logic_error("<It is empty!>");
+  }
+  std::string subcommand;
+  in >> subcommand;
+  StreamGuard guard(out);
+  out << std::fixed << std::setprecision(1);
+  if (subcommand == "AREA")
+  {
+    out << getPolygonArea(*std::max_element(data.begin(), data.end(), polygonAreaComparator));
+  }
+  else if (subcommand == "VERTEXES")
+  {
+    out << (*std::max_element(data.begin(), data.end(), polygonAreaComparator)).points.size();
+  }
+  else
+  {
+    out << "<INVALID COMMAND>\n";
   }
 }
