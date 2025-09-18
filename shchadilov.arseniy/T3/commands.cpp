@@ -72,7 +72,7 @@ namespace
 
     bool operator()(const Polygon& poly) const
     {
-      return poly.points.size() == count;
+      return poly.points.size() == count_;
     }
   };
 
@@ -88,12 +88,12 @@ namespace
 
       struct AngleCheck
       {
-        const std::vector< Point >& points;
-        size_t n;
+        const std::vector< Point >& points_;
+        size_t n_;
 
         AngleCheck(const std::vector< Point >& pts, size_t size):
         points_(pts),
-        n__(size)
+        n_(size)
         {}
 
         bool operator()(size_t i) const
