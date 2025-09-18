@@ -68,6 +68,11 @@ namespace
   {
     return getPolygonArea(a) < getPolygonArea(b);
   }
+
+  bool polygonVertexesComparator(const nikonov::Polygon& a, const nikonov::Polygon& b)
+  {
+    return a.points.size() < b.points.size();
+  }
 }
 
 void nikonov::getArea(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
@@ -114,19 +119,18 @@ void nikonov::getMax(const std::vector< Polygon >& data, std::istream& in, std::
 {
   if (data.empty())
   {
-    throw std::logic_error("<It is empty!>");
+    throw std::logic_error("It is empty!");
   }
   std::string subcommand;
   in >> subcommand;
   StreamGuard guard(out);
-  out << std::fixed << std::setprecision(1);
   if (subcommand == "AREA")
   {
-    out << getPolygonArea(*std::max_element(data.begin(), data.end(), polygonAreaComparator));
+    out << std::fixed << std::setprecision(1) << getPolygonArea(*std::max_element(data.begin(), data.end(), polygonAreaComparator));
   }
   else if (subcommand == "VERTEXES")
   {
-    out << (*std::max_element(data.begin(), data.end(), polygonAreaComparator)).points.size();
+    out << (*std::max_element(data.begin(), data.end(), polygonVertexesComparator)).points.size();
   }
   else
   {
