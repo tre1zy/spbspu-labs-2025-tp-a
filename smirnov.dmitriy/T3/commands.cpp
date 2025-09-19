@@ -157,7 +157,6 @@ namespace smirnov
     }
   }
 
-
   bool onSegment(const smirnov::Point& p, const smirnov::Point& q, const smirnov::Point& r) {
     return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
            q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
@@ -187,24 +186,39 @@ namespace smirnov
     return false;
   }
 
+  bool isPointInside(const Polygon& poly, const smirnov::Point& p)
+  {
+    bool inside = false;
+    for (size_t i = 0, j = poly.points.size() - 1; i < poly.points.size(); j = i++) {
+      const smirnov::Point& pi = poly.points[i];
+      const smirnov::Point& pj = poly.points[j];
+      bool intersect = ((pi.y > p.y) != (pj.y > p.y)) &&
+                       (p.x < (pj.x - pi.x) * (p.y - pi.y) / double(pj.y - pi.y) + pi.x);
+      if (intersect)
+        inside = !inside;
+    }
+    return inside;
+  }
+
   bool hasIntersection(const Polygon& first, const Polygon& second)
   {
     for (size_t i = 0; i < first.points.size(); ++i) {
       smirnov::Point a1 = first.points[i];
       smirnov::Point a2 = first.points[(i + 1) % first.points.size()];
-
       for (size_t j = 0; j < second.points.size(); ++j) {
         smirnov::Point b1 = second.points[j];
         smirnov::Point b2 = second.points[(j + 1) % second.points.size()];
-
         if (doIntersect(a1, a2, b1, b2)) {
           return true;
         }
       }
     }
+
+    if (isPointInside(first, second.points[0])) return true;
+    if (isPointInside(second, first.points[0])) return true;
+
     return false;
 }
-
   void doIntersections(const std::vector< Polygon > & data, std::istream & in, std::ostream & out)
   {
     Polygon polygon;
