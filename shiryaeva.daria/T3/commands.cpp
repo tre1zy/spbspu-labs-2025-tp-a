@@ -13,7 +13,7 @@ bool shiryaeva::hasVertexCount(const Polygon &p, std::size_t count)
   return p.points.size() == count;
 }
 
-bool intersectsWith(const Polygon &a, const Polygon &b)
+bool intersectsWith(const shiryaeva::Polygon &a, const shiryaeva::Polygon &b)
 {
   int p1_minX = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
   int p1_maxX = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
