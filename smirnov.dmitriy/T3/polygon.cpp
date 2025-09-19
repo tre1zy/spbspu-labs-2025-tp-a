@@ -70,16 +70,21 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
   std::vector < Point > vec;
   vec.reserve(n);
   std::copy_n(inputItT{ in }, n, std::back_inserter(vec));
-  if (in && vec.size() == n)
-  {
-    value = Polygon{ vec };
-  }
-  else
-  {
-    in.setstate(std::ios::failbit);
-  }
+
+if (!in || vec.size() != n)
+{
+  in.setstate(std::ios::failbit);
   return in;
 }
+
+  std::string rest;
+  std::getline(in, rest);
+  if (rest.find_first_not_of(" \t\r") != std::string::npos)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+
 
 bool smirnov::operator==(const Polygon& p1, const Polygon& p2)
 {
