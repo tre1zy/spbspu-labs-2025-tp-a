@@ -177,7 +177,6 @@ namespace smirnov
     int o4 = orientation(p2, q2, q1);
 
     if (o1 != o2 && o3 != o4) return true;
-
     if (o1 == 0 && onSegment(p1, p2, q1)) return true;
     if (o2 == 0 && onSegment(p1, q2, q1)) return true;
     if (o3 == 0 && onSegment(p2, p1, q2)) return true;
@@ -232,8 +231,12 @@ namespace smirnov
         }
       }
     }
-    if (isPointInside(first, second.points[0])) return true;
-    if (isPointInside(second, first.points[0])) return true;
+    for (const auto& p : second.points) {
+      if (isPointInside(first, p)) return true;
+    }
+    for (const auto& p : first.points) {
+      if (isPointInside(second, p)) return true;
+    }
     return false;
   }
 
