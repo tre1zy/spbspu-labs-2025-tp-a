@@ -1,7 +1,6 @@
 #include "datastruct.h"
 #include <stdexcept>
 #include <initializer_list>
-
 namespace
 {
   void expect(std::istream& in, std::initializer_list<char> expected)
@@ -11,40 +10,30 @@ namespace
     {
       if (!(in >> ch) || ch != e)
       {
-        in.setstate(std::ios::failbit);
-        return;
+        throw std::logic_error("reading err");
       }
     }
   }
-
-  std::complex<double> read_complex(std::istream& in)
+	@@ -20,9 +20,15 @@ namespace
   {
     double real, imag;
     expect(in, {' ', '#', 'c', '('});
-    if (!(in >> real))
-    {
-      in.setstate(std::ios::failbit);
-    }
+    in >> real;
     expect(in, {' '});
-    if (!(in >> imag))
-    {
-      in.setstate(std::ios::failbit);
-    }
+    in >> imag;
     expect(in, {')', ':'});
     return {real, imag};
   }
-
   unsigned long long read_binary(std::istream& in)
   {
-    char ch = 0;
+    char ch;
     expect(in, {' ', '0', 'b'});
-
     std::string t2;
-    while (in)
+    while (true)
     {
       if (!(in >> ch))
       {
-        in.setstate(std::ios::failbit);
+        throw std::logic_error("err");
       }
       if (ch == ':')
       {
@@ -52,30 +41,19 @@ namespace
       }
       t2 += ch;
     }
-    unsigned long long res = 0;
-    try
-    {
-      res = std::stoull(t2);
-    }
-    catch (...)
-    {
-      in.setstate(std::ios::failbit);
-    }
-    return res;
+    return std::stoull(t2);
   }
-
   std::string read_string(std::istream& in)
   {
     char ch;
     expect(in, {' ', '"'});
-
     std::string t2;
     bool inside_quotes = true;
     while (inside_quotes)
     {
       if (!(in >> ch))
       {
-        in.setstate(std::ios::failbit);
+        throw std::logic_error("err");
       }
       if (ch == '"')
       {
@@ -89,7 +67,6 @@ namespace
     expect(in, {':'});
     return t2;
   }
-
   void read_key(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
@@ -97,7 +74,7 @@ namespace
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
-      in.setstate(std::ios::failbit);
+      throw std::logic_error("err");
     }
 
     if (ch == '1')
@@ -113,20 +90,43 @@ namespace
       data.key3 = read_string(in);
     }
   }
+  void unsafe_read(std::istream& in, asafov::DataStruct& data)
+  {
+    expect(in, {'(', ':'});
+    read_key(in, data);
+    read_key(in, data);
+    read_key(in, data);
+    expect(in, {')'});
+  }
+  void skipLine(std::istream& in)
+  {
+    char ch;
+    while (in.get(ch))
+    {
+      if (ch == '\n')
+      {
+        break;
+      }
+    }
+  }
 }
-
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
   DataStruct temp;
   in >> std::noskipws;
-  expect(in, {'(', ':'});
-  read_key(in, data);
-  read_key(in, data);
-  read_key(in, data);
-  expect(in, {')'});
-  if (in.good())
+  try
   {
-    data = temp;
+    unsafe_read(in, temp);
   }
+  catch (...)
+  {
+    in.setstate(std::ios::failbit);
+    std::string line;
+    skipLine(in);
+    return in;
+  }
+  data = temp;
+  std::string line;
+  skipLine(in);
   return in;
 }
