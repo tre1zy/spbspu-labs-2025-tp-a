@@ -57,6 +57,11 @@ namespace smirnov
     return in;
   }
 
+  bool operator==(const Point& a, const Point& b)
+  {
+    return a.x == b.x && a.y == b.y;
+  }
+
   bool operator==(const Polygon& p1, const Polygon& p2)
   {
     return p1.points == p2.points;
