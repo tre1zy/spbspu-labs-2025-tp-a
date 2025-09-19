@@ -69,8 +69,12 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
   using inputItT = std::istream_iterator< smirnov::Point >;
   std::vector < Point > vec;
   vec.reserve(n);
-  std::copy_n(inputItT{ in }, n, std::back_inserter(vec));
-  if (in && vec.size() == n)
+  std::copy_n(inputItT{ in }, n , std::back_inserter(vec));
+  if (in.peek() != '\n')
+  {
+    std::copy_n(inputItT{ in }, 1, std::back_inserter(vec));
+  }
+  if (in && vec.size() == n && in.peek() == '\n')
   {
     value = Polygon{ vec };
   }
