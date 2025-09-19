@@ -6,54 +6,55 @@
 #include "ScopeGuard.hpp"
 #include "polygon.hpp"
 
-using VecPolygons = std::vector< holodilov::Polygon >;
-
-bool checkPolygonVertexesAmount(const holodilov::Polygon& polygon, const size_t amountVertexes)
+namespace
 {
-  return polygon.points.size() == amountVertexes;
-}
-
-bool checkPolygonVertexesEven(const holodilov::Polygon& polygon)
-{
-  return polygon.points.size() % 2 == 0;
-}
-
-bool checkPolygonVertexesOdd(const holodilov::Polygon& polygon)
-{
-  return polygon.points.size() % 2 == 1;
-}
-
-bool comparePolygonsByVertexes(const holodilov::Polygon& lhs, const holodilov::Polygon& rhs)
-{
-  return lhs.points.size() < rhs.points.size();
-}
-
-bool comparePolygonsByArea(const holodilov::Polygon& lhs, const holodilov::Polygon& rhs)
-{
-  return lhs.getArea() < rhs.getArea();
-}
-
-double accumulateAreaEvenOdd(double sum, const holodilov::Polygon& polygon, bool isOdd)
-{
-  if (polygon.points.size() % 2 == isOdd)
+  bool checkPolygonVertexesAmount(const holodilov::Polygon& polygon, const size_t amountVertexes)
   {
-    sum += polygon.getArea();
+    return polygon.points.size() == amountVertexes;
   }
-  return sum;
-}
 
-double accumulateArea(double sum, const holodilov::Polygon& polygon)
-{
-  return sum + polygon.getArea();
-}
-
-double accumulateAreaVertexes(double sum, const holodilov::Polygon& polygon, size_t amountVertexes)
-{
-  if (polygon.points.size() == amountVertexes)
+  bool checkPolygonVertexesEven(const holodilov::Polygon& polygon)
   {
-    sum += polygon.getArea();
+    return polygon.points.size() % 2 == 0;
   }
-  return sum;
+
+  bool checkPolygonVertexesOdd(const holodilov::Polygon& polygon)
+  {
+    return polygon.points.size() % 2 == 1;
+  }
+
+  bool comparePolygonsByVertexes(const holodilov::Polygon& lhs, const holodilov::Polygon& rhs)
+  {
+    return lhs.points.size() < rhs.points.size();
+  }
+
+  bool comparePolygonsByArea(const holodilov::Polygon& lhs, const holodilov::Polygon& rhs)
+  {
+    return lhs.getArea() < rhs.getArea();
+  }
+
+  double accumulateAreaEvenOdd(double sum, const holodilov::Polygon& polygon, bool isOdd)
+  {
+    if (polygon.points.size() % 2 == isOdd)
+    {
+      sum += polygon.getArea();
+    }
+    return sum;
+  }
+
+  double accumulateArea(double sum, const holodilov::Polygon& polygon)
+  {
+    return sum + polygon.getArea();
+  }
+
+  double accumulateAreaVertexes(double sum, const holodilov::Polygon& polygon, size_t amountVertexes)
+  {
+    if (polygon.points.size() == amountVertexes)
+    {
+      sum += polygon.getArea();
+    }
+    return sum;
+  }
 }
 
 namespace holodilov::subcommands

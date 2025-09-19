@@ -2,7 +2,7 @@
 #define POLYGON_HPP
 
 #include <vector>
-#include <iostream>
+#include <istream>
 
 namespace holodilov
 {
@@ -16,7 +16,6 @@ namespace holodilov
 
   struct Polygon
   {
-  public:
     std::vector< Point > points;
 
     bool operator==(const Polygon& rhs) const;
@@ -27,6 +26,8 @@ namespace holodilov
   std::istream& operator>>(std::istream& is, Point& point);
 
   std::istream& operator>>(std::istream& is, Polygon& polygon);
+
+  using VecPolygons = std::vector< Polygon >;
 }
 
 #endif

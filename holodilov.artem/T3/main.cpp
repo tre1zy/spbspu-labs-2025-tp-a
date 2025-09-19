@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   }
 
   using istreamIter = std::istream_iterator< Polygon >;
-  std::vector< Polygon > vecPolygons;
+  VecPolygons vecPolygons;
 ;  while (!fis.eof())
   {
     std::copy(istreamIter(fis), istreamIter(), std::back_inserter(vecPolygons));

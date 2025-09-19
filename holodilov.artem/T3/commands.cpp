@@ -6,21 +6,24 @@
 #include "polygon.hpp"
 #include "subcommands.hpp"
 
-using VecPolygons = std::vector< holodilov::Polygon >;
-
-bool compareAreaWithTarget(const holodilov::Polygon& polygon, double targetArea)
+namespace
 {
-  return polygon.getArea() < targetArea;
-}
+  using holodilov::VecPolygons;
 
-VecPolygons accumulateEcho(VecPolygons vecPolygons, const holodilov::Polygon& polygon, const holodilov::Polygon& targetPolygon)
-{
-  vecPolygons.push_back(polygon);
-  if (polygon == targetPolygon)
+  bool compareAreaWithTarget(const holodilov::Polygon& polygon, double targetArea)
+  {
+    return polygon.getArea() < targetArea;
+  }
+
+  VecPolygons accumulateEcho(VecPolygons vecPolygons, const holodilov::Polygon& polygon, const holodilov::Polygon& targetPolygon)
   {
     vecPolygons.push_back(polygon);
+    if (polygon == targetPolygon)
+    {
+      vecPolygons.push_back(polygon);
+    }
+    return vecPolygons;
   }
-  return vecPolygons;
 }
 
 void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)

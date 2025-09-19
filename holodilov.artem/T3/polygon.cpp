@@ -4,10 +4,13 @@
 #include <numeric>
 #include "DelimIO.hpp"
 
-int sumPointPairForArea(const holodilov::Point& point)
+namespace
 {
-  holodilov::Point previousPoint = *(&point-1);
-  return point.y*previousPoint.x - point.x*previousPoint.y;
+  int sumPointPairForArea(const holodilov::Point& point)
+  {
+    holodilov::Point previousPoint = *(&point-1);
+    return point.y*previousPoint.x - point.x*previousPoint.y;
+  }
 }
 
 double holodilov::Polygon::getArea() const
