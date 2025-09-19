@@ -201,7 +201,7 @@ void shiryaeva::intersections(std::istream &in, std::ostream &out, const std::ve
   out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectsWith, polygon, std::placeholders::_1));
 }
 
-double dot(const Point &a, const Point &b, const Point &c)
+double dot(const shiryaeva::Point &a, const shiryaeva::Point &b, const shiryaeva::Point &c)
 {
   double abx = b.x - a.x;
   double aby = b.y - a.y;
@@ -210,14 +210,14 @@ double dot(const Point &a, const Point &b, const Point &c)
   return abx * bcx + aby * bcy;
 }
 
-double getDistanceSquared(const Point &a, const Point &b)
+double getDistanceSquared(const shiryaeva::Point &a, const shiryaeva::Point &b)
 {
   double dx = b.x - a.x;
   double dy = b.y - a.y;
   return dx * dx + dy * dy;
 }
 
-bool isRightAngle(const Point &prev, const Point &current, const Point &next)
+bool isRightAngle(const shiryaeva::Point &prev, const shiryaeva::Point &current, const shiryaeva::Point &next)
 {
   return std::abs(dot(prev, current, next)) <= EPS;
 }
