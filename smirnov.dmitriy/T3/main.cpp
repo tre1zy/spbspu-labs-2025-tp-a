@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::cerr << "not a file" << "\n";
+        std::cerr << " not a file" << "\n";
         return 1;
     }
     return 0;
