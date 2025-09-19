@@ -14,7 +14,8 @@ namespace
       }
     }
   }
-	@@ -20,9 +20,15 @@ namespace
+
+	std::complex<double> read_complex(std::istream& in)
   {
     double real, imag;
     expect(in, {' ', '#', 'c', '('});
@@ -24,6 +25,7 @@ namespace
     expect(in, {')', ':'});
     return {real, imag};
   }
+
   unsigned long long read_binary(std::istream& in)
   {
     char ch;
@@ -43,6 +45,7 @@ namespace
     }
     return std::stoull(t2);
   }
+
   std::string read_string(std::istream& in)
   {
     char ch;
@@ -67,6 +70,7 @@ namespace
     expect(in, {':'});
     return t2;
   }
+
   void read_key(std::istream& in, asafov::DataStruct& data)
   {
     char ch;
@@ -90,6 +94,7 @@ namespace
       data.key3 = read_string(in);
     }
   }
+
   void unsafe_read(std::istream& in, asafov::DataStruct& data)
   {
     expect(in, {'(', ':'});
@@ -98,6 +103,7 @@ namespace
     read_key(in, data);
     expect(in, {')'});
   }
+
   void skipLine(std::istream& in)
   {
     char ch;
@@ -110,6 +116,7 @@ namespace
     }
   }
 }
+
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
   DataStruct temp;
