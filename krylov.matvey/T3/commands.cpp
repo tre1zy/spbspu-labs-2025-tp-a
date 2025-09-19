@@ -50,7 +50,8 @@ namespace
     VertexesCmp cmp{vert};
     std::vector< Polygon > filtered(polygons.size());
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), cmp);
-    std::vector<double> areas(filtered.size());
+    filtered.shrink_to_fit();
+    std::vector< double > areas(filtered.size());
     std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
     double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
     out << totalArea;
