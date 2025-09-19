@@ -231,8 +231,10 @@ void orlova::intersectionOfDicts(std::istream& in, std::ostream& out, Dictionari
     return;
   }
   Dictionary temp, newDict;
-  std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), std::inserter(temp, temp.end()), details::CompareKeys{});
-  std::transform(temp.begin(), temp.end(), std::inserter(newDict, newDict.end()), std::bind(details::intersectListDict, _1, dict2));
+  details::CompareKeys comp;
+  auto inserter = std::inserter(newDict, newDict.end());
+  std::set_intersection(dict1.begin(), dict1.end(), dict2.begin(), dict2.end(), std::inserter(temp, temp.end()), comp);
+  std::transform(temp.begin(), temp.end(), inserter, std::bind(details::intersectListDict, _1, dict2));
   dicts[newDictName] = newDict;
   out << "<SUCCESSFULLY INTERSECTED>";
 }
@@ -258,7 +260,12 @@ void orlova::nonrepeatingWords(std::istream& in, std::ostream& out, Dictionaries
   std::string dictName2;
   std::string newDictName;
   in >> dictName1 >> dictName2 >> newDictName;
-  if (!details::dictionaryExists(dicts, dictName1) || !details::dictionaryExists(dicts, dictName2) || details::dictionaryExists(dicts, newDictName))
+  if (!details::dictionaryExists(dicts, dictName1) || !details::dictionaryExists(dicts, dictName2))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (details::dictionaryExists(dicts, newDictName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -287,7 +294,12 @@ void orlova::residual(std::istream& in, std::ostream& out, Dictionaries& dicts)
   std::string dictName2;
   std::string newDictName;
   in >> dictName1 >> dictName2 >> newDictName;
-  if (!details::dictionaryExists(dicts, dictName1) || !details::dictionaryExists(dicts, dictName2) || details::dictionaryExists(dicts, newDictName))
+  if (!details::dictionaryExists(dicts, dictName1) || !details::dictionaryExists(dicts, dictName2))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (details::dictionaryExists(dicts, newDictName))
   {
     out << "<INVALID COMMAND>\n";
     return;
