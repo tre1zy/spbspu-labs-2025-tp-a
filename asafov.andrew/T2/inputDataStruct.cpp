@@ -1,6 +1,7 @@
 #include "datastruct.h"
 #include <stdexcept>
 #include <initializer_list>
+#include <streamGuard.h>
 
 namespace
 {
@@ -134,6 +135,7 @@ namespace
 
 std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
+  StreamGuard guard(in);
   DataStruct temp;
   in >> std::noskipws;
   unsafe_read(in, temp);

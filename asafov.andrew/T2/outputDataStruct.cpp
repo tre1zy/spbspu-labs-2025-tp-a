@@ -1,6 +1,7 @@
 #include "datastruct.h"
 #include <iomanip>
 #include <algorithm>
+#include <streamGuard.h>
 
 namespace
 {
@@ -34,6 +35,7 @@ namespace
 
 std::ostream& asafov::operator<<(std::ostream& os, const DataStruct& data)
 {
+  StreamGuard guard(os);
   os << "(:key1 ";
   outputULLBin(os, data.key1);
   os << ":key2 ";
