@@ -8,241 +8,238 @@
 #include <stdexcept>
 #include <string>
 
-namespace shiryaeva
+bool shiryaeva::hasVertexCount(const Polygon &p, std::size_t count)
 {
-  bool hasVertexCount(const Polygon &p, std::size_t count)
+  return p.points.size() == count;
+}
+
+bool intersectsWith(const Polygon &a, const Polygon &b)
+{
+  int p1_minX = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
+  int p1_maxX = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
+  int p1_minY = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByY)->y;
+  int p1_maxY = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByY)->y;
+
+  int p2_minX = std::min_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByX)->x;
+  int p2_maxX = std::max_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByX)->x;
+  int p2_minY = std::min_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByY)->y;
+  int p2_maxY = std::max_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByY)->y;
+
+  bool x_overlap = (p1_minX <= p2_maxX) && (p2_minX <= p1_maxX);
+  bool y_overlap = (p1_minY <= p2_maxY) && (p2_minY <= p1_maxY);
+
+  return x_overlap && y_overlap;
+}
+
+bool shiryaeva::HasDuplicates(const Polygon& p)
+{
+  if (p.points.size() < 2)
   {
-    return p.points.size() == count;
+    return false;
   }
+  std::vector< Point > sortedPoints = p.points;
+  std::sort(sortedPoints.begin(), sortedPoints.end());
+  return std::adjacent_find(sortedPoints.begin(), sortedPoints.end()) != sortedPoints.end();
+}
 
-  bool intersectsWith(const Polygon &a, const Polygon &b)
+void shiryaeva::area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  FormatGuard guard(out);
+  std::string subcmd;
+  in >> subcmd;
+
+  std::vector< Polygon > filtered;
+  if (subcmd == "EVEN")
   {
-    int p1_minX = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
-    int p1_maxX = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByX)->x;
-    int p1_minY = std::min_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByY)->y;
-    int p1_maxY = std::max_element(a.points.cbegin(), a.points.cend(), shiryaeva::comparePointByY)->y;
-
-    int p2_minX = std::min_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByX)->x;
-    int p2_maxX = std::max_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByX)->x;
-    int p2_minY = std::min_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByY)->y;
-    int p2_maxY = std::max_element(b.points.cbegin(), b.points.cend(), shiryaeva::comparePointByY)->y;
-
-    bool x_overlap = (p1_minX <= p2_maxX) && (p2_minX <= p1_maxX);
-    bool y_overlap = (p1_minY <= p2_maxY) && (p2_minY <= p1_maxY);
-
-    return x_overlap && y_overlap;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isEven);
   }
-
-  bool HasDuplicates(const Polygon& p)
+  else if (subcmd == "ODD")
   {
-    if (p.points.size() < 2)
-    {
-      return false;
-    }
-    std::vector< Point > sortedPoints = p.points;
-    std::sort(sortedPoints.begin(), sortedPoints.end());
-    return std::adjacent_find(sortedPoints.begin(), sortedPoints.end()) != sortedPoints.end();
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isOdd);
   }
-
-  void area(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+  else if (subcmd == "MEAN")
   {
-    FormatGuard guard(out);
-    std::string subcmd;
-    in >> subcmd;
-
-    std::vector< Polygon > filtered;
-    if (subcmd == "EVEN")
-    {
-      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isEven);
-    }
-    else if (subcmd == "ODD")
-    {
-      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), isOdd);
-    }
-    else if (subcmd == "MEAN")
-    {
-      if (polygons.empty())
-      {
-        throw std::logic_error("<INVALID COMMAND>");
-      }
-      out << std::fixed << std::setprecision(1) << getTotalArea(polygons) / polygons.size();
-      return;
-    }
-    else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
-    {
-      std::size_t n = std::stoul(subcmd);
-      if (n < MIN_VERTEX_COUNT)
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
-      std::function< bool(const Polygon&) > pred = std::bind(hasVertexCount, std::placeholders::_1, n);
-      std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
-    }
-    else
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    out << std::fixed << std::setprecision(1) << getTotalArea(filtered);
-  }
-
-  void max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
-  {
-    FormatGuard guard(out);
-    std::string subcmd;
-    in >> subcmd;
-
     if (polygons.empty())
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
-    out << std::fixed << std::setprecision(1);
-
-    if (subcmd == "AREA")
-    {
-      auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByArea);
-      out << getPolygonArea(*maxIt);
-    }
-    else if (subcmd == "VERTEXES")
-    {
-      auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByVertexes);
-      out << maxIt->points.size();
-    }
-    else
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
+    out << std::fixed << std::setprecision(1) << getTotalArea(polygons) / polygons.size();
+    return;
   }
-
-  void min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+  else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
   {
-    FormatGuard guard(out);
-    std::string subcmd;
-    in >> subcmd;
-    out << std::fixed << std::setprecision(1);
-
-    if (polygons.empty())
+    std::size_t n = std::stoul(subcmd);
+    if (n < MIN_VERTEX_COUNT)
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
-    out << std::fixed << std::setprecision(1);
-
-    if (subcmd == "AREA")
-    {
-      auto minIt = std::min_element(polygons.begin(), polygons.end(), compareByArea);
-      out << getPolygonArea(*minIt);
-    }
-    else if (subcmd == "VERTEXES")
-    {
-      auto minIt = std::min_element(polygons.begin(), polygons.end(), compareByVertexes);
-      out << minIt->points.size();
-    }
-    else
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
+    std::function< bool(const Polygon&) > pred = std::bind(hasVertexCount, std::placeholders::_1, n);
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
   }
-
-  void count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+  else
   {
-    std::string subcmd;
-    in >> subcmd;
-    std::size_t cnt = 0;
-
-    if (subcmd == "EVEN")
-    {
-      cnt = std::count_if(polygons.begin(), polygons.end(), isEven);
-    }
-    else if (subcmd == "ODD")
-    {
-      cnt = std::count_if(polygons.begin(), polygons.end(), isOdd);
-    }
-    else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
-    {
-      size_t vertexCount = std::stoul(subcmd);
-      if (vertexCount < MIN_VERTEX_COUNT)
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
-      auto pred = std::bind(hasVertexCount, std::placeholders::_1, vertexCount);
-      cnt = std::count_if(polygons.begin(), polygons.end(), pred);
-    }
-    else
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    out << cnt;
+    throw std::logic_error("<INVALID COMMAND>");
   }
+  out << std::fixed << std::setprecision(1) << getTotalArea(filtered);
+}
 
-  void lessArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+void shiryaeva::max(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  FormatGuard guard(out);
+  std::string subcmd;
+  in >> subcmd;
+
+  if (polygons.empty())
   {
-    FormatGuard guard(out);
-    Polygon polygon;
-    in >> polygon;
-    if (!in || polygon.points.size() < 3 || !HasDuplicates(polygon))
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  out << std::fixed << std::setprecision(1);
+
+  if (subcmd == "AREA")
+  {
+    auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByArea);
+    out << getPolygonArea(*maxIt);
+  }
+  else if (subcmd == "VERTEXES")
+  {
+    auto maxIt = std::max_element(polygons.begin(), polygons.end(), compareByVertexes);
+    out << maxIt->points.size();
+  }
+  else
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+}
+
+void shiryaeva::min(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  FormatGuard guard(out);
+  std::string subcmd;
+  in >> subcmd;
+  out << std::fixed << std::setprecision(1);
+
+  if (polygons.empty())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  out << std::fixed << std::setprecision(1);
+
+  if (subcmd == "AREA")
+  {
+    auto minIt = std::min_element(polygons.begin(), polygons.end(), compareByArea);
+    out << getPolygonArea(*minIt);
+  }
+  else if (subcmd == "VERTEXES")
+  {
+    auto minIt = std::min_element(polygons.begin(), polygons.end(), compareByVertexes);
+    out << minIt->points.size();
+  }
+  else
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+}
+
+void shiryaeva::count(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  std::string subcmd;
+  in >> subcmd;
+  std::size_t cnt = 0;
+
+  if (subcmd == "EVEN")
+  {
+    cnt = std::count_if(polygons.begin(), polygons.end(), isEven);
+  }
+  else if (subcmd == "ODD")
+  {
+    cnt = std::count_if(polygons.begin(), polygons.end(), isOdd);
+  }
+  else if (std::all_of(subcmd.begin(), subcmd.end(), ::isdigit))
+  {
+    size_t vertexCount = std::stoul(subcmd);
+    if (vertexCount < MIN_VERTEX_COUNT)
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
-    size_t cnt = std::count_if(
-      polygons.begin(), polygons.end(),
-      [&polygon](const Polygon &p)
-      {
-        return getPolygonArea(p) < getPolygonArea(polygon);
-      });
-    out << cnt;
+    auto pred = std::bind(hasVertexCount, std::placeholders::_1, vertexCount);
+    cnt = std::count_if(polygons.begin(), polygons.end(), pred);
   }
-
-  void intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+  else
   {
-    Polygon polygon;
-    in >> polygon;
-    if ((polygon.points.empty()) || (!in) || (in.peek() != '\n'))
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  out << cnt;
+}
+
+void shiryaeva::lessArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  FormatGuard guard(out);
+  Polygon polygon;
+  in >> polygon;
+  if (!in || polygon.points.size() < 3 || !HasDuplicates(polygon))
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  size_t cnt = std::count_if(polygons.begin(), polygons.end(),
+  [&polygon](const Polygon& p)
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      return getPolygonArea(p) < getPolygonArea(polygon);
     }
+  );
+  out << cnt;
+}
 
-    out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectsWith, polygon, std::placeholders::_1));
-  }
-
-  double dot(const Point &a, const Point &b, const Point &c)
+void shiryaeva::intersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
+{
+  Polygon polygon;
+  in >> polygon;
+  if ((polygon.points.empty()) || (!in) || (in.peek() != '\n'))
   {
-    double abx = b.x - a.x;
-    double aby = b.y - a.y;
-    double bcx = c.x - b.x;
-    double bcy = c.y - b.y;
-    return abx * bcx + aby * bcy;
+    throw std::logic_error("<INVALID COMMAND>");
   }
 
-  double getDistanceSquared(const Point &a, const Point &b)
+  out << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectsWith, polygon, std::placeholders::_1));
+}
+
+double dot(const Point &a, const Point &b, const Point &c)
+{
+  double abx = b.x - a.x;
+  double aby = b.y - a.y;
+  double bcx = c.x - b.x;
+  double bcy = c.y - b.y;
+  return abx * bcx + aby * bcy;
+}
+
+double getDistanceSquared(const Point &a, const Point &b)
+{
+  double dx = b.x - a.x;
+  double dy = b.y - a.y;
+  return dx * dx + dy * dy;
+}
+
+bool isRightAngle(const Point &prev, const Point &current, const Point &next)
+{
+  return std::abs(dot(prev, current, next)) <= EPS;
+}
+
+bool shiryaeva::isRectangle(const Polygon &polygon)
+{
+  const auto &points = polygon.points;
+
+  if (points.size() != RECTANGLE_SIDES)
   {
-    double dx = b.x - a.x;
-    double dy = b.y - a.y;
-    return dx * dx + dy * dy;
+    return false;
   }
+  double diag1 = getDistanceSquared(points[0], points[2]);
+  double diag2 = getDistanceSquared(points[1], points[3]);
 
-  bool isRightAngle(const Point &prev, const Point &current, const Point &next)
+  if (std::abs(diag1 - diag2) > EPS)
   {
-    return std::abs(dot(prev, current, next)) <= EPS;
+    return false;
   }
 
-  bool isRectangle(const Polygon &polygon)
-  {
-    const auto &points = polygon.points;
-
-    if (points.size() != RECTANGLE_SIDES)
-    {
-      return false;
-    }
-    double diag1 = getDistanceSquared(points[0], points[2]);
-    double diag2 = getDistanceSquared(points[1], points[3]);
-
-    if (std::abs(diag1 - diag2) > EPS)
-    {
-      return false;
-    }
-
-    return isRightAngle(points[3], points[0], points[1]) &&
-      isRightAngle(points[0], points[1], points[2]) &&
-      isRightAngle(points[1], points[2], points[3]) &&
-      isRightAngle(points[2], points[3], points[0]);
-  }
+  return isRightAngle(points[3], points[0], points[1]) &&
+    isRightAngle(points[0], points[1], points[2]) &&
+    isRightAngle(points[1], points[2], points[3]) &&
+    isRightAngle(points[2], points[3], points[0]);
 }
