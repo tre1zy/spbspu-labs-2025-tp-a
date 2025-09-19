@@ -33,17 +33,31 @@ struct aleksandrov::Note
   char pitch;
 
   std::string toString() const;
+  short toSemitones() const;
 };
 
 struct aleksandrov::Interval
 {
   Note first;
   Note second;
+
+  void inverseUp();
+  void inverseDown();
 };
 
 struct aleksandrov::Chord
 {
-  std::map< std::string, Note > notes;
+  struct NoteComparator
+  {
+    bool operator()(const Note& lhs, const Note& rhs) const
+    {
+      return lhs.toSemitones() < rhs.toSemitones();
+    }
+  };
+  std::map< Note, size_t, NoteComparator > notes;
+
+  void inverseUp();
+  void inverseDown();
 };
 
 class aleksandrov::MusicalElement
@@ -71,6 +85,9 @@ public:
   bool isInterval() const noexcept;
   bool isChord() const noexcept;
   bool isNone() const noexcept;
+
+  void inverseUp();
+  void inverseDown();
 
 private:
   MusicalElementType type_;

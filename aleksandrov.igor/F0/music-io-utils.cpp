@@ -8,11 +8,11 @@
 namespace
 {
   template< class Key, class Value >
-  struct ValueReturner
+  struct KeyReturner
   {
-    const Value& operator()(const std::pair< Key, Value >& pair) const
+    const Key& operator()(const std::pair< Key, Value >& pair) const
     {
-      return pair.second;
+      return pair.first;
     }
   };
 
@@ -142,7 +142,7 @@ std::istream& aleksandrov::operator>>(std::istream& in, Chord& chord)
     {
       break;
     }
-    temp.notes.emplace(note.toString(), note);
+    temp.notes.emplace(note, note.toSemitones());
   }
   while (in.peek() == '-' && in.get());
 
@@ -167,12 +167,12 @@ std::istream& aleksandrov::operator>>(std::istream& in, MusicalElement& element)
   {
     if (temp.notes.size() == 1)
     {
-      element = MusicalElement(temp.notes.begin()->second);
+      element = MusicalElement(temp.notes.begin()->first);
     }
     else if (temp.notes.size() == 2)
     {
-      Note first = temp.notes.begin()->second;
-      Note second = temp.notes.rbegin()->second;
+      Note first = temp.notes.begin()->first;
+      Note second = temp.notes.rbegin()->first;
       if (first.toString() > second.toString())
       {
         std::swap(first, second);
@@ -208,9 +208,9 @@ std::ostream& aleksandrov::operator<<(std::ostream& out, const Chord& chord)
   StreamGuard guard(out);
   const auto& notes = chord.notes;
   std::ostream_iterator< Note > outIt(out, "-");
-  ValueReturner< std::string, Note > returner;
+  KeyReturner< Note, size_t > returner;
   std::transform(notes.begin(), std::prev(notes.end()), outIt, returner);
-  return out << notes.rbegin()->second;
+  return out << notes.rbegin()->first;
 }
 
 std::ostream& aleksandrov::operator<<(std::ostream& out, const MusicalElement& element)

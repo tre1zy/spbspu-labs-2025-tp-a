@@ -59,6 +59,7 @@ void aleksandrov::processCommands(std::istream& in, std::ostream& out, Sequences
   commands["elements"] = std::bind(elementsSeq, std::ref(in), std::ref(out), std::cref(seqs));
   commands["notes"] = std::bind(notesSeq, std::ref(in), std::ref(out), std::cref(seqs));
   commands["type"] = std::bind(typeSeq, std::ref(in), std::ref(out), std::cref(seqs));
+  commands["inverse"] = std::bind(inverseSeq, std::ref(in), std::ref(seqs));
 
   std::string command;
   while (!(in >> command).eof())
@@ -361,6 +362,41 @@ void aleksandrov::typeSeq(std::istream& in, std::ostream& out, const Sequences& 
   out << '\n';
 }
 
+void aleksandrov::inverseSeq(std::istream& in, Sequences& seqs)
+{
+  std::string seqName;
+  in >> seqName;
+  auto seqIt = seqs.find(seqName);
+  if (seqIt == seqs.end())
+  {
+    throw std::logic_error("No such sequence '" + seqName + "'");
+  }
+  Sequence& sequence = seqIt->second;
+  size_t position = 0;
+  if (!(in >> position) || !position || position > sequence.size())
+  {
+    throw std::logic_error("Incorrect position!");
+  }
+  if (sequence[position - 1].isNote())
+  {
+    throw std::logic_error("Cannot inverse a note!");
+  }
+  std::string direction;
+  in >> direction;
+  if (direction == "up")
+  {
+    sequence[position - 1].inverseUp();
+  }
+  else if (direction == "down")
+  {
+    sequence[position - 1].inverseDown();
+  }
+  else
+  {
+    throw std::logic_error("Incorrect direction!");
+  }
+}
+
 void aleksandrov::printHelp(std::ostream& out)
 {
   out << "list\n";
@@ -393,5 +429,8 @@ void aleksandrov::printHelp(std::ostream& out)
   out << "- print amount of notes in all elements of the sequence with the name 'name'\n";
   out << "type <name> <position>\n";
   out << "- print type of element at position pos of the sequence with the name 'name'\n";
+  out << "inverse <name> <pos> up/down\n";
+  out << "- inverse up or down an interval or a chord at position pos\n";
+  out << "  of the sequence with the name 'name'\n";
 }
 

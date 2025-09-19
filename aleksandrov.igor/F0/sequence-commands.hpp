@@ -26,6 +26,7 @@ namespace aleksandrov
   void elementsSeq(std::istream&, std::ostream&, const Sequences&);
   void notesSeq(std::istream&, std::ostream&, const Sequences&);
   void typeSeq(std::istream&, std::ostream&, const Sequences&);
+  void inverseSeq(std::istream&, Sequences&);
 }
 
 #endif

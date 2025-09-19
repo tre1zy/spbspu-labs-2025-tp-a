@@ -1,5 +1,20 @@
 #include "music.hpp"
+#include <stdexcept>
 #include <cassert>
+
+namespace
+{
+  const std::map< char, short > notesSemitones = {
+    { 'A', 0 },
+    { 'B', 1 },
+    { 'H', 2 },
+    { 'C', 3 },
+    { 'D', 5 },
+    { 'E', 7 },
+    { 'F', 8 },
+    { 'G', 10 }
+  };
+}
 
 std::string aleksandrov::Note::toString() const
 {
@@ -11,6 +26,92 @@ std::string aleksandrov::Note::toString() const
   }
   str += pitch;
   return str;
+}
+
+short aleksandrov::Note::toSemitones() const
+{
+  short semitones = notesSemitones.at(letter);
+  if (accidental == '#')
+  {
+    ++semitones;
+  }
+  else if (accidental == 'b')
+  {
+    --semitones;
+  }
+  return (pitch - '0') * 12 + semitones;
+}
+
+void aleksandrov::Interval::inverseUp()
+{
+  if (first.pitch + 1 == '8' && first.letter != 'C')
+  {
+    throw std::logic_error("Inversing down note is out of range!");
+  }
+  else if (first.pitch > 56)
+  {
+    throw std::logic_error("Inversing down note is out of range!");
+  }
+  ++first.pitch;
+  std::swap(first, second);
+}
+
+void aleksandrov::Interval::inverseDown()
+{
+  if (second.pitch - 1 == '0')
+  {
+    if (second.letter != 'H' && second.letter != 'A')
+    {
+      throw std::logic_error("Inversing down note is out of range!");
+    }
+  }
+  else if (second.pitch < 48)
+  {
+    throw std::logic_error("Inversing down note is out of range!");
+  }
+  --second.pitch;
+  std::swap(first, second);
+}
+
+void aleksandrov::Chord::inverseUp()
+{
+  if (notes.empty())
+  {
+    throw std::logic_error("Cannot inverse an empty chord!");
+  }
+  Note lowest = notes.begin()->first;
+  Note inverted = lowest;
+  ++inverted.pitch;
+  if (inverted.pitch == '8' && inverted.letter != 'C')
+  {
+    throw std::logic_error("Inversing up lowest note is out of range!");
+  }
+  notes.erase(notes.begin());
+  notes.emplace(inverted, inverted.toSemitones());
+}
+
+void aleksandrov::Chord::inverseDown()
+{
+  if (notes.empty())
+  {
+    throw std::logic_error("Cannot inverse an empty chord!");
+  }
+  Note highest = std::prev(notes.end())->first;
+  Note inverted = highest;
+  --inverted.pitch;
+  if (inverted.pitch == '0')
+  {
+    if (inverted.letter != 'H' && inverted.letter != 'A')
+    {
+      throw std::logic_error("Inversing down note is out of range!");
+    }
+  }
+  else if (inverted.pitch < '0')
+  {
+    throw std::logic_error("Inversing down note is out of range!");
+  }
+  notes.erase(std::prev(notes.end()));
+  notes.emplace(inverted, inverted.toSemitones());
 }
 
 aleksandrov::MusicalElement::MusicalElement():
@@ -143,5 +244,37 @@ bool aleksandrov::MusicalElement::isChord() const noexcept
 bool aleksandrov::MusicalElement::isNone() const noexcept
 {
   return type_ == MusicalElementType::None;
+}
+
+void aleksandrov::MusicalElement::inverseUp()
+{
+  if (isNote())
+  {
+    throw std::logic_error("Cannot inverse a note!");
+  }
+  else if (isInterval())
+  {
+    interval_.inverseUp();
+  }
+  else if (isChord())
+  {
+    chord_.inverseUp();
+  }
+}
+
+void aleksandrov::MusicalElement::inverseDown()
+{
+  if (isNote())
+  {
+    throw std::logic_error("Cannot inverse a note!");
+  }
+  else if (isInterval())
+  {
+    interval_.inverseDown();
+  }
+  else if (isChord())
+  {
+    chord_.inverseDown();
+  }
 }
 
