@@ -78,7 +78,7 @@ Polygon shiryaeva::TriangleGenerator::operator()()
   return buildTriangle(index++, points);
 }
 
-std::vector< Polygon > shiryaeva::polygonToTriangles(const Polygon &p)
+std::vector< shiryaeva::Polygon > shiryaeva::polygonToTriangles(const Polygon &p)
 {
   std::vector< Polygon > tris;
   tris.resize(p.points.size() - 2);
