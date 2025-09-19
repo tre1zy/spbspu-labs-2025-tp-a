@@ -1,129 +1,151 @@
 #include "polygon.hpp"
-#include <iostream>
+#include <algorithm>
+#include <functional>
 #include <iterator>
 #include <vector>
-#include <algorithm>
-#include <cmath>
+#include "delimiters.hpp"
 
-namespace smirnov
+struct PolygonArea
 {
-  std::istream& operator>>(std::istream& in, Point& value)
+  smirnov:: Point first;
+  double operator()(const smirnov::Point& second)
   {
-    std::istream::sentry guard(in);
-    if (!guard)
-    {
-      return in;
-    }
+    double area = (second.x + first.x) * (first.y - second.y);
+    first = second;
+    return area;
+  }
+};
 
-    char lparen = 0;
-    char semicolon = 0;
-    char rparen = 0;
-
-    in >> lparen >> value.x >> semicolon >> value.y >> rparen;
-    if (!in || lparen != '(' || semicolon != ';' || rparen != ')')
-    {
-      in.setstate(std::ios::failbit);
-    }
+std::istream& smirnov::operator>>(std::istream& in, Point& value)
+{
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
     return in;
   }
-
-  std::istream& operator>>(std::istream& in, Polygon& value)
+  using del = smirnov::DelimiterChar;
+  int x{};
+  int y{};
+  in >> del{ '(' } >> x >> del{ ';' } >> y >> del{ ')' };
+  if (in)
   {
-    std::istream::sentry guard(in);
-    if (!guard)
-    {
-      return in;
-    }
-
-    size_t n = 0;
-    in >> n;
-    if (n < 3)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    using inputItT = std::istream_iterator< smirnov::Point >;
-    std::vector< Point > vec;
-    vec.reserve(n);
-    std::copy_n(inputItT{ in }, n, std::back_inserter(vec));
-
-    if (!in || vec.size() != n)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    value = Polygon{ vec };
-    return in;
+    value = Point{ x,y };
   }
-
-  bool operator==(const Point& a, const Point& b)
+  else
   {
-    return a.x == b.x && a.y == b.y;
+    in.setstate(std::ios::failbit);
   }
-
-  bool operator==(const Polygon& p1, const Polygon& p2)
-  {
-    return p1.points == p2.points;
-  }
-
-  double getArea(const Polygon& p)
-  {
-    double area = 0.0;
-    for (size_t i = 0; i < p.points.size(); ++i)
-    {
-      const Point& a = p.points[i];
-      const Point& b = p.points[(i + 1) % p.points.size()];
-      area += (a.x * b.y - b.x * a.y);
-    }
-    return std::abs(area) / 2.0;
-  }
-
-  bool isPerpendicular(const Point& p1, const Point& p2, const Point& p3)
-  {
-    int dx1 = p2.x - p1.x;
-    int dy1 = p2.y - p1.y;
-    int dx2 = p3.x - p2.x;
-    int dy2 = p3.y - p2.y;
-    return dx1 * dx2 + dy1 * dy2 == 0;
-  }
-
-  bool isRect(const Polygon& p)
-  {
-    if (p.points.size() != 4)
-    {
-      return false;
-    }
-    return isPerpendicular(p.points[0], p.points[1], p.points[2]) &&
-           isPerpendicular(p.points[1], p.points[2], p.points[3]) &&
-           isPerpendicular(p.points[2], p.points[3], p.points[0]) &&
-           isPerpendicular(p.points[3], p.points[0], p.points[1]);
-  }
-
-  bool isOddCountVertexes(const Polygon& p)
-  {
-    return (p.points.size() % 2) != 0;
-  }
-
-  bool isEvenCountVertexes(const Polygon& p)
-  {
-    return (p.points.size() % 2) == 0;
-  }
-
-  bool isNCountVertexes(const Polygon& p, size_t n)
-  {
-    return p.points.size() == n;
-  }
-
-  bool minArea(const Polygon& p1, const Polygon& p2)
-  {
-    return getArea(p1) < getArea(p2);
-  }
-
-  bool minVertexes(const Polygon& p1, const Polygon& p2)
-  {
-    return p1.points.size() < p2.points.size();
-  }
+  return in;
 }
 
+bool smirnov::operator<(const Point& p1, const Point& p2)
+{
+  if (p1.x != p2.x)
+  {
+    return p1.x < p2.x;
+  }
+  return p1.y < p2.y;
+}
+
+bool smirnov::operator==(const Point& p1, const Point& p2)
+{
+  return p1.x == p2.x && p1.y == p2.y;
+}
+
+std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
+{
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
+    return in;
+  }
+  size_t n = 0;
+  in >> n;
+  if (n < 3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  using inputItT = std::istream_iterator< smirnov::Point >;
+  std::vector < Point > vec;
+  vec.reserve(n);
+  std::copy_n(inputItT{ in }, n, std::back_inserter(vec));
+  if (in && vec.size() == n)
+  {
+    value = Polygon{ vec };
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+bool smirnov::operator==(const Polygon& p1, const Polygon& p2)
+{
+  return p1.points == p2.points;
+}
+
+bool smirnov::operator<=(const Point &first, const Point &second)
+{
+  return !(second < first);
+}
+
+bool smirnov::operator>=(const Point &first, const Point &second)
+{
+  return !(first < second);
+}
+
+double smirnov::getArea(const Polygon& p)
+{
+  std::vector< double > partArea;
+  std::transform(p.points.begin(), p.points.end(), std::back_inserter(partArea), PolygonArea{ p.points[0] });
+  double area = std::accumulate(partArea.cbegin(), partArea.cend(), 0.0);
+  area += (p.points[p.points.size() - 1].x + p.points[0].x) * (p.points[p.points.size() - 1].y - p.points[0].y);
+  return std::abs(area) / 2;
+}
+
+bool smirnov::isPerpendicular(const Point& p1, const Point& p2, const Point& p3)
+{
+  double x1 = p1.x - p2.x;
+  double y1 = p1.y - p2.y;
+  double x2 = p1.x - p3.x;
+  double y2 = p1.y - p3.y;
+  return x1 * x2 + y1 * y2 == 0;
+}
+
+bool smirnov::isRect(const Polygon& p)
+{
+  if (p.points.size() != 4)
+  {
+    return false;
+  }
+  std::vector< Point > vec(p.points);
+  std::sort(vec.begin(), vec.end());
+  return isPerpendicular(vec[0], vec[1], vec[2]) && isPerpendicular(vec[1], vec[0], vec[3]) && isPerpendicular(vec[3], vec[2], vec[1]);
+}
+
+bool smirnov::isOddCountVertexes(const Polygon& p)
+{
+  return p.points.size() % 2;
+}
+
+bool smirnov::isEvenCountVertexes(const Polygon& p)
+{
+  return p.points.size() % 2 == 0;
+}
+
+bool smirnov::isNCountVertexes(const Polygon& p, size_t n)
+{
+  return p.points.size() == n;
+}
+
+bool smirnov::minArea(const Polygon& p1, const Polygon& p2)
+{
+  return getArea(p1) < getArea(p2);
+}
+
+bool smirnov::minVertexes(const Polygon& p1, const Polygon& p2)
+{
+  return p1.points.size() < p2.points.size();
+}
