@@ -2,7 +2,6 @@
 #define COMMANDS_H
 
 #include <string>
-#include <vector>
 #include "Dictionary.hpp"
 
 namespace holodilov
@@ -26,6 +25,10 @@ namespace holodilov
   void printDict(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries);
 
   void findWord(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
+
+  void merge(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
+
+  void intersect(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
 
   void exportAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
 

@@ -1,10 +1,9 @@
 #ifndef DICTIONARY_HPP
 #define DICTIONARY_HPP
 
-#include <string>
 #include <list>
+#include <string>
 #include <map>
-#include <iostream>
 
 namespace holodilov
 {
@@ -18,6 +17,5 @@ namespace holodilov
   std::ostream& operator<<(std::ostream& out, const Dictionary& dict);
   std::istream& operator>>(std::istream& in, Dictionary& dict);
 }
-
 
 #endif

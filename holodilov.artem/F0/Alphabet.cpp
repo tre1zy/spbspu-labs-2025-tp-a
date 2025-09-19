@@ -54,7 +54,6 @@ std::istream& holodilov::operator>>(std::istream& in, Alphabet& alphabet)
   return in;
 }
 
-
 bool holodilov::Alphabet::operator==(const Alphabet& rhs) const
 {
   return alphabet_ == rhs.alphabet_;
