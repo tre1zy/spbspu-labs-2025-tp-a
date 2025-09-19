@@ -11,14 +11,16 @@ namespace
     {
       if (!(in >> ch) || ch != e)
       {
-        throw std::logic_error("reading err");
+        in.setstate(std::ios::failbit);
+        break;
       }
     }
   }
 
   std::complex<double> read_complex(std::istream& in)
   {
-    double real, imag;
+    double real = 0;
+    double imag = 0;
     expect(in, {' ', '#', 'c', '('});
     in >> real;
     expect(in, {' '});
@@ -36,7 +38,8 @@ namespace
     {
       if (!(in >> ch))
       {
-        throw std::logic_error("err");
+        in.setstate(std::ios::failbit);
+        break;
       }
       if (ch == ':')
       {
@@ -44,7 +47,16 @@ namespace
       }
       t2 += ch;
     }
-    return std::stoull(t2);
+    unsigned long long res = 0;
+    try
+    {
+      res = std::stoull(t2);
+    }
+    catch (...)
+    {
+      in.setstate(std::ios::failbit);
+    }
+    return res;
   }
 
   std::string read_string(std::istream& in)
@@ -57,7 +69,8 @@ namespace
     {
       if (!(in >> ch))
       {
-        throw std::logic_error("err");
+        in.setstate(std::ios::failbit);
+        break;
       }
       if (ch == '"')
       {
@@ -79,7 +92,8 @@ namespace
 
     if (!(in >> ch) || (ch != '1' && ch != '2' && ch != '3'))
     {
-      throw std::logic_error("err");
+      in.setstate(std::ios::failbit);
+      return;
     }
 
     if (ch == '1')
@@ -122,19 +136,14 @@ std::istream& asafov::operator>>(std::istream& in, asafov::DataStruct& data)
 {
   DataStruct temp;
   in >> std::noskipws;
-  try
-  {
-    unsafe_read(in, temp);
-  }
-  catch (...)
+  unsafe_read(in, temp);
+  if (!in)
   {
     in.setstate(std::ios::failbit);
-    std::string line;
     skipLine(in);
     return in;
   }
   data = temp;
-  std::string line;
   skipLine(in);
   return in;
 }
