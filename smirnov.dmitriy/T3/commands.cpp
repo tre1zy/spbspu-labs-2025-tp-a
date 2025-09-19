@@ -231,6 +231,13 @@ namespace smirnov
         }
       }
     }
+    for (const auto& p1 : first.points) {
+      for (const auto& p2 : second.points) {
+        if (p1.x == p2.x && p1.y == p2.y) {
+          return true;
+        }
+      }
+    }
     for (const auto& p : second.points) {
       if (isPointInside(first, p)) return true;
     }
