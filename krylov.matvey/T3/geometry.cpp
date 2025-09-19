@@ -88,7 +88,11 @@ bool krylov::isOdd(const Polygon &polygon)
 
 double krylov::getArea(const Polygon& polygon)
 {
-  const std::vector< Point > &p = polygon.points;
+  const std::vector< Point >& p = polygon.points;
+  if (p.empty())
+  {
+    return 0.0;
+  }
   double area = crossProduct(p.back(), p.front());
   area += std::inner_product(p.begin(), p.end() - 1, p.begin() + 1, 0.0, std::plus< double >{}, crossProduct);
   return std::abs(area) / 2.0;
