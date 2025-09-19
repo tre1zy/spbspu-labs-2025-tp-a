@@ -249,12 +249,25 @@ namespace smirnov
 
   void doIntersections(const std::vector< Polygon > & data, std::istream & in, std::ostream & out)
   {
-    Polygon polygon;
-    in >> polygon;
-    if (!in)
+    std::string rest;
+    std::getline(in, rest);
+    if (rest.empty())
     {
       throw std::logic_error("Wrong argument");
     }
+
+    std::istringstream iss(rest);
+    Polygon polygon;
+    if (!(iss >> polygon))
+    {
+      throw std::logic_error("Wrong argument");
+    }
+    iss >> std::ws;
+    if (!iss.eof())
+    {
+      throw std::logic_error("Wrong argument");
+    }
+
     auto isIntersected = std::bind(hasIntersection, std::cref(polygon), _1);
     out << std::count_if(data.begin(), data.end(), isIntersected) << '\n';
   }
