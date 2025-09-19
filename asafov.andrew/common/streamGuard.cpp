@@ -1,4 +1,4 @@
-#include "stream-guard.hpp"
+#include "streamGuard.h"
 
 asafov::StreamGuard::StreamGuard(std::ostream& os):
 stream(s),
