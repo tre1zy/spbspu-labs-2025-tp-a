@@ -59,6 +59,7 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
   {
     return in;
   }
+
   size_t n = 0;
   in >> n;
   if (n < 3)
@@ -66,6 +67,7 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
     in.setstate(std::ios::failbit);
     return in;
   }
+
   using inputItT = std::istream_iterator< smirnov::Point >;
   std::vector < Point > vec;
   vec.reserve(n);
@@ -84,7 +86,9 @@ if (!in || vec.size() != n)
     in.setstate(std::ios::failbit);
     return in;
   }
-
+  value = Polygon{ vec };
+  return in;
+}
 
 bool smirnov::operator==(const Polygon& p1, const Polygon& p2)
 {
