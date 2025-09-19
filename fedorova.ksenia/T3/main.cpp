@@ -13,8 +13,6 @@ int main(int argc, char** argv)
 {
   using namespace fedorova;
 
-  std::vector< Polygon > polygons;
-
   if (argc != 2)
   {
     std::cerr << "<INCORRECT ARGUMENTS>\n";
@@ -27,6 +25,8 @@ int main(int argc, char** argv)
     std::cerr << "<INCORRECT FILE\n>";
     return 1;
   }
+
+  std::vector< Polygon > polygons;
 
   while (!file.eof())
   {
