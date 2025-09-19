@@ -1,12 +1,6 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <map>
 #include <vector>
-#include <iomanip>
-#include <limits>
-#include <functional>
-#include <iterator>
 #include "polygon.hpp"
 #include "commands.hpp"
 
@@ -15,15 +9,22 @@ int main()
   using namespace smirnov;
 
   std::vector< Polygon > polygons;
-  Polygon poly;
-  while (std::cin >> poly)
+
+  while (true)
   {
-    polygons.push_back(poly);
+    Polygon poly;
+    if (std::cin >> poly)
+    {
+      polygons.push_back(poly);
+    }
+    else
+    {
+      std::cin.clear();
+      break;
+    }
   }
 
-  std::cin.clear();
   std::string cmd;
-
   while (std::cin >> cmd)
   {
     try
