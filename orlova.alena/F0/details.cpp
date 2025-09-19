@@ -1,13 +1,13 @@
-#include <iterator>
 #include "details.h"
+#include <iterator>
 #include "io-utils.h"
 
-bool orlova::dictionaryExists(const Dictionaries& dicts, const std::string& name)
+bool details::dictionaryExists(const Dictionaries& dicts, const std::string& name)
 {
   return dicts.find(name) != dicts.end();
 }
 
-void orlova::printTranslations(std::ostream& out, const Translations& translations)
+void details::printTranslations(std::ostream& out, const Translations& translations)
 {
   if (translations.empty())
   {
@@ -20,7 +20,7 @@ void orlova::printTranslations(std::ostream& out, const Translations& translatio
   out << *(--translations.end());
 }
 
-orlova::Translations orlova::intersectLists(Translations& list1, Translations& list2)
+orlova::Translations details::intersectLists(Translations& list1, Translations& list2)
 {
   list1.sort();
   list2.sort();
@@ -29,7 +29,7 @@ orlova::Translations orlova::intersectLists(Translations& list1, Translations& l
   return res;
 }
 
-std::pair< std::string, orlova::Translations > orlova::intersectListDict(const std::pair< std::string, Translations >& pair,
+std::pair< std::string, orlova::Translations > details::intersectListDict(const std::pair< std::string, Translations >& pair,
   const orlova::Dictionary& intersected)
 {
   Translations list1 = pair.second;

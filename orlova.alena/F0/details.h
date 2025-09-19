@@ -5,12 +5,13 @@
 #include "commands.h"
 #include "io-utils.h"
 
-namespace orlova
+namespace details
 {
+  using namespace orlova;
   bool dictionaryExists(const Dictionaries&, const std::string&);
   void printTranslations(std::ostream&, const Translations&);
   Translations intersectLists(Translations&, Translations&);
-  std::pair< std::string, Translations > intersectListDict(const std::pair< std::string, Translations >&, const orlova::Dictionary&);
+  std::pair< std::string, Translations > intersectListDict(const std::pair< std::string, Translations >&, const Dictionary&);
 
   struct WordPairGeneratorIterator
   {
@@ -163,12 +164,12 @@ namespace orlova
 }
 
 template<>
-struct std::iterator_traits< orlova::WordPairGeneratorIterator >
+struct std::iterator_traits< details::WordPairGeneratorIterator >
 {
-  using value_type = orlova::WordPairGeneratorIterator::value_type;
-  using pointer = orlova::WordPairGeneratorIterator::pointer;
-  using reference = orlova::WordPairGeneratorIterator::reference;
-  using iterator_category = orlova::WordPairGeneratorIterator::iterator_category;
+  using value_type = details::WordPairGeneratorIterator::value_type;
+  using pointer = details::WordPairGeneratorIterator::pointer;
+  using reference = details::WordPairGeneratorIterator::reference;
+  using iterator_category = details::WordPairGeneratorIterator::iterator_category;
 };
 
 #endif
