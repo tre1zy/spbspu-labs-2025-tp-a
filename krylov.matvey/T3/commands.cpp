@@ -38,16 +38,6 @@ namespace
     out << res;
   }
 
-  double getAreaIfGoodNumOfVert(const Polygon& p, size_t vert)
-  {
-    VertexesCmp cmp{ vert };
-    if (cmp(p))
-    {
-      return getArea(p);
-    }
-    return 0.0;
-  }
-
   void printAreaVertexes(const std::vector< Polygon >& polygons, std::ostream& out, const std::string& s)
   {
     using namespace std::placeholders;
@@ -57,10 +47,11 @@ namespace
     {
       throw std::logic_error("Not enough vertexes\n");
     }
-    std::vector< double > areas(polygons.size());
-    auto f = std::bind(getAreaIfGoodNumOfVert, _1, vert);
-    std::transform(polygons.begin(), polygons.end(), areas.begin(), f);
-    double area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    VertexesCmp cmp{vert};
+    std::vector< Polygon > filtered(polygons.size());
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), cmp);
+    auto f = std::bind(getArea, _2);
+    double area = std::accumulate(filtered.begin(), filtered.end(), 0.0, std::bind(std::plus< double >(), _1, f));
     out << area;
   }
 
