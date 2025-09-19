@@ -1,103 +1,60 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <map>
 #include <vector>
-#include <sstream>
+#include <limits>
+#include <functional>
+#include <iterator>
 #include "polygon.hpp"
 #include "commands.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
-  using namespace smirnov;
+    using namespace smirnov;
+    if (argc == 2)
+    {
+        std::string fname = argv[1];
+        std::ifstream file(fname);
+        std::vector< Polygon > polygons;
+        using inputIt = std::istream_iterator< Polygon >;
+        while (!file.eof())
+        {
+            std::copy(inputIt{ file }, inputIt{}, std::back_inserter(polygons));
+            file.clear();
+            file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        }
+        std::map < std::string, std::function< void(std::istream&, std::ostream&) > > commands;
+        {
+            using namespace std::placeholders;
+            commands["AREA"] = std::bind(doAreaCommand, std::cref(polygons), _1, _2);
+            commands["MAX"] = std::bind(doMaxCommand, std::cref(polygons), _1, _2);
+            commands["MIN"] = std::bind(doMinCommand, std::cref(polygons), _1, _2);
+            commands["COUNT"] = std::bind(doCountCommand, std::cref(polygons), _1, _2);
+            commands["RECTS"] = std::bind(doRectsCommand, std::cref(polygons), _2);
+            commands["INTERSECTIONS"] = std::bind(doIntersections, std::cref(polygons), _1, _2);
+        }
 
-  std::vector<std::string> lines;
-  std::string line;
-  while (std::getline(std::cin, line))
-  {
-    lines.push_back(line);
-  }
-
-  std::vector<Polygon> polygons;
-  size_t i = 0;
-  for (; i < lines.size(); ++i)
-  {
-    std::string s = lines[i];
-    auto first_non_ws = s.find_first_not_of(" \t\r\n");
-    if (first_non_ws == std::string::npos)
-    {
-      ++i;
-      break;
+        std::string cmd;
+        while (std::cin >> cmd)
+        {
+            try
+            {
+                commands.at(cmd)(std::cin, std::cout);
+            }
+            catch (...)
+            {
+                std::cout << "<INVALID COMMAND>\n";
+            }
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        }
+        file.close();
     }
-    std::string token;
-    std::istringstream iss0(s);
-    if (!(iss0 >> token))
+    else
     {
-      ++i;
-      break;
+        std::cerr << "not a file" << "\n";
+        return 1;
     }
-    if (token == "AREA" || token == "COUNT" || token == "MAX" || token == "MIN" ||
-        token == "RECTS" || token == "MAXSEQ" || token == "INTERSECTIONS" || token == "ECHO" ||
-        token == "INFRAME" || token == "PERMS" || token == "RMECHO" || token == "SAME")
-    {
-      break;
-    }
-    std::istringstream iss(s);
-    Polygon p;
-    if (iss >> p)
-    {
-      polygons.push_back(p);
-    }
-  }
-
-  for (; i < lines.size(); ++i)
-  {
-    std::string cmdline = lines[i];
-    std::istringstream iss(cmdline);
-    std::string cmd;
-    if (!(iss >> cmd))
-    {
-      continue;
-    }
-    try
-    {
-      if (cmd == "AREA")
-      {
-        doAreaCommand(polygons, iss, std::cout);
-      }
-      else if (cmd == "COUNT")
-      {
-        doCountCommand(polygons, iss, std::cout);
-      }
-      else if (cmd == "MAX")
-      {
-        doMaxCommand(polygons, iss, std::cout);
-      }
-      else if (cmd == "MIN")
-      {
-        doMinCommand(polygons, iss, std::cout);
-      }
-      else if (cmd == "RECTS")
-      {
-        doRectsCommand(polygons, std::cout);
-      }
-      else if (cmd == "MAXSEQ")
-      {
-        doMaxseqCommand(polygons, iss, std::cout);
-      }
-      else if (cmd == "INTERSECTIONS")
-      {
-        doIntersections(polygons, iss, std::cout);
-      }
-      else
-      {
-        throw std::logic_error("INVALID COMMAND");
-      }
-    }
-    catch (const std::logic_error& e)
-    {
-      std::cout << "<" << e.what() << ">" << '\n';
-    }
-  }
-
-  return 0;
+    return 0;
 }
-
