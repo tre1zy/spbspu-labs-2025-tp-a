@@ -42,12 +42,6 @@ namespace
   }
 }
 
-void aleksandrov::printHelp(std::ostream& out)
-{
-  StreamGuard guard(out);
-  out << "No help\n";
-}
-
 void aleksandrov::processCommands(std::istream& in, std::ostream& out, Sequences& seqs)
 {
   std::map< std::string, std::function< void() > > commands;
@@ -365,5 +359,39 @@ void aleksandrov::typeSeq(std::istream& in, std::ostream& out, const Sequences& 
     break;
   }
   out << '\n';
+}
+
+void aleksandrov::printHelp(std::ostream& out)
+{
+  out << "list\n";
+  out << "- print loaded/created sequences in this session\n";
+  out << "new <name>\n";
+  out << "- create a new sequence with the name 'name'\n";
+  out << "load <filename> <name>\n";
+  out << "- load a new sequence with the name 'name' from the file 'filename'\n";
+  out << "  (make sure to type a full path to the file)\n";
+  out << "save <name> <filename>\n";
+  out << "- save a sequence with the name 'name' to the file 'filename'\n";
+  out << "  (make sure to type a full path to the file)\n";
+  out << "clear <name>\n";
+  out << "- clear a sequence with the name 'name'\n";
+  out << "delete <name>\n";
+  out << "- delete a sequence with the name 'name'\n";
+  out << "clone <name>\n";
+  out << "- clone a sequence with the name 'name'\n";
+  out << "add <name> <element> <pos>\n";
+  out << "- add a new element at position pos in a sequence with the name 'name'\n";
+  out << "remove <name> <pos>\n";
+  out << "- remove an element at position pos in a sequence with the name 'name'\n";
+  out << "merge <name1> <name2> <name>\n";
+  out << "- merge 2 sequences into one new with the name 'name'\n";
+  out << "print <name>\n";
+  out << "- print all the elements of a sequence with the name 'name'\n";
+  out << "elements <name>\n";
+  out << "- print amount of elements of the sequence with the name 'name'\n";
+  out << "notes <name>\n";
+  out << "- print amount of notes in all elements of the sequence with the name 'name'\n";
+  out << "type <name> <position>\n";
+  out << "- print type of element at position pos of the sequence with the name 'name'\n";
 }
 
