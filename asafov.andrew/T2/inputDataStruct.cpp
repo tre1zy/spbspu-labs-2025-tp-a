@@ -1,6 +1,7 @@
 #include "datastruct.h"
 #include <stdexcept>
 #include <initializer_list>
+
 namespace
 {
   void expect(std::istream& in, std::initializer_list<char> expected)
@@ -15,7 +16,7 @@ namespace
     }
   }
 
-	std::complex<double> read_complex(std::istream& in)
+  std::complex<double> read_complex(std::istream& in)
   {
     double real, imag;
     expect(in, {' ', '#', 'c', '('});
