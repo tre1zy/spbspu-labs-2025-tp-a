@@ -23,7 +23,7 @@ bool shiryaeva::operator==(const Point &lhs, const Point &rhs)
   return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-bool operator<(const Point &lhs, const Point &rhs)
+bool shiryaeva::operator<(const Point &lhs, const Point &rhs)
 {
   return (lhs.x < rhs.x) || (lhs.x == rhs.x && lhs.y < rhs.y);
 }
@@ -68,12 +68,12 @@ double shiryaeva::getDistance(const Point &p1, const Point &p2)
   return std::sqrt(std::pow(p1.x - p2.x, 2) + std::pow(p1.y - p2.y, 2));
 }
 
-Polygon shiryaeva::buildTriangle(std::size_t i, const std::vector< Point > &pts)
+shiryaeva::Polygon shiryaeva::buildTriangle(std::size_t i, const std::vector< Point > &pts)
 {
   return Polygon{ std::vector< Point >{ pts[0], pts[i + 1], pts[i + 2] } };
 }
 
-Polygon shiryaeva::TriangleGenerator::operator()()
+shiryaeva::Polygon shiryaeva::TriangleGenerator::operator()()
 {
   return buildTriangle(index++, points);
 }
