@@ -186,8 +186,27 @@ namespace smirnov
     return false;
   }
 
+  bool pointOnEdge(const Polygon& poly, const smirnov::Point& p)
+  {
+    for (size_t i = 0; i < poly.points.size(); ++i) {
+      smirnov::Point a = poly.points[i];
+      smirnov::Point b = poly.points[(i + 1) % poly.points.size()];
+
+      long long cross = (p.y - a.y) * (b.x - a.x) - (p.x - a.x) * (b.y - a.y);
+      if (cross == 0 &&
+          std::min(a.x, b.x) <= p.x && p.x <= std::max(a.x, b.x) &&
+          std::min(a.y, b.y) <= p.y && p.y <= std::max(a.y, b.y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool isPointInside(const Polygon& poly, const smirnov::Point& p)
   {
+    if (pointOnEdge(poly, p)) {
+      return true;
+    }
     bool inside = false;
     for (size_t i = 0, j = poly.points.size() - 1; i < poly.points.size(); j = i++) {
       const smirnov::Point& pi = poly.points[i];
@@ -213,12 +232,11 @@ namespace smirnov
         }
       }
     }
-
     if (isPointInside(first, second.points[0])) return true;
     if (isPointInside(second, first.points[0])) return true;
-
     return false;
-}
+  }
+
   void doIntersections(const std::vector< Polygon > & data, std::istream & in, std::ostream & out)
   {
     Polygon polygon;
