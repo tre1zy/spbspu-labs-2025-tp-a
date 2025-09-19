@@ -16,6 +16,8 @@ namespace smirnov
     std::istream& operator>>(std::istream& in, Point& value);
     bool operator<(const Point& p1, const Point& p2);
     bool operator==(const Point& p1, const Point& p2);
+    bool operator<=(const Point &first, const Point &second);
+    bool operator>=(const Point &first, const Point &second);
 
 
     struct Polygon
