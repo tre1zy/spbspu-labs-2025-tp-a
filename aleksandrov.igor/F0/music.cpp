@@ -17,59 +17,6 @@ aleksandrov::MusicalElement::MusicalElement():
   type_(MusicalElementType::None)
 {}
 
-aleksandrov::MusicalElement::MusicalElement(const MusicalElement& other):
-  type_(other.type_)
-{
-  switch (type_)
-  {
-  case MusicalElementType::Note:
-    new (std::addressof(note_)) Note(other.note_);
-    break;
-  case MusicalElementType::Interval:
-    new (std::addressof(interval_)) Interval(other.interval_);
-    break;
-  case MusicalElementType::Chord:
-    new (std::addressof(chord_)) Chord(other.chord_);
-    break;
-  default:
-    break;
-  }
-}
-
-aleksandrov::MusicalElement::MusicalElement(MusicalElement&& other) noexcept:
-  type_(std::move(other.type_))
-{
-  switch (type_)
-  {
-  case MusicalElementType::Note:
-    new (std::addressof(note_)) Note(std::move(other.note_));
-    break;
-  case MusicalElementType::Interval:
-    new (std::addressof(interval_)) Interval(std::move(other.interval_));
-    break;
-  case MusicalElementType::Chord:
-    new (std::addressof(chord_)) Chord(std::move(other.chord_));
-    break;
-  default:
-    break;
-  }
-  other.type_ = MusicalElementType::None;
-}
-
-aleksandrov::MusicalElement& aleksandrov::MusicalElement::operator=(const MusicalElement& rhs)
-{
-  MusicalElement copy(rhs);
-  swap(copy);
-  return *this;
-}
-
-aleksandrov::MusicalElement& aleksandrov::MusicalElement::operator=(MusicalElement&& rhs) noexcept
-{
-  MusicalElement copy(std::move(rhs));
-  swap(copy);
-  return *this;
-}
-
 aleksandrov::MusicalElement::MusicalElement(const Note& note):
   type_(MusicalElementType::Note),
   note_(note)
@@ -81,45 +28,60 @@ aleksandrov::MusicalElement::MusicalElement(const Interval& interval):
 {}
 
 aleksandrov::MusicalElement::MusicalElement(const Chord& chord):
-  type_(MusicalElementType::Chord),
-  chord_(chord)
-{}
+  type_(MusicalElementType::Chord)
+{
+  new (std::addressof(chord_)) Chord(chord);
+}
 
 aleksandrov::MusicalElement::~MusicalElement() noexcept
+{
+  if (isChord())
+  {
+    chord_.~Chord();
+  }
+}
+
+aleksandrov::MusicalElement::MusicalElement(const MusicalElement& other):
+  type_(other.type_)
 {
   switch (type_)
   {
   case MusicalElementType::Note:
-    note_.~Note();
+    note_ = other.note_;
     break;
   case MusicalElementType::Interval:
-    interval_.~Interval();
+    interval_ = other.interval_;
     break;
   case MusicalElementType::Chord:
-    chord_.~Chord();
+    new (std::addressof(chord_)) Chord(other.chord_);
     break;
   default:
     break;
   }
 }
 
-void aleksandrov::MusicalElement::swap(MusicalElement& other) noexcept
+aleksandrov::MusicalElement& aleksandrov::MusicalElement::operator=(const MusicalElement& rhs)
 {
-  std::swap(type_, other.type_);
-  switch (type_)
+  if (isChord())
+  {
+    chord_.~Chord();
+  }
+  switch (rhs.type_)
   {
   case MusicalElementType::Note:
-    std::swap(note_, other.note_);
+    note_ = rhs.note_;
     break;
   case MusicalElementType::Interval:
-    std::swap(interval_, other.interval_);
+    interval_ = rhs.interval_;
     break;
   case MusicalElementType::Chord:
-    std::swap(chord_, other.chord_);
+    new (std::addressof(chord_)) Chord(rhs.chord_);
     break;
   default:
     break;
   }
+  type_ = rhs.type_;
+  return *this;
 }
 
 aleksandrov::MusicalElementType aleksandrov::MusicalElement::getType() const noexcept

@@ -51,16 +51,12 @@ class aleksandrov::MusicalElement
 public:
   MusicalElement();
   MusicalElement(const MusicalElement&);
-  MusicalElement(MusicalElement&&) noexcept;
   explicit MusicalElement(const Note&);
   explicit MusicalElement(const Interval&);
   explicit MusicalElement(const Chord&);
   ~MusicalElement() noexcept;
 
   MusicalElement& operator=(const MusicalElement&);
-  MusicalElement& operator=(MusicalElement&&) noexcept;
-
-  void swap(MusicalElement&) noexcept;
 
   MusicalElementType getType() const noexcept;
 

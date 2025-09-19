@@ -6,6 +6,7 @@
 #include <functional>
 #include <algorithm>
 #include <numeric>
+#include <vector>
 #include <map>
 #include <stream-guard.hpp>
 #include "music-io-utils.hpp"
@@ -23,13 +24,22 @@ namespace
     }
   };
 
-  struct NotesCounter
+  size_t countNotes(const MusicalElement& element) noexcept
   {
-    size_t operator()(size_t count, const MusicalElement& element) const
+    if (element.isNote())
     {
-      return count + (element.isNote() ? 1 : (element.isInterval() ? 2 : 0));
+      return 1;
     }
-  };
+    else if (element.isInterval())
+    {
+      return 2;
+    }
+    else if (element.isChord())
+    {
+      return element.chord().notes.size();
+    }
+    return 0;
+  }
 }
 
 void aleksandrov::printHelp(std::ostream& out)
@@ -318,7 +328,9 @@ void aleksandrov::notesSeq(std::istream& in, std::ostream& out, const Sequences&
     throw std::logic_error("No such sequence '" + seqName + "'");
   }
   const Sequence& sequence = seqIt->second;
-  size_t notesCount = std::accumulate(sequence.begin(), sequence.end(), 0, NotesCounter{});
+  std::vector< size_t > noteCounts(sequence.size());
+  std::transform(sequence.begin(), sequence.end(), noteCounts.begin(), countNotes);
+  size_t notesCount = std::accumulate(noteCounts.begin(), noteCounts.end(), 0);
   out << "Total number of notes in '" << seqName << "': " << notesCount << '\n';
 }
 
@@ -343,8 +355,15 @@ void aleksandrov::typeSeq(std::istream& in, std::ostream& out, const Sequences& 
   case MusicalElementType::Note:
     out << "note";
     break;
-  default:
+  case MusicalElementType::Interval:
     out << "interval";
+    break;
+  case MusicalElementType::Chord:
+    out << "chord";
+    break;
+  default:
+    break;
   }
   out << '\n';
 }
+

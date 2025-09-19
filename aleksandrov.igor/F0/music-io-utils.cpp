@@ -18,7 +18,7 @@ namespace
 
   bool isCorrectLetter(char l) noexcept
   {
-    return 'A' <= l && l <= 'H';
+    return 65 <= l && l <= 72;
   }
 
   bool isCorrectAccidental(char acc) noexcept
@@ -35,7 +35,7 @@ namespace
     case '8':
       return l == 'C' && !isCorrectAccidental(acc);
     default:
-      return '1' <= p && p <= '7';
+      return 49 <= p && p <= 55;
     }
   }
 }
@@ -110,6 +110,10 @@ std::istream& aleksandrov::operator>>(std::istream& in, Interval& interval)
       Note second;
       if (in >> second)
       {
+        if (first.toString() > second.toString())
+        {
+          std::swap(first, second);
+        }
         interval.first = first;
         interval.second = second;
       }
@@ -169,6 +173,10 @@ std::istream& aleksandrov::operator>>(std::istream& in, MusicalElement& element)
     {
       Note first = temp.notes.begin()->second;
       Note second = temp.notes.rbegin()->second;
+      if (first.toString() > second.toString())
+      {
+        std::swap(first, second);
+      }
       element = MusicalElement(Interval{ first, second });
     }
     else
@@ -197,6 +205,7 @@ std::ostream& aleksandrov::operator<<(std::ostream& out, const Interval& interva
 
 std::ostream& aleksandrov::operator<<(std::ostream& out, const Chord& chord)
 {
+  StreamGuard guard(out);
   const auto& notes = chord.notes;
   std::ostream_iterator< Note > outIt(out, "-");
   ValueReturner< std::string, Note > returner;
