@@ -43,7 +43,7 @@ std::istream& holodilov::operator>>(std::istream& is, Point& point)
     return is;
   }
 
-  Point pointTemp { 0, 0 };
+  Point pointTemp{ 0, 0 };
   is >> DelimIO{ '(' };
   is >> pointTemp.x >> DelimIO{ ';' };
   is >> pointTemp.y >> DelimIO{ ')' };
