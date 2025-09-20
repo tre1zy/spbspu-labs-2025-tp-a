@@ -318,7 +318,7 @@ void smirnov::mergeCommand(Dicts & dicts, std::istream & in, std::ostream & out)
   const Dict & first = it1->second;
   const Dict & second = it2->second;
   Dict result;
-  std::copy(first.begin(), second.end(), std::inserter(result, result.end()));
+  std::copy(first.begin(), first.end(), std::inserter(result, result.end()));
   std::copy_if(second.begin(), second.end(), std::inserter(result, result.end()), NotInResult(result));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
