@@ -9,51 +9,51 @@
 #include <numeric>
 #include "polygon.hpp"
 
+namespace
+{
+  template< class UnaryPredicate >
+  double getSumArea(const std::vector< smirnov::Polygon >& polygons, UnaryPredicate P)
+  {
+    std::vector< smirnov::Polygon > rightPolygons;
+    std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(rightPolygons), P);
+    std::vector< double > areas;
+    std::transform(rightPolygons.cbegin(), rightPolygons.cend(), std::back_inserter(areas), smirnov::getArea);
+    double result = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
+    return result;
+  }
+
+  double doAreaEven(const std::vector< smirnov::Polygon >& polygons)
+  {
+    return getSumArea(polygons, smirnov::isEvenCountVertexes);
+  }
+
+  double doAreaOdd(const std::vector< smirnov::Polygon >& polygons)
+  {
+    return getSumArea(polygons, smirnov::isOddCountVertexes);
+  }
+
+  double doAreaMean(const std::vector< smirnov::Polygon >& polygons)
+  {
+    if (polygons.empty())
+    {
+      throw std::logic_error("NO POLYGONS FOR AREA MEAN COMMAND");
+    }
+    std::vector< double > areas;
+    std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), smirnov::getArea);
+    double result = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
+    result /= polygons.size();
+    return result;
+  }
+
+  double doAreaNum(const std::vector< smirnov::Polygon >& polygons, size_t n)
+  {
+    return getSumArea(polygons, std::bind(smirnov::isNCountVertexes, std::placeholders::_1, n));
+  }
+}
+
 namespace smirnov
 {
   using namespace std::placeholders;
-
-  namespace
-  {
-    template< class UnaryPredicate >
-    double getSumArea(const std::vector< Polygon >& polygons, UnaryPredicate P)
-    {
-      std::vector< Polygon > rightPolygons;
-      std::copy_if(polygons.cbegin(), polygons.cend(), std::back_inserter(rightPolygons), P);
-      std::vector< double > areas;
-      std::transform(rightPolygons.cbegin(), rightPolygons.cend(), std::back_inserter(areas), getArea);
-      double result = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
-      return result;
-    }
-
-    double doAreaEven(const std::vector< Polygon >& polygons)
-    {
-      return getSumArea(polygons, isEvenCountVertexes);
-    }
-
-    double doAreaOdd(const std::vector< Polygon >& polygons)
-    {
-      return getSumArea(polygons, isOddCountVertexes);
-    }
-
-    double doAreaMean(const std::vector< Polygon >& polygons)
-    {
-      if (polygons.empty())
-      {
-        throw std::logic_error("NO POLYGONS FOR AREA MEAN COMMAND");
-      }
-      std::vector< double > areas;
-      std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), getArea);
-      double result = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
-      result /= polygons.size();
-      return result;
-    }
-
-    double doAreaNum(const std::vector< Polygon >& polygons, size_t n)
-    {
-      return getSumArea(polygons, std::bind(isNCountVertexes, _1, n));
-    }
-  }
 
   void doAreaCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
   {
