@@ -187,7 +187,7 @@ std::istream& ivanova::operator>>(std::istream& in, StringT& x)
   char next;
   const size_t max_length = 1000;
   x.key.clear();
-  
+
   while (in >> next && next != '"' && x.key.size() < max_length)
   {
     if (next == '\n')
@@ -197,7 +197,7 @@ std::istream& ivanova::operator>>(std::istream& in, StringT& x)
     }
     x.key.push_back(next);
   }
-  
+
   if (x.key.size() >= max_length)
   {
     in.setstate(std::ios_base::failbit);
@@ -206,7 +206,7 @@ std::istream& ivanova::operator>>(std::istream& in, StringT& x)
   {
     in.setstate(std::ios_base::failbit);
   }
-  
+
   return in;
 }
 
@@ -222,18 +222,18 @@ std::istream& ivanova::operator>>(std::istream& in, dataStruct& ds)
   bool is_key1 = false;
   bool is_key2 = false;
   bool is_key3 = false;
-  
+
   const size_t max_iterations = 10;
   size_t iteration_count = 0;
-  
+
   while ((!is_key1 || !is_key2 || !is_key3) && in && iteration_count < max_iterations)
   {
     iteration_count++;
     in >> ExpectCharT{':'};
-    
+
     std::string keyName;
     in >> keyName;
-    
+
     if (keyName == "key1" && !is_key1)
     {
       DoubleScienceT x;
