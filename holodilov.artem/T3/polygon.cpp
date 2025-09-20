@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
+#include <limits>
 #include "DelimIO.hpp"
 
 namespace
