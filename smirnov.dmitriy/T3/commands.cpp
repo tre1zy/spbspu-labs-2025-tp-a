@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include "polygon.hpp"
-#include "scopeguard.hpp"
+#include "scopeGuard.hpp"
 
 namespace smirnov
 {
@@ -25,6 +25,8 @@ namespace smirnov
     std::string s;
     in >> s;
     double result = 0.0;
+    ScopeGuard streamGuard(out);
+    out << std::fixed << std::setprecision(1);
     std::map< std::string, std::function< double() > > subcommand;
     {
       using namespace std::placeholders;
@@ -39,14 +41,13 @@ namespace smirnov
       {
         throw std::logic_error("FEW VERTEXES");
       }
-      result = doAreaNum(polygons, n);
     }
     catch (const std::invalid_argument&)
     {
       result = subcommand[s]();
     }
     std::vector< double > areas;
-    out << std::fixed << std::setprecision(1) << result << "\n";
+    out << result << "\n";
   }
 
   void doMinMaxCommand(
@@ -60,7 +61,7 @@ namespace smirnov
       throw std::logic_error("zero polygons");
     }
 
-    StreamGuard streamGuard(out);
+    ScopeGuard streamGuard(out);
     out << std::fixed << std::setprecision(1);
 
     if (s == "AREA")
