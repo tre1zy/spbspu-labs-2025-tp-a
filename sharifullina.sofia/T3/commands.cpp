@@ -198,14 +198,7 @@ void sharifullina::printMax(std::istream & in, std::ostream & out, const std::ve
   subcmds["VERTEXES"] = std::bind(getMaxVertexes, std::ref(out), std::cref(polygons));
   std::string subcommand;
   in >> subcommand;
-  try
-  {
-    subcmds.at(subcommand)();
-  }
-  catch (const std::exception &)
-  {
-    throw;
-  }
+  subcmds.at(subcommand)();
 }
 
 void sharifullina::printMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -219,14 +212,7 @@ void sharifullina::printMin(std::istream & in, std::ostream & out, const std::ve
   subcmds["VERTEXES"] = std::bind(getMinVertexes, std::ref(out), std::cref(polygons));
   std::string subcommand;
   in >> subcommand;
-  try
-  {
-    subcmds.at(subcommand)();
-  }
-  catch (const std::exception &)
-  {
-    throw;
-  }
+  subcmds.at(subcommand)();
 }
 
 void sharifullina::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
