@@ -3,10 +3,13 @@
 #include <functional>
 #include <vector>
 #include <fstream>
+#include <iterator>
+#include <algorithm>
 #include "dictionary_utils.hpp"
 
 using dictionary_system = std::unordered_map< std::string, std::unordered_map< std::string, std::set < std::string > > >;
 using dict_type = std::unordered_map< std::string, std::set< std::string > >;
+using out_it = std::ostream_iterator< std::string >;
 
 void kushekbaev::insert(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
@@ -44,8 +47,8 @@ void kushekbaev::print(std::ostream& out, std::istream& in, dictionary_system& c
   out << "In " << dictionary_name << ":\n";
   if (!word_map.empty())
   {
-    DictionaryPrinter printer{out, word_map};
-    printer();
+    Printer printer{ out };
+    std::transform(word_map.begin(), word_map.end(), out_it(out, "\n"), printer);
   }
 }
 
@@ -78,8 +81,8 @@ void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& cu
   }
   if (!current_dictionary_system.empty())
   {
-    DictsSaver saver{file, current_dictionary_system};
-    saver();
+    DictionarySaver saver;
+    std::transform(current_dictionary_system.begin(), current_dictionary_system.end(), out_it(file), saver);
   }
   out << "Dictionary system successfully saved.\n";
 }
@@ -118,9 +121,9 @@ void kushekbaev::search(std::ostream& out, std::istream& in, dictionary_system& 
   if (!translations.empty())
   {
     out << " ";
-    TranslationsPrinter printer{out, translations};
-    printer();
+    std::copy(translations.begin(), translations.end(), out_it(out, " "));
   }
+  out << "\n";
 }
 
 void kushekbaev::clear_dictionary(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -146,18 +149,17 @@ void kushekbaev::reverse_search(std::ostream& out, std::istream& in, dictionary_
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
   std::vector< std::string > matching_words;
-  if (!dict_it->second.empty())
-  {
-    WordCollector collector{ translation_to_find, matching_words, dict_it->second };
-    collector();
-  }
+  std::vector< std::pair< std::string, std::set< std::string > > > matching_entries;
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(),
+    std::back_inserter(matching_entries), HasTranslation{ translation_to_find });
+  std::transform(matching_entries.begin(), matching_entries.end(),
+    std::back_inserter(matching_words), KeyExtractor{});
   if (matching_words.empty())
   {
     throw std::out_of_range("<TRANSLATION NOT FOUND>");
   }
-  out << "Words with translation *" << translation_to_find << "*: ";
-  WordsPrinter printer{out, matching_words};
-  printer();
+  out << "Words with translation *" << translation_to_find << "*: " << matching_words[0];
+  std::copy(std::next(matching_words.begin()), matching_words.end(), out_it(out, ", "));
   out << "\n";
 }
 
@@ -204,7 +206,7 @@ void kushekbaev::remove_translation_at_all(std::ostream& out, std::istream& in, 
   }
   if (removed_count == 0)
   {
-      throw std::out_of_range("<TRANSLATION NOT FOUND>");
+    throw std::out_of_range("<TRANSLATION NOT FOUND>");
   }
   out << "Removed " << removed_count << " instances of translation '" << translation_to_delete << ".'\n";
 }
@@ -216,25 +218,24 @@ void kushekbaev::delete_all_translations(std::ostream& out, std::istream& in, di
   auto dict_it = current_dictionary_system.find(dictionary_name);
   if (dict_it == current_dictionary_system.end())
   {
-      throw std::out_of_range("<DICTIONARY NOT FOUND>");
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
+
   std::vector< std::string > matching_words;
-  if (!dict_it->second.empty())
-  {
-    WordFinder finder{ translation_to_delete, matching_words, dict_it->second };
-    finder();
-  }
+  std::vector< std::pair< std::string, std::set< std::string > > > matching_entries;
+
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(),
+    std::back_inserter(matching_entries), HasTranslation{ translation_to_delete });
+  std::transform(matching_entries.begin(), matching_entries.end(),
+    std::back_inserter(matching_words), KeyExtractor{});
+
   if (matching_words.empty())
   {
-      throw std::out_of_range("<TRANSLATION NOT FOUND>");
+    throw std::out_of_range("<TRANSLATION NOT FOUND>");
   }
-  if (!matching_words.empty())
-  {
-    for (const auto& word: matching_words)
-    {
-      dict_it->second.erase(word);
-    }
-  }
+  dict_type new_dict;
+  std::remove_copy_if(dict_it->second.begin(), dict_it->second.end(),
+    std::inserter(new_dict, new_dict.end()), IsInMatchingWords{ matching_words });
   out << "Words with this translation deleted successfully.\n";
 }
 
@@ -247,27 +248,16 @@ void kushekbaev::prefix_search(std::ostream& out, std::istream& in, dictionary_s
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
-  bool found = false;
   out << "Words with prefix '" << prefix << "':\n";
-  for (const auto& word_pair: dict_it->second)
-  {
-    const std::string& word = word_pair.first;
-    if (word.rfind(prefix, 0) == 0)
-    {
-      out << "-> " << word << " : ";
-      const auto& translations = word_pair.second;
-      for (auto it = translations.begin(); it != translations.end(); ++it)
-      {
-        if (it != translations.begin()) out << ", ";
-        out << *it;
-      }
-      out << "\n";
-      found = true;
-    }
-  }
-  if (!found)
+  std::vector< std::pair< std::string, std::set< std::string > > > matching_entries;
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(), std::back_inserter(matching_entries), HasPrefix{ prefix });
+  if (matching_entries.empty())
   {
     out << "<NO WORDS FOUND>\n";
+  }
+  else
+  {
+    std::transform(matching_entries.begin(), matching_entries.end(), out_it(out, ", "), OutputTransformer{ out });
   }
 }
 
@@ -280,27 +270,16 @@ void kushekbaev::no_prefix_search(std::ostream& out, std::istream& in, dictionar
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
-  bool found = false;
   out << "Words without prefix '" << prefix << "':\n";
-  for (const auto& word_pair: dict_it->second)
-  {
-    const std::string& word = word_pair.first;
-    if (word.rfind(prefix, 0) != 0)
-    {
-      out << "-> " << word << " : ";
-      const auto& translations = word_pair.second;
-      for (auto it = translations.begin(); it != translations.end(); ++it)
-      {
-        if (it != translations.begin()) out << ", ";
-        out << *it;
-      }
-      out << "\n";
-      found = true;
-    }
-  }
-  if (!found)
+  std::vector< std::pair< std::string, std::set< std::string > > > matching_entries;
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(), std::back_inserter(matching_entries), NoPrefix{ prefix });
+  if (matching_entries.empty())
   {
     out << "<NO WORDS FOUND>\n";
+  }
+  else
+  {
+    std::transform(matching_entries.begin(), matching_entries.end(), out_it(out, ", "), OutputTransformer{ out });
   }
 }
 
@@ -313,27 +292,16 @@ void kushekbaev::suffix_search(std::ostream& out, std::istream& in, dictionary_s
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
-  bool found = false;
   out << "Words with suffix '" << suffix << "':\n";
-  for (const auto& word_pair: dict_it->second)
-  {
-    const std::string& word = word_pair.first;
-    if (word.size() >= suffix.size() && word.compare(word.size() - suffix.size(), suffix.size(), suffix) == 0)
-    {
-      out << "-> " << word << " : ";
-      const auto& translations = word_pair.second;
-      out << *translations.begin();
-      for (auto it = translations.begin()++; it != translations.end(); ++it)
-      {
-        out << "," << *it;
-      }
-      out << "\n";
-      found = true;
-    }
-  }
-  if (!found)
+  std::vector< std::pair< std::string, std::set< std::string > > > matching_entries;
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(), std::back_inserter(matching_entries), HasSuffix{ suffix });
+  if (matching_entries.empty())
   {
     out << "<NO WORDS FOUND>\n";
+  }
+  else
+  {
+    std::transform(matching_entries.begin(), matching_entries.end(), out_it(out, ", "), OutputTransformer{ out });
   }
 }
 
@@ -346,27 +314,16 @@ void kushekbaev::no_suffix_search(std::ostream& out, std::istream& in, dictionar
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
-  bool found = false;
   out << "Words with bo suffix '" << suffix << "':\n";
-  for (const auto& word_pair: dict_it->second)
-  {
-    const std::string& word = word_pair.first;
-    if (word.size() >= suffix.size() && word.compare(word.size() - suffix.size(), suffix.size(), suffix) != 0)
-    {
-      out << "-> " << word << " : ";
-      const auto& translations = word_pair.second;
-      for (auto it = translations.begin(); it != translations.end(); ++it)
-      {
-        if (it != translations.begin()) out << ", ";
-        out << *it;
-      }
-      out << "\n";
-      found = true;
-    }
-  }
-  if (!found)
+  std::vector< std::pair< std::string, std::set< std::string > > > matching_entries;
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(), std::back_inserter(matching_entries), NoSuffix{ suffix });
+  if (matching_entries.empty())
   {
     out << "<NO WORDS FOUND>\n";
+  }
+  else
+  {
+    std::transform(matching_entries.begin(), matching_entries.end(), out_it(out, ", "), OutputTransformer{ out });
   }
 }
 
@@ -389,17 +346,10 @@ void kushekbaev::merge(std::ostream& out, std::istream& in, dictionary_system& c
     throw std::runtime_error("<NEW DICTIONARY NAME ALREADY EXISTS>");
   }
   auto& new_dict = current_dictionary_system[new_dictionary];
-  for (const auto& entry: first_dict_it->second)
-  {
-    new_dict[entry.first] = entry.second;
-  }
-  for (const auto& entry: second_dict_it->second)
-  {
-    for (const auto& translation: entry.second)
-    {
-      new_dict[entry.first].insert(translation);
-    }
-  }
+  std::vector< std::pair < std::string, std::set< std::string > > > all_entries;
+  std::copy(first_dict_it->second.begin(), first_dict_it->second.end(), std::back_inserter(all_entries));
+  std::copy(second_dict_it->second.begin(), second_dict_it->second.end(), std::back_inserter(all_entries));
+  std::transform(all_entries.begin(), all_entries.end(), out_it(out), DictionaryBuilder{ new_dict });
   out << "Successfully merged!\n";
 }
 
@@ -418,19 +368,10 @@ void kushekbaev::split(std::ostream& out, std::istream& in, dictionary_system& c
   }
   auto& dict1 = current_dictionary_system[new_dictionary_1];
   auto& dict2 = current_dictionary_system[new_dictionary_2];
-  for (const auto& entry: original_dict_it->second)
-  {
-    const std::string& word = entry.first;
-    const std::set< std::string >& translations = entry.second;
-    if (word < delimiter)
-    {
-      dict1[word] = translations;
-    }
-    else
-    {
-      dict2[word] = translations;
-    }
-  }
+  std::copy_if(original_dict_it->second.begin(), original_dict_it->second.end(), std::inserter(dict1, dict1.end()),
+    LessThanDelimiter{ delimiter });
+  std::copy_if(original_dict_it->second.begin(), original_dict_it->second.end(), std::inserter(dict2, dict2.end()),
+    GreaterOrEqualDelimiter{ delimiter });
   out << "Successfully splitted.\n";
 }
 
@@ -443,76 +384,73 @@ void kushekbaev::find_words_without_translations(std::ostream& out, std::istream
   {
     throw std::out_of_range("<DICTIONARY NOT FOUND>");
   }
-  bool found_empty = false;
   out << "Words without translations in dictionary '" << dictionary << "':\n";
-  for (const auto& word_entry: dict_it->second)
-  {
-    const std::string& word = word_entry.first;
-    const std::set< std::string >& translations = word_entry.second;
-    if (translations.empty())
-    {
-      out << "-> " << word << "\n";
-      found_empty = true;
-    }
-  }
-  if (!found_empty)
+  std::vector< std::pair< std::string, std::set< std::string > > > empty_words;
+  std::copy_if(dict_it->second.begin(), dict_it->second.end(), std::back_inserter(empty_words),
+    HasNoTranslation{});
+  if (empty_words.empty())
   {
     out << "<ALL WORDS HAVE TRANSLATIONS>\n";
+  }
+  else
+  {
+    std::transform(empty_words.begin(), empty_words.end(), out_it(out), WordPrinterForFind{});
   }
 }
 
 void kushekbaev::complement(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
-    std::string new_name, dict1_name, dict2_name;
-    in >> new_name >> dict1_name >> dict2_name;
-    auto dict1_it = current_dictionary_system.find(dict1_name);
-    auto dict2_it = current_dictionary_system.find(dict2_name);
-    if (dict1_it == current_dictionary_system.end() || dict2_it == current_dictionary_system.end())
-    {
-      throw std::out_of_range("<DICTIONARY NOT FOUND>");
-    }
-    if (dict1_name == dict2_name)
-    {
-      current_dictionary_system[new_name] = {};
-      out << "Created empty dictionary (same dictionaries complemented)\n";
-      return;
-    }
-    auto& new_dict = current_dictionary_system[new_name] = {};
-    const auto& dict1 = dict1_it->second;
-    const auto& dict2 = dict2_it->second;
-    if (!dict1.empty())
-    {
-      ComplementWorker worker{new_dict, dict1, dict2};
-      worker();
-    }
-    out << "Complement dictionary created with " << new_dict.size() << " words\n";
+  std::string new_name, dict1_name, dict2_name;
+  in >> new_name >> dict1_name >> dict2_name;
+  auto dict1_it = current_dictionary_system.find(dict1_name);
+  auto dict2_it = current_dictionary_system.find(dict2_name);
+  if (dict1_it == current_dictionary_system.end() || dict2_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  if (dict1_name == dict2_name)
+  {
+    current_dictionary_system[new_name] = {};
+    out << "Created empty dictionary (same dictionaries complemented)\n";
+    return;
+  }
+  auto& new_dict = current_dictionary_system[new_name] = {};
+  const auto& dict1 = dict1_it->second;
+  const auto& dict2 = dict2_it->second;
+  if (!dict1.empty())
+  {
+    std::copy_if(dict1.begin(), dict1.end(), std::inserter(new_dict, new_dict.end()), IsNotInDict2{ dict2 });
+  }
+  out << "Complement dictionary created with " << new_dict.size() << " words\n";
 }
 
 void kushekbaev::intersect(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
 {
-    std::string new_name, dict1_name, dict2_name;
-    in >> new_name >> dict1_name >> dict2_name;
-    auto dict1_it = current_dictionary_system.find(dict1_name);
-    auto dict2_it = current_dictionary_system.find(dict2_name);
-    if (dict1_it == current_dictionary_system.end() || dict2_it == current_dictionary_system.end())
-    {
-      throw std::out_of_range("<DICTIONARY NOT FOUND>");
-    }
-    auto& new_dict = current_dictionary_system[new_name] = {};
-    const auto& dict1 = dict1_it->second;
-    const auto& dict2 = dict2_it->second;
-    if (dict1_name == dict2_name)
-    {
-      new_dict = dict1;
-      out << "Dictionary copied (same dictionaries intersected)\n";
-      return;
-    }
-    if (!dict1.empty())
-    {
-      IntersectWorker worker{new_dict, dict1, dict2};
-      worker();
-    }
-    out << "Intersection created with " << new_dict.size() << " common words\n";
+  std::string new_name, dict1_name, dict2_name;
+  in >> new_name >> dict1_name >> dict2_name;
+  auto dict1_it = current_dictionary_system.find(dict1_name);
+  auto dict2_it = current_dictionary_system.find(dict2_name);
+  if (dict1_it == current_dictionary_system.end() || dict2_it == current_dictionary_system.end())
+  {
+    throw std::out_of_range("<DICTIONARY NOT FOUND>");
+  }
+  auto& new_dict = current_dictionary_system[new_name] = {};
+  const auto& dict1 = dict1_it->second;
+  const auto& dict2 = dict2_it->second;
+  if (dict1_name == dict2_name)
+  {
+    new_dict = dict1;
+    out << "Dictionary copied (same dictionaries intersected)\n";
+    return;
+  }
+  if (!dict1.empty())
+  {
+    std::vector< std::pair< std::string, std::set< std::string > > > common_words;
+    std::copy_if(dict1.begin(), dict1.end(), std::back_inserter(common_words), IsInDict2{ dict2 });
+    std::transform(common_words.begin(), common_words.end(), std::inserter(new_dict, new_dict.end()),
+      MergeTranslations{ dict2 });
+  }
+  out << "Intersection created with " << new_dict.size() << " common words\n";
 }
 
 void kushekbaev::unification(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -530,20 +468,11 @@ void kushekbaev::unification(std::ostream& out, std::istream& in, dictionary_sys
   {
     throw std::runtime_error("<NEW DICTIONARY NAME ALREADY EXISTS>");
   }
+  current_dictionary_system[new_name] = dict1_it->second;
   auto& new_dict = current_dictionary_system[new_name];
-  const auto& dict1 = dict1_it->second;
   const auto& dict2 = dict2_it->second;
-  for (const auto& entry: dict1)
-  {
-    new_dict[entry.first] = entry.second;
-  }
-  for (const auto& entry: dict2)
-  {
-    for (const auto& translation: entry.second)
-    {
-      new_dict[entry.first].insert(translation);
-    }
-  }
+  DictionaryMerger merger{ new_dict };
+  std::transform(dict2.begin(), dict2.end(), out_it(out), merger);
   out << "Unification dictionary created successfully\n";
 }
 

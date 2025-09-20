@@ -10,187 +10,175 @@
 
 using dictionary_system = std::unordered_map< std::string, std::unordered_map< std::string, std::set< std::string > > >;
 using dict_type = std::unordered_map< std::string, std::set< std::string > >;
+using pair = std::pair< std::string, std::set< std::string > >;
 
 namespace kushekbaev
 {
 
-std::vector< std::string > split_line(std::string& line);
+  std::vector< std::string > split_line(std::string& line);
 
-struct DictionaryMergerHelper
-{
-  dict_type& target;
-  void operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-};
+  struct Printer
+  {
+    std::ostream& out;
+    std::string operator()(const pair& p) const;
+  };
 
-struct EntryPrinter
-{
-  std::ostream& out;
-  void operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-};
+  struct TranslationTransformer
+  {
+    std::string operator()(const std::string& translation) const;
+  };
 
-struct TranslationSaver
-{
-  std::ofstream& file;
-  void operator()(const std::string& translation);
-};
+  struct IsInMatchingWords
+  {
+    const std::vector< std::string >& words;
+    bool operator()(const pair& entry) const;
+  };
 
-struct WordEntrySaver
-{
-  std::ofstream& file;
-  void operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-};
+  struct WordPrinter
+  {
+    std::ostream& out;
+    void operator()(const pair& entry) const;
+  };
 
-struct WordEraserHelper
-{
-  dict_type& word_map;
-  void operator()(const std::string& word);
-};
+  struct HasNoTranslation
+  {
+    bool operator()(const pair& entry) const;
+  };
 
-struct DictionaryEntrySaver
-{
-  std::ofstream& file;
-  void operator()(const std::pair< const std::string, dict_type >& dict_entry);
-};
+  struct WordPrinterForFind
+  {
+    std::string operator()(const pair& entry) const;
+  };
 
-struct IsNotInDict2
-{
-  const dict_type& dict2;
-  bool operator()(const std::pair<const std::string, std::set<std::string>>& entry);
-};
+  struct HasPrefix
+  {
+    std::string& prefix;
+    bool operator()(const pair& entry) const;
+  };
 
-struct DictionaryMerger
-{
-  dict_type& target;
-  void operator()(const dict_type& source);
-};
+  struct NoPrefix
+  {
+    std::string& prefix;
+    bool operator()(const pair& entry) const;
+  };
 
-struct DictionaryInserter
-{
-  dictionary_system& target;
-  void operator()(const dictionary_system::value_type& entry);
-};
+  struct HasSuffix
+  {
+    std::string& suffix;
+    bool operator()(const pair& entry) const;
+  };
 
-struct HasTranslationPredicate
-{
-  const std::string& translation_to_delete;
-  bool operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-};
+  struct NoSuffix
+  {
+    std::string& suffix;
+    bool operator()(const pair& entry) const;
+  };
 
-struct KeyExtractor
-{
-  const std::string& operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-};
+  struct OutputTransformer
+  {
+    std::ostream& out;
+    std::string operator()(const pair& entry) const;
+  };
 
-struct IntersectInserter
-{
-  dict_type& new_dict;
-  const dict_type& dict2;
-  void operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-};
+  struct DictionaryBuilder
+  {
+    dict_type& result_dict;
+    std::string operator()(const pair& entry) const;
+  };
 
-struct TranslationsPrinter
-{
-  std::ostream& out;
-  const std::set< std::string >& translations;
-  bool first = true;
-  void operator()();
-};
+  struct LessThanDelimiter
+  {
+    std::string& delimiter;
+    bool operator()(const pair& entry) const;
+  };
 
-struct DictionaryPrinter
-{
-  std::ostream& out;
-  const dict_type& word_map;
-  void operator()();
-};
+  struct GreaterOrEqualDelimiter
+  {
+    std::string& delimiter;
+    bool operator()(const pair& entry) const;
+  };
 
-struct TranslationsSaver
-{
-  std::ofstream& file;
-  const std::set< std::string >& translations;
-  void operator()();
-};
+  struct IsInDict2
+  {
+    const dict_type& dict2;
+    bool operator()(const pair& entry) const;
+  };
 
-struct WordsSaver
-{
-  std::ofstream& file;
-  const dict_type& word_map;
-  void operator()();
-};
+  struct MergeTranslations
+  {
+    const dict_type& dict2;
+    pair operator()(const pair& entry) const;
+  };
 
-struct DictsSaver
-{
-  std::ofstream& file;
-  const dictionary_system& dicts;
-  void operator()();
-};
+  struct DictionaryMerger
+  {
+    dict_type& target_dict;
+    std::string operator()(const pair& entry);
+  };
 
-void insert_translations(std::set< std::string >& translations, const std::vector< std::string >& tokens, size_t index);
+  struct TranslationProcessor
+  {
+    const std::string& translation;
+    size_t& count;
+    pair operator()(const pair& entry);
+  };
 
-struct FileImporter
-{
-  std::ifstream& file;
-  dictionary_system& dicts;
-  std::string current_dict_name;
-  bool in_dict = false;
-  size_t line_count = 0;
-  void operator()();
-};
+  struct EmptyTranslationChecker
+  {
+    std::vector< std::string >& to_erase;
+    pair operator()(const pair& entry);
+  };
 
-struct WordCollector
-{
-  const std::string& translation_to_find;
-  std::vector< std::string >& matching_words;
-  const dict_type& word_map;
-  void operator()();
-};
+  struct NonEmptyFilter
+  {
+    bool operator()(const pair& entry);
+  };
 
-struct WordsPrinter
-{
-  std::ostream& out;
-  const std::vector< std::string >& words;
-  void operator()();
-};
+  struct WordEntrySaver
+  {
+    std::string operator()(const std::pair< const std::string, std::set< std::string > >& entry);
+  };
 
-struct TranslationRemover
-{
-  const std::string& translation_to_delete;
-  std::vector< std::string >& words_to_erase;
-  size_t& removed_count;
-  dict_type& word_map;
-  void operator()();
-};
+  struct DictionarySaver
+  {
+    std::string operator()(const std::pair< const std::string, dict_type >& dict_entry);
+  };
 
-struct WordEraser
-{
-  dict_type& word_map;
-  const std::vector< std::string >& words_to_erase;
-  void operator()();
-};
+  struct IsNotInDict2
+  {
+    const dict_type& dict2;
+    bool operator()(const std::pair<const std::string, std::set<std::string>>& entry);
+  };
 
-struct WordFinder
-{
-  const std::string& translation_to_delete;
-  std::vector< std::string >& matching_words;
-  const dict_type& word_map;
-  void operator()();
-};
+  struct HasTranslation
+  {
+    std::string& translation;
+    bool operator()(const std::pair< std::string, std::set< std::string > >& entry) const;
+  };
 
-struct ComplementWorker
-{
-  dict_type& new_dict;
-  const dict_type& dict1;
-  const dict_type& dict2;
-  void operator()();
-};
+  struct KeyExtractor
+  {
+    std::string operator()(const std::pair< std::string, std::set< std::string > >& entry) const;
+  };
 
-struct IntersectWorker
-{
-  dict_type& new_dict;
-  const dict_type& dict1;
-  const dict_type& dict2;
-  void operator()();
-};
+  struct FileImporter
+  {
+    std::ifstream& file;
+    dictionary_system& dicts;
+    std::string current_dict_name;
+    bool in_dict = false;
+    size_t line_count = 0;
+    void operator()();
+  };
 
+  struct TranslationRemover
+  {
+    const std::string& translation_to_delete;
+    std::vector< std::string >& words_to_erase;
+    size_t& removed_count;
+    dict_type& word_map;
+    void operator()();
+  };
 }
 
 #endif

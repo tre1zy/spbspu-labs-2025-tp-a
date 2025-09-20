@@ -1,6 +1,10 @@
 #include "dictionary_utils.hpp"
 #include <algorithm>
+#include <sstream>
 #include <iterator>
+
+using pair = std::pair< std::string, std::set< std::string > >;
+using out_it = std::ostream_iterator< std::string >;
 
 std::vector< std::string > kushekbaev::split_line(std::string& line)
 {
@@ -24,139 +28,194 @@ std::vector< std::string > kushekbaev::split_line(std::string& line)
   return tokens;
 }
 
-void kushekbaev::DictionaryMergerHelper::operator()(const std::pair< const std::string, std::set< std::string > >& entry)
+std::string kushekbaev::Printer::operator()(const pair& p) const
 {
-  target[entry.first].insert(entry.second.begin(), entry.second.end());
+  std::ostringstream oss;
+  oss << p.first << " : ";
+  std::copy(p.second.begin(), p.second.end(), out_it(oss, ", "));
+  auto result = oss.str();
+  if (!result.empty())
+  {
+    result.erase(result.size() - 2);
+  }
+  return result;
 }
 
-void kushekbaev::EntryPrinter::operator()(const std::pair<const std::string, std::set< std::string > >& entry)
+std::string kushekbaev::TranslationTransformer::operator()(const std::string& translation) const
 {
-  const std::string& word = entry.first;
-  const std::set< std::string >& translations = entry.second;
-  out << "  -> " << word << " : ";
-  if (translations.empty())
+  return translation;
+}
+
+bool kushekbaev::IsInMatchingWords::operator()(const pair& entry) const
+{
+  return std::find(words.begin(), words.end(), entry.first) != words.end();
+}
+
+void kushekbaev::WordPrinter::operator()(const pair& entry) const
+{
+  out << "-> " << entry.first << " : ";
+  if (!entry.second.empty())
   {
-    out << "<NO TRANSLATIONS>";
-  }
-  else
-  {
-    TranslationsPrinter printer{out, translations};
-    printer();
+    out << *entry.second.begin();
+    std::copy(std::next(entry.second.begin()), entry.second.end(), out_it(out, ", "));
   }
   out << "\n";
 }
 
-void kushekbaev::WordEntrySaver::operator()(const std::pair< const std::string, std::set< std::string > >& entry)
+bool kushekbaev::NoPrefix::operator()(const pair& entry) const
 {
-  const std::string& word = entry.first;
-  const std::set< std::string >& translations = entry.second;
-  file << word;
-  if (!translations.empty())
+  return entry.first.rfind(prefix, 0) != 0;
+}
+
+bool kushekbaev::HasPrefix::operator()(const pair& entry) const
+{
+  return entry.first.rfind(prefix, 0) == 0;
+}
+
+bool kushekbaev::NoSuffix::operator()(const pair& entry) const
+{
+  return entry.first.rfind(suffix, 0) != 0;
+}
+
+bool kushekbaev::HasSuffix::operator()(const pair& entry) const
+{
+  return entry.first.rfind(suffix, 0) == 0;
+}
+
+std::string kushekbaev::OutputTransformer::operator()(const pair& entry) const
+{
+  std::ostringstream oss;
+  oss << "-> " << entry.first << " : ";
+  if (!entry.first.empty())
   {
-    TranslationsSaver saver{ file, translations };
-    saver();
+    std::copy(entry.second.begin(), entry.second.end(), out_it(oss, ", "));
+    std::string result = oss.str();
+    if (result.size() > 2)
+    {
+      result = result.substr(0, result.size() - 2);
+    }
+    return result;
   }
-  file << "\n";
+  return oss.str();
 }
 
-void kushekbaev::DictionaryEntrySaver::operator()(const std::pair< const std::string, dict_type >& dict_entry)
+std::string kushekbaev::DictionaryBuilder::operator()(const pair& entry) const
 {
-  const std::string& dict_name = dict_entry.first;
-  const auto& word_map = dict_entry.second;
-  file << "[ " << dict_name << " ]\n";
-  if (!word_map.empty())
+  result_dict[entry.first].insert(entry.second.begin(), entry.second.end());
+  return "";
+}
+
+bool kushekbaev::LessThanDelimiter::operator()(const pair& entry) const
+{
+  return entry.first < delimiter;
+}
+
+bool kushekbaev::GreaterOrEqualDelimiter::operator()(const pair& entry) const
+{
+  return entry.first >= delimiter;
+}
+
+bool kushekbaev::HasNoTranslation::operator()(const pair& entry) const
+{
+  return entry.second.empty();
+}
+
+std::string kushekbaev::WordPrinterForFind::operator()(const pair& entry) const
+{
+  return "-> " + entry.first + "\n";
+}
+
+bool kushekbaev::IsInDict2::operator()(const pair& entry) const
+{
+  return dict2.find(entry.first) != dict2.end();
+}
+
+pair kushekbaev::MergeTranslations::operator()(const pair& entry) const
+{
+  auto dict2_it = dict2.find(entry.first);
+  std::set< std::string > merged_translations = entry.second;
+  if (dict2_it != dict2.end())
   {
-    WordsSaver saver{ file, word_map };
-    saver();
+    merged_translations.insert(dict2_it->second.begin(), dict2_it->second.end());
   }
-  file << "\n";
+  return { entry.first, merged_translations };
 }
 
-void kushekbaev::WordEraserHelper::operator()(const std::string& word)
+std::string kushekbaev::DictionaryMerger::operator()(const pair& entry)
 {
-  word_map.erase(word);
+  target_dict[entry.first].insert(entry.second.begin(), entry.second.end());
+  return "";
 }
 
-bool kushekbaev::IsNotInDict2::operator()(const std::pair<const std::string, std::set< std::string > >& entry)
+std::string kushekbaev::DictionarySaver::operator()(const std::pair< const std::string, dict_type >& entry)
+{
+  std::ostringstream oss;
+  oss << "[ " << entry.first << " ]\n";
+  for (const auto& word_entry: entry.second)
+  {
+    oss << " ";
+    std::copy(word_entry.second.begin(), word_entry.second.end(),
+      out_it(oss, " "));
+  }
+  oss << "\n";
+  return oss.str();
+}
+
+bool kushekbaev::IsNotInDict2::operator()(const std::pair< const std::string, std::set< std::string > >& entry)
 {
   return dict2.find(entry.first) == dict2.end();
 }
 
-bool kushekbaev::HasTranslationPredicate::operator()(const std::pair< const std::string, std::set< std::string > >& entry)
-{
-  const std::set< std::string >& translations = entry.second;
-  return translations.find(translation_to_delete) != translations.end();
-}
-
-const std::string& kushekbaev::KeyExtractor::operator()(const std::pair< const std::string, std::set< std::string > >& entry)
+std::string kushekbaev::KeyExtractor::operator()(const std::pair< std::string, std::set< std::string > >& entry) const
 {
   return entry.first;
 }
 
-void kushekbaev::IntersectInserter::operator()(const std::pair< const std::string, std::set< std::string > >& entry)
+bool kushekbaev::HasTranslation::operator()(const std::pair< std::string, std::set< std::string > >& entry) const
 {
-  const std::string& word = entry.first;
-  auto dict2_it = dict2.find(word);
-  if (dict2_it != dict2.end())
+  return entry.second.find(translation) != entry.second.end();
+}
+
+pair kushekbaev::TranslationProcessor::operator()(const pair& entry)
+{
+  auto modified_entry = entry;
+  if (modified_entry.second.erase(translation))
   {
-    auto& new_translations = new_dict[word];
-    new_translations.insert(entry.second.begin(), entry.second.end());
-    new_translations.insert(dict2_it->second.begin(), dict2_it->second.end());
+    ++count;
   }
+  return modified_entry;
 }
 
-void kushekbaev::DictionaryMerger::operator()(const dict_type& source)
+pair kushekbaev::EmptyTranslationChecker::operator()(const pair& entry)
 {
-  std::for_each(source.begin(), source.end(), DictionaryMergerHelper{ target });
-}
-
-void kushekbaev::DictionaryInserter::operator()(const dictionary_system::value_type& entry)
-{
-  target[entry.first].insert(entry.second.begin(), entry.second.end());
-}
-
-void kushekbaev::TranslationSaver::operator()(const std::string& translation)
-{
-  file << " " << translation;
-}
-
-void kushekbaev::TranslationsPrinter::operator()()
-{
-  if (!translations.empty())
+  if (entry.second.empty())
   {
-    out << *translations.begin();
-    std::copy(std::next(translations.begin()), translations.end(), std::ostream_iterator< std::string >(out, " "));
+    to_erase.push_back(entry.first);
   }
+  return entry;
 }
 
-void kushekbaev::DictionaryPrinter::operator()()
+bool kushekbaev::NonEmptyFilter::operator()(const pair& entry)
 {
-  std::for_each(word_map.begin(), word_map.end(), EntryPrinter{ out }); //copy
+  return !entry.second.empty();
 }
 
-void kushekbaev::TranslationsSaver::operator()()
+void kushekbaev::TranslationRemover::operator()()
 {
-  std::for_each(translations.begin(), translations.end(), TranslationSaver{ file }); //copy
-}
+  std::vector< std::pair< std::string, std::set< std::string > > > temp_entries;
+  std::copy(word_map.begin(), word_map.end(), std::back_inserter(temp_entries));
 
-void kushekbaev::WordsSaver::operator()()
-{
-  std::for_each(word_map.begin(), word_map.end(), WordEntrySaver{ file }); //copy
-}
+  std::vector< std::pair< std::string, std::set< std::string > > > processed_entries;
+  std::transform(temp_entries.begin(), temp_entries.end(), std::back_inserter(processed_entries),
+    TranslationProcessor{ translation_to_delete, removed_count });
 
-void kushekbaev::DictsSaver::operator()()
-{
-  std::for_each(dicts.begin(), dicts.end(), DictionaryEntrySaver{file}); //copy
-}
+  std::vector< std::pair< std::string, std::set< std::string > > > checked_entries;
+  std::transform(processed_entries.begin(), processed_entries.end(), std::back_inserter(checked_entries),
+    EmptyTranslationChecker{ words_to_erase });
 
-void kushekbaev::insert_translations(std::set< std::string >& translations, const std::vector< std::string >& tokens, size_t index)
-{
-  if (index  >= tokens.size())
-  {
-    return;
-  }
-  translations.insert(tokens[index]);
-  insert_translations(translations, tokens, index + 1);
+  word_map.clear();
+  std::copy_if(checked_entries.begin(), checked_entries.end(), std::inserter(word_map, word_map.end()),
+    NonEmptyFilter{});
 }
 
 void kushekbaev::FileImporter::operator()()
@@ -207,69 +266,4 @@ void kushekbaev::FileImporter::operator()()
       }
     }
   }
-}
-
-void kushekbaev::WordCollector::operator()()
-{
-  for (const auto& entry: word_map)
-  {
-    const std::string& word = entry.first;
-    const std::set< std::string >& translations = entry.second;
-    if (translations.find(translation_to_find) != translations.end())
-    {
-      matching_words.push_back(word);
-    }
-  }
-}
-
-void kushekbaev::WordsPrinter::operator()()
-{
-  if (!words.empty())
-  {
-    out << words[0];
-    std::copy(std::next(words.begin()), words.end(), std::ostream_iterator< std::string >(out, ", "));
-  }
-}
-
-void kushekbaev::TranslationRemover::operator()()
-{
-  for (auto it = word_map.begin(); it != word_map.end(); ++it) //!
-  {
-    auto& translations = it->second;
-    if (translations.erase(translation_to_delete))
-    {
-      removed_count++;
-      if (translations.empty())
-      {
-        words_to_erase.push_back(it->first);
-        it = word_map.erase(it);
-        continue;
-      }
-    }
-  }
-}
-
-void kushekbaev::WordEraser::operator()()
-{
-  std::for_each(words_to_erase.begin(), words_to_erase.end(), WordEraserHelper{ word_map }); //!
-}
-
-void kushekbaev::WordFinder::operator()()
-{
-  std::vector< std::pair< const std::string, std::set< std::string> > > matching_entries;
-  HasTranslationPredicate predicate{translation_to_delete};
-  std::copy_if(word_map.begin(), word_map.end(), std::back_inserter(matching_entries), predicate);
-  KeyExtractor extractor;
-  std::transform(matching_entries.begin(), matching_entries.end(), std::back_inserter(matching_words), extractor);
-}
-
-void kushekbaev::ComplementWorker::operator()()
-{
-  IsNotInDict2 predicate{ dict2 };
-  std::copy_if(dict1.begin(), dict1.end(), std::inserter(new_dict, new_dict.end()), predicate);
-}
-
-void kushekbaev::IntersectWorker::operator()()
-{
-  std::for_each(dict1.begin(), dict1.end(), IntersectInserter{new_dict, dict2}); //!
 }
