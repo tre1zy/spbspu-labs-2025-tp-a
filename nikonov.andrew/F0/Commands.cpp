@@ -42,6 +42,7 @@ void nikonov::compressText(Storage& storage, std::istream& in, std::ostream& out
   if (!storage.addCompressedText(newTextId, text->getOriginalContent(), compressed, newEncodingId)) {
     throw std::runtime_error("ERROR: Memory overflow.");
   }
+  out << "Text compressed successfully. Encoding ID: " << newEncodingId << std::endl;
 }
 
 void nikonov::decompressText(Storage& storage, std::istream& in, std::ostream& out)
@@ -66,6 +67,7 @@ void nikonov::decompressText(Storage& storage, std::istream& in, std::ostream& o
   if (!storage.addText(newTextId, decompressed)) {
     throw std::runtime_error("ERROR: Memory overflow.");
   }
+  out << "Text decompressed successfully." << std::endl;
 }
 
 void nikonov::createEncoding(Storage& storage, std::istream& in, std::ostream& out)
@@ -83,6 +85,7 @@ void nikonov::createEncoding(Storage& storage, std::istream& in, std::ostream& o
   if (!storage.addEncoding(newEncodingId, codes, textId)) {
     throw std::runtime_error("ERROR: Memory overflow.");
   }
+  out << "Encoding created successfully. ID: " << newEncodingId << std::endl;
 }
 
 void nikonov::applyEncoding(Storage& storage, std::istream& in, std::ostream& out)
@@ -107,6 +110,7 @@ void nikonov::applyEncoding(Storage& storage, std::istream& in, std::ostream& ou
   if (!storage.addCompressedText(newTextId, text->getOriginalContent(), compressed, encodingId)) {
     throw std::runtime_error("ERROR: Memory overflow.");
   }
+  out << "Encoding applied successfully." << std::endl;
 }
 
 void nikonov::compareEncodings(Storage& storage, std::istream& in, std::ostream& out)
@@ -206,6 +210,7 @@ void nikonov::loadTextFromFile(Storage& storage, std::istream& in, std::ostream&
     throw std::runtime_error("ERROR: Memory overflow.");
   }
   file.close();
+  out << "Text loaded from file successfully." << std::endl;
 }
 
 void nikonov::readTextFromStdin(Storage& storage, std::istream& in, std::ostream& out)
@@ -220,6 +225,7 @@ void nikonov::readTextFromStdin(Storage& storage, std::istream& in, std::ostream
   if (!storage.addText(textId, content)) {
     throw std::runtime_error("ERROR: Memory overflow.");
   }
+  out << "Text read from stdin successfully." << std::endl;
 }
 
 void nikonov::uploadText(Storage& storage, std::istream& in, std::ostream& out)
@@ -236,6 +242,7 @@ void nikonov::uploadText(Storage& storage, std::istream& in, std::ostream& out)
   }
   file << text->getOriginalContent();
   file.close();
+  out << "Text uploaded to file successfully." << std::endl;
 }
 
 void nikonov::getEncodingFromFile(Storage& storage, std::istream& in, std::ostream& out)
@@ -262,6 +269,7 @@ void nikonov::getEncodingFromFile(Storage& storage, std::istream& in, std::ostre
     throw std::runtime_error("ERROR: Memory overflow.");
   }
   file.close();
+  out << "Encoding loaded from file successfully." << std::endl;
 }
 
 void nikonov::uploadEncoding(Storage& storage, std::istream& in, std::ostream& out)
@@ -280,4 +288,5 @@ void nikonov::uploadEncoding(Storage& storage, std::istream& in, std::ostream& o
     file << pair.first << " " << pair.second << std::endl;
   }
   file.close();
+  out << "Encoding uploaded to file successfully." << std::endl;
 }
