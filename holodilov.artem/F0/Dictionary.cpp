@@ -43,17 +43,8 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   std::string name;
   std::string lang;
   in >> name;
-  if (in.peek() == '\n')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
   in >> lang;
-  if (in.peek() != '\n')
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
+  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
   Dictionary dictTemp(std::move(name), std::move(lang));
 
