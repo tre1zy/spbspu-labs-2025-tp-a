@@ -5,7 +5,7 @@
 
 namespace holodilov
 {
-  class ScopeGuard final
+  class ScopeGuard
   {
   public:
     explicit ScopeGuard(std::basic_ios< char >& stream);

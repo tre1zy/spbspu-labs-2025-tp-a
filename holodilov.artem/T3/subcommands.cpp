@@ -61,18 +61,18 @@ namespace holodilov::subcommands
 {
   void countEven(std::ostream& os, const VecPolygons& vecPolygons) {
   size_t count = std::count_if(vecPolygons.begin(), vecPolygons.end(), checkPolygonVertexesEven);
-  os << count << '\n';
+  os << count;;
 }
 
 void countOdd(std::ostream& os, const VecPolygons& vecPolygons) {
   size_t count = std::count_if(vecPolygons.begin(), vecPolygons.end(), checkPolygonVertexesOdd);
-  os << count << '\n';
+  os << count;
 }
 
 void countAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes) {
   auto checker = std::bind(checkPolygonVertexesAmount, std::placeholders::_1, amountVertexes);
   size_t count = std::count_if(vecPolygons.begin(), vecPolygons.end(), checker);
-  os << count << '\n';
+  os << count;
 }
 
 void maxArea(std::ostream& os, const VecPolygons& vecPolygons)
@@ -81,7 +81,7 @@ void maxArea(std::ostream& os, const VecPolygons& vecPolygons)
 
   Polygon polygon = *(std::max_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByArea));
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.getArea() << '\n';
+  std::cout << polygon.getArea();
 }
 
 void maxVertexes(std::ostream& os, const VecPolygons& vecPolygons)
@@ -90,7 +90,7 @@ void maxVertexes(std::ostream& os, const VecPolygons& vecPolygons)
 
   Polygon polygon = *(std::max_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByVertexes));
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.points.size() << '\n';
+  std::cout << polygon.points.size();
 }
 
 void minArea(std::ostream& os, const VecPolygons& vecPolygons)
@@ -99,7 +99,7 @@ void minArea(std::ostream& os, const VecPolygons& vecPolygons)
 
   Polygon polygon = *(std::min_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByArea));
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.getArea() << '\n';
+  std::cout << polygon.getArea();
 }
 
 void minVertexes(std::ostream& os, const VecPolygons& vecPolygons)
@@ -108,7 +108,7 @@ void minVertexes(std::ostream& os, const VecPolygons& vecPolygons)
 
   Polygon polygon = *(std::min_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByVertexes));
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.points.size() << '\n';
+  std::cout << polygon.points.size();
 }
 
 void areaEven(std::ostream& os, const VecPolygons& vecPolygons)
@@ -118,7 +118,7 @@ void areaEven(std::ostream& os, const VecPolygons& vecPolygons)
   auto accumulator = std::bind(accumulateAreaEvenOdd, std::placeholders::_1, std::placeholders::_2, false);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea << '\n';
+  std::cout << sumArea;
 }
 
 void areaOdd(std::ostream& os, const VecPolygons& vecPolygons)
@@ -128,7 +128,7 @@ void areaOdd(std::ostream& os, const VecPolygons& vecPolygons)
   auto accumulator = std::bind(accumulateAreaEvenOdd, std::placeholders::_1, std::placeholders::_2, true);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea << '\n';
+  std::cout << sumArea;
 }
 
 void areaMean(std::ostream& os, const VecPolygons& vecPolygons)
@@ -143,7 +143,7 @@ void areaMean(std::ostream& os, const VecPolygons& vecPolygons)
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulateArea);
   double meanArea = sumArea / static_cast< double >(vecPolygons.size());
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << meanArea << '\n';
+  std::cout << meanArea;
 }
 
 void areaAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes)
@@ -153,6 +153,6 @@ void areaAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountV
   auto accumulator = std::bind(accumulateAreaVertexes, std::placeholders::_1, std::placeholders::_2, amountVertexes);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
   std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea << '\n';
+  std::cout << sumArea;
 }
 }
