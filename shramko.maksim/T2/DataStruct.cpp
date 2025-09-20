@@ -244,7 +244,11 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
 std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
 {
   StreamGuard guard(in);
-  in >> ExpectCharT{'0'} >> ExpectCharT{'b'};
+  if (!(in >> ExpectCharT{'0'} >> ExpectCharT{'b'}))
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
 
   x.key = 0;
   x.prefix_zeroes = 0;
