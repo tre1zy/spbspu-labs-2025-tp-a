@@ -22,14 +22,12 @@ int main(int argc, char* argv[])
   std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
 
-  while (!inFile.eof())
+  // Read all polygons exactly once from the file into polyList
+  if (inFile)
   {
     std::copy(it(inFile), it(), std::back_inserter(polyList));
-    if (!inFile)
-    {
-      inFile.clear();
-      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
+    // No loop here — std::copy will consume until EOF; repeated copying
+    // previously caused duplicated polygons in polyList.
   }
 
   std::map< std::string, std::function< void() > > commandMap;
@@ -41,7 +39,8 @@ int main(int argc, char* argv[])
   commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
 
   std::string line;
-  while (!(std::cin >> line).eof())
+  // Use the idiomatic pattern for reading command tokens from stdin
+  while (std::cin >> line)
   {
     try
     {
