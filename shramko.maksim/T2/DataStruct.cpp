@@ -167,7 +167,7 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
     {
       break;
     }
-    if (!std::isdigit(ch) && ch != '.') 
+    if (!std::isdigit(ch) && ch != '.')
     {
       break;
     }
