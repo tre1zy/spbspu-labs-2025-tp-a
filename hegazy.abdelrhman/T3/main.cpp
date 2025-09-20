@@ -13,6 +13,7 @@
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
+  using it = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
@@ -22,27 +23,27 @@ int main(int argc, char* argv[])
 
   std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
+
   if (!inFile)
   {
-    std::cerr << "Cannot open file: " << argv[1] << "\n";
+    std::cerr << "Error: Cannot open file " << argv[1] << "\n";
     return 1;
   }
 
-  // Read polygons from file
-  std::string line;
-  while (std::getline(inFile, line))
+  while (inFile)
   {
-    if (line.empty()) continue;
-    
-    std::istringstream iss(line);
     Polygon poly;
-    if (iss >> poly)
+    if (inFile >> poly)
     {
       polyList.push_back(poly);
     }
+    else if (!inFile.eof())
+    {
+      inFile.clear();
+      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 
-  // Create command map
   std::map< std::string, std::function< void() > > commandMap;
   commandMap["AREA"] = std::bind(bob::printAreaSum, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["MAX"] = std::bind(bob::printMaxValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
@@ -50,23 +51,21 @@ int main(int argc, char* argv[])
   commandMap["COUNT"] = std::bind(bob::printCountOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["LESSAREA"] = std::bind(bob::printLessAreaCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  
-  // Add new commands
-  commandMap["ECHO"] = std::bind(bob::printEcho, std::ref(std::cin), std::ref(polyList), std::ref(std::cout));
-  commandMap["INFRAME"] = std::bind(bob::printInframe, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["MAXSEQ"] = std::bind(bob::printMaxseq, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["PERMS"] = std::bind(bob::printPerms, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["SAME"] = std::bind(bob::printSame, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  commandMap["ECHO"] = []() { std::cout << "<INVALID COMMAND>"; };
+  commandMap["INFRAME"] = []() { std::cout << "<INVALID COMMAND>"; };
+  commandMap["MAXSEQ"] = []() { std::cout << "<INVALID COMMAND>"; };
+  commandMap["PERMS"] = []() { std::cout << "<INVALID COMMAND>"; };
+  commandMap["SAME"] = []() { std::cout << "<INVALID COMMAND>"; };
 
-  // Process commands
-  std::string cmd;
-  while (std::cin >> cmd)
+  std::string line;
+  while (std::cin >> line)
   {
     try
     {
-      if (commandMap.find(cmd) != commandMap.end())
+      auto it = commandMap.find(line);
+      if (it != commandMap.end())
       {
-        commandMap.at(cmd)();
+        it->second();
         std::cout << "\n";
       }
       else

@@ -15,8 +15,7 @@ namespace geom
     Point operator()() const
     {
       Point p;
-      in >> p;
-      if (!in)
+      if (!(in >> p))
       {
         throw std::ios_base::failure("Error reading point");
       }
@@ -69,17 +68,20 @@ namespace geom
     std::vector< Point > pts;
     pts.reserve(count);
     
-    try
+    in.clear();
+    
+    for (size_t i = 0; i < count; ++i)
     {
-      std::generate_n(std::back_inserter(pts), count, PointReader{ in });
-    }
-    catch (const std::ios_base::failure&)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
+      Point p;
+      if (!(in >> p))
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      pts.push_back(p);
     }
 
-    if (!in || pts.size() != count)
+    if (!in)
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -96,6 +98,7 @@ namespace geom
 
   double getAreaOfTrg(const Polygon& poly)
   {
+    if (poly.points.size() < 3) return 0.0;
     double side1 = getDist(poly.points[0], poly.points[1]);
     double side2 = getDist(poly.points[0], poly.points[2]);
     double side3 = getDist(poly.points[2], poly.points[1]);
@@ -115,6 +118,7 @@ namespace geom
 
   std::vector < Polygon > polyToTrg(const Polygon& poly)
   {
+    if (poly.points.size() < 3) return {};
     size_t size = poly.points.size() - 2;
     size_t ind = 0;
     std::vector< Polygon > triangles(size);
@@ -124,9 +128,17 @@ namespace geom
 
   double getPolygonArea(const Polygon& poly)
   {
-    std::vector< double > areas;
-    std::vector< Polygon > triangles = polyToTrg(poly);
-    std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTrg);
-    return std::accumulate(areas.begin(), areas.end(), 0.0);
+    if (poly.points.size() < 3) return 0.0;
+    double area = 0.0;
+    size_t n = poly.points.size();
+    
+    for (size_t i = 0; i < n; ++i)
+    {
+      size_t j = (i + 1) % n;
+      area += poly.points[i].x * poly.points[j].y;
+      area -= poly.points[j].x * poly.points[i].y;
+    }
+    
+    return std::abs(area) / 2.0;
   }
 }
