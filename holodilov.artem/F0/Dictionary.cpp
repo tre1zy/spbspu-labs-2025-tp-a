@@ -12,7 +12,6 @@ std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
   {
     return out;
   }
-
   out << dict.name << " " << dict.lang << "\n";
 
   using OstreamIterator = std::ostream_iterator< std::string >;
@@ -27,7 +26,6 @@ std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
 
     if (beginIter != dict.dict.end()) {
       out << "\n";
-
     }
   }
   return out;

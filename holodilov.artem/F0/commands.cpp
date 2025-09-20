@@ -8,12 +8,12 @@
 
 namespace
 {
-  std::string dictToDictName(const std::pair<const std::string, holodilov::Dictionary >& pair)
+  std::string const& dictToDictName(const std::pair<const std::string, holodilov::Dictionary >& pair)
   {
     return pair.first;
   }
 
-  std::list< std::string > dictToTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& enWord)
+  std::list< std::string > const& dictToTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& enWord)
   {
     if (pair.second.dict.contains(enWord))
     {
