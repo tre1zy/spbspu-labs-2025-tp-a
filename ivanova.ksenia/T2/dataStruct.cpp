@@ -1,10 +1,8 @@
 #include "dataStruct.hpp"
-
-#include <bitset>
 #include <iomanip>
-
+#include <cmath>
+#include <cstdio>
 #include "streamGuard.hpp"
-
 
 bool ivanova::dataStruct::operator<(const dataStruct& other)
 {
@@ -36,18 +34,32 @@ std::ostream& ivanova::operator<<(std::ostream& out, const DoubleScienceT& x)
 std::ostream& ivanova::operator<<(std::ostream& out, const UllBinT& x)
 {
   out << "0b";
-  std::bitset<64> bits(x.key);
-  std::string binaryStr = bits.to_string();
-  std::size_t firstOne = binaryStr.find('1');
-  if (firstOne != std::string::npos)
-  {
-    std::string preffix(x.prefix_zeroes, '0');
-    out << preffix << binaryStr.substr(firstOne);
-  }
-  else
+  
+  if (x.key == 0)
   {
     out << "0";
+    return out;
   }
+
+  for (size_t i = 0; i < x.prefix_zeroes; ++i)
+  {
+    out << '0';
+  }
+
+  unsigned long long temp = x.key;
+  int bit_count = 0;
+  while (temp > 0)
+  {
+    temp >>= 1;
+    bit_count++;
+  }
+
+  temp = x.key;
+  for (int i = bit_count - 1; i >= 0; --i)
+  {
+    out << ((temp >> i) & 1 ? '1' : '0');
+  }
+
   return out;
 }
 
@@ -113,10 +125,13 @@ std::istream& ivanova::operator>>(std::istream& in, UllBinT& x)
   bool reading_prefix = true;
   char ch;
   bool has_bits = false;
+  size_t bit_count = 0;
+  const size_t max_bits = 64;
 
-  while (in.get(ch) && (ch == '0' || ch == '1'))
+  while (in.get(ch) && (ch == '0' || ch == '1') && bit_count < max_bits)
   {
     has_bits = true;
+    bit_count++;
 
     if (reading_prefix)
     {
@@ -140,9 +155,16 @@ std::istream& ivanova::operator>>(std::istream& in, UllBinT& x)
     }
   }
 
-  if (has_bits)
+  if (bit_count >= max_bits)
   {
-    if (in) in.unget();
+    in.setstate(std::ios::failbit);
+  }
+  else if (has_bits)
+  {
+    if (in)
+    {
+      in.unget();
+    }
   }
   else
   {
@@ -161,8 +183,12 @@ std::istream& ivanova::operator>>(std::istream& in, StringT& x)
   StreamGuard guard(in);
   in >> std::noskipws;
   in >> ExpectCharT{'"'};
+  
   char next;
-  while (in >> next && next != '"')
+  const size_t max_length = 1000;
+  x.key.clear();
+  
+  while (in >> next && next != '"' && x.key.size() < max_length)
   {
     if (next == '\n')
     {
@@ -171,6 +197,16 @@ std::istream& ivanova::operator>>(std::istream& in, StringT& x)
     }
     x.key.push_back(next);
   }
+  
+  if (x.key.size() >= max_length)
+  {
+    in.setstate(std::ios_base::failbit);
+  }
+  else if (next != '"')
+  {
+    in.setstate(std::ios_base::failbit);
+  }
+  
   return in;
 }
 
@@ -183,12 +219,21 @@ std::istream& ivanova::operator>>(std::istream& in, dataStruct& ds)
   }
   in >> ExpectCharT{'('};
   dataStruct result;
-  bool is_key1 = false, is_key2 = false, is_key3 = false;
-  while ((!is_key1 || !is_key2 || !is_key3) && in)
+  bool is_key1 = false;
+  bool is_key2 = false;
+  bool is_key3 = false;
+  
+  const size_t max_iterations = 10;
+  size_t iteration_count = 0;
+  
+  while ((!is_key1 || !is_key2 || !is_key3) && in && iteration_count < max_iterations)
   {
+    iteration_count++;
     in >> ExpectCharT{':'};
+    
     std::string keyName;
     in >> keyName;
+    
     if (keyName == "key1" && !is_key1)
     {
       DoubleScienceT x;
@@ -214,12 +259,22 @@ std::istream& ivanova::operator>>(std::istream& in, dataStruct& ds)
     else
     {
       in.setstate(std::ios::failbit);
+      break;
     }
   }
-  in >> ExpectCharT{':'} >> ExpectCharT{')'};
-  if (in)
+
+  if (iteration_count >= max_iterations)
   {
-    ds = result;
+    in.setstate(std::ios::failbit);
   }
+  else if (in)
+  {
+    in >> ExpectCharT{':'} >> ExpectCharT{')'};
+    if (in)
+    {
+      ds = result;
+    }
+  }
+
   return in;
 }
