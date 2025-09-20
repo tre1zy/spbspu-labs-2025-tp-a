@@ -98,7 +98,7 @@ namespace sherkunov {
     }
     long long n = 0;
     unsigned long long d = 0;
-    input >> DelimiterIO{ 'N' } >> n >> DelimiterIO{':'} >> DelimiterIO{'D'} >> d;
+    input >> DelimiterIO{ 'N' } >> n >> DelimiterIO{ ':' } >> DelimiterIO{ 'D' } >> d;
     if (input) {
       value.ref = std::make_pair(n, d);
     }
@@ -140,7 +140,7 @@ namespace sherkunov {
 
   std::istream& io_helpers::operator>>(std::istream& input, Key2IO&& value)
   {
-    return input >> DelimiterIO{'('} >> DelimiterIO{':'} >> PairIO{value.ref} >> DelimiterIO{':'} >> DelimiterIO{')'};
+    return input >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> PairIO{ value.ref } >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
   }
 
   std::istream& operator>>(std::istream& input, DataStruct& value)
