@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include <map>
+#include <limits>
 #include <iostream>
 
 std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
