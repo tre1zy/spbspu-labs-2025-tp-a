@@ -12,8 +12,11 @@
 int main(int argc, char* argv[])
 {
     using namespace smirnov;
-    if (argc == 2)
+    if (argc != 2)
     {
+	std::cerr << "not a file" << "/n";
+	return 1;
+    }
         std::string fname = argv[1];
         std::ifstream file(fname);
         std::vector< Polygon > polygons;
@@ -50,11 +53,5 @@ int main(int argc, char* argv[])
             std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         }
         file.close();
-    }
-    else
-    {
-        std::cerr << "not a file" << "\n";
-        return 1;
-    }
     return 0;
 }
