@@ -8,7 +8,7 @@ nikonov::HuffmanNode::HuffmanNode(char c, int freq):
   right(nullptr)
 {}
 
-std::unordered_map< char, int > nikonov::HuffmanCore::calculateFrequency(const std::string& text)
+std::unordered_map< char, int > nikonov::HuffmanCore::calculateFrequency(const str& text)
 {
   std::unordered_map< char, int > freq;
   for (char c : text) {
@@ -17,7 +17,7 @@ std::unordered_map< char, int > nikonov::HuffmanCore::calculateFrequency(const s
   return freq;
 }
 
-void nikonov::HuffmanCore::buildCodeTable(HuffmanNode* node, const std::string& code, std::unordered_map< char, std::string >& codes)
+void nikonov::HuffmanCore::buildCodeTable(HuffmanNode* node, const str& code, std::unordered_map< char, str >& codes)
 {
   if (node->left == nullptr && node->right == nullptr) {
     codes[node->character] = code;
@@ -31,7 +31,7 @@ void nikonov::HuffmanCore::buildCodeTable(HuffmanNode* node, const std::string& 
   }
 }
 
-std::unordered_map< char, std::string > nikonov::HuffmanCore::buildCodes(const std::string& text)
+std::unordered_map< char, std::string > nikonov::HuffmanCore::buildCodes(const str& text)
 {
   if (text.empty()) {
     return {};
@@ -59,7 +59,7 @@ std::unordered_map< char, std::string > nikonov::HuffmanCore::buildCodes(const s
   HuffmanNode* root = pq.top();
   pq.pop();
 
-  std::unordered_map< char, std::string > codes;
+  std::unordered_map< char, str > codes;
   if (freq.size() == 1) {
     codes[root->character] = "0";
   } else {
@@ -70,19 +70,19 @@ std::unordered_map< char, std::string > nikonov::HuffmanCore::buildCodes(const s
   return codes;
 }
 
-std::string nikonov::HuffmanCore::compress(const std::string& text, const std::unordered_map< char, std::string >& codes)
+std::string nikonov::HuffmanCore::compress(const str& text, const std::unordered_map< char, str >& codes)
 {
-  std::string compressed;
+  str compressed;
   for (char c : text) {
     compressed += codes.at(c);
   }
   return compressed;
 }
 
-std::string nikonov::HuffmanCore::decompress(const std::string& compressed, const std::unordered_map< std::string, char >& reverseCodes)
+std::string nikonov::HuffmanCore::decompress(const str& compressed, const std::unordered_map< str, char >& reverseCodes)
 {
-  std::string decompressed;
-  std::string currentCode;
+  str decompressed;
+  str currentCode;
   for (char bit : compressed) {
     currentCode += bit;
     if (reverseCodes.find(currentCode) != reverseCodes.end()) {

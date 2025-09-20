@@ -4,6 +4,7 @@
 #include <functional>
 #include <iosfwd>
 namespace nikonov {
+  using str = std::string;
   class Storage;
   void getCommands(std::map< std::string, std::function< void(Storage&, std::istream&, std::ostream&) > >& commands);
   void compressText(Storage& storage, std::istream& in, std::ostream& out);

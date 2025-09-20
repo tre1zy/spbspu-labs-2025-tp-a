@@ -6,6 +6,7 @@
 #include <queue>
 #include <vector>
 namespace nikonov {
+  using str = std::string;
   struct HuffmanNode {
     char character;
     int frequency;
