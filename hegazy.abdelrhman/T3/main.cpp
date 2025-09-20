@@ -13,7 +13,7 @@
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
-  using it = std::istream_iterator< Polygon >;
+  using it = std::istream_iterator<Polygon>;
 
   if (argc != 2)
   {
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::vector< Polygon > polyList;
+  std::vector<Polygon> polyList;
   std::ifstream inFile(argv[1]);
 
   if (!inFile)
@@ -30,48 +30,31 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  while (inFile)
+  while (!inFile.eof())
   {
-    Polygon poly;
-    if (inFile >> poly)
-    {
-      polyList.push_back(poly);
-    }
-    else if (!inFile.eof())
+    std::copy(it(inFile), it(), std::back_inserter(polyList));
+    if (!inFile)
     {
       inFile.clear();
-      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      inFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
 
-  std::map< std::string, std::function< void() > > commandMap;
+  std::map<std::string, std::function<void()>> commandMap;
   commandMap["AREA"] = std::bind(bob::printAreaSum, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["MAX"] = std::bind(bob::printMaxValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["MIN"] = std::bind(bob::printMinValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["COUNT"] = std::bind(bob::printCountOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["LESSAREA"] = std::bind(bob::printLessAreaCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["ECHO"] = []() { std::cout << "<INVALID COMMAND>"; };
-  commandMap["INFRAME"] = []() { std::cout << "<INVALID COMMAND>"; };
-  commandMap["MAXSEQ"] = []() { std::cout << "<INVALID COMMAND>"; };
-  commandMap["PERMS"] = []() { std::cout << "<INVALID COMMAND>"; };
-  commandMap["SAME"] = []() { std::cout << "<INVALID COMMAND>"; };
 
   std::string line;
-  while (std::cin >> line)
+  while (!(std::cin >> line).eof())
   {
     try
     {
-      auto it = commandMap.find(line);
-      if (it != commandMap.end())
-      {
-        it->second();
-        std::cout << "\n";
-      }
-      else
-      {
-        throw std::invalid_argument("Unknown command");
-      }
+      commandMap.at(line)();
+      std::cout << "\n";
     }
     catch (const std::exception& e)
     {
@@ -79,10 +62,9 @@ int main(int argc, char* argv[])
       if (std::cin.fail())
       {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       }
     }
   }
-  
   return 0;
 }

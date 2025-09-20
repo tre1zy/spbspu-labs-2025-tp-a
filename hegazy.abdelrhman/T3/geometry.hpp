@@ -13,7 +13,7 @@ namespace geom
 
   struct Polygon
   {
-    std::vector< Point > points;
+    std::vector<Point> points;
   };
 
   bool operator==(const Point& p1, const Point& p2);
@@ -24,14 +24,14 @@ namespace geom
   double getPolygonArea(const Polygon& poly);
   double getDist(const Point& a, const Point& b);
   double getAreaOfTrg(const Polygon& poly);
-  Polygon createTrg(size_t i, const std::vector< Point >& points);
-  std::vector< Polygon > polyToTrg(const Polygon& poly);
+  Polygon createTrg(size_t i, const std::vector<Point>& points);
+  std::vector<Polygon> polyToTrg(const Polygon& poly);
   struct TrgGenerator
   {
-    explicit TrgGenerator(size_t& idx, const std::vector< Point >& pts) :
+    explicit TrgGenerator(size_t& idx, const std::vector<Point>& pts) :
       points_{ pts }, i_{ idx }
     {}
-    const std::vector< Point >& points_;
+    const std::vector<Point>& points_;
     size_t& i_;
     Polygon operator()();
   };
