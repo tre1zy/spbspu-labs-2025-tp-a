@@ -84,27 +84,15 @@ namespace smirnov
     }
   };
 
-  struct InSecondDict
+  struct InResult
   {
     const Dict & dict2;
-    explicit InSecondDict(const Dict & d):
+    explicit InResult(const Dict & d):
       dict2(d)
     {}
     bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
     {
       return dict2.find(entry.first) != dict2.end();
-    }
-  };
-
-  struct NotInSecondDict
-  {
-    const Dict & dict2;
-    explicit NotInSecondDict(const Dict & d):
-      dict2(d)
-    {}
-    bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
-    {
-      return dict2.find(entry.first) == dict2.end();
     }
   };
 
@@ -495,7 +483,7 @@ void smirnov::intersectCommand(Dicts & dicts, std::istream & in, std::ostream & 
   const Dict & dict1 = it1->second;
   const Dict & dict2 = it2->second;
   Dict result;
-  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), InSecondDict(dict2));
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), InResult(dict2));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
@@ -524,7 +512,7 @@ void smirnov::differenceCommand(Dicts & dicts, std::istream & in, std::ostream &
   const Dict & dict1 = it1->second;
   const Dict & dict2 = it2->second;
   Dict result;
-  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), NotInSecondDict(dict2));
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), NotInResult(dict2));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
@@ -553,8 +541,8 @@ void smirnov::uniqueCommand(Dicts & dicts, std::istream & in, std::ostream & out
   const Dict & dict1 = it1->second;
   const Dict & dict2 = it2->second;
   Dict result;
-  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), NotInSecondDict(dict2));
-  std::copy_if(dict2.begin(), dict2.end(), std::inserter(result, result.end()), NotInSecondDict(dict1));
+  std::copy_if(dict1.begin(), dict1.end(), std::inserter(result, result.end()), NotInResult(dict2));
+  std::copy_if(dict2.begin(), dict2.end(), std::inserter(result, result.end()), NotInResult(dict1));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
