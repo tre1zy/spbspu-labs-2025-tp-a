@@ -166,7 +166,7 @@ namespace
       MaxSeq res = acc;
       if (poly == pattern)
       {
-        res.cur_seq = res.cur_seq +1;
+        res.cur_seq = res.cur_seq + 1;
         if (res.cur_seq > res.max_seq)
         {
           res.max_seq = res.cur_seq;
@@ -204,7 +204,7 @@ namespace
   {
     if (polygons.empty())
     {
-        throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID COMMAND>");
     }
     std::vector< double > areas(polygons.size());
     std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
@@ -216,7 +216,7 @@ namespace
   {
     if (numVtx < 3)
     {
-        throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID COMMAND>");
     }
     std::vector< smirnov::Polygon > filtered;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), IsVertexCount(numVtx));
@@ -313,14 +313,7 @@ void smirnov::printMax(std::istream & in, std::ostream & out, const std::vector<
   sub_map sub_cmds;
   sub_cmds["AREA"] = std::bind(printMaxArea, std::cref(polygons), std::ref(out));
   sub_cmds["VERTEXES"] = std::bind(printMaxVertexes, std::cref(polygons), std::ref(out));
-  try
-  {
-    sub_cmds.at(arg)();
-  }
-  catch (...)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
+  sub_cmds.at(arg)();
 }
 
 void smirnov::printMin(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -337,14 +330,7 @@ void smirnov::printMin(std::istream & in, std::ostream & out, const std::vector<
   sub_map sub_cmds;
   sub_cmds["AREA"] = std::bind(printMinArea, std::cref(polygons), std::ref(out));
   sub_cmds["VERTEXES"] = std::bind(printMinVertexes, std::cref(polygons), std::ref(out));
-  try
-  {
-    sub_cmds.at(arg)();
-  }
-  catch (...)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
+  sub_cmds.at(arg)();
 }
 
 void smirnov::printCount(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
@@ -373,11 +359,7 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
 void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   Polygon poly;
-  if (!(in >> poly) || poly.points.size() < 3 || in.peek() != '\n')
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  if (polygons.empty())
+  if (!(in >> poly) || poly.points.size() < 3 || in.peek() != '\n' || polygons.empty())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
