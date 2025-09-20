@@ -1,8 +1,7 @@
 #include "commands.hpp"
+#include "wordFunctors.hpp"
 #include "outputFunctors.hpp"
 #include "splitFunctors.hpp"
-#include "filterFunctors.hpp"
-#include "wordFunctors.hpp"
 #include "index.hpp"
 #include <fstream>
 #include <iostream>
@@ -21,13 +20,13 @@ krylov::CommandProcessor::CommandProcessor(std::ostream& output):
 void krylov::CommandProcessor::initializeCommands()
 {
   using namespace std::placeholders;
-  commands["createindex"] = std::bind(&CommandProcessor::createIndexCmd, this, _1);
-  commands["showindex"] = std::bind(&CommandProcessor::showIndexCmd, this, _1);
-  commands["searchword"] = std::bind(&CommandProcessor::searchWordCmd, this, _1);
-  commands["mergeindexes"] = std::bind(&CommandProcessor::mergeIndexesCmd, this, _1);
-  commands["mergebylines"] = std::bind(&CommandProcessor::mergeByLinesCmd, this, _1);
-  commands["listindexes"] = std::bind(&CommandProcessor::listIndexesCmd, this, _1);
-  commands["clearindex"] = std::bind(&CommandProcessor::clearIndexCmd, this, _1);
+  commands["create"] = std::bind(&CommandProcessor::createIndexCmd, this, _1);
+  commands["printindex"] = std::bind(&CommandProcessor::printIndexCmd, this, _1);
+  commands["find"] = std::bind(&CommandProcessor::findWordCmd, this, _1);
+  commands["merge"] = std::bind(&CommandProcessor::mergeIndexesCmd, this, _1);
+  commands["zip"] = std::bind(&CommandProcessor::zipTextsCmd, this, _1);
+  commands["list"] = std::bind(&CommandProcessor::listIndexesCmd, this, _1);
+  commands["deleteindex"] = std::bind(&CommandProcessor::deleteIndexCmd, this, _1);
 }
 
 void krylov::CommandProcessor::execute(const std::string& line)
@@ -90,7 +89,7 @@ void krylov::CommandProcessor::createIndex(const std::string& indexName, const s
   out_ << "Index " << indexName << " created successfully" << '\n';
 }
 
-void krylov::CommandProcessor::searchWord(const std::string& indexName, const std::string& word)
+void krylov::CommandProcessor::findWord(const std::string& indexName, const std::string& word)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -102,7 +101,7 @@ void krylov::CommandProcessor::searchWord(const std::string& indexName, const st
   finder();
 }
 
-void krylov::CommandProcessor::showIndex(const std::string& indexName)
+void krylov::CommandProcessor::printIndex(const std::string& indexName)
 {
   auto it = indexes_.find(indexName);
   if (it == indexes_.end())
@@ -115,7 +114,7 @@ void krylov::CommandProcessor::showIndex(const std::string& indexName)
   std::transform(index.index.begin(), index.index.end(), std::ostream_iterator< WordEntry >(out_, "\n"), pairToWordEntry);
 }
 
-void krylov::CommandProcessor::clearIndex(const std::string& indexName)
+void krylov::CommandProcessor::deleteIndex(const std::string& indexName)
 {
   auto it = indexes_.find(indexName);
 
@@ -165,7 +164,7 @@ void krylov::CommandProcessor::mergeIndexes(const std::string& index1, const std
   out_ << "Index " << newIndex << " created by merging" << '\n';
 }
 
-void krylov::CommandProcessor::mergeByLines(const std::string& index1, const std::string& index2, const std::string& newIndex)
+void krylov::CommandProcessor::zipTexts(const std::string& index1, const std::string& index2, const std::string& newIndex)
 {
   if (!indexes_.count(index1) || !indexes_.count(index2) || indexes_.count(newIndex))
   {
@@ -200,22 +199,22 @@ void krylov::CommandProcessor::createIndexCmd(const std::vector< std::string >& 
   createIndex(args[0], args[1]);
 }
 
-void krylov::CommandProcessor::showIndexCmd(const std::vector< std::string >& args)
+void krylov::CommandProcessor::printIndexCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 1)
   {
     throw std::invalid_argument("Invalid command");
   }
-  showIndex(args[0]);
+  printIndex(args[0]);
 }
 
-void krylov::CommandProcessor::searchWordCmd(const std::vector< std::string >& args)
+void krylov::CommandProcessor::findWordCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 2)
   {
     throw std::invalid_argument("Invalid command");
   }
-  searchWord(args[0], args[1]);
+  findWord(args[0], args[1]);
 }
 
 
@@ -228,13 +227,13 @@ void krylov::CommandProcessor::mergeIndexesCmd(const std::vector< std::string >&
   mergeIndexes(args[0], args[1], args[2]);
 }
 
-void krylov::CommandProcessor::mergeByLinesCmd(const std::vector< std::string >& args)
+void krylov::CommandProcessor::zipTextsCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 3)
   {
     throw std::invalid_argument("Invalid command");
   }
-  mergeByLines(args[0], args[1], args[2]);
+  zipTexts(args[0], args[1], args[2]);
 }
 
 void krylov::CommandProcessor::listIndexesCmd(const std::vector< std::string >& args)
@@ -247,11 +246,11 @@ void krylov::CommandProcessor::listIndexesCmd(const std::vector< std::string >& 
 }
 
 
-void krylov::CommandProcessor::clearIndexCmd(const std::vector< std::string >& args)
+void krylov::CommandProcessor::deleteIndexCmd(const std::vector< std::string >& args)
 {
   if (args.size() != 1)
   {
     throw std::invalid_argument("Invalid command");
   }
-  clearIndex(args[0]);
+  deleteIndex(args[0]);
 }
