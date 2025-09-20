@@ -35,6 +35,7 @@ namespace smirnov
       return result;
     }
   };
+
   struct PrefixMatcher
   {
     const std::string & prefix;
@@ -80,46 +81,6 @@ namespace smirnov
     bool operator()(const Dict::value_type & entry) const
     {
       return result.find(entry.first) == result.end();
-    }
-  };
-
-  struct CopyEntryToDict
-  {
-    Dict & result;
-    explicit CopyEntryToDict(Dict & r):
-      result(r)
-    {}
-    void operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
-    {
-      result[entry.first] = entry.second;
-    }
-  };
-
-  struct MergeTranslations
-  {
-    std::vector< std::string > & translations;
-    explicit MergeTranslations(std::vector< std::string > & tr):
-      translations(tr)
-    {}
-    void operator()(const std::string & tr) const
-    {
-      if (std::find(translations.begin(), translations.end(), tr) == translations.end())
-      {
-        translations.push_back(tr);
-      }
-    }
-  };
-
-  struct MergeEntryToDict
-  {
-    Dict & result;
-    explicit MergeEntryToDict(Dict & r):
-      result(r)
-    {}
-    void operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
-    {
-      std::vector< std::string > & translations = result[entry.first];
-      std::for_each(entry.second.begin(), entry.second.end(), MergeTranslations(translations));
     }
   };
 
