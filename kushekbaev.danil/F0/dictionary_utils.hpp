@@ -134,11 +134,6 @@ namespace kushekbaev
     bool operator()(const pair& entry);
   };
 
-  struct WordEntrySaver
-  {
-    std::string operator()(const std::pair< const std::string, std::set< std::string > >& entry);
-  };
-
   struct DictionarySaver
   {
     std::string operator()(const std::pair< const std::string, dict_type >& dict_entry);
@@ -178,6 +173,11 @@ namespace kushekbaev
     size_t& removed_count;
     dict_type& word_map;
     void operator()();
+  };
+
+  struct WordEntrySaver
+  {
+    std::string operator()(const std::pair< const std::string, std::set< std::string > >& word_entry);
   };
 }
 

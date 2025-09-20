@@ -147,25 +147,24 @@ std::string kushekbaev::DictionaryMerger::operator()(const pair& entry)
   return "";
 }
 
+std::string kushekbaev::WordEntrySaver::operator()(const std::pair< const std::string, std::set< std::string > >& word_entry)
+{
+  std::ostringstream word_oss;
+  word_oss << word_entry.first;
+  if (!word_entry.second.empty())
+  {
+    word_oss << " ";
+    std::copy(word_entry.second.begin(), word_entry.second.end(), out_it(word_oss, " "));
+  }
+  word_oss << "\n";
+  return word_oss.str();
+}
+
+
 std::string kushekbaev::DictionarySaver::operator()(const std::pair< const std::string, dict_type >& entry)
 {
   std::ostringstream oss;
   oss << "[ " << entry.first << " ]\n";
-  struct WordEntrySaver
-  {
-    std::string operator()(const std::pair< const std::string, std::set< std::string > >& word_entry)
-    {
-      std::ostringstream word_oss;
-      word_oss << word_entry.first;
-      if (!word_entry.second.empty())
-      {
-        word_oss << " ";
-        std::copy(word_entry.second.begin(), word_entry.second.end(), out_it(word_oss, " "));
-      }
-      word_oss << "\n";
-      return word_oss.str();
-    }
-  };
   WordEntrySaver word_saver;
   std::transform(entry.second.begin(), entry.second.end(), out_it(oss), word_saver);
   oss << "\n";
