@@ -19,7 +19,7 @@ double holodilov::Polygon::getArea() const
     return 0;
   }
   std::vector< int > summands(points.size());
-  std::transform(points.begin() + 1, points.end(), points.begin(), sumPointPairForArea);
+  std::transform(points.begin() + 1, points.end(), points.begin(), summands.begin(), sumPointPairForArea);
   summands.push_back(points[points.size() - 1].x * points[0].y - points[points.size() - 1].y * points[0].x);
   return std::abs(std::accumulate(summands.begin(), summands.end(), 0)) / 2.0;
 }
