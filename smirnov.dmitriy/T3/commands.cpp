@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "Polygon.hpp"
+#include "polygon.hpp"
 #include "scopeguard.hpp"
 
 namespace smirnov
