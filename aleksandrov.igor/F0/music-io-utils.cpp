@@ -7,15 +7,6 @@
 
 namespace
 {
-  template< class Key, class Value >
-  struct KeyReturner
-  {
-    const Key& operator()(const std::pair< Key, Value >& pair) const
-    {
-      return pair.first;
-    }
-  };
-
   bool isCorrectLetter(char l) noexcept
   {
     return 65 <= l && l <= 72;

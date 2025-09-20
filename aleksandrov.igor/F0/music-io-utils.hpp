@@ -15,6 +15,15 @@ namespace aleksandrov
   std::ostream& operator<<(std::ostream&, const Interval&);
   std::ostream& operator<<(std::ostream&, const Chord&);
   std::ostream& operator<<(std::ostream&, const MusicalElement&);
+
+  template< class Key, class Value >
+  struct KeyReturner
+  {
+    const Key& operator()(const std::pair< Key, Value >& pair) const
+    {
+      return pair.first;
+    }
+  };
 }
 
 #endif

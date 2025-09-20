@@ -15,15 +15,6 @@ namespace
 {
   using namespace aleksandrov;
 
-  template< class Key, class Value >
-  struct KeyReturner
-  {
-    const Key& operator()(const std::pair< Key, Value >& pair) const
-    {
-      return pair.first;
-    }
-  };
-
   size_t countNotes(const MusicalElement& element) noexcept
   {
     if (element.isNote())
