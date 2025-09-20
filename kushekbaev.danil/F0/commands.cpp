@@ -96,7 +96,7 @@ void kushekbaev::import_dictionary(std::ostream& out, std::istream& in, dictiona
   {
     throw std::runtime_error("Cannot open your file!");
   }
-  FileImporter importer{file, current_dictionary_system};
+  FileImporter importer{ file, current_dictionary_system };
   importer();
   out << "Successfully imported file.\n";
 }
