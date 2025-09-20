@@ -219,7 +219,7 @@ double getDistanceSquared(const shiryaeva::Point &a, const shiryaeva::Point &b)
 
 bool isRightAngle(const shiryaeva::Point &prev, const shiryaeva::Point &current, const shiryaeva::Point &next)
 {
-  return std::abs(dot(prev, current, next)) <= EPS;
+  return std::abs(dot(prev, current, next)) <= shiryaeva::EPS;
 }
 
 bool shiryaeva::isRectangle(const Polygon &polygon)
