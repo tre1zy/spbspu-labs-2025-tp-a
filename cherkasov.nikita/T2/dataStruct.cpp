@@ -116,11 +116,13 @@ namespace cherkasov
         {
           in >> ComplexIO{tmp.key1};
           has1 = true;
-        } else if (label == ":key2" && !has2)
+        }
+        else if (label == ":key2" && !has2)
         {
           in >> RationalIO{tmp.key2};
           has2 = true;
-        } else if (label == ":key3" && !has3)
+        }
+        else if (label == ":key3" && !has3)
         {
           in >> StringIO{tmp.key3};
           has3 = true;
@@ -131,7 +133,8 @@ namespace cherkasov
         }
       }
       in >> DelimiterIO{':'} >> DelimiterIO{')'};
-      if (!has1 || !has2 || !has3) {
+      if (!has1 || !has2 || !has3)
+      {
         throw std::runtime_error("Not enough keys");
       }
     }
@@ -140,7 +143,10 @@ namespace cherkasov
       in.setstate(std::ios::failbit);
     }
 
-    if (in) obj = tmp;
+    if (in)
+    {
+      obj = tmp;
+    }
     return in;
   }
 

@@ -9,8 +9,6 @@
 int main()
 {
   using namespace cherkasov;
-  StreamGuard coutGuard(std::cout);
-  StreamGuard cinGuard(std::cin);
   std::vector< DataStruct > data;
   while (!std::cin.eof())
   {
