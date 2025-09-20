@@ -6,29 +6,21 @@
 #include <functional>
 #include <algorithm>
 #include <string>
-#include <sstream>
 #include "geometry.hpp"
 #include "commands.hpp"
 
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
-  using it = std::istream_iterator<Polygon>;
+  using it = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
-    std::cerr << "Usage: " << argv[0] << " <filename>\n";
     return 1;
   }
 
-  std::vector<Polygon> polyList;
+  std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
-
-  if (!inFile)
-  {
-    std::cerr << "Error: Cannot open file " << argv[1] << "\n";
-    return 1;
-  }
 
   while (!inFile.eof())
   {
@@ -36,11 +28,11 @@ int main(int argc, char* argv[])
     if (!inFile)
     {
       inFile.clear();
-      inFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
-  std::map<std::string, std::function<void()>> commandMap;
+  std::map< std::string, std::function< void() > > commandMap;
   commandMap["AREA"] = std::bind(bob::printAreaSum, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["MAX"] = std::bind(bob::printMaxValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
   commandMap["MIN"] = std::bind(bob::printMinValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
@@ -62,7 +54,7 @@ int main(int argc, char* argv[])
       if (std::cin.fail())
       {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
     }
   }

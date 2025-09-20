@@ -65,7 +65,7 @@ namespace geom
       return in;
     }
 
-    std::vector<Point> pts;
+    std::vector< Point > pts;
     pts.reserve(count);
     std::generate_n(std::back_inserter(pts), count, PointReader{ in });
 
@@ -93,9 +93,9 @@ namespace geom
     return std::sqrt(p * (p - side1) * (p - side2) * (p - side3));
   }
 
-  Polygon createTrg(size_t i, const std::vector<Point>& points)
+  Polygon createTrg(size_t i, const std::vector< Point >& points)
   {
-    return Polygon{ std::vector<Point>{ points[0], points[i + 1], points[i + 2] } };
+    return Polygon{ std::vector< Point >{ points[0], points[i + 1], points[i + 2] } };
   }
 
   Polygon TrgGenerator::operator()()
@@ -103,19 +103,19 @@ namespace geom
     return createTrg(i_++, points_);
   }
 
-  std::vector<Polygon> polyToTrg(const Polygon& poly)
+  std::vector < Polygon > polyToTrg(const Polygon& poly)
   {
     size_t size = poly.points.size() - 2;
     size_t ind = 0;
-    std::vector<Polygon> triangles(size);
+    std::vector< Polygon > triangles(size);
     std::generate(triangles.begin(), triangles.end(), TrgGenerator{ ind, poly.points });
     return triangles;
   }
 
   double getPolygonArea(const Polygon& poly)
   {
-    std::vector<double> areas;
-    std::vector<Polygon> triangles = polyToTrg(poly);
+    std::vector< double > areas;
+    std::vector< Polygon > triangles = polyToTrg(poly);
     std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTrg);
     return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
