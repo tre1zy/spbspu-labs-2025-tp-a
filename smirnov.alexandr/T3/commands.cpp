@@ -363,13 +363,25 @@ void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vec
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  char next = 0;
   in >> std::ws;
-  in.get(next);
-  if (!(in.eof() || next == '\n'))
+  if (!in.eof())
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    char c = in.get();
+    if (c != '\n' && c != EOF)
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    in >> std::ws;
+    if (!in.eof())
+    {
+      char tail = in.get();
+      if (tail != EOF)
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
+    }
   }
+
   int min_x = getMinX(polygons);
   int max_x = getMaxX(polygons);
   int min_y = getMinY(polygons);
