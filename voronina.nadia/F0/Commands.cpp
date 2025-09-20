@@ -573,8 +573,8 @@ namespace voronina
     std::transform(begin, end, std::back_inserter(chosenTables), tableChooser);
 
     CodeInfoFunctor functor;
-    std::transform(chosenTables.begin(), chosenTables.end(), std::back_inserter(codes),
-                   functor);
+    auto inserter = std::back_inserter(codes);
+    std::transform(chosenTables.begin(), chosenTables.end(), inserter, functor);
     out << CodeInfoHeader{};
     std::copy(codes.begin(), codes.end(), std::ostream_iterator< CodeInfo >(out, "\n"));
   }
