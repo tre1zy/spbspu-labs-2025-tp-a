@@ -14,8 +14,8 @@ int main(int argc, char* argv[])
     using namespace smirnov;
     if (argc != 2)
     {
-	std::cerr << "not a file" << "/n";
-	return 1;
+    std::cerr << "not a file" << "/n";
+    return 1;
     }
         std::string fname = argv[1];
         std::ifstream file(fname);
