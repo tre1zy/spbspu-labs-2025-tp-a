@@ -107,10 +107,11 @@ void holodilov::commands::echo(std::istream& is, std::ostream& os, VecPolygons& 
 {
   Polygon targetPolygon;
   is >> targetPolygon;
-  if (!is || is.peek() != '\n')
+  if (!is)
   {
     throw std::logic_error("Error: invalid polygon argument.");
   }
+  is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
   const size_t amountDuplicates = std::count(vecPolygons.begin(), vecPolygons.end(), targetPolygon);
 
@@ -123,10 +124,11 @@ void holodilov::commands::lessArea(std::istream& is, std::ostream& os, const Vec
 {
   Polygon targetPolygon;
   is >> targetPolygon;
-  if (!is || is.peek() != '\n')
+  if (!is)
   {
     throw std::logic_error("Error: invalid polygon argument.");
   }
+  is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
   auto areaComparator = std::bind(compareAreaWithTarget, std::placeholders::_1, targetPolygon.getArea());
   size_t result = std::count_if(vecPolygons.begin(), vecPolygons.end(), areaComparator);
