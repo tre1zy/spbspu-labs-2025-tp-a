@@ -22,7 +22,7 @@ void kushekbaev::insert(std::ostream& out, std::istream& in, dictionary_system& 
     throw std::logic_error("<THIS TRANSLATION ALREADY EXISTS>");
   }
   translation_set.insert(inputed_translation);
-  out <<"Translation inserted successfully.\n";
+  out << "Translation inserted successfully.\n";
 }
 
 void kushekbaev::insert_without_translation(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -67,7 +67,7 @@ void kushekbaev::remove(std::ostream& out, std::istream& in, dictionary_system& 
     throw std::out_of_range("<WORD NOT FOUND>");
   }
   dict_it->second.erase(word_it);
-  out <<"Word with its translation successfully removed.\n";
+  out << "Word with its translation successfully removed.\n";
 }
 
 void kushekbaev::save(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -185,7 +185,7 @@ void kushekbaev::remove_translation(std::ostream& out, std::istream& in, diction
     throw std::out_of_range("<TRANSLATION NOT FOUND>");
   }
   translations.erase(translation_it);
-  out <<"Translation successfully deleted.\n";
+  out << "Translation successfully deleted.\n";
 }
 
 void kushekbaev::remove_translation_at_all(std::ostream& out, std::istream& in, dictionary_system& current_dictionary_system)
@@ -478,5 +478,5 @@ void kushekbaev::unification(std::ostream& out, std::istream& in, dictionary_sys
 
 void kushekbaev::print_help(std::ostream& out)
 {
-  out <<"Available commands: insert, ...\n";
+  out << "Available commands: insert, ...\n";
 }
