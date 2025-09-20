@@ -183,7 +183,7 @@ std::istream& ivanova::operator>>(std::istream& in, StringT& x)
   StreamGuard guard(in);
   in >> std::noskipws;
   in >> ExpectCharT{'"'};
-  
+
   char next;
   const size_t max_length = 1000;
   x.key.clear();
