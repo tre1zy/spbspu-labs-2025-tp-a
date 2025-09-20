@@ -27,12 +27,15 @@ void krylov::CommandProcessor::initializeCommands()
   commands["zip"] = std::bind(&CommandProcessor::zipTextsCmd, this, _1);
   commands["list"] = std::bind(&CommandProcessor::listIndexesCmd, this, _1);
   commands["deleteindex"] = std::bind(&CommandProcessor::deleteIndexCmd, this, _1);
+  commands["weave"] = std::bind(&CommandProcessor::deleteIndexCmd, this, _1);
+  commands["intersect"] = std::bind(&CommandProcessor::deleteIndexCmd, this, _1);
+  commands["diff"] = std::bind(&CommandProcessor::deleteIndexCmd, this, _1);
 }
 
 void krylov::CommandProcessor::execute(const std::string& line)
 {
   std::vector< std::string > args;
-  std::size_t wordCount = countWords(line);
+  size_t wordCount = countWords(line);
   WordGenerator gen{ line.begin(), line.end() };
   std::generate_n(std::back_inserter(args), wordCount, gen);
 
@@ -79,7 +82,7 @@ void krylov::CommandProcessor::createIndex(const std::string& indexName, const s
     throw std::invalid_argument("Invalid command");
   }
 
-  std::vector< std::size_t > lineNumbers(newIndex.lines.size());
+  std::vector< size_t > lineNumbers(newIndex.lines.size());
   std::iota(lineNumbers.begin(), lineNumbers.end(), 0);
 
   SplitWords processor{ newIndex.lines, newIndex.index };
@@ -150,7 +153,7 @@ void krylov::CommandProcessor::mergeIndexes(const std::string& index1, const std
 
   std::copy(it1->second.index.begin(), it1->second.index.end(), std::inserter(result.index, result.index.end()));
 
-  std::size_t offset = it1->second.lines.size();
+  size_t offset = it1->second.lines.size();
   std::for_each(it2->second.index.begin(), it2->second.index.end(), MergeWithOffset{ result, offset });
 
   std::vector< std::string >& lines1 = it1->second.lines;
@@ -173,7 +176,7 @@ void krylov::CommandProcessor::zipTexts(const std::string& index1, const std::st
 
   const auto& lines1 = indexes_.at(index1).lines;
   const auto& lines2 = indexes_.at(index2).lines;
-  std::size_t maxSize = std::max(lines1.size(), lines2.size());
+  size_t maxSize = std::max(lines1.size(), lines2.size());
 
   std::vector< std::string > mergedLines(maxSize);
   std::generate(mergedLines.begin(), mergedLines.end(), MergeLinesFunctor{ lines1, lines2, 0 });
@@ -181,13 +184,96 @@ void krylov::CommandProcessor::zipTexts(const std::string& index1, const std::st
   IndexDocument resultIndex;
   resultIndex.lines = mergedLines;
 
-  std::vector< std::size_t > lineNumbers(maxSize);
+  std::vector< size_t > lineNumbers(maxSize);
   std::iota(lineNumbers.begin(), lineNumbers.end(), 1);
 
   std::transform(lineNumbers.begin(), lineNumbers.end(), lineNumbers.begin(), SplitAndAdd{ resultIndex, resultIndex.lines });
 
   indexes_[newIndex] = std::move(resultIndex);
   out_ << "Index " << newIndex << " created by merging lines" << '\n';
+}
+
+void krylov::CommandProcessor::intersectIndexes(const std::string& index1, const std::string& index2, const std::string& newIndex)
+{
+  auto it1 = indexes_.find(index1);
+  auto it2 = indexes_.find(index2);
+  if (it1 == indexes_.end() || it2 == indexes_.end() || indexes_.count(newIndex))
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+  IndexDocument result;
+  const auto& idx1 = it1->second.index;
+  const auto& idx2 = it2->second.index;
+  std::vector<IndexDictionary::value_type> tempResult;
+  std::copy_if(idx1.begin(), idx1.end(), std::back_inserter(tempResult), IsInSecondIndex{ idx2 });
+  std::transform(tempResult.begin(), tempResult.end(), std::inserter(result.index, result.index.begin()), MergeEntries{idx2});
+  indexes_[newIndex] = std::move(result);
+  out_ << "Index " << newIndex << " created by intersection" << '\n';
+}
+
+void krylov::CommandProcessor::weaveTexts(const std::string& index1, const std::string& index2, const std::string& newIndex)
+{
+  if (!indexes_.count(index1) || !indexes_.count(index2) || indexes_.count(newIndex))
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+  const auto& lines1 = indexes_.at(index1).lines;
+  const auto& lines2 = indexes_.at(index2).lines;
+  std::vector< std::string > newText;
+  size_t totalSize = lines1.size() + lines2.size();
+  newText.reserve(totalSize);
+  WeaveLinesGenerator generator(lines1, lines2);
+  std::generate_n(std::back_inserter(newText), totalSize, generator);
+  IndexDocument resultIndex;
+  resultIndex.lines = newText;
+  std::vector< size_t > lineNumbers(newText.size());
+  std::iota(lineNumbers.begin(), lineNumbers.end(), 1);
+  std::transform(lineNumbers.begin(), lineNumbers.end(), lineNumbers.begin(), SplitAndAdd{ resultIndex, resultIndex.lines });
+  indexes_[newIndex] = std::move(resultIndex);
+  out_ << "Index " << newIndex << " created by weaving" << '\n';
+}
+
+void krylov::CommandProcessor::diffIndexes(const std::string& index1, const std::string& index2, const std::string& newIndex)
+{
+  auto it1 = indexes_.find(index1);
+  auto it2 = indexes_.find(index2);
+  if (it1 == indexes_.end() || it2 == indexes_.end() || indexes_.count(newIndex))
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+  IndexDocument result;
+  const auto& idx1 = it1->second.index;
+  const auto& idx2 = it2->second.index;
+  std::copy_if(idx1.begin(), idx1.end(), std::inserter(result.index, result.index.begin()), IsNotInSecondIndex{ idx2 });
+  indexes_[newIndex] = std::move(result);
+  out_ << "Index " << newIndex << " created by difference" << '\n';
+}
+
+void krylov::CommandProcessor::intersectIndexesCmd(const std::vector< std::string >& args)
+{
+  if (args.size() != 3)
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+  intersectIndexes(args[0], args[1], args[2]);
+}
+
+void krylov::CommandProcessor::weaveTextsCmd(const std::vector< std::string >& args)
+{
+  if (args.size() != 3)
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+  weaveTexts(args[0], args[1], args[2]);
+}
+
+void krylov::CommandProcessor::diffIndexesCmd(const std::vector< std::string >& args)
+{
+  if (args.size() != 3)
+  {
+    throw std::invalid_argument("Invalid command");
+  }
+  diffIndexes(args[0], args[1], args[2]);
 }
 
 void krylov::CommandProcessor::createIndexCmd(const std::vector< std::string >& args)
