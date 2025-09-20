@@ -392,7 +392,7 @@ void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::st
   Dictionary& dict2 = dictionaries.at(dictName2);
 
   Dictionary dictNew(dictNameNew, dictLangNew);
-  auto checkIntersectionBound = std::bind(checkIntersection, std::placeholders::_1, dict2);
+  auto checkIntersectionBound = std::bind(checkIntersection, std::placeholders::_1, std::cref(dict2));
 
   auto inserterNewDict = std::inserter(dictNew.dict, dictNew.dict.end());
   std::copy_if(dict1.dict.begin(), dict1.dict.end(), inserterNewDict, checkIntersectionBound);
