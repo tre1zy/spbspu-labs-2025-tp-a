@@ -1,5 +1,5 @@
 #include <functional>
-#include <iostream>'
+#include <iostream>
 #include <map>
 #include <limits>
 #include <cstring>
@@ -47,6 +47,7 @@ int main(const int argc, const char** argv)
     try
     {
       cmds.at(strCommand)();
+      std::cout << '\n';
     }
     catch (const std::out_of_range& e)
     {
@@ -59,7 +60,7 @@ int main(const int argc, const char** argv)
     }
     catch (const std::exception& e)
     {
-      std::cout << e.what();
+      std::cout << e.what() << "\n";
       if (std::cin.fail())
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
