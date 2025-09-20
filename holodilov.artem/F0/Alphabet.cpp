@@ -1,32 +1,42 @@
 #include "Alphabet.hpp"
+#include <algorithm>
+#include <functional>
 #include <iterator>
-#include <numeric>
 #include <vector>
+
+namespace
+{
+  std::list< std::string > dictPairToTranslations(const std::pair< std::string, std::list< std::string > >& pair)
+  {
+    return pair.second;
+  }
+
+  std::string translationToAlphabet(std::string& translation, std::set< char >& alphabet)
+  {
+    alphabet.insert(translation.begin(), translation.end());
+    return translation;
+  }
+
+  std::list< std::string > translationListsToAlphabet(std::list< std::string >& translations, std::set< char >& alphabet)
+  {
+    auto translationToAlphabetBound = std::bind(translationToAlphabet, std::placeholders::_1, std::ref(alphabet));
+    std::transform(translations.begin(), translations.end(), translations.begin(), translationToAlphabetBound);
+    return translations;
+  }
+}
 
 void holodilov::Alphabet::load(const Dictionary& dictionary)
 {
-  std::vector< std::string > vecTranslationStrings(dictionary.dict.size());
-  std::transform(dictionary.dict.begin(), dictionary.dict.end(), vecTranslationStrings.begin(), dictPairToString);
+  std::vector< std::list< std::string > > vecTranslationLists(dictionary.dict.size());
+  std::transform(dictionary.dict.begin(), dictionary.dict.end(), vecTranslationLists.begin(), dictPairToTranslations);
 
-  std::string strAllTranslations = std::accumulate(vecTranslationStrings.begin(), vecTranslationStrings.end(), std::string());
-
-  alphabet_ = std::accumulate(strAllTranslations.begin(), strAllTranslations.end(), std::set< char >(), accumulateAlphabet);
+  auto translationsToAlphabetBound = std::bind(translationListsToAlphabet, std::placeholders::_1, std::ref(alphabet_));
+  std::transform(vecTranslationLists.begin(), vecTranslationLists.end(), vecTranslationLists.begin(), translationsToAlphabetBound);
+  isLoaded_ = true;
 }
 
-std::string holodilov::Alphabet::dictPairToString(const std::pair< std::string, std::list< std::string > >& pair)
-{
-  return joinList(pair.second);
-}
-
-std::set< char > holodilov::Alphabet::accumulateAlphabet(std::set< char >&& setAlphabet, char ch)
-{
-  setAlphabet.insert(ch);
-  return setAlphabet;
-}
-
-std::string holodilov::Alphabet::joinList(const std::list< std::string >& list)
-{
-  return std::accumulate(list.begin(), list.end(), std::string(""));
+bool holodilov::Alphabet::isLoaded() const {
+  return isLoaded_;
 }
 
 std::ostream& holodilov::operator<<(std::ostream& out, const Alphabet& alphabet)
@@ -51,6 +61,7 @@ std::istream& holodilov::operator>>(std::istream& in, Alphabet& alphabet)
 
   using istreamIter = std::istream_iterator< char >;
   std::copy(istreamIter(in), istreamIter(), std::inserter(alphabet.alphabet_, alphabet.alphabet_.end()));
+  alphabet.isLoaded_ = true;
   return in;
 }
 

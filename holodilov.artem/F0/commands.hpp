@@ -30,9 +30,9 @@ namespace holodilov
 
   void intersect(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
 
-  void exportAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
+  void exportAlphabet(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries);
 
-  void checkAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries);
+  void checkAlphabet(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries);
 
   void printDictNames(std::ostream& out, const std::map< std::string, Dictionary >& dictionaries);
 }

@@ -3,7 +3,6 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
-#include <numeric>
 #include "Alphabet.hpp"
 #include "ScopeGuard.hpp"
 
@@ -14,24 +13,24 @@ namespace
     return pair.first;
   }
 
-  std::list< std::string > translationsAccumulator(std::list< std::string > translations, const std::list< std::string >& translation)
+  std::list< std::string > dictToTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& enWord)
   {
-    translations.insert(translations.end(), translation.begin(), translation.end());
-    return translations;
-  }
-
-  std::list< std::string > dictToWordTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& englishWord)
-  {
-    if (pair.second.dict.contains(englishWord))
+    if (pair.second.dict.contains(enWord))
     {
-      return pair.second.dict.at(englishWord);
+      return pair.second.dict.at(enWord);
     }
     return std::list< std::string >();
   }
 
-  bool checkElementIntersect(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
+  bool checkIntersection(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
   {
     return dict.dict.contains(pair.first);
+  }
+
+  std::list< std::string > translationsToStr(const std::list< std::string >& translations, std::list< std::string >& allTranslations)
+  {
+    allTranslations.insert(allTranslations.end(), translations.begin(), translations.end());
+    return translations;
   }
 }
 
@@ -296,16 +295,16 @@ void holodilov::findWord(std::istream& in, std::ostream& out, std::map< std::str
   {
     throw std::logic_error("Error: invalid command.\n");
   }
-
-  std::vector< std::list< std::string > > vecTranslationLists(dictionaries.size());
-  auto dictToWordTranslationsBound = std::bind(dictToWordTranslations, std::placeholders::_1, std::cref(englishWord));
-  std::transform(dictionaries.begin(), dictionaries.end(), vecTranslationLists.begin(), dictToWordTranslationsBound);
+  std::vector< std::list< std::string > > translLists(dictionaries.size());
+  auto dictToTranslBound = std::bind(dictToTranslations, std::placeholders::_1, std::cref(englishWord));
+  std::transform(dictionaries.begin(), dictionaries.end(), translLists.begin(), dictToTranslBound);
 
   std::list< std::string > listTranslations;
-  listTranslations = std::accumulate(vecTranslationLists.begin(), vecTranslationLists.end(), std::list < std::string >{ }, translationsAccumulator);
+  auto translationsToStrBound = std::bind(translationsToStr, std::placeholders::_1, std::ref(listTranslations));
+  std::transform(translLists.begin(), translLists.end(), translLists.begin(), translationsToStrBound);
 
-  using ostreamIter = std::ostream_iterator< std::string >;
-  std::copy(listTranslations.begin(), listTranslations.end(), ostreamIter(out, "\n"));
+  std::set< std::string > setTranslations(listTranslations.begin(), listTranslations.end());
+  std::copy(setTranslations.begin(), setTranslations.end(), std::ostream_iterator< std::string >(out, "\n"));
 }
 
 void holodilov::merge(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
@@ -393,14 +392,16 @@ void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::st
   Dictionary& dict2 = dictionaries.at(dictName2);
 
   Dictionary dictNew(dictNameNew, dictLangNew);
-  auto checkElementIntersectBound = std::bind(checkElementIntersect, std::placeholders::_1, dict2);
-  std::copy_if(dict1.dict.begin(), dict1.dict.end(), std::inserter(dictNew.dict, dictNew.dict.end()), checkElementIntersectBound);
+  auto checkIntersectionBound = std::bind(checkIntersection, std::placeholders::_1, dict2);
+
+  auto inserterNewDict = std::inserter(dictNew.dict, dictNew.dict.end());
+  std::copy_if(dict1.dict.begin(), dict1.dict.end(), inserterNewDict, checkIntersectionBound);
 
   dictionaries[dictNameNew] = dictNew;
   out << "Dictionaries " << dictName1 << " and " << dictName2 << " were intersected to " << dictNameNew << "\n";
 }
 
-void holodilov::exportAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::exportAlphabet(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -439,7 +440,7 @@ void holodilov::exportAlphabet(std::istream& in, std::ostream& out, std::map< st
   out << "Alphabet of " << dictName << " dictionary was exported into file " << filename << "\n";
 }
 
-void holodilov::checkAlphabet(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
 {
   std::string dictName;
   in >> dictName;
