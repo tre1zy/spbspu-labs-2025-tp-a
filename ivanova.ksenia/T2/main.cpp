@@ -20,7 +20,7 @@ int main()
 
     while (std::cin.fail() && !std::cin.eof())
     {
-      std::cin.clear();
+      std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       std::copy(iIterator(std::cin), iIterator(), std::back_inserter(data));
     }
