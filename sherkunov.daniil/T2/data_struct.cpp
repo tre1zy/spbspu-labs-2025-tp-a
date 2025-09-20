@@ -74,7 +74,7 @@ namespace sherkunov {
       return input;
     }
     long long temp = 0;
-    if (!(input >> temp >> LexCharIO{'l'} >> LexCharIO{'l'})) {
+    if (!(input >> temp >> LexCharIO{ 'l' } >> LexCharIO{ 'l' })) {
       return input;
     }
     value.ref = temp;
@@ -121,7 +121,7 @@ namespace sherkunov {
       return input;
     }
     std::string temp;
-    input >> DelimiterIO{'"'};
+    input >> DelimiterIO{ '"' };
     std::getline(input, temp, '"');
     if (input) {
       value.ref = std::move(temp);
@@ -150,7 +150,7 @@ namespace sherkunov {
       return input;
     }
     DataStruct temp{};
-    input >> io_helpers::DelimiterIO{'('} >> io_helpers::DelimiterIO{':'};
+    input >> io_helpers::DelimiterIO{ '(' } >> io_helpers::DelimiterIO{ ':' };
 
     for (int i = 0; i < 3; ++i) {
       std::string key;
@@ -164,23 +164,23 @@ namespace sherkunov {
       char k = key.back();
       switch (k) {
       case '1':
-        input >> io_helpers::LongLongIO{temp.key1};
+        input >> io_helpers::LongLongIO{ temp.key1 };
         break;
       case '2':
-        input >> io_helpers::Key2IO{temp.key2};
+        input >> io_helpers::Key2IO{ temp.key2 };
         break;
       case '3':
-        input >> io_helpers::StringIO{temp.key3};
+        input >> io_helpers::StringIO{ temp.key3 };
         break;
       default:
         input.setstate(std::ios::failbit);
         return input;
       }
 
-      input >> io_helpers::DelimiterIO{':'};
+      input >> io_helpers::DelimiterIO{ ':' };
     }
 
-    input >> io_helpers::DelimiterIO{')'};
+    input >> io_helpers::DelimiterIO{ ')' };
     if (input) {
       value = std::move(temp);
     }
@@ -194,12 +194,12 @@ namespace sherkunov {
       return output;
     }
     long long key1_copy = value.key1;
-    std::pair<long long, unsigned long long> key2_copy = value.key2;
+    std::pair< long long, unsigned long long > key2_copy = value.key2;
     std::string key3_copy = value.key3;
 
-    output << "(:key1 " << io_helpers::LongLongIO{key1_copy};
-    output << ":key2 (:" << io_helpers::PairIO{key2_copy} << ":)";
-    output << ":key3 " << io_helpers::StringIO{key3_copy} << ":)";
+    output << "(:key1 " << io_helpers::LongLongIO{ key1_copy };
+    output << ":key2 (:" << io_helpers::PairIO{ key2_copy } << ":)";
+    output << ":key3 " << io_helpers::StringIO{ key3_copy } << ":)";
     return output;
   }
 
