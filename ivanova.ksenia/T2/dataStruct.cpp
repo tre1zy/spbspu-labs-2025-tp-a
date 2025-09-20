@@ -34,7 +34,7 @@ std::ostream& ivanova::operator<<(std::ostream& out, const DoubleScienceT& x)
 std::ostream& ivanova::operator<<(std::ostream& out, const UllBinT& x)
 {
   out << "0b";
-  
+
   if (x.key == 0)
   {
     out << "0";
