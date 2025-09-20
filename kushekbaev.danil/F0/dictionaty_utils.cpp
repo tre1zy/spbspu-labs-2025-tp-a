@@ -151,12 +151,23 @@ std::string kushekbaev::DictionarySaver::operator()(const std::pair< const std::
 {
   std::ostringstream oss;
   oss << "[ " << entry.first << " ]\n";
-  for (const auto& word_entry: entry.second)
+  struct WordEntrySaver
   {
-    oss << " ";
-    std::copy(word_entry.second.begin(), word_entry.second.end(),
-      out_it(oss, " "));
-  }
+    std::string operator()(const std::pair< const std::string, std::set< std::string > >& word_entry)
+    {
+      std::ostringstream word_oss;
+      word_oss << word_entry.first;
+      if (!word_entry.second.empty())
+      {
+        word_oss << " ";
+        std::copy(word_entry.second.begin(), word_entry.second.end(), out_it(word_oss, " "));
+      }
+      word_oss << "\n";
+      return word_oss.str();
+    }
+  };
+  WordEntrySaver word_saver;
+  std::transform(entry.second.begin(), entry.second.end(), out_it(oss), word_saver);
   oss << "\n";
   return oss.str();
 }
