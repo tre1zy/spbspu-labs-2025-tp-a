@@ -293,7 +293,7 @@ void smirnov::printArea(std::istream & in, std::ostream & out, const std::vector
     size_t numVtx = std::stoull(arg);
     if (numVtx < 3)
     {
-      throw std::logic_error("<INVALID COMMAND");
+      throw;
     }
     printAreaByVertex(polygons, out, numVtx);
   }
@@ -350,7 +350,7 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
     size_t numVtx = std::stoull(arg);
     if (numVtx < 3)
     {
-      throw std::logic_error("<INVALID COMMAND");
+      throw;
     }
     printCountByVertex(polygons, out, numVtx);
   }
