@@ -163,8 +163,14 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
 
   while (in.get(ch))
   {
-    if (ch == std::istream::traits_type::eof()) break;
-    if (!std::isdigit(ch) && ch != '.') break;
+    if (ch == std::istream::traits_type::eof())
+    {
+      break;
+    }
+    if (!std::isdigit(ch) && ch != '.') 
+    {
+      break;
+    }
     if (ch == '.')
     {
       if (has_dot)
@@ -184,8 +190,10 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
       mant = mant * 10.0 + (ch - '0');
     }
   }
-  if (ch != std::istream::traits_type::eof()) in.putback(ch);
-
+  if (ch != std::istream::traits_type::eof())
+  {
+    in.putback(ch);
+  }
   if (!has_digits)
   {
     in.setstate(std::ios::failbit);
@@ -223,8 +231,14 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
   bool has_exp_digits = false;
   while (in.get(ch))
   {
-    if (ch == std::istream::traits_type::eof()) break;
-    if (!std::isdigit(ch)) break;
+    if (ch == std::istream::traits_type::eof())
+    {
+      break;
+    }
+    if (!std::isdigit(ch))
+    {
+      break;
+    }
     has_exp_digits = true;
     exp = exp * 10 + (ch - '0');
   }
@@ -257,8 +271,14 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
   char ch;
   while (in.get(ch))
   {
-    if (ch == std::istream::traits_type::eof()) break;
-    if (ch != '0' && ch != '1') break;
+    if (ch == std::istream::traits_type::eof())
+    {
+      break;
+    }
+    if (ch != '0' && ch != '1')
+    {
+      break;
+    }
     if (ch == '0' && !has_bits)
     {
       ++x.prefix_zeroes;
