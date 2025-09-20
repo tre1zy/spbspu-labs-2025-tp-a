@@ -83,8 +83,8 @@ void sc::maxArea(std::ostream& os, const VecPolygons& vecPolygons)
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::max_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByArea));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.getArea();
+  os << std::fixed << std::setprecision(1);
+  os << polygon.getArea();
 }
 
 void sc::maxVertexes(std::ostream& os, const VecPolygons& vecPolygons)
@@ -92,8 +92,8 @@ void sc::maxVertexes(std::ostream& os, const VecPolygons& vecPolygons)
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::max_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByVertexes));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.points.size();
+  os << std::fixed << std::setprecision(1);
+  os << polygon.points.size();
 }
 
 void sc::minArea(std::ostream& os, const VecPolygons& vecPolygons)
@@ -101,8 +101,8 @@ void sc::minArea(std::ostream& os, const VecPolygons& vecPolygons)
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::min_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByArea));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.getArea();
+  os << std::fixed << std::setprecision(1);
+  os << polygon.getArea();
 }
 
 void sc::minVertexes(std::ostream& os, const VecPolygons& vecPolygons)
@@ -110,8 +110,8 @@ void sc::minVertexes(std::ostream& os, const VecPolygons& vecPolygons)
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::min_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByVertexes));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.points.size();
+  os << std::fixed << std::setprecision(1);
+  os << polygon.points.size();
 }
 
 void sc::areaEven(std::ostream& os, const VecPolygons& vecPolygons)
@@ -120,8 +120,8 @@ void sc::areaEven(std::ostream& os, const VecPolygons& vecPolygons)
 
   auto accumulator = std::bind(accumulateAreaEvenOdd, std::placeholders::_1, std::placeholders::_2, false);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea;
+  os << std::fixed << std::setprecision(1);
+  os << sumArea;
 }
 
 void sc::areaOdd(std::ostream& os, const VecPolygons& vecPolygons)
@@ -130,8 +130,8 @@ void sc::areaOdd(std::ostream& os, const VecPolygons& vecPolygons)
 
   auto accumulator = std::bind(accumulateAreaEvenOdd, std::placeholders::_1, std::placeholders::_2, true);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea;
+  os << std::fixed << std::setprecision(1);
+  os << sumArea;
 }
 
 void sc::areaMean(std::ostream& os, const VecPolygons& vecPolygons)
@@ -145,8 +145,8 @@ void sc::areaMean(std::ostream& os, const VecPolygons& vecPolygons)
 
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulateArea);
   double meanArea = sumArea / static_cast< double >(vecPolygons.size());
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << meanArea;
+  os << std::fixed << std::setprecision(1);
+  os << meanArea;
 }
 
 void sc::areaAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes)
@@ -155,7 +155,7 @@ void sc::areaAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amo
 
   auto accumulator = std::bind(accumulateAreaVertexes, std::placeholders::_1, std::placeholders::_2, amountVertexes);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea;
+  os << std::fixed << std::setprecision(1);
+  os << sumArea;
 }
 

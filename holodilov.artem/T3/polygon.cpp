@@ -6,10 +6,9 @@
 
 namespace
 {
-  int sumPointPairForArea(const holodilov::Point& point)
+  int sumPointPairForArea(const holodilov::Point& point, const holodilov::Point& prevPoint)
   {
-    holodilov::Point previousPoint = *(&point - 1);
-    return point.y * previousPoint.x - point.x * previousPoint.y;
+    return point.y * prevPoint.x - point.x * prevPoint.y;
   }
 }
 
@@ -20,7 +19,7 @@ double holodilov::Polygon::getArea() const
     return 0;
   }
   std::vector< int > summands(points.size());
-  std::transform(points.begin() + 1, points.end(), summands.begin(), sumPointPairForArea);
+  std::transform(points.begin() + 1, points.end(), points.begin(), sumPointPairForArea);
   summands.push_back(points[points.size() - 1].x * points[0].y - points[points.size() - 1].y * points[0].x);
   return std::abs(std::accumulate(summands.begin(), summands.end(), 0)) / 2.0;
 }
@@ -72,6 +71,11 @@ std::istream& holodilov::operator>>(std::istream& is, Polygon& polygon)
   Polygon polygonTemp;
   using istreamIter = std::istream_iterator< Point >;
   std::copy_n(istreamIter(is), amountPoints, std::back_inserter(polygonTemp.points));
+  if (!is)
+  {
+    return is;
+  }
+  is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   if ((polygonTemp.points.size() != amountPoints) || (polygonTemp.points.size() < 3))
   {
     is.setstate(std::ios::failbit);
