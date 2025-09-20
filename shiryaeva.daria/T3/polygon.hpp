@@ -6,10 +6,10 @@
 #include <istream>
 #include <cmath>
 
-constexpr size_t MIN_VERTEX_COUNT = 3;
-
 namespace shiryaeva
 {
+  constexpr size_t MIN_VERTEX_COUNT = 3;
+
   struct Point
   {
     int x;

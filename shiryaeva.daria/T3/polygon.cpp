@@ -7,9 +7,12 @@
 std::istream &shiryaeva::operator>>(std::istream &in, Point &point)
 {
   std::istream::sentry s(in);
-  if (!s) return in;
+  if (!s)
+  {
+    return in;
+  }
 
-  Point tmp{};
+  Point tmp{0, 0};
   in >> DelimiterIO{'('} >> tmp.x >> DelimiterIO{';'} >> tmp.y >> DelimiterIO{')'};
   if (in)
   {
@@ -31,7 +34,10 @@ bool shiryaeva::operator<(const Point &lhs, const Point &rhs)
 std::istream &shiryaeva::operator>>(std::istream &in, Polygon &polygon)
 {
   std::istream::sentry s(in);
-  if (!s) return in;
+  if (!s)
+  {
+    return in;
+  }
 
   size_t count{};
   in >> count;

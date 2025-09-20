@@ -5,11 +5,11 @@
 #include <string>
 #include "polygon.hpp"
 
-constexpr size_t RECTANGLE_SIDES = 4;
-constexpr double EPS = 1e-9;
-
 namespace shiryaeva
 {
+  constexpr size_t RECTANGLE_SIDES = 4;
+  constexpr double EPS = 1e-9;
+
   bool hasVertexCount(const Polygon &p, size_t count);
   bool isRectangle(const Polygon &polygon);
   bool HasDuplicates(const Polygon& p);

@@ -122,7 +122,7 @@ void shiryaeva::min(std::istream &in, std::ostream &out, const std::vector< Poly
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  out << std::fixed << std::setprecision(1);
+
 
   if (subcmd == "AREA")
   {
@@ -171,6 +171,11 @@ void shiryaeva::count(std::istream &in, std::ostream &out, const std::vector< Po
   out << cnt;
 }
 
+bool isAreaLessThan(const shiryaeva::Polygon& p1, const shiryaeva::Polygon& p2)
+{
+  return getPolygonArea(p1) < getPolygonArea(p2);
+}
+
 void shiryaeva::lessArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons)
 {
   FormatGuard guard(out);
@@ -180,12 +185,7 @@ void shiryaeva::lessArea(std::istream &in, std::ostream &out, const std::vector<
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  size_t cnt = std::count_if(polygons.begin(), polygons.end(),
-  [&polygon](const Polygon& p)
-    {
-      return getPolygonArea(p) < getPolygonArea(polygon);
-    }
-  );
+  size_t cnt = std::count_if(polygons.begin(), polygons.end(), std::bind(isAreaLessThan, std::placeholders::_1, polygon));
   out << cnt;
 }
 
@@ -238,8 +238,10 @@ bool shiryaeva::isRectangle(const Polygon &polygon)
     return false;
   }
 
-  return isRightAngle(points[3], points[0], points[1]) &&
-    isRightAngle(points[0], points[1], points[2]) &&
-    isRightAngle(points[1], points[2], points[3]) &&
-    isRightAngle(points[2], points[3], points[0]);
+  const auto& p0 = points[0];
+  const auto& p1 = points[1];
+  const auto& p2 = points[2];
+  const auto& p3 = points[3];
+
+  return isRightAngle(p3, p0, p1) && isRightAngle(p0, p1, p2) && isRightAngle(p1, p2, p3) && isRightAngle(p2, p3, p0);
 }
