@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <iterator>
@@ -6,6 +7,7 @@
 #include <functional>
 #include <algorithm>
 #include <string>
+#include <sstream>
 #include "geometry.hpp"
 #include "commands.hpp"
 
@@ -16,46 +18,71 @@ int main(int argc, char* argv[])
 
   if (argc != 2)
   {
+    
     return 1;
   }
 
   std::vector< Polygon > polyList;
-  std::ifstream inFile(argv[1]);
-
-  // Read all polygons exactly once from the file into polyList
-  if (inFile)
   {
-    std::copy(it(inFile), it(), std::back_inserter(polyList));
-    // No loop here — std::copy will consume until EOF; repeated copying
-    // previously caused duplicated polygons in polyList.
+    std::ifstream inFile(argv[1]);
+    if (inFile)
+    {
+     
+      std::copy(it(inFile), it(), std::back_inserter(polyList));
+    }
   }
 
-  std::map< std::string, std::function< void() > > commandMap;
-  commandMap["AREA"] = std::bind(bob::printAreaSum, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["MAX"] = std::bind(bob::printMaxValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["MIN"] = std::bind(bob::printMinValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["COUNT"] = std::bind(bob::printCountOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["LESSAREA"] = std::bind(bob::printLessAreaCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  
+  using CommandFn = std::function<void(std::istream&, const std::vector<Polygon>&, std::ostream&)>;
+  std::unordered_map<std::string, CommandFn> commandMap;
 
-  std::string line;
-  // Use the idiomatic pattern for reading command tokens from stdin
-  while (std::cin >> line)
+  
+  commandMap["AREA"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printAreaSum(in, polygons, out); };
+  commandMap["COUNT"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printCountOf(in, polygons, out); };
+  commandMap["MAXSEQ"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printMaxSeq(in, polygons, out); };
+  commandMap["ECHO"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printEcho(in, polygons, out); };
+  commandMap["INFRAME"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printInframe(in, polygons, out); };
+  commandMap["PERMS"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printPerms(in, polygons, out); };
+  commandMap["SAME"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printSame(in, polygons, out); };
+  commandMap["LESSAREA"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printLessAreaCnt(in, polygons, out); };
+  commandMap["INTERSECTIONS"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printIntersectionsCnt(in, polygons, out); };
+  commandMap["MAX"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printMaxValueOf(in, polygons, out); };
+  commandMap["MIN"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printMinValueOf(in, polygons, out); };
+  commandMap["LESS"] = [](std::istream& in, const auto& polygons, std::ostream& out){ bob::printLess(in, polygons, out); };
+ 
+
+  std::string cmd;
+  
+  while (std::cin >> cmd)
   {
+   
+    std::string restOfLine;
+    std::getline(std::cin, restOfLine); 
+   
+    std::istringstream argsStream(restOfLine);
+
+    auto itCmd = commandMap.find(cmd);
+    if (itCmd == commandMap.end())
+    {
+     
+      std::cout << "<INVALID COMMAND>\n";
+      continue;
+    }
+
     try
     {
-      commandMap.at(line)();
+      
+      itCmd->second(argsStream, polyList, std::cout);
+      
+      
       std::cout << "\n";
     }
-    catch (const std::exception& e)
+    catch (const std::exception& )
     {
+      
       std::cout << "<INVALID COMMAND>\n";
-      if (std::cin.fail())
-      {
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      }
     }
   }
+
   return 0;
 }
