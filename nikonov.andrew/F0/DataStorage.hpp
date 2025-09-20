@@ -49,5 +49,4 @@ namespace nikonov {
     std::unordered_map< str, std::unique_ptr< Encoding > > encodings_;
   };
 }
-
 #endif
