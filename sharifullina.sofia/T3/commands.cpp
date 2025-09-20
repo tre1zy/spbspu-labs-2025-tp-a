@@ -45,7 +45,7 @@ namespace
     return poly.points.size() == num;
   }
 
-  void getAreaEven(std::ostream& out, const std::vector< sharifullina::Polygon > & polygons)
+  void getAreaEven(std::ostream & out, const std::vector< sharifullina::Polygon > & polygons)
   {
     std::vector< sharifullina::Polygon > temp;
     std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(temp), isEvenPoly);

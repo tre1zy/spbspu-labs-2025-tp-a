@@ -21,7 +21,8 @@ namespace sharifullina::detail
   }
 
   IsPermutationPredicate::IsPermutationPredicate(const Polygon & t) : target(t)
-  {}
+  {
+  }
 
   bool IsPermutationPredicate::operator()(const Polygon & poly) const
   {
@@ -40,7 +41,8 @@ namespace sharifullina::detail
   }
 
   LessAreaPredicate::LessAreaPredicate(double area) : targetArea(area)
-  {}
+  {
+  }
 
   bool LessAreaPredicate::operator()(const Polygon & poly) const
   {
