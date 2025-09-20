@@ -3,6 +3,7 @@
 #include <functional>
 #include <map>
 #include <numeric>
+#include <limits>
 #include "polygon.hpp"
 #include "subcommands.hpp"
 
