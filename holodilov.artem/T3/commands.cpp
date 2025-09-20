@@ -107,7 +107,7 @@ void holodilov::commands::echo(std::istream& is, std::ostream& os, VecPolygons& 
 {
   Polygon targetPolygon;
   is >> targetPolygon;
-  if (!is || is.peek() != '\n')
+  if (!is)
   {
     throw std::logic_error("Error: invalid polygon argument.\n");
   }
@@ -123,7 +123,7 @@ void holodilov::commands::lessArea(std::istream& is, std::ostream& os, const Vec
 {
   Polygon targetPolygon;
   is >> targetPolygon;
-  if (!is || is.peek() != '\n')
+  if (!is)
   {
     throw std::logic_error("Error: invalid polygon argument.\n");
   }
