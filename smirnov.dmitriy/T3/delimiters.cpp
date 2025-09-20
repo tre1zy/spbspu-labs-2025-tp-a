@@ -1,6 +1,6 @@
 #include "delimiters.hpp"
 #include <algorithm>
-#include "scopeGuard.hpp"
+#include "scopeguard.hpp"
 
 std::istream& smirnov::operator>>(std::istream& in, DelimiterString&& exp)
 {
