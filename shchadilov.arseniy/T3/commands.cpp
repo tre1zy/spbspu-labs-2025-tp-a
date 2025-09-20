@@ -92,8 +92,8 @@ namespace
         size_t n_;
 
         AngleCheck(const std::vector< Point >& pts, size_t size):
-        points_(pts),
-        n_(size)
+          points_(pts),
+          n_(size)
         {}
 
         bool operator()(size_t i) const
