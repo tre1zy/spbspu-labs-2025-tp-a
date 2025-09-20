@@ -470,7 +470,7 @@ void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const std::ma
     throw std::logic_error("Error: alphabet file not found.");
   }
   fis >> alphabetFromFile;
-  if (fis.fail() && !fis.eof())
+  if (fis.fail() && (!fis.eof()))
   {
     throw std::logic_error("Error: unable to read alphabet file.");
   }
