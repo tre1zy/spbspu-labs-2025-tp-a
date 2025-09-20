@@ -1,9 +1,9 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <string>
+#include <vector>
 #include "polygon.hpp"
 #include "commands.hpp"
 

@@ -1,9 +1,9 @@
 #include "commands.hpp"
 #include <algorithm>
-#include <numeric>
 #include <iomanip>
-#include <string>
+#include <numeric>
 #include <stdexcept>
+#include <string>
 #include <vector>
 #include "streamGuard.hpp"
 

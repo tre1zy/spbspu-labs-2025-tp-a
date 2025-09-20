@@ -1,9 +1,9 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
+#include <functional>
 #include <iostream>
 #include <vector>
-#include <functional>
 #include "polygon.hpp"
 
 

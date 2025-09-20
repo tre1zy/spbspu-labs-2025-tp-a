@@ -1,7 +1,7 @@
 #include "polygon.hpp"
 #include <algorithm>
-#include <numeric>
 #include <iterator>
+#include <numeric>
 #include <vector>
 
 bool shchadilov::Point::operator==(const Point& other) const
