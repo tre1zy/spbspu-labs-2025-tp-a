@@ -55,7 +55,7 @@ std::ostream& shramko::operator<<(std::ostream& out, const DoubleScienceT& x)
   }
 
   double abs_key = std::fabs(x.key);
-  int exp = static_cast< int >(std::floor(std::log10(abs_key)));
+  int exp = static_cast<int>(std::floor(std::log10(abs_key)));
   double mant = abs_key / std::pow(10.0, exp);
 
   char sign = (x.key < 0 ? '-' : '\0');
@@ -64,9 +64,9 @@ std::ostream& shramko::operator<<(std::ostream& out, const DoubleScienceT& x)
     out << sign;
   }
 
-  int mant_int = static_cast< int >(mant);
+  int mant_int = static_cast<int>(mant);
   double frac_part = mant - mant_int;
-  int frac_digit = static_cast< int >(frac_part * 10 + 0.5);
+  int frac_digit = static_cast<int>(frac_part * 10 + 0.5);
 
   out << mant_int << '.' << frac_digit << 'e';
 
@@ -126,6 +126,7 @@ std::ostream& shramko::operator<<(std::ostream& out, const dataStruct& ds)
 
 std::istream& shramko::operator>>(std::istream& in, ExpectCharT&& x)
 {
+  StreamGuard guard(in); // Добавлен StreamGuard
   char ch;
   if (!(in >> ch) || ch != x.ch)
   {
@@ -136,6 +137,7 @@ std::istream& shramko::operator>>(std::istream& in, ExpectCharT&& x)
 
 std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
 {
+  StreamGuard guard(in); // Добавлен StreamGuard
   skip_ws(in);
 
   double mant_sign = 1.0;
@@ -234,7 +236,7 @@ std::istream& shramko::operator>>(std::istream& in, DoubleScienceT& x)
     return in;
   }
 
-  exp *= static_cast< int >(exp_sign);
+  exp *= static_cast<int>(exp_sign);
   x.key = mant * std::pow(10.0, exp);
   return in;
 }
@@ -259,7 +261,7 @@ std::istream& shramko::operator>>(std::istream& in, UllBinT& x)
       continue;
     }
     has_bits = true;
-    if (x.key > (std::numeric_limits< unsigned long long >::max() >> 1))
+    if (x.key > (std::numeric_limits<unsigned long long>::max() >> 1))
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -302,6 +304,7 @@ std::istream& shramko::operator>>(std::istream& in, StringT& x)
 
 std::istream& shramko::operator>>(std::istream& in, dataStruct& ds)
 {
+  StreamGuard guard(in);
   in >> ExpectCharT{'('};
   dataStruct result;
 
