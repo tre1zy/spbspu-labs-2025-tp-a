@@ -20,9 +20,9 @@ namespace sharifullina::detail
     }
   }
 
-  IsPermutationPredicate::IsPermutationPredicate(const Polygon & t) : target(t)
-  {
-  }
+  IsPermutationPredicate::IsPermutationPredicate(const Polygon & t):
+    target(t)
+  {}
 
   bool IsPermutationPredicate::operator()(const Polygon & poly) const
   {
@@ -40,9 +40,9 @@ namespace sharifullina::detail
     return sortedLhs == sortedRhs;
   }
 
-  LessAreaPredicate::LessAreaPredicate(double area) : targetArea(area)
-  {
-  }
+  LessAreaPredicate::LessAreaPredicate(double area):
+    targetArea(area)
+  {}
 
   bool LessAreaPredicate::operator()(const Polygon & poly) const
   {
