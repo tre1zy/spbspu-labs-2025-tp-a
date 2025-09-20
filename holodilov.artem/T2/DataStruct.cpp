@@ -15,20 +15,9 @@ std::istream& holodilov::operator>>(std::istream& in, DataStruct& dataStruct)
   for (int i = 0; i < 3; ++i)
   {
     in >> io::DelimIO{ ':' };
-    io::KeyNameIO keyName{ 0 };
+    io::KeyNameIO keyName;
     in >> keyName;
-    if (keyName.keyNumber == 1)
-    {
-      in >> io::UllOctIO{ dataStructTemp.key1 };
-    }
-    else if (keyName.keyNumber == 2)
-    {
-      in >> io::ComplexIO{ dataStructTemp.key2 };
-    }
-    else if (keyName.keyNumber == 3)
-    {
-      in >> io::StringIO{ dataStructTemp.key3 };
-    }
+    keyName.fillDataStructField(in, dataStructTemp);
     if (!in)
     {
       return in;
@@ -163,11 +152,37 @@ std::istream& holodilov::io::operator>>(std::istream& in, KeyNameIO& keyName)
   in >> DelimIO{ 'k' } >> DelimIO{ 'e' } >> DelimIO{ 'y' };
   if (in)
   {
-    in >> keyName.keyNumber;
-    if (keyName.keyNumber != 1 && keyName.keyNumber != 2 && keyName.keyNumber != 3)
+    in >> keyName.keyNumber_;
+    if (!keyName.isValid())
     {
       in.setstate(std::ios::failbit);
     }
   }
   return in;
+}
+
+int holodilov::io::KeyNameIO::getKeyNumber() const
+{
+  return keyNumber_;
+}
+
+bool holodilov::io::KeyNameIO::isValid() const
+{
+  return (keyNumber_ == 1) || (keyNumber_ == 2) || (keyNumber_ == 3);
+}
+
+void holodilov::io::KeyNameIO::fillDataStructField(std::istream& in, DataStruct& dataStruct) const
+{
+  if (keyNumber_ == 1)
+  {
+    in >> UllOctIO{ dataStruct.key1 };
+  }
+  else if (keyNumber_ == 2)
+  {
+    in >> ComplexIO{ dataStruct.key2 };
+  }
+  else if (keyNumber_ == 3)
+  {
+    in >> StringIO{ dataStruct.key3 };
+  }
 }
