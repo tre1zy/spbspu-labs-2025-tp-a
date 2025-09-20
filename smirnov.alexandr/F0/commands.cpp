@@ -2,24 +2,39 @@
 #include <algorithm>
 #include <iterator>
 #include <fstream>
+#include <numeric>
 
 namespace smirnov
 {
-  struct EntryFormatter
+  struct AddWithSpace
   {
-    std::ostream & out;
-    explicit EntryFormatter(std::ostream & o):
-      out(o)
-    {}
-    void operator()(const std::pair< const std::string,
-      std::vector< std::string > > & entry) const
+    std::string operator()(const std::string & acc, const std::string & tr) const
     {
-      out << entry.first << " - ";
-      std::copy(entry.second.begin(), entry.second.end(), std::ostream_iterator< std::string >(out, " "));
-      out << "\n";
+      return acc.empty() ? tr : acc + " " + tr;
     }
   };
 
+  struct Joiner
+  {
+    std::string operator()(const std::vector<std::string> & vec) const
+    {
+      return std::accumulate(vec.begin(), vec.end(), std::string(), AddWithSpace());
+    }
+  };
+
+  struct EntryToStr
+  {
+    std::string operator()(const Dict::value_type & entry) const
+    {
+      std::string result = entry.first + " -";
+      if (!entry.second.empty())
+      {
+        Joiner joiner;
+        result += " " + joiner(entry.second);
+      }
+      return result;
+    }
+  };
   struct PrefixMatcher
   {
     const std::string & prefix;
@@ -53,6 +68,18 @@ namespace smirnov
     bool operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
     {
       return entry.first == word;
+    }
+  };
+
+  struct NotInResult
+  {
+    const Dict & result;
+    explicit NotInResult(const Dict & r):
+      result(r)
+    {}
+    bool operator()(const Dict::value_type & entry) const
+    {
+      return result.find(entry.first) == result.end();
     }
   };
 
@@ -93,20 +120,6 @@ namespace smirnov
     {
       std::vector< std::string > & translations = result[entry.first];
       std::for_each(entry.second.begin(), entry.second.end(), MergeTranslations(translations));
-    }
-  };
-
-  struct EntryFileFormatter
-  {
-    std::ofstream & file;
-    explicit EntryFileFormatter(std::ofstream & f):
-      file(f)
-    {}
-    void operator()(const std::pair< const std::string, std::vector< std::string > > & entry) const
-    {
-      file << entry.first << " - ";
-      std::copy(entry.second.begin(), entry.second.end(), std::ostream_iterator< std::string >(file, " "));
-      file << "\n";
     }
   };
 
@@ -295,7 +308,9 @@ void smirnov::printCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << dictName << " is empty.\n";
     return;
   }
-  std::for_each(dict.begin(), dict.end(), EntryFormatter(out));
+  std::vector< std::string > lines(dict.size());
+  std::transform(dict.begin(), dict.end(), lines.begin(), EntryToStr());
+  std::copy(lines.begin(), lines.end(), std::ostream_iterator< std::string >(out, "\n"));
 }
 
 void smirnov::saveCommand(Dicts & dicts, std::istream & in, std::ostream & out)
@@ -325,7 +340,9 @@ void smirnov::saveCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     return;
   }
   file << dictName << "\n";
-  std::for_each(dictIt->second.begin(), dictIt->second.end(), EntryFileFormatter(file));
+  std::vector< std::string > lines(dictIt->second.size());
+  std::transform(dictIt->second.begin(), dictIt->second.end(), lines.begin(), EntryToStr());
+  std::copy(lines.begin(), lines.end(), std::ostream_iterator< std::string >(file, "\n"));
 }
 
 void smirnov::mergeCommand(Dicts & dicts, std::istream & in, std::ostream & out)
@@ -349,9 +366,11 @@ void smirnov::mergeCommand(Dicts & dicts, std::istream & in, std::ostream & out)
     out << "<INVALID COMMAND>\n";
     return;
   }
+  const Dict & first = it1->second;
+  const Dict & second = it2->second;
   Dict result;
-  std::for_each(it1->second.begin(), it1->second.end(), CopyEntryToDict(result));
-  std::for_each(it2->second.begin(), it2->second.end(), MergeEntryToDict(result));
+  std::copy(first.begin(), second.end(), std::inserter(result, result.end()));
+  std::copy_if(second.begin(), second.end(), std::inserter(result, result.end()), NotInResult(result));
   dicts[newName] = std::move(result);
   out << "Dictionary " << newName << " is successfully created\n";
 }
