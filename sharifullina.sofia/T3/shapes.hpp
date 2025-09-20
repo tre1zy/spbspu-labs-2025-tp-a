@@ -8,8 +8,8 @@ namespace sharifullina
 {
   struct Point
   {
-    int x{};
-    int y{};
+    int x;
+    int y;
     bool operator==(const Point & rhs) const;
   };
 

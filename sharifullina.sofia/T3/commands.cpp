@@ -181,7 +181,7 @@ void sharifullina::printArea(std::istream & in, std::ostream & out, const std::v
     size_t count = std::stoull(subcommand);
     if (count < 3)
     {
-      throw std::logic_error("not that command");
+      throw;
     }
     getAreaVertexes(out, polygons, count);
   }
@@ -204,7 +204,7 @@ void sharifullina::printMax(std::istream & in, std::ostream & out, const std::ve
   }
   catch (const std::exception &)
   {
-    throw std::logic_error("not that command");
+    throw;
   }
 }
 
@@ -225,7 +225,7 @@ void sharifullina::printMin(std::istream & in, std::ostream & out, const std::ve
   }
   catch (const std::exception &)
   {
-    throw std::logic_error("not that command");
+    throw;
   }
 }
 
@@ -245,7 +245,7 @@ void sharifullina::printCount(std::istream & in, std::ostream & out, const std::
     size_t count = std::stoull(subcommand);
     if (count < 3)
     {
-      throw std::logic_error("not that command");
+      throw;
     }
     getCountVertexes(out, polygons, count);
   }
