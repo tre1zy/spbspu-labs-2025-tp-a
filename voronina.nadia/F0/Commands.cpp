@@ -439,8 +439,8 @@ namespace voronina
     std::size_t encodingIndex = encodingNumber - 1;
     if (encodingIndex >= vectorOfTables.size())
     {
-      throw std::invalid_argument("Код с номером " + std::to_string(encodingNumber) +
-                                  " не найден");
+      auto str = std::to_string(encodingNumber);
+      throw std::invalid_argument("Код с номером " + str + " не найден");
     }
     out << vectorOfTables[encodingIndex] << '\n';
   }
