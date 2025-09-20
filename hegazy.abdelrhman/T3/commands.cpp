@@ -8,8 +8,9 @@
 #include <unordered_map>
 #include <string>
 #include <set>
+#include <sstream>
 #include "geometry.hpp"
-#include <stream_guard.hpp>
+#include "stream_guard.hpp"
 
 namespace
 {
@@ -270,4 +271,168 @@ void bob::printIntersectionsCnt(std::istream& input, const std::vector< geom::Po
     using namespace std::placeholders;
     output << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectionCheck, ref, _1));
   }
+}
+
+// New command implementations
+void bob::printEcho(std::istream& input, std::vector< Polygon >& polygons, std::ostream& output)
+{
+  Polygon poly;
+  input >> poly;
+  if (!input)
+  {
+    throw std::invalid_argument("Invalid polygon");
+  }
+  
+  // Check for duplicate points
+  std::set< geom::Point > uniquePoints(poly.points.begin(), poly.points.end());
+  if (uniquePoints.size() != poly.points.size())
+  {
+    throw std::invalid_argument("Duplicate points");
+  }
+  
+  polygons.push_back(poly);
+  output << polygons.size();
+}
+
+void bob::printInframe(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
+{
+  if (polygons.empty())
+  {
+    throw std::invalid_argument("No polygons");
+  }
+  
+  Polygon ref;
+  input >> ref;
+  if (!input)
+  {
+    throw std::invalid_argument("Invalid reference polygon");
+  }
+  
+  // Find bounding box of all polygons
+  int minX = std::numeric_limits<int>::max();
+  int minY = std::numeric_limits<int>::max();
+  int maxX = std::numeric_limits<int>::min();
+  int maxY = std::numeric_limits<int>::min();
+  
+  for (const auto& poly : polygons)
+  {
+    for (const auto& point : poly.points)
+    {
+      minX = std::min(minX, point.x);
+      minY = std::min(minY, point.y);
+      maxX = std::max(maxX, point.x);
+      maxY = std::max(maxY, point.y);
+    }
+  }
+  
+  // Check if reference polygon fits within the bounding box
+  bool fits = true;
+  for (const auto& point : ref.points)
+  {
+    if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY)
+    {
+      fits = false;
+      break;
+    }
+  }
+  
+  output << (fits ? "<TRUE>" : "<FALSE>");
+}
+
+void bob::printMaxseq(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
+{
+  Polygon ref;
+  input >> ref;
+  if (!input)
+  {
+    throw std::invalid_argument("Invalid reference polygon");
+  }
+  
+  size_t maxCount = 0;
+  size_t currentCount = 0;
+  
+  for (const auto& poly : polygons)
+  {
+    if (poly.points.size() == ref.points.size())
+    {
+      currentCount++;
+      maxCount = std::max(maxCount, currentCount);
+    }
+    else
+    {
+      currentCount = 0;
+    }
+  }
+  
+  output << maxCount;
+}
+
+void bob::printPerms(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
+{
+  Polygon ref;
+  input >> ref;
+  if (!input)
+  {
+    throw std::invalid_argument("Invalid reference polygon");
+  }
+  
+  size_t count = 0;
+  for (const auto& poly : polygons)
+  {
+    if (poly.points.size() == ref.points.size())
+    {
+      std::vector< geom::Point > sortedRef = ref.points;
+      std::vector< geom::Point > sortedPoly = poly.points;
+      
+      std::sort(sortedRef.begin(), sortedRef.end(), [](const geom::Point& a, const geom::Point& b) {
+        return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+      });
+      
+      std::sort(sortedPoly.begin(), sortedPoly.end(), [](const geom::Point& a, const geom::Point& b) {
+        return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+      });
+      
+      if (sortedRef == sortedPoly)
+      {
+        count++;
+      }
+    }
+  }
+  
+  output << count;
+}
+
+void bob::printSame(std::istream& input, const std::vector< Polygon >& polygons, std::ostream& output)
+{
+  Polygon ref;
+  input >> ref;
+  if (!input)
+  {
+    throw std::invalid_argument("Invalid reference polygon");
+  }
+  
+  size_t count = 0;
+  for (const auto& poly : polygons)
+  {
+    if (poly.points.size() == ref.points.size())
+    {
+      std::vector< geom::Point > sortedRef = ref.points;
+      std::vector< geom::Point > sortedPoly = poly.points;
+      
+      std::sort(sortedRef.begin(), sortedRef.end(), [](const geom::Point& a, const geom::Point& b) {
+        return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+      });
+      
+      std::sort(sortedPoly.begin(), sortedPoly.end(), [](const geom::Point& a, const geom::Point& b) {
+        return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+      });
+      
+      if (sortedRef == sortedPoly)
+      {
+        count++;
+      }
+    }
+  }
+  
+  output << count;
 }

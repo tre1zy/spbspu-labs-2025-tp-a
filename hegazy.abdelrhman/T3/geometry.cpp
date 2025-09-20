@@ -5,7 +5,7 @@
 #include <iterator>
 #include <limits>
 #include <ios>
-#include <delimiter.hpp>
+#include "delimiter.hpp"
 
 namespace geom
 {
@@ -15,7 +15,8 @@ namespace geom
     Point operator()() const
     {
       Point p;
-      if (!(in >> p))
+      in >> p;
+      if (!in)
       {
         throw std::ios_base::failure("Error reading point");
       }
@@ -67,9 +68,18 @@ namespace geom
 
     std::vector< Point > pts;
     pts.reserve(count);
-    std::generate_n(std::back_inserter(pts), count, PointReader{ in });
+    
+    try
+    {
+      std::generate_n(std::back_inserter(pts), count, PointReader{ in });
+    }
+    catch (const std::ios_base::failure&)
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
 
-    if (!in)
+    if (!in || pts.size() != count)
     {
       in.setstate(std::ios::failbit);
       return in;

@@ -13,6 +13,13 @@ namespace bob
   void printLessAreaCnt(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output);
   bool polygonsIntersect(const geom::Polygon& p1, const geom::Polygon& p2);
   void printIntersectionsCnt(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output);
+  
+  // New commands
+  void printEcho(std::istream& input, std::vector< geom::Polygon >& polygons, std::ostream& output);
+  void printInframe(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output);
+  void printMaxseq(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output);
+  void printPerms(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output);
+  void printSame(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output);
 }
 
 #endif
