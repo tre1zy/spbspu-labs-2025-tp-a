@@ -42,12 +42,16 @@ int main(int argc, char* argv[])
       {
         commands.at(cmd)(std::cin, std::cout);
       }
+
       catch (...)
       {
         std::cout << "<INVALID COMMAND>\n";
+        if (std::cin.fail())
+        {
+          std::cin.clear();
+          std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        }
       }
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     file.close();
   }
