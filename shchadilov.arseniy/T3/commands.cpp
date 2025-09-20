@@ -67,7 +67,7 @@ namespace
     size_t count_;
 
     VertexCountChecker(size_t cnt):
-	count_(cnt)
+      count_(cnt)
     {}
 
     bool operator()(const Polygon& poly) const
