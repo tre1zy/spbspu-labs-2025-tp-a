@@ -359,29 +359,11 @@ void smirnov::printCount(std::istream & in, std::ostream & out, const std::vecto
 void smirnov::printInFrame(std::istream & in, std::ostream & out, const std::vector< Polygon > & polygons)
 {
   Polygon poly;
-  if (!(in >> poly) || poly.points.size() < 3 || polygons.empty())
+  if (!(in >> poly) || poly.points.size() < 3 || polygons.empty() || in.peek() != '\n')
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
   in >> std::ws;
-  if (!in.eof())
-  {
-    char c = in.get();
-    if (c != '\n' && c != EOF)
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    in >> std::ws;
-    if (!in.eof())
-    {
-      char tail = in.get();
-      if (tail != EOF)
-      {
-        throw std::logic_error("<INVALID COMMAND>");
-      }
-    }
-  }
-
   int min_x = getMinX(polygons);
   int max_x = getMaxX(polygons);
   int min_y = getMinY(polygons);
