@@ -1,19 +1,20 @@
-#ifndef STREAM_GUARD_HPP
-#define STREAM_GUARD_HPP
+#ifndef SCOPE_GUARD_HPP
+#define SCOPE_GUARD_HPP
 
 #include <ios>
 
 namespace smirnov
 {
-    class StreamGuard
-    {
-    public:
-        StreamGuard(std::basic_ios< char >& s);
-        ~StreamGuard();
-    private:
-        std::basic_ios< char >& s_;
-        std::streamsize precision_;
-        std::basic_ios< char >::fmtflags flags_;
-    };
+  class ScopeGuard
+  {
+  public:
+    ScopeGuard(std::basic_ios< char >& s);
+    ~ScopeGuard();
+
+  private:
+    std::basic_ios< char >& s_;
+    std::streamsize precision_;
+    std::basic_ios< char >::fmtflags flags_;
+  };
 }
 #endif

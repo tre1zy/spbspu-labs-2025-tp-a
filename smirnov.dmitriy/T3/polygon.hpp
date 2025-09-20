@@ -2,27 +2,26 @@
 #define POLYGON_HPP
 
 #include <iostream>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 namespace smirnov
 {
   struct Point
   {
-      int x;
-      int y;
+    int x;
+    int y;
   };
 
   std::istream& operator>>(std::istream& in, Point& value);
   bool operator<(const Point& p1, const Point& p2);
   bool operator==(const Point& p1, const Point& p2);
-  bool operator<=(const Point &first, const Point &second);
-  bool operator>=(const Point &first, const Point &second);
-
+  bool operator<=(const Point& first, const Point& second);
+  bool operator>=(const Point& first, const Point& second);
 
   struct Polygon
   {
-      std::vector< Point > points;
+    std::vector< Point > points;
   };
   std::istream& operator>>(std::istream& in, Polygon& value);
   double getArea(const Polygon& p);

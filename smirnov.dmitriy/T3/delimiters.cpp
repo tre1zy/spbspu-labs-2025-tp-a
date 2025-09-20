@@ -1,43 +1,36 @@
 #include "delimiters.hpp"
 #include <algorithm>
-#include "streamguard.hpp"
+#include "scopeGuard.hpp"
 
 std::istream& smirnov::operator>>(std::istream& in, DelimiterString&& exp)
 {
-    std::istream::sentry guard(in);
-    if (!guard)
-    {
-        return in;
-    }
-    std::string s = "";
-    char c = 0;
-    for (size_t i = 0; i < exp.expected.size(); ++i)
-    {
-        in >> c;
-        s += c;
-    }
-    std::string expUp = exp.expected;
-    std::transform(exp.expected.begin(), exp.expected.end(), exp.expected.begin(), ::tolower);
-    if (!(s == exp.expected || s == expUp))
-    {
-        in.setstate(std::ios::failbit);
-    }
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
     return in;
+  }
+
+  size_t i = 0;
+  while (exp.expected[i] != '\0')
+  {
+    in >> DelimiterChar({exp.expected[i++]});
+  }
+  return in;
 }
 
 std::istream& smirnov::operator>>(std::istream& in, DelimiterChar&& exp)
 {
-    std::istream::sentry guard(in);
-    if (!guard)
-    {
-        return in;
-    }
-    smirnov::StreamGuard sguard(in);
-    char c = 0;
-    in >> c;
-    if (!(c == exp.expected || c == std::tolower(exp.expected)))
-    {
-        in.setstate(std::ios::failbit);
-    }
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
     return in;
+  }
+  smirnov::ScopeGuard sguard(in);
+  char c = 0;
+  in >> c;
+  if (!(c == exp.expected || c == std::tolower(exp.expected)))
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
