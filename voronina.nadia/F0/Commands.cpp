@@ -639,8 +639,7 @@ namespace voronina
     std::copy(printers.begin(), printers.end(), OIter{ out, "\n" });
   }
 
-  void visualize(const std::vector< ShannonFanoTable >& vectorOfTables, std::istream& in,
-                 std::ostream& out)
+  void visualize(const FanoTablesVec& vectorOfTables, std::istream& in, std::ostream& out)
   {
     iofmtguard ifmtguard{ in };
     iofmtguard ofmtguard{ out };
