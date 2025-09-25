@@ -76,7 +76,6 @@ std::istream& holodilov::operator>>(std::istream& is, Polygon& polygon)
   {
     return is;
   }
-  is.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   if ((polygonTemp.points.size() != amountPoints) || (polygonTemp.points.size() < 3))
   {
     is.setstate(std::ios::failbit);
