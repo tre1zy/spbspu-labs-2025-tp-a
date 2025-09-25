@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 
   using istreamIter = std::istream_iterator< Polygon >;
   VecPolygons vecPolygons;
-;  while (!fis.eof())
+  while (!fis.eof())
   {
     std::copy(istreamIter(fis), istreamIter(), std::back_inserter(vecPolygons));
     if (!fis)
@@ -52,6 +52,7 @@ int main(int argc, char** argv)
     try
     {
       cmds.at(commandName)();
+      std::cout << "\n";
     }
     catch (...)
     {

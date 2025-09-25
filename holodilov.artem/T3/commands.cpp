@@ -35,11 +35,11 @@ void holodilov::commands::area(std::istream& is, std::ostream& os, const VecPoly
     int amountVertexes = std::stoi(subcommand);
     if (amountVertexes < 3)
     {
-      throw std::logic_error("Error: vertexes amount must be >= 3.\n");
+      throw std::logic_error("Error: vertexes amount must be >= 3.");
     }
     subcommands::areaAmount(os, vecPolygons, amountVertexes);
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument&)
   {
     std::map< std::string, std::function< void() > > cmds;
     cmds["EVEN"] = std::bind(subcommands::areaEven, std::ref(os), std::cref(vecPolygons));
@@ -53,7 +53,7 @@ void holodilov::commands::min(std::istream& is, std::ostream& os, const VecPolyg
 {
   if (vecPolygons.empty())
   {
-    throw std::logic_error("Error: no polygons to handle.\n");
+    throw std::logic_error("Error: no polygons to handle.");
   }
 
   std::string subcommand;
@@ -69,7 +69,7 @@ void holodilov::commands::max(std::istream& is, std::ostream& os, const VecPolyg
 {
   if (vecPolygons.empty())
   {
-    throw std::logic_error("Error: no polygons to handle.\n");
+    throw std::logic_error("Error: no polygons to handle.");
   }
 
   std::string subcommand;
@@ -90,11 +90,11 @@ void holodilov::commands::count(std::istream& is, std::ostream& os, const VecPol
     int amountVertexes = std::stoi(subcommand);
     if (amountVertexes < 3)
     {
-      throw std::logic_error("Error: vertexes amount must be >= 3.\n");
+      throw std::logic_error("Error: vertexes amount must be >= 3.");
     }
     subcommands::countAmount(os, vecPolygons, amountVertexes);
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument&)
   {
     std::map< std::string, std::function< void() > > cmds;
     cmds["EVEN"] = std::bind(subcommands::countEven, std::ref(os), std::cref(vecPolygons));
@@ -107,28 +107,28 @@ void holodilov::commands::echo(std::istream& is, std::ostream& os, VecPolygons& 
 {
   Polygon targetPolygon;
   is >> targetPolygon;
-  if (!is || is.peek() != '\n')
+  if (!is || (is.peek() != '\n'))
   {
-    throw std::logic_error("Error: invalid polygon argument.\n");
+    throw std::logic_error("Error: invalid polygon argument.");
   }
 
   const size_t amountDuplicates = std::count(vecPolygons.begin(), vecPolygons.end(), targetPolygon);
 
   auto accumulateBound = std::bind(accumulateEcho, std::placeholders::_1, std::placeholders::_2, std::cref(targetPolygon));
   vecPolygons = std::accumulate(vecPolygons.begin(), vecPolygons.end(), VecPolygons(0), accumulateBound);
-  os << amountDuplicates << '\n';
+  os << amountDuplicates;
 }
 
 void holodilov::commands::lessArea(std::istream& is, std::ostream& os, const VecPolygons& vecPolygons)
 {
   Polygon targetPolygon;
   is >> targetPolygon;
-  if (!is || is.peek() != '\n')
+  if (!is || (is.peek() != '\n'))
   {
-    throw std::logic_error("Error: invalid polygon argument.\n");
+    throw std::logic_error("Error: invalid polygon argument.");
   }
 
   auto areaComparator = std::bind(compareAreaWithTarget, std::placeholders::_1, targetPolygon.getArea());
   size_t result = std::count_if(vecPolygons.begin(), vecPolygons.end(), areaComparator);
-  os << result << '\n';
+  os << result;
 }

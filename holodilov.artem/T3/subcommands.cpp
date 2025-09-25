@@ -57,81 +57,84 @@ namespace
   }
 }
 
-namespace holodilov::subcommands
+namespace sc = holodilov::subcommands;
+
+void sc::countEven(std::ostream& os, const VecPolygons& vecPolygons)
 {
-  void countEven(std::ostream& os, const VecPolygons& vecPolygons) {
   size_t count = std::count_if(vecPolygons.begin(), vecPolygons.end(), checkPolygonVertexesEven);
-  os << count << '\n';
+  os << count;;
 }
 
-void countOdd(std::ostream& os, const VecPolygons& vecPolygons) {
+void sc::countOdd(std::ostream& os, const VecPolygons& vecPolygons)
+{
   size_t count = std::count_if(vecPolygons.begin(), vecPolygons.end(), checkPolygonVertexesOdd);
-  os << count << '\n';
+  os << count;
 }
 
-void countAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes) {
+void sc::countAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes)
+{
   auto checker = std::bind(checkPolygonVertexesAmount, std::placeholders::_1, amountVertexes);
   size_t count = std::count_if(vecPolygons.begin(), vecPolygons.end(), checker);
-  os << count << '\n';
+  os << count;
 }
 
-void maxArea(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::maxArea(std::ostream& os, const VecPolygons& vecPolygons)
 {
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::max_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByArea));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.getArea() << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << polygon.getArea();
 }
 
-void maxVertexes(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::maxVertexes(std::ostream& os, const VecPolygons& vecPolygons)
 {
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::max_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByVertexes));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.points.size() << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << polygon.points.size();
 }
 
-void minArea(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::minArea(std::ostream& os, const VecPolygons& vecPolygons)
 {
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::min_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByArea));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.getArea() << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << polygon.getArea();
 }
 
-void minVertexes(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::minVertexes(std::ostream& os, const VecPolygons& vecPolygons)
 {
   ScopeGuard scopeGuard(os);
 
   Polygon polygon = *(std::min_element(vecPolygons.begin(), vecPolygons.end(), comparePolygonsByVertexes));
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << polygon.points.size() << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << polygon.points.size();
 }
 
-void areaEven(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::areaEven(std::ostream& os, const VecPolygons& vecPolygons)
 {
   ScopeGuard scopeGuard(os);
 
   auto accumulator = std::bind(accumulateAreaEvenOdd, std::placeholders::_1, std::placeholders::_2, false);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << sumArea;
 }
 
-void areaOdd(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::areaOdd(std::ostream& os, const VecPolygons& vecPolygons)
 {
   ScopeGuard scopeGuard(os);
 
   auto accumulator = std::bind(accumulateAreaEvenOdd, std::placeholders::_1, std::placeholders::_2, true);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << sumArea;
 }
 
-void areaMean(std::ostream& os, const VecPolygons& vecPolygons)
+void sc::areaMean(std::ostream& os, const VecPolygons& vecPolygons)
 {
   if (vecPolygons.empty())
   {
@@ -142,17 +145,17 @@ void areaMean(std::ostream& os, const VecPolygons& vecPolygons)
 
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulateArea);
   double meanArea = sumArea / static_cast< double >(vecPolygons.size());
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << meanArea << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << meanArea;
 }
 
-void areaAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes)
+void sc::areaAmount(std::ostream& os, const VecPolygons& vecPolygons, size_t amountVertexes)
 {
   ScopeGuard scopeGuard(os);
 
   auto accumulator = std::bind(accumulateAreaVertexes, std::placeholders::_1, std::placeholders::_2, amountVertexes);
   double sumArea = std::accumulate(vecPolygons.begin(), vecPolygons.end(), 0.0, accumulator);
-  std::cout << std::fixed << std::setprecision(1);
-  std::cout << sumArea << '\n';
+  os << std::fixed << std::setprecision(1);
+  os << sumArea;
 }
-}
+
