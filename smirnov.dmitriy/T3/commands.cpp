@@ -60,7 +60,7 @@ namespace smirnov
       throw std::logic_error("zero polygons");
     }
 
-    StreamGuard streamGuard(out);
+    ScopeGuard streamGuard(out);
     out << std::fixed << std::setprecision(1);
 
     if (s == "AREA")
