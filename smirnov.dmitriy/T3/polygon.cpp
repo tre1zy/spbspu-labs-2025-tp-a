@@ -66,20 +66,19 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
     in.setstate(std::ios::failbit);
     return in;
   }
-  using inputItT = std::istream_iterator< smirnov::Point >;
+  using inputItT = std::istream_iterator< Point >;
   std::vector < Point > vec;
   vec.reserve(n);
 
-  std::copy_n(std::istream_iterator< Point >{in}, n - 1, std::back_inserter(vec));
+  std::copy_n(inputItT{in}, n - 1, std::back_inserter(vec));
   if (in.peek() != '\n')
   {
-    std::copy_n(std::istream_iterator< Point >{in}, 1, std::back_inserter(vec));
+    std::copy_n(inputItT{in}, 1, std::back_inserter(vec));
   }
   if (!in || vec.size() != n || in.peek() != '\n')
   {
     in.setstate(std::ios::failbit);
   }
-
   value = Polygon{vec};
   return in;
 }
