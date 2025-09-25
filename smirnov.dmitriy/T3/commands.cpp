@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include "polygon.hpp"
-#include "streamguard.hpp"
+#include "scopeguard.hpp"
 
 namespace smirnov
 {
