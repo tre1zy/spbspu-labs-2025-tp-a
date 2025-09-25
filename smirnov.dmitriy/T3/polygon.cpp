@@ -79,7 +79,7 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
   {
     in.setstate(std::ios::failbit);
   }
-  
+
   value = Polygon{vec};
   return in;
 }
