@@ -25,8 +25,6 @@ namespace smirnov
     std::string s;
     in >> s;
     double result = 0.0;
-    StreamGuard  streamGuard(out);
-    out << std::fixed << std::setprecision(1);
     std::map< std::string, std::function< double() > > subcommand;
     {
       using namespace std::placeholders;
@@ -41,13 +39,14 @@ namespace smirnov
       {
         throw std::logic_error("FEW VERTEXES");
       }
+      result = doAreaNum(polygons, n);
     }
     catch (const std::invalid_argument&)
     {
       result = subcommand[s]();
     }
     std::vector< double > areas;
-    out << result << "\n";
+    out << std::fixed << std::setprecision(1) << result << "\n";
   }
 
   void doMinMaxCommand(
@@ -61,7 +60,7 @@ namespace smirnov
       throw std::logic_error("zero polygons");
     }
 
-    StreamGuard  streamGuard(out);
+    StreamGuard streamGuard(out);
     out << std::fixed << std::setprecision(1);
 
     if (s == "AREA")
@@ -143,7 +142,6 @@ namespace smirnov
     size_t maxseq;
     bool operator()(const Polygon& polygon, const Polygon& data);
   };
-
 
   void doMaxseqCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
   {
