@@ -7,13 +7,12 @@
 #include <string>
 #include <vector>
 #include "polygon.hpp"
-#include "scopeguard.hpp"
 
 namespace smirnov
 {
   using namespace std::placeholders;
 
-  template < class UnaryPredicate >
+  template< class UnaryPredicate >
   double getSumArea(const std::vector< Polygon >& polygons, UnaryPredicate P);
   double doAreaEven(const std::vector< Polygon >& polygons);
   double doAreaOdd(const std::vector< Polygon >& polygons);
@@ -25,8 +24,6 @@ namespace smirnov
     std::string s;
     in >> s;
     double result = 0.0;
-    StreamGuard  streamGuard(out);
-    out << std::fixed << std::setprecision(1);
     std::map< std::string, std::function< double() > > subcommand;
     {
       using namespace std::placeholders;
@@ -41,18 +38,17 @@ namespace smirnov
       {
         throw std::logic_error("FEW VERTEXES");
       }
+      result = doAreaNum(polygons, n);
     }
     catch (const std::invalid_argument&)
     {
       result = subcommand[s]();
     }
     std::vector< double > areas;
-    out << result << "\n";
+    out << std::fixed << std::setprecision(1) << result << "\n";
   }
 
-  void doMinMaxCommand(
-    const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out, const std::string& name
-  )
+  void doMinMaxCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out, const std::string& name)
   {
     std::string s;
     in >> s;
@@ -60,30 +56,26 @@ namespace smirnov
     {
       throw std::logic_error("zero polygons");
     }
-
-    StreamGuard  streamGuard(out);
-    out << std::fixed << std::setprecision(1);
-
     if (s == "AREA")
     {
       if (name == "max")
       {
-        out << getArea(*std::max_element(polygons.begin(), polygons.end(), minArea)) << "\n";
+        out << std::fixed << std::setprecision(1) << getArea(*std::max_element(polygons.begin(), polygons.end(), minArea)) << "\n";
       }
       else
       {
-        out << getArea(*std::min_element(polygons.begin(), polygons.end(), minArea)) << "\n";
+        out << std::fixed << std::setprecision(1) << getArea(*std::min_element(polygons.begin(), polygons.end(), minArea)) << "\n";
       }
     }
     else if (s == "VERTEXES")
     {
       if (name == "max")
       {
-        out << (*std::max_element(polygons.begin(), polygons.end(), minVertexes)).points.size() << "\n";
+        out << std::fixed << std::setprecision(1) << (*std::max_element(polygons.begin(), polygons.end(), minVertexes)).points.size() << "\n";
       }
       else
       {
-        out << (*std::min_element(polygons.begin(), polygons.end(), minVertexes)).points.size() << "\n";
+        out << std::fixed << std::setprecision(1) << (*std::min_element(polygons.begin(), polygons.end(), minVertexes)).points.size() << "\n";
       }
     }
     else
@@ -112,11 +104,11 @@ namespace smirnov
     }
     else if (s == "ODD")
     {
-      out << std::count_if(polygons.begin(), polygons.end(), isOddCountVertexes) << "\n";
+      out << std::count_if(polygons.begin(), polygons.end(),isOddCountVertexes) << "\n";
     }
     else if (s == std::to_string(std::stoi(s)))
     {
-      size_t n = std::stoi(s);
+      size_t n = static_cast< size_t >(std::stoi(s));
       if (n < 3)
       {
         throw std::logic_error("FEW VERTEXES");
@@ -141,9 +133,8 @@ namespace smirnov
   {
     size_t cur;
     size_t maxseq;
-    bool operator()(const Polygon& polygon, const Polygon& data);
+    bool operator()(const Polygon& Polygon, const smirnov::Polygon& data);
   };
-
 
   void doMaxseqCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
   {
@@ -155,7 +146,7 @@ namespace smirnov
     }
     else
     {
-      PolygonMaxSeq seq{ 0, 0 };
+      PolygonMaxSeq seq{0,0};
       size_t numberSeq = std::count_if(polygons.begin(), polygons.end(), std::bind(std::ref(seq), _1, data));
       if (numberSeq < 1)
       {
@@ -168,28 +159,28 @@ namespace smirnov
     }
   }
 
-  bool hasIntersection(const Polygon& p1, const Polygon& p2)
+  bool hasIntersection(const Polygon&p1, const Polygon&p2)
   {
     auto pair_p1 = std::minmax_element(p1.points.cbegin(), p1.points.cend());
     auto pair_p2 = std::minmax_element(p2.points.cbegin(), p2.points.cend());
     return !(*pair_p1.second < *pair_p2.first || *pair_p2.second < *pair_p1.first);
   }
 
-  void doIntersections(const std::vector< Polygon >& data, std::istream& in, std::ostream& out)
+  void doIntersections(const std::vector< Polygon > & data, std::istream & in, std::ostream & out)
   {
-    Polygon polygon;
-    in >> polygon;
+    Polygon Polygon;
+    in >> Polygon;
     if (!in)
     {
       throw std::logic_error("Wrong argument");
     }
 
-    out << std::count_if(data.begin(), data.end(), std::bind(hasIntersection, std::placeholders::_1, polygon)) << '\n';
+    out << std::count_if(data.begin(), data.end(), std::bind(hasIntersection,  std::placeholders::_1, Polygon)) << '\n';
   }
 
-  bool PolygonMaxSeq::operator()(const Polygon& polygon, const Polygon& data)
+  bool PolygonMaxSeq::operator()(const Polygon& Polygon, const smirnov::Polygon& data)
   {
-    if (polygon == data)
+    if (Polygon == data)
     {
       cur++;
       maxseq = std::max(maxseq, cur);
@@ -201,7 +192,7 @@ namespace smirnov
     return maxseq;
   }
 
-  template < class UnaryPredicate >
+  template< class UnaryPredicate >
   double getSumArea(const std::vector< Polygon >& polygons, UnaryPredicate P)
   {
     std::vector< Polygon > rightPolygons;

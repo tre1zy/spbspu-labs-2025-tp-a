@@ -7,7 +7,7 @@
 
 struct PolygonArea
 {
-  smirnov::Point first;
+  smirnov:: Point first;
   double operator()(const smirnov::Point& second)
   {
     double area = (second.x + first.x) * (first.y - second.y);
@@ -24,12 +24,12 @@ std::istream& smirnov::operator>>(std::istream& in, Point& value)
     return in;
   }
   using del = smirnov::DelimiterChar;
-  int x = 0;
-  int y = 0;
+  int x{};
+  int y{};
   in >> del{ '(' } >> x >> del{ ';' } >> y >> del{ ')' };
   if (in)
   {
-    value = Point{ x, y };
+    value = Point{ x,y };
   }
   else
   {
@@ -67,20 +67,16 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
     return in;
   }
   using inputItT = std::istream_iterator< smirnov::Point >;
-  std::vector< Point > vec;
+  std::vector < Point > vec;
   vec.reserve(n);
-  std::copy_n(inputItT{ in }, n - 1, std::back_inserter(vec));
-  if (in.peek() != '\n')
+  std::copy_n(inputItT{ in }, n, std::back_inserter(vec));
+  if (in && vec.size() == n)
   {
-    std::copy_n(inputItT{ in }, 1, std::back_inserter(vec));
-  }
-  if (!in || vec.size() != n || in.peek() != '\n')
-  {
-    in.setstate(std::ios::failbit);
+    value = Polygon{ vec };
   }
   else
   {
-    value = Polygon{ vec };
+    in.setstate(std::ios::failbit);
   }
   return in;
 }
@@ -90,12 +86,12 @@ bool smirnov::operator==(const Polygon& p1, const Polygon& p2)
   return p1.points == p2.points;
 }
 
-bool smirnov::operator<=(const Point& first, const Point& second)
+bool smirnov::operator<=(const Point &first, const Point &second)
 {
   return !(second < first);
 }
 
-bool smirnov::operator>=(const Point& first, const Point& second)
+bool smirnov::operator>=(const Point &first, const Point &second)
 {
   return !(first < second);
 }
@@ -126,8 +122,7 @@ bool smirnov::isRect(const Polygon& p)
   }
   std::vector< Point > vec(p.points);
   std::sort(vec.begin(), vec.end());
-  return isPerpendicular(vec[0], vec[1], vec[2]) && isPerpendicular(vec[1], vec[0], vec[3]) &&
-         isPerpendicular(vec[3], vec[2], vec[1]);
+  return isPerpendicular(vec[0], vec[1], vec[2]) && isPerpendicular(vec[1], vec[0], vec[3]) && isPerpendicular(vec[3], vec[2], vec[1]);
 }
 
 bool smirnov::isOddCountVertexes(const Polygon& p)
@@ -154,3 +149,4 @@ bool smirnov::minVertexes(const Polygon& p1, const Polygon& p2)
 {
   return p1.points.size() < p2.points.size();
 }
+
