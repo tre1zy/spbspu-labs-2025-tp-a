@@ -4,6 +4,7 @@
 #include <functional>
 #include <iterator>
 #include "Alphabet.hpp"
+#include <vector>
 #include "ScopeGuard.hpp"
 
 namespace
