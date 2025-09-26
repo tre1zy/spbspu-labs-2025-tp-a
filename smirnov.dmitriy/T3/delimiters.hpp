@@ -1,24 +1,24 @@
 #ifndef DELIMITERS_HPP
 #define DELIMITERS_HPP
 
-#include <string>
 #include <iostream>
+#include <string>
 
 namespace smirnov
 {
-    struct DelimiterString
-    {
-        std::string expected;
-    };
+  struct DelimiterString
+  {
+    const char* expected;
+  };
 
-    std::istream& operator>>(std::istream& in, DelimiterString&& exp);
+  std::istream& operator>>(std::istream& in, DelimiterString&& exp);
 
-    struct DelimiterChar
-    {
-        char expected;
-    };
+  struct DelimiterChar
+  {
+    char expected;
+  };
 
-    std::istream& operator>>(std::istream& in, DelimiterChar&& exp);
+  std::istream& operator>>(std::istream& in, DelimiterChar&& exp);
 }
 
 #endif
