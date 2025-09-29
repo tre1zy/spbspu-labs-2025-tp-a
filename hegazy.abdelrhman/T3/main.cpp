@@ -16,18 +16,21 @@ int main(int argc, char* argv[])
 
   if (argc != 2)
   {
+    std::cerr << "Usage: " << argv[0] << " <filename>\n";
     return 1;
   }
 
   std::vector< Polygon > polyList;
   std::ifstream inFile(argv[1]);
 
-  // Read all polygons exactly once from the file into polyList
-  if (inFile)
+  while (!inFile.eof())
   {
     std::copy(it(inFile), it(), std::back_inserter(polyList));
-    // No loop here — std::copy will consume until EOF; repeated copying
-    // previously caused duplicated polygons in polyList.
+    if (!inFile)
+    {
+      inFile.clear();
+      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 
   std::map< std::string, std::function< void() > > commandMap;
@@ -39,13 +42,20 @@ int main(int argc, char* argv[])
   commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
 
   std::string line;
-  // Use the idiomatic pattern for reading command tokens from stdin
-  while (std::cin >> line)
+  while (!(std::cin >> line).eof())
   {
     try
     {
-      commandMap.at(line)();
-      std::cout << "\n";
+      auto it = commandMap.find(line);
+      if (it != commandMap.end())
+      {
+        it->second();
+        std::cout << "\n";
+      }
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
     }
     catch (const std::exception& e)
     {
