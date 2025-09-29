@@ -16,7 +16,6 @@ int main(int argc, char* argv[])
 
   if (argc != 2)
   {
-    std::cerr << "Usage: " << argv[0] << " <filename>\n";
     return 1;
   }
 
@@ -46,16 +45,8 @@ int main(int argc, char* argv[])
   {
     try
     {
-      auto it = commandMap.find(line);
-      if (it != commandMap.end())
-      {
-        it->second();
-        std::cout << "\n";
-      }
-      else
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+      commandMap.at(line)();
+      std::cout << "\n";
     }
     catch (const std::exception& e)
     {

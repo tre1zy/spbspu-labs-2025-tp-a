@@ -37,21 +37,9 @@ namespace
 
   bool intersectionCheck(const geom::Polygon& polygon, const geom::Polygon& other)
   {
-    auto polygonMinMaxX = std::minmax_element(polygon.points.cbegin(), polygon.points.cend(),
-      [](const geom::Point& a, const geom::Point& b) { return a.x < b.x; });
-    auto polygonMinMaxY = std::minmax_element(polygon.points.cbegin(), polygon.points.cend(),
-      [](const geom::Point& a, const geom::Point& b) { return a.y < b.y; });
-
-    auto otherMinMaxX = std::minmax_element(other.points.cbegin(), other.points.cend(),
-      [](const geom::Point& a, const geom::Point& b) { return a.x < b.x; });
-    auto otherMinMaxY = std::minmax_element(other.points.cbegin(), other.points.cend(),
-      [](const geom::Point& a, const geom::Point& b) { return a.y < b.y; });
-
-    // Check if bounding boxes intersect
-    bool xOverlap = !(polygonMinMaxX.second->x < otherMinMaxX.first->x || otherMinMaxX.second->x < polygonMinMaxX.first->x);
-    bool yOverlap = !(polygonMinMaxY.second->y < otherMinMaxY.first->y || otherMinMaxY.second->y < polygonMinMaxY.first->y);
-
-    return xOverlap && yOverlap;
+    auto polygonMinMax = std::minmax_element(polygon.points.cbegin(), polygon.points.cend());
+    auto otherMinMax = std::minmax_element(other.points.cbegin(), other.points.cend());
+    return !(*polygonMinMax.second < *otherMinMax.first || *polygonMinMax.first > *otherMinMax.second);
   }
 
   size_t countEvenVertices(const std::vector< Polygon >& polygons)
@@ -135,7 +123,7 @@ namespace
 
   void outputMaxVertices(std::ostream& os, const std::vector< Polygon >& polygons)
   {
-    auto max_poly = *std::max_element(polygons.begin(), polygons.end(), compareByVertexCount);
+    auto  max_poly = *std::max_element(polygons.begin(), polygons.end(), compareByVertexCount);
     os << max_poly.points.size();
   }
 
@@ -254,82 +242,32 @@ void bob::printLessAreaCnt(std::istream& input, const std::vector< Polygon >& po
 {
   Polygon ref;
   input >> ref;
-
-  if (!input)
+  if (!input || input.peek() != '\n')
   {
-    throw std::invalid_argument("Invalid polygon");
+    input.clear();
+    throw std::logic_error("<INVALID COMMAND>");
   }
 
-  // Clear any remaining characters until newline
-  if (input.peek() != EOF && input.peek() != '\n')
-  {
-    std::string remaining;
-    std::getline(input, remaining);
-    if (!remaining.empty() && remaining != " ")
-    {
-      throw std::invalid_argument("Extra data after polygon");
-    }
-  }
-
-  double refArea = geom::getPolygonArea(ref);
-
-  size_t count = std::count_if(polygons.begin(), polygons.end(),
-    [refArea](const Polygon& poly) {
-      return geom::getPolygonArea(poly) < refArea;
-    });
-
-  output << count;
-}
-
-bool bob::polygonsIntersect(const geom::Polygon& p1, const geom::Polygon& p2)
-{
-  auto p1MinMaxX = std::minmax_element(p1.points.cbegin(), p1.points.cend(),
-    [](const geom::Point& a, const geom::Point& b) { return a.x < b.x; });
-  auto p1MinMaxY = std::minmax_element(p1.points.cbegin(), p1.points.cend(),
-    [](const geom::Point& a, const geom::Point& b) { return a.y < b.y; });
-
-  auto p2MinMaxX = std::minmax_element(p2.points.cbegin(), p2.points.cend(),
-    [](const geom::Point& a, const geom::Point& b) { return a.x < b.x; });
-  auto p2MinMaxY = std::minmax_element(p2.points.cbegin(), p2.points.cend(),
-    [](const geom::Point& a, const geom::Point& b) { return a.y < b.y; });
-
-  // Check if bounding boxes intersect
-  bool xOverlap = !(p1MinMaxX.second->x < p2MinMaxX.first->x || p2MinMaxX.second->x < p1MinMaxX.first->x);
-  bool yOverlap = !(p1MinMaxY.second->y < p2MinMaxY.first->y || p2MinMaxY.second->y < p1MinMaxY.first->y);
-
-  return xOverlap && yOverlap;
+  using namespace std::placeholders;
+  output << std::count_if(polygons.begin(), polygons.end(), std::bind(compareByArea, _1, ref));
 }
 
 void bob::printIntersectionsCnt(std::istream& input, const std::vector< geom::Polygon >& polygons, std::ostream& output)
 {
   Polygon ref;
   input >> ref;
-
   if (!input)
   {
-    throw std::invalid_argument("Invalid polygon");
+    throw std::invalid_argument("Wrong argument");
   }
-
-  // Clear any remaining characters until newline
-  if (input.peek() != EOF && input.peek() != '\n')
+  else
   {
-    std::string remaining;
-    std::getline(input, remaining);
-    if (!remaining.empty() && remaining != " ")
+    std::set< geom::Point > checkForEqualPoints(ref.points.cbegin(), ref.points.cend());
+    if (checkForEqualPoints.size() != ref.points.size())
     {
-      throw std::invalid_argument("Extra data after polygon");
+      throw std::invalid_argument("Have equal points");
     }
+    using namespace std::placeholders;
+    output << std::count_if(polygons.cbegin(), polygons.cend(), std::bind(intersectionCheck, ref, _1));
   }
-
-  // Check for duplicate points in reference polygon
-  std::set< geom::Point > checkForEqualPoints(ref.points.cbegin(), ref.points.cend());
-  if (checkForEqualPoints.size() != ref.points.size())
-  {
-    throw std::invalid_argument("Duplicate points in polygon");
-  }
-
-  output << std::count_if(polygons.cbegin(), polygons.cend(),
-    [&ref](const geom::Polygon& poly) {
-      return polygonsIntersect(ref, poly);
-    });
 }
