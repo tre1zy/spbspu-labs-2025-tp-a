@@ -9,7 +9,7 @@ namespace
 {
   void printArea(double a)
   {
-    std::cout << std::fixed << std::setprecision(1) << a << "\n";
+    std::cout << "\n";
   }
 
   void printCount(size_t c)
@@ -80,6 +80,7 @@ namespace cherkasov
 
     try
     {
+      std::cout << std::fixed << std::setprecision(1);
       if (command == "AREA")
       {
         handleArea(polys, arg);

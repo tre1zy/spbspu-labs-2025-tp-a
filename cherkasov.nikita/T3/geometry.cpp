@@ -79,26 +79,26 @@ namespace cherkasov
 
   bool isPointInPolygon(const Point& point, const Polygon& poly)
   {
-  if (poly.points.size() < 3)
-  {
-    return false;
-  }
-  bool inside = false;
-  size_t n = poly.points.size();
-  for (size_t i = 0, j = n - 1; i < n; j = i++)
-  {
-    const Point& pi = poly.points[i];
-    const Point& pj = poly.points[j];
-    bool yCondition = (pi.y > point.y) != (pj.y > point.y);
-    double xIntersection = (pj.x - pi.x) * (point.y - pi.y) / double(pj.y - pi.y) + pi.x;
-    bool xCondition = point.x < xIntersection;
-    bool intersect = yCondition && xCondition;
-    if (intersect)
+    if (poly.points.size() < 3)
     {
-      inside = !inside;
+      return false;
     }
-  }
-  return inside;
+    bool inside = false;
+    size_t n = poly.points.size();
+    for (size_t i = 0, j = n - 1; i < n; j = i++)
+    {
+      const Point& pi = poly.points[i];
+      const Point& pj = poly.points[j];
+      bool yCondition = (pi.y > point.y) != (pj.y > point.y);
+      double xIntersection = (pj.x - pi.x) * (point.y - pi.y) / double(pj.y - pi.y) + pi.x;
+      bool xCondition = point.x < xIntersection;
+      bool intersect = yCondition && xCondition;
+      if (intersect)
+      {
+        inside = !inside;
+      }
+    }
+    return inside;
   }
 
   bool polygonsIntersect(const Polygon& a, const Polygon& b)
@@ -128,36 +128,19 @@ namespace cherkasov
 
   bool hasRightAngle(const Polygon& poly)
   {
-  size_t n = poly.points.size();
-  if (n < 3)
-  {
-    return false;
-  }
-  for (size_t i = 0; i < n; ++i)
-  {
-    const Point& a = poly.points[i];
-    const Point& b = poly.points[(i + 1) % n];
-    const Point& c = poly.points[(i + 2) % n];
-    if ((b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y) == 0)
-    {
-      return true;
-    }
-  }
-  return false;
-  }
-
-  bool hasRightAngle(const Polygon& poly)
-  {
     size_t n = poly.points.size();
     if (n < 3)
     {
-        return false;
+      return false;
     }
     for (size_t i = 0; i < n; ++i)
     {
-      if (isRightAngleAtVertex(poly, i))
+      const Point& a = poly.points[i];
+      const Point& b = poly.points[(i + 1) % n];
+      const Point& c = poly.points[(i + 2) % n];
+      if ((b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y) == 0)
       {
-          return true;
+        return true;
       }
     }
     return false;
