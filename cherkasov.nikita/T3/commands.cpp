@@ -9,7 +9,7 @@ namespace
 {
   void printArea(double a)
   {
-    std::cout << "\n";
+    std::cout << a << "\n";
   }
 
   void printCount(size_t c)
@@ -61,6 +61,18 @@ namespace
   {
     return p.points.size() == n;
   }
+
+  struct IntersectsWith
+  {
+    const cherkasov::Polygon& q_;
+    IntersectsWith(const cherkasov::Polygon& q):
+    q_(q)
+    {}
+    bool operator()(const cherkasov::Polygon& p) const
+    {
+      return cherkasov::polygonsIntersect(p, q_);
+    }
+  };
 }
 
 namespace cherkasov
@@ -231,11 +243,7 @@ namespace cherkasov
   void handleIntersections(const std::vector<Polygon>& polys, const std::string& arg)
   {
     Polygon q = parsePolygon(arg);
-    size_t count = std::count_if(polys.begin(), polys.end(),
-      [&](const Polygon& p)
-      {
-        return polygonsIntersect(p, q);
-      });
+    size_t count = std::count_if(polys.begin(), polys.end(), IntersectsWith(q));
     printCount(count);
   }
 
