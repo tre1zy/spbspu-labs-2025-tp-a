@@ -19,27 +19,31 @@ int main(int argc, char* argv[])
 
   std::vector<Polygon> polyList;
   std::ifstream inFile(argv[1]);
-  if (inFile.is_open())
+  if (!inFile.is_open())
   {
-    std::string lineStr;
-    while (std::getline(inFile, lineStr))
+    return 1;
+  }
+
+  std::string lineStr;
+  while (std::getline(inFile, lineStr))
+  {
+    if (lineStr.empty()) continue;
+    std::istringstream iss(lineStr);
+    Polygon poly;
+    try
     {
-      if (lineStr.empty()) continue;
-      std::istringstream iss(lineStr);
-      try
+      iss >> poly;
+      if (iss && iss.eof())
       {
-        Polygon poly;
-        iss >> poly;
-        if (iss && iss.eof())
-        {
-          polyList.push_back(std::move(poly));
-        }
-      }
-      catch (...)
-      {
+        polyList.push_back(std::move(poly));
       }
     }
+    catch (...)
+    {
+    
+    }
   }
+  inFile.close();
 
   std::map<std::string, std::function<void(std::istream&, const std::vector<Polygon>&, std::ostream&)>> commandMap;
   commandMap["AREA"] = bob::printAreaSum;
