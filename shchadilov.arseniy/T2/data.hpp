@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <array>
+#include <delimiter.hpp>
 
 namespace shchadilov
 {
