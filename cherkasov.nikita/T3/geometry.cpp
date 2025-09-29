@@ -116,8 +116,10 @@ namespace cherkasov
   bool hasRightAngle(const Polygon& poly)
   {
     size_t n = poly.points.size();
-    if (n < 3) return false;
-
+    if (n < 3)
+    {
+      return false;
+    }
     for (size_t i = 0; i < n; ++i)
     {
       const Point& a = poly.points[i];
