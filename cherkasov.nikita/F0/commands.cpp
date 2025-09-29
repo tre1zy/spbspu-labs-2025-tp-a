@@ -4,9 +4,76 @@
 #include <sstream>
 #include <algorithm>
 #include <vector>
+#include <iterator>
 
 namespace cherkasov
 {
+  struct PrintKey
+  {
+    std::ostream& out;
+    void operator()(const DictTable::value_type& kv) const
+    {
+      out << kv.first << '\n';
+    }
+  };
+
+  struct Merger
+  {
+    Dict& target;
+    void operator()(const Dict::value_type& kv) const
+    {
+      target[kv.first] += kv.second;
+    }
+  };
+
+  struct Intersector
+  {
+    const Dict& other;
+    Dict& result;
+    void operator()(const Dict::value_type& kv) const
+    {
+      auto it = other.find(kv.first);
+      if (it != other.end())
+      {
+        result[kv.first] = std::min(kv.second, it->second);
+      }
+    }
+  };
+
+  struct CmpTop
+  {
+    bool operator()(const WordEntry& a, const WordEntry& b) const
+    {
+      return (a.second == b.second) ? (a.first < b.first) : (a.second > b.second);
+    }
+  };
+
+  struct CmpRare
+  {
+    bool operator()(const WordEntry& a, const WordEntry& b) const
+    {
+      return (a.second == b.second) ? (a.first < b.first) : (a.second < b.second);
+    }
+  };
+
+  struct Importer
+  {
+    Dict& dict;
+    void operator()(const std::string& word) const
+    {
+      ++dict[word];
+    }
+  };
+
+  struct PrintWord
+  {
+    std::ostream& out;
+    void operator()(const WordEntry& w) const
+    {
+      out << w.first << " " << w.second << '\n';
+    }
+  };
+
   void makeDict(std::istream & in, DictTable & dicts)
   {
     std::string name;
@@ -22,13 +89,10 @@ namespace cherkasov
   {
     if (dicts.empty())
     {
-      out << "<EMPTY>" << '\n';
+      out << "<EMPTY>\n";
       return;
     }
-    for (const auto & kv : dicts)
-    {
-      out << kv.first << '\n';
-    }
+    std::for_each(dicts.begin(), dicts.end(), PrintKey{out});
   }
 
   void importText(std::istream & in, DictTable & dicts)
@@ -45,11 +109,8 @@ namespace cherkasov
     {
       throw std::logic_error("<INVALID FILE>");
     }
-    std::string word;
-    while (file >> word)
-    {
-      ++(it->second[word]);
-    }
+    std::istream_iterator<std::string> begin(file), end;
+    std::for_each(begin, end, Importer{it->second});
   }
 
   void mergeDicts(std::istream & in, DictTable & dicts)
@@ -65,10 +126,7 @@ namespace cherkasov
       throw std::logic_error("<INVALID DICTIONARY>");
     }
     Dict merged = dicts[d1];
-    for (auto & kv : dicts[d2])
-    {
-      merged[kv.first] += kv.second;
-    }
+    std::for_each(dicts[d2].begin(), dicts[d2].end(), Merger{merged});
     dicts[res] = std::move(merged);
   }
 
@@ -85,14 +143,7 @@ namespace cherkasov
       throw std::logic_error("<INVALID DICTIONARY>");
     }
     Dict result;
-    for (auto & kv : dicts[d1])
-    {
-      auto it = dicts[d2].find(kv.first);
-      if (it != dicts[d2].end())
-      {
-        result[kv.first] = std::min(kv.second, it->second);
-      }
-    }
+    std::for_each(dicts[d1].begin(), dicts[d1].end(), Intersector{dicts[d2], result});
     dicts[res] = std::move(result);
   }
 
@@ -186,16 +237,9 @@ namespace cherkasov
     {
       throw std::logic_error("<INVALID NUMBER>");
     }
-    std::vector< WordEntry > words(it->second.begin(), it->second.end());
-    std::sort(words.begin(), words.end(),
-      [](const WordEntry & a, const WordEntry & b)
-      {
-        return (a.second == b.second) ? (a.first < b.first) : (a.second > b.second);
-      });
-    for (int i = 0; i < count; ++i)
-    {
-      out << words[i].first << " " << words[i].second << '\n';
-    }
+    std::vector<WordEntry> words(it->second.begin(), it->second.end());
+    std::sort(words.begin(), words.end(), CmpTop{});
+    std::for_each(words.begin(), words.begin() + count, PrintWord{out});
   }
 
   void printRare(std::istream & in, std::ostream & out, const DictTable & dicts)
@@ -212,15 +256,8 @@ namespace cherkasov
     {
       throw std::logic_error("<INVALID NUMBER>");
     }
-    std::vector< WordEntry > words(it->second.begin(), it->second.end());
-    std::sort(words.begin(), words.end(),
-      [](const WordEntry & a, const WordEntry & b)
-      {
-        return (a.second == b.second) ? (a.first < b.first) : (a.second < b.second);
-      });
-    for (int i = 0; i < count; ++i)
-    {
-      out << words[i].first << " " << words[i].second << '\n';
-    }
+    std::vector<WordEntry> words(it->second.begin(), it->second.end());
+    std::sort(words.begin(), words.end(), CmpRare{});
+    std::for_each(words.begin(), words.begin() + count, PrintWord{out});
   }
 }
