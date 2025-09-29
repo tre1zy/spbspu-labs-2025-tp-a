@@ -7,7 +7,6 @@ std::istream& io::operator>>(std::istream& in, DelimiterIO&& dest)
   {
     return in;
   }
-
   char c;
   in >> c;
   if (!in || c != dest.exp)

@@ -1,11 +1,11 @@
 #include "stream_guard.hpp"
 
-bob::Iofmtguard::Iofmtguard(std::basic_ios< char >& stream):
-  stream_(stream),
-  precision_(stream.precision()),
-  width_(stream.width()),
-  fill_(stream.fill()),
-  flags_(stream.flags())
+bob::Iofmtguard::Iofmtguard(std::basic_ios<char>& stream)
+  : stream_(stream),
+    precision_(stream.precision()),
+    width_(stream.width()),
+    fill_(stream.fill()),
+    flags_(stream.flags())
 {}
 
 bob::Iofmtguard::~Iofmtguard()

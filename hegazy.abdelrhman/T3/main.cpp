@@ -1,12 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <iterator>
-#include <limits>
+#include <sstream>
 #include <map>
 #include <functional>
 #include <algorithm>
 #include <string>
-#include <sstream>  
 #include "geometry.hpp"
 #include "commands.hpp"
 
@@ -21,25 +19,29 @@ int main(int argc, char* argv[])
 
   std::vector<Polygon> polyList;
   std::ifstream inFile(argv[1]);
-  if (inFile.is_open()) {
+  if (inFile.is_open())
+  {
     std::string lineStr;
-    while (std::getline(inFile, lineStr)) {
+    while (std::getline(inFile, lineStr))
+    {
       if (lineStr.empty()) continue;
       std::istringstream iss(lineStr);
-      try {
+      try
+      {
         Polygon poly;
         iss >> poly;
-        if (iss && iss.eof()) {
+        if (iss && iss.eof())
+        {
           polyList.push_back(std::move(poly));
         }
-      } catch (...) {
-      
+      }
+      catch (...)
+      {
       }
     }
   }
 
-  
-  std::map< std::string, std::function< void(std::istream&, const std::vector<Polygon>&, std::ostream&) > > commandMap;
+  std::map<std::string, std::function<void(std::istream&, const std::vector<Polygon>&, std::ostream&)>> commandMap;
   commandMap["AREA"] = bob::printAreaSum;
   commandMap["MAX"] = bob::printMaxValueOf;
   commandMap["MIN"] = bob::printMinValueOf;
@@ -47,22 +49,26 @@ int main(int argc, char* argv[])
   commandMap["LESSAREA"] = bob::printLessAreaCnt;
   commandMap["INTERSECTIONS"] = bob::printIntersectionsCnt;
 
-  
   std::string cmdLine;
-  while (std::getline(std::cin, cmdLine)) {
+  while (std::getline(std::cin, cmdLine))
+  {
     if (cmdLine.empty()) continue;
     std::istringstream iss(cmdLine);
     std::string cmd;
     if (!(iss >> cmd)) continue;
     auto it = commandMap.find(cmd);
-    if (it == commandMap.end()) {
+    if (it == commandMap.end())
+    {
       std::cout << "<INVALID COMMAND>\n";
       continue;
     }
-    try {
+    try
+    {
       it->second(iss, polyList, std::cout);
       std::cout << "\n";
-    } catch (const std::exception&) {
+    }
+    catch (const std::exception&)
+    {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
