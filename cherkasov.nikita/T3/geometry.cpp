@@ -28,18 +28,18 @@ namespace cherkasov
     {
       return 0.0;
     }
-      double area = 0.0;
-      size_t n = poly.points.size();
-      for (size_t i = 0; i < n; ++i)
-      {
-        const Point& p1 = poly.points[i];
-        const Point& p2 = poly.points[(i + 1) % n];
-        area += (p1.x * p2.y) - (p2.x * p1.y);
-      }
-      return std::abs(area) / 2.0;
+    double area = 0.0;
+    size_t n = poly.points.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+      const Point& p1 = poly.points[i];
+      const Point& p2 = poly.points[(i + 1) % n];
+      area += (p1.x * p2.y) - (p2.x * p1.y);
+    }
+    return std::abs(area) / 2.0;
   }
 
-  int orientation(const Point& a, const Point& b, const Point& c)
+  int getOrientation(const Point& a, const Point& b, const Point& c)
   {
     long long val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
     if (val == 0)
@@ -51,37 +51,54 @@ namespace cherkasov
 
   bool onSegment(const Point& p, const Point& q, const Point& r)
   {
-    return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
-           q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
+    return q.x <= std::max(p.x, r.x) &&
+           q.x >= std::min(p.x, r.x) &&
+           q.y <= std::max(p.y, r.y) &&
+           q.y >= std::min(p.y, r.y);
   }
 
   bool edgesIntersect(const Point& p1, const Point& p2, const Point& q1, const Point& q2)
   {
-    int o1 = orientation(p1, p2, q1);
-    int o2 = orientation(p1, p2, q2);
-    int o3 = orientation(q1, q2, p1);
-    int o4 = orientation(q1, q2, p2);
+    int o1 = getOrientation(p1, p2, q1);
+    int o2 = getOrientation(p1, p2, q2);
+    int o3 = getOrientation(q1, q2, p1);
+    int o4 = getOrientation(q1, q2, p2);
     if (o1 != o2 && o3 != o4)
     {
-      return true;
+        return true;
     }
-    if (o1 == 0 && onSegment(p1, q1, p2))
-    {
-      return true;
-    }
-    if (o2 == 0 && onSegment(p1, q2, p2))
-    {
-      return true;
-    }
-    if (o3 == 0 && onSegment(q1, p1, q2))
-    {
-      return true;
-    }
-    if (o4 == 0 && onSegment(q1, p2, q2))
+    if ((o1 == 0 && onSegment(p1, q1, p2)) ||
+        (o2 == 0 && onSegment(p1, q2, p2)) ||
+        (o3 == 0 && onSegment(q1, p1, q2)) ||
+        (o4 == 0 && onSegment(q1, p2, q2)))
     {
       return true;
     }
     return false;
+  }
+
+  bool isPointInPolygon(const Point& point, const Polygon& poly)
+  {
+  if (poly.points.size() < 3)
+  {
+    return false;
+  }
+  bool inside = false;
+  size_t n = poly.points.size();
+  for (size_t i = 0, j = n - 1; i < n; j = i++)
+  {
+    const Point& pi = poly.points[i];
+    const Point& pj = poly.points[j];
+    bool yCondition = (pi.y > point.y) != (pj.y > point.y);
+    double xIntersection = (pj.x - pi.x) * (point.y - pi.y) / double(pj.y - pi.y) + pi.x;
+    bool xCondition = point.x < xIntersection;
+    bool intersect = yCondition && xCondition;
+    if (intersect)
+    {
+      inside = !inside;
+    }
+  }
+  return inside;
   }
 
   bool polygonsIntersect(const Polygon& a, const Polygon& b)
@@ -106,11 +123,27 @@ namespace cherkasov
         }
       }
     }
-    if (isPointInPolygon(a.points[0], b) || isPointInPolygon(b.points[0], a))
+    return isPointInPolygon(a.points[0], b) || isPointInPolygon(b.points[0], a);
+  }
+
+  bool hasRightAngle(const Polygon& poly)
+  {
+  size_t n = poly.points.size();
+  if (n < 3)
+  {
+    return false;
+  }
+  for (size_t i = 0; i < n; ++i)
+  {
+    const Point& a = poly.points[i];
+    const Point& b = poly.points[(i + 1) % n];
+    const Point& c = poly.points[(i + 2) % n];
+    if ((b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y) == 0)
     {
       return true;
     }
-    return false;
+  }
+  return false;
   }
 
   bool hasRightAngle(const Polygon& poly)
@@ -118,46 +151,18 @@ namespace cherkasov
     size_t n = poly.points.size();
     if (n < 3)
     {
-      return false;
+        return false;
     }
     for (size_t i = 0; i < n; ++i)
     {
-      const Point& a = poly.points[i];
-      const Point& b = poly.points[(i + 1) % n];
-      const Point& c = poly.points[(i + 2) % n];
-      int dx1 = b.x - a.x;
-      int dy1 = b.y - a.y;
-      int dx2 = c.x - b.x;
-      int dy2 = c.y - b.y;
-      if (dx1 * dx2 + dy1 * dy2 == 0)
+      if (isRightAngleAtVertex(poly, i))
       {
-        return true;
+          return true;
       }
     }
     return false;
   }
-  bool isPointInPolygon(const Point& point, const Polygon& poly)
-  {
-    if (poly.points.size() < 3)
-    {
-      return false;
-    }
-    bool inside = false;
-    size_t n = poly.points.size();
-    for (size_t i = 0, j = n - 1; i < n; j = i++)
-    {
-      const Point& pi = poly.points[i];
-      const Point& pj = poly.points[j];
-      bool intersect = ((pi.y > point.y) != (pj.y > point.y)) &&
-        (point.x < (pj.x - pi.x) * (point.y - pi.y) / double(pj.y - pi.y) + pi.x);
 
-      if (intersect)
-      {
-        inside = !inside;
-      }
-    }
-    return inside;
-  }
   std::vector<Polygon> readPolygons(const std::string& filename)
   {
     std::ifstream file(filename);
