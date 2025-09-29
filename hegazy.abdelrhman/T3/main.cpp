@@ -6,56 +6,64 @@
 #include <functional>
 #include <algorithm>
 #include <string>
+#include <sstream>  
 #include "geometry.hpp"
 #include "commands.hpp"
 
 int main(int argc, char* argv[])
 {
   using Polygon = geom::Polygon;
-  using it = std::istream_iterator< Polygon >;
 
   if (argc != 2)
   {
     return 1;
   }
 
-  std::vector< Polygon > polyList;
+  std::vector<Polygon> polyList;
   std::ifstream inFile(argv[1]);
-
-  while (!inFile.eof())
-  {
-    std::copy(it(inFile), it(), std::back_inserter(polyList));
-    if (!inFile)
-    {
-      inFile.clear();
-      inFile.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  if (inFile.is_open()) {
+    std::string lineStr;
+    while (std::getline(inFile, lineStr)) {
+      if (lineStr.empty()) continue;
+      std::istringstream iss(lineStr);
+      try {
+        Polygon poly;
+        iss >> poly;
+        if (iss && iss.eof()) {
+          polyList.push_back(std::move(poly));
+        }
+      } catch (...) {
+      
+      }
     }
   }
 
-  std::map< std::string, std::function< void() > > commandMap;
-  commandMap["AREA"] = std::bind(bob::printAreaSum, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["MAX"] = std::bind(bob::printMaxValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["MIN"] = std::bind(bob::printMinValueOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["COUNT"] = std::bind(bob::printCountOf, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["LESSAREA"] = std::bind(bob::printLessAreaCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
-  commandMap["INTERSECTIONS"] = std::bind(bob::printIntersectionsCnt, std::ref(std::cin), std::cref(polyList), std::ref(std::cout));
+  
+  std::map< std::string, std::function< void(std::istream&, const std::vector<Polygon>&, std::ostream&) > > commandMap;
+  commandMap["AREA"] = bob::printAreaSum;
+  commandMap["MAX"] = bob::printMaxValueOf;
+  commandMap["MIN"] = bob::printMinValueOf;
+  commandMap["COUNT"] = bob::printCountOf;
+  commandMap["LESSAREA"] = bob::printLessAreaCnt;
+  commandMap["INTERSECTIONS"] = bob::printIntersectionsCnt;
 
-  std::string line;
-  while (!(std::cin >> line).eof())
-  {
-    try
-    {
-      commandMap.at(line)();
-      std::cout << "\n";
-    }
-    catch (const std::exception& e)
-    {
+  
+  std::string cmdLine;
+  while (std::getline(std::cin, cmdLine)) {
+    if (cmdLine.empty()) continue;
+    std::istringstream iss(cmdLine);
+    std::string cmd;
+    if (!(iss >> cmd)) continue;
+    auto it = commandMap.find(cmd);
+    if (it == commandMap.end()) {
       std::cout << "<INVALID COMMAND>\n";
-      if (std::cin.fail())
-      {
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      }
+      continue;
+    }
+    try {
+      it->second(iss, polyList, std::cout);
+      std::cout << "\n";
+    } catch (const std::exception&) {
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
   return 0;

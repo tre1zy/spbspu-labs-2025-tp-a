@@ -17,7 +17,8 @@ namespace geom
       Point p;
       if (!(in >> p))
       {
-        throw std::ios_base::failure("Error reading point");
+        in.setstate(std::ios::failbit);
+        return p;  
       }
       return p;
     }
@@ -25,17 +26,17 @@ namespace geom
 
   bool operator==(const Point& p1, const Point& p2)
   {
-    return p1.x == p2.x && p1.y == p2.y;
+    return p1.x == p2.x && p1.y == p2.y;  
   }
 
   bool operator>(const Point& p, const Point& other)
   {
-    return (p.x > other.x && p.y > other.y);
+    return p.x > other.x && p.y > other.y;
   }
 
   bool operator<(const Point& p, const Point& other)
   {
-    return (p.x < other.x && p.y < other.y);
+    return p.x < other.x && p.y < other.y;
   }
 
   std::istream& operator>>(std::istream& in, Point& p)
@@ -69,7 +70,7 @@ namespace geom
     pts.reserve(count);
     std::generate_n(std::back_inserter(pts), count, PointReader{ in });
 
-    if (!in)
+    if (!in || pts.size() != count)  
     {
       in.setstate(std::ios::failbit);
       return in;
@@ -114,6 +115,7 @@ namespace geom
 
   double getPolygonArea(const Polygon& poly)
   {
+    if (poly.points.size() < 3) return 0.0;
     std::vector< double > areas;
     std::vector< Polygon > triangles = polyToTrg(poly);
     std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTrg);
