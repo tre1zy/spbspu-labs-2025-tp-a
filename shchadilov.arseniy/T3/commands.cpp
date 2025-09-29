@@ -98,9 +98,9 @@ namespace
 
         bool operator()(size_t i) const
         {
-          const Point& a = points[i];
-          const Point& b = points[(i + 1) % n];
-          const Point& c = points[(i + 2) % n];
+          const Point& a = points_[i];
+          const Point& b = points_[(i + 1) % n_];
+          const Point& c = points_[(i + 2) % n_];
 
           int dx1 = b.x - a.x;
           int dy1 = b.y - a.y;
