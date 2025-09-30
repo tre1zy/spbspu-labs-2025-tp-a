@@ -24,22 +24,15 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::string lineStr;
-  while (std::getline(inFile, lineStr))
+  std::string line;
+  while (std::getline(inFile, line))
   {
-    if (lineStr.empty()) continue;
-    std::istringstream iss(lineStr);
+    if (line.empty()) continue;
+    std::istringstream iss(line);
     Polygon poly;
-    try
+    if (iss >> poly && iss.eof())
     {
-      iss >> poly;
-      if (iss && iss.eof())
-      {
-        polyList.push_back(std::move(poly));
-      }
-    }
-    catch (...)
-    {
+      polyList.push_back(poly);
     }
   }
   inFile.close();
