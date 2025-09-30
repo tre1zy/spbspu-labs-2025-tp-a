@@ -30,9 +30,13 @@ int main(int argc, char* argv[])
     if (line.empty()) continue;
     std::istringstream iss(line);
     Polygon poly;
-    if (iss >> poly && iss.eof())
+    if (iss >> poly)
     {
       polyList.push_back(poly);
+    }
+    else
+    {
+      std::cerr << "Skipping invalid line: " << line << std::endl;
     }
   }
   inFile.close();

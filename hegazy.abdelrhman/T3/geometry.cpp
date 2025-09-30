@@ -114,6 +114,6 @@ namespace geom
     std::vector<double> areas;
     std::vector<Polygon> triangles = polyToTrg(poly);
     std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTrg);
-    return std::accumulate(areas.begin(), areas.end(), 0.0) * 2;
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
   }
 }
