@@ -34,5 +34,4 @@ namespace geom
     Polygon operator()();
   };
 }
-
 #endif

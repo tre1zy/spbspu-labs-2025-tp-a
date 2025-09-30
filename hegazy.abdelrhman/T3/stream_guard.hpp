@@ -17,5 +17,4 @@ namespace bob
     std::ios::fmtflags flags_;
   };
 }
-
 #endif

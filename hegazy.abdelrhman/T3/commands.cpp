@@ -38,14 +38,16 @@ namespace
   {
     if (p1.points.empty() || p2.points.empty()) return false;
     double min_x1 = p1.points[0].x, max_x1 = min_x1, min_y1 = p1.points[0].y, max_y1 = min_y1;
-    for (const auto& pt : p1.points) {
+    for (const auto& pt : p1.points)
+    {
       min_x1 = std::min(min_x1, pt.x);
       max_x1 = std::max(max_x1, pt.x);
       min_y1 = std::min(min_y1, pt.y);
       max_y1 = std::max(max_y1, pt.y);
     }
     double min_x2 = p2.points[0].x, max_x2 = min_x2, min_y2 = p2.points[0].y, max_y2 = min_y2;
-    for (const auto& pt : p2.points) {
+    for (const auto& pt : p2.points)
+    {
       min_x2 = std::min(min_x2, pt.x);
       max_x2 = std::max(max_x2, pt.x);
       min_y2 = std::min(min_y2, pt.y);

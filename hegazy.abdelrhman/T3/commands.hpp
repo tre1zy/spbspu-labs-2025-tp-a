@@ -14,5 +14,4 @@ namespace bob
   bool polygonsIntersect(const geom::Polygon& p1, const geom::Polygon& p2);
   void printIntersectionsCnt(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
 }
-
 #endif
