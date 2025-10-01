@@ -33,6 +33,12 @@ int main(int argc, char* argv[])
     Polygon poly;
     if (iss >> poly)
     {
+      iss >> std::ws;
+      if (!iss.eof())
+      {
+        std::cerr << "Skipping invalid line: " << line << std::endl;
+        continue;
+      }
       polyList.push_back(poly);
     }
     else
