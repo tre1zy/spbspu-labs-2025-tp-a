@@ -47,7 +47,13 @@ namespace geom
       return in;
     }
     using del = io::DelimiterIO;
-    return in >> del{'('} >> p.x >> del{';'} >> p.y >> del{')'};
+    char open, close;
+    if (!(in >> open) || open != '(' || !(in >> p.x) || !(in >> del{';'}) || !(in >> p.y) || !(in >> close) || close != ')')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    return in;
   }
 
   std::istream& operator>>(std::istream& in, Polygon& poly)
@@ -58,24 +64,28 @@ namespace geom
       return in;
     }
     size_t count;
-    if (!(in >> count) || !in.good() || count < 3)
+    if (!(in >> count) || count < 3)
     {
       in.setstate(std::ios::failbit);
       return in;
     }
     std::vector<Point> pts;
     pts.reserve(count);
+    std::istream::sentry pointSentry(in);
     for (size_t i = 0; i < count; ++i)
     {
       Point p;
+      std::istream::pos_type pos = in.tellg();
       if (!(in >> p))
       {
+        in.clear();
+        in.seekg(pos);
         in.setstate(std::ios::failbit);
         return in;
       }
       pts.push_back(p);
     }
-    if (pts.size() != count)
+    if (!in || pts.size() != count)
     {
       in.setstate(std::ios::failbit);
       return in;
