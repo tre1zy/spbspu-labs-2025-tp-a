@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
   {
     if (line.empty()) continue;
     std::istringstream iss(line);
+    iss >> std::ws; // Skip leading whitespace
     Polygon poly;
     if (iss >> poly)
     {

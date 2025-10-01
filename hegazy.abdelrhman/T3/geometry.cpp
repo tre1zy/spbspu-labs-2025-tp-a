@@ -47,19 +47,7 @@ namespace geom
       return in;
     }
     using del = io::DelimiterIO;
-    char open, close;
-    if (!(in >> open) || open != '(' || !(in >> p.x) || !(in >> del{';'}) || !(in >> p.y) || !(in >> close) || close != ')')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    char next;
-    if (in >> next && !std::isspace(next))
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    return in;
+    return in >> del{'('} >> p.x >> del{';'} >> p.y >> del{')'};
   }
 
   std::istream& operator>>(std::istream& in, Polygon& poly)
@@ -77,26 +65,7 @@ namespace geom
     }
     std::vector<Point> pts;
     pts.reserve(count);
-    std::istream::sentry pointSentry(in);
-    for (size_t i = 0; i < count; ++i)
-    {
-      Point p;
-      std::istream::pos_type pos = in.tellg();
-      if (!(in >> p))
-      {
-        in.clear();
-        in.seekg(pos);
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      pts.push_back(p);
-      char next;
-      if (in >> next && !std::isspace(next) && next != std::char_traits<char>::eof())
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-    }
+    std::generate_n(std::back_inserter(pts), count, PointReader{in});
     if (!in || pts.size() != count)
     {
       in.setstate(std::ios::failbit);
