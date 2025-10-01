@@ -24,13 +24,13 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  bool fileHasData = false;
+  bool fileIsEmpty = true;
   std::string line;
   while (std::getline(inFile, line))
   {
     if (!line.empty())
     {
-      fileHasData = true;
+      fileIsEmpty = false;
       std::istringstream iss(line);
       iss >> std::ws;
       Polygon poly;
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     }
   }
   inFile.close();
-  if (!fileHasData)
+  if (fileIsEmpty)
   {
     std::cout << "Atleast 2 optional supported commands" << std::endl;
     return 0;
