@@ -58,7 +58,7 @@ namespace geom
       return in;
     }
     size_t count;
-    if (!(in >> count) || count < 3)
+    if (!(in >> count) || count < 3 || !in)
     {
       in.setstate(std::ios::failbit);
       return in;

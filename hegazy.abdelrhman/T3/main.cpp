@@ -24,24 +24,28 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  bool fileHasData = false;
   std::string line;
   while (std::getline(inFile, line))
   {
-    if (line.empty()) continue;
-    std::istringstream iss(line);
-    iss >> std::ws;
-    Polygon poly;
-    if (iss >> poly)
+    if (!line.empty())
     {
-      polyList.push_back(poly);
-    }
-    else
-    {
-      std::cerr << "Skipping invalid line: " << line << std::endl;
+      fileHasData = true;
+      std::istringstream iss(line);
+      iss >> std::ws;
+      Polygon poly;
+      if (iss >> poly)
+      {
+        polyList.push_back(poly);
+      }
+      else
+      {
+        std::cerr << "Skipping invalid line: " << line << std::endl;
+      }
     }
   }
   inFile.close();
-  if (polyList.empty() && argc == 2)
+  if (!fileHasData)
   {
     std::cout << "Atleast 2 optional supported commands" << std::endl;
     return 0;
