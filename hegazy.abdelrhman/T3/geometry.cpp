@@ -66,18 +66,18 @@ namespace geom
     std::vector<Point> pts;
     pts.reserve(count);
     std::streampos start = in.tellg();
-    for (size_t i = 0; i < count; ++i)
+    bool valid = true;
+    for (size_t i = 0; i < count && valid; ++i)
     {
       Point p;
       if (!(in >> p))
       {
-        in.setstate(std::ios::failbit);
-        in.seekg(start);
-        return in;
+        valid = false;
+        break;
       }
       pts.push_back(p);
     }
-    if (pts.size() != count)
+    if (!valid || pts.size() != count || in.fail())
     {
       in.setstate(std::ios::failbit);
       in.seekg(start);
