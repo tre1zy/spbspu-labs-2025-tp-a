@@ -65,15 +65,29 @@ namespace geom
     }
     std::vector<Point> pts;
     pts.reserve(count);
+    std::istream::pos_type pos = in.tellg();
     for (size_t i = 0; i < count; ++i)
     {
       Point p;
-      if (!(in >> p) || !in.good())
+      if (!(in >> p))
       {
+        in.clear();
+        in.seekg(pos);
         in.setstate(std::ios::failbit);
         return in;
       }
       pts.push_back(p);
+      pos = in.tellg();
+      char next;
+      if (i < count - 1 && !(in >> std::ws >> next) && in.eof())
+      {
+        in.clear();
+        in.seekg(pos);
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      in.clear();
+      in.seekg(pos);
     }
     if (pts.size() != count)
     {
