@@ -1,9 +1,7 @@
 #include "Dictionary.hpp"
 #include <algorithm>
 #include <iterator>
-#include <map>
 #include <limits>
-#include <iostream>
 
 std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
 {
@@ -45,7 +43,7 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   in >> lang;
   in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
-  Dictionary dictTemp(std::move(name), std::move(lang));
+  Dictionary dictTemp{ name, lang, MapDictionary() };
 
   std::string englishWord;
   while (!in.eof())

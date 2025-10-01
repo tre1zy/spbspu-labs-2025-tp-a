@@ -16,16 +16,17 @@ namespace
 
   std::list< std::string > const& dictToTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& enWord)
   {
-    if (pair.second.dict.contains(enWord))
-    {
+    try {
       return pair.second.dict.at(enWord);
     }
-    return std::list< std::string >();
+    catch (const std::out_of_range&) {
+      return std::list< std::string >();
+    }
   }
 
   bool checkIntersection(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
   {
-    return dict.dict.contains(pair.first);
+    return dict.dict.find(pair.first) != dict.dict.end();
   }
 
   std::list< std::string > translationsToStr(const std::list< std::string >& translations, std::list< std::string >& allTranslations)
@@ -35,7 +36,7 @@ namespace
   }
 }
 
-void holodilov::createDict(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::createDict(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string name;
   in >> name;
@@ -51,16 +52,16 @@ void holodilov::createDict(std::istream& in, std::ostream& out, std::map< std::s
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (dictionaries.contains(name))
+  if (dictionaries.find(name) != dictionaries.end())
   {
     throw std::logic_error("Error: dictionary with this name already exists.");
   }
 
-  dictionaries.emplace(name, Dictionary(name, lang));
+  dictionaries.emplace(name, Dictionary{ name, lang, MapDictionary() });
   out << "Created dictionary:\n" << "name: " << name << "\nlang: " << lang;
 }
 
-void holodilov::exportDict(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::exportDict(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -75,7 +76,7 @@ void holodilov::exportDict(std::istream& in, std::ostream& out, std::map< std::s
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -97,7 +98,7 @@ void holodilov::exportDict(std::istream& in, std::ostream& out, std::map< std::s
   out << "Dictionary " << dictName << " successfully exported into file " << fileName;
 }
 
-void holodilov::importDict(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::importDict(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string filename;
   in >> filename;
@@ -121,7 +122,7 @@ void holodilov::importDict(std::istream& in, std::ostream& out, std::map< std::s
   }
   fis.close();
 
-  if (dictionaries.contains(dict.name))
+  if (dictionaries.find(dict.name) != dictionaries.end())
   {
     throw std::logic_error("Error: dictionary with this name already exists.");
   }
@@ -130,7 +131,7 @@ void holodilov::importDict(std::istream& in, std::ostream& out, std::map< std::s
   out << "Dictionary " << dict.name << " was successfully imported.";
 }
 
-void holodilov::clearDict(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::clearDict(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -139,7 +140,7 @@ void holodilov::clearDict(std::istream& in, std::ostream& out, std::map< std::st
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -148,7 +149,7 @@ void holodilov::clearDict(std::istream& in, std::ostream& out, std::map< std::st
   out << "Dictionary " << dictName << " was cleared.";
 }
 
-void holodilov::deleteDict(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::deleteDict(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -157,7 +158,7 @@ void holodilov::deleteDict(std::istream& in, std::ostream& out, std::map< std::s
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -166,7 +167,7 @@ void holodilov::deleteDict(std::istream& in, std::ostream& out, std::map< std::s
   out << "Dictionary " << dictName << " was deleted.";
 }
 
-void holodilov::addWord(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::addWord(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -189,7 +190,7 @@ void holodilov::addWord(std::istream& in, std::ostream& out, std::map< std::stri
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -204,7 +205,7 @@ void holodilov::addWord(std::istream& in, std::ostream& out, std::map< std::stri
   out << "Word " << englishWord << " was added to " << dictName;
 }
 
-void holodilov::deleteWord(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::deleteWord(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -220,12 +221,12 @@ void holodilov::deleteWord(std::istream& in, std::ostream& out, std::map< std::s
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
 
-  if (!dictionaries.at(dictName).dict.contains(englishWord))
+  if (dictionaries.at(dictName).dict.find(englishWord) == dictionaries.at(dictName).dict.end())
   {
     throw std::logic_error("Error: word not found in this dictionary.");
   }
@@ -234,7 +235,7 @@ void holodilov::deleteWord(std::istream& in, std::ostream& out, std::map< std::s
   out << "Word " << englishWord << " was deleted from dictionary " << dictName;
 }
 
-void holodilov::updateWord(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::updateWord(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -257,11 +258,11 @@ void holodilov::updateWord(std::istream& in, std::ostream& out, std::map< std::s
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
-  if (!dictionaries.at(dictName).dict.contains(englishWord))
+  if (dictionaries.at(dictName).dict.find(englishWord) == dictionaries.at(dictName).dict.end())
   {
     throw std::logic_error("Error: word not found in this dictionary.");
   }
@@ -272,7 +273,7 @@ void holodilov::updateWord(std::istream& in, std::ostream& out, std::map< std::s
   out << "Word " << englishWord << " was updated to " << englishWordNew;
 }
 
-void holodilov::printDict(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
+void holodilov::printDict(std::istream& in, std::ostream& out, const MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -281,14 +282,14 @@ void holodilov::printDict(std::istream& in, std::ostream& out, const std::map< s
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
   out << dictionaries.at(dictName);
 }
 
-void holodilov::findWord(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::findWord(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string englishWord;
   in >> englishWord;
@@ -308,7 +309,7 @@ void holodilov::findWord(std::istream& in, std::ostream& out, std::map< std::str
   std::copy(setTranslations.begin(), setTranslations.end(), std::ostream_iterator< std::string >(out, "\n"));
 }
 
-void holodilov::merge(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::merge(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName1;
   in >> dictName1;
@@ -338,23 +339,22 @@ void holodilov::merge(std::istream& in, std::ostream& out, std::map< std::string
     throw std::logic_error("Error: invalid command.");
   }
 
-  if ((!dictionaries.contains(dictName1)) || (!dictionaries.contains(dictName2)))
+  if ((dictionaries.find(dictName1) == dictionaries.end()) || (dictionaries.find(dictName2) == dictionaries.end()))
   {
     throw std::logic_error("Error: dictionary not found.");
   }
 
-  std::map< std::string, std::list< std::string > > mapNewDict = dictionaries.at(dictName1).dict;
+  MapDictionary mapNewDict = dictionaries.at(dictName1).dict;
 
   Dictionary& dict2 = dictionaries.at(dictName2);
   mapNewDict.insert(dict2.dict.begin(), dict2.dict.end());
 
-  Dictionary dictNew(dictNameNew, dictLangNew);
-  dictNew.dict = mapNewDict;
+  Dictionary dictNew{ dictNameNew, dictLangNew, mapNewDict };
   dictionaries[dictNameNew] = dictNew;
   out << "Dictionaries " << dictName1 << " and " << dictName2 << " were merged to " << dictNameNew;
 }
 
-void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::string, Dictionary >& dictionaries)
+void holodilov::intersect(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
   std::string dictName1;
   in >> dictName1;
@@ -384,7 +384,7 @@ void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::st
     throw std::logic_error("Error: invalid command.");
   }
 
-  if ((!dictionaries.contains(dictName1)) || (!dictionaries.contains(dictName2)))
+  if ((dictionaries.find(dictName1) == dictionaries.end()) || (dictionaries.find(dictName2) == dictionaries.end()))
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -392,7 +392,7 @@ void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::st
   Dictionary& dict1 = dictionaries.at(dictName1);
   Dictionary& dict2 = dictionaries.at(dictName2);
 
-  Dictionary dictNew(dictNameNew, dictLangNew);
+  Dictionary dictNew{ dictNameNew, dictLangNew, MapDictionary() };
   auto checkIntersectionBound = std::bind(checkIntersection, std::placeholders::_1, std::cref(dict2));
 
   auto inserterNewDict = std::inserter(dictNew.dict, dictNew.dict.end());
@@ -402,7 +402,7 @@ void holodilov::intersect(std::istream& in, std::ostream& out, std::map< std::st
   out << "Dictionaries " << dictName1 << " and " << dictName2 << " were intersected to " << dictNameNew;
 }
 
-void holodilov::exportAlphabet(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
+void holodilov::exportAlphabet(std::istream& in, std::ostream& out, const MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -418,7 +418,7 @@ void holodilov::exportAlphabet(std::istream& in, std::ostream& out, const std::m
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -441,7 +441,7 @@ void holodilov::exportAlphabet(std::istream& in, std::ostream& out, const std::m
   out << "Alphabet of " << dictName << " dictionary was exported into file " << filename;
 }
 
-void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
+void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const MapDictionaries& dictionaries)
 {
   std::string dictName;
   in >> dictName;
@@ -457,7 +457,7 @@ void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const std::ma
     throw std::logic_error("Error: invalid command.");
   }
 
-  if (!dictionaries.contains(dictName))
+  if (dictionaries.find(dictName) == dictionaries.end())
   {
     throw std::logic_error("Error: dictionary not found.");
   }
@@ -484,7 +484,7 @@ void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const std::ma
   out << (alphabetFromFile == alphabetFromDict);
 }
 
-void holodilov::printDictNames(std::ostream& out, const std::map< std::string, Dictionary >& dictionaries)
+void holodilov::printDictNames(std::ostream& out, const MapDictionaries& dictionaries)
 {
   if (dictionaries.empty())
   {
