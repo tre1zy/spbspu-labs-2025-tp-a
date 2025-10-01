@@ -68,7 +68,7 @@ namespace geom
     for (size_t i = 0; i < count; ++i)
     {
       Point p;
-      if (!(in >> p) || in.eof() || in.fail())
+      if (!(in >> p) || !in.good())
       {
         in.setstate(std::ios::failbit);
         return in;
