@@ -41,11 +41,6 @@ int main(int argc, char* argv[])
     }
   }
   inFile.close();
-  if (polyList.empty() && argc == 2)
-  {
-    std::cout << "Atleast 2 optional supported commands" << std::endl;
-    return 0;
-  }
 
   std::map<std::string, std::function<void(std::istream&, const std::vector<Polygon>&, std::ostream&)>> commandMap;
   commandMap["AREA"] = bob::printAreaSum;
