@@ -53,6 +53,12 @@ namespace geom
       in.setstate(std::ios::failbit);
       return in;
     }
+    char next;
+    if (in >> next && !std::isspace(next))
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     return in;
   }
 
@@ -84,6 +90,12 @@ namespace geom
         return in;
       }
       pts.push_back(p);
+      char next;
+      if (in >> next && !std::isspace(next) && next != std::char_traits<char>::eof())
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
     }
     if (!in || pts.size() != count)
     {
