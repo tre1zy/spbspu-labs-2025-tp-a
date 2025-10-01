@@ -58,19 +58,21 @@ namespace geom
       return in;
     }
     size_t count;
-    if (!(in >> count) || !in || count < 3)
+    if (!(in >> count) || count < 3)
     {
       in.setstate(std::ios::failbit);
       return in;
     }
     std::vector<Point> pts;
     pts.reserve(count);
+    std::streampos start = in.tellg();
     for (size_t i = 0; i < count; ++i)
     {
       Point p;
       if (!(in >> p))
       {
         in.setstate(std::ios::failbit);
+        in.seekg(start);
         return in;
       }
       pts.push_back(p);
@@ -78,6 +80,7 @@ namespace geom
     if (pts.size() != count)
     {
       in.setstate(std::ios::failbit);
+      in.seekg(start);
       return in;
     }
     poly.points = std::move(pts);

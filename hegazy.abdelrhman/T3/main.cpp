@@ -24,32 +24,23 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  bool fileIsEmpty = true;
   std::string line;
   while (std::getline(inFile, line))
   {
-    if (!line.empty())
+    if (line.empty()) continue;
+    std::istringstream iss(line);
+    iss >> std::ws;
+    Polygon poly;
+    if (iss >> poly)
     {
-      fileIsEmpty = false;
-      std::istringstream iss(line);
-      iss >> std::ws;
-      Polygon poly;
-      if (iss >> poly)
-      {
-        polyList.push_back(poly);
-      }
-      else
-      {
-        std::cerr << "Skipping invalid line: " << line << std::endl;
-      }
+      polyList.push_back(poly);
+    }
+    else
+    {
+      std::cerr << "Skipping invalid line: " << line << std::endl;
     }
   }
   inFile.close();
-  if (fileIsEmpty)
-  {
-    std::cout << "Atleast 2 optional supported commands" << std::endl;
-    return 0;
-  }
 
   std::map<std::string, std::function<void(std::istream&, const std::vector<Polygon>&, std::ostream&)>> commandMap;
   commandMap["AREA"] = bob::printAreaSum;
