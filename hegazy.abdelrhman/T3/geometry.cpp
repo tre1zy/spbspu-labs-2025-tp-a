@@ -65,8 +65,17 @@ namespace geom
     }
     std::vector<Point> pts;
     pts.reserve(count);
-    std::generate_n(std::back_inserter(pts), count, PointReader{in});
-    if (!in || pts.size() != count)
+    for (size_t i = 0; i < count; ++i)
+    {
+      Point p;
+      if (!(in >> p) || in.eof() || in.fail())
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      pts.push_back(p);
+    }
+    if (pts.size() != count)
     {
       in.setstate(std::ios::failbit);
       return in;
