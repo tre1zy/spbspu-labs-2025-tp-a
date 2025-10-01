@@ -24,24 +24,28 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  bool fileIsEmpty = true;
+  bool hasValidPolygons = false;
   std::string line;
   while (std::getline(inFile, line))
   {
     if (!line.empty())
     {
-      fileIsEmpty = false;
       std::istringstream iss(line);
       iss >> std::ws;
       Polygon poly;
       if (iss >> poly)
       {
         polyList.push_back(poly);
+        hasValidPolygons = true;
+      }
+      else
+      {
+        std::cerr << "Skipping invalid line: " << line << std::endl;
       }
     }
   }
   inFile.close();
-  if (fileIsEmpty)
+  if (!hasValidPolygons)
   {
     std::cout << "Atleast 2 optional supported commands" << std::endl;
     return 0;
