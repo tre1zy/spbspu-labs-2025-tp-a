@@ -31,12 +31,14 @@ int main(int argc, char* argv[])
     std::istringstream iss(line);
     iss >> std::ws;
     Polygon poly;
-    if (iss >> poly && !iss.fail())
+    std::streampos pos = iss.tellg();
+    if (iss >> poly && iss.eof())
     {
       polyList.push_back(poly);
     }
     else
     {
+      iss.seekg(pos);
       std::cerr << "Skipping invalid line: " << line << std::endl;
     }
   }

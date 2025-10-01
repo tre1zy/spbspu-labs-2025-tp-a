@@ -66,21 +66,23 @@ namespace geom
     std::vector<Point> pts;
     pts.reserve(count);
     std::streampos start = in.tellg();
-    bool valid = true;
-    for (size_t i = 0; i < count && valid; ++i)
+    for (size_t i = 0; i < count; ++i)
     {
       Point p;
       if (!(in >> p))
       {
-        valid = false;
-        break;
+        in.clear(); // Clear any error flags
+        in.seekg(start); // Reset to start of line
+        in.setstate(std::ios::failbit); // Explicitly set failbit
+        return in;
       }
       pts.push_back(p);
     }
-    if (!valid || pts.size() != count || in.fail())
+    if (pts.size() != count)
     {
-      in.setstate(std::ios::failbit);
+      in.clear();
       in.seekg(start);
+      in.setstate(std::ios::failbit);
       return in;
     }
     poly.points = std::move(pts);
