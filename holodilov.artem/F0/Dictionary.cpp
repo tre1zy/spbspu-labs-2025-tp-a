@@ -3,6 +3,14 @@
 #include <iterator>
 #include <limits>
 
+void holodilov::Dictionary::printTranslations(std::ostream& out, const std::string& englishWord)
+{
+  if (dict.find(englishWord) != dict.end()) {
+    std::list< std::string > translations = dict.at(englishWord);
+    std::copy(translations.begin(), translations.end(), std::ostream_iterator< std::string >(out, "\n"));
+  }
+}
+
 std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
 {
   std::ostream::sentry sentry(out);

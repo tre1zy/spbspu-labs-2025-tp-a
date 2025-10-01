@@ -9,30 +9,20 @@
 
 namespace
 {
-  std::string const& dictToDictName(const std::pair<const std::string, holodilov::Dictionary >& pair)
+  std::string const& dictToDictName(const std::pair< const std::string, holodilov::Dictionary >& pair)
   {
     return pair.first;
   }
 
-  std::list< std::string > const& dictToTranslations(const std::pair< std::string, holodilov::Dictionary >& pair, const std::string& enWord)
+  holodilov::Dictionary& printDictTranslations(holodilov::MapDictionariesPair& pair, std::ostream& out, const std::string& enWord)
   {
-    try {
-      return pair.second.dict.at(enWord);
-    }
-    catch (const std::out_of_range&) {
-      return std::list< std::string >();
-    }
+    pair.second.printTranslations(out, enWord);
+    return pair.second;
   }
 
   bool checkIntersection(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
   {
     return dict.dict.find(pair.first) != dict.dict.end();
-  }
-
-  std::list< std::string > translationsToStr(const std::list< std::string >& translations, std::list< std::string >& allTranslations)
-  {
-    allTranslations.insert(allTranslations.end(), translations.begin(), translations.end());
-    return translations;
   }
 }
 
@@ -297,16 +287,10 @@ void holodilov::findWord(std::istream& in, std::ostream& out, MapDictionaries& d
   {
     throw std::logic_error("Error: invalid command.");
   }
-  std::vector< std::list< std::string > > translLists(dictionaries.size());
-  auto dictToTranslBound = std::bind(dictToTranslations, std::placeholders::_1, std::cref(englishWord));
-  std::transform(dictionaries.begin(), dictionaries.end(), translLists.begin(), dictToTranslBound);
 
-  std::list< std::string > listTranslations;
-  auto translationsToStrBound = std::bind(translationsToStr, std::placeholders::_1, std::ref(listTranslations));
-  std::transform(translLists.begin(), translLists.end(), translLists.begin(), translationsToStrBound);
-
-  std::set< std::string > setTranslations(listTranslations.begin(), listTranslations.end());
-  std::copy(setTranslations.begin(), setTranslations.end(), std::ostream_iterator< std::string >(out, "\n"));
+  std::vector< Dictionary > vecDictionaries;
+  auto printDictTranslationsBound = std::bind(printDictTranslations, std::placeholders::_1,  std::ref(out), std::cref(englishWord));
+  std::transform(dictionaries.begin(), dictionaries.end(), std::back_inserter(vecDictionaries), printDictTranslationsBound);
 }
 
 void holodilov::merge(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
