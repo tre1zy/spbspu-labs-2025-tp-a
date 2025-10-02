@@ -22,7 +22,7 @@ int main(const int argc, const char** argv)
     return 1;
   }
 
-  MapDictionaries dictionaries;
+  MapDicts dictionaries;
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["CreateDict"] = std::bind(createDict, std::ref(std::cin), std::ref(std::cout), std::ref(dictionaries));

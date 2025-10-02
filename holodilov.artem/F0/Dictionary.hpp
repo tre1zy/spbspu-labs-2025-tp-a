@@ -8,20 +8,20 @@
 
 namespace holodilov
 {
-  using MapDictionary = std::map< std::string, std::list< std::string > >;
+  using MapWords = std::map< std::string, std::list< std::string > >;
 
   struct Dictionary
   {
     std::string name;
     std::string lang;
-    MapDictionary dict;
+    MapWords dict;
   };
 
   std::ostream& operator<<(std::ostream& out, const Dictionary& dict);
   std::istream& operator>>(std::istream& in, Dictionary& dict);
 
-  using MapDictionaries = std::map< std::string, Dictionary >;
-  using MapDictionariesPair = std::pair< const std::string, Dictionary >;
+  using MapDicts = std::map< std::string, Dictionary >;
+  using MapDictsPair = std::pair< const std::string, Dictionary >;
 }
 
 #endif

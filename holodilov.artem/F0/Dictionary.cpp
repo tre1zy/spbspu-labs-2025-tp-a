@@ -43,7 +43,7 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   in >> lang;
   in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
-  Dictionary dictTemp{ name, lang, MapDictionary() };
+  Dictionary dictTemp{ name, lang, MapWords() };
 
   std::string englishWord;
   while (!in.eof())
