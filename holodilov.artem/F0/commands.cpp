@@ -9,22 +9,28 @@
 
 namespace
 {
+  struct SetTranslationsCreator
+  {
+    const std::string& englishWord;
+    std::set< std::string >& setTranslations;
+
+    holodilov::Dictionary& operator()(holodilov::MapDictsPair& pair)
+    {
+      if (pair.second.dict.find(englishWord) != pair.second.dict.end())
+      {
+        std::list < std::string > listTranslations = pair.second.dict.at(englishWord);
+        setTranslations.insert(listTranslations.begin(), listTranslations.end());
+      }
+      return pair.second;
+    }
+  };
+
   std::string const& dictToDictName(const std::pair< const std::string, holodilov::Dictionary >& pair)
   {
     return pair.first;
   }
 
-  holodilov::Dictionary& createSetTranslations(holodilov::MapDictsPair& pair, std::set< std::string >& translations, const std::string& enWord)
-  {
-    if (pair.second.dict.find(enWord) != pair.second.dict.end())
-    {
-      std::list < std::string > listTranslations = pair.second.dict.at(enWord);
-      translations.insert(listTranslations.begin(), listTranslations.end());
-    }
-    return pair.second;
-  }
-
-  bool checkIntersection(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
+  bool checkIntersect(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
   {
     return dict.dict.find(pair.first) != dict.dict.end();
   }
@@ -285,23 +291,23 @@ void holodilov::printDict(std::istream& in, std::ostream& out, const MapDicts& d
 
 void holodilov::findWord(std::istream& in, std::ostream& out, MapDicts& mapDicts)
 {
-  std::string enWord;
-  in >> enWord;
+  std::string englishWord;
+  in >> englishWord;
   if (!in)
   {
     throw std::logic_error("Error: invalid command.");
   }
 
   std::vector< Dictionary > vecDictionaries;
-  std::set< std::string > setTransl;
+  std::set< std::string > setTranslations;
 
-  auto createSetBound = std::bind(createSetTranslations, std::placeholders::_1,  std::ref(setTransl), std::cref(enWord));
-  std::transform(mapDicts.begin(), mapDicts.end(), std::back_inserter(vecDictionaries), createSetBound);
-  if (setTransl.empty())
+  SetTranslationsCreator creator{ englishWord, setTranslations };
+  std::transform(mapDicts.begin(), mapDicts.end(), std::back_inserter(vecDictionaries), creator);
+  if (setTranslations.empty())
   {
     out << "Unable to find translations of this word.";
   }
-  std::copy(setTransl.begin(), setTransl.end(), std::ostream_iterator< std::string >(out, "\n"));
+  std::copy(setTranslations.begin(), setTranslations.end(), std::ostream_iterator< std::string >(out, "\n"));
 }
 
 void holodilov::merge(std::istream& in, std::ostream& out, MapDicts& dictionaries)
@@ -388,7 +394,7 @@ void holodilov::intersect(std::istream& in, std::ostream& out, MapDicts& diction
   Dictionary& dict2 = dictionaries.at(dictName2);
 
   Dictionary dictNew{ dictNameNew, dictLangNew, MapWords() };
-  auto checkIntersectionBound = std::bind(checkIntersection, std::placeholders::_1, std::cref(dict2));
+  auto checkIntersectionBound = std::bind(checkIntersect, std::placeholders::_1, std::cref(dict2));
 
   auto inserterNewDict = std::inserter(dictNew.dict, dictNew.dict.end());
   std::copy_if(dict1.dict.begin(), dict1.dict.end(), inserterNewDict, checkIntersectionBound);
