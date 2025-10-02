@@ -1,7 +1,7 @@
 #ifndef CONSOLE_OPTIONS_HPP
 #define CONSOLE_OPTIONS_HPP
 
-#include <ostream>
+#include <iostream>
 
 namespace holodilov
 {

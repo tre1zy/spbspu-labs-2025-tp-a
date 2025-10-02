@@ -27,11 +27,11 @@ namespace
 
 void holodilov::Alphabet::load(const Dictionary& dictionary)
 {
-  std::vector< std::list< std::string > > vecTranslationLists(dictionary.dict.size());
-  std::transform(dictionary.dict.begin(), dictionary.dict.end(), vecTranslationLists.begin(), dictPairToTranslations);
+  std::vector< std::list< std::string > > vecTranslLists(dictionary.dict.size());
+  std::transform(dictionary.dict.begin(), dictionary.dict.end(), vecTranslLists.begin(), dictPairToTranslations);
 
   auto translationsToAlphabetBound = std::bind(translationListsToAlphabet, std::placeholders::_1, std::ref(alphabet_));
-  std::transform(vecTranslationLists.begin(), vecTranslationLists.end(), vecTranslationLists.begin(), translationsToAlphabetBound);
+  std::transform(vecTranslLists.begin(), vecTranslLists.end(), vecTranslLists.begin(), translationsToAlphabetBound);
   isLoaded_ = true;
 }
 

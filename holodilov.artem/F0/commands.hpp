@@ -1,7 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include <string>
 #include "Dictionary.hpp"
 
 namespace holodilov

@@ -25,7 +25,7 @@ namespace
     }
   };
 
-  std::string const& dictToDictName(const std::pair< const std::string, holodilov::Dictionary >& pair)
+  std::string dictToDictName(const holodilov::MapDictsPair& pair)
   {
     return pair.first;
   }
@@ -42,7 +42,6 @@ void holodilov::createDict(std::istream& in, std::ostream& out, MapDicts& dictio
   in >> name;
   if (!in)
   {
-
     throw std::logic_error("Error: invalid command.");
   }
   std::string lang;
@@ -394,10 +393,10 @@ void holodilov::intersect(std::istream& in, std::ostream& out, MapDicts& diction
   Dictionary& dict2 = dictionaries.at(dictName2);
 
   Dictionary dictNew{ dictNameNew, dictLangNew, MapWords() };
-  auto checkIntersectionBound = std::bind(checkIntersect, std::placeholders::_1, std::cref(dict2));
+  auto checkIntersectBound = std::bind(checkIntersect, std::placeholders::_1, std::cref(dict2));
 
   auto inserterNewDict = std::inserter(dictNew.dict, dictNew.dict.end());
-  std::copy_if(dict1.dict.begin(), dict1.dict.end(), inserterNewDict, checkIntersectionBound);
+  std::copy_if(dict1.dict.begin(), dict1.dict.end(), inserterNewDict, checkIntersectBound);
 
   dictionaries[dictNameNew] = dictNew;
   out << "Dictionaries " << dictName1 << " and " << dictName2 << " were intersected to " << dictNameNew;
@@ -494,7 +493,6 @@ void holodilov::printDictNames(std::ostream& out, const MapDicts& dictionaries)
   }
 
   using ostreamIter = std::ostream_iterator< std::string >;
-
   std::vector< std::string > dictNames(dictionaries.size());
   std::transform(dictionaries.begin(), dictionaries.end(), dictNames.begin(), dictToDictName);
   std::copy(dictNames.begin(), dictNames.end(), ostreamIter(out, "\n"));
