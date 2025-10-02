@@ -14,8 +14,7 @@ int main(int argc, char* argv[])
   using namespace smirnov;
   if (argc == 2)
   {
-    std::string fname = argv[1];
-    std::ifstream file(fname);
+    std::ifstream file(argv[1]);
     std::vector< Polygon > polygons;
     using inputIt = std::istream_iterator< Polygon >;
     while (!file.eof())
@@ -24,16 +23,18 @@ int main(int argc, char* argv[])
       file.clear();
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
+
+    using namespace std::placeholders;
+
+    const std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands =
     {
-      using namespace std::placeholders;
-      commands["AREA"] = std::bind(doAreaCommand, std::cref(polygons), _1, _2);
-      commands["MAX"] = std::bind(doMaxCommand, std::cref(polygons), _1, _2);
-      commands["MIN"] = std::bind(doMinCommand, std::cref(polygons), _1, _2);
-      commands["COUNT"] = std::bind(doCountCommand, std::cref(polygons), _1, _2);
-      commands["RECTS"] = std::bind(doRectsCommand, std::cref(polygons), _2);
-      commands["INTERSECTIONS"] = std::bind(doIntersections, std::cref(polygons), _1, _2);
-    }
+      {"AREA", std::bind(doAreaCommand, std::cref(polygons), _1, _2)},
+      {"MAX", std::bind(doMaxCommand, std::cref(polygons), _1, _2)},
+      {"MIN", std::bind(doMinCommand, std::cref(polygons), _1, _2)},
+      {"COUNT", std::bind(doCountCommand, std::cref(polygons), _1, _2)},
+      {"RECTS", std::bind(doRectsCommand, std::cref(polygons), _2)},
+      {"INTERSECTIONS", std::bind(doIntersections, std::cref(polygons), _1, _2)}
+    };
 
     std::string cmd;
     while (std::cin >> cmd)
@@ -49,7 +50,6 @@ int main(int argc, char* argv[])
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    file.close();
   }
   else
   {
