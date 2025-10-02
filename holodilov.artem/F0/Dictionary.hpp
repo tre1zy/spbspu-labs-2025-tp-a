@@ -15,8 +15,6 @@ namespace holodilov
     std::string name;
     std::string lang;
     MapDictionary dict;
-
-    void printTranslations(std::ostream& out, const std::string& englishWord);
   };
 
   std::ostream& operator<<(std::ostream& out, const Dictionary& dict);

@@ -3,14 +3,6 @@
 #include <iterator>
 #include <limits>
 
-void holodilov::Dictionary::printTranslations(std::ostream& out, const std::string& englishWord)
-{
-  if (dict.find(englishWord) != dict.end()) {
-    std::list< std::string > translations = dict.at(englishWord);
-    std::copy(translations.begin(), translations.end(), std::ostream_iterator< std::string >(out, "\n"));
-  }
-}
-
 std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
 {
   std::ostream::sentry sentry(out);
@@ -57,14 +49,24 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   while (!in.eof())
   {
     in >> englishWord;
+    if (!in)
+    {
+      return in;
+    }
     dictTemp.dict[englishWord] = std::list< std::string >();
 
     int amountTranslations = 0;
     in >> amountTranslations;
-
+    if (!in)
+    {
+      return in;
+    }
     using istreamIter = std::istream_iterator< std::string >;
     std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dictTemp.dict[englishWord]));
-
+    if (!in)
+    {
+      return in;
+    }
   }
   if (in)
   {

@@ -14,9 +14,13 @@ namespace
     return pair.first;
   }
 
-  holodilov::Dictionary& printDictTranslations(holodilov::MapDictionariesPair& pair, std::ostream& out, const std::string& enWord)
+  holodilov::Dictionary& createSetTranslations(holodilov::MapDictionariesPair& pair, std::set< std::string >& translations, const std::string& enWord)
   {
-    pair.second.printTranslations(out, enWord);
+    if (pair.second.dict.find(enWord) != pair.second.dict.end())
+    {
+      std::list < std::string > listTranslations = pair.second.dict.at(enWord);
+      translations.insert(listTranslations.begin(), listTranslations.end());
+    }
     return pair.second;
   }
 
@@ -281,16 +285,23 @@ void holodilov::printDict(std::istream& in, std::ostream& out, const MapDictiona
 
 void holodilov::findWord(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
 {
-  std::string englishWord;
-  in >> englishWord;
+  std::string enWord;
+  in >> enWord;
   if (!in)
   {
     throw std::logic_error("Error: invalid command.");
   }
 
   std::vector< Dictionary > vecDictionaries;
-  auto printDictTranslationsBound = std::bind(printDictTranslations, std::placeholders::_1,  std::ref(out), std::cref(englishWord));
-  std::transform(dictionaries.begin(), dictionaries.end(), std::back_inserter(vecDictionaries), printDictTranslationsBound);
+  std::set< std::string > setTranslations;
+
+  auto createSetBound = std::bind(createSetTranslations, std::placeholders::_1,  std::ref(setTranslations), std::cref(enWord));
+  std::transform(dictionaries.begin(), dictionaries.end(), std::back_inserter(vecDictionaries), createSetBound);
+  if (setTranslations.empty())
+  {
+    out << "Unable to find translations of this word.";
+  }
+  std::copy(setTranslations.begin(), setTranslations.end(), std::ostream_iterator< std::string >(out, "\n"));
 }
 
 void holodilov::merge(std::istream& in, std::ostream& out, MapDictionaries& dictionaries)
