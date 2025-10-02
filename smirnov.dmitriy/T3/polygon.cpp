@@ -1,20 +1,10 @@
 #include "polygon.hpp"
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <iterator>
 #include <vector>
 #include "delimiters.hpp"
-
-struct PolygonArea
-{
-  smirnov::Point first;
-  double operator()(const smirnov::Point& second)
-  {
-    double area = (second.x + first.x) * (first.y - second.y);
-    first = second;
-    return area;
-  }
-};
 
 std::istream& smirnov::operator>>(std::istream& in, Point& value)
 {
@@ -23,10 +13,9 @@ std::istream& smirnov::operator>>(std::istream& in, Point& value)
   {
     return in;
   }
-  using del = smirnov::DelimiterChar;
   int x{ 0 };
   int y{ 0 };
-  in >> del{ '(' } >> x >> del{ ';' } >> y >> del{ ')' };
+  in >> DelimiterChar{ '(' } >> x >> DelimiterChar{ ';' } >> y >> DelimiterChar{ ')' };
   if (in)
   {
     value = Point{ x, y };
@@ -40,11 +29,7 @@ std::istream& smirnov::operator>>(std::istream& in, Point& value)
 
 bool smirnov::operator<(const Point& p1, const Point& p2)
 {
-  if (p1.x != p2.x)
-  {
-    return p1.x < p2.x;
-  }
-  return p1.y < p2.y;
+  return p1.x != p2.x ? p1.x < p2.x : p1.y < p2.y;
 }
 
 bool smirnov::operator==(const Point& p1, const Point& p2)
@@ -88,23 +73,41 @@ bool smirnov::operator==(const Polygon& p1, const Polygon& p2)
   return p1.points == p2.points;
 }
 
-bool smirnov::operator<=(const Point& first, const Point& second)
+bool smirnov::operator<=(const Point& p1, const Point& p2)
 {
-  return !(second < first);
+  return !(p2 < p1);
 }
 
-bool smirnov::operator>=(const Point& first, const Point& second)
+bool smirnov::operator>=(const Point& p1, const Point& p2)
 {
-  return !(first < second);
+  return !(p1 < p2);
 }
+
+struct PolygonArea
+{
+  smirnov::Point previousPoint;
+  double operator()(double currentSum, const smirnov::Point& currentPoint)
+  {
+    double segmentArea = (currentPoint.x + previousPoint.x) * (previousPoint.y - currentPoint.y);
+    previousPoint = currentPoint;
+    return currentSum + segmentArea;
+  }
+};
 
 double smirnov::getArea(const Polygon& p)
 {
-  std::vector< double > partArea;
-  std::transform(p.points.begin(), p.points.end(), std::back_inserter(partArea), PolygonArea{ p.points[0] });
-  double area = std::accumulate(partArea.cbegin(), partArea.cend(), 0.0);
-  area += (p.points[p.points.size() - 1].x + p.points[0].x) * (p.points[p.points.size() - 1].y - p.points[0].y);
-  return std::abs(area) / 2;
+  if (p.points.empty())
+  {
+    return 0.0;
+  }
+
+  PolygonArea areaCalc{p.points[0]};
+
+  double area = std::accumulate(p.points.begin() + 1, p.points.end(),0.0,std::ref(areaCalc));
+
+  area += (p.points.back().x + p.points.front().x) * (p.points.back().y - p.points.front().y);
+
+  return std::abs(area) / 2.0;
 }
 
 bool smirnov::isPerpendicular(const Point& p1, const Point& p2, const Point& p3)
@@ -122,15 +125,16 @@ bool smirnov::isRect(const Polygon& p)
   {
     return false;
   }
-  std::vector< Point > vec(p.points);
-  std::sort(vec.begin(), vec.end());
-  return isPerpendicular(vec[0], vec[1], vec[2]) && isPerpendicular(vec[1], vec[0], vec[3]) &&
-         isPerpendicular(vec[3], vec[2], vec[1]);
+  std::array<Point, 4> points;
+  std::copy(p.points.begin(), p.points.end(), points.begin());
+  std::sort(points.begin(), points.end());
+  return isPerpendicular(points[0], points[1], points[2]) && isPerpendicular(points[1], points[0], points[3]) &&
+         isPerpendicular(points[3], points[2], points[1]);
 }
 
 bool smirnov::isOddCountVertexes(const Polygon& p)
 {
-  return p.points.size() % 2;
+  return p.points.size() % 2 != 0;
 }
 
 bool smirnov::isEvenCountVertexes(const Polygon& p)
