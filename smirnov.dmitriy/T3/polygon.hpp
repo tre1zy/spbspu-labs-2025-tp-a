@@ -9,15 +9,15 @@ namespace smirnov
 {
   struct Point
   {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
   };
 
   std::istream& operator>>(std::istream& in, Point& value);
   bool operator<(const Point& p1, const Point& p2);
   bool operator==(const Point& p1, const Point& p2);
-  bool operator<=(const Point& first, const Point& second);
-  bool operator>=(const Point& first, const Point& second);
+  bool operator<=(const Point& p1, const Point& p2);
+  bool operator>=(const Point& p1, const Point& p2);
 
   struct Polygon
   {
