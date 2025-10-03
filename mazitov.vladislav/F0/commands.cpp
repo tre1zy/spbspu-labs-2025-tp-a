@@ -4,6 +4,10 @@
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
+#include <vector>
+#include <fstream>
+#include <iterator>
+#include <numeric>
 
 namespace
 {
