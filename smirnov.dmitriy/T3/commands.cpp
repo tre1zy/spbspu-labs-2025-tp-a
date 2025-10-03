@@ -60,32 +60,32 @@ namespace
 
   void doMinMaxCmd(const std::vector< smirnov::Polygon >& p, std::istream& in, std::ostream& out, const std::string& name)
   {
-  std::string s;
-  in >> s;
+    std::string s;
+    in >> s;
 
-  smirnov::ScopeGuard guard(out);
+    smirnov::ScopeGuard guard(out);
 
-  if (p.empty())
-  {
-    throw std::logic_error("zero polygons");
-  }
-
-  out << std::fixed << std::setprecision(1);
-
-  const std::map< std::string, std::map< std::string, std::function< void() > > > commands =
-  {
+    if (p.empty())
     {
-      "AREA",
+      throw std::logic_error("zero polygons");
+    }
+
+    out << std::fixed << std::setprecision(1);
+
+    const std::map< std::string, std::map< std::string, std::function< void() > > > commands =
+    {
       {
-        {"max", std::bind(maxAreaCmd, std::cref(p), std::ref(out))},
-        {"min", std::bind(minAreaCmd, std::cref(p), std::ref(out))}
+        "AREA",
+        {
+          {"max", std::bind(maxAreaCmd, std::cref(p), std::ref(out))},
+          {"min", std::bind(minAreaCmd, std::cref(p), std::ref(out))}
         }
       },
       {
         "VERTEXES",
-      {
-        {"max", std::bind(maxVertexesCmd, std::cref(p), std::ref(out))},
-        {"min", std::bind(minVertexesCmd, std::cref(p), std::ref(out))}
+        {
+          {"max", std::bind(maxVertexesCmd, std::cref(p), std::ref(out))},
+          {"min", std::bind(minVertexesCmd, std::cref(p), std::ref(out))}
         }
       }
     };
@@ -117,7 +117,6 @@ namespace
 
   bool hasIntersection(const smirnov::Polygon& p1, const smirnov::Polygon& p2)
   {
-
     auto pair1 = std::minmax_element(p1.points.cbegin(), p1.points.cend());
     auto pair2 = std::minmax_element(p2.points.cbegin(), p2.points.cend());
 
@@ -146,7 +145,6 @@ namespace
   {
     return getSumArea(polygons, smirnov::isOddCountVertexes);
   }
-
 
   struct SumAreas
   {
