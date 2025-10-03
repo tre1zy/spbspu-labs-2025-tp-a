@@ -100,7 +100,7 @@ void mazitov::degreeCommand(DataSetManager& mgmt, std::istream& in, std::ostream
 
   std::string compressed = mgmt.getCompressedData(setName);
   double originalSize = dataSet->originalText.size() * 8.0;
-  double compressedSize = dataSet->huffCodes.size();
+  double compressedSize = compressed.size();
   double ratio = compressedSize / originalSize;
   out << "Degree ratio: " << std::fixed << std::setprecision(2) << ratio << "\n";
 }
@@ -169,7 +169,7 @@ void mazitov::subrtactCommand(DataSetManager& mgmt, std::istream& in, std::ostre
   }
   if (!mgmt.dataSetExists(set2))
   {
-    throw std::runtime_error("<SET1_NOT_FOUND>");
+    throw std::runtime_error("<SET2_NOT_FOUND>");
   }
   if (mgmt.dataSetExists(resultSet))
   {
@@ -215,7 +215,7 @@ void mazitov::compareDegreesCommand(DataSetManager& mgmt, std::istream& in, std:
   std::string comp2 = mgmt.getCompressedData(set2);
   double ratio1 = static_cast< double >(comp1.size()) / (ds1->originalText.size() * 8);
   double ratio2 = static_cast< double >(comp2.size()) / (ds2->originalText.size() * 8);
-  if (ratio1 < ratio2)
+  if (ratio1 > ratio2)
   {
     out << set1 << " better compress (" << ratio1 << " < " << ratio2 << ")\n";
   }
