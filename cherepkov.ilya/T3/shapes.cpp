@@ -3,6 +3,17 @@
 #include <delimiter_io.hpp>
 #include "shapes.hpp"
 
+bool cherepkov::Point::operator==(const Point & rhs) const
+{
+  return x == rhs.x && y == rhs.y;
+}
+
+cherepkov::Point cherepkov::Point::operator-(const Point & rhs) const
+{
+  return {x - rhs.x, y - rhs.y};
+}
+
+
 std::istream& cherepkov::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sent(in);

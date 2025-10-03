@@ -5,6 +5,7 @@
 #include <fstream>
 #include <limits>
 #include "shapes.hpp"
+#include "commands.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -37,12 +38,12 @@ int main(int argc, char* argv[])
   }
 
   std::map< std::string, std::function< void() > > cmds;
-  cmds["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(data));
-  cmds["INFRAME"] =
-  cmds["SAME"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["AREA"] = std::bind(area, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MAX"] = std::bind(max, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["MIN"] = std::bind(min, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["COUNT"] = std::bind(count, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["INFRAME"] = std::bind(inFrame, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  cmds["SAME"] = std::bind(same, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
   std::string command;
   while (!(std::cin >> command).eof())

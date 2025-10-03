@@ -9,6 +9,8 @@ namespace cherepkov
   struct Point
   {
     int x, y;
+    bool operator==(const Point & rhs) const;
+    Point operator-(const Point & rhs) const;
   };
   struct Polygon
   {
