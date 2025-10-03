@@ -115,28 +115,6 @@ namespace
     return std::count_if(polygons.begin(), polygons.end(), smirnov::isOddCountVertexes);
   }
 
-
-  struct PolygonMaxSeq
-  {
-    size_t cur = 0;
-    size_t maxseq = 0;
-    bool operator()(const smirnov::Polygon& Polygon, const smirnov::Polygon& data);
-  };
-
-  bool PolygonMaxSeq::operator()(const smirnov::Polygon& Polygon, const smirnov::Polygon& data)
-  {
-    if (Polygon == data)
-    {
-      cur++;
-      maxseq = std::max(maxseq, cur);
-    }
-    else
-    {
-      cur = 0;
-    }
-    return maxseq;
-  }
-
   bool hasIntersection(const smirnov::Polygon& p1, const smirnov::Polygon& p2)
   {
 
@@ -151,7 +129,7 @@ namespace
   }
 
   template < class UnaryPredicate >
-double getSumArea(const std::vector< smirnov::Polygon >& polygons, UnaryPredicate P)
+  double getSumArea(const std::vector< smirnov::Polygon >& polygons, UnaryPredicate P)
   {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0, [&](double acc, const smirnov::Polygon& poly)
     {
@@ -168,6 +146,7 @@ double getSumArea(const std::vector< smirnov::Polygon >& polygons, UnaryPredicat
   {
     return getSumArea(polygons, smirnov::isOddCountVertexes);
   }
+
 
   struct SumAreas
   {
@@ -224,8 +203,6 @@ void smirnov::doAreaCommand(const std::vector< Polygon >& polygons, std::istream
   }
   out << std::fixed << std::setprecision(1) << result << "\n";
 }
-
-
 
 void smirnov::doMaxCommand(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
