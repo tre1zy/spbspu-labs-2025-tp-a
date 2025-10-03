@@ -5,9 +5,9 @@
 #include <iomanip>
 #include <stdexcept>
 #include <vector>
+#include <numeric>
 #include <fstream>
 #include <iterator>
-#include <numeric>
 
 namespace
 {
@@ -64,10 +64,43 @@ namespace
       return byte;
     }
   };
+  struct BitsGenerator
+  {
+    std::string& bits;
+    explicit BitsGenerator(std::string& b):
+      bits(b)
+    {}
+    void operator()(unsigned char byte) const
+    {
+      for (int i = 7; i >= 0; i--)
+      {
+        bits += (byte & (1 << i)) ? '1' : '0';
+      }
+    }
+  };
+}
+
+void mazitov::createCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
+{
+  std::string setName;
+  in >> setName;
+  if (mgmt.dataSetExists(setName))
+  {
+    throw std::runtime_error("<SET_ALREADY_EXISTS>");
+  }
+  if (mgmt.createDataSet(setName))
+  {
+    out << "Set " << setName << " created successfully.\n";
+  }
+  else
+  {
+    throw std::runtime_error("<CREATE_FAILED>");
+  }
 }
 
 void mazitov::getCmds(std::map< std::string, std::function< void(DataSetManager&, std::istream&, std::ostream&) > >& cmds)
 {
+  cmds["create"] = createCommand;
   cmds["compress"] = compressCommand;
   cmds["decompress"] = decompressCommand;
   cmds["degree"] = degreeCommand;
@@ -75,17 +108,19 @@ void mazitov::getCmds(std::map< std::string, std::function< void(DataSetManager&
   cmds["show_compressed"] = showCompressedCommand;
   cmds["delete"] = deleteCommand;
   cmds["merge"] = mergeCommand;
-  cmds["subtract"] = subrtactCommand;
+  cmds["subtract"] = subtractCommand;
   cmds["compare_degree"] = compareDegreesCommand;
   cmds["show_code"] = showCodeCommand;
   cmds["load_text"] = loadTextCommand;
   cmds["compressedToBin"] = compressedToBinCommand;
+  cmds["loadCompressed"] = loadCompressedCommand;
 }
 
 void mazitov::compressCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
 {
   std::string setName, text;
   in >> setName;
+  in >> std::ws;
   std::getline(in, text);
   if (!text.empty() && text[0] == ' ')
   {
@@ -99,15 +134,22 @@ void mazitov::compressCommand(DataSetManager& mgmt, std::istream& in, std::ostre
   {
     throw std::runtime_error("<SET_NOT_FOUND>");
   }
-  if (text.empty())
-  {
-    throw std::runtime_error("<TEXT_IS_EMPTY>");
-  }
-
   auto* dataSet = mgmt.getDataSet(setName);
-  dataSet->originalText = text;
+  if (!text.empty())
+  {
+    dataSet->originalText = text;
+  }
+  else if (!dataSet->originalText.empty())
+  {
+    text = dataSet->originalText;
+  }
+  else
+  {
+    throw std::runtime_error("<NO_TEXT_TO_COMPRESS>");
+  }
   if (mgmt.compressDataSet(setName))
   {
+    dataSet->compressedBits = mgmt.getCompressedData(setName);
     out << "Succesful: text was compressed and add in " << setName << ".\n";
   }
 }
@@ -118,9 +160,8 @@ void mazitov::decompressCommand(DataSetManager& mgmt, std::istream& in, std::ost
   in >> setName;
   if (!mgmt.dataSetExists(setName))
   {
-    throw std::runtime_error("SET_NOT_FOUND");
+    throw std::runtime_error("<SET_NOT_FOUND>");
   }
-
   auto* dataSet = mgmt.getDataSet(setName);
   if (dataSet->originalText.empty())
   {
@@ -137,7 +178,6 @@ void mazitov::degreeCommand(DataSetManager& mgmt, std::istream& in, std::ostream
   {
     throw std::runtime_error("<SET_NOT_FOUND>");
   }
-
   auto* dataSet = mgmt.getDataSet(setName);
   if (dataSet->originalText.empty() || dataSet->huffCodes.empty())
   {
@@ -178,12 +218,15 @@ void mazitov::showCompressedCommand(DataSetManager& mgmt, std::istream& in, std:
   }
 
   auto* ds = mgmt.getDataSet(setName);
-  if (ds->originalText.empty() || ds->huffCodes.empty())
+  std::string compressedBits = ds->compressedBits;
+  if (compressedBits.empty())
   {
-    throw std::runtime_error("<NO_COMPRESSED_DATA>");
+    if (ds->originalText.empty() || ds->huffCodes.empty())
+    {
+      throw std::runtime_error("<NO_COMPRESSED_DATA>");
+    }
+    compressedBits = mgmt.getCompressedData(setName);
   }
-
-  std::string compressedBits = mgmt.getCompressedData(setName);
   std::size_t numBytes = (compressedBits.size() + 7) / 8;
   std::vector< std::size_t > ind(numBytes);
   std::iota(ind.begin(), ind.end(), 0);
@@ -234,7 +277,7 @@ void mazitov::mergeCommand(DataSetManager& mgmt, std::istream& in, std::ostream&
   out << "Sets: " << set1 << " and " << set2 << " were merge in " << resultSet << "\n";
 }
 
-void mazitov::subrtactCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
+void mazitov::subtractCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
 {
   std::string set1, set2, resultSet;
   in >> set1 >> set2 >> resultSet;
@@ -374,4 +417,36 @@ void mazitov::compressedToBinCommand(DataSetManager& mgmt, std::istream& in, std
   file.write(reinterpret_cast< const char* >(bytes.data()), bytes.size());
   file.close();
   out << "Compressed data from set " << setName << "was saved in file " << filename << "\n";
+}
+
+void mazitov::loadCompressedCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
+{
+  std::string setName, filename;
+  in >> setName >> filename;
+  if (!mgmt.dataSetExists(setName))
+  {
+    throw std::runtime_error("<SET_NOT_FOUND>");
+  }
+  std::ifstream file(filename, std::ios::binary);
+  if (!file)
+  {
+    throw std::runtime_error("<FILE_NOT_FOUND>");
+  }
+  file.seekg(0, std::ios::end);
+  std::streamsize fileSize = file.tellg();
+  file.seekg(0, std::ios::beg);
+  if (fileSize <= 0)
+  {
+    throw std::runtime_error("<COMPRESSED_DATA_EMPTY>");
+  }
+  std::vector< unsigned char > bytes(fileSize);
+  if (!file.read(reinterpret_cast< char* >(bytes.data()), fileSize))
+  {
+    throw std::runtime_error("<FILE_READ_ERROR>");
+  }
+  std::string comprBits;
+  std::for_each(bytes.begin(), bytes.end(), BitsGenerator(comprBits));
+  auto* ds = mgmt.getDataSet(setName);
+  ds->compressedBits = comprBits;
+  out << "Compressed data loaded from " << filename << " to set " << setName << "\n";
 }

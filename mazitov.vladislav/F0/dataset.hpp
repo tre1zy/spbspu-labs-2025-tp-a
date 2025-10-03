@@ -12,6 +12,7 @@ namespace mazitov
   struct DataSet
   {
     std::string originalText;
+    std::string compressedBits;
     std::unordered_map< char, std::string > huffCodes;
   };
 
