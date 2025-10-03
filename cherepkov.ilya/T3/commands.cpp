@@ -208,10 +208,10 @@ namespace
   {
     if (res)
     {
-      out << "<TRUE>";
+      out << "<TRUE\n>";
       return;
     }
-    out << "<FALSE>";
+    out << "<FALSE\n>";
   }
 
   bool compareXPoint(const cherepkov::Point& a, const cherepkov::Point& b)
@@ -409,10 +409,16 @@ void cherepkov::same(std::istream& in, std::ostream& out, const std::vector< Pol
     throw std::logic_error("not polygons");
   }
   Polygon poly;
-  if (!(in >> poly) || in.peek() != '\n')
+  if (!(in >> poly))
   {
     throw std::logic_error("incorrect input");
   }
+
+  if (in.peek() != '\n' && in.peek() != EOF)
+  {
+    throw std::logic_error("incorrect input");
+  }
+  
   sortPolygon(poly);
   iSame cmp{poly};
   out << std::count_if(polygons.begin(), polygons.end(), cmp) << '\n';
