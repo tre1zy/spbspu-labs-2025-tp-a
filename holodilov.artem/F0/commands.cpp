@@ -206,10 +206,16 @@ void holodilov::addWord(std::istream& in, std::ostream& out, MapDicts& dictionar
   {
     throw std::logic_error("Error: dictionary not found.");
   }
-  dictionaries.at(dictName).dict[enWord] = std::list< std::string >();
+
+  Dictionary& dict = dictionaries.at(dictName);
+  if (dict.dict.find(enWord) != dict.dict.end())
+  {
+    throw std::logic_error("Error: this word is already in the dictionary.");
+  }
+  dict.dict[enWord] = std::list< std::string >();
 
   using istreamIter = std::istream_iterator< std::string >;
-  std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dictionaries[dictName].dict[enWord]));
+  std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dict.dict[enWord]));
   if (!in)
   {
     throw std::logic_error("Error: invalid command.");
