@@ -384,10 +384,21 @@ void cherepkov::inFrame(std::istream& in, std::ostream& out, const std::vector< 
 {
   Polygon framed;
   in >> framed;
-  if (in.fail() || polygons.empty())
+  if (!(in >> framed))
   {
-    throw std::logic_error("");
+    throw std::logic_error("incorrect input");
   }
+
+  if (in.peek() != '\n' && in.peek() != EOF)
+  {
+    throw std::logic_error("incorrect input");
+  }
+
+  if (polygons.empty())
+  {
+    throw std::logic_error("not polygons");
+  }
+
   int max_framed_x = findMaxXPolygon(framed);
   int max_framed_y = findMaxYPolygon(framed);
   int min_framed_x = findMinXPolygon(framed);
