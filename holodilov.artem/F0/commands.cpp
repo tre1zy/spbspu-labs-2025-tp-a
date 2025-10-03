@@ -30,9 +30,22 @@ namespace
     return pair.first;
   }
 
-  bool checkIntersect(const std::pair< std::string, std::list< std::string > >& pair, const holodilov::Dictionary& dict)
+  bool checkIntersect(const holodilov::MapWordsPair& pair, const holodilov::Dictionary& dict)
   {
     return dict.dict.find(pair.first) != dict.dict.end();
+  }
+
+  holodilov::MapWordsPair mergeWords(const holodilov::MapWordsPair& pair, const holodilov::MapWords& mapDict2)
+  {
+    holodilov::MapWordsPair result = pair;
+    if (mapDict2.find(result.first) != mapDict2.end())
+    {
+      std::list< std::string > translationsDict2 = mapDict2.at(result.first);
+      result.second.insert(result.second.end(), translationsDict2.begin(), translationsDict2.end());
+      result.second.sort();
+      result.second.unique();
+    }
+    return result;
   }
 }
 
@@ -344,9 +357,12 @@ void holodilov::merge(std::istream& in, std::ostream& out, MapDicts& dictionarie
     throw std::logic_error("Error: dictionary not found.");
   }
 
-  MapWords mapNewDict = dictionaries.at(dictName1).dict;
-
+  MapWords mapNewDict;
+  Dictionary& dict1 = dictionaries.at(dictName1);
   Dictionary& dict2 = dictionaries.at(dictName2);
+
+  auto mergeWordsBound = std::bind(mergeWords, std::placeholders::_1, std::cref(dict2.dict));
+  std::transform(dict1.dict.begin(), dict1.dict.end(), std::inserter(mapNewDict, mapNewDict.end()), mergeWordsBound);
   mapNewDict.insert(dict2.dict.begin(), dict2.dict.end());
 
   Dictionary dictNew{ dictNameNew, dictLangNew, mapNewDict };
@@ -391,13 +407,18 @@ void holodilov::intersect(std::istream& in, std::ostream& out, MapDicts& diction
 
   Dictionary& dict1 = dictionaries.at(dictName1);
   Dictionary& dict2 = dictionaries.at(dictName2);
+  MapWords mapNewDict;
 
-  Dictionary dictNew{ dictNameNew, dictLangNew, MapWords() };
   auto checkIntersectBound = std::bind(checkIntersect, std::placeholders::_1, std::cref(dict2));
-
-  auto inserterNewDict = std::inserter(dictNew.dict, dictNew.dict.end());
+  auto inserterNewDict = std::inserter(mapNewDict, mapNewDict.end());
   std::copy_if(dict1.dict.begin(), dict1.dict.end(), inserterNewDict, checkIntersectBound);
 
+  auto mergeWordsBound = std::bind(mergeWords, std::placeholders::_1, std::cref(dict2.dict));
+  MapWords mapNewDictTemp;
+  auto inserterNewDictTemp = std::inserter(mapNewDictTemp, mapNewDictTemp.end());
+  std::transform(mapNewDict.begin(), mapNewDict.end(), inserterNewDictTemp, mergeWordsBound);
+
+  Dictionary dictNew{ dictNameNew, dictLangNew, mapNewDictTemp };
   dictionaries[dictNameNew] = dictNew;
   out << "Dictionaries " << dictName1 << " and " << dictName2 << " were intersected to " << dictNameNew;
 }

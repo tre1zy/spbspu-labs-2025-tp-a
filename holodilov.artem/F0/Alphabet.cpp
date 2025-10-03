@@ -6,7 +6,7 @@
 
 namespace
 {
-  std::list< std::string > dictPairToTranslations(const std::pair< std::string, std::list< std::string > >& pair)
+  std::list< std::string > dictPairToTranslations(const holodilov::MapWordsPair& pair)
   {
     return pair.second;
   }

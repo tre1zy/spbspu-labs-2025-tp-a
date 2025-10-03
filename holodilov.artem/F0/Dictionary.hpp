@@ -9,6 +9,7 @@
 namespace holodilov
 {
   using MapWords = std::map< std::string, std::list< std::string > >;
+  using MapWordsPair = std::pair< std::string, std::list< std::string > >;
 
   struct Dictionary
   {
