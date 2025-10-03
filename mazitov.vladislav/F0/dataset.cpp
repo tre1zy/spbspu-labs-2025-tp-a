@@ -65,3 +65,12 @@ std::string mazitov::DataSetManager::getCompressedData(const std::string& name) 
   }
   return res;
 }
+
+std::size_t mazitov::DataSetManager::getCompressedSize(const std::string& name) const
+{
+  if (dataSets.find(name) == dataSets.end())
+  {
+    return 0;
+  }
+  return getCompressedData(name).size();
+}

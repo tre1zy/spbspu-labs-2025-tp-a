@@ -29,7 +29,7 @@ namespace mazitov
   {
     bool operator()(const huffPtr &, const huffPtr &) const;
   };
-  
+
   huffPtr buildHuffmanTree(const freqTable &);
   freqTable buildFreqTable(const std::string &);
   void generateCodes(const huffPtr &, huffCodesTable &);

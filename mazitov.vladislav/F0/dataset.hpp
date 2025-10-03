@@ -24,6 +24,7 @@ namespace mazitov
     bool compressDataSet(const std::string &);
     DataSet* getDataSet(const std::string &);
     std::string getCompressedData(const std::string &) const;
+    std::size_t getCompressedSize(const std::string &) const;
   private:
     std::map< std::string, DataSet > dataSets;
   };
