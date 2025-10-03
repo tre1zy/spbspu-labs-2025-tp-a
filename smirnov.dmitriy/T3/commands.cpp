@@ -137,29 +137,6 @@ namespace
     return maxseq;
   }
 
-  void doMaxseqCommand(const std::vector< smirnov::Polygon >& polygons, std::istream& in, std::ostream& out)
-  {
-    smirnov::Polygon data;
-    in >> data;
-    if (data.points.size() < 3)
-    {
-      throw std::logic_error("INVALID COMMAND");
-    }
-    else
-    {
-      PolygonMaxSeq seq{};
-      size_t numberSeq = std::count_if(polygons.begin(), polygons.end(), std::bind(std::ref(seq), std::placeholders::_1, data));
-      if (numberSeq < 1)
-      {
-        throw std::logic_error("INVALID COMMAND");
-      }
-      else
-      {
-        out << seq.maxseq << "\n";
-      }
-    }
-  }
-
   bool hasIntersection(const smirnov::Polygon& p1, const smirnov::Polygon& p2)
   {
 
@@ -308,6 +285,3 @@ void smirnov::doIntersections(const std::vector< Polygon >& data, std::istream& 
 
   out << std::count_if(data.begin(), data.end(), std::bind(hasIntersection, std::placeholders::_1, Polygon)) << '\n';
 }
-
-
-

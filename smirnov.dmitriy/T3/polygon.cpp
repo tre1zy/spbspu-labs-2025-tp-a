@@ -4,6 +4,7 @@
 #include <functional>
 #include <iterator>
 #include <vector>
+#include <limits>
 #include "delimiters.hpp"
 
 std::istream& smirnov::operator>>(std::istream& in, Point& value)
