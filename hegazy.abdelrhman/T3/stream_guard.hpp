@@ -18,5 +18,5 @@ namespace bob
     char fill_;
     std::ios::fmtflags flags_;
   };
-} // namespace bob
+}
 #endif
