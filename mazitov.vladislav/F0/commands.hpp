@@ -20,7 +20,7 @@ namespace mazitov
   void showCodeCommand(DataSetManager &, std::istream &, std::ostream &);
   void loadTextCommand(DataSetManager &, std::istream &, std::ostream &);
   void compressedToBinCommand(DataSetManager &, std::istream &, std::ostream &);
-  void loadCompressed(DataSetManager &, std::istream &, std::ostream &);
+  void loadCompressedCommand(DataSetManager &, std::istream &, std::ostream &);
 }
 
 #endif
