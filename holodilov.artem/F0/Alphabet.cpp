@@ -6,37 +6,46 @@
 
 namespace
 {
-  std::list< std::string > dictPairToTranslations(const holodilov::MapWordsPair& pair)
+  const std::string& joinWords(const std::string& str, std::string& strJoined)
   {
-    return pair.second;
+    strJoined += str;
+    return str;
   }
 
-  std::string translationToAlphabet(std::string& translation, std::set< char >& alphabet)
+  std::string joinListsToWords(const holodilov::MapWordsPair& pair)
   {
-    alphabet.insert(translation.begin(), translation.end());
-    return translation;
-  }
-
-  std::list< std::string > translationListsToAlphabet(std::list< std::string >& translations, std::set< char >& alphabet)
-  {
-    auto translationToAlphabetBound = std::bind(translationToAlphabet, std::placeholders::_1, std::ref(alphabet));
-    std::transform(translations.begin(), translations.end(), translations.begin(), translationToAlphabetBound);
-    return translations;
+    std::string strJoined;
+    std::vector< std::string > vecWordsTemp;
+    auto joinWordsBound = std::bind(joinWords, std::placeholders::_1, std::ref(strJoined));
+    std::transform(pair.second.begin(), pair.second.end(), std::back_inserter(vecWordsTemp), joinWordsBound);
+    return strJoined;
   }
 }
 
-void holodilov::Alphabet::load(const Dictionary& dictionary)
+holodilov::Alphabet::Alphabet(const Dictionary &dictionary)
 {
-  std::vector< std::list< std::string > > vecTranslLists(dictionary.dict.size());
-  std::transform(dictionary.dict.begin(), dictionary.dict.end(), vecTranslLists.begin(), dictPairToTranslations);
+  std::vector< std::string > vecWords;
+  std::transform(dictionary.dict.begin(), dictionary.dict.end(), std::back_inserter(vecWords), joinListsToWords);
 
-  auto translationsToAlphabetBound = std::bind(translationListsToAlphabet, std::placeholders::_1, std::ref(alphabet_));
-  std::transform(vecTranslLists.begin(), vecTranslLists.end(), vecTranslLists.begin(), translationsToAlphabetBound);
-  isLoaded_ = true;
+  std::string strJoined;
+  auto joinWordsBound = std::bind(joinWords, std::placeholders::_1, std::ref(strJoined));
+  std::transform(vecWords.begin(), vecWords.end(), std::back_inserter(vecWords), joinWordsBound);
+
+  std::sort(strJoined.begin(), strJoined.end());
+  auto newStrEnd = std::unique(strJoined.begin(), strJoined.end());
+  strJoined.erase(newStrEnd, strJoined.end());
+  alphabet_ = strJoined;
 }
 
-bool holodilov::Alphabet::isLoaded() const {
-  return isLoaded_;
+holodilov::Alphabet::Alphabet(std::istream& in)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    in.setstate(std::ios::failbit);
+    return;
+  }
+  in >> alphabet_;
 }
 
 std::ostream& holodilov::operator<<(std::ostream& out, const Alphabet& alphabet)
@@ -46,23 +55,8 @@ std::ostream& holodilov::operator<<(std::ostream& out, const Alphabet& alphabet)
   {
     return out;
   }
-  using ostreamIter = std::ostream_iterator< char >;
-  std::copy(alphabet.alphabet_.begin(), alphabet.alphabet_.end(), ostreamIter(out));
+  out << alphabet.alphabet_;
   return out;
-}
-
-std::istream& holodilov::operator>>(std::istream& in, Alphabet& alphabet)
-{
-  std::istream::sentry sentry(in);
-  if (!sentry)
-  {
-    return in;
-  }
-
-  using istreamIter = std::istream_iterator< char >;
-  std::copy(istreamIter(in), istreamIter(), std::inserter(alphabet.alphabet_, alphabet.alphabet_.end()));
-  alphabet.isLoaded_ = true;
-  return in;
 }
 
 bool holodilov::Alphabet::operator==(const Alphabet& rhs) const

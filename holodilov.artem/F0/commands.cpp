@@ -3,8 +3,9 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
-#include "Alphabet.hpp"
 #include <vector>
+#include <set>
+#include "Alphabet.hpp"
 #include "ScopeGuard.hpp"
 
 namespace
@@ -450,9 +451,7 @@ void holodilov::exportAlphabet(std::istream& in, std::ostream& out, const MapDic
     throw std::logic_error("Error: dictionary not found.");
   }
 
-  Alphabet alphabet;
-  alphabet.load(dictionaries.at(dictName));
-
+  Alphabet alphabet(dictionaries.at(dictName));
   std::ofstream fos;
   fos.open(filename);
   if (!fos.is_open())
@@ -489,23 +488,19 @@ void holodilov::checkAlphabet(std::istream& in, std::ostream& out, const MapDict
     throw std::logic_error("Error: dictionary not found.");
   }
 
-  Alphabet alphabetFromFile;
-
   std::ifstream fis;
   fis.open(filename);
   if (!fis.is_open())
   {
     throw std::logic_error("Error: alphabet file not found.");
   }
-  fis >> alphabetFromFile;
-  if (fis.fail() && (!fis.eof()))
+  Alphabet alphabetFromFile(fis);
+  if (fis.fail() || fis.bad())
   {
     throw std::logic_error("Error: unable to read alphabet file.");
   }
 
-  Alphabet alphabetFromDict;
-  alphabetFromDict.load(dictionaries.at(dictName));
-
+  Alphabet alphabetFromDict(dictionaries.at(dictName));
   ScopeGuard scopeGuard(out);
   out << std::boolalpha;
   out << (alphabetFromFile == alphabetFromDict);
