@@ -29,7 +29,7 @@ std::istream& smirnov::operator>>(std::istream& in, Point& value)
 
 bool smirnov::operator<(const Point& p1, const Point& p2)
 {
-  return p1.x != p2.x ? p1.x < p2.x : p1.y < p2.y;
+  return (p1.x < p2.x) || (p1.x == p2.x && p1.y < p2.y);
 }
 
 bool smirnov::operator==(const Point& p1, const Point& p2)
@@ -64,7 +64,7 @@ std::istream& smirnov::operator>>(std::istream& in, Polygon& value)
   {
     in.setstate(std::ios::failbit);
   }
-  value = Polygon{ vec };
+  value = Polygon{ std::move(vec) };
   return in;
 }
 
@@ -116,7 +116,7 @@ bool smirnov::isPerpendicular(const Point& p1, const Point& p2, const Point& p3)
   double y1 = p1.y - p2.y;
   double x2 = p1.x - p3.x;
   double y2 = p1.y - p3.y;
-  return x1 * x2 + y1 * y2 == 0;
+  return std::abs(x1 * x2 + y1 * y2) < std::numeric_limits< double >::epsilon();
 }
 
 bool smirnov::isRect(const Polygon& p)
@@ -125,8 +125,8 @@ bool smirnov::isRect(const Polygon& p)
   {
     return false;
   }
-  std::array<Point, 4> points;
-  std::copy(p.points.begin(), p.points.end(), points.begin());
+  std::array< Point, 4 > points;
+  std::copy_n(p.points.begin(), 4, points.begin());
   std::sort(points.begin(), points.end());
   return isPerpendicular(points[0], points[1], points[2]) && isPerpendicular(points[1], points[0], points[3]) &&
          isPerpendicular(points[3], points[2], points[1]);
