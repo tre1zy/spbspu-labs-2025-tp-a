@@ -75,7 +75,7 @@ namespace
   {
     return poly.points.size() == n;
   }
-  
+
   void getAreaVertexes(std::ostream & out, const std::vector< cherepkov::Polygon > & polygons, size_t n)
   {
     std::vector< cherepkov::Polygon > temp;
