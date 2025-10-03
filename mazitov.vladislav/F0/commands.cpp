@@ -57,7 +57,7 @@ void mazitov::compressCommand(DataSetManager& mgmt, std::istream& in, std::ostre
   {
     throw std::runtime_error("<TEXT_IS_EMPTY>");
   }
-  
+
   auto* dataSet = mgmt.getDataSet(setName);
   dataSet->originalText = text;
   if (mgmt.compressDataSet(setName))
@@ -74,7 +74,7 @@ void mazitov::decompressCommand(DataSetManager& mgmt, std::istream& in, std::ost
   {
     throw std::runtime_error("SET_NOT_FOUND");
   }
-  
+
   auto* dataSet = mgmt.getDataSet(setName);
   if (dataSet->originalText.empty())
   {
@@ -91,7 +91,7 @@ void mazitov::degreeCommand(DataSetManager& mgmt, std::istream& in, std::ostream
   {
     throw std::runtime_error("<SET_NOT_FOUND>");
   }
-  
+
   auto* dataSet = mgmt.getDataSet(setName);
   if (dataSet->originalText.empty() || dataSet->huffCodes.empty())
   {
@@ -138,15 +138,15 @@ void mazitov::mergeCommand(DataSetManager& mgmt, std::istream& in, std::ostream&
 {
   std::string set1, set2, resultSet;
   in >> set1 >> set2 >> resultSet;
-  if (!mgmt.dataSetExists(set1)) 
+  if (!mgmt.dataSetExists(set1))
   {
     throw std::runtime_error("<SET1_NOT_FOUND>");
   }
-  if (!mgmt.dataSetExists(set2)) 
+  if (!mgmt.dataSetExists(set2))
   {
     throw std::runtime_error("<SET2_NOT_FOUND>");
   }
-  if (mgmt.dataSetExists(resultSet)) 
+  if (mgmt.dataSetExists(resultSet))
   {
     throw std::runtime_error("<RESULT_SET_ALREADY_EXISTS>");
   }
