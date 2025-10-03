@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
-      if (std::cin.fail())
+      if (std::cin.fail() || std::cin.eof())
       {
         std::cin.clear(std::cin.rdstate() ^ std::ios::failbit);
       }

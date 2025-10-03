@@ -208,10 +208,10 @@ namespace
   {
     if (res)
     {
-      out << "<TRUE\n>";
+      out << "<TRUE>\n";
       return;
     }
-    out << "<FALSE\n>";
+    out << "<FALSE>\n";
   }
 
   bool compareXPoint(const cherepkov::Point& a, const cherepkov::Point& b)
