@@ -1,17 +1,18 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
+
+#include "geometry.hpp"
+
 #include <iostream>
 #include <vector>
-#include "geometry.hpp"
 
 namespace bob
 {
-  void printAreaSum(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
-  void printMaxValueOf(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
-  void printMinValueOf(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
-  void printCountOf(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
-  void printLessAreaCnt(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
-  bool polygonsIntersect(const geom::Polygon& p1, const geom::Polygon& p2);
-  void printIntersectionsCnt(std::istream& input, const std::vector<geom::Polygon>& polygons, std::ostream& output);
-}
+  void printAreaSum(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void printMaxValueOf(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void printMinValueOf(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void printCountOf(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void printLessArea(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+  void printIntersections(std::istream &in, std::ostream &out, const std::vector< Polygon > &polygons);
+} // namespace bob
 #endif

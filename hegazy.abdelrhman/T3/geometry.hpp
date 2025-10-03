@@ -1,37 +1,49 @@
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
-#include <vector>
-#include <iosfwd>
 
-namespace geom
+#include <iostream>
+#include <vector>
+
+namespace bob
 {
   struct Point
   {
-    double x;
-    double y;
+    int x, y;
   };
+
+  std::istream &operator>>(std::istream &in, Point &p);
 
   struct Polygon
   {
-    std::vector<Point> points;
+    std::vector< Point > points;
   };
 
-  bool operator==(const Point& p1, const Point& p2);
-  bool operator>(const Point& p, const Point& other);
-  bool operator<(const Point& p, const Point& other);
-  std::istream& operator>>(std::istream& in, Point& p);
-  std::istream& operator>>(std::istream& in, Polygon& poly);
-  double getPolygonArea(const Polygon& poly);
-  double getDist(const Point& a, const Point& b);
-  double getAreaOfTrg(const Polygon& poly);
-  Polygon createTrg(size_t i, const std::vector<Point>& points);
-  std::vector<Polygon> polyToTrg(const Polygon& poly);
-  struct TrgGenerator
+  std::istream &operator>>(std::istream &in, Polygon &poly);
+
+  bool isOdd(const Polygon &p);
+  bool isEven(const Polygon &p);
+
+  double getDistance(const Point &a, const Point &b);
+
+  Polygon buildTriangle(size_t i, const std::vector< Point > &pts);
+
+  struct TriangleGenerator
   {
-    TrgGenerator(size_t idx, const std::vector<Point>& pts) : points_(pts), i_(idx) {}
-    const std::vector<Point>& points_;
-    size_t i_;
+    size_t &index;
+    const std::vector< Point > &points;
     Polygon operator()();
   };
-}
+
+  std::vector< Polygon > polygonToTriangles(const Polygon &poly);
+
+  double getTriangleArea(const Polygon &triangle);
+  double getPolygonArea(const Polygon &poly);
+  double getTotalArea(const std::vector< Polygon > &polygons);
+
+  bool compareByArea(const Polygon &a, const Polygon &b);
+  bool compareByVertexes(const Polygon &a, const Polygon &b);
+  bool comparePointByX(const Point &a, const Point &b);
+  bool comparePointByY(const Point &a, const Point &b);
+} // namespace bob
+
 #endif

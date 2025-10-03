@@ -1,138 +1,123 @@
 #include "geometry.hpp"
+#include "DataStruct.h"
+
 #include <algorithm>
 #include <numeric>
 #include <cmath>
 #include <iterator>
-#include <limits>
-#include <ios>
-#include "delimiter.hpp"
 
-namespace geom
+std::istream &bob::operator>>(std::istream &in, bob::Point &p)
 {
-  struct PointReader
-  {
-    std::istream& in;
-    Point operator()() const
-    {
-      Point p;
-      if (!(in >> p))
-      {
-        in.setstate(std::ios::failbit);
-        return p;
-      }
-      return p;
-    }
-  };
+  std::istream::sentry sentry(in);
+  if (!sentry)
+    return in;
 
-  bool operator==(const Point& p1, const Point& p2)
-  {
-    return p1.x == p2.x && p1.y == p2.y;
-  }
+  bob::Point temp{0, 0};
+  in >> DelimiterIO{'('} >> temp.x >> DelimiterIO{';'} >> temp.y >> DelimiterIO{')'};
 
-  bool operator>(const Point& p, const Point& other)
-  {
-    return p.x > other.x && p.y > other.y;
-  }
+  if (in)
+    p = temp;
+  return in;
+}
 
-  bool operator<(const Point& p, const Point& other)
-  {
-    return p.x < other.x && p.y < other.y;
-  }
+std::istream &bob::operator>>(std::istream &in, bob::Polygon &polygon)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+    return in;
 
-  std::istream& operator>>(std::istream& in, Point& p)
+  size_t count;
+  in >> count;
+  if (count < 3)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    using del = io::DelimiterIO;
-    char open, close;
-    if (!(in >> open) || open != '(' || !(in >> p.x) || !(in >> del{';'}) || !(in >> p.y) || !(in >> close) || close != ')')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
+    in.setstate(std::ios::failbit);
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Polygon& poly)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    size_t count;
-    if (!(in >> count) || count < 3)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    std::vector<Point> pts;
-    pts.reserve(count);
-    std::istream::sentry pointSentry(in);
-    for (size_t i = 0; i < count; ++i)
-    {
-      Point p;
-      std::istream::pos_type pos = in.tellg();
-      if (!(in >> p))
-      {
-        in.clear();
-        in.seekg(pos);
-        in.setstate(std::ios::failbit);
-        return in;
-      }
-      pts.push_back(p);
-    }
-    if (!in || pts.size() != count)
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    poly.points = std::move(pts);
-    return in;
-  }
+  std::vector< bob::Point > temp;
+  using input_it_t = std::istream_iterator< bob::Point >;
+  std::copy_n(input_it_t{in}, count, std::back_inserter(temp));
 
-  double getDist(const Point& a, const Point& b)
+  if (in)
   {
-    return std::sqrt(std::pow((a.x - b.x), 2) + std::pow((a.y - b.y), 2));
+    polygon.points = temp;
   }
+  return in;
+}
 
-  double getAreaOfTrg(const Polygon& poly)
-  {
-    double side1 = getDist(poly.points[0], poly.points[1]);
-    double side2 = getDist(poly.points[0], poly.points[2]);
-    double side3 = getDist(poly.points[2], poly.points[1]);
-    double p = (side1 + side2 + side3) / 2;
-    return std::sqrt(p * (p - side1) * (p - side2) * (p - side3));
-  }
+bool bob::isOdd(const bob::Polygon &p)
+{
+  return (p.points.size() % 2) == 1;
+}
 
-  Polygon createTrg(size_t i, const std::vector<Point>& points)
-  {
-    return Polygon{std::vector<Point>{points[0], points[i + 1], points[i + 2]}};
-  }
+bool bob::isEven(const bob::Polygon &p)
+{
+  return (p.points.size() % 2) == 0;
+}
 
-  Polygon TrgGenerator::operator()()
-  {
-    return createTrg(i_++, points_);
-  }
+double bob::getDistance(const bob::Point &a, const bob::Point &b)
+{
+  return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2));
+}
 
-  std::vector<Polygon> polyToTrg(const Polygon& poly)
-  {
-    size_t size = poly.points.size() - 2;
-    size_t ind = 0;
-    std::vector<Polygon> triangles(size);
-    std::generate(triangles.begin(), triangles.end(), TrgGenerator{ind, poly.points});
-    return triangles;
-  }
+bob::Polygon bob::buildTriangle(size_t i, const std::vector< bob::Point > &pts)
+{
+  return bob::Polygon{std::vector< bob::Point >{pts[0], pts[i + 1], pts[i + 2]}};
+}
 
-  double getPolygonArea(const Polygon& poly)
-  {
-    if (poly.points.size() < 3) return 0.0;
-    std::vector<double> areas;
-    std::vector<Polygon> triangles = polyToTrg(poly);
-    std::transform(triangles.begin(), triangles.end(), std::back_inserter(areas), getAreaOfTrg);
-    return std::accumulate(areas.begin(), areas.end(), 0.0);
-  }
+bob::Polygon bob::TriangleGenerator::operator()()
+{
+  return buildTriangle(index++, points);
+}
+
+std::vector< bob::Polygon > bob::polygonToTriangles(const bob::Polygon &poly)
+{
+  std::vector< bob::Polygon > triangles(poly.points.size() - 2);
+  size_t index = 0;
+  std::generate(triangles.begin(), triangles.end(), TriangleGenerator{index, poly.points});
+  return triangles;
+}
+
+double bob::getTriangleArea(const bob::Polygon &triangle)
+{
+  double a = getDistance(triangle.points[0], triangle.points[1]);
+  double b = getDistance(triangle.points[1], triangle.points[2]);
+  double c = getDistance(triangle.points[0], triangle.points[2]);
+  double s = (a + b + c) / 2.0;
+  return std::sqrt(s * (s - a) * (s - b) * (s - c));
+}
+
+double bob::getPolygonArea(const bob::Polygon &poly)
+{
+  std::vector< bob::Polygon > triangles = polygonToTriangles(poly);
+  std::vector< double > areas(triangles.size());
+  std::transform(triangles.begin(), triangles.end(), areas.begin(), getTriangleArea);
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
+}
+
+double bob::getTotalArea(const std::vector< bob::Polygon > &polygons)
+{
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), areas.begin(), getPolygonArea);
+  return std::accumulate(areas.begin(), areas.end(), 0.0);
+}
+
+bool bob::compareByArea(const Polygon &a, const Polygon &b)
+{
+  return getPolygonArea(a) < getPolygonArea(b);
+}
+
+bool bob::compareByVertexes(const Polygon &a, const Polygon &b)
+{
+  return a.points.size() < b.points.size();
+}
+
+bool bob::comparePointByX(const Point &a, const Point &b)
+{
+  return (a.x < b.x) || (a.x == b.x && a.y < b.y);
+}
+
+bool bob::comparePointByY(const Point &a, const Point &b)
+{
+  return (a.y < b.y) || (a.y == b.y && a.x < b.x);
 }
