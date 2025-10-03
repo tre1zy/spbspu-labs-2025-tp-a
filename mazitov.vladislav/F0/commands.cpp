@@ -18,6 +18,48 @@ namespace
       return text.find(c) == std::string::npos;
     }
   };
+  struct HexPrinter
+  {
+    std::ostream& out;
+    std::size_t counter;
+    explicit HexPrinter(std::ostream& o):
+      out(o),
+      counter(0)
+    {}
+    void operator()(unsigned char byte)
+    {
+      out << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast< int >(byte);
+      counter++;
+      if (counter % 8 == 0)
+      {
+        out << "\n";
+      }
+      else
+      {
+        out << " ";
+      }
+    }
+  };
+  struct ByteGenerator
+  {
+    const std::string& bits;
+    explicit ByteGenerator(const std::string& b):
+      bits(b)
+    {}
+    unsigned char operator()(std::size_t byteIndex) const
+    {
+      unsigned char byte = 0;
+      std::size_t startBit = byteIndex * 8;
+      for (std::size_t j = 0; j < 8 && startBit + j < bits.size(); j++)
+      {
+        if (bits[startBit + j] == '1')
+        {
+          byte |= (1 << (7 - j));
+        }
+      }
+      return byte;
+    }
+  };
 }
 
 void mazitov::getCmds(std::map< std::string, std::function< void(DataSetManager&, std::istream&, std::ostream&) > >& cmds)
@@ -122,6 +164,35 @@ void mazitov::showOriginalCommand(DataSetManager& mgmt, std::istream& in, std::o
   out << dataSet->originalText << "\n";
 }
 
+void mazitov::showCompressedCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
+{
+  std::string setName;
+  in >> setName;
+  if (!mgmt.dataSetExists(setName))
+  {
+    throw std::runtime_error("<SET_NOT_FOUND>");
+  }
+
+  auto* ds = mgmt.getDataSet(setName);
+  if (ds->originalText.empty() || ds->huffCodes.empty())
+  {
+    throw std::runtime_error("<NO_COMPRESSED_DATA>");
+  }
+
+  std::string compressedBits = mgmt.getCompressedData(setName);
+  std::size_t numBytes = (compressedBits.size() + 7) / 8;
+  std::vector< std::size_t > ind(numBytes);
+  std::iota(ind.begin(), ind.end(), 0);
+  std::vector< unsigned char > bytes(numBytes);
+  std::transform(ind.begin(), ind.end(), bytes.begin(), ByteGenerator(compressedBits));
+  HexPrinter printer(out);
+  std::for_each(bytes.begin(), bytes.end(), std::ref(printer));
+  if (!bytes.empty() && bytes.size() % 8 != 0)
+  {
+    out << "\n";
+  }
+}
+
 void mazitov::deleteCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
 {
   std::string setName;
@@ -215,11 +286,11 @@ void mazitov::compareDegreesCommand(DataSetManager& mgmt, std::istream& in, std:
   std::string comp2 = mgmt.getCompressedData(set2);
   double ratio1 = static_cast< double >(comp1.size()) / (ds1->originalText.size() * 8);
   double ratio2 = static_cast< double >(comp2.size()) / (ds2->originalText.size() * 8);
-  if (ratio1 > ratio2)
+  if (ratio1 < ratio2)
   {
     out << set1 << " better compress (" << ratio1 << " < " << ratio2 << ")\n";
   }
-  else if (ratio2 > ratio1)
+  else if (ratio2 < ratio1)
   {
     out << set2 << " better compress (" << ratio2 << " < " << ratio1 << ")\n";
   }
@@ -248,4 +319,55 @@ void mazitov::showCodeCommand(DataSetManager& mgmt, std::istream& in, std::ostre
   {
     out << "  '" << pair.first << "': " << pair.second << "\n";
   }
+}
+
+void mazitov::loadTextCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
+{
+  std::string setName, filename;
+  in >> setName >> filename;
+  if (!mgmt.dataSetExists(setName))
+  {
+    throw std::runtime_error("<SET_NOT_FOUND>");
+  }
+  std::ifstream file(filename);
+  if (!file)
+  {
+    throw std::runtime_error("<FILE_NOT_FOUND>");
+  }
+
+  std::string content((std::istreambuf_iterator< char >(file)), std::istreambuf_iterator< char >());
+  if (content.empty())
+  {
+    throw std::runtime_error("<TEXT_IS_EMPTY>");
+  }
+
+  auto* ds = mgmt.getDataSet(setName);
+  ds->originalText = content;
+  out << "File " << filename << "was loaded at set " << setName << "\n";
+}
+
+void mazitov::compressedToBinCommand(DataSetManager& mgmt, std::istream& in, std::ostream& out)
+{
+  std::string setName, filename;
+  in >> setName >> filename;
+  if (!mgmt.dataSetExists(setName))
+  {
+    throw std::runtime_error("<SET_NOT_FOUND>");
+  }
+  auto* ds = mgmt.getDataSet(setName);
+  if (ds->originalText.empty() || ds->huffCodes.empty())
+  {
+    throw std::runtime_error("<NO_COMPRESSED_DATA>");
+  }
+
+  std::string compressedBits = mgmt.getCompressedData(setName);
+  std::size_t numBytes = (compressedBits.size() + 7) / 8;
+  std::vector< std::size_t > ind(numBytes);
+  std::iota(ind.begin(), ind.end(), 0);
+  std::vector< unsigned char > bytes(numBytes);
+  std::transform(ind.begin(), ind.end(), bytes.begin(), ByteGenerator(compressedBits));
+  std::ofstream file(filename, std::ios::binary);
+  file.write(reinterpret_cast< const char* >(bytes.data()), bytes.size());
+  file.close();
+  out << "Compressed data from set " << setName << "was saved in file " << filename << "\n";
 }
