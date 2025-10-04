@@ -1,19 +1,22 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
-#include <string>
+#include <map>
 #include <vector>
+#include <string>
+#include <functional>
 #include "geometry.hpp"
 
 namespace cherkasov
 {
-  void processCommand(const std::vector<Polygon>& polys, const std::string& cmd);
-  void handleArea(const std::vector<Polygon>& polys, const std::string& arg);
-  void handleMax(const std::vector<Polygon>& polys, const std::string& arg);
-  void handleMin(const std::vector<Polygon>& polys, const std::string& arg);
-  void handleCount(const std::vector<Polygon>& polys, const std::string& arg);
-  void handleIntersections(const std::vector<Polygon>& polys, const std::string& arg);
-  void handleRightShapes(const std::vector<Polygon>& polys);
+  void doAreaComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
+  void doMaxComm(const std::vector< Polygon>& polygons, std::ostream& out, std::istream& in);
+  void doMinComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
+  void doCountComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
+  void doMaxseqComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
+  void doIntersectComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
+  void doIsCuttedComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
+  void doRightShapesComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in);
 }
 
 #endif
