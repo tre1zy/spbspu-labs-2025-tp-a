@@ -105,15 +105,6 @@ namespace
     out << res;
   }
 
-  size_t getMaxseq(const Polygon& polygon, const Polygon& pattern)
-  {
-    if (isPolygonsEqual(polygon, pattern))
-    {
-      return 1;
-    }
-    return 0;
-  }
-
   struct PointInPolygon
   {
     const Polygon& polygon;

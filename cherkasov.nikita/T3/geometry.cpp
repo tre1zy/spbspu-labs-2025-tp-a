@@ -85,10 +85,6 @@ namespace cherkasov
     {
       return false;
     }
-    auto left1 = std::min_element(polygon.points.begin(), polygon.points.end());
-    auto right1 = std::max_element(polygon.points.begin(), polygon.points.end());
-    auto left2 = std::min_element(other.points.begin(), other.points.end());
-    auto right2 = std::max_element(other.points.begin(), other.points.end());
     int minx1 = polygon.points.front().x, miny1 = polygon.points.front().y, maxx1 = minx1, maxy1 = miny1;
     for (size_t i = 0; i < polygon.points.size(); ++i)
     {
@@ -157,8 +153,7 @@ namespace cherkasov
     double area = 0.0;
     for (size_t i = 0, j = p.size() - 1; i < p.size(); j = i++)
     {
-      area += static_cast<double>(p[j].x) * static_cast<double>(p[i].y)
-            - static_cast<double>(p[i].x) * static_cast<double>(p[j].y);
+      area += double(p[j].x) * double(p[i].y) - double(p[i].x) * double(p[j].y);
     }
     return std::abs(area) / 2.0;
   }
