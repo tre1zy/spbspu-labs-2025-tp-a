@@ -7,7 +7,7 @@ cherkasov::StreamGuard::StreamGuard(std::basic_ios< char >& s):
   fmt_(s.flags()),
   fill_(s.fill())
   {}
-  
+
 cherkasov::StreamGuard::~StreamGuard()
 {
   s_.width(width_);
