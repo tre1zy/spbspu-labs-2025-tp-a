@@ -276,7 +276,7 @@ struct RightAngleTester
   }
 };
 
-void shchadilov::printRights(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
+void shchadilov::printRights(std::ostream& out, const std::vector<Polygon>& polygons)
 {
   RightAngleTester tester;
   size_t count = countIf(polygons, tester);

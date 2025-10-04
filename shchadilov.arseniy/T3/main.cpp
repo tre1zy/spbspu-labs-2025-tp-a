@@ -46,8 +46,7 @@ int main(int argc, char* argv[])
   commands["MAX"] = std::bind(printMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["MIN"] = std::bind(printMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
   commands["COUNT"] = std::bind(printCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-  commands["RIGHTSHAPES"] = std::bind(printRights, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
-
+  commands["RIGHTSHAPES"] = std::bind(printRights, std::ref(std::cout), std::cref(polygons));
   commands["RMECHO"] = std::bind(printRmEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
 
   std::string command;
