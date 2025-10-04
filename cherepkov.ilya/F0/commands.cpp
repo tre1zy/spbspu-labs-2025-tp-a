@@ -458,25 +458,22 @@ void median(DictionarySet &dicts, std::istream &in, std::ostream &out)
   }
 
   std::vector< std::pair< std::string, size_t > > words(it->second.begin(), it->second.end());
-  // sort by frequency ascending (so median is natural)
+
   std::sort(words.begin(), words.end(), CompareByFrequency(false));
 
   size_t total = words.size();
-  // median index for sorted list: middle element (0-based)
+
   size_t mid = (total - 1) / 2;
 
-  // need 2*k + 1 words centered at mid
   long long needed = 2 * k + 1;
   if (static_cast<long long>(total) < needed)
   {
     throw std::logic_error("<NOT ENOUGH WORDS>");
   }
 
-  // choose window [L..R] such that mid in center
   long long L = static_cast<long long>(mid) - k;
   long long R = static_cast<long long>(mid) + k;
 
-  // if total is even, median as spec says "слово с медианной частотой" — we used (n-1)/2 style
   if (L < 0) { L = 0; R = L + needed - 1; }
   if (R >= static_cast<long long>(total)) { R = static_cast<long long>(total) - 1; L = R - (needed - 1); }
 
@@ -486,4 +483,4 @@ void median(DictionarySet &dicts, std::istream &in, std::ostream &out)
   }
 }
 
-} // namespace cherepkov
+}

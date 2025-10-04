@@ -86,9 +86,7 @@ std::string printPair(const std::pair< std::string, size_t > &p)
   return p.first + ": " + std::to_string(p.second);
 }
 
-MergeDictEntry::MergeDictEntry(Dictionary &d):
-  destination(d)
-{}
+MergeDictEntry::MergeDictEntry(Dictionary &d): destination(d) {}
 
 std::pair< const std::string, size_t > MergeDictEntry::operator()(const std::pair< const std::string, size_t > &pair) const
 {
@@ -96,9 +94,7 @@ std::pair< const std::string, size_t > MergeDictEntry::operator()(const std::pai
   return std::make_pair(pair.first, destination[pair.first]);
 }
 
-CompareByFrequency::CompareByFrequency(bool desc):
-  descending(desc)
-{}
+CompareByFrequency::CompareByFrequency(bool desc) : descending(desc) {}
 
 bool CompareByFrequency::operator()(const std::pair< std::string, size_t > &a, const std::pair< std::string, size_t > &b) const
 {
@@ -109,18 +105,14 @@ bool CompareByFrequency::operator()(const std::pair< std::string, size_t > &a, c
   return descending ? a.second > b.second : a.second < b.second;
 }
 
-WordIntersectFilter::WordIntersectFilter(const Dictionary &d):
-  dict2(d)
-{}
+WordIntersectFilter::WordIntersectFilter(const Dictionary &d) : dict2(d) {}
 
 bool WordIntersectFilter::operator()(const std::pair< const std::string, size_t > &entry) const
 {
   return dict2.count(entry.first) > 0;
 }
 
-WordExcludeFilter::WordExcludeFilter(const Dictionary &d):
-  dict2(d)
-{}
+WordExcludeFilter::WordExcludeFilter(const Dictionary &d) : dict2(d) {}
 
 bool WordExcludeFilter::operator()(const std::pair< const std::string, size_t > &entry) const
 {
@@ -154,4 +146,4 @@ void printWords(const DictionarySet &dicts, const std::string &name, std::ostrea
   }
 }
 
-} // namespace cherepkov
+}
