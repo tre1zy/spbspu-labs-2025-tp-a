@@ -92,7 +92,7 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
-  {
+  { 
     return in;
   }
 
@@ -111,6 +111,17 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   if (!in)
   {
+    return in;
+  }
+  if (amountWords < 0)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  if (amountWords == 0)
+  {
+    dict.name = name;
+    dict.lang = lang;
     return in;
   }
 
