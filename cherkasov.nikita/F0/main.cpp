@@ -11,7 +11,6 @@ int main(int argc, char * argv[])
 {
   using namespace cherkasov;
   DictTable dicts;
-
   if (argc == 2)
   {
     if (std::string(argv[1]) == "--help")
@@ -21,18 +20,7 @@ int main(int argc, char * argv[])
     }
     try
     {
-      std::ifstream fin(argv[1]);
-      if (!fin.is_open())
-      {
-        throw std::runtime_error("<INVALID FILE>");
-      }
-      Dict d;
-      std::string word;
-      while (fin >> word)
-      {
-        ++d[word];
-      }
-      dicts["default"] = std::move(d);
+      loadFile(std::string(argv[1]), dicts);
     }
     catch (const std::exception & e)
     {

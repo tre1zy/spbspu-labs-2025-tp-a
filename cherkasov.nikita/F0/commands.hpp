@@ -24,6 +24,7 @@ namespace cherkasov
   void printTop(std::istream & in, std::ostream & out, const DictTable & dicts);
   void printRare(std::istream & in, std::ostream & out, const DictTable & dicts);
   void printHelp(std::ostream& out);
+  void loadFile(const std::string& filename, DictTable& dicts);
 }
 
 #endif

@@ -260,7 +260,7 @@ namespace cherkasov
     std::sort(words.begin(), words.end(), CmpRare{});
     std::for_each(words.begin(), words.begin() + count, PrintWord{out});
   }
-  void cherkasov::printHelp(std::ostream& out)
+  void printHelp(std::ostream& out)
   {
     out << "Usage: ./program [file]\n";
     out << "Commands:\n";
@@ -276,5 +276,20 @@ namespace cherkasov
     out << " cleandict <dict>\n";
     out << " top <dict> <n>\n";
     out << " rare <dict> <n>\n";
+  }
+  void loadFile(const std::string& filename, DictTable& dicts)
+  {
+    std::ifstream file(filename);
+    if (!file)
+    {
+      throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    auto& dict = dicts["default"];
+    std::string word;
+    while (file >> word)
+    {
+      ++dict[word];
+    }
   }
 }
