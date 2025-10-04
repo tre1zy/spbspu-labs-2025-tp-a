@@ -69,10 +69,10 @@ namespace cherkasov
     return std::tie(x, y) < std::tie(other.x, other.y);
   }
 
-bool Polygon::operator==(const Polygon& other) const
-{
-  return points == other.points;
-}
+  bool Polygon::operator==(const Polygon& other) const
+  {
+    return points == other.points;
+  }
 
   bool VertexesCmp::operator()(const Polygon& polygon) const
   {
