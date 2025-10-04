@@ -50,25 +50,7 @@ namespace
     }
   };
 
-  double accumulateArea(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
-  {
-    std::vector< Polygon > filtered;
-    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
-
-    std::vector< double > areas;
-    areas.reserve(filtered.size());
-    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
-
-    return std::accumulate(areas.begin(), areas.end(), 0.0);
-  };
-
-  size_t countIf(const std::vector< Polygon >& polygons, std::function<bool(const Polygon&)> pred)
-  {
-    return std::count_if(polygons.begin(), polygons.end(), pred);
-  }
-}
-
-bool hasRightAngle(const shchadilov::Polygon& poly)
+  bool hasRightAngle(const shchadilov::Polygon& poly)
   {
     const auto& points = poly.points;
     size_t n = points.size();
@@ -91,8 +73,26 @@ bool hasRightAngle(const shchadilov::Polygon& poly)
         }
     }
   return false;
+  };
+
+  double accumulateArea(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
+  {
+    std::vector< Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
+
+    std::vector< double > areas;
+    areas.reserve(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
+
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  };
+
+  size_t countIf(const std::vector< Polygon >& polygons, std::function<bool(const Polygon&)> pred)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), pred);
   }
 
+}
 
 void shchadilov::printArea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
