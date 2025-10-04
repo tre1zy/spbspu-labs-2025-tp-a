@@ -15,19 +15,19 @@ int main(int argc, char* argv[])
   {
     if (std::string(argv[1]) == "--help")
     {
-        printHelp(std::cout);
-        return 0;
+      printHelp(std::cout);
+      return 0;
     }
     try
     {
-        loadFile(std::string(argv[1]), dicts);
+      loadFile(std::string(argv[1]), dicts);
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
-        return 1;
+      std::cerr << e.what() << '\n';
+      return 1;
     }
-    }
+  }
 
   std::map< std::string, std::function< void() > > cmds;
   cmds["createdict"] = std::bind(createDictionary, std::ref(std::cin), std::ref(dicts));
@@ -43,10 +43,10 @@ int main(int argc, char* argv[])
 
   cmds["top"] = [&]() {
     printTopRare(std::ref(std::cin), std::ref(std::cout), std::cref(dicts), "descending");
-    };
+  };
   cmds["rare"] = [&]() {
     printTopRare(std::ref(std::cin), std::ref(std::cout), std::cref(dicts), "ascending");
-    };
+  };
 
   cmds["frequency"] = std::bind(printFrequency, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["wordrange"] = std::bind(createWordRange, std::ref(std::cin), std::ref(dicts));
@@ -55,22 +55,22 @@ int main(int argc, char* argv[])
   std::string command;
   while (std::cin >> command)
   {
-  try
+    try
     {
-         cmds.at(command)();
-        }
-        catch (const std::out_of_range&)
-        {
-            std::cout << "<INVALID COMMAND>" << '\n';
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << '\n';
-        }
-
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      cmds.at(command)();
+    }
+    catch (const std::out_of_range&)
+    {
+      std::cout << "<INVALID COMMAND>" << '\n';
+    }
+    catch (const std::exception& e)
+    {
+      std::cout << e.what() << '\n';
     }
 
-    return 0;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
+
+  return 0;
 }
