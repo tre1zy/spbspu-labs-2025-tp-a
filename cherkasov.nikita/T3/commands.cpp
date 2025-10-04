@@ -1,255 +1,302 @@
 #include "commands.hpp"
-#include <iostream>
 #include <iomanip>
-#include <sstream>
 #include <numeric>
 #include <algorithm>
+#include <map>
+#include <functional>
+#include <streamGuard.hpp>
+#include "geometry.hpp"
 
 namespace
 {
-  void printArea(double a)
+  using namespace cherkasov;
+  void printAreaEven(const std::vector< Polygon >& polygons, std::ostream& out)
   {
-    std::cout << a << "\n";
+    std::vector< Polygon > even_polygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(even_polygons), isEven);
+    std::vector< double > areas(even_polygons.size());
+    std::transform(even_polygons.begin(), even_polygons.end(), areas.begin(), getArea);
+    double area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << std::fixed << std::setprecision(1) << area;
   }
 
-  void printCount(size_t c)
+  void printAreaOdd(const std::vector< Polygon >& polygons, std::ostream& out)
   {
-    std::cout << c << "\n";
+    std::vector< Polygon > odd_polygons;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(odd_polygons), isOdd);
+    std::vector< double > areas(odd_polygons.size());
+    std::transform(odd_polygons.begin(), odd_polygons.end(), areas.begin(), getArea);
+    double area = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << std::fixed << std::setprecision(1) << area;
   }
 
-  double accumulateArea(double sum, const cherkasov::Polygon& p)
+  void printAreaMean(const std::vector< Polygon >& polygons, std::ostream& out)
   {
-    return sum + cherkasov::getArea(p);
-  }
-
-  double accumulateEven(double sum, const cherkasov::Polygon& p)
-  {
-    return (p.points.size() % 2 == 0) ? sum + cherkasov::getArea(p) : sum;
-  }
-
-  double accumulateOdd(double sum, const cherkasov::Polygon& p)
-  {
-    return (p.points.size() % 2 == 1) ? sum + cherkasov::getArea(p) : sum;
-  }
-
-  double accumulateWithN(double sum, const cherkasov::Polygon& p, size_t n)
-  {
-    return (p.points.size() == n) ? sum + cherkasov::getArea(p) : sum;
-  }
-
-  bool lessArea(const cherkasov::Polygon& a, const cherkasov::Polygon& b)
-  {
-    return cherkasov::getArea(a) < cherkasov::getArea(b);
-  }
-
-  bool lessVertexes(const cherkasov::Polygon& a, const cherkasov::Polygon& b)
-  {
-    return a.points.size() < b.points.size();
-  }
-
-  bool isEvenPolygon(const cherkasov::Polygon& p)
-  {
-    return p.points.size() % 2 == 0;
-  }
-
-  bool isOddPolygon(const cherkasov::Polygon& p)
-  {
-    return p.points.size() % 2 == 1;
-  }
-
-  bool hasVertexCount(const cherkasov::Polygon& p, size_t n)
-  {
-    return p.points.size() == n;
-  }
-
-  struct IntersectsWith
-  {
-    const cherkasov::Polygon& q_;
-    IntersectsWith(const cherkasov::Polygon& q):
-    q_(q)
-    {}
-    bool operator()(const cherkasov::Polygon& p) const
+    if (polygons.empty())
     {
-      return cherkasov::polygonsIntersect(p, q_);
+      throw std::logic_error("No shapes!\n");
+    }
+    double res = areaMean(polygons);
+    out << std::fixed << std::setprecision(1) << res;
+  }
+
+  void printAreaVertexes(const std::vector< Polygon >& polygons, std::ostream& out, const std::string& s)
+  {
+    size_t vert = std::stoull(s);
+    if (vert < 3)
+    {
+      throw std::logic_error("Not enough vertexes\n");
+    }
+    VertexesCmp cmp{vert};
+    std::vector< Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), cmp);
+    std::vector< double > areas(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), areas.begin(), getArea);
+    double totalArea = std::accumulate(areas.begin(), areas.end(), 0.0);
+    out << std::fixed << std::setprecision(1) << totalArea;
+  }
+
+  void printMaxArea(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    auto p = std::max_element(polygons.begin(), polygons.end(), maxArea);
+    out << std::fixed << std::setprecision(1);
+    out << getArea(*p);
+  }
+
+  void printMaxVertexes(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    auto p = std::max_element(polygons.begin(), polygons.end(), maxVertexes);
+    out << (*p).points.size();
+  }
+
+  void printMinArea(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    auto p = std::min_element(polygons.begin(), polygons.end(), maxArea);
+    out << std::fixed << std::setprecision(1);
+    out << getArea(*p);
+  }
+
+  void printMinVertexes(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    auto p = std::min_element(polygons.begin(), polygons.end(), maxVertexes);
+    out << (*p).points.size();
+  }
+
+  void printCountEven(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    size_t res = countEven(polygons);
+    out << res;
+  }
+
+  void printCountOdd(const std::vector< Polygon >& polygons, std::ostream& out)
+  {
+    size_t res = countOdd(polygons);
+    out << res;
+  }
+
+  void printCountVertexes(const std::vector< Polygon >& polygons, std::ostream& out, const std::string& s)
+  {
+    size_t vert = std::stoull(s);
+    if (vert < 3)
+    {
+      throw std::logic_error("Not enough vertexes\n");
+    }
+    size_t res = countVertexes(polygons, vert);
+    out << res;
+  }
+
+  size_t getMaxseq(const Polygon& polygon, const Polygon& pattern)
+  {
+    if (isPolygonsEqual(polygon, pattern))
+    {
+      return 1;
+    }
+    return 0;
+  }
+
+  struct PointInPolygon
+  {
+    const Polygon& polygon;
+
+    PointInPolygon(const Polygon& p):
+      polygon(p)
+    {}
+
+    bool operator()(const Point& pt) const
+    {
+      return std::find(polygon.points.begin(), polygon.points.end(), pt) != polygon.points.end();
+    }
+  };
+
+  struct TriangleInPolygonChecker
+  {
+    const Polygon& triangle;
+
+    TriangleInPolygonChecker(const Polygon& t):
+      triangle(t)
+    {}
+
+    bool operator()(const Polygon& poly) const
+    {
+      PointInPolygon check(poly);
+      return std::all_of(triangle.points.begin(), triangle.points.end(), check);
     }
   };
 }
 
 namespace cherkasov
 {
-  void processCommand(const std::vector<Polygon>& polys, const std::string& cmd)
+  void doIsCuttedComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
   {
-    std::istringstream iss(cmd);
-    std::string command;
-    iss >> command;
-    std::string arg;
-    std::getline(iss, arg);
-
-    if (!arg.empty() && arg[0] == ' ')
+    Polygon triangle;
+    in >> triangle;
+    if (!in)
     {
-      arg.erase(0, 1);
+      throw std::logic_error("Invalid input");
     }
+    if (triangle.points.size() != 3)
+    {
+      throw std::logic_error("Input must be a triangle");
+    }
+    TriangleInPolygonChecker checker(triangle);
+    size_t count = std::count_if(polygons.begin(), polygons.end(), checker);
+    out << count;
+  }
 
+  void doAreaComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
+  {
+    StreamGuard guard(out);
+    std::string subcommand;
+    in >> subcommand;
+    if (!in)
+    {
+      throw std::logic_error("Invalid input");
+    }
+    std::map< std::string, std::function< void() > > commands;
+    commands["EVEN"] = std::bind(printAreaEven, std::cref(polygons), std::ref(std::cout));
+    commands["ODD"] = std::bind(printAreaOdd, std::cref(polygons), std::ref(std::cout));
+    commands["MEAN"] = std::bind(printAreaMean, std::cref(polygons), std::ref(std::cout));
+    commands["VERTEXES"] = std::bind(printAreaVertexes, std::cref(polygons), std::ref(std::cout), std::cref(subcommand));
     try
     {
-      std::cout << std::fixed << std::setprecision(1);
-      if (command == "AREA")
+      commands.at("VERTEXES")();
+    }
+    catch (const std::exception &)
+    {
+      commands.at(subcommand)();
+    }
+  }
+
+  void doMaxComm(const std::vector< Polygon >& polygons, std::ostream &out, std::istream& in)
+  {
+    StreamGuard guard(out);
+    if (polygons.size() < 1)
+    {
+      throw std::logic_error("No maximum\n");
+    }
+    std::string subcommand;
+    in >> subcommand;
+    if (!in)
+    {
+      throw std::logic_error("Invalid input");
+    }
+    std::map< std::string, std::function< void() > > commands;
+    commands["AREA"] = std::bind(printMaxArea, std::cref(polygons), std::ref(std::cout));
+    commands["VERTEXES"] = std::bind(printMaxVertexes, std::cref(polygons), std::ref(std::cout));
+    commands.at(subcommand)();
+  }
+
+  void doMinComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
+  {
+    StreamGuard guard(out);
+    if (polygons.size() < 1)
+    {
+      throw std::logic_error("No minimum!\n");
+    }
+    std::string subcommand;
+    in >> subcommand;
+    if (!in)
+    {
+      throw std::logic_error("Invalid input");
+    }
+    std::map< std::string, std::function< void() > > commands;
+    commands["AREA"] = std::bind(printMinArea, std::cref(polygons), std::ref(std::cout));
+    commands["VERTEXES"] = std::bind(printMinVertexes, std::cref(polygons), std::ref(std::cout));
+    commands.at(subcommand)();
+  }
+
+  void doCountComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
+  {
+    StreamGuard guard(out);
+    std::string subcommand;
+    in >> subcommand;
+    if (!in)
+    {
+      throw std::logic_error("Invalid input");
+    }
+    std::map< std::string, std::function< void() > > commands;
+    commands["EVEN"] = std::bind(printCountEven, std::cref(polygons), std::ref(std::cout));
+    commands["ODD"] = std::bind(printCountOdd, std::cref(polygons), std::ref(std::cout));
+    commands["VERTEXES"] = std::bind(printCountVertexes, std::cref(polygons), std::ref(std::cout), std::cref(subcommand));
+    try
+    {
+      commands.at("VERTEXES")();
+    }
+    catch (const std::exception&)
+    {
+      commands.at(subcommand)();
+    }
+  }
+
+  void doMaxseqComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
+  {
+    Polygon pattern;
+    in >> pattern;
+    if (!in)
+    {
+      throw std::logic_error("Invalid input");
+    }
+    if (std::count(polygons.begin(), polygons.end(), pattern) == 0)
+    {
+      throw std::logic_error("No similar polygons");
+    }
+    std::vector< size_t > seqOfPolygons(polygons.size());
+    for (size_t i = 0; i < polygons.size(); ++i)
+    {
+      seqOfPolygons[i] = (isPolygonsEqual(polygons[i], pattern) ? 1 : 0);
+    }
+    size_t maxRun = 0;
+    size_t cur = 0;
+    for (size_t i = 0; i < seqOfPolygons.size(); ++i)
+    {
+      if (seqOfPolygons[i])
       {
-        handleArea(polys, arg);
-      }
-      else if (command == "MAX")
-      {
-        handleMax(polys, arg);
-      }
-      else if (command == "MIN")
-      {
-        handleMin(polys, arg);
-      }
-      else if (command == "COUNT")
-      {
-        handleCount(polys, arg);
-      }
-      else if (command == "INTERSECTIONS")
-      {
-        handleIntersections(polys, arg);
-      }
-      else if (command == "RIGHTSHAPES")
-      {
-        handleRightShapes(polys);
+        ++cur;
+        if (cur > maxRun) maxRun = cur;
       }
       else
       {
-        std::cout << "<INVALID COMMAND>\n";
+        cur = 0;
       }
     }
-    catch (...)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-    }
+    out << maxRun;
   }
 
-  void handleArea(const std::vector<Polygon>& polys, const std::string& arg)
+  void doIntersectComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
   {
-    if (arg == "MEAN")
+    Polygon target;
+    in >> target;
+    if (!in)
     {
-      if (polys.empty())
-      {
-        throw std::invalid_argument("no polys");
-      }
-      double sum = std::accumulate(polys.begin(), polys.end(), 0.0, accumulateArea);
-      printArea(sum / polys.size());
+      throw std::logic_error("Invalid input");
     }
-    else if (arg == "EVEN")
-    {
-      double sum = std::accumulate(polys.begin(), polys.end(), 0.0, accumulateEven);
-      printArea(sum);
-    }
-    else if (arg == "ODD")
-    {
-      double sum = std::accumulate(polys.begin(), polys.end(), 0.0, accumulateOdd);
-      printArea(sum);
-    }
-    else
-    {
-      size_t num = std::stoul(arg);
-      if (num < 3)
-      {
-        throw std::invalid_argument("invalid vertex count");
-      }
-      double sum = 0.0;
-      for (const Polygon& p : polys)
-      {
-        sum = accumulateWithN(sum, p, num);
-      }
-      printArea(sum);
-    }
+    out << std::count_if(polygons.begin(), polygons.end(), IntersectCmp{ target });
   }
 
-  void handleMax(const std::vector<Polygon>& polys, const std::string& arg)
+  void doRightShapesComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
   {
-    if (polys.empty())
-    {
-      throw std::invalid_argument("no polys");
-    }
-    if (arg == "AREA")
-    {
-      auto it = std::max_element(polys.begin(), polys.end(), lessArea);
-      printArea(getArea(*it));
-    }
-    else if (arg == "VERTEXES")
-    {
-      auto it = std::max_element(polys.begin(), polys.end(), lessVertexes);
-      printCount(it->points.size());
-    }
-    else
-    {
-      throw std::invalid_argument("bad arg");
-    }
-  }
-
-  void handleMin(const std::vector<Polygon>& polys, const std::string& arg)
-  {
-    if (polys.empty())
-    {
-      throw std::invalid_argument("no polys");
-    }
-    if (arg == "AREA")
-    {
-      auto it = std::min_element(polys.begin(), polys.end(), lessArea);
-      printArea(getArea(*it));
-    }
-    else if (arg == "VERTEXES")
-    {
-      auto it = std::min_element(polys.begin(), polys.end(), lessVertexes);
-      printCount(it->points.size());
-    }
-    else
-    {
-      throw std::invalid_argument("bad arg");
-    }
-  }
-
-  void handleCount(const std::vector<Polygon>& polys, const std::string& arg)
-  {
-    if (arg == "EVEN")
-    {
-      size_t c = std::count_if(polys.begin(), polys.end(), isEvenPolygon);
-      printCount(c);
-    }
-    else if (arg == "ODD")
-    {
-      size_t c = std::count_if(polys.begin(), polys.end(), isOddPolygon);
-      printCount(c);
-    }
-    else
-    {
-      size_t num = std::stoul(arg);
-      if (num < 3)
-      {
-        throw std::invalid_argument("invalid vertex count");
-      }
-      size_t c = 0;
-      for (const Polygon& p : polys)
-      {
-        if (hasVertexCount(p, num))
-        {
-          ++c;
-        }
-      }
-      printCount(c);
-    }
-  }
-
-  void handleIntersections(const std::vector<Polygon>& polys, const std::string& arg)
-  {
-    Polygon q = parsePolygon(arg);
-    size_t count = std::count_if(polys.begin(), polys.end(), IntersectsWith(q));
-    printCount(count);
-  }
-
-  void handleRightShapes(const std::vector<Polygon>& polys)
-  {
-    size_t c = std::count_if(polys.begin(), polys.end(), hasRightAngle);
-    printCount(c);
+    (void)in;
+    size_t count = std::count_if(polygons.begin(), polygons.end(), RightAngleCmp{});
+    out << count;
   }
 }

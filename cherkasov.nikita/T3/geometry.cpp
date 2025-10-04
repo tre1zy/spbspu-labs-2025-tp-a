@@ -1,221 +1,230 @@
 #include "geometry.hpp"
-#include <cmath>
+#include <numeric>
 #include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
+#include <functional>
+#include <iterator>
+#include <cmath>
+#include <delimeterIO.hpp>
 
 namespace cherkasov
 {
-  bool Point::operator==(const Point& other) const
+std::istream& operator>>(std::istream& in, Point& p)
+{
+  std::istream::sentry s(in);
+  if (!s)
   {
-    return x == other.x && y == other.y;
+    return in;
   }
-
-  bool Point::operator!=(const Point& other) const
+  Point temp{ 0, 0 };
+  in >> DelimiterIO{ '(' };
+  in >> temp.x;
+  in >> DelimiterIO{ ';' };
+  in >> temp.y;
+  in >> DelimiterIO{ ')' };
+  if (in)
   {
-    return !(*this == other);
+    p = temp;
   }
+  return in;
+}
 
-  bool Polygon::operator==(const Polygon& other) const
+std::istream& operator>>(std::istream& in, Polygon& polygon)
+{
+  std::istream::sentry s(in);
+  if (!s)
   {
-    return points == other.points;
+    return in;
   }
-
-  double getArea(const Polygon& poly)
+  size_t k = 0;
+  in >> k;
+  if (!in)
   {
-    if (poly.points.size() < 3)
+    return in;
+  }
+  if (k < 3)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  std::vector< Point > points(k);
+  for (size_t i = 0; i < k; ++i)
+  {
+    if (!(in >> points[i]))
     {
-      return 0.0;
+      in.setstate(std::ios::failbit);
+      return in;
     }
-    double area = 0.0;
-    size_t n = poly.points.size();
-    for (size_t i = 0; i < n; ++i)
-    {
-      const Point& p1 = poly.points[i];
-      const Point& p2 = poly.points[(i + 1) % n];
-      area += (p1.x * p2.y) - (p2.x * p1.y);
-    }
-    return std::abs(area) / 2.0;
   }
+  polygon.points = points;
+  return in;
+}
 
-  int getOrientation(const Point& a, const Point& b, const Point& c)
+bool Point::operator==(const Point& other) const
+{
+  return x == other.x && y == other.y;
+}
+
+bool Point::operator<(const Point& other) const
+{
+  return std::tie(x, y) < std::tie(other.x, other.y);
+}
+
+bool Polygon::operator==(const Polygon& other) const
+{
+  return points == other.points;
+}
+
+bool VertexesCmp::operator()(const Polygon& polygon) const
+{
+  return polygon.points.size() == k;
+}
+
+bool IntersectCmp::operator()(const Polygon& other) const
+{
+  if (polygon.points.empty() || other.points.empty())
   {
-    long long val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-    if (val == 0)
-    {
-      return 0;
-    }
-    return (val > 0) ? 1 : 2;
+    return false;
   }
-
-  bool onSegment(const Point& p, const Point& q, const Point& r)
+  auto left1 = std::min_element(polygon.points.begin(), polygon.points.end());
+  auto right1 = std::max_element(polygon.points.begin(), polygon.points.end());
+  auto left2 = std::min_element(other.points.begin(), other.points.end());
+  auto right2 = std::max_element(other.points.begin(), other.points.end());
+  int minx1 = polygon.points.front().x, miny1 = polygon.points.front().y, maxx1 = minx1, maxy1 = miny1;
+  for (size_t i = 0; i < polygon.points.size(); ++i)
   {
-    return q.x <= std::max(p.x, r.x) &&
-           q.x >= std::min(p.x, r.x) &&
-           q.y <= std::max(p.y, r.y) &&
-           q.y >= std::min(p.y, r.y);
+    minx1 = std::min(minx1, polygon.points[i].x);
+    miny1 = std::min(miny1, polygon.points[i].y);
+    maxx1 = std::max(maxx1, polygon.points[i].x);
+    maxy1 = std::max(maxy1, polygon.points[i].y);
   }
-
-  bool edgesIntersect(const Point& p1, const Point& p2, const Point& q1, const Point& q2)
+  int minx2 = other.points.front().x, miny2 = other.points.front().y, maxx2 = minx2, maxy2 = miny2;
+  for (size_t i = 0; i < other.points.size(); ++i)
   {
-    int o1 = getOrientation(p1, p2, q1);
-    int o2 = getOrientation(p1, p2, q2);
-    int o3 = getOrientation(q1, q2, p1);
-    int o4 = getOrientation(q1, q2, p2);
-    if (o1 != o2 && o3 != o4)
-    {
-        return true;
-    }
-    if ((o1 == 0 && onSegment(p1, q1, p2)) ||
-        (o2 == 0 && onSegment(p1, q2, p2)) ||
-        (o3 == 0 && onSegment(q1, p1, q2)) ||
-        (o4 == 0 && onSegment(q1, p2, q2)))
+    minx2 = std::min(minx2, other.points[i].x);
+    miny2 = std::min(miny2, other.points[i].y);
+    maxx2 = std::max(maxx2, other.points[i].x);
+    maxy2 = std::max(maxy2, other.points[i].y);
+  }
+  bool noOverlap = (maxx1 < minx2) || (maxx2 < minx1) || (maxy1 < miny2) || (maxy2 < miny1);
+  return !noOverlap;
+}
+
+bool RightAngleCmp::operator()(const Polygon& poly) const
+{
+  if (poly.points.size() < 3)
+  {
+    return false;
+  }
+  const std::vector< Point >& pts = poly.points;
+  size_t n = pts.size();
+  for (size_t i = 0; i < n; ++i)
+  {
+    const Point& a = pts[(i + n - 1) % n];
+    const Point& b = pts[i];
+    const Point& c = pts[(i + 1) % n];
+    int abx = b.x - a.x;
+    int aby = b.y - a.y;
+    int bcx = c.x - b.x;
+    int bcy = c.y - b.y;
+    int dot = abx * bcx + aby * bcy;
+    if (dot == 0)
     {
       return true;
     }
+  }
+  return false;
+}
+
+bool isEven(const Polygon &polygon)
+{
+  return polygon.points.size() % 2 == 0;
+}
+
+bool isOdd(const Polygon &polygon)
+{
+  return !isEven(polygon);
+}
+
+double getArea(const Polygon& polygon)
+{
+  const std::vector< Point >& p = polygon.points;
+  if (p.empty())
+  {
+    return 0.0;
+  }
+  double area = 0.0;
+  for (size_t i = 0, j = p.size() - 1; i < p.size(); j = i++)
+  {
+    area += static_cast<double>(p[j].x) * static_cast<double>(p[i].y)
+          - static_cast<double>(p[i].x) * static_cast<double>(p[j].y);
+  }
+  return std::abs(area) / 2.0;
+}
+
+double areaMean(const std::vector< Polygon >& polygons)
+{
+  if (polygons.empty())
+  {
+    return 0.0;
+  }
+  std::vector< double > areas(polygons.size());
+  std::transform(polygons.begin(), polygons.end(), areas.begin(), getArea);
+  double res = std::accumulate(areas.begin(), areas.end(), 0.0);
+  return res / polygons.size();
+}
+
+bool maxArea(const Polygon& p1, const Polygon& p2)
+{
+  return getArea(p1) < getArea(p2);
+}
+
+bool maxVertexes(const Polygon& p1, const Polygon& p2)
+{
+  return p1.points.size() < p2.points.size();
+}
+
+size_t countEven(const std::vector< Polygon >& polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isEven);
+}
+
+size_t countOdd(const std::vector< Polygon >& polygons)
+{
+  return std::count_if(polygons.begin(), polygons.end(), isOdd);
+}
+
+size_t countVertexes(const std::vector< Polygon >& polygons, size_t vert)
+{
+  VertexesCmp cmp{ vert };
+  return std::count_if(polygons.begin(), polygons.end(), cmp);
+}
+
+bool isPointsEqual(const Point& p1, const Point& p2)
+{
+  return p1.x == p2.x && p1.y == p2.y;
+}
+
+bool isPolygonsEqual(const Polygon& p1, const Polygon& p2)
+{
+  const std::vector< Point >& points1 = p1.points;
+  const std::vector< Point >& points2 = p2.points;
+  if (points1.size() != points2.size())
+  {
     return false;
   }
-
-  bool isPointInPolygon(const Point& point, const Polygon& poly)
+  for (size_t i = 0; i < points1.size(); ++i)
   {
-    if (poly.points.size() < 3)
+    if (!isPointsEqual(points1[i], points2[i]))
     {
       return false;
     }
-    bool inside = false;
-    size_t n = poly.points.size();
-    for (size_t i = 0, j = n - 1; i < n; j = i++)
-    {
-      const Point& pi = poly.points[i];
-      const Point& pj = poly.points[j];
-      bool yCondition = (pi.y > point.y) != (pj.y > point.y);
-      double xIntersection = (pj.x - pi.x) * (point.y - pi.y) / double(pj.y - pi.y) + pi.x;
-      bool xCondition = point.x < xIntersection;
-      bool intersect = yCondition && xCondition;
-      if (intersect)
-      {
-        inside = !inside;
-      }
-    }
-    return inside;
   }
+  return true;
+}
 
-  bool polygonsIntersect(const Polygon& a, const Polygon& b)
-  {
-    if (a.points == b.points)
-    {
-      return true;
-    }
-    const size_t n = a.points.size();
-    const size_t m = b.points.size();
-    for (size_t i = 0; i < n; ++i)
-    {
-      const Point& a1 = a.points[i];
-      const Point& a2 = a.points[(i + 1) % n];
-      for (size_t j = 0; j < m; ++j)
-      {
-        const Point& b1 = b.points[j];
-        const Point& b2 = b.points[(j + 1) % m];
-        if (edgesIntersect(a1, a2, b1, b2))
-        {
-          return true;
-        }
-      }
-    }
-    return isPointInPolygon(a.points[0], b) || isPointInPolygon(b.points[0], a);
-  }
+int crossProduct(const Point &p1, const Point &p2)
+{
+  return p1.x * p2.y - p1.y * p2.x;
+}
 
-  bool hasRightAngle(const Polygon& poly)
-  {
-    size_t n = poly.points.size();
-    if (n < 3)
-    {
-      return false;
-    }
-    for (size_t i = 0; i < n; ++i)
-    {
-      const Point& a = poly.points[i];
-      const Point& b = poly.points[(i + 1) % n];
-      const Point& c = poly.points[(i + 2) % n];
-      if ((b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y) == 0)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  std::vector<Polygon> readPolygons(const std::string& filename)
-  {
-    std::ifstream file(filename);
-    if (!file.is_open())
-    {
-      throw std::runtime_error("Cannot open file: " + filename);
-    }
-
-    std::vector<Polygon> polys;
-    std::string line;
-    while (std::getline(file, line))
-    {
-      if (line.empty())
-      {
-        continue;
-      }
-      try
-      {
-        Polygon poly = parsePolygon(line);
-        if (poly.points.size() >= 3)
-        {
-          polys.push_back(poly);
-        }
-      }
-      catch (...)
-      {
-        continue;
-      }
-    }
-    return polys;
-  }
-
-  Polygon parsePolygon(const std::string &str)
-  {
-    std::istringstream iss(str);
-    size_t n;
-    if (!(iss >> n) || n < 3)
-    {
-      throw std::invalid_argument("Invalid vertex count");
-    }
-    Polygon poly;
-    for (size_t i = 0; i < n; ++i)
-    {
-      char ch;
-      Point p;
-      if (!(iss >> ch >> p.x >> ch >> p.y >> ch))
-      {
-        throw std::invalid_argument("Invalid point format");
-      }
-      poly.points.push_back(p);
-    }
-    if (poly.points.size() != n)
-    {
-      throw std::invalid_argument("vertex count mismatch");
-    }
-    for (size_t i = 0; i < poly.points.size(); ++i)
-    {
-      for (size_t j = i + 1; j < poly.points.size(); ++j)
-      {
-        if (poly.points[i] == poly.points[j])
-        {
-          throw std::invalid_argument("duplicate point");
-        }
-      }
-    }
-    std::string rest;
-    if (iss >> rest)
-    {
-      throw std::invalid_argument("extra data after polygon");
-    }
-    return poly;
-  }
 }
