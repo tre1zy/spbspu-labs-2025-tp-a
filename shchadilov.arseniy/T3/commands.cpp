@@ -50,47 +50,6 @@ namespace
     }
   };
 
-  struct RightAngleChecker
-  {
-    bool operator()(const Polygon& poly) const
-    {
-      const auto& points = poly.points;
-      size_t n = points.size();
-
-      std::vector< size_t > indices(n);
-      std::iota(indices.begin(), indices.end(), 0);
-
-      struct AngleCheck
-      {
-        const std::vector< Point >& points_;
-        size_t n_;
-
-        AngleCheck(const std::vector< Point >& pts, size_t size) :
-          points_(pts),
-          n_(size)
-        {
-        }
-
-        bool operator()(size_t i) const
-        {
-          const Point& a = points_[i];
-          const Point& b = points_[(i + 1) % n_];
-          const Point& c = points_[(i + 2) % n_];
-
-          int dx1 = b.x - a.x;
-          int dy1 = b.y - a.y;
-          int dx2 = c.x - b.x;
-          int dy2 = c.y - b.y;
-
-          return dx1 * dx2 + dy1 * dy2 == 0;
-        }
-      };
-
-      AngleCheck angleCheck(points, n);
-      return std::any_of(indices.begin(), indices.end(), angleCheck);
-    }
-  };
-
   double accumulateArea(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
   {
     std::vector< Polygon > filtered;
@@ -108,6 +67,32 @@ namespace
     return std::count_if(polygons.begin(), polygons.end(), pred);
   }
 }
+
+bool hasRightAngle(const shchadilov::Polygon& poly)
+  {
+    const auto& points = poly.points;
+    size_t n = points.size();
+    if (n < 3) return false;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        const shchadilov::Point& a = points[i];
+        const shchadilov::Point& b = points[(i + 1) % n];
+        const shchadilov::Point& c = points[(i + 2) % n];
+
+        int dx1 = b.x - a.x;
+        int dy1 = b.y - a.y;
+        int dx2 = c.x - b.x;
+        int dy2 = c.y - b.y;
+
+        if (dx1 * dx2 + dy1 * dy2 == 0)
+        {
+            return true;
+        }
+    }
+  return false;
+  }
+
 
 void shchadilov::printArea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
@@ -245,20 +230,9 @@ void shchadilov::printCount(std::istream& in, std::ostream& out, const std::vect
   }
 }
 
-struct RightAngleTester
-{
-  RightAngleChecker checker;
-
-  bool operator()(const Polygon& poly) const
-  {
-    return checker(poly);
-  }
-};
-
 void shchadilov::printRights(std::ostream& out, const std::vector<Polygon>& polygons)
 {
-  RightAngleTester tester;
-  size_t count = countIf(polygons, tester);
+  size_t count = std::count_if(polygons.begin(), polygons.end(), hasRightAngle);
   out << count;
 }
 
