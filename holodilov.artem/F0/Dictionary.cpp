@@ -92,7 +92,7 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
-  { 
+  {
     return in;
   }
 
