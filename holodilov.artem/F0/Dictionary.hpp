@@ -4,7 +4,7 @@
 #include <list>
 #include <string>
 #include <map>
-#include <iostream>
+#include <iosfwd>
 
 namespace holodilov
 {

@@ -1,5 +1,6 @@
 #include "Dictionary.hpp"
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <limits>
 
@@ -13,7 +14,6 @@ std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
   out << dict.name << " " << dict.lang << "\n";
 
   using OstreamIterator = std::ostream_iterator< std::string >;
-
   auto beginIter = dict.dict.begin();
   while (beginIter != dict.dict.end())
   {

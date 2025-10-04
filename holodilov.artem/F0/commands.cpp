@@ -3,6 +3,7 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
+#include <iostream>
 #include <vector>
 #include <set>
 #include "Alphabet.hpp"
@@ -64,7 +65,6 @@ void holodilov::createDict(std::istream& in, std::ostream& out, MapDicts& dictio
   {
     throw std::logic_error("Error: invalid command.");
   }
-
   if (dictionaries.find(name) != dictionaries.end())
   {
     throw std::logic_error("Error: dictionary with this name already exists.");
@@ -157,7 +157,7 @@ void holodilov::clearDict(std::istream& in, std::ostream& out, MapDicts& diction
   {
     throw std::logic_error("Error: dictionary not found.");
   }
-  dictionaries[dictName].dict.clear();
+  dictionaries.at(dictName).dict.clear();
 
   out << "Dictionary " << dictName << " was cleared.";
 }
@@ -216,7 +216,7 @@ void holodilov::addWord(std::istream& in, std::ostream& out, MapDicts& dictionar
   dict.dict[enWord] = std::list< std::string >();
 
   using istreamIter = std::istream_iterator< std::string >;
-  std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dict.dict[enWord]));
+  std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dict.dict.at(enWord)));
   if (!in)
   {
     throw std::logic_error("Error: invalid command.");

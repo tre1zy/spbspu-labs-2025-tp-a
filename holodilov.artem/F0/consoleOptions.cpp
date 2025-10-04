@@ -1,4 +1,5 @@
 #include "consoleOptions.hpp"
+#include <iostream>
 
 void holodilov::printHelpOption(std::ostream& os)
 {

@@ -1,7 +1,7 @@
 #ifndef ALPHABET_HPP
 #define ALPHABET_HPP
 
-#include <iostream>
+#include <iosfwd>
 #include "Dictionary.hpp"
 
 namespace holodilov
