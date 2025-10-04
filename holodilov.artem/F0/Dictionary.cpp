@@ -2,7 +2,73 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <vector>
 #include <limits>
+
+namespace
+{
+  struct WordWithTranslations
+  {
+    std::string enWord;
+    std::list< std::string > translations;
+  };
+
+  std::ostream& operator<<(std::ostream& out, const WordWithTranslations& rhs)
+  {
+    std::ostream::sentry sentry(out);
+    if (!sentry)
+    {
+      return out;
+    }
+
+    out << rhs.enWord << " ";
+    out << rhs.translations.size() << " ";
+    using OstreamIter = std::ostream_iterator< std::string >;
+    std::copy(rhs.translations.begin(), rhs.translations.end(), OstreamIter(out, " "));
+    return out;
+  }
+
+  std::istream& operator>>(std::istream& in, WordWithTranslations& rhs)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+
+    WordWithTranslations wordWithTranslationsTemp;
+    in >> wordWithTranslationsTemp.enWord;
+    if (!in)
+    {
+      return in;
+    }
+
+    int amountTranslations = 0;
+    in >> amountTranslations;
+    if (!in)
+    {
+      return in;
+    }
+
+    using IstreamIter = std::istream_iterator< std::string >;
+    std::copy_n(IstreamIter(in), amountTranslations, std::back_inserter(wordWithTranslationsTemp.translations));
+    if (in)
+    {
+      rhs = wordWithTranslationsTemp;
+    }
+    return in;
+  }
+
+  WordWithTranslations createWordWithTranslations(const holodilov::MapWordsPair& pair)
+  {
+    return WordWithTranslations{ pair.first, pair.second };
+  }
+
+  holodilov::MapWordsPair createMapWordsPair(const WordWithTranslations& wordWithTranslations)
+  {
+    return holodilov::MapWordsPair{ wordWithTranslations.enWord, wordWithTranslations.translations };
+  }
+}
 
 std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
 {
@@ -12,20 +78,13 @@ std::ostream& holodilov::operator<<(std::ostream& out, const Dictionary& dict)
     return out;
   }
   out << dict.name << " " << dict.lang << "\n";
+  out << dict.dict.size() << "\n";
 
-  using OstreamIterator = std::ostream_iterator< std::string >;
-  auto beginIter = dict.dict.begin();
-  while (beginIter != dict.dict.end())
-  {
-    out << beginIter->first << " ";
-    out << beginIter->second.size() << " ";
-    std::copy(std::begin(beginIter->second), std::end(beginIter->second), OstreamIterator(out, " "));
-    ++beginIter;
+  std::vector< WordWithTranslations > vecWordWithTransl;
+  std::transform(dict.dict.begin(), dict.dict.end(), std::back_inserter(vecWordWithTransl), createWordWithTranslations);
 
-    if (beginIter != dict.dict.end()) {
-      out << "\n";
-    }
-  }
+  using OstreamIter = std::ostream_iterator< WordWithTranslations >;
+  std::copy(vecWordWithTransl.begin(), vecWordWithTransl.end(), OstreamIter(out, "\n"));
   return out;
 }
 
@@ -42,35 +101,30 @@ std::istream& holodilov::operator>>(std::istream& in, Dictionary& dict)
   in >> name;
   in >> lang;
   in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-
-  Dictionary dictTemp{ name, lang, MapWords() };
-
-  std::string englishWord;
-  while (!in.eof())
+  if (!in)
   {
-    in >> englishWord;
-    if (!in)
-    {
-      return in;
-    }
-    dictTemp.dict[englishWord] = std::list< std::string >();
+    return in;
+  }
 
-    int amountTranslations = 0;
-    in >> amountTranslations;
-    if (!in)
-    {
-      return in;
-    }
-    using istreamIter = std::istream_iterator< std::string >;
-    std::copy_n(istreamIter(in), amountTranslations, std::back_inserter(dictTemp.dict[englishWord]));
-    if (!in)
-    {
-      return in;
-    }
-  }
-  if (in)
+  int amountWords = 0;
+  in >> amountWords;
+  in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  if (!in)
   {
-    dict = dictTemp;
+    return in;
   }
+
+  using IstreamIter = std::istream_iterator< WordWithTranslations >;
+  std::vector< WordWithTranslations > vecWordWithTransl;
+  std::copy_n(IstreamIter(in), amountWords, std::back_inserter(vecWordWithTransl));
+  if (!in)
+  {
+    return in;
+  }
+
+  auto inserter = std::inserter(dict.dict, dict.dict.end());
+  std::transform(vecWordWithTransl.begin(), vecWordWithTransl.end(), inserter, createMapWordsPair);
+  dict.name = name;
+  dict.lang = lang;
   return in;
 }
