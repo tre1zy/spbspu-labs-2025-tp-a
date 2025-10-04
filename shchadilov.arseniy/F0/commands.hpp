@@ -7,8 +7,8 @@
 
 namespace shchadilov
 {
-  using FrequencyDictionary = std::unordered_map<std::string, std::size_t>;
-  using DictionarySet = std::unordered_map<std::string, FrequencyDictionary>;
+  using FrequencyDictionary = std::unordered_map< std::string, std::size_t >;
+  using DictionarySet = std::unordered_map< std::string, FrequencyDictionary >;
 
   void help(std::ostream& out);
   void create(DictionarySet& set, std::istream& in);

@@ -65,7 +65,7 @@ namespace shchadilov
 
   struct ExtractKey
   {
-    std::string operator()(const std::pair<const std::string, FrequencyDictionary>& pair) const
+    std::string operator()(const std::pair< const std::string, FrequencyDictionary >& pair) const
     {
       return pair.first;
     }
@@ -80,7 +80,7 @@ namespace shchadilov
     }
 
     out << "Available dictionaries:\n";
-    std::transform(set.cbegin(), set.cend(), std::ostream_iterator<std::string>(out, "\n"), ExtractKey{});
+    std::transform(set.cbegin(), set.cend(), std::ostream_iterator< std::string >(out, "\n"), ExtractKey{});
   }
 
   struct WordAdder
@@ -116,7 +116,7 @@ namespace shchadilov
 
     const std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-    std::vector<std::string> words = extractWords(content);
+    std::vector< std::string > words = extractWords(content);
     WordAdder adder
     {
       set.at(dictName)
@@ -140,10 +140,10 @@ namespace shchadilov
       return out;
     }
 
-    std::vector<std::pair<std::string, std::size_t>> sortedWords(dict.begin(), dict.end());
+    std::vector< std::pair< std::string, std::size_t > > sortedWords(dict.begin(), dict.end());
     std::sort(sortedWords.begin(), sortedWords.end());
 
-    std::vector<std::string> lines;
+    std::vector< std::string > lines;
     lines.reserve(sortedWords.size());
     std::transform(sortedWords.begin(), sortedWords.end(), std::back_inserter(lines), PairToString());
 
@@ -153,7 +153,7 @@ namespace shchadilov
 
   struct NameExtractor
   {
-    std::string operator()(const std::pair<const std::string, FrequencyDictionary>& p) const
+    std::string operator()(const std::pair< const std::string, FrequencyDictionary >& p) const
     {
       return p.first;
     }
@@ -185,7 +185,7 @@ namespace shchadilov
       return out;
     }
 
-    std::vector<std::string> names;
+    std::vector< std::string > names;
     names.reserve(set.size());
     std::transform(set.begin(), set.end(), std::back_inserter(names), NameExtractor());
     std::sort(names.begin(), names.end());
@@ -233,7 +233,7 @@ namespace shchadilov
   struct MergeInserter
   {
     FrequencyDictionary& target_;
-    void operator()(const std::pair<std::string, std::size_t>& pair) const
+    void operator()(const std::pair< std::string, std::size_t >& pair) const
     {
       target_[pair.first] += pair.second;
     }
@@ -271,7 +271,7 @@ namespace shchadilov
   {
     const FrequencyDictionary& source_;
 
-    bool operator()(const std::pair<std::string, size_t>& pair) const
+    bool operator()(const std::pair< std::string, size_t >& pair) const
     {
       return source_.count(pair.first) > 0;
     }
@@ -283,7 +283,7 @@ namespace shchadilov
     const FrequencyDictionary& dict2_;
     FrequencyDictionary& result_;
 
-    void operator()(const std::pair<std::string, size_t>& pair) const
+    void operator()(const std::pair< std::string, size_t >& pair) const
     {
       auto it = dict2_.find(pair.first);
       if (it != dict2_.end())
@@ -328,7 +328,7 @@ namespace shchadilov
       file_(f)
     {}
 
-    void operator()(const std::pair<std::string, std::size_t>& wordPair) const
+    void operator()(const std::pair< std::string, std::size_t >& wordPair) const
     {
       file_ << wordPair.first << " " << wordPair.second << "\n";
     }
@@ -338,14 +338,14 @@ namespace shchadilov
   {
     std::ofstream& file_;
 
-    void operator()(const std::pair<std::string, FrequencyDictionary>& dictPair) const
+    void operator()(const std::pair< std::string, FrequencyDictionary >& dictPair) const
     {
       const std::string& dictName = dictPair.first;
       const FrequencyDictionary& dict = dictPair.second;
 
       file_ << dictName << " " << dict.size() << "\n";
 
-      std::vector<std::pair<std::string, std::size_t>> words(dict.begin(), dict.end());
+      std::vector<std::pair< std::string, std::size_t >> words(dict.begin(), dict.end());
       std::sort(words.begin(), words.end());
 
       std::for_each(words.begin(), words.end(), WordPairWriter(file_));
@@ -490,7 +490,7 @@ namespace shchadilov
   }
   struct ByFrequencyDesc
   {
-    bool operator()(const std::pair<std::string, std::size_t>& a, const std::pair<std::string, std::size_t>& b) const
+    bool operator()(const std::pair< std::string, std::size_t >& a, const std::pair< std::string, std::size_t >& b) const
     {
       if (a.second == b.second)
       {
@@ -508,7 +508,7 @@ namespace shchadilov
       out_(o)
     {}
 
-    void operator()(const std::pair<std::string, std::size_t>& p) const
+    void operator()(const std::pair< std::string, std::size_t >& p) const
     {
       out_ << p.first << ": " << p.second << "\n";
     }
@@ -533,7 +533,7 @@ namespace shchadilov
         return;
       }
 
-      std::vector<std::pair<std::string, std::size_t>> words(dict_.begin(), dict_.end());
+      std::vector< std::pair< std::string, std::size_t > > words(dict_.begin(), dict_.end());
       std::sort(words.begin(), words.end(), ByFrequencyDesc());
 
       if (N_ >= 0 && words.size() > static_cast<std::size_t>(N_))
@@ -568,7 +568,7 @@ namespace shchadilov
   struct DiffFilter
   {
     const FrequencyDictionary& dict2;
-    bool operator()(const std::pair<std::string, std::size_t>& p) const
+    bool operator()(const std::pair< std::string, std::size_t >& p) const
     {
       return dict2.count(p.first) == 0;
     }
@@ -605,7 +605,7 @@ namespace shchadilov
     FrequencyDictionary& result_;
     const FrequencyDictionary& other_;
 
-    void operator()(const std::pair<std::string, std::size_t>& p) const
+    void operator()(const std::pair< std::string, std::size_t >& p) const
     {
       auto it = other_.find(p.first);
       if (it != other_.end())
@@ -624,7 +624,7 @@ namespace shchadilov
     FrequencyDictionary& result_;
     const FrequencyDictionary& base_;
 
-    void operator()(const std::pair<std::string, std::size_t>& p) const
+    void operator()(const std::pair< std::string, std::size_t >& p) const
     {
       if (result_.count(p.first) == 0)
       {
@@ -682,7 +682,7 @@ namespace shchadilov
     const FrequencyDictionary& other_;
     std::size_t& counter_;
 
-    void operator()(const std::pair<std::string, std::size_t>& p) const
+    void operator()(const std::pair< std::string, std::size_t >& p) const
     {
       if (other_.count(p.first) > 0)
       {
@@ -742,8 +742,8 @@ namespace shchadilov
 
   struct CompareByFrequency
   {
-    bool operator()(const std::pair<std::string, std::size_t>& a,
-      const std::pair<std::string, std::size_t>& b) const
+    bool operator()(const std::pair< std::string, std::size_t >& a,
+      const std::pair< std::string, std::size_t >& b) const
     {
       if (a.second != b.second)
       {
@@ -759,7 +759,7 @@ namespace shchadilov
     PrintPair(std::ostream& o):
       out_(o)
     {}
-    void operator()(const std::pair<std::string, std::size_t>& p) const
+    void operator()(const std::pair< std::string, std::size_t >& p) const
     {
       out_ << p.first << " " << p.second << "\n";
     }
@@ -787,7 +787,7 @@ namespace shchadilov
       return;
     }
 
-    std::vector<std::pair<std::string, std::size_t>> words;
+    std::vector< std::pair< std::string, std::size_t > > words;
     words.reserve(dict.size());
     std::copy(dict.begin(), dict.end(), std::back_inserter(words));
     std::sort(words.begin(), words.end(), CompareByFrequency{});

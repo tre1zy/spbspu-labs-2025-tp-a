@@ -8,7 +8,7 @@
 namespace shchadilov
 {
   std::string cleanWord(const std::string& word);
-  std::vector<std::string> extractWords(const std::string& text);
+  std::vector< std::string > extractWords(const std::string& text);
 }
 
 #endif

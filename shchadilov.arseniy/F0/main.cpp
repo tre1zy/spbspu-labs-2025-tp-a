@@ -22,7 +22,7 @@ int main(int argc, const char* argv[])
 
   DictionarySet dictionaries;
 
-  std::map<std::string, std::function<void(std::istream&, std::ostream&)>> commands;
+  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
   using namespace std::placeholders;
 
   commands["create"] = std::bind(create, std::ref(dictionaries), _1);

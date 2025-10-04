@@ -63,14 +63,14 @@ namespace shchadilov
     }
 
   private:
-    std::vector<std::string>& words_;
+    std::vector< std::string >& words_;
     std::string currentWord_ = "";;
     IsPunctuation isPunctuation_;
   };
 
-  std::vector<std::string> extractWords(const std::string& text)
+  std::vector< std::string > extractWords(const std::string& text)
   {
-    std::vector<std::string> words;
+    std::vector< std::string > words;
     if (text.empty())
     {
       return words;
