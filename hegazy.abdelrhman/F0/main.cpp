@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   std::string command;
   while (std::cin >> command)
   {
-    try
+  try
     {
          cmds.at(command)();
         }
