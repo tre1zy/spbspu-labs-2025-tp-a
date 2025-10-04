@@ -38,9 +38,10 @@ namespace
   struct ConditionalAreaAccumulator
   {
     std::function< bool(const Polygon&) > predicate_;
-    ConditionalAreaAccumulator(std::function< bool(const Polygon&) > pred):
+    ConditionalAreaAccumulator(std::function< bool(const Polygon&) > pred) :
       predicate_(pred)
-    {}
+    {
+    }
 
     double operator()(double sum, const Polygon& poly) const
     {
@@ -52,9 +53,10 @@ namespace
   {
     std::function< bool(const Polygon&) > predicate_;
 
-    ConditionalCounter(std::function< bool(const Polygon&) > pred):
+    ConditionalCounter(std::function< bool(const Polygon&) > pred) :
       predicate_(pred)
-    {}
+    {
+    }
 
     size_t operator()(size_t count, const Polygon& poly) const
     {
@@ -66,9 +68,10 @@ namespace
   {
     size_t count_;
 
-    VertexCountChecker(size_t cnt):
+    VertexCountChecker(size_t cnt) :
       count_(cnt)
-    {}
+    {
+    }
 
     bool operator()(const Polygon& poly) const
     {
@@ -91,10 +94,11 @@ namespace
         const std::vector< Point >& points_;
         size_t n_;
 
-        AngleCheck(const std::vector< Point >& pts, size_t size):
+        AngleCheck(const std::vector< Point >& pts, size_t size) :
           points_(pts),
           n_(size)
-        {}
+        {
+        }
 
         bool operator()(size_t i) const
         {
@@ -129,7 +133,7 @@ namespace
   }
 }
 
-void shchadilov::printArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+void shchadilov::printArea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   std::string param;
   in >> param;
@@ -180,7 +184,7 @@ struct VertexCountComparator
   }
 };
 
-void shchadilov::printMax(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+void shchadilov::printMax(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   std::string param;
   in >> param;
@@ -209,7 +213,7 @@ void shchadilov::printMax(const std::vector< Polygon >& polygons, std::istream& 
   }
 }
 
-void shchadilov::printMin(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+void shchadilov::printMin(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   std::string param;
   in >> param;
@@ -238,7 +242,7 @@ void shchadilov::printMin(const std::vector< Polygon >& polygons, std::istream& 
   }
 }
 
-void shchadilov::printCount(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+void shchadilov::printCount(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   std::string param;
   in >> param;
@@ -272,7 +276,7 @@ struct RightAngleTester
   }
 };
 
-void shchadilov::printRights(const std::vector< Polygon >& polygons, std::ostream& out)
+void shchadilov::printRights(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
 {
   RightAngleTester tester;
   size_t count = countIf(polygons, tester);
@@ -288,17 +292,16 @@ struct PolygonEqual
 };
 
 struct TargetDuplicate
+{
+  Polygon target_;
+  PolygonEqual eq_;
+  bool operator()(const Polygon& a, const Polygon& b) const
   {
-    Polygon target_;
-    PolygonEqual eq_;
-    bool operator()(const Polygon& a, const Polygon& b) const
-    {
     return eq_(a, target_) && eq_(b, target_);
-    }
-  };
+  }
+};
 
-
-void shchadilov::printRmEcho(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
+void shchadilov::printRmEcho(std::istream& in, std::ostream& out, std::vector<Polygon>& polygons)
 {
   Polygon target;
   if (!(in >> target))
@@ -306,7 +309,7 @@ void shchadilov::printRmEcho(std::vector< Polygon >& polygons, std::istream& in,
     throw std::invalid_argument("Invalid polygon for RMECHO");
   }
 
-  TargetDuplicate pred{target, PolygonEqual{}};
+  TargetDuplicate pred{ target, PolygonEqual{} };
   auto newEnd = std::unique(polygons.begin(), polygons.end(), pred);
 
   size_t removed = std::distance(newEnd, polygons.end());

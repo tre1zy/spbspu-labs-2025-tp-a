@@ -40,54 +40,22 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > areaCmd;
-  areaCmd["AREA"] = std::bind(printArea, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
+  std::map< std::string, std::function< void() > > commands;
 
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > maxCmd;
-  maxCmd["MAX"] = std::bind(printMax, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
+  commands["AREA"] = std::bind(printArea, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MAX"] = std::bind(printMax, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["MIN"] = std::bind(printMin, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["COUNT"] = std::bind(printCount, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
+  commands["RIGHTSHAPES"] = std::bind(printRights, std::ref(std::cin), std::ref(std::cout), std::cref(polygons));
 
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > minCmd;
-  minCmd["MIN"] = std::bind(printMin, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
-
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > countCmd;
-  countCmd["COUNT"] = std::bind(printCount, std::cref(polygons), std::placeholders::_1, std::placeholders::_2);
-
-  std::map< std::string, std::function< void(std::istream&, std::ostream&) > > rmechoCmd;
-  rmechoCmd["RMECHO"] = std::bind(printRmEcho, std::ref(polygons), std::placeholders::_1, std::placeholders::_2);
+  commands["RMECHO"] = std::bind(printRmEcho, std::ref(std::cin), std::ref(std::cout), std::ref(polygons));
 
   std::string command;
   while (std::cin >> command)
   {
     try
     {
-      if (command == "AREA")
-      {
-        areaCmd.at(command)(std::cin, std::cout);
-      }
-      else if (command == "MAX")
-      {
-        maxCmd.at(command)(std::cin, std::cout);
-      }
-      else if (command == "MIN")
-      {
-        minCmd.at(command)(std::cin, std::cout);
-      }
-      else if (command == "COUNT")
-      {
-        countCmd.at(command)(std::cin, std::cout);
-      }
-      else if (command == "RIGHTSHAPES")
-      {
-        printRights(polygons, std::cout);
-      }
-      else if (command == "RMECHO")
-      {
-        rmechoCmd.at(command)(std::cin, std::cout);
-      }
-      else
-      {
-        throw std::invalid_argument("Invalid command");
-      }
+      commands.at(command)();
       std::cout << "\n";
     }
     catch (const std::exception& e)

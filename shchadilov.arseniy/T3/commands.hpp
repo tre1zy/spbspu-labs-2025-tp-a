@@ -9,12 +9,12 @@
 
 namespace shchadilov
 {
-  void printArea(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
-  void printMax(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
-  void printMin(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
-  void printCount(const std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
-  void printRights(const std::vector< Polygon >& polygons, std::ostream& out);
-  void printRmEcho(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out);
+  void printArea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons);
+  void printMax(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons);
+  void printMin(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons);
+  void printCount(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons);
+  void printRights(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons);
+  void printRmEcho(std::istream& in, std::ostream& out, std::vector<Polygon>& polygons);
 }
 
 #endif
