@@ -30,7 +30,7 @@ holodilov::Alphabet::Alphabet(const Dictionary &dictionary)
 
   std::string strJoined;
   auto joinWordsBound = std::bind(joinWords, std::placeholders::_1, std::ref(strJoined));
-  std::transform(vecWords.begin(), vecWords.end(), std::back_inserter(vecWords), joinWordsBound);
+  std::transform(vecWords.begin(), vecWords.end(), vecWords.begin(), joinWordsBound);
 
   std::sort(strJoined.begin(), strJoined.end());
   auto newStrEnd = std::unique(strJoined.begin(), strJoined.end());
