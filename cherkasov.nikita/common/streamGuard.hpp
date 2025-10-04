@@ -1,5 +1,5 @@
-#ifndef STREAMGUARD_HPP
-#define STREAMGUARD_HPP
+#ifndef STREAM_GUARD_HPP
+#define STREAM_GUARD_HPP
 #include <ios>
 
 namespace cherkasov
@@ -7,9 +7,9 @@ namespace cherkasov
   class StreamGuard
   {
   public:
+    StreamGuard(std::basic_ios< char >& s);
     StreamGuard(const StreamGuard&) = delete;
     StreamGuard(StreamGuard&&) = delete;
-    explicit StreamGuard(std::basic_ios< char >& s);
     ~StreamGuard();
   private:
     std::basic_ios< char >& s_;

@@ -2,10 +2,9 @@
 #include <iomanip>
 #include <numeric>
 #include <algorithm>
+#include <streamGuard.hpp>
 #include <map>
 #include <functional>
-#include <streamGuard.hpp>
-#include "geometry.hpp"
 
 namespace
 {
@@ -104,65 +103,10 @@ namespace
     size_t res = countVertexes(polygons, vert);
     out << res;
   }
-
-  size_t getMaxseq(const Polygon& polygon, const Polygon& pattern)
-  {
-    if (isPolygonsEqual(polygon, pattern))
-    {
-      return 1;
-    }
-    return 0;
-  }
-
-  struct PointInPolygon
-  {
-    const Polygon& polygon;
-
-    PointInPolygon(const Polygon& p):
-      polygon(p)
-    {}
-
-    bool operator()(const Point& pt) const
-    {
-      return std::find(polygon.points.begin(), polygon.points.end(), pt) != polygon.points.end();
-    }
-  };
-
-  struct TriangleInPolygonChecker
-  {
-    const Polygon& triangle;
-
-    TriangleInPolygonChecker(const Polygon& t):
-      triangle(t)
-    {}
-
-    bool operator()(const Polygon& poly) const
-    {
-      PointInPolygon check(poly);
-      return std::all_of(triangle.points.begin(), triangle.points.end(), check);
-    }
-  };
 }
 
 namespace cherkasov
 {
-  void doIsCuttedComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
-  {
-    Polygon triangle;
-    in >> triangle;
-    if (!in)
-    {
-      throw std::logic_error("Invalid input");
-    }
-    if (triangle.points.size() != 3)
-    {
-      throw std::logic_error("Input must be a triangle");
-    }
-    TriangleInPolygonChecker checker(triangle);
-    size_t count = std::count_if(polygons.begin(), polygons.end(), checker);
-    out << count;
-  }
-
   void doAreaComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
   {
     StreamGuard guard(out);
@@ -246,40 +190,6 @@ namespace cherkasov
     {
       commands.at(subcommand)();
     }
-  }
-
-  void doMaxseqComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)
-  {
-    Polygon pattern;
-    in >> pattern;
-    if (!in)
-    {
-      throw std::logic_error("Invalid input");
-    }
-    if (std::count(polygons.begin(), polygons.end(), pattern) == 0)
-    {
-      throw std::logic_error("No similar polygons");
-    }
-    std::vector< size_t > seqOfPolygons(polygons.size());
-    for (size_t i = 0; i < polygons.size(); ++i)
-    {
-      seqOfPolygons[i] = (isPolygonsEqual(polygons[i], pattern) ? 1 : 0);
-    }
-    size_t maxRun = 0;
-    size_t cur = 0;
-    for (size_t i = 0; i < seqOfPolygons.size(); ++i)
-    {
-      if (seqOfPolygons[i])
-      {
-        ++cur;
-        if (cur > maxRun) maxRun = cur;
-      }
-      else
-      {
-        cur = 0;
-      }
-    }
-    out << maxRun;
   }
 
   void doIntersectComm(const std::vector< Polygon >& polygons, std::ostream& out, std::istream& in)

@@ -14,15 +14,18 @@ namespace cherkasov
     bool operator<(const Point& other) const;
   };
   std::istream& operator>>(std::istream& in, Point& p);
+
   struct Polygon
   {
     std::vector< Point > points;
     bool operator==(const Polygon& other) const;
   };
   std::istream& operator>>(std::istream& in, Polygon& polygon);
+
   struct VertexesCmp
   {
     size_t k;
+
     explicit VertexesCmp(size_t vert):
       k(vert)
     {}
