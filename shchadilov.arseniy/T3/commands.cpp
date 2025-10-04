@@ -287,6 +287,17 @@ struct PolygonEqual
   }
 };
 
+struct TargetDuplicate
+  {
+    Polygon target_;
+    PolygonEqual eq_;
+    bool operator()(const Polygon& a, const Polygon& b) const
+    {
+    return eq_(a, target_) && eq_(b, target_);
+    }
+  };
+
+
 void shchadilov::printRmEcho(std::vector< Polygon >& polygons, std::istream& in, std::ostream& out)
 {
   Polygon target;
@@ -295,33 +306,11 @@ void shchadilov::printRmEcho(std::vector< Polygon >& polygons, std::istream& in,
     throw std::invalid_argument("Invalid polygon for RMECHO");
   }
 
-  size_t removed = 0;
-  auto it = polygons.begin();
-  PolygonEqual comparator;
+  TargetDuplicate pred{target, PolygonEqual{}};
+  auto newEnd = std::unique(polygons.begin(), polygons.end(), pred);
 
-  while (it != polygons.end())
-  {
-    if (comparator(*it, target))
-    {
-      auto next = it + 1;
-      while (next != polygons.end() && comparator(*next, target))
-      {
-        ++next;
-        ++removed;
-      }
-      if (next != it + 1)
-      {
-        it = polygons.erase(it + 1, next);
-      }
-      else
-      {
-        ++it;
-      }
-    }
-    else
-    {
-      ++it;
-    }
-  }
+  size_t removed = std::distance(newEnd, polygons.end());
+  polygons.erase(newEnd, polygons.end());
+
   out << removed;
 }
