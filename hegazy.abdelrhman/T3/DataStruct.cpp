@@ -169,11 +169,12 @@ std::ostream &bob::operator<<(std::ostream &out, const bob::DataStruct &data)
   return out;
 }
 
-bob::IoGuard::IoGuard(std::basic_ios< char > &s) : s_(s),
-width_(s.width()),
-fill_(s.fill()),
-precision_(s.precision()),
-fmt_(s.flags())
+bob::IoGuard::IoGuard(std::basic_ios< char > &s):
+  s_(s),
+  width_(s.width()),
+  fill_(s.fill()),
+  precision_(s.precision()),
+  fmt_(s.flags())
 {
 }
 bob::IoGuard::~IoGuard()
