@@ -16,12 +16,7 @@ int main(int argc, char * argv[])
   {
     if (std::string(argv[1]) == "--help")
     {
-      std::cout << "Usage: ./program [text_file]\n";
-      std::cout << "Commands:\n";
-      std::cout << " createdict <dict>\n showdicts\n loadtext <dict> <file>\n"
-                   " union <res> <d1> <d2>\n intersect <res> <d1> <d2>\n copy <res> <dict>\n"
-                   " addword <dict> <word> <freq>\n size <dict>\n cleanword <dict> <word>\n"
-                   " cleandict <dict>\n top <dict> <n>\n rare <dict> <n>\n";
+      printHelp(std::cout);
       return 0;
     }
     try

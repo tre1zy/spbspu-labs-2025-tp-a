@@ -260,4 +260,21 @@ namespace cherkasov
     std::sort(words.begin(), words.end(), CmpRare{});
     std::for_each(words.begin(), words.begin() + count, PrintWord{out});
   }
+  void cherkasov::printHelp(std::ostream& out)
+  {
+    out << "Usage: ./program [file]\n";
+    out << "Commands:\n";
+    out << " createdict <dict>\n";
+    out << " showdicts\n";
+    out << " loadtext <dict> <file>\n";
+    out << " union <res> <d1> <d2>\n";
+    out << " intersect <res> <d1> <d2>\n";
+    out << " copy <res> <dict>\n";
+    out << " addword <dict> <word> <freq>\n";
+    out << " size <dict>\n";
+    out << " cleanword <dict> <word>\n";
+    out << " cleandict <dict>\n";
+    out << " top <dict> <n>\n";
+    out << " rare <dict> <n>\n";
+  }
 }
