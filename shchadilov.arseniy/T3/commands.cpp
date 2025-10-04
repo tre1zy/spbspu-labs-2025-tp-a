@@ -50,29 +50,87 @@ namespace
     }
   };
 
+  struct Angle
+  {
+    Point a_, b_, c_;
+    Angle(const Point& a, const Point& b, const Point& c):
+      a_(a),
+      b_(b),
+      c_(c)
+    {}
+  };
+
+  struct IsRightAngle
+  {
+    bool operator()(const Angle& angle) const
+    {
+      int dx1 = angle.b_.x - angle.a_.x;
+      int dy1 = angle.b_.y - angle.a_.y;
+      int dx2 = angle.c_.x - angle.b_.x;
+      int dy2 = angle.c_.y - angle.b_.y;
+
+      return dx1 * dx2 + dy1 * dy2 == 0;
+    }
+  };
+
+
+  class AngleGenerator
+  {
+    public:
+      explicit AngleGenerator(const Polygon& polygon):
+        polygon_(polygon),
+        currentIndex_(0),
+        vertexCount_(polygon.points.size())
+      {}
+
+    Angle operator()()
+    {
+      const auto& points = polygon_.points;
+      size_t n = vertexCount_;
+
+      size_t i = currentIndex_;
+      size_t next_i =  (i + 1) % n;
+      size_t next_next_i = (i + 2) % n;
+
+      const Point& a = points[i];
+      const Point& b = points[next_i];
+      const Point& c = points[next_next_i];
+
+      currentIndex_++;
+      return Angle(a, b, c);
+    }
+
+    void reset()
+    {
+      currentIndex_ = 0;
+    }
+
+    bool hasNext() const
+    {
+      return false;
+    }
+
+  private:
+    const Polygon& polygon_;
+    size_t currentIndex_;
+    size_t vertexCount_;
+  };
+
   bool hasRightAngle(const shchadilov::Polygon& poly)
   {
-    const auto& points = poly.points;
-    size_t n = points.size();
-    if (n < 3) return false;
-
-    for (size_t i = 0; i < n; ++i)
+    if (poly.points.size() < 3)
     {
-        const shchadilov::Point& a = points[i];
-        const shchadilov::Point& b = points[(i + 1) % n];
-        const shchadilov::Point& c = points[(i + 2) % n];
-
-        int dx1 = b.x - a.x;
-        int dy1 = b.y - a.y;
-        int dx2 = c.x - b.x;
-        int dy2 = c.y - b.y;
-
-        if (dx1 * dx2 + dy1 * dy2 == 0)
-        {
-            return true;
-        }
+      return false;
     }
-  return false;
+
+    AngleGenerator generator(poly);
+    std::vector< Angle > angles;
+    angles.reserve(poly.points.size());
+
+    std::generate_n(std::back_inserter(angles), poly.points.size(), generator);
+
+    return std::any_of(angles.begin(), angles.end(), IsRightAngle());
+
   };
 
   double accumulateArea(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
