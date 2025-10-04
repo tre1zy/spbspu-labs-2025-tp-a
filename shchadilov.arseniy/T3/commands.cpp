@@ -35,35 +35,6 @@ namespace
     }
   };
 
-  struct ConditionalAreaAccumulator
-  {
-    std::function< bool(const Polygon&) > predicate_;
-    ConditionalAreaAccumulator(std::function< bool(const Polygon&) > pred) :
-      predicate_(pred)
-    {
-    }
-
-    double operator()(double sum, const Polygon& poly) const
-    {
-      return predicate_(poly) ? sum + getArea(poly) : sum;
-    }
-  };
-
-  struct ConditionalCounter
-  {
-    std::function< bool(const Polygon&) > predicate_;
-
-    ConditionalCounter(std::function< bool(const Polygon&) > pred) :
-      predicate_(pred)
-    {
-    }
-
-    size_t operator()(size_t count, const Polygon& poly) const
-    {
-      return predicate_(poly) ? count + 1 : count;
-    }
-  };
-
   struct VertexCountChecker
   {
     size_t count_;
@@ -79,58 +50,106 @@ namespace
     }
   };
 
-  struct RightAngleChecker
+  struct Angle
   {
-    bool operator()(const Polygon& poly) const
+    Point a_, b_, c_;
+    Angle(const Point& a, const Point& b, const Point& c):
+      a_(a),
+      b_(b),
+      c_(c)
+    {}
+  };
+
+  struct IsRightAngle
+  {
+    bool operator()(const Angle& angle) const
     {
-      const auto& points = poly.points;
-      size_t n = points.size();
+      int dx1 = angle.b_.x - angle.a_.x;
+      int dy1 = angle.b_.y - angle.a_.y;
+      int dx2 = angle.c_.x - angle.b_.x;
+      int dy2 = angle.c_.y - angle.b_.y;
 
-      std::vector< size_t > indices(n);
-      std::iota(indices.begin(), indices.end(), 0);
-
-      struct AngleCheck
-      {
-        const std::vector< Point >& points_;
-        size_t n_;
-
-        AngleCheck(const std::vector< Point >& pts, size_t size) :
-          points_(pts),
-          n_(size)
-        {
-        }
-
-        bool operator()(size_t i) const
-        {
-          const Point& a = points_[i];
-          const Point& b = points_[(i + 1) % n_];
-          const Point& c = points_[(i + 2) % n_];
-
-          int dx1 = b.x - a.x;
-          int dy1 = b.y - a.y;
-          int dx2 = c.x - b.x;
-          int dy2 = c.y - b.y;
-
-          return dx1 * dx2 + dy1 * dy2 == 0;
-        }
-      };
-
-      AngleCheck angleCheck(points, n);
-      return std::any_of(indices.begin(), indices.end(), angleCheck);
+      return dx1 * dx2 + dy1 * dy2 == 0;
     }
+  };
+
+
+  class AngleGenerator
+  {
+    public:
+      explicit AngleGenerator(const Polygon& polygon):
+        polygon_(polygon),
+        currentIndex_(0),
+        vertexCount_(polygon.points.size())
+      {}
+
+    Angle operator()()
+    {
+      const auto& points = polygon_.points;
+      size_t n = vertexCount_;
+
+      size_t i = currentIndex_;
+      size_t next_i =  (i + 1) % n;
+      size_t next_next_i = (i + 2) % n;
+
+      const Point& a = points[i];
+      const Point& b = points[next_i];
+      const Point& c = points[next_next_i];
+
+      currentIndex_++;
+      return Angle(a, b, c);
+    }
+
+    void reset()
+    {
+      currentIndex_ = 0;
+    }
+
+    bool hasNext() const
+    {
+      return false;
+    }
+
+  private:
+    const Polygon& polygon_;
+    size_t currentIndex_;
+    size_t vertexCount_;
+  };
+
+  bool hasRightAngle(const shchadilov::Polygon& poly)
+  {
+    if (poly.points.size() < 3)
+    {
+      return false;
+    }
+
+    AngleGenerator generator(poly);
+    std::vector< Angle > angles;
+    angles.reserve(poly.points.size());
+
+    std::generate_n(std::back_inserter(angles), poly.points.size(), generator);
+
+    return std::any_of(angles.begin(), angles.end(), IsRightAngle());
+
   };
 
   double accumulateArea(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
   {
-    ConditionalAreaAccumulator accumulator(pred);
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
+    std::vector< Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
+
+    std::vector< double > areas;
+    areas.reserve(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
+
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  };
+
+  size_t countIf(const std::vector< Polygon >& polygons, std::function<bool(const Polygon&)> pred)
+  {
+    return std::count_if(polygons.begin(), polygons.end(), pred);
   }
 
-  size_t countIf(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
-  {
-    ConditionalCounter counter(pred);
-    return std::accumulate(polygons.begin(), polygons.end(), 0, counter);
-  }
 }
 
 void shchadilov::printArea(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
@@ -154,8 +173,11 @@ void shchadilov::printArea(std::istream& in, std::ostream& out, const std::vecto
     {
       throw std::invalid_argument("No polygons for MEAN");
     }
-    AreaAccumulator accumulator;
-    out << std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator) / polygons.size();
+    std::vector< double > allAreas;
+    allAreas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(allAreas), getArea);
+    double totalArea = std::accumulate(allAreas.begin(), allAreas.end(), 0.0);
+    out << totalArea / polygons.size();
   }
   else
   {
@@ -266,20 +288,9 @@ void shchadilov::printCount(std::istream& in, std::ostream& out, const std::vect
   }
 }
 
-struct RightAngleTester
+void shchadilov::printRights(std::ostream& out, const std::vector<Polygon>& polygons)
 {
-  RightAngleChecker checker;
-
-  bool operator()(const Polygon& poly) const
-  {
-    return checker(poly);
-  }
-};
-
-void shchadilov::printRights(std::istream& in, std::ostream& out, const std::vector<Polygon>& polygons)
-{
-  RightAngleTester tester;
-  size_t count = countIf(polygons, tester);
+  size_t count = std::count_if(polygons.begin(), polygons.end(), hasRightAngle);
   out << count;
 }
 
@@ -295,6 +306,10 @@ struct TargetDuplicate
 {
   Polygon target_;
   PolygonEqual eq_;
+
+  TargetDuplicate(const Polygon& target, const PolygonEqual& eq)
+    : target_(target), eq_(eq)
+  {}
   bool operator()(const Polygon& a, const Polygon& b) const
   {
     return eq_(a, target_) && eq_(b, target_);
@@ -309,7 +324,7 @@ void shchadilov::printRmEcho(std::istream& in, std::ostream& out, std::vector<Po
     throw std::invalid_argument("Invalid polygon for RMECHO");
   }
 
-  TargetDuplicate pred{ target, PolygonEqual{} };
+  TargetDuplicate pred(target, PolygonEqual{});
   auto newEnd = std::unique(polygons.begin(), polygons.end(), pred);
 
   size_t removed = std::distance(newEnd, polygons.end());
