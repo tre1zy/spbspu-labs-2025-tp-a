@@ -295,6 +295,10 @@ struct TargetDuplicate
 {
   Polygon target_;
   PolygonEqual eq_;
+
+  TargetDuplicate(const Polygon& target, const PolygonEqual& eq)
+    : target_(target), eq_(eq)
+  {}
   bool operator()(const Polygon& a, const Polygon& b) const
   {
     return eq_(a, target_) && eq_(b, target_);
@@ -309,7 +313,7 @@ void shchadilov::printRmEcho(std::istream& in, std::ostream& out, std::vector<Po
     throw std::invalid_argument("Invalid polygon for RMECHO");
   }
 
-  TargetDuplicate pred{ target, PolygonEqual{} };
+  TargetDuplicate pred(target, PolygonEqual{});
   auto newEnd = std::unique(polygons.begin(), polygons.end(), pred);
 
   size_t removed = std::distance(newEnd, polygons.end());
