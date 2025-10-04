@@ -35,35 +35,6 @@ namespace
     }
   };
 
-  struct ConditionalAreaAccumulator
-  {
-    std::function< bool(const Polygon&) > predicate_;
-    ConditionalAreaAccumulator(std::function< bool(const Polygon&) > pred) :
-      predicate_(pred)
-    {
-    }
-
-    double operator()(double sum, const Polygon& poly) const
-    {
-      return predicate_(poly) ? sum + getArea(poly) : sum;
-    }
-  };
-
-  struct ConditionalCounter
-  {
-    std::function< bool(const Polygon&) > predicate_;
-
-    ConditionalCounter(std::function< bool(const Polygon&) > pred) :
-      predicate_(pred)
-    {
-    }
-
-    size_t operator()(size_t count, const Polygon& poly) const
-    {
-      return predicate_(poly) ? count + 1 : count;
-    }
-  };
-
   struct VertexCountChecker
   {
     size_t count_;
@@ -122,14 +93,19 @@ namespace
 
   double accumulateArea(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
   {
-    ConditionalAreaAccumulator accumulator(pred);
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator);
-  }
+    std::vector< Polygon > filtered;
+    std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(filtered), pred);
 
-  size_t countIf(const std::vector< Polygon >& polygons, std::function< bool(const Polygon&) > pred)
+    std::vector< double > areas;
+    areas.reserve(filtered.size());
+    std::transform(filtered.begin(), filtered.end(), std::back_inserter(areas), getArea);
+
+    return std::accumulate(areas.begin(), areas.end(), 0.0);
+  };
+
+  size_t countIf(const std::vector< Polygon >& polygons, std::function<bool(const Polygon&)> pred)
   {
-    ConditionalCounter counter(pred);
-    return std::accumulate(polygons.begin(), polygons.end(), 0, counter);
+    return std::count_if(polygons.begin(), polygons.end(), pred);
   }
 }
 
@@ -154,8 +130,11 @@ void shchadilov::printArea(std::istream& in, std::ostream& out, const std::vecto
     {
       throw std::invalid_argument("No polygons for MEAN");
     }
-    AreaAccumulator accumulator;
-    out << std::accumulate(polygons.begin(), polygons.end(), 0.0, accumulator) / polygons.size();
+    std::vector< double > allAreas;
+    allAreas.reserve(polygons.size());
+    std::transform(polygons.begin(), polygons.end(), std::back_inserter(allAreas), getArea);
+    double totalArea = std::accumulate(allAreas.begin(), allAreas.end(), 0.0);
+    out << totalArea / polygons.size();
   }
   else
   {
