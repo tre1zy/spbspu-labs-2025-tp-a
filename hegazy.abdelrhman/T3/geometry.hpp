@@ -44,6 +44,5 @@ namespace bob
   bool compareByVertexes(const Polygon &a, const Polygon &b);
   bool comparePointByX(const Point &a, const Point &b);
   bool comparePointByY(const Point &a, const Point &b);
-} // namespace bob
-
+}
 #endif

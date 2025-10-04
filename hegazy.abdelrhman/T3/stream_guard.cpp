@@ -8,7 +8,6 @@ bob::Iofmtguard::Iofmtguard(std::basic_ios< char > &stream)
     flags_(stream.flags())
 {
 }
-
 bob::Iofmtguard::~Iofmtguard()
 {
   stream_.precision(precision_);

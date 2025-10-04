@@ -66,6 +66,5 @@ namespace bob
   std::ostream &operator<<(std::ostream &os, const DataStruct &data);
   std::ostream &operator<<(std::ostream &os, const ULLBinaryO &dest);
 
-}; // namespace bob
-
+};
 #endif

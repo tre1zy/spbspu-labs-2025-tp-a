@@ -155,7 +155,6 @@ std::istream &bob::operator>>(std::istream &is, DataStruct &data)
 
   return is;
 }
-
 std::ostream &bob::operator<<(std::ostream &out, const bob::DataStruct &data)
 {
   std::ostream::sentry sentry(out);
@@ -171,13 +170,12 @@ std::ostream &bob::operator<<(std::ostream &out, const bob::DataStruct &data)
 }
 
 bob::IoGuard::IoGuard(std::basic_ios< char > &s) : s_(s),
-                                                   width_(s.width()),
-                                                   fill_(s.fill()),
-                                                   precision_(s.precision()),
-                                                   fmt_(s.flags())
+width_(s.width()),
+fill_(s.fill()),
+precision_(s.precision()),
+fmt_(s.flags())
 {
 }
-
 bob::IoGuard::~IoGuard()
 {
   s_.width(width_);
@@ -185,7 +183,6 @@ bob::IoGuard::~IoGuard()
   s_.precision(precision_);
   s_.flags(fmt_);
 }
-
 bool bob::compareDataStruct(const DataStruct &a, const DataStruct &b)
 {
   if (a.key1 != b.key1)
