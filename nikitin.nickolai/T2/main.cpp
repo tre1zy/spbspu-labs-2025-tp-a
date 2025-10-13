@@ -1,9 +1,9 @@
-#include "data_struct.hpp"
 #include <iterator>
 #include <vector>
 #include <algorithm>
 #include <limits>
 #include <iostream>
+#include "data_struct.hpp"
 
 int main()
 {
