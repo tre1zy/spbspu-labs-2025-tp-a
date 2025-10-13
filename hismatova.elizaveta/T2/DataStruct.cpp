@@ -1,125 +1,155 @@
 #include "DataStruct.hpp"
 #include <iomanip>
 #include <vector>
-namespace hismatova
+#include <ios>
+
+class StreamGuard
 {
-  std::istream& operator>>(std::istream& in, CharIO&& data)
+public:
+  explicit StreamGuard(std::ostream& stream):
+    stream_(stream),
+    flags_(stream.flags())
+  {}
+  ~StreamGuard()
   {
-    std::istream::sentry sen(in);
-    if (!sen)
-    {
-      return in;
-    }
-    char c = '0';
-    in >> c;
-    if (in && (c != data.ch))
-    {
-      in.setstate(std::ios::failbit);
-    }
+    stream_.flags(flags_);
+  }
+private:
+  std::ostream& stream_;
+  std::ios::fmtflags flags_;
+};
+
+std::istream& hismatova::operator>>(std::istream& in, hismatova::CharIO&& data)
+{
+  std::istream::sentry sen(in);
+  if (!sen)
+  {
     return in;
   }
-  std::istream& operator>>(std::istream& in, ULLIO&& data)
+  char c = '0';
+  in >> c;
+  if (in && (c != data.ch))
   {
-    (void)data;
-    std::istream::sentry sen(in);
-    if (!sen)
-    {
-      return in;
-    }
-    char u = '0';
-    char l1 = '0';
-    char l2 = '0';
-    in >> u >> l1 >> l2;
-    if (in && (u == 'u' || u == 'U') && l1 == l2 && (l1 == 'l' || l1 == 'L'))
-    {
-      ;
-    }
-    else
-    {
-      in.setstate(std::ios::failbit);
-    }
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
+
+std::istream& hismatova::operator>>(std::istream& in, hismatova::ULLIO&& data)
+{
+  std::istream::sentry sen(in);
+  if (!sen)
+  {
     return in;
   }
-  std::istream& operator>>(std::istream& in, NumberIO&& data)
+  char first, second, third;
+  in >> first;
+  if (!in || (first != 'u' && first != 'U'))
   {
-    std::istream::sentry sen(in);
-    if (!sen)
-    {
-      return in;
-    }
-    in >> data.ref >> ULLIO{};
+    in.setstate(std::ios::failbit);
     return in;
   }
-  std::istream& operator>>(std::istream& in, ComplexIO&& data)
+  in >> second;
+  if (!in || (second != 'l' && second != 'L'))
   {
-    std::istream::sentry sen(in);
-    if (!sen)
-    {
-      return in;
-    }
-    double real;
-    double img;
-    in >> CharIO{'#'} >> CharIO{'c'} >> CharIO{'('} >> real >> img >> CharIO{')'};
-    if (in)
-    {
-      data.ref = std::complex< double >(real, img);
-    }
+    in.setstate(std::ios::failbit);
     return in;
   }
-  std::istream& operator>>(std::istream& in, StringIO&& data)
+  in >> third;
+  if (!in || (third != 'l' && third != 'L'))
   {
-    std::istream::sentry sen(in);
-    if (!sen)
-    {
-      return in;
-    }
-    return std::getline(in >> CharIO{'"'}, data.ref, '"');
+    in.setstate(std::ios::failbit);
   }
-  std::istream& operator>>(std::istream& in, DataStruct& data)
+  return in;
+}
+
+std::istream& hismatova::operator>>(std::istream& in, hismatova::NumberIO&& data)
+{
+  std::istream::sentry sen(in);
+  if (!sen)
   {
-    std::istream::sentry sen(in);
-    if (!sen)
+    return in;
+  }
+  in >> data.ref >> hismatova::ULLIO{};
+  return in;
+}
+
+std::istream& hismatova::operator>>(std::istream& in, hismatova::ComplexIO&& data)
+{
+  std::istream::sentry sen(in);
+  if (!sen)
+  {
+    return in;
+  }
+  double real;
+  double img;
+  using io = hismatova::CharIO;
+  in >> io{'#'} >> io{'c'} >> io{'('} >> real >> img >> io{')'};
+  if (in)
+  {
+    data.ref = std::complex< double >(real, img);
+  }
+  return in;
+}
+
+std::istream& hismatova::operator>>(std::istream& in, hismatova::StringIO&& data)
+{
+  std::istream::sentry sen(in);
+  if (!sen)
+  {
+    return in;
+  }
+  return std::getline(in >> hismatova::CharIO{'"'}, data.ref, '"');
+}
+
+std::istream& hismatova::operator>>(std::istream& in, hismatova::DataStruct& data)
+{
+  std::istream::sentry sen(in);
+  if (!sen)
+  {
+    return in;
+  }
+  hismatova::DataStruct inp;
+  {
+    in >> hismatova::CharIO{'('};
+    std::vector< std::string > keys(3);
+    for (int i = 0; i < 3; ++i)
     {
-      return in;
-    }
-    DataStruct inp;
-    {
-      in >> CharIO {'('};
-      std::vector< std::string > keys(3);
-      for (int i = 0; i < 3; ++i)
+      in >> hismatova::CharIO{':'} >> keys[i];
+      if (keys[i] == "key1")
       {
-        in >> CharIO {':'} >> keys[i];
-        if (keys[i] == "key1")
-        {
-          in >> NumberIO {inp.key1};
-        }
-        else if (keys[i] == "key2")
-        {
-          in >> ComplexIO {inp.key2};
-        }
-        else if (keys[i] == "key3")
-        {
-          in >> StringIO {inp.key3};
-        }
-        else
-        {
-          in.setstate(std::ios::failbit);
-        }
+        in >> hismatova::NumberIO{inp.key1};
       }
-      in >> CharIO {':'} >> CharIO{')'};
+      else if (keys[i] == "key2")
+      {
+        in >> hismatova::ComplexIO{inp.key2};
+      }
+      else if (keys[i] == "key3")
+      {
+        in >> hismatova::StringIO{inp.key3};
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+      }
     }
-    if (in)
-    {
-      data = inp;
-    }
-    return in;
+    in >> hismatova::CharIO{':'} >> hismatova::CharIO{')'};
   }
-  std::ostream& operator<<(std::ostream& out, const DataStruct& data)
+  if (in)
   {
-    out << "(:key1 " << data.key1 << "ull"
-      << ":key2 #c(" << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.real()) << " "
-      << std::fixed << std::setprecision(1) << static_cast< double >(data.key2.imag()) << ")"
-      << ":key3 \"" << data.key3 << "\":)";
-    return out;
+    data = inp;
   }
+  return in;
+}
+
+std::ostream& hismatova::operator<<(std::ostream& out, const hismatova::DataStruct& data)
+{
+  StreamGuard guard(out);
+  const char* p1 = "(:key1 ";
+  const char* p2 = "ull:key2 #c ";
+  const char* suf = "):key3 \"";
+  const char* end = "\":)";
+  auto fix1 = std::fixed << std::setprecision(1);
+  out << p1 << data.key1 << p2 << fix1 << data.key2.real() << " " << data.key2.imag() << suf << data.key3 << end;
+  return out;
 }

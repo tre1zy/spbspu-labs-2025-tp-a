@@ -1,6 +1,10 @@
+#ifndef DATASTRUCT_HPP
+#define DATASTRUCT_HPP
+
 #include <iostream>
 #include <complex>
 #include <string>
+
 namespace hismatova
 {
   struct DataStruct
@@ -40,3 +44,5 @@ namespace hismatova
   };
   std::istream& operator>>(std::istream& in, StringIO&& data);
 }
+
+#endif
