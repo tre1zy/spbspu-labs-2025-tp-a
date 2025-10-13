@@ -61,17 +61,6 @@ std::istream& hismatova::operator>>(std::istream& in, hismatova::ULLIO&& data)
   return in;
 }
 
-std::istream& hismatova::operator>>(std::istream& in, hismatova::NumberIO&& data)
-{
-  std::istream::sentry sen(in);
-  if (!sen)
-  {
-    return in;
-  }
-  in >> data.ref >> hismatova::ULLIO{};
-  return in;
-}
-
 std::istream& hismatova::operator>>(std::istream& in, hismatova::ComplexIO&& data)
 {
   std::istream::sentry sen(in);
@@ -116,7 +105,7 @@ std::istream& hismatova::operator>>(std::istream& in, hismatova::DataStruct& dat
       in >> hismatova::CharIO{':'} >> keys[i];
       if (keys[i] == "key1")
       {
-        in >> hismatova::NumberIO{inp.key1};
+        in >> hismatova::ULLIO{inp.key1};
       }
       else if (keys[i] == "key2")
       {
