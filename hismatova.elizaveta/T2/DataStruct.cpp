@@ -3,21 +3,14 @@
 #include <vector>
 #include <ios>
 
-class StreamGuard
+hismatova::StreamGuard::StreamGuard(std::ostream& stream):
+  stream_(stream),
+  flags_(stream.flags())
+{}
+hismatova::StreamGuard::~StreamGuard()
 {
-public:
-  explicit StreamGuard(std::ostream& stream):
-    stream_(stream),
-    flags_(stream.flags())
-  {}
-  ~StreamGuard()
-  {
-    stream_.flags(flags_);
-  }
-private:
-  std::ostream& stream_;
-  std::ios::fmtflags flags_;
-};
+  stream_.flags(flags_);
+}
 
 std::istream& hismatova::operator>>(std::istream& in, hismatova::CharIO&& data)
 {
@@ -37,9 +30,13 @@ std::istream& hismatova::operator>>(std::istream& in, hismatova::CharIO&& data)
 
 std::istream& hismatova::operator>>(std::istream& in, hismatova::ULLIO&& data)
 {
-  (void)data;
   std::istream::sentry sen(in);
   if (!sen)
+  {
+    return in;
+  }
+  in >> data.ref;
+  if (!in)
   {
     return in;
   }
@@ -145,7 +142,7 @@ std::istream& hismatova::operator>>(std::istream& in, hismatova::DataStruct& dat
 
 std::ostream& hismatova::operator<<(std::ostream& out, const hismatova::DataStruct& data)
 {
-  StreamGuard guard(out);
+  hismatova::StreamGuard guard(out);
   out << std::fixed << std::setprecision(1);
   auto& k1 = data.key1;
   auto r = data.key2.real();

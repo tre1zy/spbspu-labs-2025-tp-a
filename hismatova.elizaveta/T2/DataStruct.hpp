@@ -26,13 +26,9 @@ namespace hismatova
   std::istream& operator>>(std::istream& in, CharIO&& data);
   struct ULLIO
   {
-  };
-  std::istream& operator>>(std::istream& in, ULLIO&& data);
-  struct NumberIO
-  {
     unsigned long long& ref;
   };
-  std::istream& operator>>(std::istream& in, NumberIO&& data);
+  std::istream& operator>>(std::istream& in, ULLIO&& data);
   struct ComplexIO
   {
     std::complex< double >& ref;
@@ -43,6 +39,15 @@ namespace hismatova
     std::string& ref;
   };
   std::istream& operator>>(std::istream& in, StringIO&& data);
+  class StreamGuard
+  {
+  public:
+    explicit StreamGuard(std::ostream& stream);
+    ~StreamGuard();
+  private:
+    std::ostream& stream_;
+    std::ios::fmtflags flags_;
+  };
 }
 
 #endif
