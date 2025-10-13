@@ -37,6 +37,7 @@ std::istream& hismatova::operator>>(std::istream& in, hismatova::CharIO&& data)
 
 std::istream& hismatova::operator>>(std::istream& in, hismatova::ULLIO&& data)
 {
+  (void)data;
   std::istream::sentry sen(in);
   if (!sen)
   {
@@ -145,11 +146,11 @@ std::istream& hismatova::operator>>(std::istream& in, hismatova::DataStruct& dat
 std::ostream& hismatova::operator<<(std::ostream& out, const hismatova::DataStruct& data)
 {
   StreamGuard guard(out);
-  const char* p1 = "(:key1 ";
-  const char* p2 = "ull:key2 #c ";
-  const char* suf = "):key3 \"";
-  const char* end = "\":)";
-  auto fix1 = std::fixed << std::setprecision(1);
-  out << p1 << data.key1 << p2 << fix1 << data.key2.real() << " " << data.key2.imag() << suf << data.key3 << end;
+  out << std::fixed << std::setprecision(1);
+  auto& k1 = data.key1;
+  auto r = data.key2.real();
+  auto i = data.key2.imag();
+  auto& k3 = data.key3;
+  out << "(:key1 " << k1 << "ull:key2 #c(" << r << " " << i << "):key3 \"" << k3 << "\":)";
   return out;
 }
