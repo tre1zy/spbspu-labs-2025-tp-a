@@ -41,7 +41,7 @@ int main()
   std::string command;
   std::cout.setf(std::ios::fixed, std::ios::floatfield);
   std::cout.precision(4);
-  
+
   while (!(std::cin >> command).eof())
   {
     try
